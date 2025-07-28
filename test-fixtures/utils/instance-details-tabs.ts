@@ -174,7 +174,6 @@ export const TestMetricsTab = async (instanceDetailsPage: InstanceDetailsPage, i
   await page.getByTestId(dataTestIds.tabs.metricsTab).click();
 
   if (instance.status === "RUNNING") {
-    await instanceDetailsPage.waitForMetricsData();
     await expect(page.getByTestId(dataTestIds.metrics.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.cpuUsageCard)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.loadAverageCard)).toBeVisible();
