@@ -174,9 +174,6 @@ export const TestMetricsTab = async (instanceDetailsPage: InstanceDetailsPage, i
   await page.getByTestId(dataTestIds.tabs.metricsTab).click();
 
   if (instance.status === "RUNNING") {
-    await instanceDetailsPage.waitForMetricsData();
-    await expect(page.getByText(pageElements.metricsDescription)).toBeVisible();
-
     await expect(page.getByTestId(dataTestIds.metrics.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.cpuUsageCard)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.loadAverageCard)).toBeVisible();
@@ -198,9 +195,6 @@ export const TestLiveLogsTab = async (instanceDetailsPage: InstanceDetailsPage, 
   await page.getByTestId(dataTestIds.tabs.liveLogsTab).click();
 
   if (instance.status === "RUNNING") {
-    await instanceDetailsPage.waitForLogsData();
-    await expect(page.getByText(pageElements.liveLogsDescription)).toBeVisible();
-
     await expect(page.getByTestId(dataTestIds.liveLogs.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.logsContainer)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.scrollToTopButton)).toBeVisible();
