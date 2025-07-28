@@ -365,8 +365,6 @@ const CloudAccountForm = ({
                     formData.setFieldTouched("subscriptionId", false);
                     formData.setFieldTouched("cloudProvider", false);
                   }}
-                  serviceSubscriptions={subscriptions.filter((subscription) => subscription.serviceId === serviceId)}
-                  instances={allInstances}
                   subscriptionInstancesNumHash={subscriptionInstanceCountHash}
                 />
               ),

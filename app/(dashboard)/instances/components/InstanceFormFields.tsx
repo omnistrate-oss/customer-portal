@@ -129,7 +129,6 @@ export const getStandardInformationFields = (
           servicePlans={Object.values(serviceOfferingsObj[serviceId] || {}).sort((a: any, b: any) =>
             a.productTierName.localeCompare(b.productTierName)
           )}
-          serviceSubscriptions={subscriptions.filter((subscription) => subscription.serviceId === serviceId)}
           name="servicePlanId"
           formData={formData}
           disabled={formMode !== "create"}
@@ -169,7 +168,6 @@ export const getStandardInformationFields = (
             setFieldTouched("resourceId", false);
           }}
           subscriptionInstancesNumHash={subscriptionInstanceCountHash}
-          instances={instances}
         />
       ),
       previewValue: offering?.productTierName,

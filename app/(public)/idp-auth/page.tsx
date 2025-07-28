@@ -1,16 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 import { Stack } from "@mui/material";
 import { Buffer } from "buffer";
 import Cookies from "js-cookie";
 
 import { customerSignInWithIdentityProvider } from "src/api/customer-user";
 import axios from "src/axios";
-import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
+import checkRouteValidity from "src/utils/route/checkRouteValidity";
 import { getInstancesRoute } from "src/utils/routes";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
@@ -41,16 +42,16 @@ const IDPAuthPage = () => {
           } catch (error) {
             console.warn("Failed to set SSO state:", error);
           }
+          const decodedDestination = decodeURIComponent(destination);
 
           // Redirect to the Destination URL
-          if (destination && PAGE_TITLE_MAP[destination]) {
-            router.replace(decodeURIComponent(destination));
+          if (destination && checkRouteValidity(decodedDestination)) {
+            router.replace(decodedDestination, {}, { showProgressBar: true });
           } else {
-            router.replace(getInstancesRoute());
+            router.replace(getInstancesRoute(), {}, { showProgressBar: true });
           }
         }
       } catch (error) {
-        
         isAPICallInprogress.current = false;
         sessionStorage.removeItem("authState");
         if (error.response && error.response.status === 409) {

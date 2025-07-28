@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowOutward } from "@mui/icons-material";
 import { Box } from "@mui/material";
@@ -12,12 +12,10 @@ import { $api } from "src/api/query";
 import { getSubscriptionRequest } from "src/api/subscriptionRequests";
 import { getSubscription } from "src/api/subscriptions";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
-import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
-import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
@@ -39,7 +37,6 @@ const SubscriptionPlanCard = ({
   disabled,
   disabledMessage,
   isPlanSelectionDisabled,
-  disabledReasonText,
 }) => {
   const rootSubscription = subscriptions.find((sub) => sub.roleType === "root");
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -128,15 +125,6 @@ const SubscriptionPlanCard = ({
           </Button>
         )}
       </div>
-
-      {disabledReasonText && (
-        <div className="mt-2 mb-1 flex items-center gap-2">
-          <AlertTriangle height="15px" width="15px" color="#DC6803" style={{ flexShrink: 0 }} />
-          <Text weight="medium" size="xsmall" color="#DC6803">
-            {disabledReasonText}
-          </Text>
-        </div>
-      )}
     </div>
   );
 
@@ -169,23 +157,19 @@ const SubscriptionPlanCard = ({
 
 type SubscriptionPlanRadioProps = {
   servicePlans: ServiceOffering[];
-  serviceSubscriptions: Subscription[];
   formData: any;
   name: string;
   onChange?: (servicePlanId?: string, subscriptionId?: string) => void;
   disabled?: boolean;
-  instances: ResourceInstance[];
   subscriptionInstancesNumHash: Record<string, number>;
 };
 
 const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
   servicePlans,
-  serviceSubscriptions,
   name,
   formData,
   onChange = () => {},
   disabled,
-  instances,
   subscriptionInstancesNumHash,
 }) => {
   const environmentType = useEnvironmentType();
@@ -208,16 +192,6 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
   const createSubscriptionMutation = $api.useMutation("post", "/2022-09-01-00/subscription");
   const createSubscriptionRequestMutation = $api.useMutation("post", "/2022-09-01-00/subscription/request");
 
-  const subscriptionInstanceCountHash: Record<string, number> = useMemo(() => {
-    const res: Record<string, number> = {};
-    instances.forEach((instance) => {
-      if (instance.subscriptionId) {
-        res[instance.subscriptionId] = (res[instance.subscriptionId] || 0) + 1;
-      }
-    });
-    return res;
-  }, [instances]);
-
   if (!servicePlans.length) {
     return (
       <div className="flex items-center justify-center h-10">
@@ -234,25 +208,6 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
         // When disabled, show only the Selected Service Plan. This is in case of Modify Instance
         .filter((el) => (disabled ? el.productTierID === servicePlanId : true))
         .map((plan) => {
-          const subscriptionForPlan = serviceSubscriptions.filter((el) => el.productTierId === plan.productTierID);
-          const editorAndRootSubscriptions = subscriptionForPlan.filter((subscription) =>
-            ["root", "editor"].includes(subscription.roleType)
-          );
-
-          const isPlanBlocked = editorAndRootSubscriptions.every((subscription) => {
-            const limit = subscription.maxNumberOfInstances ?? plan.maxNumberOfInstances ?? Infinity;
-            const isPaymentIssue =
-              !subscription.paymentMethodConfigured &&
-              !(subscription.allowCreatesWhenPaymentNotConfigured ?? plan.allowCreatesWhenPaymentNotConfigured);
-            return (subscriptionInstanceCountHash[subscription.id] ?? 0) >= limit || isPaymentIssue;
-          });
-
-          let servicePlanDisabledText: ReactNode = "";
-
-          if (editorAndRootSubscriptions.length && isPlanBlocked) {
-            servicePlanDisabledText = "No usable subscriptions available for this plan";
-          }
-
           return (
             <Box key={plan.productTierID} id="plan-card-container">
               <SubscriptionPlanCard
@@ -332,7 +287,6 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
                 disabled={disabled || plan.serviceModelStatus !== "READY"}
                 disabledMessage={plan.serviceModelStatus !== "READY" ? "Product not available at the moment" : ""}
                 isPlanSelectionDisabled={disabled || plan.serviceModelStatus !== "READY"}
-                disabledReasonText={servicePlanDisabledText}
               />
             </Box>
           );

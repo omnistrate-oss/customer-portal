@@ -13,14 +13,12 @@ import SearchInput from "src/components/DataGrid/SearchInput";
 import FieldTitle from "src/components/FormElementsv2/FieldTitle/FieldTitle";
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
-import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import JobCompleted from "src/components/JobResource/JobCompleted";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import Switch from "src/components/Switch/Switch";
 
 import useSnackbar from "../../../hooks/useSnackbar";
 import Card from "../../Card/Card";
-import Divider from "../../Divider/Divider";
 import Tooltip from "../../Tooltip/Tooltip";
 import { Text } from "../../Typography/Typography";
 import DataUnavailableMessage from "../DataUnavailableMessage";
@@ -338,13 +336,8 @@ function Logs(props) {
           gap="20px"
           flexWrap="wrap"
         >
-          <DataGridHeaderTitle title={`Logs`} desc="Detailed logs for monitoring and troubleshooting" />
-
           {nodes?.length > 0 && (
             <Box sx={{ minWidth: "200px" }}>
-              <Text size="small" weight="medium" color="#344054" sx={{ marginBottom: "4px", display: "block" }}>
-                Node ID
-              </Text>
               <Select
                 data-testid={dataTestIds.liveLogs.nodeIdMenu}
                 value={selectedNode}
@@ -371,39 +364,30 @@ function Logs(props) {
               </Select>
             </Box>
           )}
-        </Stack>
-        <Stack
-          direction="row"
-          justifyContent="end"
-          alignItems="center"
-          p="12px 24px"
-          borderBottom="1px solid #EAECF0"
-          gap="20px"
-          flexWrap="wrap"
-        >
-          <SearchInput
-            placeholder="Search logs..."
-            searchText={searchText}
-            setSearchText={setSearchText}
-            width="250px"
-          />
-
-          <Stack direction="row" gap="6px" alignItems="center">
-            <FieldTitle>Syntax Highlight</FieldTitle>
-            <Switch
-              checked={enableSyntaxHighlighting}
-              onChange={(e) => setEnableSyntaxHighlighting(e.target.checked)}
-              size="small"
+          <Stack direction="row" justifyContent="end" alignItems="center" gap="20px" flexWrap="wrap">
+            <SearchInput
+              placeholder="Search logs..."
+              searchText={searchText}
+              setSearchText={setSearchText}
+              width="250px"
             />
-          </Stack>
 
-          {/* <Stack direction="row" gap="6px" alignItems="center">
+            <Stack direction="row" gap="6px" alignItems="center">
+              <FieldTitle>Syntax Highlight</FieldTitle>
+              <Switch
+                checked={enableSyntaxHighlighting}
+                onChange={(e) => setEnableSyntaxHighlighting(e.target.checked)}
+                size="small"
+              />
+            </Stack>
+
+            {/* <Stack direction="row" gap="6px" alignItems="center">
             <FieldTitle>Log Order</FieldTitle>
             <Switch checked={invertLogOrder} onChange={(e) => setInvertLogOrder(e.target.checked)} size="small" />
           </Stack> */}
+          </Stack>
         </Stack>
       </Box>
-      <Divider sx={{ marginTop: "12px" }} />
       {instanceStatus === "COMPLETE" && selectedNode?.isJob === true ? (
         <JobCompleted />
       ) : (

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC } from "react";
 import { Stack, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 
@@ -24,7 +24,6 @@ type EmailStepProps = {
 const EmailStep: FC<EmailStepProps> = (props) => {
   const { setCurrentStep, formData, setShouldRememberLoginDetails, shouldRememberLoginDetails } = props;
   const { setEmail } = useLastLoginDetails();
-  
 
   function handleNextClick() {
     formData.validateForm().then((errors) => {
@@ -61,6 +60,12 @@ const EmailStep: FC<EmailStepProps> = (props) => {
           value={formData.values.email}
           onChange={formData.handleChange}
           onBlur={formData.handleBlur}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleNextClick();
+            }
+          }}
           error={formData.touched.email && formData.errors.email}
           helperText={formData.touched.email && formData.errors.email}
         />

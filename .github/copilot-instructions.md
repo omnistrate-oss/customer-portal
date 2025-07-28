@@ -523,6 +523,27 @@ const UserProfile = ({ user }) => {
 - Ensure marketing claims are clear, accurate, and not misleading
 - Check for inclusive language and avoid jargon that may exclude audiences
 
+#### Brand Name Restrictions
+
+- **Flag "Omnistrate" in User-Facing Content**: The word "Omnistrate" should never appear in user-facing UI text, error messages, marketing copy, or any content visible to end users
+- **Acceptable Usage**: "Omnistrate" is only acceptable in:
+  - Code comments for internal documentation
+  - Configuration files and environment variables
+  - Internal API endpoints and service names
+  - Developer documentation and README files
+  - File paths and directory names
+- **User-Facing Alternatives**: Use generic terms like "platform", "SaaS Builder", "the application", or context-appropriate alternatives
+
+```jsx
+// ❌ Flag this - "Omnistrate" visible to users
+<h1>Welcome to Omnistrate SaaS Builder</h1>
+<p>Omnistrate helps you build SaaS products</p>
+
+// ✅ Suggest this instead
+<h1>Welcome to SaaS Builder</h1>
+<p>Our platform helps you build SaaS products</p>
+```
+
 #### Deprecated Terms (Flag for Replacement)
 
 | Deprecated Term       | Correct Term               |

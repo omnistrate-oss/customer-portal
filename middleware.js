@@ -17,11 +17,13 @@ export async function middleware(request) {
 
   const redirectToSignIn = () => {
     const path = request.nextUrl.pathname;
+    const search = request.nextUrl.search || "";
 
     // Prevent Redirecting to the Same Page
     if (path.startsWith("/signin")) return;
+    const destination = path?.startsWith("/") ? path : "";
 
-    const redirectPath = "/signin";
+    const redirectPath = destination ? `/signin?destination=${encodeURIComponent(destination + search)}` : "/signin";
 
     const response = NextResponse.redirect(new URL(redirectPath, request.url));
     response.headers.set(`x-middleware-cache`, `no-cache`);

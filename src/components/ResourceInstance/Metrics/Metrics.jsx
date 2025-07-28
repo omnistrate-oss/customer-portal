@@ -5,7 +5,6 @@ import useWebSocket from "react-use-websocket";
 
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
-import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import JobCompleted from "src/components/JobResource/JobCompleted";
 
 import useSnackbar from "../../../hooks/useSnackbar";
@@ -754,20 +753,8 @@ function Metrics(props) {
         }}
         alignItems="center"
       >
-        <DataGridHeaderTitle
-          title={`Metrics`}
-          desc="Metrics for monitoring and performance insights"
-          count={instanceStatus !== "COMPLETE" && selectedNode?.isJob !== true ? 10 + customMetrics?.length : 0}
-          units={{
-            singular: "Metric",
-            plural: "Metrics",
-          }}
-        />
         {nodes?.length > 0 && (
           <Box>
-            <Text size="small" weight="medium" color="#344054" ml="5px">
-              Node ID
-            </Text>
             <Select
               data-testid="node-id-menu"
               value={selectedNode}

@@ -22,6 +22,7 @@ import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
 import { getIdentityProviderButtonLabel } from "../utils";
 
 import PasswordLoginFields from "./PasswordLoginFields";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 
 const LogoImg = styled("img")({
   height: "24px",
@@ -52,7 +53,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     isReCaptchaSetup,
     isRecaptchaScriptLoaded,
   } = props;
-
+  const { orgName } = useProviderOrgDetails();
   const searchParams = useSearchParams();
   const org = searchParams?.get("org");
   const orgUrl = searchParams?.get("orgUrl");
@@ -468,7 +469,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
           )}
           {environmentType === "PROD" && allowPasswordLogin && (
             <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center" }}>
-              New to Omnistrate?{" "}
+              New {orgName ? "to " + orgName : "here"}?{" "}
               <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
                 Sign Up{" "}
               </Link>
