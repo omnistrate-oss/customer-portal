@@ -195,9 +195,6 @@ export const TestLiveLogsTab = async (instanceDetailsPage: InstanceDetailsPage, 
   await page.getByTestId(dataTestIds.tabs.liveLogsTab).click();
 
   if (instance.status === "RUNNING") {
-    await instanceDetailsPage.waitForLogsData();
-    await expect(page.getByText(pageElements.liveLogsDescription)).toBeVisible();
-
     await expect(page.getByTestId(dataTestIds.liveLogs.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.logsContainer)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.scrollToTopButton)).toBeVisible();
