@@ -35,7 +35,9 @@ const EndpointLine = ({ isPrimary, openPort, endpointURL, mt = "0px" }) => {
   }
 
   // Append port to URL if it's not standard HTTP (80) or HTTPS (443) port
-  if (openPort && openPort !== 80 && openPort !== 443 && !hasProtocol) {
+  // and the URL doesn't already contain a port
+  const urlAlreadyHasPort = urlWithProtocol.includes(":") && !hasProtocol;
+  if (openPort && openPort !== 80 && openPort !== 443 && !hasProtocol && !urlAlreadyHasPort) {
     urlWithProtocol = `${urlWithProtocol}:${openPort}`;
   }
 
