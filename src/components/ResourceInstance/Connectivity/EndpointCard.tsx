@@ -20,11 +20,26 @@ type EndpointCardProps = {
 
 const EndpointLine = ({ isPrimary, openPort, endpointURL, mt = "0px" }) => {
   const portEndpoint = { 443: "https://", 80: "http://" };
-  const urlWithProtocol = endpointURL.includes("http")
-    ? endpointURL
-    : portEndpoint[openPort]
-      ? `${portEndpoint[openPort]}${endpointURL}`
-      : endpointURL;
+
+  // Determine the full URL with appropriate protocol
+  let urlWithProtocol = endpointURL;
+
+  // If URL already has a protocol, use it as-is
+  const hasProtocol = endpointURL.startsWith("http:") || endpointURL.startsWith("https:");
+  if (hasProtocol) {
+    urlWithProtocol = endpointURL;
+  } else {
+    // Add appropriate protocol based on port number (if available)
+    const protocolPrefix = portEndpoint[openPort];
+    urlWithProtocol = protocolPrefix ? `${protocolPrefix}${endpointURL}` : endpointURL;
+  }
+
+  // Append port to URL if it's not standard HTTP (80) or HTTPS (443) port
+  // and the URL doesn't already contain a port
+  const urlAlreadyHasPort = urlWithProtocol.includes(":") && !hasProtocol;
+  if (openPort && openPort !== 80 && openPort !== 443 && !hasProtocol && !urlAlreadyHasPort) {
+    urlWithProtocol = `${urlWithProtocol}:${openPort}`;
+  }
 
   return (
     <Stack direction="row" gap="6px" alignItems="center" mt={mt}>
@@ -36,7 +51,6 @@ const EndpointLine = ({ isPrimary, openPort, endpointURL, mt = "0px" }) => {
         ) : (
           <span>{urlWithProtocol}</span>
         )}
-        {openPort && !portEndpoint[openPort] && <span>:{openPort}</span>}
       </Text>
 
       <CopyButton
