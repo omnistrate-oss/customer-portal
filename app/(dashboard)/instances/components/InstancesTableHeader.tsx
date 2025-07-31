@@ -203,12 +203,12 @@ const InstancesTableHeader = ({
       dataTestId: "modify-button",
       label: "Modify",
       actionType: "secondary",
-      isDisabled: false,
-      //   !selectedInstance ||
-      //   (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
-      //   status === "DISCONNECTED" ||
-      //   isProxyResource ||
-      //   !isUpdateAllowedByRBAC,
+      isDisabled:
+        !selectedInstance ||
+        (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
+        status === "DISCONNECTED" ||
+        isProxyResource ||
+        !isUpdateAllowedByRBAC,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         setOverlayType("modify-instance-form");
