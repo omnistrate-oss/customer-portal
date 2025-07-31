@@ -19867,7 +19867,7 @@ export interface components {
         DisableProductTierFeatureRequest: {
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature: string;
             /**
@@ -20119,7 +20119,7 @@ export interface components {
             };
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature: string;
             /**
@@ -34781,7 +34781,7 @@ export interface components {
             };
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature?: string;
             /**
