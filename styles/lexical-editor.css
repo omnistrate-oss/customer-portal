@@ -1,0 +1,519 @@
+/* Lexical Rich Text Editor Styles */
+
+/* Text wrapping utility class */
+.text-wrap-fix {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.lexical-editor-container {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    ".SFNSText-Regular",
+    "San Francisco",
+    "Roboto",
+    "Segoe UI",
+    "Helvetica Neue",
+    helvetica,
+    arial,
+    sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.editor-shell {
+  background: #fff;
+  border-radius: 4px;
+}
+
+.editor-container {
+  position: relative;
+  background: #fff;
+  border-radius: 0 0 4px 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: auto;
+}
+
+.editor-input {
+  min-height: 150px;
+  padding: 10px;
+  outline: none;
+  color: #000;
+  position: relative;
+  tab-size: 1;
+  text-align: start;
+  font-size: 14px;
+  line-height: 1.5;
+  width: 100%;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  /* iOS specific fixes */
+  -webkit-text-size-adjust: 100%;
+  -webkit-overflow-scrolling: touch;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+}
+
+.editor-placeholder {
+  color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  user-select: none;
+  white-space: nowrap;
+  display: inline-block;
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.editor-paragraph {
+  margin: 0;
+  margin-bottom: 8px;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.editor-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.editor-text-left {
+  text-align: left;
+}
+
+.editor-text-center {
+  text-align: center;
+}
+
+.editor-text-right {
+  text-align: right;
+}
+
+.editor-text-justify {
+  text-align: justify;
+}
+
+.editor-quote {
+  margin: 0;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  padding-left: 16px;
+  border-left: 4px solid #ccc;
+  font-style: italic;
+}
+
+/* Common heading styles */
+.editor-heading-h1,
+.editor-heading-h2,
+.editor-heading-h3 {
+  color: rgb(5, 5, 5);
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.editor-heading-h1 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.editor-heading-h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.editor-heading-h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+/* Common alignment classes for all headings and paragraphs */
+.editor-heading-h1.editor-text-center,
+.editor-heading-h2.editor-text-center,
+.editor-heading-h3.editor-text-center,
+.editor-paragraph.editor-text-center {
+  text-align: center;
+}
+
+.editor-heading-h1.editor-text-right,
+.editor-heading-h2.editor-text-right,
+.editor-heading-h3.editor-text-right,
+.editor-paragraph.editor-text-right {
+  text-align: right;
+}
+
+.editor-heading-h1.editor-text-justify,
+.editor-heading-h2.editor-text-justify,
+.editor-heading-h3.editor-text-justify,
+.editor-paragraph.editor-text-justify {
+  text-align: justify;
+}
+
+.editor-heading-h4 {
+  font-size: 16px;
+  color: rgb(5, 5, 5);
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.editor-heading-h5 {
+  font-size: 14px;
+  color: rgb(5, 5, 5);
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.editor-heading-h6 {
+  font-size: 12px;
+  color: rgb(5, 5, 5);
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.editor-text-bold {
+  font-weight: bold;
+}
+
+.editor-text-italic {
+  font-style: italic;
+}
+
+.editor-text-underline {
+  text-decoration: underline;
+}
+
+.editor-text-strikethrough {
+  text-decoration: line-through;
+}
+
+.editor-text-underlineStrikethrough {
+  text-decoration: underline line-through;
+}
+
+.editor-text-code {
+  background-color: rgb(240, 242, 245);
+  padding: 1px 0.25rem;
+  font-family: Menlo, Consolas, Monaco, monospace;
+  font-size: 94%;
+  border-radius: 3px;
+}
+
+.editor-link {
+  color: rgb(33, 111, 219);
+  text-decoration: none;
+}
+
+.editor-link:hover {
+  text-decoration: underline;
+}
+
+.editor-code {
+  background-color: rgb(240, 242, 245);
+  font-family: Menlo, Consolas, Monaco, monospace;
+  display: block;
+  padding: 8px 8px 8px 52px;
+  line-height: 1.53;
+  font-size: 13px;
+  margin: 0;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  tab-size: 2;
+  overflow-x: auto;
+  position: relative;
+  border-radius: 4px;
+}
+
+.editor-code:before {
+  content: attr(data-gutter);
+  position: absolute;
+  background-color: #eee;
+  left: 0;
+  top: 0;
+  border-right: 1px solid #ccc;
+  padding: 8px;
+  color: #777;
+  white-space: pre-wrap;
+  text-align: right;
+  min-width: 25px;
+}
+
+.editor-list-ol {
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+}
+
+.editor-list-ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+}
+
+.editor-listitem {
+  margin: 8px 32px 8px 32px;
+}
+
+.editor-nested-listitem {
+  list-style-type: none;
+}
+
+.editor-nested-listitem:before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #777;
+  border-radius: 50%;
+}
+
+.editor-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+  border-radius: 4px;
+}
+
+/* Toolbar styles */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f5f5f5;
+  border-radius: 4px 4px 0 0;
+  gap: 4px;
+  flex-wrap: wrap;
+  /* Prevent focus-related scrolling */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.toolbar button {
+  border: none;
+  background: none;
+  border-radius: 4px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  /* Prevent scroll-to-top on button interactions */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.toolbar button:hover {
+  background-color: #e0e0e0;
+}
+
+.toolbar button.active {
+  background-color: #1976d2;
+  color: white;
+}
+
+.toolbar button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-divider {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 8px;
+  height: 24px;
+}
+
+/* Token highlighting for code blocks */
+.editor-tokenComment {
+  color: slategray;
+}
+
+.editor-tokenPunctuation {
+  color: #999;
+}
+
+.editor-tokenProperty {
+  color: #905;
+}
+
+.editor-tokenSelector {
+  color: #690;
+}
+
+.editor-tokenOperator {
+  color: #9a6e3a;
+}
+
+.editor-tokenAttr {
+  color: #07a;
+}
+
+.editor-tokenVariable {
+  color: #e90;
+}
+
+.editor-tokenFunction {
+  color: #dd4a68;
+}
+
+/* Focus styles */
+.editor-input:focus {
+  outline: none;
+  border: none;
+}
+
+.editor-input:focus-visible {
+  outline: none;
+}
+
+/* Prevent toolbar buttons from stealing focus */
+.toolbar button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.toolbar button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure proper selection visibility */
+.editor-input ::selection {
+  background-color: #b3d4fc;
+}
+
+.editor-input ::-moz-selection {
+  background-color: #b3d4fc;
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+  .toolbar button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+  }
+
+  .toolbar .MuiSelect-root {
+    min-height: 44px;
+  }
+}
+
+/* Prevent text selection in toolbar */
+.toolbar {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Read-only styles */
+.lexical-editor-container[data-readonly="true"] .toolbar {
+  display: none;
+}
+
+.lexical-editor-container[data-readonly="true"] {
+  border: 1px solid #e0e0e0;
+}
+
+.lexical-editor-container[data-readonly="true"] .editor-input {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .editor-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* iOS specific fixes for text wrapping and display */
+@supports (-webkit-touch-callout: none) {
+  .editor-input {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Apply text wrapping fixes to all editor elements */
+  .editor-input,
+  .editor-paragraph,
+  .editor-heading-h1,
+  .editor-heading-h2,
+  .editor-heading-h3,
+  .editor-heading-h4,
+  .editor-heading-h5,
+  .editor-heading-h6 {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: pre-wrap !important;
+  }
+}
+
+/* Additional mobile fixes */
+@media screen and (max-device-width: 768px) {
+  .editor-input {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    line-height: 1.4;
+  }
+
+  .lexical-editor-container {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure all text elements wrap on mobile using utility patterns */
+  .editor-input *,
+  .editor-paragraph,
+  .editor-heading-h1,
+  .editor-heading-h2,
+  .editor-heading-h3 {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: pre-wrap !important;
+  }
+}
