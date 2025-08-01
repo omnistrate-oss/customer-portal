@@ -8,7 +8,7 @@ import { AvailabilityZone } from "src/types/availabilityZone";
 import { CloudProvider, FormMode } from "src/types/common/enums";
 import { CustomNetwork } from "src/types/customNetwork";
 import { ResourceInstance } from "src/types/resourceInstance";
-import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
+import { APIEntity, ServiceOffering, TierVersionSet } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
@@ -37,7 +37,8 @@ export const getStandardInformationFields = (
   formMode: FormMode,
   customAvailabilityZones: AvailabilityZone[],
   isFetchingCustomAvailabilityZones: boolean,
-  instances: ResourceInstance[]
+  instances: ResourceInstance[],
+  versionSets : TierVersionSet[]
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -57,6 +58,11 @@ export const getStandardInformationFields = (
 
   const serviceMenuItems = getServiceMenuItems(serviceOfferings);
   const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
+
+  //@ts-ignore
+  const allowCustomerVersionOverride = Boolean(offering?.allowCustomerVersionOverride)
+
+  console.log("Offering", offering)
 
   const subscriptionMenuItems = subscriptions.filter((sub) => sub.productTierId === servicePlanId);
 

@@ -33,6 +33,7 @@ import {
   getNetworkConfigurationFields,
   getStandardInformationFields,
 } from "./InstanceFormFields";
+import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 
 const InstanceForm = ({
   formMode,
@@ -320,6 +321,20 @@ const InstanceForm = ({
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
+  //fetch product tier versions
+  const { data: customerVersionSets = [], isFetching: isFetchingCustomerVersionSets } = useCustomerVersionSets(
+    {
+      serviceId: values.serviceId,
+      productTierId: values.servicePlanId,
+    },
+    {
+      //@ts-ignore
+      enabled: Boolean(offering?.allowCustomerVersionOverride),
+    }
+  );
+
+  console.log("customerVersionSets", customerVersionSets);
+
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,
     resourceId: selectedInstance?.resourceID || values.resourceId,
@@ -427,7 +442,8 @@ const InstanceForm = ({
       formMode,
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      customerVersionSets
     );
   }, [formMode, formData.values, resourceSchema, customAvailabilityZones, subscriptions, nonCloudAccountInstances]);
 
