@@ -24,7 +24,6 @@ import PreviewCard from "components/DynamicForm/PreviewCard";
 import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
-import * as Yup from "yup";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { getInitialValues } from "../utils";
 
@@ -348,30 +347,24 @@ const InstanceForm = ({
     inputParams.forEach((param) => {
       if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
         // Only add regex validation if regex is defined and not empty
-        // @ts-ignore - regex property exists but not in type definition
         if (param.regex && param.regex.trim()) {
           // Test if the regex pattern is valid before adding validation
           let isValidRegex = false;
           try {
-            // @ts-ignore - regex property exists but not in type definition
             new RegExp(param.regex);
             isValidRegex = true;
           } catch (error) {
-            // @ts-ignore - regex property exists but not in type definition
             console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
             isValidRegex = false;
           }
 
           if (isValidRegex) {
-            const fieldValidation = Yup.string().test(
-              "regex-validation",
-              // @ts-ignore - regex property exists but not in type definition
-              `Value does not match the required pattern: ${param.regex}`,
-              function (value) {
+            const fieldValidation = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
                 if (!value) return true; // Empty values handled by required validation
 
-                // @ts-ignore - regex property exists but not in type definition
-                const regex = new RegExp(param.regex);
+                const regex = new RegExp(param.regex as string);
 
                 // Handle array values (for multi-select fields)
                 if (Array.isArray(value)) {
@@ -381,8 +374,7 @@ const InstanceForm = ({
 
                 // Handle single values
                 return regex.test(value);
-              }
-            );
+              });
 
             requestParamsValidation[param.key] = fieldValidation;
           }
@@ -390,7 +382,7 @@ const InstanceForm = ({
       }
     });
 
-    return Yup.object().shape(requestParamsValidation);
+    return yup.object().shape(requestParamsValidation);
   }, [resourceSchemaData]);
 
   const requestParamsModifyValidationSchema = useMemo(() => {
@@ -406,30 +398,24 @@ const InstanceForm = ({
         ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())
       ) {
         // Only add regex validation if regex is defined and not empty
-        // @ts-ignore - regex property exists but not in type definition
         if (param.regex && param.regex.trim()) {
           // Test if the regex pattern is valid before adding validation
           let isValidRegex = false;
           try {
-            // @ts-ignore - regex property exists but not in type definition
             new RegExp(param.regex);
             isValidRegex = true;
           } catch (error) {
-            // @ts-ignore - regex property exists but not in type definition
             console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
             isValidRegex = false;
           }
 
           if (isValidRegex) {
-            const fieldValidation = Yup.string().test(
-              "regex-validation",
-              // @ts-ignore - regex property exists but not in type definition
-              `Value does not match the required pattern: ${param.regex}`,
-              function (value) {
+            const fieldValidation = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
                 if (!value) return true; // Empty values handled by required validation
 
-                // @ts-ignore - regex property exists but not in type definition
-                const regex = new RegExp(param.regex);
+                const regex = new RegExp(param.regex as string);
 
                 // Handle array values (for multi-select fields)
                 if (Array.isArray(value)) {
@@ -439,8 +425,7 @@ const InstanceForm = ({
 
                 // Handle single values
                 return regex.test(value);
-              }
-            );
+              });
 
             requestParamsValidation[param.key] = fieldValidation;
           }
@@ -448,7 +433,7 @@ const InstanceForm = ({
       }
     });
 
-    return Yup.object().shape(requestParamsValidation);
+    return yup.object().shape(requestParamsValidation);
   }, [resourceSchemaData]);
 
   // Update validation schema when requestParams validation changes
