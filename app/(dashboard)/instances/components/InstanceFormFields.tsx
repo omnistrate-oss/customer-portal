@@ -533,7 +533,7 @@ export const getDeploymentConfigurationFields = (
         name: `requestParams.${param.key}`,
         value: values.requestParams[param.key] || "",
         type: "multi-select-autocomplete",
-        menuItems: param.options.sort().map((option) => ({
+        menuItems: [...param.options].sort().map((option) => ({
           label: option,
           value: option,
         })),
