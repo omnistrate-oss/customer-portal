@@ -5,6 +5,7 @@ import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNe
 import { useFormik } from "formik";
 import { cloneDeep } from "lodash";
 import * as yup from "yup";
+import { AnySchema } from "yup";
 
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
@@ -342,7 +343,7 @@ const InstanceForm = ({
     const inputParams = resourceCreateSchema?.inputParameters || [];
 
     // Create validation rules for requestParams
-    const requestParamsValidation: Record<string, any> = {};
+    const requestParamsValidation: Record<string, AnySchema> = {};
 
     inputParams.forEach((param) => {
       if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
@@ -359,7 +360,7 @@ const InstanceForm = ({
           }
 
           if (isValidRegex) {
-            const fieldValidation = yup
+            let fieldValidation = yup
               .string()
               .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
                 if (!value) return true; // Empty values handled by required validation
@@ -376,6 +377,11 @@ const InstanceForm = ({
                 return regex.test(value);
               });
 
+            // Add nullable() if parameter has options
+            if (param.options) {
+              (fieldValidation as any) = fieldValidation.nullable();
+            }
+
             requestParamsValidation[param.key] = fieldValidation;
           }
         }
@@ -389,7 +395,7 @@ const InstanceForm = ({
     const inputParams = resourceModifySchema?.inputParameters || [];
 
     // Create validation rules for requestParams
-    const requestParamsValidation: Record<string, any> = {};
+    const requestParamsValidation: Record<string, AnySchema> = {};
 
     inputParams.forEach((param) => {
       if (
@@ -410,7 +416,7 @@ const InstanceForm = ({
           }
 
           if (isValidRegex) {
-            const fieldValidation = yup
+            let fieldValidation = yup
               .string()
               .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
                 if (!value) return true; // Empty values handled by required validation
@@ -426,6 +432,11 @@ const InstanceForm = ({
                 // Handle single values
                 return regex.test(value);
               });
+
+            // Add nullable() if parameter has options
+            if (param.options) {
+              (fieldValidation as any) = fieldValidation.nullable();
+            }
 
             requestParamsValidation[param.key] = fieldValidation;
           }
