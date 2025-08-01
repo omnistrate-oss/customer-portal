@@ -5,7 +5,7 @@ import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNe
 import { useFormik } from "formik";
 import { cloneDeep } from "lodash";
 import * as yup from "yup";
-import { AnySchema, StringSchema } from "yup";
+import { StringSchema } from "yup";
 
 type ValidationSchema = StringSchema<string | undefined> | StringSchema<string | null | undefined>;
 
