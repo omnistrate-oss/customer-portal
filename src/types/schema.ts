@@ -4511,7 +4511,6 @@ export interface components {
         /** @example {
          *       "Description": "Ensures high availability across multiple zones.",
          *       "IsManaged": true,
-         *       "Modifiable": true,
          *       "Name": "Prometheus",
          *       "Properties": {
          *         "Cupiditate rem.": "Saepe exercitationem ut doloribus ea sit.",
@@ -4530,11 +4529,6 @@ export interface components {
              * @example true
              */
             IsManaged?: boolean;
-            /**
-             * @description Whether the amenity can be modified.
-             * @example true
-             */
-            Modifiable?: boolean;
             /**
              * @description The name of the amenity.
              * @example Prometheus
@@ -12729,7 +12723,6 @@ export interface components {
          *         {
          *           "Description": "Ensures high availability across multiple zones.",
          *           "IsManaged": true,
-         *           "Modifiable": true,
          *           "Name": "Prometheus",
          *           "Properties": {
          *             "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12741,7 +12734,6 @@ export interface components {
          *         {
          *           "Description": "Ensures high availability across multiple zones.",
          *           "IsManaged": true,
-         *           "Modifiable": true,
          *           "Name": "Prometheus",
          *           "Properties": {
          *             "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12753,7 +12745,6 @@ export interface components {
          *         {
          *           "Description": "Ensures high availability across multiple zones.",
          *           "IsManaged": true,
-         *           "Modifiable": true,
          *           "Name": "Prometheus",
          *           "Properties": {
          *             "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12765,7 +12756,6 @@ export interface components {
          *         {
          *           "Description": "Ensures high availability across multiple zones.",
          *           "IsManaged": true,
-         *           "Modifiable": true,
          *           "Name": "Prometheus",
          *           "Properties": {
          *             "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12783,7 +12773,6 @@ export interface components {
              *       {
              *         "Description": "Ensures high availability across multiple zones.",
              *         "IsManaged": true,
-             *         "Modifiable": true,
              *         "Name": "Prometheus",
              *         "Properties": {
              *           "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12795,7 +12784,6 @@ export interface components {
              *       {
              *         "Description": "Ensures high availability across multiple zones.",
              *         "IsManaged": true,
-             *         "Modifiable": true,
              *         "Name": "Prometheus",
              *         "Properties": {
              *           "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12807,7 +12795,6 @@ export interface components {
              *       {
              *         "Description": "Ensures high availability across multiple zones.",
              *         "IsManaged": true,
-             *         "Modifiable": true,
              *         "Name": "Prometheus",
              *         "Properties": {
              *           "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12819,7 +12806,6 @@ export interface components {
              *       {
              *         "Description": "Ensures high availability across multiple zones.",
              *         "IsManaged": true,
-             *         "Modifiable": true,
              *         "Name": "Prometheus",
              *         "Properties": {
              *           "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12839,7 +12825,6 @@ export interface components {
          *             {
          *               "Description": "Ensures high availability across multiple zones.",
          *               "IsManaged": true,
-         *               "Modifiable": true,
          *               "Name": "Prometheus",
          *               "Properties": {
          *                 "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12851,7 +12836,6 @@ export interface components {
          *             {
          *               "Description": "Ensures high availability across multiple zones.",
          *               "IsManaged": true,
-         *               "Modifiable": true,
          *               "Name": "Prometheus",
          *               "Properties": {
          *                 "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12863,7 +12847,6 @@ export interface components {
          *             {
          *               "Description": "Ensures high availability across multiple zones.",
          *               "IsManaged": true,
-         *               "Modifiable": true,
          *               "Name": "Prometheus",
          *               "Properties": {
          *                 "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12875,7 +12858,6 @@ export interface components {
          *             {
          *               "Description": "Ensures high availability across multiple zones.",
          *               "IsManaged": true,
-         *               "Modifiable": true,
          *               "Name": "Prometheus",
          *               "Properties": {
          *                 "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12897,7 +12879,6 @@ export interface components {
              *           {
              *             "Description": "Ensures high availability across multiple zones.",
              *             "IsManaged": true,
-             *             "Modifiable": true,
              *             "Name": "Prometheus",
              *             "Properties": {
              *               "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12909,7 +12890,6 @@ export interface components {
              *           {
              *             "Description": "Ensures high availability across multiple zones.",
              *             "IsManaged": true,
-             *             "Modifiable": true,
              *             "Name": "Prometheus",
              *             "Properties": {
              *               "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12921,7 +12901,6 @@ export interface components {
              *           {
              *             "Description": "Ensures high availability across multiple zones.",
              *             "IsManaged": true,
-             *             "Modifiable": true,
              *             "Name": "Prometheus",
              *             "Properties": {
              *               "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -12933,7 +12912,6 @@ export interface components {
              *           {
              *             "Description": "Ensures high availability across multiple zones.",
              *             "IsManaged": true,
-             *             "Modifiable": true,
              *             "Name": "Prometheus",
              *             "Properties": {
              *               "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18060,7 +18038,6 @@ export interface components {
          *               {
          *                 "Description": "Ensures high availability across multiple zones.",
          *                 "IsManaged": true,
-         *                 "Modifiable": true,
          *                 "Name": "Prometheus",
          *                 "Properties": {
          *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18072,7 +18049,6 @@ export interface components {
          *               {
          *                 "Description": "Ensures high availability across multiple zones.",
          *                 "IsManaged": true,
-         *                 "Modifiable": true,
          *                 "Name": "Prometheus",
          *                 "Properties": {
          *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18084,7 +18060,6 @@ export interface components {
          *               {
          *                 "Description": "Ensures high availability across multiple zones.",
          *                 "IsManaged": true,
-         *                 "Modifiable": true,
          *                 "Name": "Prometheus",
          *                 "Properties": {
          *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18096,7 +18071,6 @@ export interface components {
          *               {
          *                 "Description": "Ensures high availability across multiple zones.",
          *                 "IsManaged": true,
-         *                 "Modifiable": true,
          *                 "Name": "Prometheus",
          *                 "Properties": {
          *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18117,7 +18091,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18129,7 +18102,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18141,7 +18113,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18153,7 +18124,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18181,7 +18151,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18193,7 +18162,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18205,7 +18173,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -18217,7 +18184,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -19867,7 +19833,7 @@ export interface components {
         DisableProductTierFeatureRequest: {
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature: string;
             /**
@@ -20119,7 +20085,7 @@ export interface components {
             };
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature: string;
             /**
@@ -22182,6 +22148,7 @@ export interface components {
          *         "option1",
          *         "option2"
          *       ],
+         *       "regex": "^[a-zA-Z0-9_-]{3,16}$",
          *       "required": true,
          *       "tabIndex": 1,
          *       "type": "Boolean|Float64|String|JSON|Resource"
@@ -22235,6 +22202,11 @@ export interface components {
              *     ]
              */
             options?: string[];
+            /**
+             * @description The parameter regex for validation
+             * @example ^[a-zA-Z0-9_-]{3,16}$
+             */
+            regex?: string;
             /**
              * @description Whether the parameter is required
              * @example true
@@ -33189,7 +33161,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33201,7 +33172,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33213,7 +33183,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33225,7 +33194,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33252,7 +33220,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33264,7 +33231,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33276,7 +33242,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33288,7 +33253,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Consectetur pariatur.": "Natus alias nostrum fuga quisquam et.",
@@ -33321,7 +33285,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33333,7 +33296,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33345,7 +33307,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33357,7 +33318,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33373,7 +33333,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33385,7 +33344,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33397,7 +33355,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33409,7 +33366,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33429,7 +33385,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33441,7 +33396,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33453,7 +33407,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33465,7 +33418,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33481,7 +33433,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33493,7 +33444,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33505,7 +33455,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33517,7 +33466,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33537,7 +33485,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33549,7 +33496,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33561,7 +33507,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33573,7 +33518,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33589,7 +33533,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33601,7 +33544,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33613,7 +33555,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33625,7 +33566,6 @@ export interface components {
          *                 {
          *                   "Description": "Ensures high availability across multiple zones.",
          *                   "IsManaged": true,
-         *                   "Modifiable": true,
          *                   "Name": "Prometheus",
          *                   "Properties": {
          *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33651,7 +33591,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33663,7 +33602,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33675,7 +33613,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33687,7 +33624,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33703,7 +33639,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33715,7 +33650,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33727,7 +33661,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33739,7 +33672,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33759,7 +33691,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33771,7 +33702,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33783,7 +33713,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33795,7 +33724,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33811,7 +33739,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33823,7 +33750,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33835,7 +33761,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -33847,7 +33772,6 @@ export interface components {
              *               {
              *                 "Description": "Ensures high availability across multiple zones.",
              *                 "IsManaged": true,
-             *                 "Modifiable": true,
              *                 "Name": "Prometheus",
              *                 "Properties": {
              *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -34781,7 +34705,7 @@ export interface components {
             };
             /**
              * @description ProductTierFeatureType is to enable / disable features per product tier
-             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS
+             * @example LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY
              */
             feature?: string;
             /**
@@ -75346,7 +75270,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75356,7 +75279,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75366,7 +75288,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75380,7 +75301,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75390,7 +75310,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75400,7 +75319,6 @@ export interface operations {
                      *               {
                      *                 "Description": "Ensures high availability across multiple zones.",
                      *                 "IsManaged": true,
-                     *                 "Modifiable": true,
                      *                 "Name": "Prometheus",
                      *                 "Properties": {
                      *                   "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75419,7 +75337,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75429,7 +75346,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75439,7 +75355,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75453,7 +75368,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75463,7 +75377,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75473,7 +75386,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75491,7 +75403,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75501,7 +75412,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75511,7 +75421,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75525,7 +75434,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75535,7 +75443,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75545,7 +75452,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75563,7 +75469,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75573,7 +75478,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75583,7 +75487,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75597,7 +75500,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75607,7 +75509,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75617,7 +75518,6 @@ export interface operations {
                      *                 {
                      *                   "Description": "Ensures high availability across multiple zones.",
                      *                   "IsManaged": true,
-                     *                   "Modifiable": true,
                      *                   "Name": "Prometheus",
                      *                   "Properties": {
                      *                     "Dolores voluptas natus dolor non aut sint.": "Possimus sed et."
@@ -75708,7 +75608,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75720,7 +75619,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75732,7 +75630,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75744,7 +75641,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75760,7 +75656,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75772,7 +75667,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75784,7 +75678,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75796,7 +75689,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75816,7 +75708,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75828,7 +75719,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75840,7 +75730,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75852,7 +75741,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75868,7 +75756,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75880,7 +75767,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75892,7 +75778,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
@@ -75904,7 +75789,6 @@ export interface operations {
                  *                 {
                  *                   "Description": "Ensures high availability across multiple zones.",
                  *                   "IsManaged": true,
-                 *                   "Modifiable": true,
                  *                   "Name": "Prometheus",
                  *                   "Properties": {
                  *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",

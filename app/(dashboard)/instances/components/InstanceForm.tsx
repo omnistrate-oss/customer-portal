@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import { cloneDeep } from "lodash";
@@ -24,7 +24,6 @@ import PreviewCard from "components/DynamicForm/PreviewCard";
 import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
-
 import useResourceSchema from "../hooks/useResourceSchema";
 import { getInitialValues } from "../utils";
 
@@ -44,6 +43,18 @@ const InstanceForm = ({
   setCreateInstanceModalData,
 }) => {
   const snackbar = useSnackbar();
+
+  // State for validation schema
+  const [validationSchema, setValidationSchema] = useState(() =>
+    yup.object({
+      serviceId: yup.string().required("Product is required"),
+      servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+      subscriptionId: yup.string().required("Subscription is required"),
+      resourceId: yup.string().required("Resource is required"),
+      // requestParams validation will be added dynamically
+    })
+  );
+
   const {
     subscriptions,
     serviceOfferings,
@@ -100,12 +111,9 @@ const InstanceForm = ({
       nonCloudAccountInstances
     ),
     enableReinitialize: true,
-    validationSchema: yup.object({
-      serviceId: yup.string().required("Product is required"),
-      servicePlanId: yup.string().required("A plan with a valid subscription is required"),
-      subscriptionId: yup.string().required("Subscription is required"),
-      resourceId: yup.string().required("Resource is required"),
-    }),
+    validationSchema: validationSchema,
+    validateOnBlur: true,
+    validateOnChange: true,
     onSubmit: async (values) => {
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
       const selectedResource = offering?.resourceParameters.find(
@@ -313,6 +321,7 @@ const InstanceForm = ({
   });
 
   const { values } = formData;
+
   const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
@@ -326,7 +335,129 @@ const InstanceForm = ({
     instanceId: selectedInstance?.id,
   });
 
-  const resourceSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
+  const resourceCreateSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
+  const resourceModifySchema = resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE") as APIEntity;
+
+  const requestParamsCreateValidationSchema = useMemo(() => {
+    const inputParams = resourceCreateSchema?.inputParameters || [];
+
+    // Create validation rules for requestParams
+    const requestParamsValidation: Record<string, any> = {};
+
+    inputParams.forEach((param) => {
+      if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
+        // Only add regex validation if regex is defined and not empty
+        if (param.regex && param.regex.trim()) {
+          // Test if the regex pattern is valid before adding validation
+          let isValidRegex = false;
+          try {
+            new RegExp(param.regex);
+            isValidRegex = true;
+          } catch (error) {
+            console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
+            isValidRegex = false;
+          }
+
+          if (isValidRegex) {
+            const fieldValidation = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
+                if (!value) return true; // Empty values handled by required validation
+
+                const regex = new RegExp(param.regex as string);
+
+                // Handle array values (for multi-select fields)
+                if (Array.isArray(value)) {
+                  if (value.length === 0) return true;
+                  return value.every((item) => !item || regex.test(item));
+                }
+
+                // Handle single values
+                return regex.test(value);
+              });
+
+            requestParamsValidation[param.key] = fieldValidation;
+          }
+        }
+      }
+    });
+
+    return yup.object().shape(requestParamsValidation);
+  }, [resourceSchemaData]);
+
+  const requestParamsModifyValidationSchema = useMemo(() => {
+    const inputParams = resourceModifySchema?.inputParameters || [];
+
+    // Create validation rules for requestParams
+    const requestParamsValidation: Record<string, any> = {};
+
+    inputParams.forEach((param) => {
+      if (
+        param.custom === true &&
+        param.modifiable === true &&
+        ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())
+      ) {
+        // Only add regex validation if regex is defined and not empty
+        if (param.regex && param.regex.trim()) {
+          // Test if the regex pattern is valid before adding validation
+          let isValidRegex = false;
+          try {
+            new RegExp(param.regex);
+            isValidRegex = true;
+          } catch (error) {
+            console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
+            isValidRegex = false;
+          }
+
+          if (isValidRegex) {
+            const fieldValidation = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
+                if (!value) return true; // Empty values handled by required validation
+
+                const regex = new RegExp(param.regex as string);
+
+                // Handle array values (for multi-select fields)
+                if (Array.isArray(value)) {
+                  if (value.length === 0) return true;
+                  return value.every((item) => !item || regex.test(item));
+                }
+
+                // Handle single values
+                return regex.test(value);
+              });
+
+            requestParamsValidation[param.key] = fieldValidation;
+          }
+        }
+      }
+    });
+
+    return yup.object().shape(requestParamsValidation);
+  }, [resourceSchemaData]);
+
+  // Update validation schema when requestParams validation changes
+  useEffect(() => {
+    if (formMode === "modify" && selectedInstance) {
+      const newValidationSchema = yup.object({
+        serviceId: yup.string().required("Product is required"),
+        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+        subscriptionId: yup.string().required("Subscription is required"),
+        resourceId: yup.string().required("Resource is required"),
+        requestParams: requestParamsModifyValidationSchema,
+      });
+      setValidationSchema(newValidationSchema);
+    } else {
+      const newValidationSchema = yup.object({
+        serviceId: yup.string().required("Product is required"),
+        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+        subscriptionId: yup.string().required("Subscription is required"),
+        resourceId: yup.string().required("Resource is required"),
+        requestParams: requestParamsCreateValidationSchema,
+      });
+      setValidationSchema(newValidationSchema);
+    }
+  }, [requestParamsCreateValidationSchema, requestParamsModifyValidationSchema, formMode, selectedInstance]);
 
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,
@@ -347,7 +478,7 @@ const InstanceForm = ({
 
   // Sets the Default Values for the Request Parameters
   useEffect(() => {
-    const inputParameters = resourceSchema?.inputParameters || [];
+    const inputParameters = resourceCreateSchema?.inputParameters || [];
 
     const defaultValues = inputParameters.reduce((acc: any, param: any) => {
       acc[param.key] = param.defaultValue || "";
@@ -373,7 +504,7 @@ const InstanceForm = ({
         formData.setFieldValue("network_type", "");
       }
     }
-  }, [resourceSchema, formMode, offering]);
+  }, [resourceCreateSchema, formMode, offering]);
 
   const customAvailabilityZones = useMemo(() => {
     // @ts-expect-error TODO: Ask someone on the backend to fix the docs
@@ -423,30 +554,37 @@ const InstanceForm = ({
       subscriptionsObj,
       isFetchingSubscriptions,
       formData,
-      resourceSchema,
+      resourceCreateSchema,
       formMode,
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances
     );
-  }, [formMode, formData.values, resourceSchema, customAvailabilityZones, subscriptions, nonCloudAccountInstances]);
+  }, [
+    formMode,
+    formData.values,
+    resourceCreateSchema,
+    customAvailabilityZones,
+    subscriptions,
+    nonCloudAccountInstances,
+  ]);
 
   const networkConfigurationFields = useMemo(() => {
     return getNetworkConfigurationFields(
       formMode,
       formData.values,
-      resourceSchema,
+      resourceCreateSchema,
       serviceOfferingsObj,
       customNetworks,
       isFetchingCustomNetworks
     );
-  }, [formMode, formData.values, resourceSchema, serviceOfferingsObj, customNetworks, isFetchingCustomNetworks]);
+  }, [formMode, formData.values, resourceCreateSchema, serviceOfferingsObj, customNetworks, isFetchingCustomNetworks]);
 
   const deploymentConfigurationFields = useMemo(() => {
     return getDeploymentConfigurationFields(
       formMode,
       formData.values,
-      resourceSchema,
+      resourceCreateSchema,
       resourceIdInstancesHashMap,
       isFetchingResourceInstanceIds,
       cloudAccountInstances
@@ -454,7 +592,7 @@ const InstanceForm = ({
   }, [
     formMode,
     formData.values,
-    resourceSchema,
+    resourceCreateSchema,
     resourceIdInstancesHashMap,
     isFetchingResourceInstanceIds,
     cloudAccountInstances,
