@@ -372,6 +372,8 @@ const InstanceForm = ({
     serviceId: values.serviceId,
     resourceId: selectedInstance?.resourceID || values.resourceId,
     instanceId: selectedInstance?.id,
+    productTierId: values.servicePlanId,
+    productTierVersion: values.productTierVersion,
   });
 
   const resourceSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;

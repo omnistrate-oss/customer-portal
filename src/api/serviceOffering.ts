@@ -22,9 +22,19 @@ export const getServiceOffering = (serviceId: string, environmentType: Environme
 export const describeServiceOfferingResource = (
   serviceId: string,
   resourceId: string,
-  instanceId = "none"
+  instanceId = "none",
+  productTierId?: string,
+  productTierVersion?: string
 ): Promise<AxiosResponse<DescribeServiceOfferingResourceSuccessResponse>> => {
-  return axios.get(`/service-offering/${serviceId}/resource/${resourceId}/instance/${instanceId}`);
+  const queryParams: Record<string, string> = {};
+
+  if (productTierVersion && productTierId) {
+    queryParams["productTierId"] = productTierId;
+    queryParams["productTierVersion"] = productTierVersion;
+  }
+  return axios.get(`/service-offering/${serviceId}/resource/${resourceId}/instance/${instanceId}`, {
+    params: queryParams,
+  });
 };
 
 export const listServiceOfferings = (query): Promise<AxiosResponse<ListServiceOfferingSuccessResponse>> => {
