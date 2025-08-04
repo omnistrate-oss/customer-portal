@@ -98,7 +98,8 @@ const InstanceForm = ({
       subscriptions,
       serviceOfferingsObj,
       serviceOfferings,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      [] // Will be updated later when customerVersionSets loads
     ),
     enableReinitialize: true,
     validationSchema: yup.object({
@@ -106,16 +107,47 @@ const InstanceForm = ({
       servicePlanId: yup.string().required("A plan with a valid subscription is required"),
       subscriptionId: yup.string().required("Subscription is required"),
       resourceId: yup.string().required("Resource is required"),
+      productTierVersion: yup.string().nullable(),
     }),
     onSubmit: async (values) => {
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
-      const selectedResource = offering?.resourceParameters.find(
-        (resource) => resource.resourceId === values.resourceId
-      );
+
+      // Determine if we should use version set resources or service offering resources
+      // Check for VERSION_SET_OVERRIDE feature with CUSTOMER scope in productTierFeatures
+      const allowCustomerVersionOverride =
+        offering?.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        ) || false;
+
+      let resourceKey = "";
+
+      if (allowCustomerVersionOverride && values.productTierVersion) {
+        // Get resource from the selected version set
+        const selectedVersionSet = customerVersionSets.find(
+          (versionSet) => versionSet.version === values.productTierVersion
+        );
+        const selectedVersionSetResource = selectedVersionSet?.resources?.find(
+          (resource) => resource.id === values.resourceId
+        );
+        // For version set resources, use the resource id as the key
+        resourceKey = selectedVersionSetResource?.urlKey || "";
+      } else {
+        // Get resource from service offering
+        const selectedOfferingResource = offering?.resourceParameters.find(
+          (resource) => resource.resourceId === values.resourceId
+        );
+        // For service offering resources, use the urlKey
+        resourceKey = selectedOfferingResource?.urlKey || "";
+      }
 
       const data: any = {
         ...cloneDeep(values),
       };
+
+      // Remove productTierVersion if allowCustomerVersionOverride is false or if we're not creating
+      if (!allowCustomerVersionOverride || formMode !== "create") {
+        delete data.productTierVersion;
+      }
 
       const createSchema =
         // eslint-disable-next-line no-use-before-define
@@ -200,7 +232,7 @@ const InstanceForm = ({
 
         if (inputParametersObj["custom_dns_configuration"] && data.requestParams["custom_dns_configuration"]) {
           data.requestParams.custom_dns_configuration = {
-            [selectedResource?.urlKey || ""]: data.requestParams.custom_dns_configuration,
+            [resourceKey]: data.requestParams.custom_dns_configuration,
           };
         }
 
@@ -221,7 +253,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
               },
               query: {
                 subscriptionId: values.subscriptionId,
@@ -299,7 +331,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
                 id: selectedInstance?.id,
               },
               query: {
@@ -328,12 +360,13 @@ const InstanceForm = ({
       productTierId: values.servicePlanId,
     },
     {
-      //@ts-ignore
-      enabled: Boolean(offering?.allowCustomerVersionOverride),
+      // Only fetch customer version sets if the offering supports VERSION_SET_OVERRIDE feature
+      enabled:
+        offering?.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        ) || false,
     }
   );
-
-  console.log("customerVersionSets", customerVersionSets);
 
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,
@@ -445,7 +478,15 @@ const InstanceForm = ({
       nonCloudAccountInstances,
       customerVersionSets
     );
-  }, [formMode, formData.values, resourceSchema, customAvailabilityZones, subscriptions, nonCloudAccountInstances]);
+  }, [
+    formMode,
+    formData.values,
+    resourceSchema,
+    customAvailabilityZones,
+    subscriptions,
+    nonCloudAccountInstances,
+    customerVersionSets,
+  ]);
 
   const networkConfigurationFields = useMemo(() => {
     return getNetworkConfigurationFields(

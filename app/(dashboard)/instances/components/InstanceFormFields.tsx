@@ -1,14 +1,17 @@
+import React from "react";
 import Link from "next/link";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 
 import { Field } from "src/components/DynamicForm/types";
+import StatusChip from "src/components/StatusChip/StatusChip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { productTierTypes } from "src/constants/servicePlan";
+import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyles/versionSet";
 import { AvailabilityZone } from "src/types/availabilityZone";
 import { CloudProvider, FormMode } from "src/types/common/enums";
 import { CustomNetwork } from "src/types/customNetwork";
 import { ResourceInstance } from "src/types/resourceInstance";
-import { APIEntity, ServiceOffering, TierVersionSet } from "src/types/serviceOffering";
+import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
@@ -19,10 +22,12 @@ import {
   getResourceMenuItems,
   getServiceMenuItems,
   getValidSubscriptionForInstanceCreation,
+  getVersionSetResourceMenuItems,
 } from "../utils";
 
 import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
+import { TierVersionSet } from "src/types/tier-version-set";
 
 export const getStandardInformationFields = (
   servicesObj,
@@ -38,7 +43,7 @@ export const getStandardInformationFields = (
   customAvailabilityZones: AvailabilityZone[],
   isFetchingCustomAvailabilityZones: boolean,
   instances: ResourceInstance[],
-  versionSets : TierVersionSet[]
+  versionSets: TierVersionSet[]
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -59,14 +64,24 @@ export const getStandardInformationFields = (
   const serviceMenuItems = getServiceMenuItems(serviceOfferings);
   const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
 
-  //@ts-ignore
-  const allowCustomerVersionOverride = Boolean(offering?.allowCustomerVersionOverride)
-
-  console.log("Offering", offering)
+  // Check for VERSION_SET_OVERRIDE feature with CUSTOMER scope in productTierFeatures
+  const allowCustomerVersionOverride =
+    offering?.productTierFeatures?.some(
+      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+    ) || false;
 
   const subscriptionMenuItems = subscriptions.filter((sub) => sub.productTierId === servicePlanId);
 
-  const resourceMenuItems = getResourceMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId]);
+  const serviceOfferingResourceMenuItems = getResourceMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId]);
+
+  const selectedVersionSet = versionSets?.find((versionSet) => versionSet.version === values.productTierVersion);
+
+  const tierVersionSetResourceMenuItems = getVersionSetResourceMenuItems(selectedVersionSet);
+
+  //if allowCustomerVersionOverride is true, use resources from version set else use service offering resources
+  const resourceMenuItems = allowCustomerVersionOverride
+    ? tierVersionSetResourceMenuItems
+    : serviceOfferingResourceMenuItems;
 
   const inputParametersObj = (resourceSchema?.inputParameters || []).reduce((acc: any, param: any) => {
     acc[param.key] = param;
@@ -212,27 +227,71 @@ export const getStandardInformationFields = (
       ),
       previewValue: subscriptionsObj[values.subscriptionId]?.id,
     },
-    {
-      dataTestId: "resource-type-select",
-      label: "Resource Name",
-      subLabel: "Select the resource",
-      name: "resourceId",
+  ];
+
+  // Add Product Tier Version field if feature is enabled and version sets are available
+  if (allowCustomerVersionOverride) {
+    console.log("Version Sets:", versionSets);
+    // Create menu items from customerVersionSets with status chips for preferred versions
+    const versionMenuItems = versionSets.map((versionSet) => {
+      const isPreferred = versionSet.status === "Preferred";
+
+      return {
+        label: isPreferred ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>{versionSet.version}</span>
+            <StatusChip {...getVersionSetStatusStylesAndLabel("Preferred")} />
+          </div>
+        ) : (
+          versionSet.version
+        ),
+        value: versionSet.version,
+      };
+    });
+
+    // Find the default value (version set with status 'Preferred')
+    const preferredVersionSet = versionSets.find((versionSet) => versionSet.status === "Preferred");
+    const defaultValue = preferredVersionSet?.version || versionSets[0]?.version || "";
+
+    fields.push({
+      dataTestId: "product-tier-version-select",
+      label: "Product Tier Version",
+      subLabel: "Select the product tier version",
+      name: "productTierVersion",
       type: "select",
       required: true,
-      emptyMenuText: !serviceId
-        ? "Select a Product"
-        : !servicePlanId
-          ? "Select a subscription plan"
-          : "No resources available",
-      menuItems: resourceMenuItems,
-      previewValue: resourceMenuItems.find((item) => item.value === values.resourceId)?.label,
+      emptyMenuText: "No versions available",
+      menuItems: versionMenuItems,
+      previewValue: values.productTierVersion,
       disabled: formMode !== "create",
-      onChange: () => {
-        setFieldValue("requestParams", {});
-      },
-      isHidden: resourceMenuItems.length <= 1,
+    });
+
+    // Set default value if not already set
+    if (!values.productTierVersion && defaultValue) {
+      setFieldValue("productTierVersion", defaultValue);
+    }
+  }
+
+  fields.push({
+    dataTestId: "resource-type-select",
+    label: "Resource Name",
+    subLabel: "Select the resource",
+    name: "resourceId",
+    type: "select",
+    required: true,
+    emptyMenuText: !serviceId
+      ? "Select a Product"
+      : !servicePlanId
+        ? "Select a subscription plan"
+        : "No resources available",
+    menuItems: resourceMenuItems,
+    previewValue: resourceMenuItems.find((item) => item.value === values.resourceId)?.label,
+    disabled: formMode !== "create",
+    onChange: () => {
+      setFieldValue("requestParams", {});
     },
-  ];
+    isHidden: resourceMenuItems.length <= 1,
+  });
 
   if (cloudProviderFieldExists) {
     fields.push({
