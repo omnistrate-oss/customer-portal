@@ -23,6 +23,7 @@ import PasswordField from "components/NonDashboardComponents/FormElementsV2/Pass
 import SubmitButton from "components/NonDashboardComponents/FormElementsV2/SubmitButton";
 import TextField from "components/NonDashboardComponents/FormElementsV2/TextField";
 import SuccessBox from "components/SuccessBox/SuccessBox";
+import { useLastLoginDetails } from "../../signin/hooks/useLastLoginDetails";
 
 const FormGrid = styled(Box)(() => ({
   display: "grid",
@@ -48,6 +49,7 @@ const signupValidationSchema = Yup.object({
 const SignupPage = (props) => {
   const { googleReCaptchaSiteKey, isReCaptchaSetup } = props;
   const { orgName, orgLogoURL } = useProviderOrgDetails();
+  const { email: loginStepOneEmail } = useLastLoginDetails();
 
   const searchParams = useSearchParams();
   const org = searchParams?.get("org");
@@ -101,7 +103,7 @@ const SignupPage = (props) => {
   const formik = useFormik({
     initialValues: {
       name: "",
-      email: "",
+      email: loginStepOneEmail || "",
       password: "",
       confirmPassword: "",
       legalcompanyname: "",
