@@ -5,7 +5,6 @@ export default function useCustomerVersionSets(
   queryOptions = {}
 ) {
 
-  console.log("queryOptions", queryOptions)
   const { serviceId, productTierId } = queryParams;
   return $api.useQuery(
     "get",

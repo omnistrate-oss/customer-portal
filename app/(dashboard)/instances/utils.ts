@@ -307,7 +307,7 @@ export const getInitialValues = (
   const resources = getResourceMenuItems(offering);
 
   // Find the preferred version if available
-  const preferredVersion = versionSets?.find((v) => v.type === "Preferred");
+  const preferredVersion = versionSets?.find((v) => v.status === "Preferred");
   const defaultProductTierVersion = preferredVersion?.version || "";
 
   return {

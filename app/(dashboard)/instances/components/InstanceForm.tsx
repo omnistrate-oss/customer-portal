@@ -370,7 +370,6 @@ const InstanceForm = ({
     }
   );
 
-  console.log("allowCustomerVersionOverride", allowCustomerVersionOverride);
 
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,

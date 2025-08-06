@@ -232,7 +232,6 @@ export const getStandardInformationFields = (
 
   // Add Product Tier Version field if feature is enabled and version sets are available
   if (allowCustomerVersionOverride) {
-    console.log("Version Sets:", versionSets);
     // Create menu items from customerVersionSets with status chips for preferred versions
     const versionMenuItems = versionSets.map((versionSet) => {
       const isPreferred = versionSet.status === "Preferred";
