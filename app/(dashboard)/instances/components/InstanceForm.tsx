@@ -371,7 +371,7 @@ const InstanceForm = ({
     ) || false;
 
   //fetch product tier versions
-  const { data: customerVersionSets = [] } = useCustomerVersionSets(
+  const { data: customerVersionSets = [], isFetching: isFetchingVersionSets } = useCustomerVersionSets(
     {
       serviceId: values.serviceId,
       productTierId: values.servicePlanId,
@@ -624,7 +624,8 @@ const InstanceForm = ({
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances,
-      customerVersionSets
+      customerVersionSets, 
+      isFetchingVersionSets
     );
   }, [
     formMode,
@@ -699,7 +700,7 @@ const InstanceForm = ({
           </div>
         </CardWithTitle>
 
-        {isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
+        {isFetchingVersionSets || isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
           <CardWithTitle title="Network Configuration">
             <div className="space-y-6">
               {networkConfigurationFields.map((field, index) => {
@@ -708,7 +709,7 @@ const InstanceForm = ({
             </div>
           </CardWithTitle>
         )}
-        {isFetchingResourceSchema ? (
+        {isFetchingVersionSets || isFetchingResourceSchema ? (
           <LoadingSpinner />
         ) : !deploymentConfigurationFields.length ? null : (
           <CardWithTitle title="Deployment Configuration">

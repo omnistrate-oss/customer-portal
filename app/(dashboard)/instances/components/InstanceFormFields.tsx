@@ -43,7 +43,8 @@ export const getStandardInformationFields = (
   customAvailabilityZones: AvailabilityZone[],
   isFetchingCustomAvailabilityZones: boolean,
   instances: ResourceInstance[],
-  versionSets: TierVersionSet[]
+  versionSets: TierVersionSet[],
+  isFetchingVersionSets: boolean
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -231,7 +232,7 @@ export const getStandardInformationFields = (
   ];
 
   // Add Product Tier Version field if feature is enabled and version sets are available
-  if (allowCustomerVersionOverride) {
+  if (allowCustomerVersionOverride ) {
     // Create menu items from customerVersionSets with status chips for preferred versions
     const versionMenuItems = versionSets.map((versionSet) => {
       const isPreferred = versionSet.status === "Preferred";
@@ -279,6 +280,7 @@ export const getStandardInformationFields = (
         // Reset requestParams when version changes
         setFieldValue("requestParams", {});
       },
+      isLoading: isFetchingVersionSets,
     });
 
     // Set default value if not already set
