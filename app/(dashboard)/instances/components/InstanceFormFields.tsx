@@ -256,12 +256,12 @@ export const getStandardInformationFields = (
 
     fields.push({
       dataTestId: "product-tier-version-select",
-      label: "Product Tier Version",
-      subLabel: "Select the product tier version",
+      label: "Service Plan Version",
+      subLabel: "Select the service plan version",
       name: "productTierVersion",
       type: "select",
       required: true,
-      emptyMenuText: "No versions available",
+      emptyMenuText: "No plan versions available",
       menuItems: versionMenuItems,
       previewValue: values.productTierVersion,
       disabled: formMode !== "create",
