@@ -24,6 +24,10 @@ const GridDynamicField: React.FC<GridDynamicFieldProps> = ({ field, formData }) 
     return null;
   }
 
+  // Use Formik's getFieldMeta helper to get error and touched state
+  const fieldMeta = formData.getFieldMeta(field.name);
+  const { error: fieldError, touched: fieldTouched } = fieldMeta;
+
   let Field: null | React.ReactNode = null;
 
   if (customComponent) {
@@ -54,7 +58,7 @@ const GridDynamicField: React.FC<GridDynamicFieldProps> = ({ field, formData }) 
       <div className="col-span-4">
         {Field}
         {field.description && field.description}
-        <FieldError marginTop="4px">{formData.touched[field.name] && formData.errors[field.name]}</FieldError>
+        <FieldError marginTop="4px">{fieldTouched && fieldError}</FieldError>
       </div>
     </div>
   );

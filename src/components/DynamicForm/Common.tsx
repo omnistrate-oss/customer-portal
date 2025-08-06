@@ -175,6 +175,7 @@ export const MultilinePasswordInput = ({ field, formData }) => {
       name={field.name}
       inputRef={textAreaRef}
       value={displayValue}
+      disabled={field.disabled}
       onChange={isPasswordVisible ? handleChange : undefined}
       sx={{
         "& .MuiInputAdornment-root": {
