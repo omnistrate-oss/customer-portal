@@ -13,6 +13,7 @@ import { CustomNetwork } from "src/types/customNetwork";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
+import { TierVersionSet } from "src/types/tier-version-set";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
@@ -27,7 +28,6 @@ import {
 
 import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
-import { TierVersionSet } from "src/types/tier-version-set";
 
 export const getStandardInformationFields = (
   servicesObj,
@@ -174,6 +174,7 @@ export const getStandardInformationFields = (
             const resources = getResourceMenuItems(offering);
             setFieldValue("resourceId", resources[0]?.value || "");
             setFieldValue("requestParams", {});
+            setFieldValue("productTierVersion", "");
 
             const subscription = getValidSubscriptionForInstanceCreation(
               serviceOfferingsObj,
@@ -264,6 +265,21 @@ export const getStandardInformationFields = (
       menuItems: versionMenuItems,
       previewValue: values.productTierVersion,
       disabled: formMode !== "create",
+      onChange: (e) => {
+        const selectedVersion = e.target.value;
+        const selectedVersionSet = versionSets.find((versionSet) => versionSet.version === selectedVersion);
+        if (!selectedVersionSet) return;
+        const resourceMenuItems = getVersionSetResourceMenuItems(selectedVersionSet);
+        const firstResource = resourceMenuItems[0];
+        if (firstResource) {
+          setFieldValue("resourceId", firstResource.value);
+        } else {
+          setFieldValue("resourceId", "");
+        }
+        setFieldValue("productTierVersion", selectedVersion);
+        // Reset requestParams when version changes
+        setFieldValue("requestParams", {});
+      },
     });
 
     // Set default value if not already set
