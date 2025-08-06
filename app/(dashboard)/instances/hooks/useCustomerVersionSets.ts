@@ -1,7 +1,11 @@
-import { UseQueryOptions } from "@tanstack/react-query";
 import { $api } from "src/api/query";
 
-export default function useCustomerVersionSets(queryParams: { serviceId: string; productTierId: string }, queryOptions = {}) {
+export default function useCustomerVersionSets(
+  queryParams: { serviceId: string; productTierId: string },
+  queryOptions = {}
+) {
+
+  console.log("queryOptions", queryOptions)
   const { serviceId, productTierId } = queryParams;
   return $api.useQuery(
     "get",
@@ -15,10 +19,8 @@ export default function useCustomerVersionSets(queryParams: { serviceId: string;
       },
     },
     {
-
       select: (data) => data.tierVersionSets,
-      enabled: Boolean(serviceId && productTierId),
-      ...queryOptions,
+       ...queryOptions,
     }
   );
 }

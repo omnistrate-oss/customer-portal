@@ -25,6 +25,7 @@ import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
+import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { getInitialValues } from "../utils";
 
@@ -33,7 +34,6 @@ import {
   getNetworkConfigurationFields,
   getStandardInformationFields,
 } from "./InstanceFormFields";
-import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 
 const InstanceForm = ({
   formMode,
@@ -353,27 +353,31 @@ const InstanceForm = ({
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
+  const allowCustomerVersionOverride =
+    offering?.productTierFeatures?.some(
+      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+    ) || false;
+
   //fetch product tier versions
-  const { data: customerVersionSets = [], isFetching: isFetchingCustomerVersionSets } = useCustomerVersionSets(
+  const { data: customerVersionSets = [] } = useCustomerVersionSets(
     {
       serviceId: values.serviceId,
       productTierId: values.servicePlanId,
     },
     {
       // Only fetch customer version sets if the offering supports VERSION_SET_OVERRIDE feature
-      enabled:
-        offering?.productTierFeatures?.some(
-          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-        ) || false,
+      enabled: allowCustomerVersionOverride,
     }
   );
+
+  console.log("allowCustomerVersionOverride", allowCustomerVersionOverride);
 
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,
     resourceId: selectedInstance?.resourceID || values.resourceId,
     instanceId: selectedInstance?.id,
-    productTierId: values.servicePlanId,
-    productTierVersion: values.productTierVersion,
+    productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
+    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion: "",
   });
 
   const resourceSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
