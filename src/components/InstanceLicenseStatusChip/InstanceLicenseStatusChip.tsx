@@ -40,7 +40,7 @@ const InstanceLicenseStatusChip: FC<LicenseStatusChipProps> = ({
 
   const statusSytlesAndLabel = getResourceInstanceLicenseStatusStylesAndLabel(licenseStatus);
 
-  const formattedExpirationDate = dayjs.utc(expirationDate).format("MMM d, YYYY HH:mm:ss");
+  const formattedExpirationDate = dayjs.utc(expirationDate).format("MMM D, YYYY HH:mm:ss");
 
   return (
     <Stack direction="row" alignItems="center" gap="6px" minWidth="94px" justifyContent="space-between">
