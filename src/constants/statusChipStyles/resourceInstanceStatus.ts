@@ -30,8 +30,8 @@ export const resourceInstanceStatusMap: Record<string, { category: Category; lab
 };
 
 export const getResourceInstanceStatusStylesAndLabel = (status: string): ColorObject & { label?: string } => {
-  const category = resourceInstanceStatusMap[status]?.category;
-  const label = resourceInstanceStatusMap[status]?.label;
+  const category = resourceInstanceStatusMap[status]?.category || "unknown";
+  const label = resourceInstanceStatusMap[status]?.label || "Unknown";
   return {
     ...(category ? chipCategoryColors[category] : { ...defaultChipStyles }),
     ...(label ? { label } : {}),
