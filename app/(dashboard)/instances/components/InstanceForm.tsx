@@ -624,7 +624,7 @@ const InstanceForm = ({
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances,
-      customerVersionSets, 
+      customerVersionSets,
       isFetchingVersionSets
     );
   }, [
@@ -635,6 +635,7 @@ const InstanceForm = ({
     subscriptions,
     nonCloudAccountInstances,
     customerVersionSets,
+    isFetchingVersionSets,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
