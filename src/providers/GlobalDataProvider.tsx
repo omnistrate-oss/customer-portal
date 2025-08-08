@@ -101,7 +101,7 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
     return (
       <div className="flex flex-col" style={{ minHeight: "100vh" }}>
         <Navbar />
-        <NoServiceFoundUI text="No Products Found" />
+        <NoServiceFoundUI text="No Products Found" showMessage />
       </div>
     );
   }

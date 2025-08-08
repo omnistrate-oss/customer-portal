@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Collapse, Stack } from "@mui/material";
+import { Box, Collapse, Stack } from "@mui/material";
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
+import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -21,7 +22,6 @@ import {
   toggleInstanceDetailsSummaryVisibility,
 } from "src/slices/genericSlice";
 import { NetworkType } from "src/types/common/enums";
-import SubscriptionNotFoundUI from "components/Access/SubscriptionNotFoundUI";
 import Button from "components/Button/Button";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
@@ -142,7 +142,9 @@ const InstanceDetailsPage = ({
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
     return (
       <PageContainer>
-        <SubscriptionNotFoundUI isOfferingFound={!!offering} />
+        <Box pt="100px">
+          <NoServiceFoundUI text="Product Not Found" showMessage />
+        </Box>
       </PageContainer>
     );
   }
