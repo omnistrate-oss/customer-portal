@@ -50,9 +50,7 @@ const NoServiceFoundUI: FC<NoServiceFoundUIProps> = ({ text, showMessage }) => {
           <Button
             variant="contained"
             onClick={async () => {
-              if (typeof window !== "undefined" && window?.location) {
-                window.location.href = getInstancesRoute();
-              }
+              window.location.href = getInstancesRoute();
             }}
             sx={{ marginY: "20px" }}
           >
