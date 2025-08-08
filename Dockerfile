@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION as desired
-FROM node:22.9.0-alpine AS base
+FROM node:24.4.1-alpine AS base
 
 # Next.js app lives here
 WORKDIR /app
