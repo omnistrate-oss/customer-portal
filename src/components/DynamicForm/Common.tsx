@@ -10,6 +10,7 @@ import TextField from "components/FormElementsv2/TextField/TextField";
 import KeyIcon from "components/Icons/Key/KeyIcon";
 import { Text } from "components/Typography/Typography";
 
+import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import Autocomplete from "../FormElementsv2/AutoComplete/AutoComplete";
 import FormControlLabel from "../FormElementsv2/FormControlLabel/FormControlLabel";
 import Radio, { RadioGroup } from "../FormElementsv2/Radio/Radio";
@@ -291,6 +292,14 @@ export const TextInput = ({ field, formData }: { field: Field; formData: any }) 
   );
 };
 
+const SelectLoadingUI = () => {
+  return (
+    <Stack alignItems="center" padding={1}>
+      <LoadingSpinnerSmall />
+    </Stack>
+  );
+};
+
 export const SelectField = ({ field, formData }) => {
   const { values, touched, errors, handleChange, handleBlur } = formData;
   return (
@@ -313,7 +322,9 @@ export const SelectField = ({ field, formData }) => {
       sx={{ mt: 0 }}
       maxWidth="590px"
     >
-      {field.menuItems?.length > 0 ? (
+      {field.isLoading ? (
+        <SelectLoadingUI />
+      ) : field.menuItems?.length > 0 ? (
         field.menuItems.map((option) => {
           const menuItem = (
             <MenuItem key={option.value} value={option.value} disabled={option.disabled}>

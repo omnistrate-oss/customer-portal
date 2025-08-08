@@ -4867,31 +4867,30 @@ export interface components {
         };
         /** @example {
          *       "configs": {
-         *         "Similique magnam.": "Illum beatae blanditiis quis.",
-         *         "Veritatis est sit officiis eveniet.": "Asperiores cupiditate."
+         *         "Animi consequuntur ipsam explicabo.": "Animi iusto est sit est voluptate ad.",
+         *         "Et nihil.": "Vel suscipit et."
          *       },
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "DEV",
-         *       "fileContent": "Eaque qui cum consequatur.",
+         *       "fileContent": "Officiis eveniet iure asperiores cupiditate dolore.",
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
          *       "secrets": {
-         *         "Accusantium minima.": "Nesciunt impedit mollitia adipisci amet doloribus.",
-         *         "Est et nihil voluptatem vel suscipit.": "Repellat animi consequuntur ipsam explicabo maxime.",
-         *         "Iusto est sit est voluptate ad dolorem.": "Dolorem quae eveniet ut."
+         *         "Dolorem quae eveniet ut.": "Accusantium minima."
          *       },
-         *       "serviceLogoURL": "http://turner.net/jessyca_schaefer"
+         *       "serviceLogoURL": "http://gutmann.org/gaetano.rau"
          *     } */
         BuildServiceFromComposeSpecRequest2: {
             /**
              * @description Configs for the service. Key is the compose spec name of the config and value is base64 encoded config content
              * @example {
-             *       "At maiores sed et labore molestiae expedita.": "Vel ut ea odit commodi.",
-             *       "Quia et in dolores.": "Voluptatibus eligendi voluptas enim voluptas vel accusamus."
+             *       "Consequuntur quaerat similique aliquam.": "Ut iusto aut amet.",
+             *       "Eveniet est eum ut itaque laboriosam reprehenderit.": "Harum commodi sapiente.",
+             *       "Sed et labore molestiae expedita rerum vel.": "Ea odit commodi et possimus."
              *     }
              */
             configs?: {
@@ -4919,7 +4918,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Sapiente quis nisi qui earum dolorum.
+             * @example Dolor voluptatibus.
              */
             fileContent: string;
             /**
@@ -4945,7 +4944,7 @@ export interface components {
             /**
              * @description Secrets for the service. Key is the compose spec name of the secret and value is base64 encoded secret content
              * @example {
-             *       "Laboriosam reprehenderit enim harum commodi sapiente assumenda.": "Quaerat similique aliquam consectetur ut iusto."
+             *       "Sunt saepe dolore animi.": "Natus quae sequi praesentium."
              *     }
              */
             secrets?: {
@@ -4954,7 +4953,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://prohaskastreich.org/neva
+             * @example http://padberg.com/zion
              */
             serviceLogoURL?: string;
         };
@@ -5068,12 +5067,12 @@ export interface components {
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "DEV",
-         *       "fileContent": "Ut voluptatum.",
+         *       "fileContent": "Saepe culpa quos dolorem.",
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
-         *       "serviceLogoURL": "http://labadie.info/rashawn"
+         *       "serviceLogoURL": "http://rosenbaumlockman.net/vincenzo_dach"
          *     } */
         BuildServiceFromServicePlanSpecRequest2: {
             /**
@@ -5098,7 +5097,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in service plan configuration format
-             * @example Unde placeat aliquid iusto asperiores.
+             * @example Velit sit deleniti.
              */
             fileContent: string;
             /**
@@ -5124,7 +5123,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://walker.biz/pink
+             * @example http://streichmcdermott.info/rex.altenwerth
              */
             serviceLogoURL?: string;
         };
@@ -5164,17 +5163,17 @@ export interface components {
         };
         /** @example {
          *       "id": "subr-12345678",
-         *       "token": "kb"
+         *       "token": "1"
          *     } */
         CancelSubscriptionRequestRequest: {
             /**
              * @description ID of a Subscription Request
-             * @example Asperiores sit enim quasi quas minima non.
+             * @example Cumque sit dolorem.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example rkf
+             * @example gl
              */
             token: string;
         };
@@ -5762,7 +5761,7 @@ export interface components {
         /** @example {
          *       "code": "ac_12345678",
          *       "state": "12345678",
-         *       "token": "92"
+         *       "token": "i"
          *     } */
         CompleteOAuthConnectionRequest: {
             /**
@@ -5777,7 +5776,7 @@ export interface components {
             state?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ft
+             * @example p
              */
             token: string;
         };
@@ -6418,6 +6417,13 @@ export interface components {
          *             "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
          *           },
          *           "feature": "Consequatur placeat in voluptate."
+         *         },
+         *         {
+         *           "configuration": {
+         *             "Accusantium unde et quia culpa aut.": "Deleniti dicta repellat.",
+         *             "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
+         *           },
+         *           "feature": "Consequatur placeat in voluptate."
          *         }
          *       ],
          *       "name": "MySQL multi-writer service hosted model",
@@ -6441,20 +6447,6 @@ export interface components {
             /**
              * @description Enabled service model features
              * @example [
-             *       {
-             *         "configuration": {
-             *           "Accusantium unde et quia culpa aut.": "Deleniti dicta repellat.",
-             *           "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
-             *         },
-             *         "feature": "Consequatur placeat in voluptate."
-             *       },
-             *       {
-             *         "configuration": {
-             *           "Accusantium unde et quia culpa aut.": "Deleniti dicta repellat.",
-             *           "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
-             *         },
-             *         "feature": "Consequatur placeat in voluptate."
-             *       },
              *       {
              *         "configuration": {
              *           "Accusantium unde et quia culpa aut.": "Deleniti dicta repellat.",
@@ -6586,10 +6578,10 @@ export interface components {
             token: string;
         };
         /** @example {
-         *       "awsAccessKey": "Dolores aspernatur.",
+         *       "awsAccessKey": "Enim eaque.",
          *       "awsAccountID": "123456789012",
          *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-         *       "awsSecretKey": "Blanditiis unde odit.",
+         *       "awsSecretKey": "Est occaecati laborum nemo.",
          *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
          *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
          *       "byoaInstanceID": "instance-12345678",
@@ -6598,13 +6590,13 @@ export interface components {
          *       "gcpProjectID": "my-project",
          *       "gcpProjectNumber": "123456789012",
          *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-         *       "gcpServiceAccountKey": "Voluptate dolores ea.",
+         *       "gcpServiceAccountKey": "Qui quasi.",
          *       "name": "Dev AWS account"
          *     } */
         CreateAccountConfigRequest2: {
             /**
              * @description The AWS access key
-             * @example Nostrum voluptate.
+             * @example Labore eligendi voluptatibus at aut odit.
              */
             awsAccessKey?: string;
             /**
@@ -6619,7 +6611,7 @@ export interface components {
             awsBootstrapRoleARN?: string;
             /**
              * @description The AWS secret key
-             * @example Sed autem.
+             * @example Dolores commodi numquam voluptatibus mollitia omnis tempora.
              */
             awsSecretKey?: string;
             /**
@@ -6664,7 +6656,7 @@ export interface components {
             gcpServiceAccountEmail?: string;
             /**
              * @description The GCP service account key
-             * @example Aut esse sunt sit dolores omnis.
+             * @example Modi libero nisi.
              */
             gcpServiceAccountKey?: string;
             /**
@@ -7096,7 +7088,7 @@ export interface components {
          *       "clientSecret": "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",
          *       "disabled": false,
          *       "emailIdentifiers": "company.com",
-         *       "environmentType": "Et suscipit.",
+         *       "environmentType": "Sed autem.",
          *       "identityProviderName": "Google",
          *       "loginButtonIconUrl": "https://example.com/icon.png",
          *       "loginButtonText": "Login with Google",
@@ -7133,7 +7125,7 @@ export interface components {
             emailIdentifiers?: string;
             /**
              * @description The type of environment to filter costs by
-             * @example Ipsam rerum temporibus ut rem voluptatum odio.
+             * @example Nostrum voluptate.
              */
             environmentType?: string;
             /**
@@ -7621,10 +7613,10 @@ export interface components {
         /** @example {
          *       "defaultValue": "default value",
          *       "dependentResourceId": "r-12345678",
-         *       "description": "Explicabo quibusdam illum velit nam sequi ex.",
-         *       "hasOptions": true,
-         *       "isList": true,
-         *       "key": "3b0",
+         *       "description": "Est explicabo.",
+         *       "hasOptions": false,
+         *       "isList": false,
+         *       "key": "e2k",
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
          *         "medium": "t3.large",
@@ -7637,7 +7629,7 @@ export interface components {
          *         "minLength": "Eaque ab molestiae."
          *       },
          *       "modifiable": false,
-         *       "name": "y",
+         *       "name": "rgf",
          *       "options": [
          *         "a",
          *         "b",
@@ -7645,10 +7637,10 @@ export interface components {
          *         "default value"
          *       ],
          *       "regex": "^[a-zA-Z0-9_-]+$",
-         *       "required": true,
+         *       "required": false,
          *       "resourceId": "r-12345678",
          *       "tabIndex": 1,
-         *       "type": "Et et."
+         *       "type": "Neque quisquam dicta assumenda repellendus."
          *     } */
         CreateInputParameterRequest2: {
             /**
@@ -7663,24 +7655,24 @@ export interface components {
             dependentResourceId?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Doloremque nam neque quisquam dicta assumenda repellendus.
+             * @example Ducimus officiis qui voluptates doloribus quidem.
              */
             description: string;
             /**
              * @description Marks the input parameter to be selectable from a list of values
              * @default false
-             * @example false
+             * @example true
              */
             hasOptions: boolean;
             /**
              * @description Marks the input parameter as a list of values
              * @default false
-             * @example true
+             * @example false
              */
             isList: boolean;
             /**
              * @description Key of the input parameter
-             * @example 5
+             * @example pu
              */
             key: string;
             /**
@@ -7702,7 +7694,7 @@ export interface components {
             modifiable: boolean;
             /**
              * @description External name for the input parameter
-             * @example be
+             * @example 3
              */
             name: string;
             /**
@@ -7737,7 +7729,7 @@ export interface components {
              * @example 1
              */
             tabIndex: number;
-            /** @example Nobis molestias. */
+            /** @example Cum in quae. */
             type: string;
         };
         /** @example {
@@ -7869,7 +7861,7 @@ export interface components {
          *       },
          *       "stableEgressIP": true,
          *       "tlsTerminationPort": 443,
-         *       "zoneConfiguration": "Ut est iure ea tenetur excepturi."
+         *       "zoneConfiguration": "Ipsum molestiae."
          *     } */
         CreateNetworkConfigRequest2: {
             /**
@@ -7916,7 +7908,7 @@ export interface components {
             tlsTerminationPort?: number;
             /**
              * @description The preferred type of zonal availability for this resource and the specific zone(s) to deploy in
-             * @example Qui quas quis vel.
+             * @example Ratione deleniti cum.
              */
             zoneConfiguration?: string;
         };
@@ -7985,7 +7977,7 @@ export interface components {
          *       "resourceId": "r-12345678",
          *       "value": "johndoe",
          *       "valueRef": "$var.username",
-         *       "valueType": "Ratione deleniti cum."
+         *       "valueType": "Illo porro."
          *     } */
         CreateOutputParameterRequest2: {
             /**
@@ -8018,7 +8010,7 @@ export interface components {
              * @example $var.username
              */
             valueRef?: string;
-            /** @example Voluptate repellendus consequuntur. */
+            /** @example Placeat pariatur aut. */
             valueType?: string;
         };
         /** @example {
@@ -9238,7 +9230,7 @@ export interface components {
          *       "imageConfigId": "imgc-12345678",
          *       "infraConfigId": "ic-12345678",
          *       "internal": true,
-         *       "isProxy": true,
+         *       "isProxy": false,
          *       "jobConfig": {
          *         "activeDeadlineSeconds": 300,
          *         "backoffLimit": 5
@@ -9402,53 +9394,7 @@ export interface components {
          *       ],
          *       "resourceType": "Generic",
          *       "terraformConfigurations": {
-         *         "Ea nam iusto et est nostrum.": {
-         *           "gitConfiguration": {
-         *             "accessToken": "my-token",
-         *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-         *             "referenceName": "tags/v1.0.0",
-         *             "repositoryUrl": "https://github.com/username/myrepo",
-         *             "userName": "my-user"
-         *           },
-         *           "privateModuleGitAccessTokens": {
-         *             "tokenName": "accessToken"
-         *           },
-         *           "requiredOutputKeys": [
-         *             "output1"
-         *           ],
-         *           "requiredOutputs": [
-         *             {
-         *               "exported": true,
-         *               "key": "output1"
-         *             }
-         *           ],
-         *           "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
-         *           "terraformPath": "/project1/tf"
-         *         },
-         *         "Est ipsam.": {
-         *           "gitConfiguration": {
-         *             "accessToken": "my-token",
-         *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-         *             "referenceName": "tags/v1.0.0",
-         *             "repositoryUrl": "https://github.com/username/myrepo",
-         *             "userName": "my-user"
-         *           },
-         *           "privateModuleGitAccessTokens": {
-         *             "tokenName": "accessToken"
-         *           },
-         *           "requiredOutputKeys": [
-         *             "output1"
-         *           ],
-         *           "requiredOutputs": [
-         *             {
-         *               "exported": true,
-         *               "key": "output1"
-         *             }
-         *           ],
-         *           "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
-         *           "terraformPath": "/project1/tf"
-         *         },
-         *         "Sed impedit.": {
+         *         "Dolorem ut aliquid impedit voluptas deserunt.": {
          *           "gitConfiguration": {
          *             "accessToken": "my-token",
          *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -9601,7 +9547,7 @@ export interface components {
             /**
              * @description The Terraform configurations for various cloud providers
              * @example {
-             *       "Enim non.": {
+             *       "Consectetur autem tempora culpa enim nostrum.": {
              *         "gitConfiguration": {
              *           "accessToken": "my-token",
              *           "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -9624,7 +9570,7 @@ export interface components {
              *         "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
              *         "terraformPath": "/project1/tf"
              *       },
-             *       "Harum eum mollitia fuga corrupti aliquid.": {
+             *       "Et qui eveniet saepe.": {
              *         "gitConfiguration": {
              *           "accessToken": "my-token",
              *           "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -9647,7 +9593,7 @@ export interface components {
              *         "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
              *         "terraformPath": "/project1/tf"
              *       },
-             *       "Ipsum reiciendis.": {
+             *       "Ut eos.": {
              *         "gitConfiguration": {
              *           "accessToken": "my-token",
              *           "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -9858,7 +9804,7 @@ export interface components {
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "sourceEnvironmentId": "se-12345678",
          *       "type": "DEV",
-         *       "visibility": "Et aut."
+         *       "visibility": "Qui impedit aliquam."
          *     } */
         CreateServiceEnvironmentRequest2: {
             /**
@@ -9899,7 +9845,7 @@ export interface components {
             type?: string;
             /**
              * @description This parameter is used to configure the visibility of the service control-plane APIs
-             * @example Qui impedit aliquam.
+             * @example Quia voluptate id.
              */
             visibility?: string;
         };
@@ -9952,11 +9898,11 @@ export interface components {
         };
         /** @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "fileContent": "Porro in vero autem sed et fugiat.",
+         *       "fileContent": "Et porro.",
          *       "fileFormat": "text/plain",
          *       "fileName": "mysql.yaml",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://price.name/lorna.reichert"
+         *       "serviceLogoURL": "http://doyle.com/bennie"
          *     } */
         CreateServiceFromComposeSpecRequest2: {
             /**
@@ -9966,7 +9912,7 @@ export interface components {
             description: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Impedit quasi aut sed dolores.
+             * @example Reiciendis et corporis qui sapiente repellendus excepturi.
              */
             fileContent: string;
             /**
@@ -9987,7 +9933,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://ziemann.net/enoch
+             * @example http://breitenberg.info/berniece
              */
             serviceLogoURL?: string;
         };
@@ -10164,13 +10110,6 @@ export interface components {
              *           "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
              *         },
              *         "feature": "Consequatur placeat in voluptate."
-             *       },
-             *       {
-             *         "configuration": {
-             *           "Accusantium unde et quia culpa aut.": "Deleniti dicta repellat.",
-             *           "Est eaque ut voluptates sed ut.": "Ea incidunt qui ut ipsam non quia."
-             *         },
-             *         "feature": "Consequatur placeat in voluptate."
              *       }
              *     ]
              */
@@ -10223,7 +10162,7 @@ export interface components {
         /** @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://buckridgehilll.net/harmony.orn"
+         *       "serviceLogoURL": "http://powlowski.net/robin.kemmer"
          *     } */
         CreateServiceRequest2: {
             /**
@@ -10239,43 +10178,43 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://whitemorar.info/izabella
+             * @example http://gaylord.biz/clare
              */
             serviceLogoURL?: string;
         };
         /** @example {
-         *       "orchestrationCreateDSL": "Mollitia est.",
-         *       "token": "bq"
+         *       "orchestrationCreateDSL": "Eum omnis delectus est eligendi blanditiis dolore.",
+         *       "token": "7"
          *     } */
         CreateServicesOrchestrationRequest: {
             /**
              * @description base64 encoded content of service orchestration create DSL
-             * @example Culpa maxime laudantium.
+             * @example Laborum facere quia.
              */
             orchestrationCreateDSL: string;
             /**
              * @description JWT token used to perform authorization
-             * @example l
+             * @example xax
              */
             token: string;
         };
         /** @example {
-         *       "orchestrationCreateDSL": "Odit omnis dolores."
+         *       "orchestrationCreateDSL": "Rerum dolor qui est distinctio."
          *     } */
         CreateServicesOrchestrationRequest2: {
             /**
              * @description base64 encoded content of service orchestration create DSL
-             * @example Omnis maxime ex labore eligendi voluptatibus at.
+             * @example Laudantium nobis ut et ut voluptatem.
              */
             orchestrationCreateDSL: string;
         };
         /** @example {
-         *       "id": "Modi libero nisi."
+         *       "id": "Minima aut commodi voluptatibus deleniti sed sint."
          *     } */
         CreateServicesOrchestrationResponseBody: {
             /**
              * @description Services Orchestration Id
-             * @example Numquam voluptatibus mollitia omnis tempora.
+             * @example Ex dolor delectus.
              */
             id?: string;
         };
@@ -10454,12 +10393,12 @@ export interface components {
         /** @example {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "d48"
+         *       "token": "jb"
          *     } */
         CreateSubscriptionRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Tempora sed quidem.
+             * @example Aut nihil.
              */
             productTierId: string;
             /**
@@ -10469,7 +10408,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example it
+             * @example usi
              */
             token: string;
         };
@@ -10492,12 +10431,12 @@ export interface components {
         /** @example {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "gq"
+         *       "token": "ce"
          *     } */
         CreateSubscriptionRequestRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Nisi rerum.
+             * @example Sint vel tenetur facilis qui.
              */
             productTierId: string;
             /**
@@ -10507,7 +10446,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example w
+             * @example k
              */
             token: string;
         };
@@ -10574,7 +10513,7 @@ export interface components {
             type: string;
         };
         /** @example {
-         *       "description": "Est quasi sunt.",
+         *       "description": "Inventore porro earum in cumque error.",
          *       "name": "Major version set",
          *       "parentVersion": "2.0",
          *       "type": "Major|Incremental|UserDefined"
@@ -10582,7 +10521,7 @@ export interface components {
         CreateTierVersionSetRequest2: {
             /**
              * @description A brief description of the product-tier version set.
-             * @example Fugit et rerum quam asperiores quae qui.
+             * @example Blanditiis voluptatem nihil aut.
              */
             description?: string;
             /**
@@ -11037,18 +10976,18 @@ export interface components {
             type: string;
         };
         /** @example {
-         *       "token": "qw"
+         *       "token": "nv"
          *     } */
         CustomerDeleteUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example h
+             * @example qcm
              */
             token: string;
         };
         /** @example {
          *       "email": "abc@example.com",
-         *       "token": "0"
+         *       "token": "ur"
          *     } */
         CustomerInviteUserRequest: {
             /**
@@ -11058,7 +10997,7 @@ export interface components {
             email: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example 6
              */
             token: string;
         };
@@ -11165,7 +11104,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11174,7 +11114,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11183,7 +11124,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11192,7 +11134,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -11257,7 +11200,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11266,7 +11210,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11275,7 +11220,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11284,7 +11230,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -11349,7 +11296,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11358,7 +11306,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11367,7 +11316,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11376,7 +11326,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -11441,7 +11392,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11450,7 +11402,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11459,7 +11412,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11468,7 +11422,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -11544,7 +11499,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11553,7 +11509,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11562,7 +11519,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11571,7 +11529,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -11636,7 +11595,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11645,7 +11605,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11654,7 +11615,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11663,7 +11625,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -11728,7 +11691,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11737,7 +11701,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11746,7 +11711,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -11755,7 +11721,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -11779,7 +11746,7 @@ export interface components {
          *       "legalCompanyName": "mywebsite",
          *       "redirectUri": "https://www.example/redirect",
          *       "state": "state",
-         *       "token": "9j"
+         *       "token": "4gh"
          *     } */
         CustomerLoginWithIdentityProviderRequest: {
             /**
@@ -11821,7 +11788,7 @@ export interface components {
             state?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example y
+             * @example t6
              */
             token: string;
         };
@@ -11887,7 +11854,7 @@ export interface components {
         };
         /** @example {
          *       "email": "abc@example.com",
-         *       "token": "5"
+         *       "token": "qw"
          *     } */
         CustomerResetPasswordRequest: {
             /**
@@ -11897,7 +11864,7 @@ export interface components {
             email: string;
             /**
              * @description JWT token used to perform authorization
-             * @example mw
+             * @example h
              */
             token: string;
         };
@@ -11916,7 +11883,7 @@ export interface components {
          *       "environmentType": "DEV",
          *       "hashedPassword": "deprecated",
          *       "password": "password",
-         *       "token": "7"
+         *       "token": "0"
          *     } */
         CustomerSigninRequest: {
             /**
@@ -11935,7 +11902,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example f85
+             * @example 7
              */
             token: string;
         };
@@ -11978,7 +11945,7 @@ export interface components {
          *       "legalCompanyName": "mywebsite",
          *       "name": "John Doe",
          *       "password": "password",
-         *       "token": "7h"
+         *       "token": "9j"
          *     } */
         CustomerSignupRequest: {
             /** @example We sell xyz database software */
@@ -12005,7 +11972,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example g3
+             * @example y
              */
             token: string;
         };
@@ -12593,17 +12560,17 @@ export interface components {
         };
         /** @example {
          *       "id": "so-12345678",
-         *       "token": "g"
+         *       "token": "n"
          *     } */
         DeleteServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Soluta laborum facere quia qui pariatur.
+             * @example Cum odit non quidem consequatur et ut.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example pz
              */
             token: string;
         };
@@ -12653,17 +12620,17 @@ export interface components {
         };
         /** @example {
          *       "id": "sub-12345678",
-         *       "token": "i"
+         *       "token": "9"
          *     } */
         DeleteSubscriptionRequest: {
             /**
              * @description ID of a Subscription
-             * @example Aspernatur aliquid.
+             * @example Eum optio repudiandae est animi amet.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 1f2
+             * @example 5jy
              */
             token: string;
         };
@@ -12690,12 +12657,12 @@ export interface components {
             token: string;
         };
         /** @example {
-         *       "token": "20z"
+         *       "token": "7"
          *     } */
         DeleteUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example q7c
+             * @example f85
              */
             token: string;
         };
@@ -17635,7 +17602,7 @@ export interface components {
         /** @example {
          *       "environmentType": "DEV",
          *       "serviceId": "s-12345678",
-         *       "token": "cjt",
+         *       "token": "2",
          *       "visibility": "PRIVATE"
          *     } */
         DescribeServiceOfferingRequest: {
@@ -17651,7 +17618,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ff9
+             * @example 56
              */
             token: string;
             /**
@@ -17662,9 +17629,11 @@ export interface components {
         };
         /** @example {
          *       "instanceId": "instance-12345678",
+         *       "productTierId": "pt-12345678",
+         *       "productTierVersion": "1.0.0",
          *       "resourceId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "8v"
+         *       "token": "y4"
          *     } */
         DescribeServiceOfferingResourceRequest: {
             /**
@@ -17673,6 +17642,16 @@ export interface components {
              * @example instance-12345678
              */
             instanceId: string;
+            /**
+             * @description ID of a Product Tier
+             * @example Qui consectetur rerum.
+             */
+            productTierId?: string;
+            /**
+             * @description The product tier version
+             * @example 1.0.0
+             */
+            productTierVersion?: string;
             /**
              * @description ID of a resource
              * @example Sunt sed ut aut facilis.
@@ -18001,7 +17980,7 @@ export interface components {
             serviceName: string;
             /**
              * @description ID of an Org
-             * @example Ab iste ea numquam.
+             * @example Maxime laudantium ex enim facilis.
              */
             serviceOrgId: string;
             /**
@@ -18507,22 +18486,48 @@ export interface components {
         };
         /** @example {
          *       "id": "so-12345678",
-         *       "token": "o1u"
+         *       "token": "66a"
          *     } */
         DescribeServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Voluptatem ad.
+             * @example Cupiditate tempora quisquam voluptatem officia est.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example exn
+             * @example l
              */
             token: string;
         };
         /** @example {
          *       "ServicesTopology": [
+         *         {
+         *           "dependsOnDeployment": [
+         *             "instanceDeploymentAlias1",
+         *             "instanceDeploymentAlias2"
+         *           ],
+         *           "failedReason": "Invalid inputs",
+         *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+         *           "instanceId": "i-12345678",
+         *           "serviceId": "s-12345678",
+         *           "status": "PENDING",
+         *           "statusMessage": "Creating deployment",
+         *           "subscriptionId": "Enim blanditiis."
+         *         },
+         *         {
+         *           "dependsOnDeployment": [
+         *             "instanceDeploymentAlias1",
+         *             "instanceDeploymentAlias2"
+         *           ],
+         *           "failedReason": "Invalid inputs",
+         *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+         *           "instanceId": "i-12345678",
+         *           "serviceId": "s-12345678",
+         *           "status": "PENDING",
+         *           "statusMessage": "Creating deployment",
+         *           "subscriptionId": "Enim blanditiis."
+         *         },
          *         {
          *           "dependsOnDeployment": [
          *             "instanceDeploymentAlias1",
@@ -18602,19 +18607,6 @@ export interface components {
              *         "status": "PENDING",
              *         "statusMessage": "Creating deployment",
              *         "subscriptionId": "Enim blanditiis."
-             *       },
-             *       {
-             *         "dependsOnDeployment": [
-             *           "instanceDeploymentAlias1",
-             *           "instanceDeploymentAlias2"
-             *         ],
-             *         "failedReason": "Invalid inputs",
-             *         "instanceDeploymentAlias": "instanceDeploymentAlias",
-             *         "instanceId": "i-12345678",
-             *         "serviceId": "s-12345678",
-             *         "status": "PENDING",
-             *         "statusMessage": "Creating deployment",
-             *         "subscriptionId": "Enim blanditiis."
              *       }
              *     ]
              */
@@ -18626,7 +18618,7 @@ export interface components {
             createdAt: string;
             /**
              * @description ID of a Services Orchestration
-             * @example Cupiditate tempora quisquam voluptatem officia est.
+             * @example Tenetur qui amet veniam tempora sed.
              */
             id: string;
             /**
@@ -18863,33 +18855,33 @@ export interface components {
         };
         /** @example {
          *       "id": "sub-12345678",
-         *       "token": "i"
+         *       "token": "gc"
          *     } */
         DescribeSubscriptionRequest: {
             /**
              * @description ID of a Subscription
-             * @example Minus repudiandae et qui deleniti ipsa accusantium.
+             * @example Eos dicta nulla.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example sft
              */
             token: string;
         };
         /** @example {
          *       "id": "subr-12345678",
-         *       "token": "f9r"
+         *       "token": "bl"
          *     } */
         DescribeSubscriptionRequestRequest: {
             /**
              * @description ID of a Subscription Request
-             * @example Optio repudiandae est animi.
+             * @example Exercitationem dignissimos.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example jy1
+             * @example an
              */
             token: string;
         };
@@ -18902,7 +18894,7 @@ export interface components {
          *       "rootUserId": "org-12345678",
          *       "rootUserName": "John Doe",
          *       "serviceId": "s-12345678",
-         *       "serviceLogoURL": "Ullam facilis officia architecto natus harum.",
+         *       "serviceLogoURL": "Quaerat illo hic suscipit.",
          *       "serviceName": "MySQL multi-writer service",
          *       "status": "PENDING",
          *       "updatedAt": "2019-01-01T00:00:00Z",
@@ -18917,12 +18909,12 @@ export interface components {
             createdAt: string;
             /**
              * @description ID of a Subscription Request
-             * @example Iste sint vel.
+             * @example Natus iste suscipit enim ullam.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Soluta culpa voluptas exercitationem dignissimos non sunt.
+             * @example Amet ullam facilis officia.
              */
             productTierId: string;
             /**
@@ -18937,7 +18929,7 @@ export interface components {
             rootUserEmail: string;
             /**
              * @description ID of a User
-             * @example Quo natus iste suscipit enim.
+             * @example Natus harum labore assumenda nisi.
              */
             rootUserId: string;
             /**
@@ -18952,7 +18944,7 @@ export interface components {
             serviceId: string;
             /**
              * @description The logo for the service
-             * @example Facilis qui totam et eaque.
+             * @example Tempore voluptates fuga qui quam.
              */
             serviceLogoURL?: string;
             /**
@@ -18972,7 +18964,7 @@ export interface components {
             updatedAt: string;
             /**
              * @description ID of a User
-             * @example Et tempore voluptates fuga qui quam ullam.
+             * @example Eos rem iste repellendus perspiciatis qui.
              */
             updatedByUserId: string;
             /**
@@ -18998,7 +18990,7 @@ export interface components {
          *       "roleType": "root",
          *       "rootUserId": "user-12345678",
          *       "serviceId": "s-12345678",
-         *       "serviceLogoURL": "Deleniti aliquam aliquid esse odit quo cumque.",
+         *       "serviceLogoURL": "Maiores animi occaecati aspernatur aliquid.",
          *       "serviceName": "MySQL multi-writer service",
          *       "serviceOrgId": "org-12345678",
          *       "serviceOrgName": "Omnistrate",
@@ -19008,7 +19000,7 @@ export interface components {
         DescribeSubscriptionResult: {
             /**
              * @description ID of an Org
-             * @example Et nihil ad libero aut nisi.
+             * @example Voluptatem facilis hic ipsa eum.
              */
             accountConfigIdentityId: string;
             /**
@@ -19036,7 +19028,7 @@ export interface components {
             defaultSubscription: boolean;
             /**
              * @description ID of a Subscription
-             * @example Temporibus tempora non ab aut.
+             * @example Animi accusantium quis sit cumque.
              */
             id: string;
             /**
@@ -19052,7 +19044,7 @@ export interface components {
             paymentMethodConfigured?: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Et assumenda aut.
+             * @example Et nihil ad libero aut nisi.
              */
             productTierId: string;
             /**
@@ -19067,7 +19059,7 @@ export interface components {
             roleType: string;
             /**
              * @description ID of a User
-             * @example Quos qui.
+             * @example Quia nostrum inventore.
              */
             rootUserId: string;
             /**
@@ -19077,7 +19069,7 @@ export interface components {
             serviceId: string;
             /**
              * @description The logo for the service
-             * @example Quisquam aspernatur animi accusantium quis sit cumque.
+             * @example Et aut ducimus nulla est.
              */
             serviceLogoURL: string;
             /**
@@ -19087,7 +19079,7 @@ export interface components {
             serviceName: string;
             /**
              * @description ID of an Org
-             * @example Quaerat eos dicta nulla optio.
+             * @example Deleniti aliquam aliquid esse odit quo cumque.
              */
             serviceOrgId: string;
             /**
@@ -19203,12 +19195,12 @@ export interface components {
             targetVersion?: string;
         };
         /** @example {
-         *       "token": "3hu"
+         *       "token": "z36"
          *     } */
         DescribeUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 1
+             * @example lld
              */
             token: string;
         };
@@ -19228,15 +19220,15 @@ export interface components {
          *       "id": "user-abcd1234",
          *       "lastModifiedAt": "2023-01-20T00:00:00Z",
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Itaque ut autem et.",
+         *       "orgCookiePolicy": "Ut facilis sint.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "Et ea recusandae ut voluptas architecto qui.",
+         *       "orgFavIconURL": "Repellendus eos dolorum est veritatis quos.",
          *       "orgId": "org-aKQ8G13QeR",
-         *       "orgLogoURL": "Eum molestiae quas sed quod corporis.",
+         *       "orgLogoURL": "Itaque ut autem et.",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Aut distinctio veniam quae praesentium animi.",
+         *       "orgPrivacyPolicy": "At harum.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Iure quae aut sit nostrum.",
+         *       "orgTermsOfUse": "Eos culpa odit fugiat officia quia.",
          *       "orgURL": "something.acme",
          *       "planName": "STARTER",
          *       "roleType": "reader",
@@ -19276,7 +19268,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns
-             * @example Non atque blanditiis placeat et et.
+             * @example Aut distinctio veniam quae praesentium animi.
              */
             orgCookiePolicy?: string;
             /**
@@ -19286,7 +19278,7 @@ export interface components {
             orgDescription?: string;
             /**
              * @description The favicon of the org that this user owns
-             * @example Quod possimus.
+             * @example Molestiae quas sed quod corporis voluptatem et.
              */
             orgFavIconURL?: string;
             /**
@@ -19296,7 +19288,7 @@ export interface components {
             orgId?: string;
             /**
              * @description The logo of the org that this user owns
-             * @example Maiores ducimus et.
+             * @example Blanditiis placeat et et eligendi.
              */
             orgLogoURL?: string;
             /**
@@ -19306,7 +19298,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns
-             * @example Est id.
+             * @example Eaque iure quae aut sit nostrum.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -19316,7 +19308,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns
-             * @example Quis velit delectus sunt voluptatem.
+             * @example Recusandae ut voluptas architecto.
              */
             orgTermsOfUse?: string;
             /**
@@ -19341,12 +19333,12 @@ export interface components {
             status?: string;
         };
         /** @example {
-         *       "token": "zy8"
+         *       "token": "q"
          *     } */
         DescribeUsersByOrgRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example z
+             * @example 5d
              */
             token: string;
         };
@@ -19508,7 +19500,7 @@ export interface components {
         Describeresourcemetricsconfigresult: {
             /**
              * @description ID of a resource
-             * @example Laboriosam voluptatem velit consequatur.
+             * @example Inventore illum amet non et.
              */
             id: string;
             /**
@@ -19940,10 +19932,10 @@ export interface components {
             token: string;
         };
         /** @example {
-         *       "feature": "Ea distinctio at reprehenderit dolorem."
+         *       "feature": "Suscipit et consectetur."
          *     } */
         DisableServiceModelFeatureRequest2: {
-            /** @example Qui suscipit et consectetur. */
+            /** @example Voluptatum cum voluptas commodi assumenda. */
             feature: string;
         };
         /** @example {
@@ -20261,19 +20253,18 @@ export interface components {
         };
         /** @example {
          *       "configuration": {
-         *         "Hic tempore at aspernatur voluptatum.": "Voluptas commodi."
+         *         "Inventore sit ut quae occaecati.": "Similique hic tempore at."
          *       },
-         *       "feature": "Sit ut quae occaecati."
+         *       "feature": "Quo eum blanditiis animi non."
          *     } */
         EnableServiceModelFeatureRequest2: {
             /** @example {
-             *       "Debitis id.": "Et quam et ut et.",
-             *       "Eum blanditiis animi.": "Dolores et."
+             *       "In nostrum debitis.": "Perspiciatis et quam et ut."
              *     } */
             configuration: {
                 [key: string]: unknown;
             };
-            /** @example Iusto quod. */
+            /** @example Nobis blanditiis consequatur repellat velit. */
             feature: string;
         };
         /** @example {
@@ -20468,12 +20459,12 @@ export interface components {
             value: string;
         };
         /** @example {
-         *       "fault": false,
+         *       "fault": true,
          *       "id": "123abc",
          *       "message": "parameter 'p' must be an integer",
          *       "name": "bad_request",
          *       "temporary": false,
-         *       "timeout": true
+         *       "timeout": false
          *     } */
         Error: {
             /**
@@ -20498,12 +20489,12 @@ export interface components {
             name: string;
             /**
              * @description Is the error temporary?
-             * @example false
+             * @example true
              */
             temporary: boolean;
             /**
              * @description Is the error a timeout?
-             * @example false
+             * @example true
              */
             timeout: boolean;
         };
@@ -20933,12 +20924,12 @@ export interface components {
             token: string;
         };
         /** @example {
-         *       "token": "j"
+         *       "token": "3hu"
          *     } */
         GetCurrentUsageRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 0
+             * @example 1
              */
             token: string;
         };
@@ -21405,7 +21396,7 @@ export interface components {
         /** @example {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "startDate": "2023-01-01T10:00:00Z",
-         *       "token": "la"
+         *       "token": "zy8"
          *     } */
         GetUsageRequest: {
             /**
@@ -21422,7 +21413,7 @@ export interface components {
             startDate?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example wa
+             * @example z
              */
             token: string;
         };
@@ -22526,7 +22517,7 @@ export interface components {
         /** @example {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
-         *       "token": "1"
+         *       "token": "o"
          *     } */
         InviteUserRequest: {
             /**
@@ -22541,7 +22532,7 @@ export interface components {
             roleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example tu
+             * @example z2
              */
             token: string;
         };
@@ -29907,7 +29898,7 @@ export interface components {
         /** @example {
          *       "environmentType": "DEV",
          *       "orgId": "org-12345678",
-         *       "token": "4x",
+         *       "token": "nr6",
          *       "visibility": "PRIVATE"
          *     } */
         ListServiceOfferingsRequest: {
@@ -29918,12 +29909,12 @@ export interface components {
             environmentType?: string;
             /**
              * @description ID of an Org
-             * @example Rerum molestias dolorem.
+             * @example Dolorem dolorum maxime.
              */
             orgId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example n
+             * @example z
              */
             token: string;
             /**
@@ -31578,83 +31569,18 @@ export interface components {
             services?: components["schemas"]["DescribeServiceResult"][];
         };
         /** @example {
-         *       "token": "gf"
+         *       "token": "q"
          *     } */
         ListServicesOrchestrationsRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example 48
              */
             token: string;
         };
         /**
          * @description List of service orchestrations
          * @example [
-         *       {
-         *         "ServicesTopology": [
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Enim blanditiis."
-         *           },
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Enim blanditiis."
-         *           },
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Enim blanditiis."
-         *           },
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Enim blanditiis."
-         *           }
-         *         ],
-         *         "createdAt": "2021-01-01T00:00:00Z",
-         *         "id": "so-12345678",
-         *         "orchestrationFailedReason": "Invalid DSL",
-         *         "resultParams": {
-         *           "param1": "value1",
-         *           "param2": "value2"
-         *         },
-         *         "status": "PENDING",
-         *         "updatedAt": "2021-01-01T00:00:00Z"
-         *       },
          *       {
          *         "ServicesTopology": [
          *           {
@@ -31874,7 +31800,7 @@ export interface components {
         };
         /** @example {
          *       "status": "PENDING",
-         *       "token": "9"
+         *       "token": "gjs"
          *     } */
         ListSubscriptionRequestsRequest: {
             /**
@@ -31884,7 +31810,7 @@ export interface components {
             status?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 71
+             * @example l
              */
             token: string;
         };
@@ -32027,22 +31953,6 @@ export interface components {
              *         "updatedAt": "2019-01-01T00:00:00Z",
              *         "updatedByUserId": "user-12345678",
              *         "updatedByUserName": "John Doe"
-             *       },
-             *       {
-             *         "createdAt": "2019-01-01T00:00:00Z",
-             *         "id": "subr-12345678",
-             *         "productTierId": "pt-12345678",
-             *         "productTierName": "Omnistrate Multi Tenancy",
-             *         "rootUserEmail": "abc@gmail.com",
-             *         "rootUserId": "org-12345678",
-             *         "rootUserName": "John Doe",
-             *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Praesentium eum non quia.",
-             *         "serviceName": "MySQL multi-writer service",
-             *         "status": "PENDING",
-             *         "updatedAt": "2019-01-01T00:00:00Z",
-             *         "updatedByUserId": "user-12345678",
-             *         "updatedByUserName": "John Doe"
              *       }
              *     ]
              */
@@ -32051,7 +31961,7 @@ export interface components {
         /** @example {
          *       "environmentType": "DEV",
          *       "serviceId": "service-12345678",
-         *       "token": "8v"
+         *       "token": "w"
          *     } */
         ListSubscriptionsRequest: {
             /**
@@ -32066,7 +31976,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example crk
+             * @example i
              */
             token: string;
         };
@@ -32078,6 +31988,30 @@ export interface components {
          *       ],
          *       "nextPageToken": "next-token",
          *       "subscriptions": [
+         *         {
+         *           "accountConfigIdentityId": "org-12345678",
+         *           "allowCreatesWhenPaymentNotConfigured": true,
+         *           "cloudProviderNames": [
+         *             "aws",
+         *             "gcp"
+         *           ],
+         *           "createdAt": "2019-01-01T00:00:00Z",
+         *           "defaultSubscription": true,
+         *           "id": "sub-12345678",
+         *           "maxNumberOfInstances": 10,
+         *           "paymentMethodConfigured": true,
+         *           "productTierId": "pt-12345678",
+         *           "productTierName": "Omnistrate Multi Tenancy",
+         *           "roleType": "root",
+         *           "rootUserId": "user-12345678",
+         *           "serviceId": "s-12345678",
+         *           "serviceLogoURL": "Aut ea quia consequuntur et sunt itaque.",
+         *           "serviceName": "MySQL multi-writer service",
+         *           "serviceOrgId": "org-12345678",
+         *           "serviceOrgName": "Omnistrate",
+         *           "status": "ACTIVE",
+         *           "subscriptionOwnerName": "John Doe"
+         *         },
          *         {
          *           "accountConfigIdentityId": "org-12345678",
          *           "allowCreatesWhenPaymentNotConfigured": true,
@@ -32327,7 +32261,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32336,7 +32271,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32345,7 +32281,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32354,7 +32291,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -32419,7 +32357,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32428,7 +32367,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32437,7 +32377,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32446,7 +32387,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -32511,7 +32453,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32520,7 +32463,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32529,7 +32473,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             },
          *             {
          *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32538,7 +32483,8 @@ export interface components {
          *               "infraConfigId": "ic-12345678",
          *               "isExternal": true,
          *               "managedResourceType": "PortsBasedProxy",
-         *               "name": "MySQL multi-writer service"
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
          *             }
          *           ],
          *           "serviceId": "s-12345678",
@@ -32614,7 +32560,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32623,7 +32570,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32632,7 +32580,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32641,7 +32590,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -32706,7 +32656,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32715,7 +32666,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32724,7 +32676,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32733,7 +32686,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -32798,7 +32752,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32807,7 +32762,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32816,7 +32772,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32825,7 +32782,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -32890,7 +32848,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32899,7 +32858,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32908,7 +32868,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           },
              *           {
              *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -32917,7 +32878,8 @@ export interface components {
              *             "infraConfigId": "ic-12345678",
              *             "isExternal": true,
              *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service"
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
              *           }
              *         ],
              *         "serviceId": "s-12345678",
@@ -33143,12 +33105,12 @@ export interface components {
             jwtToken: string;
         };
         /** @example {
-         *       "token": "v"
+         *       "token": "um"
          *     } */
         LogoutRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example g15
+             * @example 0z6
              */
             token: string;
         };
@@ -33278,207 +33240,7 @@ export interface components {
         };
         /** @example {
          *       "DeploymentCellConfigurations": {
-         *         "Corporis modi delectus voluptatem.": {
-         *           "DeploymentCellConfigurationPerCloudProvider": {
-         *             "Hic et repellendus ducimus nisi recusandae.": {
-         *               "Amenities": [
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 }
-         *               ]
-         *             },
-         *             "Omnis ut alias corporis.": {
-         *               "Amenities": [
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 }
-         *               ]
-         *             }
-         *           }
-         *         },
-         *         "Doloremque voluptas tempora perspiciatis.": {
-         *           "DeploymentCellConfigurationPerCloudProvider": {
-         *             "Hic et repellendus ducimus nisi recusandae.": {
-         *               "Amenities": [
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 }
-         *               ]
-         *             },
-         *             "Omnis ut alias corporis.": {
-         *               "Amenities": [
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 },
-         *                 {
-         *                   "Description": "Ensures high availability across multiple zones.",
-         *                   "IsManaged": true,
-         *                   "Name": "Prometheus",
-         *                   "Properties": {
-         *                     "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-         *                     "Voluptatem et.": "Vitae rerum.",
-         *                     "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-         *                   },
-         *                   "Type": "HelmChart"
-         *                 }
-         *               ]
-         *             }
-         *           }
-         *         },
-         *         "Ipsum consequuntur.": {
+         *         "Quia voluptas temporibus nulla est.": {
          *           "DeploymentCellConfigurationPerCloudProvider": {
          *             "Hic et repellendus ducimus nisi recusandae.": {
          *               "Amenities": [
@@ -33584,107 +33346,7 @@ export interface components {
             /**
              * @description The default deployment cell configurations for the organization per environment.
              * @example {
-             *       "Eaque corporis quidem et cum beatae.": {
-             *         "DeploymentCellConfigurationPerCloudProvider": {
-             *           "Hic et repellendus ducimus nisi recusandae.": {
-             *             "Amenities": [
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               }
-             *             ]
-             *           },
-             *           "Omnis ut alias corporis.": {
-             *             "Amenities": [
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               },
-             *               {
-             *                 "Description": "Ensures high availability across multiple zones.",
-             *                 "IsManaged": true,
-             *                 "Name": "Prometheus",
-             *                 "Properties": {
-             *                   "Distinctio minus nostrum nulla ex odit.": "Perferendis a odio quis soluta eveniet dolor.",
-             *                   "Voluptatem et.": "Vitae rerum.",
-             *                   "Voluptatum mollitia esse.": "Corporis unde et et est ullam laudantium."
-             *                 },
-             *                 "Type": "HelmChart"
-             *               }
-             *             ]
-             *           }
-             *         }
-             *       },
-             *       "Excepturi et.": {
+             *       "Libero temporibus.": {
              *         "DeploymentCellConfigurationPerCloudProvider": {
              *           "Hic et repellendus ducimus nisi recusandae.": {
              *             "Amenities": [
@@ -33792,33 +33454,33 @@ export interface components {
         };
         /** @example {
          *       "id": "so-12345678",
-         *       "orchestrationModifyDSL": "Et ut hic.",
-         *       "token": "b"
+         *       "orchestrationModifyDSL": "Ratione explicabo dolores.",
+         *       "token": "ejh"
          *     } */
         ModifyServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Eligendi blanditiis dolore enim.
+             * @example Ad voluptas accusantium reiciendis doloremque blanditiis fugiat.
              */
             id: string;
             /**
              * @description base64 encoded content of services orchestration modify DSL
-             * @example Aut at cum odit.
+             * @example Et unde.
              */
             orchestrationModifyDSL: string;
             /**
              * @description JWT token used to perform authorization
-             * @example y
+             * @example xnx
              */
             token: string;
         };
         /** @example {
-         *       "orchestrationModifyDSL": "Nemo et qui quasi."
+         *       "orchestrationModifyDSL": "Dignissimos magni debitis aut omnis maxime."
          *     } */
         ModifyServicesOrchestrationRequest2: {
             /**
              * @description base64 encoded content of services orchestration modify DSL
-             * @example Eaque quae est occaecati.
+             * @example Et vitae impedit qui et perspiciatis.
              */
             orchestrationModifyDSL: string;
         };
@@ -35994,7 +35656,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a resource
-             * @example In numquam.
+             * @example Praesentium molestiae.
              */
             resourceId: string;
             /**
@@ -36722,7 +36384,8 @@ export interface components {
          *       "infraConfigId": "ic-12345678",
          *       "isExternal": true,
          *       "managedResourceType": "PortsBasedProxy",
-         *       "name": "MySQL multi-writer service"
+         *       "name": "MySQL multi-writer service",
+         *       "urlKey": "myResource"
          *     } */
         ResourceSummary: {
             /**
@@ -36760,6 +36423,11 @@ export interface components {
              * @example MySQL multi-writer service
              */
             name: string;
+            /**
+             * @description The URL key of the resource
+             * @example myResource
+             */
+            urlKey?: string;
         };
         /** @example {
          *       "id": "instance-abcd1234",
@@ -37041,7 +36709,7 @@ export interface components {
         /** @example {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
-         *       "token": "m"
+         *       "token": "5"
          *     } */
         RevokeUserRoleRequest: {
             /**
@@ -37056,7 +36724,7 @@ export interface components {
             roleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4
+             * @example mw
              */
             token: string;
         };
@@ -37695,7 +37363,7 @@ export interface components {
             statusMessage?: string;
             /**
              * @description ID of a Subscription
-             * @example Fugiat et et unde nobis consequatur quidem.
+             * @example Dolorum rerum totam veritatis iste aspernatur praesentium.
              */
             subscriptionId: string;
         };
@@ -38007,6 +37675,36 @@ export interface components {
          *       ],
          *       "productTierDescription": "A premium product tier",
          *       "productTierDocumentation": "Any documentation",
+         *       "productTierFeatures": [
+         *         {
+         *           "configuration": {
+         *             "provider": "native"
+         *           },
+         *           "feature": "LOGS",
+         *           "scope": "INTERNAL"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "provider": "native"
+         *           },
+         *           "feature": "LOGS",
+         *           "scope": "INTERNAL"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "provider": "native"
+         *           },
+         *           "feature": "LOGS",
+         *           "scope": "INTERNAL"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "provider": "native"
+         *           },
+         *           "feature": "LOGS",
+         *           "scope": "INTERNAL"
+         *         }
+         *       ],
          *       "productTierID": "pt-12345678",
          *       "productTierName": "Premium",
          *       "productTierPlanDescription": "A premium plan",
@@ -38036,20 +37734,8 @@ export interface components {
          *       "serviceEnvironmentType": "DEV",
          *       "serviceEnvironmentURLKey": "dev",
          *       "serviceEnvironmentVisibility": "PRIVATE",
-         *       "serviceLogoURL": "Dicta rem.",
+         *       "serviceLogoURL": "Quia aut dolorem ab placeat et.",
          *       "serviceModelFeatures": [
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-         *         },
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-         *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
@@ -38137,8 +37823,28 @@ export interface components {
              */
             productTierDocumentation: string;
             /**
+             * @description Enabled product tier features
+             * @example [
+             *       {
+             *         "configuration": {
+             *           "provider": "native"
+             *         },
+             *         "feature": "LOGS",
+             *         "scope": "INTERNAL"
+             *       },
+             *       {
+             *         "configuration": {
+             *           "provider": "native"
+             *         },
+             *         "feature": "LOGS",
+             *         "scope": "INTERNAL"
+             *       }
+             *     ]
+             */
+            productTierFeatures?: components["schemas"]["ProductTierFeatureDetail"][];
+            /**
              * @description ID of a Product Tier
-             * @example Et quo quia veritatis ut dolor quae.
+             * @example Quia veritatis ut dolor quae sunt.
              */
             productTierID: string;
             /**
@@ -38196,7 +37902,7 @@ export interface components {
             resourceParameters: components["schemas"]["ResourceEntity"][];
             /**
              * @description ID of a Service API
-             * @example Et praesentium molestiae.
+             * @example Earum aut.
              */
             serviceAPIID: string;
             /**
@@ -38231,24 +37937,12 @@ export interface components {
             serviceEnvironmentVisibility: string;
             /**
              * @description The logo for the service
-             * @example Cum delectus id consequatur sed.
+             * @example Sed quam et.
              */
             serviceLogoURL: string;
             /**
              * @description Enabled service model features
              * @example [
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
@@ -38266,7 +37960,7 @@ export interface components {
             serviceModelFeatures?: components["schemas"]["ServiceModelFeatureDetail"][];
             /**
              * @description ID of a Service Model
-             * @example Earum aut.
+             * @example Et cum.
              */
             serviceModelID: string;
             /**
@@ -38763,12 +38457,12 @@ export interface components {
             token: string;
         };
         /** @example {
-         *       "token": "1"
+         *       "token": "c8"
          *     } */
         StripeAuthorizeURLRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 6
+             * @example i
              */
             token: string;
         };
@@ -39002,7 +38696,8 @@ export interface components {
          *           "infraConfigId": "ic-12345678",
          *           "isExternal": true,
          *           "managedResourceType": "PortsBasedProxy",
-         *           "name": "MySQL multi-writer service"
+         *           "name": "MySQL multi-writer service",
+         *           "urlKey": "myResource"
          *         },
          *         {
          *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -39011,7 +38706,8 @@ export interface components {
          *           "infraConfigId": "ic-12345678",
          *           "isExternal": true,
          *           "managedResourceType": "PortsBasedProxy",
-         *           "name": "MySQL multi-writer service"
+         *           "name": "MySQL multi-writer service",
+         *           "urlKey": "myResource"
          *         }
          *       ],
          *       "serviceId": "s-12345678",
@@ -39123,7 +38819,8 @@ export interface components {
              *         "infraConfigId": "ic-12345678",
              *         "isExternal": true,
              *         "managedResourceType": "PortsBasedProxy",
-             *         "name": "MySQL multi-writer service"
+             *         "name": "MySQL multi-writer service",
+             *         "urlKey": "myResource"
              *       },
              *       {
              *         "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -39132,7 +38829,8 @@ export interface components {
              *         "infraConfigId": "ic-12345678",
              *         "isExternal": true,
              *         "managedResourceType": "PortsBasedProxy",
-             *         "name": "MySQL multi-writer service"
+             *         "name": "MySQL multi-writer service",
+             *         "urlKey": "myResource"
              *       },
              *       {
              *         "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -39141,7 +38839,8 @@ export interface components {
              *         "infraConfigId": "ic-12345678",
              *         "isExternal": true,
              *         "managedResourceType": "PortsBasedProxy",
-             *         "name": "MySQL multi-writer service"
+             *         "name": "MySQL multi-writer service",
+             *         "urlKey": "myResource"
              *       }
              *     ]
              */
@@ -40206,7 +39905,7 @@ export interface components {
         };
         /** @example {
          *       "defaultValue": "[\"1\", \"2.8\", \"3\"]",
-         *       "description": "Voluptas totam rerum natus modi ullam sint.",
+         *       "description": "Optio iusto quam.",
          *       "hasOptions": false,
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
@@ -40219,14 +39918,14 @@ export interface components {
          *         "min": "Consequatur ex quas.",
          *         "minLength": "Eaque ab molestiae."
          *       },
-         *       "modifiable": false,
-         *       "name": "8",
+         *       "modifiable": true,
+         *       "name": "n0",
          *       "options": [
          *         "[\"1\", \"2.8\", \"3\"]",
          *         "[\"3.4\", \"4.5\"]"
          *       ],
          *       "regex": "^[0-9]+$",
-         *       "required": true,
+         *       "required": false,
          *       "tabIndex": 1
          *     } */
         UpdateInputParameterRequest2: {
@@ -40237,7 +39936,7 @@ export interface components {
             defaultValue?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Quam numquam numquam porro et.
+             * @example Aut tempora qui molestiae velit.
              */
             description?: string;
             /**
@@ -40264,7 +39963,7 @@ export interface components {
             modifiable?: boolean;
             /**
              * @description External name for the input parameter
-             * @example 0zo
+             * @example ar
              */
             name?: string;
             /**
@@ -40553,7 +40252,7 @@ export interface components {
          *       },
          *       "stableEgressIP": true,
          *       "tlsTerminationPort": 443,
-         *       "zoneConfiguration": "Quia voluptas temporibus nulla est."
+         *       "zoneConfiguration": "Officia dolores harum dolorem."
          *     } */
         UpdateNetworkConfigRequest2: {
             /**
@@ -40599,7 +40298,7 @@ export interface components {
             tlsTerminationPort?: number;
             /**
              * @description The preferred type of zonal availability for this resource and the specific zone(s) to deploy in
-             * @example Voluptas architecto libero temporibus.
+             * @example Distinctio fugit deserunt.
              */
             zoneConfiguration?: string;
         };
@@ -40660,7 +40359,7 @@ export interface components {
          *       "name": "Username",
          *       "value": "johndoe",
          *       "valueRef": "$var.username",
-         *       "valueType": "Quod distinctio fugit deserunt."
+         *       "valueType": "Ut voluptas totam rerum natus modi."
          *     } */
         UpdateOutputParameterRequest2: {
             /**
@@ -40683,14 +40382,14 @@ export interface components {
              * @example $var.username
              */
             valueRef?: string;
-            /** @example Aliquid ipsum. */
+            /** @example Voluptatem expedita est debitis eius repellendus quod. */
             valueType?: string;
         };
         /** @example {
          *       "currentPassword": "currentPassword",
          *       "currentPasswordHash": "currentPasswordHash",
          *       "password": "password",
-         *       "token": "m"
+         *       "token": "7h"
          *     } */
         UpdatePasswordRequest: {
             /** @example currentPassword */
@@ -40701,7 +40400,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xaw
+             * @example g3
              */
             token: string;
         };
@@ -41982,7 +41681,30 @@ export interface components {
          *         "template": "apiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-prod\nspec:\n  acme:\n    server: https://acme-v02.api.letsencrypt.org/directory\n    email: test@example.com\n    privateKeySecretRef:\n      name: letsencrypt-prod\n    solvers:\n    - http01:\n        ingress:\n          class: nginx"
          *       },
          *       "terraformConfigurations": {
-         *         "Voluptatem nihil aut dolore inventore porro earum.": {
+         *         "Accusantium est ipsam qui sed.": {
+         *           "gitConfiguration": {
+         *             "accessToken": "my-token",
+         *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *             "referenceName": "tags/v1.0.0",
+         *             "repositoryUrl": "https://github.com/username/myrepo",
+         *             "userName": "my-user"
+         *           },
+         *           "privateModuleGitAccessTokens": {
+         *             "tokenName": "accessToken"
+         *           },
+         *           "requiredOutputKeys": [
+         *             "output1"
+         *           ],
+         *           "requiredOutputs": [
+         *             {
+         *               "exported": true,
+         *               "key": "output1"
+         *             }
+         *           ],
+         *           "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
+         *           "terraformPath": "/project1/tf"
+         *         },
+         *         "Eum sunt quia consequatur.": {
          *           "gitConfiguration": {
          *             "accessToken": "my-token",
          *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -42100,30 +41822,7 @@ export interface components {
             /**
              * @description The Terraform configurations for various cloud providers
              * @example {
-             *       "Et repudiandae voluptatem explicabo.": {
-             *         "gitConfiguration": {
-             *           "accessToken": "my-token",
-             *           "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-             *           "referenceName": "tags/v1.0.0",
-             *           "repositoryUrl": "https://github.com/username/myrepo",
-             *           "userName": "my-user"
-             *         },
-             *         "privateModuleGitAccessTokens": {
-             *           "tokenName": "accessToken"
-             *         },
-             *         "requiredOutputKeys": [
-             *           "output1"
-             *         ],
-             *         "requiredOutputs": [
-             *           {
-             *             "exported": true,
-             *             "key": "output1"
-             *           }
-             *         ],
-             *         "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
-             *         "terraformPath": "/project1/tf"
-             *       },
-             *       "Quia consequatur velit.": {
+             *       "Aut vel soluta id sit qui.": {
              *         "gitConfiguration": {
              *           "accessToken": "my-token",
              *           "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -42405,7 +42104,7 @@ export interface components {
          *       "name": "Production",
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "sourceEnvironmentId": "se-12345678",
-         *       "visibility": "Enim cupiditate modi."
+         *       "visibility": "Temporibus voluptatem nobis omnis alias nihil quibusdam."
          *     } */
         UpdateServiceEnvironmentRequest2: {
             /**
@@ -42444,7 +42143,7 @@ export interface components {
             sourceEnvironmentId?: string;
             /**
              * @description This parameter is used to configure the visibility of the service control-plane APIs
-             * @example Temporibus voluptatem nobis omnis alias nihil quibusdam.
+             * @example Et aut.
              */
             visibility?: string;
         };
@@ -42535,7 +42234,7 @@ export interface components {
         /** @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "Quia voluptate id."
+         *       "serviceLogoURL": "Voluptas vero voluptatibus deserunt sint quis aperiam."
          *     } */
         UpdateServiceRequest2: {
             /**
@@ -42550,7 +42249,7 @@ export interface components {
             name?: string;
             /**
              * @description The logo for the service
-             * @example Voluptas vero voluptatibus deserunt sint quis aperiam.
+             * @example Nesciunt impedit mollitia adipisci amet doloribus.
              */
             serviceLogoURL?: string;
         };
@@ -42806,16 +42505,16 @@ export interface components {
          *       },
          *       "id": "user-abcd1234",
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Dolorum fugiat perspiciatis iure similique enim nemo.",
+         *       "orgCookiePolicy": "Ad error.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "http://wehner.info/lauriane",
-         *       "orgLogoURL": "http://steuber.biz/kieran_o'connell",
+         *       "orgFavIconURL": "http://monahan.name/deborah",
+         *       "orgLogoURL": "http://mcglynn.com/gerald.wiegand",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Consequatur explicabo.",
+         *       "orgPrivacyPolicy": "Error veritatis suscipit sapiente cupiditate.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Facilis consequatur exercitationem possimus iste.",
+         *       "orgTermsOfUse": "Corrupti repellat dolorem quam.",
          *       "orgURL": "something.acme",
-         *       "token": "7m"
+         *       "token": "s"
          *     } */
         UpdateUserRequest: {
             address?: components["schemas"]["Address"];
@@ -42831,7 +42530,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns in an HTML format
-             * @example Illum ipsam inventore.
+             * @example Aut asperiores fugiat dolor in vero qui.
              */
             orgCookiePolicy?: string;
             /**
@@ -42842,13 +42541,13 @@ export interface components {
             /**
              * Format: uri
              * @description The favicon of the org that this user owns
-             * @example http://glover.com/nikki
+             * @example http://boganschmidt.net/hellen
              */
             orgFavIconURL?: string;
             /**
              * Format: uri
              * @description The logo of the org that this user owns
-             * @example http://beahan.name/modesto.towne
+             * @example http://effertz.net/genevieve_padberg
              */
             orgLogoURL?: string;
             /**
@@ -42858,7 +42557,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns in an HTML format
-             * @example Omnis modi rerum dolore rerum delectus cumque.
+             * @example Maiores fugit vero eum doloremque veritatis cum.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -42868,7 +42567,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns in an HTML format
-             * @example Non sit reprehenderit culpa qui ipsum fuga.
+             * @example Ullam officia nam.
              */
             orgTermsOfUse?: string;
             /**
@@ -42878,7 +42577,7 @@ export interface components {
             orgURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4ro
+             * @example k07
              */
             token: string;
         };
@@ -42893,14 +42592,14 @@ export interface components {
          *         "zip": "94123"
          *       },
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Et perspiciatis quia dignissimos magni debitis.",
+         *       "orgCookiePolicy": "Quam quaerat quasi voluptatibus.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "http://ritchiesenger.net/roderick_kassulke",
-         *       "orgLogoURL": "http://swift.com/jacinthe",
+         *       "orgFavIconURL": "http://skileseichmann.name/una.parker",
+         *       "orgLogoURL": "http://mohranderson.org/fae",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Non et vitae impedit.",
+         *       "orgPrivacyPolicy": "Eaque praesentium vel minus accusamus pariatur nihil.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Minima aut commodi voluptatibus deleniti sed sint.",
+         *       "orgTermsOfUse": "Quibusdam quia voluptatem accusantium excepturi culpa.",
          *       "orgURL": "something.acme"
          *     } */
         UpdateUserRequest2: {
@@ -42912,7 +42611,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns in an HTML format
-             * @example Nihil aut totam suscipit enim aspernatur.
+             * @example Officiis sit ipsum vel alias.
              */
             orgCookiePolicy?: string;
             /**
@@ -42923,13 +42622,13 @@ export interface components {
             /**
              * Format: uri
              * @description The favicon of the org that this user owns
-             * @example http://hills.org/deshaun
+             * @example http://bayerwillms.com/raoul
              */
             orgFavIconURL?: string;
             /**
              * Format: uri
              * @description The logo of the org that this user owns
-             * @example http://okeefe.com/camila
+             * @example http://volkman.net/jane_hegmann
              */
             orgLogoURL?: string;
             /**
@@ -42939,7 +42638,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns in an HTML format
-             * @example Molestiae explicabo.
+             * @example Quam quia repellendus eveniet aut sint.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -42949,7 +42648,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns in an HTML format
-             * @example Voluptatem blanditiis asperiores.
+             * @example Eos voluptates error vero rem.
              */
             orgTermsOfUse?: string;
             /**
@@ -44510,7 +44209,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Autem esse ea. */
+                    /** @example Exercitationem quasi dicta animi est illo consequuntur. */
                     "application/json": string;
                 };
             };
@@ -44943,7 +44642,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Rerum qui possimus dolores reiciendis velit quo. */
+                    /** @example Autem esse ea. */
                     "application/json": string;
                 };
             };
@@ -50105,7 +49804,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Ut fugiat eveniet reprehenderit. */
+                    /** @example Commodi et velit delectus. */
                     "application/json": string;
                 };
             };
@@ -53858,8 +53557,9 @@ export interface operations {
                 /**
                  * @description The event types to filter by
                  * @example [
-                 *       "Quam labore repellendus et quaerat.",
-                 *       "Neque id et sed id est."
+                 *       "Molestias dolores consequatur maxime et.",
+                 *       "Ut odit.",
+                 *       "Aut tenetur voluptas cupiditate."
                  *     ]
                  */
                 eventSourceTypes?: string[];
@@ -55067,6 +54767,84 @@ export interface operations {
                 };
                 content: {
                     /** @example [
+                     *       {
+                     *         "ServicesTopology": [
+                     *           {
+                     *             "dependsOnDeployment": [
+                     *               "instanceDeploymentAlias1",
+                     *               "instanceDeploymentAlias2"
+                     *             ],
+                     *             "failedReason": "Invalid inputs",
+                     *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+                     *             "instanceId": "i-12345678",
+                     *             "serviceId": "s-12345678",
+                     *             "status": "PENDING",
+                     *             "statusMessage": "Creating deployment",
+                     *             "subscriptionId": "Voluptas ut cumque explicabo sed quibusdam voluptatum."
+                     *           },
+                     *           {
+                     *             "dependsOnDeployment": [
+                     *               "instanceDeploymentAlias1",
+                     *               "instanceDeploymentAlias2"
+                     *             ],
+                     *             "failedReason": "Invalid inputs",
+                     *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+                     *             "instanceId": "i-12345678",
+                     *             "serviceId": "s-12345678",
+                     *             "status": "PENDING",
+                     *             "statusMessage": "Creating deployment",
+                     *             "subscriptionId": "Voluptas ut cumque explicabo sed quibusdam voluptatum."
+                     *           }
+                     *         ],
+                     *         "createdAt": "2021-01-01T00:00:00Z",
+                     *         "id": "so-12345678",
+                     *         "orchestrationFailedReason": "Invalid DSL",
+                     *         "resultParams": {
+                     *           "param1": "value1",
+                     *           "param2": "value2"
+                     *         },
+                     *         "status": "PENDING",
+                     *         "updatedAt": "2021-01-01T00:00:00Z"
+                     *       },
+                     *       {
+                     *         "ServicesTopology": [
+                     *           {
+                     *             "dependsOnDeployment": [
+                     *               "instanceDeploymentAlias1",
+                     *               "instanceDeploymentAlias2"
+                     *             ],
+                     *             "failedReason": "Invalid inputs",
+                     *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+                     *             "instanceId": "i-12345678",
+                     *             "serviceId": "s-12345678",
+                     *             "status": "PENDING",
+                     *             "statusMessage": "Creating deployment",
+                     *             "subscriptionId": "Voluptas ut cumque explicabo sed quibusdam voluptatum."
+                     *           },
+                     *           {
+                     *             "dependsOnDeployment": [
+                     *               "instanceDeploymentAlias1",
+                     *               "instanceDeploymentAlias2"
+                     *             ],
+                     *             "failedReason": "Invalid inputs",
+                     *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+                     *             "instanceId": "i-12345678",
+                     *             "serviceId": "s-12345678",
+                     *             "status": "PENDING",
+                     *             "statusMessage": "Creating deployment",
+                     *             "subscriptionId": "Voluptas ut cumque explicabo sed quibusdam voluptatum."
+                     *           }
+                     *         ],
+                     *         "createdAt": "2021-01-01T00:00:00Z",
+                     *         "id": "so-12345678",
+                     *         "orchestrationFailedReason": "Invalid DSL",
+                     *         "resultParams": {
+                     *           "param1": "value1",
+                     *           "param2": "value2"
+                     *         },
+                     *         "status": "PENDING",
+                     *         "updatedAt": "2021-01-01T00:00:00Z"
+                     *       },
                      *       {
                      *         "ServicesTopology": [
                      *           {
@@ -57516,128 +57294,6 @@ export interface operations {
                      *           "serviceProviderId": "sp-9zrg9W8Are",
                      *           "serviceProviderName": "Omnistrate, Inc.",
                      *           "serviceURLKey": "mysql"
-                     *         },
-                     *         {
-                     *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "isDeprecated": false,
-                     *           "offerings": [
-                     *             {
-                     *               "allowCreatesWhenPaymentNotConfigured": true,
-                     *               "assets": {
-                     *                 "cloudFormationURL": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa",
-                     *                 "cloudFormationURLNoLB": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa&param_CreateLoadBalancerPolicy=false"
-                     *               },
-                     *               "maxNumberOfInstances": 4,
-                     *               "productTierName": "Premium",
-                     *               "productTierURLKey": "premium",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-12345678",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PRIVATE",
-                     *               "serviceModelName": "Bring Your Own Account",
-                     *               "serviceModelURLKey": "byoa"
-                     *             },
-                     *             {
-                     *               "productTierName": "Basic",
-                     *               "productTierURLKey": "basic",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-abcdefgh",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PUBLIC",
-                     *               "serviceModelName": "Hosted",
-                     *               "serviceModelURLKey": "hosted"
-                     *             }
-                     *           ],
-                     *           "serviceDescription": "MySQL is a relational database",
-                     *           "serviceId": "s-12345678",
-                     *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "org-12345678",
-                     *           "serviceProviderId": "sp-9zrg9W8Are",
-                     *           "serviceProviderName": "Omnistrate, Inc.",
-                     *           "serviceURLKey": "mysql"
-                     *         },
-                     *         {
-                     *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "isDeprecated": false,
-                     *           "offerings": [
-                     *             {
-                     *               "allowCreatesWhenPaymentNotConfigured": true,
-                     *               "assets": {
-                     *                 "cloudFormationURL": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa",
-                     *                 "cloudFormationURLNoLB": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa&param_CreateLoadBalancerPolicy=false"
-                     *               },
-                     *               "maxNumberOfInstances": 4,
-                     *               "productTierName": "Premium",
-                     *               "productTierURLKey": "premium",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-12345678",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PRIVATE",
-                     *               "serviceModelName": "Bring Your Own Account",
-                     *               "serviceModelURLKey": "byoa"
-                     *             },
-                     *             {
-                     *               "productTierName": "Basic",
-                     *               "productTierURLKey": "basic",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-abcdefgh",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PUBLIC",
-                     *               "serviceModelName": "Hosted",
-                     *               "serviceModelURLKey": "hosted"
-                     *             }
-                     *           ],
-                     *           "serviceDescription": "MySQL is a relational database",
-                     *           "serviceId": "s-12345678",
-                     *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "org-12345678",
-                     *           "serviceProviderId": "sp-9zrg9W8Are",
-                     *           "serviceProviderName": "Omnistrate, Inc.",
-                     *           "serviceURLKey": "mysql"
                      *         }
                      *       ]
                      *     } */
@@ -57854,7 +57510,18 @@ export interface operations {
     };
     "service-offering-api/DescribeServiceOfferingResource": {
         parameters: {
-            query?: never;
+            query?: {
+                /**
+                 * @description The product tier Id
+                 * @example pt-12345678
+                 */
+                productTierId?: string;
+                /**
+                 * @description The product tier version
+                 * @example 1.0.0
+                 */
+                productTierVersion?: string;
+            };
             header?: never;
             path: {
                 /**
@@ -58684,7 +58351,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the compute config to describe. If not specified, the latest version is described.
-                 * @example Alias omnis voluptas.
+                 * @example Id quasi quaerat delectus in fuga assumenda.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -59824,6 +59491,10 @@ export interface operations {
                      *       {
                      *         "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
                      *         "targetEnvironmentID": "se-12345678"
+                     *       },
+                     *       {
+                     *         "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *         "targetEnvironmentID": "se-12345678"
                      *       }
                      *     ] */
                     "application/json": components["schemas"]["EnvironmentPromotionStatus"][];
@@ -60463,7 +60134,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the image config to describe. If not specified, the latest version is described.
-                 * @example Perferendis culpa.
+                 * @example Et veritatis rerum ducimus.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -61123,7 +60794,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the infra config to describe. If not specified, the latest version is described.
-                 * @example Fugit aut nemo.
+                 * @example Doloremque aperiam ab illo.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -62133,7 +61804,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Expedita consectetur maiores possimus quod.
+                 * @example Ut ex debitis adipisci dolorem.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -63955,7 +63626,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the network config to describe. If not specified, the latest version is described.
-                 * @example Commodi et velit delectus.
+                 * @example Aut laboriosam eos necessitatibus.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -64491,7 +64162,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Dolor ea reiciendis.
+                 * @example Et eum qui ut.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -65914,7 +65585,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -65923,7 +65595,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -65988,7 +65661,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -65997,7 +65671,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -66062,7 +65737,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66071,7 +65747,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -66136,7 +65813,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66145,7 +65823,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -66315,7 +65994,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66324,7 +66004,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -66389,7 +66070,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             },
                      *             {
                      *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66398,7 +66080,8 @@ export interface operations {
                      *               "infraConfigId": "ic-12345678",
                      *               "isExternal": true,
                      *               "managedResourceType": "PortsBasedProxy",
-                     *               "name": "MySQL multi-writer service"
+                     *               "name": "MySQL multi-writer service",
+                     *               "urlKey": "myResource"
                      *             }
                      *           ],
                      *           "serviceId": "s-12345678",
@@ -66653,7 +66336,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66662,7 +66346,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         }
                      *       ],
                      *       "serviceId": "s-12345678",
@@ -66817,7 +66502,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66826,7 +66512,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66835,7 +66522,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         }
                      *       ],
                      *       "serviceId": "s-12345678",
@@ -66990,7 +66678,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -66999,7 +66688,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -67008,7 +66698,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         }
                      *       ],
                      *       "serviceId": "s-12345678",
@@ -67296,7 +66987,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -67305,7 +66997,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         }
                      *       ],
                      *       "serviceId": "s-12345678",
@@ -67468,7 +67161,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -67477,7 +67171,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -67486,7 +67181,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         },
                      *         {
                      *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -67495,7 +67191,8 @@ export interface operations {
                      *           "infraConfigId": "ic-12345678",
                      *           "isExternal": true,
                      *           "managedResourceType": "PortsBasedProxy",
-                     *           "name": "MySQL multi-writer service"
+                     *           "name": "MySQL multi-writer service",
+                     *           "urlKey": "myResource"
                      *         }
                      *       ],
                      *       "serviceId": "s-12345678",
@@ -67574,7 +67271,7 @@ export interface operations {
                 managed?: boolean;
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Magni id.
+                 * @example Ea architecto quia.
                  */
                 ProductTierVersion?: string;
             };
@@ -68838,7 +68535,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Sed qui possimus fugit voluptatem in.
+                 * @example Sapiente eum maxime magni occaecati inventore et.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -70155,7 +69852,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Voluptas similique earum qui.
+                 * @example Ipsum placeat.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -71042,7 +70739,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Molestias delectus occaecati. */
+                    /** @example Voluptatem nihil. */
                     "application/json": string;
                 };
             };
@@ -71425,7 +71122,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Error aut quis rerum reiciendis labore itaque.
+                 * @example Assumenda sunt recusandae.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -71885,7 +71582,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Et eum qui ut.
+                 * @example Veniam esse veniam nulla sint distinctio veritatis.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -72054,7 +71751,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Sit aut alias dignissimos impedit est.
+                 * @example Ut vel quia dolor sed totam et.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -73562,7 +73259,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the storage config to describe. If not specified, the latest version is described.
-                 * @example Quia et nostrum et perferendis nihil.
+                 * @example Quia veniam vitae iure delectus omnis.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -74228,7 +73925,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the network config to describe. If not specified, the latest version is described.
-                 * @example Aut laboriosam eos necessitatibus.
+                 * @example Consequatur ducimus id.
                  */
                 ProductTierVersion?: string;
                 /**

@@ -27,6 +27,8 @@ import PreviewCard from "components/DynamicForm/PreviewCard";
 import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
+
+import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { getInitialValues } from "../utils";
 
@@ -111,7 +113,8 @@ const InstanceForm = ({
       subscriptions,
       serviceOfferingsObj,
       serviceOfferings,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      [] // Will be updated later when customerVersionSets loads
     ),
     enableReinitialize: true,
     validationSchema: validationSchema,
@@ -119,13 +122,43 @@ const InstanceForm = ({
     validateOnChange: true,
     onSubmit: async (values) => {
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
-      const selectedResource = offering?.resourceParameters.find(
-        (resource) => resource.resourceId === values.resourceId
-      );
+
+      // Determine if we should use version set resources or service offering resources
+      // Check for VERSION_SET_OVERRIDE feature with CUSTOMER scope in productTierFeatures
+      const allowCustomerVersionOverride =
+        offering?.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        ) || false;
+
+      let resourceKey = "";
+
+      if (allowCustomerVersionOverride && values.productTierVersion) {
+        // Get resource from the selected version set
+        const selectedVersionSet = customerVersionSets.find(
+          (versionSet) => versionSet.version === values.productTierVersion
+        );
+        const selectedVersionSetResource = selectedVersionSet?.resources?.find(
+          (resource) => resource.id === values.resourceId
+        );
+        // For version set resources, use the resource id as the key
+        resourceKey = selectedVersionSetResource?.urlKey || "";
+      } else {
+        // Get resource from service offering
+        const selectedOfferingResource = offering?.resourceParameters.find(
+          (resource) => resource.resourceId === values.resourceId
+        );
+        // For service offering resources, use the urlKey
+        resourceKey = selectedOfferingResource?.urlKey || "";
+      }
 
       const data: any = {
         ...cloneDeep(values),
       };
+
+      // Remove productTierVersion if allowCustomerVersionOverride is false or if we're not creating
+      if (!allowCustomerVersionOverride || formMode !== "create") {
+        delete data.productTierVersion;
+      }
 
       const createSchema =
         // eslint-disable-next-line no-use-before-define
@@ -210,7 +243,7 @@ const InstanceForm = ({
 
         if (inputParametersObj["custom_dns_configuration"] && data.requestParams["custom_dns_configuration"]) {
           data.requestParams.custom_dns_configuration = {
-            [selectedResource?.urlKey || ""]: data.requestParams.custom_dns_configuration,
+            [resourceKey]: data.requestParams.custom_dns_configuration,
           };
         }
 
@@ -231,7 +264,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
               },
               query: {
                 subscriptionId: values.subscriptionId,
@@ -309,7 +342,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
                 id: selectedInstance?.id,
               },
               query: {
@@ -332,10 +365,29 @@ const InstanceForm = ({
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
+  const allowCustomerVersionOverride =
+    offering?.productTierFeatures?.some(
+      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+    ) || false;
+
+  //fetch product tier versions
+  const { data: customerVersionSets = [], isFetching: isFetchingVersionSets } = useCustomerVersionSets(
+    {
+      serviceId: values.serviceId,
+      productTierId: values.servicePlanId,
+    },
+    {
+      // Only fetch customer version sets if the offering supports VERSION_SET_OVERRIDE feature
+      enabled: allowCustomerVersionOverride,
+    }
+  );
+
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,
     resourceId: selectedInstance?.resourceID || values.resourceId,
     instanceId: selectedInstance?.id,
+    productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
+    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
   });
 
   const resourceCreateSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
@@ -571,7 +623,9 @@ const InstanceForm = ({
       formMode,
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      customerVersionSets, 
+      isFetchingVersionSets
     );
   }, [
     formMode,
@@ -580,6 +634,7 @@ const InstanceForm = ({
     customAvailabilityZones,
     subscriptions,
     nonCloudAccountInstances,
+    customerVersionSets,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
@@ -645,7 +700,7 @@ const InstanceForm = ({
           </div>
         </CardWithTitle>
 
-        {isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
+        {isFetchingVersionSets || isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
           <CardWithTitle title="Network Configuration">
             <div className="space-y-6">
               {networkConfigurationFields.map((field, index) => {
@@ -654,7 +709,7 @@ const InstanceForm = ({
             </div>
           </CardWithTitle>
         )}
-        {isFetchingResourceSchema ? (
+        {isFetchingVersionSets || isFetchingResourceSchema ? (
           <LoadingSpinner />
         ) : !deploymentConfigurationFields.length ? null : (
           <CardWithTitle title="Deployment Configuration">
