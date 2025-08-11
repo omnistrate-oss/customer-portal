@@ -293,6 +293,7 @@ const CloudAccountForm = ({
               emptyMenuText: "No Products available",
               isLoading: isFetchingServiceOfferings,
               menuItems: serviceMenuItems,
+              isHidden: serviceMenuItems.length === 1,
               disabled: formMode !== "create",
               onChange: (e) => {
                 // When Service ID Changes
