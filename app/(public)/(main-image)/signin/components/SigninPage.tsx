@@ -10,7 +10,6 @@ import Logo from "src/components/NonDashboardComponents/Logo";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { IdentityProvider } from "src/types/identityProvider";
-import DisplayHeading from "components/NonDashboardComponents/DisplayHeading";
 
 const SignInForm = dynamic(() => import("./SignInForm"), { ssr: false });
 
@@ -56,7 +55,6 @@ const SigninPage: FC<SignInPageProps> = (props) => {
           ""
         )}
       </Box>
-      <DisplayHeading mt="24px">Login to your account</DisplayHeading>
       <Box>
         <SignInForm
           identityProviders={identityProviders}
