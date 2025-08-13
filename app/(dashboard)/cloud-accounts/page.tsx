@@ -655,7 +655,7 @@ const CloudAccountsPage = () => {
         onClose={() => {
           setIsOverlayOpen(false);
         }}
-        isDeletingInstance={deleteCloudAccountInstanceMutation.isPending}
+        isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={selectedAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
