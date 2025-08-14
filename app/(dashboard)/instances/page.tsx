@@ -79,7 +79,7 @@ const InstancesPage = () => {
     serviceOfferingsObj,
     isFetchingSubscriptions,
     isFetchingServiceOfferings,
-    setShowNotFoundError,
+    setShowGlobalProviderError,
   } = useGlobalData();
 
   const [selectedFilters, setSelectedFilters] =
@@ -349,9 +349,9 @@ const InstancesPage = () => {
 
   useEffect(() => {
     if (isInstancesError) {
-      setShowNotFoundError(true);
+      setShowGlobalProviderError(true);
     }
-  }, [isInstancesError, setShowNotFoundError]);
+  }, [isInstancesError, setShowGlobalProviderError]);
 
   // Filter BYOA Account Instances
   const nonBYOAInstances = useMemo(() => {

@@ -39,7 +39,7 @@ const GlobalProviderError = () => {
 
   const isOnInstancesPage = pathname === "/instances" || pathname?.startsWith("/instances/");
 
-  const handleRetryAction = async () => {
+  const handleRetryAction = () => {
     if (isOnInstancesPage) {
       // Force a page reload to ensure everything refreshes
       window.location.reload();

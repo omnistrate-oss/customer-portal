@@ -34,8 +34,8 @@ type Context = {
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>;
   servicesObj: Record<string, any>;
 
-  showNotFoundError: boolean;
-  setShowNotFoundError: SetState<boolean>;
+  showGlobalProviderError: boolean;
+  setShowGlobalProviderError: SetState<boolean>;
 };
 
 export const GlobalDataContext = createContext<Context | undefined>(undefined);
@@ -51,7 +51,7 @@ export const useGlobalData = () => {
 };
 
 const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
-  const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [showGlobalProviderError, setShowGlobalProviderError] = useState(false);
   const {
     data: subscriptions = [],
     isPending: isSubscriptionsPending,
@@ -107,7 +107,7 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
   }, [subscriptions]);
 
   // Handle critical API errors - show GlobalProviderError component if key APIs fail
-  if (isServiceOfferingsError || isSubscriptionsError || showNotFoundError) {
+  if (isServiceOfferingsError || isSubscriptionsError || showGlobalProviderError) {
     return <GlobalProviderError />;
   }
 
@@ -142,8 +142,8 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
         subscriptionsObj,
         servicesObj,
 
-        showNotFoundError,
-        setShowNotFoundError,
+        showGlobalProviderError,
+        setShowGlobalProviderError,
       }}
     >
       {children}
