@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 // import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
@@ -55,7 +55,7 @@ const Footer = styled(Box)({
   gap: "16px",
 });
 
-const LastInstanceConfimationMessage: FC<{
+const LastInstanceConfirmationMessage: FC<{
   step: number;
   offboardingInstructionDetails: OffboardInstructionDetails;
 }> = ({ step, offboardingInstructionDetails }) => {
@@ -68,7 +68,7 @@ const LastInstanceConfimationMessage: FC<{
         </Text>
         <Box marginLeft="10px" marginTop="20px" borderLeft="2px solid #F79009" paddingLeft="10px">
           <Text size="small" weight="medium" color="#414651">
-            <b>Note:</b> Deletion may take a few minutes and will run in the background.You can safely close this popup
+            <b>Note:</b> Deletion may take a few minutes and will run in the background. You can safely close this popup
             and return later to complete the off-boarding step.
             <br />
             <br />
@@ -103,17 +103,18 @@ type DeleteAccountConfigConfirmationDialogProps = {
   isLoadingAccountConfig: boolean;
   open: boolean;
   onClose: () => void;
-  isDeletingInstance: boolean;
+  isDeleteInstanceMutationPending: boolean;
   // isDeletingAccountConfig: boolean;
   onInstanceDeleteClick: () => Promise<void>;
   onOffboardClick: () => Promise<void>;
   offboardingInstructionDetails: OffboardInstructionDetails;
+  instanceId?: string;
 };
 
 const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationDialogProps> = (props) => {
   const {
     open = false,
-    isDeletingInstance,
+    isDeleteInstanceMutationPending,
     // isDeletingAccountConfig,
     accountConfig,
     instanceStatus,
@@ -121,24 +122,31 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     onClose,
     onInstanceDeleteClick,
     onOffboardClick,
+    instanceId,
   } = props;
 
   const snackbar = useSnackbar();
-  const firstDeleteRequestMade = useRef(false);
   const stepChangedToOffboard = useRef(false);
   const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
-  // const isLastInstance = true;
 
-  const showStepper = isLastInstance;
+  //show offboard step only if the instance is the last instance and the account config is found
+  const isMultiStepDialog = Boolean(isLastInstance && accountConfig);
+
+  //This variable is used infer whether to show spinner on the delete button when the delete request is made on step one
+  // The spinner needs to be shown when the button when the mutation is in pending state or if the instance is in deleting state and the account config is not ready to offboard
+  //after the mutation is complete we refetch the instance status, and it is expected to be in DELETING state
+  //for the duration till the instance status is refetched, this variable is used to show the spinner
+  const [hasRequestedDeletion, setHasRequestedDeletion] = useState(false);
+
+  let isDeletingInstance = false;
+  const showStepper = isMultiStepDialog;
   let step: "delete" | "offboard" = "delete";
 
   let buttonText = "Delete";
   let IconComponent = DeleteCirleIcon;
   let title = "Delete Confirmation";
-  let isButtonDisabled = false;
-  let isDeletionInProgress = false;
 
-  if (isLastInstance) {
+  if (isMultiStepDialog) {
     IconComponent = OffboardConfirmationIcon;
     title = "Delete and Offboard Account";
   }
@@ -150,20 +158,34 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
       buttonText = "Offboard";
     } else if (
       (instanceStatus === "DELETING" && accountConfig?.status !== "READY_TO_OFFBOARD") ||
-      firstDeleteRequestMade.current === true
+      isDeleteInstanceMutationPending ||
+      hasRequestedDeletion
     ) {
+      step = "delete";
       buttonText = "Deleting";
-      isButtonDisabled = true;
-      isDeletionInProgress = true;
+      isDeletingInstance = true;
     }
   }
 
+  useEffect(() => {
+    if (step === "offboard" && hasRequestedDeletion) {
+      // If we are in the offboard step and a deletion request was made, reset the deletion request state
+      setHasRequestedDeletion(false);
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  //reset hasRequestedDeletion state to false when instanceId changes
+  useEffect(() => {
+    if (instanceId) {
+      // If instanceId changes, reset the deletion request state
+      setHasRequestedDeletion(false);
+    }
+  }, [instanceId]);
+
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading =
-    isDeletingInstance ||
-    // isDeletingAccountConfig ||
-    (firstDeleteRequestMade.current === true && step === "delete");
+  const isLoading = isDeleteInstanceMutationPending || isDeletingInstance || hasRequestedDeletion;
 
   const formData = useFormik({
     initialValues: {
@@ -174,10 +196,10 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
         if (values.confirmationText === "deleteme") {
           try {
             await onInstanceDeleteClick();
-            if (!isLastInstance) {
+            if (!isMultiStepDialog) {
               handleClose();
             } else {
-              firstDeleteRequestMade.current = true;
+              setHasRequestedDeletion(true); // Mark deletion request as made
             }
           } catch {}
         } else {
@@ -204,7 +226,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   useEffect(() => {
     if (open) {
       formData.resetForm();
-      firstDeleteRequestMade.current = false;
       stepChangedToOffboard.current = false;
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -221,7 +242,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   return (
     <Dialog open={open} onClose={handleClose}>
       <StyledForm
-        maxWidth={isLastInstance ? "588px" : "543px"}
+        maxWidth={isMultiStepDialog ? "588px" : "543px"}
         component="form"
         onSubmit={(e) => {
           e.preventDefault();
@@ -250,8 +271,8 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
             </Stepper>
           )}
 
-          {isLastInstance ? (
-            <LastInstanceConfimationMessage
+          {isMultiStepDialog ? (
+            <LastInstanceConfirmationMessage
               step={activeStepIndex}
               offboardingInstructionDetails={offboardingInstructionDetails}
             />
@@ -272,7 +293,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
             value={formData.values.confirmationText}
             onChange={formData.handleChange}
             onBlur={formData.handleBlur}
-            disabled={isDeletionInProgress}
+            disabled={isLoading}
             sx={{
               marginTop: "16px",
               [`& .Mui-focused .MuiOutlinedInput-notchedOutline`]: {
@@ -296,7 +317,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
             sx={{ height: "40px !important", padding: "10px 14px !important" }}
             type="submit"
             variant="contained"
-            disabled={isLoading || isButtonDisabled || isDeletionInProgress}
+            disabled={isLoading}
             bgColor={"#D92D20"}
           >
             {buttonText}
