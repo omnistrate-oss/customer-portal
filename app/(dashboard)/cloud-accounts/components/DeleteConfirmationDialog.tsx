@@ -108,6 +108,7 @@ type DeleteAccountConfigConfirmationDialogProps = {
   onInstanceDeleteClick: () => Promise<void>;
   onOffboardClick: () => Promise<void>;
   offboardingInstructionDetails: OffboardInstructionDetails;
+  instanceId?: string;
 };
 
 const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationDialogProps> = (props) => {
@@ -121,6 +122,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     onClose,
     onInstanceDeleteClick,
     onOffboardClick,
+    instanceId,
   } = props;
 
   const snackbar = useSnackbar();
@@ -154,9 +156,13 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     if (instanceStatus === "DELETING" && accountConfig?.status === "READY_TO_OFFBOARD") {
       step = "offboard";
       buttonText = "Offboard";
-    } else if (instanceStatus === "DELETING" && accountConfig?.status !== "READY_TO_OFFBOARD") {
-      buttonText = "Deleting";
+    } else if (
+      (instanceStatus === "DELETING" && accountConfig?.status !== "READY_TO_OFFBOARD") ||
+      isDeleteInstanceMutationPending ||
+      hasRequestedDeletion
+    ) {
       step = "delete";
+      buttonText = "Deleting";
       isDeletingInstance = true;
     }
   }
@@ -168,6 +174,14 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
+
+  //reset hasRequestedDeletion state to false when instanceId changes
+  useEffect(() => {
+    if (instanceId) {
+      // If instanceId changes, reset the deletion request state
+      setHasRequestedDeletion(false);
+    }
+  }, [instanceId]);
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 

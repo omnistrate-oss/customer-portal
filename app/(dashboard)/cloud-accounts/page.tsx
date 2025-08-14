@@ -676,6 +676,7 @@ const CloudAccountsPage = () => {
         }}
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
+        instanceId={selectedInstance?.id}
       />
 
       <ConnectAccountConfigDialog
