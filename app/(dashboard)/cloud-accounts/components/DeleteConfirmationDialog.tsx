@@ -126,6 +126,10 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   const snackbar = useSnackbar();
   const stepChangedToOffboard = useRef(false);
   const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
+
+  //show offboard step only if the instance is the last instance and the account config is found
+  const isMultiStepDialog = Boolean(isLastInstance && accountConfig);
+
   //This variable is used infer whether to show spinner on the delete button when the delete request is made on step one
   // The spinner needs to be shown when the button when the mutation is in pending state or if the instance is in deleting state and the account config is not ready to offboard
   //after the mutation is complete we refetch the instance status, and it is expected to be in DELETING state
@@ -133,14 +137,14 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   const [hasRequestedDeletion, setHasRequestedDeletion] = useState(false);
 
   let isDeletingInstance = false;
-  const showStepper = isLastInstance;
+  const showStepper = isMultiStepDialog;
   let step: "delete" | "offboard" = "delete";
 
   let buttonText = "Delete";
   let IconComponent = DeleteCirleIcon;
   let title = "Delete Confirmation";
 
-  if (isLastInstance) {
+  if (isMultiStepDialog) {
     IconComponent = OffboardConfirmationIcon;
     title = "Delete and Offboard Account";
   }
@@ -178,7 +182,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
         if (values.confirmationText === "deleteme") {
           try {
             await onInstanceDeleteClick();
-            if (!isLastInstance) {
+            if (!isMultiStepDialog) {
               handleClose();
             } else {
               setHasRequestedDeletion(true); // Mark deletion request as made
@@ -224,7 +228,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   return (
     <Dialog open={open} onClose={handleClose}>
       <StyledForm
-        maxWidth={isLastInstance ? "588px" : "543px"}
+        maxWidth={isMultiStepDialog ? "588px" : "543px"}
         component="form"
         onSubmit={(e) => {
           e.preventDefault();
@@ -253,7 +257,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
             </Stepper>
           )}
 
-          {isLastInstance ? (
+          {isMultiStepDialog ? (
             <LastInstanceConfirmationMessage
               step={activeStepIndex}
               offboardingInstructionDetails={offboardingInstructionDetails}
