@@ -1,15 +1,18 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import Navbar from "app/(dashboard)/components/Layout/Navbar";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
 
 import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useOrgServiceOfferings from "src/hooks/useOrgServiceOfferings";
 import useSubscriptionRequests from "src/hooks/useSubscriptionRequests";
+import { SetState } from "src/types/common/reactGenerics";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
+
+import GlobalProviderError from "../../components/GlobalProviderError";
 
 type Context = {
   subscriptions: Subscription[];
@@ -30,6 +33,9 @@ type Context = {
   subscriptionsObj: Record<string, Subscription>;
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>;
   servicesObj: Record<string, any>;
+
+  showGlobalProviderError: boolean;
+  setShowGlobalProviderError: SetState<boolean>;
 };
 
 export const GlobalDataContext = createContext<Context | undefined>(undefined);
@@ -45,11 +51,13 @@ export const useGlobalData = () => {
 };
 
 const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
+  const [showGlobalProviderError, setShowGlobalProviderError] = useState(false);
   const {
     data: subscriptions = [],
     isPending: isSubscriptionsPending,
     isFetching: isFetchingSubscriptions,
     refetch: refetchSubscriptions,
+    isError: isSubscriptionsError,
   } = useSubscriptions();
 
   const {
@@ -64,6 +72,7 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
     isPending: isServiceOfferingsPending,
     isFetching: isFetchingServiceOfferings,
     refetch: refetchServiceOfferings,
+    isError: isServiceOfferingsError,
   } = useOrgServiceOfferings();
 
   const servicesObj = useMemo(() => {
@@ -97,6 +106,11 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
     }, {});
   }, [subscriptions]);
 
+  // Handle critical API errors - show GlobalProviderError component if key APIs fail
+  if (isServiceOfferingsError || isSubscriptionsError || showGlobalProviderError) {
+    return <GlobalProviderError />;
+  }
+
   if (!isFetchingServiceOfferings && serviceOfferings.length === 0) {
     return (
       <div className="flex flex-col" style={{ minHeight: "100vh" }}>
@@ -127,6 +141,9 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
         serviceOfferingsObj,
         subscriptionsObj,
         servicesObj,
+
+        showGlobalProviderError,
+        setShowGlobalProviderError,
       }}
     >
       {children}

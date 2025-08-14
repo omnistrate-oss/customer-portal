@@ -17,7 +17,7 @@ const useSubscriptions = (queryOptions = {}) => {
     },
     {
       select: (data) => data.subscriptions,
-      retry: 2,
+      retry: 3,
       ...queryOptions,
     }
   );
