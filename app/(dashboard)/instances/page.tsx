@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -74,8 +74,13 @@ const InstancesPage = () => {
 
   // const [statusFilters, setStatusFilters] = useState(getInitialFilterState());
 
-  const { subscriptionsObj, serviceOfferingsObj, isFetchingSubscriptions, isFetchingServiceOfferings } =
-    useGlobalData();
+  const {
+    subscriptionsObj,
+    serviceOfferingsObj,
+    isFetchingSubscriptions,
+    isFetchingServiceOfferings,
+    setShowNotFoundError,
+  } = useGlobalData();
 
   const [selectedFilters, setSelectedFilters] =
     useState<Record<string, FilterCategorySchema>>(getIntialFiltersObject());
@@ -339,7 +344,14 @@ const InstancesPage = () => {
     isPending: isLoadingInstances,
     isFetching: isFetchingInstances,
     refetch: refetchInstances,
-  } = useInstances();
+    isError: isInstancesError,
+  } = useInstances({ retry: 3 });
+
+  useEffect(() => {
+    if (isInstancesError) {
+      setShowNotFoundError(true);
+    }
+  }, [isInstancesError, setShowNotFoundError]);
 
   // Filter BYOA Account Instances
   const nonBYOAInstances = useMemo(() => {
