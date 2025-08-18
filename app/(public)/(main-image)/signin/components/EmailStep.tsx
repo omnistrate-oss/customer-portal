@@ -8,6 +8,7 @@ import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldCo
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import SubmitButton from "src/components/NonDashboardComponents/FormElementsV2/SubmitButton";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { SetState } from "src/types/common/reactGenerics";
 
 import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
@@ -25,6 +26,8 @@ type EmailStepProps = {
 const EmailStep: FC<EmailStepProps> = (props) => {
   const { setCurrentStep, formData, setShouldRememberLoginDetails, shouldRememberLoginDetails } = props;
   const { setEmail } = useLastLoginDetails();
+  const envType = useEnvironmentType();
+  const isProduction = envType === "PROD";
 
   function handleNextClick() {
     formData.validateForm().then((errors) => {
@@ -50,7 +53,7 @@ const EmailStep: FC<EmailStepProps> = (props) => {
   return (
     <>
       <DisplayHeading sx={{ fontSize: "26px !important" }} mt="48px">
-        Enter your email to log in or sign up
+        Enter your email to log in{isProduction && " or sign up"}
       </DisplayHeading>
       <Stack gap="30px" mt="24px">
         <FieldContainer>
