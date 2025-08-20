@@ -18,9 +18,9 @@ import {
   ResourceInstance,
   ResourceInstanceNetworkTopology,
 } from "src/types/resourceInstance";
+import { TierVersionSet } from "src/types/tier-version-set";
 
 import { loadStatusLabel, loadStatusMap } from "./constants";
-import { TierVersionSet } from "src/types/tier-version-set";
 
 export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   const menuItems: MenuItem[] = [];

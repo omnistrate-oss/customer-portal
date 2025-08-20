@@ -13,6 +13,7 @@ import InstanceHealthStatusChip, {
 } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
 import { BlackTooltip } from "src/components/Tooltip/Tooltip";
+import UpgradeDialog from "src/components/Upgrade/UpgradeDialog";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -21,7 +22,6 @@ import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/res
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
-import CapacityDialog from "components/CapacityDialog/CapacityDialog";
 import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
 import GenerateTokenDialog from "components/GenerateToken/GenerateTokenDialog";
@@ -55,10 +55,9 @@ const columnHelper = createColumnHelper<ResourceInstance>();
 type Overlay =
   | "create-instance-form"
   | "modify-instance-form"
-  | "add-capacity-dialog"
-  | "remove-capacity-dialog"
   | "delete-dialog"
   | "restore-dialog"
+  | "upgrade-dialog"
   | "generate-token-dialog"
   | "create-instance-dialog";
 
@@ -391,21 +390,6 @@ const InstancesPage = () => {
     });
   }, [nonBYOAInstances]);
 
-  // const statusFilteredInstances = useMemo(() => {
-  //   let instances = filteredInstances;
-  //   if (statusFilters.failed) {
-  //     instances = failedInstances;
-  //   }
-  //   if (statusFilters.overloaded) {
-  //     instances = overloadedInstances;
-  //   }
-
-  //   if (statusFilters.unhealthy) {
-  //     instances = unhealthyInstances;
-  //   }
-  //   return instances;
-  // }, [failedInstances, overloadedInstances, unhealthyInstances, statusFilters, nonBYOAInstances]);
-
   const selectedInstance = useMemo(() => {
     return nonBYOAInstances.find((instance) => instance.id === selectedRows[0]);
   }, [selectedRows, nonBYOAInstances]);
@@ -524,10 +508,6 @@ const InstancesPage = () => {
 
   return (
     <PageContainer>
-      {/* <PageTitle icon={InstancesIcon} className="mb-6">
-        Deployment Instances
-      </PageTitle> */}
-
       <InstancesOverview summary={instancesCountSummary} />
       <div className="mt-8">
         <DataTable
@@ -549,9 +529,6 @@ const InstancesPage = () => {
             selectedFilters,
             setSelectedFilters,
             isLoadingInstances,
-            // instancesFilterCount: instancesFilterCount,
-            // statusFilters: statusFilters,
-            // setStatusFilters: setStatusFilters,
           }}
           isLoading={isLoadingInstances || isFetchingSubscriptions || isFetchingServiceOfferings}
           selectedRows={selectedRows}
@@ -607,6 +584,15 @@ const InstancesPage = () => {
         }
       />
 
+      <UpgradeDialog
+        open={isOverlayOpen && overlayType === "upgrade-dialog"}
+        onClose={() => setIsOverlayOpen(false)}
+        refetchInstances={refetchInstances}
+        selectedInstance={selectedInstance}
+        selectedInstanceSubscription={selectedInstanceSubscription}
+        selectedInstanceOffering={selectedInstanceOffering}
+      />
+
       <TextConfirmationDialog
         open={isOverlayOpen && overlayType === "delete-dialog"}
         handleClose={() => setIsOverlayOpen(false)}
@@ -643,20 +629,6 @@ const InstancesPage = () => {
         subtitle={`Are you sure you want to delete - ${selectedRows[0]}?`}
         message="To confirm, please enter <b>deleteme</b>, in the field below:"
         isLoading={deleteInstanceMutation.isPending}
-      />
-
-      <CapacityDialog
-        open={isOverlayOpen && ["add-capacity-dialog", "remove-capacity-dialog"].includes(overlayType)}
-        currentCapacityAction={overlayType === "add-capacity-dialog" ? "add" : "remove"}
-        contextType="access"
-        handleClose={() => setIsOverlayOpen(false)}
-        autoscaling={{
-          currentReplicas: selectedInstance?.currentReplicas,
-          maxReplicas: selectedInstance?.maxReplicas,
-          minReplicas: selectedInstance?.minReplicas,
-        }}
-        data={selectedInstanceData}
-        refetch={refetchInstances}
       />
 
       <GenerateTokenDialog

@@ -101,7 +101,6 @@ const InstancesTableHeader = ({
   }, [selectedInstance, selectedInstanceOffering]);
 
   const isComplexResource = CLI_MANAGED_RESOURCES.includes(selectedResource?.resourceType as string);
-
   const isProxyResource = selectedResource?.resourceType === "PortsBasedProxy";
 
   const [mainActions, otherActions] = useMemo(() => {
@@ -111,7 +110,6 @@ const InstancesTableHeader = ({
     // Check if the user has permission to perform the operation - Role from Subscription
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
-
     const isDeleteAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Delete, role, viewEnum.Access_Resources);
 
     const pathData = {
@@ -124,6 +122,11 @@ const InstancesTableHeader = ({
       resourceKey: selectedResource?.urlKey as string,
       id: selectedInstance?.id,
     };
+
+    // Allow Upgrades if the VERSION_SET_OVERRIDE Feature is Enabled for the Product Tier
+    const allowUpgrades = selectedInstanceOffering?.productTierFeatures?.some(
+      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+    );
 
     actions.push({
       dataTestId: "stop-button",
@@ -320,6 +323,26 @@ const InstancesTableHeader = ({
                 : "",
         });
       }
+    }
+
+    if (allowUpgrades) {
+      other.push({
+        dataTestId: "upgrade-button",
+        label: "Upgrade",
+        isDisabled: !selectedInstance || !["RUNNING", "STOPPED"].includes(status) || !isUpdateAllowedByRBAC,
+        disabledMessage: !selectedInstance
+          ? "Please select an instance"
+          : !["RUNNING", "STOPPED"].includes(status)
+            ? "Instance must be running or stopped to upgrade"
+            : !isUpdateAllowedByRBAC
+              ? "Unauthorized to upgrade instances"
+              : "",
+        onClick: () => {
+          if (!selectedInstance) return snackbar.showError("Please select an instance");
+          setOverlayType("upgrade-dialog");
+          setIsOverlayOpen(true);
+        },
+      });
     }
 
     if (selectedInstance?.kubernetesDashboardEndpoint?.dashboardEndpoint) {
