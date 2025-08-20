@@ -206,6 +206,7 @@ function Logs(props) {
         // Add complete lines to logs (if any)
         if (lines.length > 0) {
           setLogs((prevLogs) => [...prevLogs, ...lines?.map((line) => (line ? line : "\n"))]);
+          setHasMoreLogs(true); // Reset hasMoreLogs when new logs arrive
         }
 
         // Set timeout to flush buffer after 5 second of inactivity

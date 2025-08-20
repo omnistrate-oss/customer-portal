@@ -189,6 +189,10 @@ const HighlightedLogContent = styled("span", {
 
   // YAML highlighting
   ...(logType === "yaml" && {
+    "& .log-timestamp": {
+      color: "#A5D6FF",
+      fontWeight: 500,
+    },
     "& .yaml-key": {
       color: "#79C0FF",
       fontWeight: 600,
@@ -322,6 +326,11 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
     case "yaml":
       return (
         text
+          // Highlight timestamps first (this fixes the issue where logs are detected as YAML)
+          .replace(
+            /\d{4}-\d{2}-\d{2}[\sT]\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)?/g,
+            '<span class="log-timestamp">$&</span>'
+          )
           // Highlight YAML keys
           .replace(
             /^(\s*)([^:\s]+)(\s*:)/gm,

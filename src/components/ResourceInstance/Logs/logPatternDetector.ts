@@ -39,7 +39,16 @@ export const LOG_PATTERNS: LogPattern[] = [
     description: "YAML configuration logs",
     detect: (line: string): boolean => {
       const trimmed = line.trim();
-      return /^[\s]*[\w-]+:\s*.+/.test(trimmed) || trimmed.includes("---") || trimmed.includes("...");
+      return (
+        // YAML document separators
+        trimmed.includes("---") ||
+        trimmed.includes("...") ||
+        // YAML-specific patterns (not JSON)
+        /^[\s]*[\w-]+:\s*[^{[]/.test(trimmed) || // Key: value but not JSON
+        /^[\s]*-\s+[\w-]+:/.test(trimmed) || // List item with key
+        // YAML block scalars
+        /^[\s]*[\w-]+:\s*[|>]/.test(trimmed)
+      );
     },
   },
   {
