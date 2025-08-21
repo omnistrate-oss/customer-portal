@@ -14,7 +14,7 @@ import termsImg from "public/assets/images/terms.png";
 
 import { SectionDescription, SectionHeading, StyledImage, Title } from "./StyledComponents";
 
-const DefaultTermsOfUse = ({ orgName }) => {
+const DefaultTermsOfUse = ({ orgName, orgSupportEmail }) => {
   return (
     <>
       <SectionHeading sx={{ marginTop: "91px" }}>General</SectionHeading>
@@ -157,9 +157,9 @@ const DefaultTermsOfUse = ({ orgName }) => {
         Contact information for our Copyright Agent for notice of claims of copyright infringement is as follows:
         <br />
         <Box component={"span"} sx={{ fontWeight: 700, marginTop: "32px", display: "inline-block" }}>
-          {orgName} Inc. <br />
+          {orgName} <br />
           Attn: Copyright Agent <br />
-          team@{orgName}.com
+          {orgSupportEmail}
         </Box>
       </SectionDescription>
       <SectionHeading>Changes to these Terms</SectionHeading>
@@ -194,7 +194,7 @@ const DefaultTermsOfUse = ({ orgName }) => {
 };
 
 const TermsPage = () => {
-  const { orgName, orgTermsOfUse } = useProviderOrgDetails();
+  const { orgName, orgSupportEmail, orgTermsOfUse } = useProviderOrgDetails();
 
   useEffect(() => {
     const pageTitle = orgName ? `Terms and Conditions - ${orgName}` : "Terms and Conditions";
@@ -243,7 +243,7 @@ const TermsPage = () => {
             />
           </article>
         ) : (
-          <DefaultTermsOfUse orgName={orgName} />
+          <DefaultTermsOfUse orgName={orgName} orgSupportEmail={orgSupportEmail} />
         )}
       </Container>
       <Footer nonFloatingBottomPosition />
