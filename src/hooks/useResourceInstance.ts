@@ -291,6 +291,7 @@ const useResourceInstance = (queryParams) => {
         const healthStatusPercent = calculateInstanceHealthPercentage(data?.detailedNetworkTopology, data?.status);
 
         const final = {
+          ...data,
           resourceInstanceId: resourceInstanceId,
           resourceKey: topologyDetails?.resourceKey,
           region: data.region,
@@ -347,5 +348,6 @@ const useResourceInstance = (queryParams) => {
 
   return query;
 };
+export type ResourceInstance = ReturnType<typeof useResourceInstance>["data"];
 
 export default useResourceInstance;

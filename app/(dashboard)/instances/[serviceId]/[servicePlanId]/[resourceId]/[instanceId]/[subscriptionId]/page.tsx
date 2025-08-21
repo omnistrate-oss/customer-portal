@@ -8,6 +8,9 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, Collapse, Stack } from "@mui/material";
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
+import InstanceActionMenu from "app/(dashboard)/instances/components/InstanceActionMenu";
+import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialogs";
+import { Overlay } from "app/(dashboard)/instances/page";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -62,6 +65,8 @@ const InstanceDetailsPage = ({
   const { serviceId, servicePlanId, resourceId, instanceId, subscriptionId } = params;
   const searchParams = useSearchParams();
   const view = searchParams?.get("view");
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [overlayType, setOverlayType] = useState<Overlay>("delete-dialog");
 
   const [currentTab, setCurrentTab] = useState<CurrentTab>("Instance Details");
 
@@ -110,7 +115,7 @@ const InstanceDetailsPage = ({
     subscriptionId: subscription?.id,
   });
 
-  const { data: resourceInstanceData } = resourceInstanceQuery;
+  const { data: resourceInstanceData, refetch: refetchInstance } = resourceInstanceQuery;
 
   const resourceSchemaQuery = useServiceOfferingResourceSchema({
     serviceId,
@@ -229,24 +234,35 @@ const InstanceDetailsPage = ({
           }}
         />
       </Collapse>
-      <Tabs value={currentTab} sx={{ marginTop: "20px" }}>
-        {Object.entries(tabs).map(([key, value]) => {
-          const isDisabled = disabledTabs?.includes(key);
-          return (
-            <Tab
-              data-testid={`${value?.replace(" ", "-").toLowerCase()}-tab`}
-              key={key}
-              label={value}
-              value={value}
-              onClick={() => {
-                setCurrentTab(value as CurrentTab);
-              }}
-              disableRipple
-              disabled={isDisabled}
-            />
-          );
-        })}
-      </Tabs>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
+        <Tabs value={currentTab}>
+          {Object.entries(tabs).map(([key, value]) => {
+            const isDisabled = disabledTabs?.includes(key);
+            return (
+              <Tab
+                data-testid={`${value?.replace(" ", "-").toLowerCase()}-tab`}
+                key={key}
+                label={value}
+                value={value}
+                onClick={() => {
+                  setCurrentTab(value as CurrentTab);
+                }}
+                disableRipple
+                disabled={isDisabled}
+              />
+            );
+          })}
+        </Tabs>
+
+        <InstanceActionMenu
+          variant="details-page"
+          instance={resourceInstanceData}
+          serviceOffering={offering}
+          subscription={subscription}
+          setOverlayType={setOverlayType}
+          setIsOverlayOpen={setIsOverlayOpen}
+        />
+      </Stack>
       {currentTab === tabs.resourceInstanceDetails && (
         <ResourceInstanceDetails
           resourceInstanceId={instanceId}
@@ -358,6 +374,16 @@ const InstanceDetailsPage = ({
           refetchInstance={resourceInstanceQuery.refetch}
         />
       )}
+
+      <InstanceDialogs
+        isOverlayOpen={isOverlayOpen}
+        setIsOverlayOpen={setIsOverlayOpen}
+        overlayType={overlayType}
+        instance={resourceInstanceData}
+        serviceOffering={offering}
+        subscription={subscription}
+        refetchData={refetchInstance}
+      />
     </PageContainer>
   );
 };

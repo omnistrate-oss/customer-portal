@@ -1,13 +1,11 @@
 import { useMemo } from "react";
-import { CircularProgress, menuClasses } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import useBillingStatus from "app/(dashboard)/billing/hooks/useBillingStatus";
 
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
-import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
-import { colors } from "src/themeConfig";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -15,8 +13,6 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 import Button from "components/Button/Button";
-import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
-import Select from "components/FormElementsv2/Select/Select";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
@@ -25,6 +21,7 @@ import { getMainResourceFromInstance } from "../utils";
 
 import AddInstanceFilters from "./AddInstanceFilters";
 import EditInstanceFilters from "./EditInstanceFilters";
+import InstanceActionMenu from "./InstanceActionMenu";
 
 type Action = {
   dataTestId?: string;
@@ -103,7 +100,7 @@ const InstancesTableHeader = ({
   const isComplexResource = CLI_MANAGED_RESOURCES.includes(selectedResource?.resourceType as string);
   const isProxyResource = selectedResource?.resourceType === "PortsBasedProxy";
 
-  const [mainActions, otherActions] = useMemo(() => {
+  const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
 
@@ -122,11 +119,6 @@ const InstancesTableHeader = ({
       resourceKey: selectedResource?.urlKey as string,
       id: selectedInstance?.id,
     };
-
-    // Allow Upgrades if the VERSION_SET_OVERRIDE Feature is Enabled for the Product Tier
-    const allowUpgrades = selectedInstanceOffering?.productTierFeatures?.some(
-      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-    );
 
     actions.push({
       dataTestId: "stop-button",
@@ -271,99 +263,7 @@ const InstancesTableHeader = ({
       disabledMessage: "Please wait for the instances to load",
     });
 
-    const other: Action[] = [];
-
-    if (!isComplexResource && !isProxyResource) {
-      other.push({
-        dataTestId: "reboot-button",
-        label: "Reboot",
-        isLoading: restartInstanceMutation.isPending,
-        isDisabled:
-          !selectedInstance ||
-          (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
-          !isUpdateAllowedByRBAC,
-        onClick: () => {
-          if (!selectedInstance) return snackbar.showError("Please select an instance");
-          if (!selectedInstanceOffering) return snackbar.showError("Product not found");
-          restartInstanceMutation.mutate({
-            params: {
-              path: pathData,
-              query: {
-                subscriptionId: selectedInstance?.subscriptionId,
-              },
-            },
-          });
-        },
-        disabledMessage: !selectedInstance
-          ? "Please select an instance"
-          : status !== "RUNNING" && status !== "FAILED"
-            ? "Instance must be running or failed to reboot"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to reboot instances"
-              : "",
-      });
-
-      if (selectedInstance?.isBackupEnabled || selectedInstance?.backupStatus) {
-        other.push({
-          dataTestId: "restore-button",
-          label: "Restore",
-          isDisabled:
-            !selectedInstance || !selectedInstance.backupStatus?.earliestRestoreTime || !isUpdateAllowedByRBAC,
-          onClick: () => {
-            if (!selectedInstance) return snackbar.showError("Please select an instance");
-            setOverlayType("restore-dialog");
-            setIsOverlayOpen(true);
-          },
-          disabledMessage: !selectedInstance
-            ? "Please select an instance"
-            : !selectedInstance.backupStatus?.earliestRestoreTime
-              ? "No restore points available"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to restore instances"
-                : "",
-        });
-      }
-    }
-
-    if (allowUpgrades) {
-      other.push({
-        dataTestId: "upgrade-button",
-        label: "Upgrade",
-        isDisabled: !selectedInstance || !["RUNNING", "STOPPED"].includes(status) || !isUpdateAllowedByRBAC,
-        disabledMessage: !selectedInstance
-          ? "Please select an instance"
-          : !["RUNNING", "STOPPED"].includes(status)
-            ? "Instance must be running or stopped to upgrade"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to upgrade instances"
-              : "",
-        onClick: () => {
-          if (!selectedInstance) return snackbar.showError("Please select an instance");
-          setOverlayType("upgrade-dialog");
-          setIsOverlayOpen(true);
-        },
-      });
-    }
-
-    if (selectedInstance?.kubernetesDashboardEndpoint?.dashboardEndpoint) {
-      other.push({
-        dataTestId: "generate-token-button",
-        label: "Generate Token",
-        isDisabled: !selectedInstance || status === "DISCONNECTED",
-        disabledMessage: !selectedInstance
-          ? "Please select an instance"
-          : status === "DISCONNECTED"
-            ? "Cloud account is disconnected"
-            : "",
-        onClick: () => {
-          if (!selectedInstance) return snackbar.showError("Please select an instance");
-          setOverlayType("generate-token-dialog");
-          setIsOverlayOpen(true);
-        },
-      });
-    }
-
-    return [actions, other];
+    return actions;
   }, [
     snackbar,
     setOverlayType,
@@ -379,83 +279,6 @@ const InstancesTableHeader = ({
     selectedResource,
     selectedInstanceSubscription?.roleType,
   ]);
-
-  const select = (
-    <Select
-      data-testid="actions-select"
-      value=""
-      renderValue={(value: string) => {
-        if (!value) {
-          return "Actions";
-        } else {
-          return "";
-        }
-      }}
-      displayEmpty
-      disabled={otherActions.length === 0 || !selectedInstance}
-      MenuProps={{
-        anchorOrigin: { vertical: "bottom", horizontal: "right" },
-        transformOrigin: { vertical: "top", horizontal: "right" },
-        sx: {
-          marginTop: "8px",
-          [`& .${menuClasses.list}`]: {
-            padding: "4px 0px",
-          },
-          [`& .${menuClasses.paper}`]: {
-            marginTop: "4px",
-            border: `1px solid ${colors.gray200}`,
-            boxShadow: "0px 2px 2px -1px #0A0D120A, 0px 4px 6px -2px #0A0D1208, 0px 12px 16px -4px #0A0D1214",
-            borderRadius: "8px",
-          },
-        },
-      }}
-      sx={{
-        margin: "0px",
-        height: "40px",
-        minWidth: "110px",
-        "&.Mui-focused": {
-          outline: `2px solid ${colors.success500}`,
-          outlineOffset: "2px",
-        },
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          border: "1px solid #D0D5DD",
-        },
-      }}
-    >
-      {otherActions.map(({ dataTestId, label, onClick, isDisabled, disabledMessage }) => {
-        const Icon = icons[label];
-        const menuItem = (
-          <MenuItem
-            data-testid={dataTestId}
-            value={label}
-            key={label}
-            sx={{
-              gap: "10px",
-              fontSize: "14px",
-              color: isDisabled ? colors.gray400 : "",
-              minWidth: otherActions?.length > 2 ? "220px" : "180px",
-              padding: "8px 16px",
-            }}
-            disabled={isDisabled}
-            onClick={onClick}
-          >
-            <Icon disabled={isDisabled} />
-            {label}
-          </MenuItem>
-        );
-
-        if (disabledMessage) {
-          return (
-            <Tooltip key={label} title={disabledMessage} placement="top">
-              <span>{menuItem}</span>
-            </Tooltip>
-          );
-        }
-
-        return menuItem;
-      })}
-    </Select>
-  );
 
   return (
     <div>
@@ -490,13 +313,16 @@ const InstancesTableHeader = ({
             );
           })}
 
-          {otherActions.length > 0 && selectedInstance ? (
-            select
-          ) : (
-            <Tooltip title={!selectedInstance ? "Please select an instance" : "No actions available"} placement="top">
-              <span>{select}</span>
-            </Tooltip>
-          )}
+          <InstanceActionMenu
+            variant="table-header"
+            disabled={!selectedInstance}
+            disabledMessage="Please select an instance"
+            instance={selectedInstance}
+            serviceOffering={selectedInstanceOffering}
+            subscription={selectedInstanceSubscription}
+            setOverlayType={setOverlayType}
+            setIsOverlayOpen={setIsOverlayOpen}
+          />
         </div>
       </div>
 
@@ -513,13 +339,6 @@ const InstancesTableHeader = ({
           filterOptionsMap={filterOptionsMap}
         />
       </div>
-      {/* <div className="flex flex-row justify-between gap-4 items-center py-4 px-6 border-b border-[#EAECF0]">
-        <InstanceFilters
-          filterStatus={statusFilters}
-          setFilterStatus={setStatusFilters}
-          filterInstanceCount={instancesFilterCount}
-        />
-      </div> */}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import DeleteIcon from "components/Icons/Delete/Delete";
 import EditIcon from "components/Icons/Edit/Edit";
 import GenerateTokenIcon from "components/Icons/GenerateToken/GenerateTokenIcon";
 import PlayIcon from "components/Icons/Play/Play";
-import RestartIcon from "components/Icons/Reboot/Reboot";
+import RebootIcon from "components/Icons/Reboot/Reboot";
 import RestoreIcon from "components/Icons/RestoreInstance/RestoreInstanceIcon";
 import StopIcon from "components/Icons/Stop/Stop";
 
@@ -15,7 +15,7 @@ export const icons = {
   Delete: DeleteIcon,
   Modify: EditIcon,
   Create: AddIcon,
-  Reboot: RestartIcon,
+  Reboot: RebootIcon,
   Restore: RestoreIcon,
   Upgrade: UpgradeIcon,
   "Generate Token": GenerateTokenIcon,

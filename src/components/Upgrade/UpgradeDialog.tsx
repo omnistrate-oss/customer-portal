@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
-import { DeploymentInstance } from "app/(dashboard)/instances/hooks/useInstances";
 
 import { $api } from "src/api/query";
+import { ResourceInstance } from "src/hooks/useResourceInstance";
 import useSnackbar from "src/hooks/useSnackbar";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
@@ -23,18 +23,18 @@ type UpgradeDialogProps = {
   open: boolean;
   onClose: () => void;
   refetchInstances: () => void;
-  selectedInstance?: DeploymentInstance;
-  selectedInstanceSubscription?: Subscription;
-  selectedInstanceOffering?: ServiceOffering;
+  instance?: ResourceInstance;
+  subscription?: Subscription;
+  serviceOffering?: ServiceOffering;
 };
 
 const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
   open,
   onClose,
   refetchInstances,
-  selectedInstance,
-  selectedInstanceSubscription,
-  selectedInstanceOffering,
+  instance,
+  subscription,
+  serviceOffering,
 }) => {
   const snackbar = useSnackbar();
   const [selectedVersion, setSelectedVersion] = useState<string>("");
@@ -48,18 +48,18 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
 
   const { data: versionSets = [], isFetching: isFetchingAvailableVersions } = useCustomerVersionSets(
     {
-      serviceId: selectedInstanceSubscription?.serviceId,
-      productTierId: selectedInstanceSubscription?.productTierId,
+      serviceId: subscription?.serviceId,
+      productTierId: subscription?.productTierId,
     },
     {
-      enabled: !!selectedInstanceSubscription?.serviceId && !!selectedInstanceSubscription?.productTierId && open,
+      enabled: !!subscription?.serviceId && !!subscription?.productTierId && open,
     }
   );
 
   const versionMenuItems = useMemo(() => {
     return versionSets.map((versionSet) => {
       const isPreferred = versionSet.status === "Preferred";
-      const isCurrentVersion = versionSet.version === selectedInstance?.tierVersion;
+      const isCurrentVersion = versionSet.version === instance?.tierVersion;
 
       return {
         label: isCurrentVersion ? (
@@ -80,9 +80,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
         disabledMessage: isCurrentVersion ? "Cannot select the current version for upgrade" : "",
       };
     });
-  }, [versionSets, selectedInstance?.tierVersion]);
-
-  console.log("Version Menu Items:", selectedInstanceOffering);
+  }, [versionSets, instance?.tierVersion]);
 
   const Content = () => {
     if (isFetchingAvailableVersions) {
@@ -102,7 +100,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
         <Stack direction="row" gap="24px" alignItems="center">
           <Box flex="1">
             <FieldLabel>Version from</FieldLabel>
-            <TextField disabled value={selectedInstance?.tierVersion || "1.0"} />
+            <TextField disabled value={instance?.tierVersion || "1.0"} />
           </Box>
 
           <Box flex="1">
@@ -148,32 +146,32 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
       confirmButtonLabel="Upgrade"
       isLoading={upgradeInstanceMutation.isPending}
       onConfirm={async () => {
-        if (!selectedInstance?.id) {
+        if (!instance?.id) {
           snackbar.showError("Please select an instance to upgrade");
           return;
         }
 
-        const resource = selectedInstanceOffering?.resourceParameters.find(
-          (resource) => resource.resourceId === selectedInstance?.resourceID
+        const resource = serviceOffering?.resourceParameters.find(
+          (resource) => resource.resourceId === instance?.resourceID
         );
 
         await upgradeInstanceMutation.mutateAsync({
           params: {
             path: {
-              id: selectedInstance.id,
+              id: instance.id,
             },
             query: {
-              subscriptionId: selectedInstance.subscriptionId,
+              subscriptionId: instance.subscriptionId,
             },
           },
           body: {
-            productTierKey: selectedInstanceOffering?.productTierURLKey || "",
+            productTierKey: serviceOffering?.productTierURLKey || "",
             resourceKey: resource?.urlKey || "",
-            serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion || "",
-            serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey || "",
-            serviceKey: selectedInstanceOffering?.serviceURLKey || "",
-            serviceModelKey: selectedInstanceOffering?.serviceModelURLKey || "",
-            serviceProviderId: selectedInstanceOffering?.serviceProviderId || "",
+            serviceAPIVersion: serviceOffering?.serviceAPIVersion || "",
+            serviceEnvironmentKey: serviceOffering?.serviceEnvironmentURLKey || "",
+            serviceKey: serviceOffering?.serviceURLKey || "",
+            serviceModelKey: serviceOffering?.serviceModelURLKey || "",
+            serviceProviderId: serviceOffering?.serviceProviderId || "",
             targetVersion: selectedVersion,
           },
         });

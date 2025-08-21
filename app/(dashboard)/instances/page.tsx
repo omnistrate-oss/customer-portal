@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { $api } from "src/api/query";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
 import LoadIndicatorNormal from "src/components/Icons/LoadIndicator/LoadIndicatorNormal";
@@ -13,10 +12,8 @@ import InstanceHealthStatusChip, {
 } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
 import { BlackTooltip } from "src/components/Tooltip/Tooltip";
-import UpgradeDialog from "src/components/Upgrade/UpgradeDialog";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
-import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
@@ -24,18 +21,16 @@ import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
 import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
-import GenerateTokenDialog from "components/GenerateToken/GenerateTokenDialog";
 import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
 import CreateInstanceModal from "components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
-import AccessSideRestoreInstance from "components/RestoreInstance/AccessSideRestoreInstance";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
-import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import PageContainer from "../components/Layout/PageContainer";
 
+import InstanceDialogs from "./components/InstanceDialogs";
 import InstanceForm from "./components/InstanceForm";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
@@ -52,7 +47,7 @@ import {
 } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
-type Overlay =
+export type Overlay =
   | "create-instance-form"
   | "modify-instance-form"
   | "delete-dialog"
@@ -62,7 +57,6 @@ type Overlay =
   | "create-instance-dialog";
 
 const InstancesPage = () => {
-  const snackbar = useSnackbar();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
@@ -405,39 +399,6 @@ const InstancesPage = () => {
     return serviceOfferingsObj[serviceId]?.[productTierId];
   }, [selectedInstanceSubscription, serviceOfferingsObj]);
 
-  // Resource of the Selected Instance
-  const selectedResource = useMemo(() => {
-    return getMainResourceFromInstance(selectedInstance, selectedInstanceOffering);
-  }, [selectedInstance, selectedInstanceOffering]);
-
-  const selectedInstanceData = useMemo(() => {
-    return {
-      id: selectedInstance?.id,
-      instanceId: selectedInstance?.id as string,
-      serviceProviderId: selectedInstanceOffering?.serviceProviderId,
-      serviceKey: selectedInstanceOffering?.serviceURLKey,
-      serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion,
-      serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey,
-      serviceModelKey: selectedInstanceOffering?.serviceModelURLKey,
-      productTierKey: selectedInstanceOffering?.productTierURLKey,
-      resourceKey: selectedResource?.urlKey as string,
-      subscriptionId: selectedInstanceSubscription?.id,
-    };
-  }, [selectedInstance, selectedInstanceOffering, selectedInstanceSubscription, selectedResource]);
-
-  const deleteInstanceMutation = $api.useMutation(
-    "delete",
-    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
-    {
-      onSuccess: () => {
-        setSelectedRows([]);
-        refetchInstances();
-        setIsOverlayOpen(false);
-        snackbar.showSuccess("Deleting deployment instance...");
-      },
-    }
-  );
-
   const instancesCountSummary = useMemo(
     () => [
       {
@@ -584,72 +545,16 @@ const InstancesPage = () => {
         }
       />
 
-      <UpgradeDialog
-        open={isOverlayOpen && overlayType === "upgrade-dialog"}
-        onClose={() => setIsOverlayOpen(false)}
-        refetchInstances={refetchInstances}
-        selectedInstance={selectedInstance}
-        selectedInstanceSubscription={selectedInstanceSubscription}
-        selectedInstanceOffering={selectedInstanceOffering}
-      />
-
-      <TextConfirmationDialog
-        open={isOverlayOpen && overlayType === "delete-dialog"}
-        handleClose={() => setIsOverlayOpen(false)}
-        onConfirm={async () => {
-          if (!selectedInstance) return snackbar.showError("No instance selected");
-          if (!selectedInstanceOffering) {
-            return snackbar.showError("Offering not found");
-          }
-          if (!selectedInstanceSubscription) {
-            return snackbar.showError("Subscription not found");
-          }
-          if (!selectedResource) {
-            return snackbar.showError("Resource not found");
-          }
-          await deleteInstanceMutation.mutateAsync({
-            params: {
-              path: {
-                serviceProviderId: selectedInstanceData.serviceProviderId,
-                serviceKey: selectedInstanceData.serviceKey,
-                serviceAPIVersion: selectedInstanceData.serviceAPIVersion,
-                serviceEnvironmentKey: selectedInstanceData.serviceEnvironmentKey,
-                serviceModelKey: selectedInstanceData.serviceModelKey,
-                productTierKey: selectedInstanceData.productTierKey,
-                resourceKey: selectedInstanceData.resourceKey,
-                id: selectedInstanceData.instanceId,
-              },
-              query: {
-                subscriptionId: selectedInstanceSubscription.id,
-              },
-            },
-          });
-        }}
-        title="Delete Instance"
-        subtitle={`Are you sure you want to delete - ${selectedRows[0]}?`}
-        message="To confirm, please enter <b>deleteme</b>, in the field below:"
-        isLoading={deleteInstanceMutation.isPending}
-      />
-
-      <GenerateTokenDialog
-        dashboardEndpoint={selectedInstance?.kubernetesDashboardEndpoint?.dashboardEndpoint}
-        open={isOverlayOpen && overlayType === "generate-token-dialog"}
-        onClose={() => setIsOverlayOpen(false)}
-        selectedInstanceId={selectedInstance?.id}
-        subscriptionId={selectedInstance?.subscriptionId}
-      />
-
-      <AccessSideRestoreInstance
-        open={isOverlayOpen && overlayType === "restore-dialog"}
-        handleClose={() => setIsOverlayOpen(false)}
-        earliestRestoreTime={selectedInstance?.backupStatus?.earliestRestoreTime}
-        service={selectedInstanceOffering}
-        setSelectionModel={setSelectedRows}
-        fetchResourceInstances={refetchInstances}
-        selectedResource={selectedResource}
-        subscriptionId={selectedInstanceSubscription?.id}
-        selectedInstanceId={selectedInstance?.id}
-        networkType={selectedInstance?.network_type}
+      <InstanceDialogs
+        isOverlayOpen={isOverlayOpen}
+        setIsOverlayOpen={setIsOverlayOpen}
+        overlayType={overlayType}
+        instance={selectedInstance}
+        serviceOffering={selectedInstanceOffering}
+        subscription={selectedInstanceSubscription}
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+        refetchData={refetchInstances}
       />
 
       <CreateInstanceModal
