@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
 
 import { $api } from "src/api/query";
@@ -12,6 +13,7 @@ import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance as DescribeResourceInstanceResponse } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
+import { getInstancesRoute } from "src/utils/routes";
 
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
@@ -19,6 +21,7 @@ import { getMainResourceFromInstance } from "../utils";
 import InstanceForm from "./InstanceForm";
 
 type InstanceDialogsProps = {
+  variant: "instances-page" | "details-page";
   isOverlayOpen: boolean;
   setIsOverlayOpen: SetState<boolean>;
   overlayType: Overlay;
@@ -34,6 +37,7 @@ type InstanceDialogsProps = {
 };
 
 const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
+  variant,
   isOverlayOpen,
   setIsOverlayOpen,
   overlayType,
@@ -46,6 +50,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   setSelectedRows = () => {},
   refetchData,
 }) => {
+  const router = useRouter();
   const [createInstanceModalData, setCreateInstanceModalData] = useState<{
     instanceId?: string;
     isCustomDNS?: boolean;
@@ -152,6 +157,10 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
               },
             },
           });
+
+          if (variant === "details-page") {
+            router.replace(getInstancesRoute());
+          }
         }}
         title="Delete Instance"
         subtitle={`Are you sure you want to delete - ${selectedInstanceData?.id}?`}

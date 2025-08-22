@@ -348,6 +348,5 @@ const useResourceInstance = (queryParams) => {
 
   return query;
 };
-export type ResourceInstance = ReturnType<typeof useResourceInstance>["data"];
 
 export default useResourceInstance;

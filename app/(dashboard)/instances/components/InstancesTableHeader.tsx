@@ -46,9 +46,7 @@ const InstancesTableHeader = ({
   filterOptionsMap,
   selectedFilters,
   setSelectedFilters,
-  // instancesFilterCount,
-  // statusFilters,
-  // setStatusFilters,
+
   isLoadingInstances,
   isLoadingPaymentConfiguration,
 }) => {
@@ -314,7 +312,7 @@ const InstancesTableHeader = ({
           })}
 
           <InstanceActionMenu
-            variant="table-header"
+            variant="instances-page"
             disabled={!selectedInstance}
             disabledMessage="Please select an instance"
             instance={selectedInstance}
@@ -322,6 +320,7 @@ const InstancesTableHeader = ({
             subscription={selectedInstanceSubscription}
             setOverlayType={setOverlayType}
             setIsOverlayOpen={setIsOverlayOpen}
+            refetchData={refetchInstances}
           />
         </div>
       </div>

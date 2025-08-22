@@ -517,6 +517,7 @@ const InstancesPage = () => {
       </div>
 
       <InstanceDialogs
+        variant="instances-page"
         isOverlayOpen={isOverlayOpen}
         setIsOverlayOpen={setIsOverlayOpen}
         overlayType={overlayType}

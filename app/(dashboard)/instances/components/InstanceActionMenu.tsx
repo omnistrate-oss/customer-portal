@@ -4,16 +4,18 @@ import { Box } from "@mui/material";
 import ActionMenu, { ActionMenuItem } from "@/components/ActionMenu";
 import { $api } from "src/api/query";
 import DeleteIcon from "src/components/Icons/Delete/Delete";
+import EditIcon from "src/components/Icons/Edit/Edit";
 import GenerateTokenIcon from "src/components/Icons/GenerateToken/GenerateTokenIcon";
 import PlayIcon from "src/components/Icons/Play/Play";
 import RebootIcon from "src/components/Icons/Reboot/Reboot";
 import RestoreInstanceIcon from "src/components/Icons/RestoreInstance/RestoreInstanceIcon";
 import StopIcon from "src/components/Icons/Stop/Stop";
+import UpgradeIcon from "src/components/Icons/Upgrade/UpgradeIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
-import { ResourceInstance } from "src/hooks/useResourceInstance";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
+import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import {
@@ -32,9 +34,10 @@ type InstanceActionMenuProps = {
   subscription?: Subscription;
   disabled?: boolean;
   disabledMessage?: string;
-  variant: "table-header" | "details-page";
+  variant: "instances-page" | "details-page";
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  refetchData: () => void;
 };
 
 const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
@@ -46,6 +49,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   variant,
   setOverlayType,
   setIsOverlayOpen,
+  refetchData,
 }) => {
   const snackbar = useSnackbar();
 
@@ -58,7 +62,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop",
     {
       onSuccess: async () => {
-        // TODO: On Success
         snackbar.showSuccess("Stopping deployment instance...");
       },
     }
@@ -172,6 +175,31 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       });
 
       res.push({
+        dataTestId: "modify-button",
+        label: "Modify",
+        icon: EditIcon,
+        isDisabled:
+          !instance ||
+          (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
+          isProxyResource ||
+          !isUpdateAllowedByRBAC,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setOverlayType("modify-instance-form");
+          setIsOverlayOpen(true);
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : status !== "RUNNING" && status !== "FAILED"
+            ? "Instance must be running or failed to modify"
+            : isProxyResource
+              ? "System managed instances cannot be modified"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to modify instances"
+                : "",
+      });
+
+      res.push({
         dataTestId: "delete-button",
         label: "Delete",
         icon: DeleteIcon,
@@ -251,6 +279,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "upgrade-button",
         label: "Upgrade",
+        icon: UpgradeIcon,
         isDisabled: !instance || !["RUNNING", "STOPPED"].includes(status as string) || !isUpdateAllowedByRBAC,
         disabledMessage: !instance
           ? "Please select an instance"

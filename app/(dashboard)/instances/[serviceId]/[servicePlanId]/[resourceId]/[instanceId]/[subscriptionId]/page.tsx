@@ -15,6 +15,7 @@ import { Overlay } from "app/(dashboard)/instances/page";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
+import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
@@ -157,7 +158,7 @@ const InstanceDetailsPage = ({
     );
   }
 
-  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isPending) {
+  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isFetching) {
     return (
       <PageContainer>
         <LoadingSpinner />
@@ -257,14 +258,18 @@ const InstanceDetailsPage = ({
           })}
         </Tabs>
 
-        <InstanceActionMenu
-          variant="details-page"
-          instance={resourceInstanceData}
-          serviceOffering={offering}
-          subscription={subscription}
-          setOverlayType={setOverlayType}
-          setIsOverlayOpen={setIsOverlayOpen}
-        />
+        <Stack direction="row" alignItems="center" gap="16px">
+          <RefreshWithToolTip disabled={resourceInstanceQuery.isPending} refetch={resourceInstanceQuery.refetch} />
+          <InstanceActionMenu
+            variant="details-page"
+            instance={resourceInstanceData?.unprocessedData}
+            serviceOffering={offering}
+            subscription={subscription}
+            setOverlayType={setOverlayType}
+            setIsOverlayOpen={setIsOverlayOpen}
+            refetchData={refetchInstance}
+          />
+        </Stack>
       </Stack>
       {currentTab === tabs.resourceInstanceDetails && (
         <ResourceInstanceDetails
@@ -380,6 +385,7 @@ const InstanceDetailsPage = ({
       )}
 
       <InstanceDialogs
+        variant="details-page"
         isOverlayOpen={isOverlayOpen}
         setIsOverlayOpen={setIsOverlayOpen}
         overlayType={overlayType}
