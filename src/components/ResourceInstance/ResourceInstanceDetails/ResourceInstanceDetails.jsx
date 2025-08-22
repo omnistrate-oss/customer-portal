@@ -132,7 +132,7 @@ function ResourceInstanceDetails(props) {
     if (showVersion) {
       res.push({
         dataTestId: "version",
-        label: "Version",
+        label: "Plan Version",
         value: tierVersion || "-",
       });
     }
