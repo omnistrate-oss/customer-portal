@@ -1,10 +1,9 @@
 import { $api } from "src/api/query";
 
 export default function useCustomerVersionSets(
-  queryParams: { serviceId: string; productTierId: string },
+  queryParams: { serviceId?: string; productTierId?: string },
   queryOptions = {}
 ) {
-
   const { serviceId, productTierId } = queryParams;
   return $api.useQuery(
     "get",
@@ -12,14 +11,15 @@ export default function useCustomerVersionSets(
     {
       params: {
         path: {
-          serviceId: serviceId,
-          productTierId: productTierId,
+          serviceId: serviceId || "",
+          productTierId: productTierId || "",
         },
       },
     },
     {
       select: (data) => data.tierVersionSets,
-       ...queryOptions,
+      enabled: !!serviceId && !!productTierId,
+      ...queryOptions,
     }
   );
 }

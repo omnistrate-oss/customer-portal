@@ -73,6 +73,7 @@ export default function NodesTable(props) {
     subscriptionId,
     isBYOAServicePlan,
     resourceInstancestatus,
+    isServerless,
   } = props;
 
   const isCustomTenancy = serviceOffering?.productTierType === productTierTypes.CUSTOM_TENANCY;
@@ -439,7 +440,7 @@ export default function NodesTable(props) {
           }
         }}
         loading={isLoading}
-        noRowsText="No nodes"
+        noRowsText={isServerless ? "No nodes to show - serverless instances do not have dedicated nodes" : "No nodes"}
       />
       <GenerateTokenDialog
         dashboardEndpoint={dashboardEndpoint}

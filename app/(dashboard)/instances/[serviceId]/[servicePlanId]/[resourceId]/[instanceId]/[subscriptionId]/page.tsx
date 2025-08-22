@@ -8,9 +8,14 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, Collapse, Stack } from "@mui/material";
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
+import InstanceActionMenu from "app/(dashboard)/instances/components/InstanceActionMenu";
+import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialogs";
+import useInstances from "app/(dashboard)/instances/hooks/useInstances";
+import { Overlay } from "app/(dashboard)/instances/page";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
+import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
@@ -62,6 +67,8 @@ const InstanceDetailsPage = ({
   const { serviceId, servicePlanId, resourceId, instanceId, subscriptionId } = params;
   const searchParams = useSearchParams();
   const view = searchParams?.get("view");
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [overlayType, setOverlayType] = useState<Overlay>("delete-dialog");
 
   const [currentTab, setCurrentTab] = useState<CurrentTab>("Instance Details");
 
@@ -97,6 +104,7 @@ const InstanceDetailsPage = ({
 
   const isCliManagedResource = useMemo(() => CLI_MANAGED_RESOURCES.includes(resourceType as string), [resourceType]);
 
+  const { data: instances = [] } = useInstances();
   const resourceInstanceQuery = useResourceInstance({
     serviceProviderId: offering?.serviceProviderId,
     serviceKey: offering?.serviceURLKey,
@@ -110,7 +118,7 @@ const InstanceDetailsPage = ({
     subscriptionId: subscription?.id,
   });
 
-  const { data: resourceInstanceData } = resourceInstanceQuery;
+  const { data: resourceInstanceData, refetch: refetchInstance } = resourceInstanceQuery;
 
   const resourceSchemaQuery = useServiceOfferingResourceSchema({
     serviceId,
@@ -149,7 +157,7 @@ const InstanceDetailsPage = ({
     );
   }
 
-  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isPending) {
+  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isFetching) {
     return (
       <PageContainer>
         <LoadingSpinner />
@@ -229,24 +237,39 @@ const InstanceDetailsPage = ({
           }}
         />
       </Collapse>
-      <Tabs value={currentTab} sx={{ marginTop: "20px" }}>
-        {Object.entries(tabs).map(([key, value]) => {
-          const isDisabled = disabledTabs?.includes(key);
-          return (
-            <Tab
-              data-testid={`${value?.replace(" ", "-").toLowerCase()}-tab`}
-              key={key}
-              label={value}
-              value={value}
-              onClick={() => {
-                setCurrentTab(value as CurrentTab);
-              }}
-              disableRipple
-              disabled={isDisabled}
-            />
-          );
-        })}
-      </Tabs>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
+        <Tabs value={currentTab}>
+          {Object.entries(tabs).map(([key, value]) => {
+            const isDisabled = disabledTabs?.includes(key);
+            return (
+              <Tab
+                data-testid={`${value?.replace(" ", "-").toLowerCase()}-tab`}
+                key={key}
+                label={value}
+                value={value}
+                onClick={() => {
+                  setCurrentTab(value as CurrentTab);
+                }}
+                disableRipple
+                disabled={isDisabled}
+              />
+            );
+          })}
+        </Tabs>
+
+        <Stack direction="row" alignItems="center" gap="16px">
+          <RefreshWithToolTip disabled={resourceInstanceQuery.isFetching} refetch={refetchInstance} />
+          <InstanceActionMenu
+            variant="details-page"
+            instance={resourceInstanceData?.unprocessedData}
+            serviceOffering={offering}
+            subscription={subscription}
+            setOverlayType={setOverlayType}
+            setIsOverlayOpen={setIsOverlayOpen}
+            refetchData={refetchInstance}
+          />
+        </Stack>
+      </Stack>
       {currentTab === tabs.resourceInstanceDetails && (
         <ResourceInstanceDetails
           resourceInstanceId={instanceId}
@@ -272,7 +295,7 @@ const InstanceDetailsPage = ({
           highAvailability={resourceInstanceData.highAvailability}
           backupStatus={resourceInstanceData.backupStatus}
           autoscaling={resourceInstanceData.autoscaling}
-          serverlessEnabled={resourceInstanceData.serverlessEnabled}
+          autostopEnabled={resourceInstanceData.serverlessEnabled}
           isCliManagedResource={isCliManagedResource}
           maintenanceTasks={resourceInstanceData.maintenanceTasks}
           licenseDetails={resourceInstanceData?.subscriptionLicense}
@@ -310,6 +333,7 @@ const InstanceDetailsPage = ({
           subscriptionData={subscription}
           subscriptionId={subscription.id}
           isBYOAServicePlan={offering?.serviceModelType === "BYOA"}
+          isServerless={resourceInstanceData?.serverlessEnabled}
         />
       )}
       {currentTab === tabs.metrics && (
@@ -358,6 +382,19 @@ const InstanceDetailsPage = ({
           refetchInstance={resourceInstanceQuery.refetch}
         />
       )}
+
+      <InstanceDialogs
+        variant="details-page"
+        isOverlayOpen={isOverlayOpen}
+        setIsOverlayOpen={setIsOverlayOpen}
+        overlayType={overlayType}
+        setOverlayType={setOverlayType}
+        instance={resourceInstanceData?.unprocessedData}
+        instances={instances}
+        serviceOffering={offering}
+        subscription={subscription}
+        refetchData={refetchInstance}
+      />
     </PageContainer>
   );
 };

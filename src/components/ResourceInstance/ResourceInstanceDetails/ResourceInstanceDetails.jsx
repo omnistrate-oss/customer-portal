@@ -30,7 +30,7 @@ function ResourceInstanceDetails(props) {
     highAvailability,
     backupStatus,
     autoscaling,
-    serverlessEnabled,
+    autostopEnabled,
     isCliManagedResource,
     maintenanceTasks,
     licenseDetails,
@@ -201,13 +201,13 @@ function ResourceInstanceDetails(props) {
       },
       {
         label: "Auto stop",
-        value: serverlessEnabled ? "Enabled" : "Disabled",
+        value: autostopEnabled ? "Enabled" : "Disabled",
         valueType: "boolean",
       },
     ];
 
     return res;
-  }, [autoscaling]);
+  }, [autoscaling, autostopEnabled]);
 
   const customNetworkData = useMemo(() => {
     const res = [
