@@ -34,9 +34,15 @@ function ResourceInstanceDetails(props) {
     isCliManagedResource,
     maintenanceTasks,
     licenseDetails,
+    tierVersion,
   } = props;
 
   const isResourceBYOA = resultParameters.gcp_project_id || resultParameters.aws_account_id;
+
+  // Show Version If The Service Offering Allows Upgrades
+  const showVersion = serviceOffering?.productTierFeatures?.some(
+    (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+  );
 
   const resultParametersWithDescription = useMemo(() => {
     const result = Object.keys(resultParameters)
@@ -122,6 +128,14 @@ function ResourceInstanceDetails(props) {
         }
       );
     }
+
+    if (showVersion) {
+      res.push({
+        dataTestId: "version",
+        label: "Version",
+        value: tierVersion || "-",
+      });
+    }
     return res;
   }, [
     resourceInstanceId,
@@ -133,6 +147,8 @@ function ResourceInstanceDetails(props) {
     highAvailability,
     backupStatus,
     isCliManagedResource,
+    tierVersion,
+    showVersion,
   ]);
 
   const licenseData = useMemo(() => {
