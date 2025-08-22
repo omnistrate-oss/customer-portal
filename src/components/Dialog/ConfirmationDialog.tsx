@@ -36,7 +36,7 @@ type ConfirmationDialogProps = {
   isLoading?: boolean;
 
   confirmationText?: string;
-  onConfirm?: () => Promise<void> | void;
+  onConfirm?: () => Promise<boolean> | boolean;
   customConfirmButton?: React.ReactNode;
   hideCancelButton?: boolean;
 };
@@ -54,7 +54,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   isLoading = false,
 
   confirmationText,
-  onConfirm = async () => {},
+  onConfirm = async () => {
+    return true;
+  },
   customConfirmButton,
   hideCancelButton = false,
 }) => {
@@ -159,8 +161,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                 snackbar.showError(`Please type "${confirmationText}" to confirm the action.`);
                 return;
               }
-              await onConfirm();
-              handleClose();
+              const res = await onConfirm();
+              if (res) {
+                handleClose();
+              }
             }}
           >
             {confirmButtonLabel} {isLoading && <LoadingSpinnerSmall />}

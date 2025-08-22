@@ -148,12 +148,17 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
       onConfirm={async () => {
         if (!instance?.id) {
           snackbar.showError("Please select an instance to upgrade");
-          return;
+          return false;
         }
 
         const resource = serviceOffering?.resourceParameters.find(
           (resource) => resource.resourceId === instance?.resourceID
         );
+
+        if (!selectedVersion) {
+          snackbar.showError("Please select a version to upgrade");
+          return false;
+        }
 
         await upgradeInstanceMutation.mutateAsync({
           params: {
@@ -175,6 +180,8 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
             targetVersion: selectedVersion,
           },
         });
+
+        return true;
       }}
     />
   );

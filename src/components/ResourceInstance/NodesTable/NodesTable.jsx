@@ -387,7 +387,6 @@ export default function NodesTable(props) {
           header: {
             resourceName,
             count: filteredNodes.length,
-            refetchData,
             isRefetching,
             isFailoverDisabled:
               !isFailoverEnabled ||
