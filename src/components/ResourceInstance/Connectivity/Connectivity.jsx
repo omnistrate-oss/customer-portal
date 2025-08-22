@@ -15,7 +15,6 @@ function Connectivity(props) {
     globalEndpoints,
     nodes,
     additionalEndpoints,
-    refetchInstance,
   } = props;
 
   const [availabilityZones, setAvailabilityZones] = useState("");
@@ -157,10 +156,6 @@ function Connectivity(props) {
 
     return dataFields;
   }, [networkType, availabilityZones, publiclyAccessible, privateNetworkCIDR, privateNetworkId]);
-
-  useEffect(() => {
-    refetchInstance();
-  }, []);
 
   if (additionalEndpoints.some((el) => el.additionalEndpoints)) {
     return <CLIManagedConnectivityDetails additionalEndpoints={additionalEndpoints} />;

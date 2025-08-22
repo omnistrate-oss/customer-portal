@@ -299,22 +299,18 @@ const InstanceDetailsPage = ({
           isCliManagedResource={isCliManagedResource}
           maintenanceTasks={resourceInstanceData.maintenanceTasks}
           licenseDetails={resourceInstanceData?.subscriptionLicense}
+          tierVersion={resourceInstanceData?.unprocessedData?.tierVersion}
         />
       )}
       {currentTab === tabs.connectivity && (
         <Connectivity
           networkType={resourceInstanceData.connectivity.networkType}
-          clusterEndpoint={resourceInstanceData.connectivity.clusterEndpoint}
-          nodeEndpoints={resourceInstanceData.connectivity.nodeEndpoints}
           ports={resourceInstanceData.connectivity.ports}
-          availabilityZones={resourceInstanceData.connectivity.availabilityZones}
           publiclyAccessible={resourceInstanceData.connectivity.publiclyAccessible}
           privateNetworkCIDR={resourceInstanceData.connectivity.privateNetworkCIDR}
           privateNetworkId={resourceInstanceData.connectivity.privateNetworkId}
           globalEndpoints={resourceInstanceData.connectivity.globalEndpoints}
           nodes={resourceInstanceData.nodes}
-          queryData={queryData}
-          refetchInstance={resourceInstanceQuery.refetch}
           additionalEndpoints={resourceInstanceData.connectivity.additionalEndpoints}
         />
       )}

@@ -330,9 +330,6 @@ export default function NodesTable(props) {
 
   const failoverMutation = useMutation({
     mutationFn: (payload) => {
-      //if the context is inventory manage instance call failover endpoint of related to
-      //invetory otherwise call access related endpoint
-
       return failoverResourceInstanceNode(payload);
     },
     onSuccess: async () => {
