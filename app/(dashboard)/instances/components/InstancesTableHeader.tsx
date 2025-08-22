@@ -79,18 +79,6 @@ const InstancesTableHeader = ({
     }
   );
 
-  const restartInstanceMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart",
-    {
-      onSuccess: async () => {
-        refetchInstances();
-        setSelectedRows([]);
-        snackbar.showSuccess("Restarting deployment instance...");
-      },
-    }
-  );
-
   const selectedResource = useMemo(() => {
     return getMainResourceFromInstance(selectedInstance, selectedInstanceOffering);
   }, [selectedInstance, selectedInstanceOffering]);
@@ -270,7 +258,6 @@ const InstancesTableHeader = ({
     selectedInstance,
     stopInstanceMutation,
     startInstanceMutation,
-    restartInstanceMutation,
     selectedInstanceOffering,
     isComplexResource,
     isProxyResource,
@@ -321,6 +308,7 @@ const InstancesTableHeader = ({
             setOverlayType={setOverlayType}
             setIsOverlayOpen={setIsOverlayOpen}
             refetchData={refetchInstances}
+            setSelectedRows={setSelectedRows}
           />
         </div>
       </div>

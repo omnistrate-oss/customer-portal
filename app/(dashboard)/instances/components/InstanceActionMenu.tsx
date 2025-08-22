@@ -38,6 +38,7 @@ type InstanceActionMenuProps = {
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
   refetchData: () => void;
+  setSelectedRows?: SetState<ResourceInstance[]>; // Optional
 };
 
 const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
@@ -50,6 +51,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   setOverlayType,
   setIsOverlayOpen,
   refetchData,
+  setSelectedRows = () => {}, // Default If Not Provided
 }) => {
   const snackbar = useSnackbar();
 
@@ -62,6 +64,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop",
     {
       onSuccess: async () => {
+        refetchData();
+        setSelectedRows([]);
         snackbar.showSuccess("Stopping deployment instance...");
       },
     }
@@ -72,7 +76,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/start",
     {
       onSuccess: async () => {
-        // TODO: On Success
+        refetchData();
+        setSelectedRows([]);
         snackbar.showSuccess("Starting deployment instance...");
       },
     }
@@ -83,11 +88,15 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart",
     {
       onSuccess: async () => {
-        // TODO: On Success
+        refetchData();
+        setSelectedRows([]);
         snackbar.showSuccess("Restarting deployment instance...");
       },
     }
   );
+
+  const pendingOperations =
+    stopInstanceMutation.isPending || startInstanceMutation.isPending || restartInstanceMutation.isPending;
 
   const actions = useMemo(() => {
     const res: ActionMenuItem[] = [];
@@ -325,7 +334,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     </Tooltip>
   ) : (
     <Box>
-      <ActionMenu disabled={disabled} menuItems={actions} />
+      <ActionMenu disabled={disabled || pendingOperations} menuItems={actions} />
     </Box>
   );
 };

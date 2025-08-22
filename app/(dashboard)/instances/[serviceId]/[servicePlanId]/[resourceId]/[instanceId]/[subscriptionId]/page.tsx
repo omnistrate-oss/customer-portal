@@ -104,6 +104,7 @@ const InstanceDetailsPage = ({
 
   const isCliManagedResource = useMemo(() => CLI_MANAGED_RESOURCES.includes(resourceType as string), [resourceType]);
 
+  const { data: instances = [] } = useInstances();
   const resourceInstanceQuery = useResourceInstance({
     serviceProviderId: offering?.serviceProviderId,
     serviceKey: offering?.serviceURLKey,
@@ -145,8 +146,6 @@ const InstanceDetailsPage = ({
     () => (resourceInstanceData?.status === "DISCONNECTED" ? ["backups"] : []),
     [resourceInstanceData, tabs]
   );
-
-  const { data: instances = [] } = useInstances();
 
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
     return (
@@ -259,7 +258,7 @@ const InstanceDetailsPage = ({
         </Tabs>
 
         <Stack direction="row" alignItems="center" gap="16px">
-          <RefreshWithToolTip disabled={resourceInstanceQuery.isPending} refetch={resourceInstanceQuery.refetch} />
+          <RefreshWithToolTip disabled={resourceInstanceQuery.isFetching} refetch={refetchInstance} />
           <InstanceActionMenu
             variant="details-page"
             instance={resourceInstanceData?.unprocessedData}

@@ -85,6 +85,10 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         refetchData();
         setIsOverlayOpen(false);
         snackbar.showSuccess("Deleting deployment instance...");
+
+        if (variant === "details-page") {
+          router.replace(getInstancesRoute());
+        }
       },
     }
   );
@@ -157,10 +161,6 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
               },
             },
           });
-
-          if (variant === "details-page") {
-            router.replace(getInstancesRoute());
-          }
         }}
         title="Delete Instance"
         subtitle={`Are you sure you want to delete - ${selectedInstanceData?.id}?`}
