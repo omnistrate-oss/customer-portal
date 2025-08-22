@@ -23,15 +23,12 @@ import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
 import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
-import CreateInstanceModal from "components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 
-import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import PageContainer from "../components/Layout/PageContainer";
 
 import InstanceDialogs from "./components/InstanceDialogs";
-import InstanceForm from "./components/InstanceForm";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
@@ -60,12 +57,6 @@ const InstancesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
-  const [createInstanceModalData, setCreateInstanceModalData] = useState<{
-    instanceId?: string;
-    isCustomDNS?: boolean;
-  }>({});
-
-  // const [statusFilters, setStatusFilters] = useState(getInitialFilterState());
 
   const {
     subscriptionsObj,
@@ -525,42 +516,18 @@ const InstancesPage = () => {
         />
       </div>
 
-      <FullScreenDrawer
-        title={overlayType === "create-instance-form" ? "Create Deployment Instance" : "Modify Deployment Instance"}
-        description={
-          overlayType === "create-instance-form" ? "Create new Deployment Instance" : "Modify Deployment Instance"
-        }
-        open={isOverlayOpen && ["create-instance-form", "modify-instance-form"].includes(overlayType)}
-        closeDrawer={() => setIsOverlayOpen(false)}
-        RenderUI={
-          <InstanceForm
-            instances={instances}
-            formMode={overlayType === "create-instance-form" ? "create" : "modify"}
-            selectedInstance={selectedInstance}
-            refetchInstances={refetchInstances}
-            setCreateInstanceModalData={setCreateInstanceModalData}
-            setIsOverlayOpen={setIsOverlayOpen}
-            setOverlayType={setOverlayType}
-          />
-        }
-      />
-
       <InstanceDialogs
         isOverlayOpen={isOverlayOpen}
         setIsOverlayOpen={setIsOverlayOpen}
         overlayType={overlayType}
+        setOverlayType={setOverlayType}
+        instances={instances}
         instance={selectedInstance}
         serviceOffering={selectedInstanceOffering}
         subscription={selectedInstanceSubscription}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
         refetchData={refetchInstances}
-      />
-
-      <CreateInstanceModal
-        open={isOverlayOpen && overlayType === "create-instance-dialog"}
-        handleClose={() => setIsOverlayOpen(false)}
-        data={createInstanceModalData}
       />
     </PageContainer>
   );

@@ -3,8 +3,8 @@ import { Box, Stack } from "@mui/material";
 import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
 
 import { $api } from "src/api/query";
-import { ResourceInstance } from "src/hooks/useResourceInstance";
 import useSnackbar from "src/hooks/useSnackbar";
+import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 

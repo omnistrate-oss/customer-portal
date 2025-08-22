@@ -1,6 +1,5 @@
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
-import { paths } from "src/types/schema";
 
 const useInstances = (queryOptions = {}) => {
   const query = $api.useQuery(
@@ -25,7 +24,5 @@ const useInstances = (queryOptions = {}) => {
 
   return query;
 };
-export type DeploymentInstance =
-  paths["/2022-09-01-00/resource-instance"]["get"]["responses"]["200"]["content"]["application/json"]["resourceInstances"][number];
 
 export default useInstances;

@@ -448,7 +448,7 @@ const CloudAccountsPage = () => {
     if (!isFetchingInstances && !isFetchingAccountConfigs) {
       refetchAccountConfigs();
     }
-    console.log("fetching account configs", isFetchingAccountConfigs);
+
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instances, isFetchingInstances]);
 

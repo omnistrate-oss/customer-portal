@@ -1,26 +1,32 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
 
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
+import CreateInstanceModal from "src/components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
 import AccessSideRestoreInstance from "src/components/RestoreInstance/AccessSideRestoreInstance";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import UpgradeDialog from "src/components/Upgrade/UpgradeDialog";
-import { ResourceInstance } from "src/hooks/useResourceInstance";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
+import { ResourceInstance as DescribeResourceInstanceResponse } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
+import InstanceForm from "./InstanceForm";
+
 type InstanceDialogsProps = {
   isOverlayOpen: boolean;
   setIsOverlayOpen: SetState<boolean>;
   overlayType: Overlay;
+  setOverlayType: SetState<Overlay>;
   serviceOffering?: ServiceOffering;
   subscription?: Subscription;
-  instance?: ResourceInstance;
+  instance?: DescribeResourceInstanceResponse;
+  instances: DescribeResourceInstanceResponse[];
 
   selectedRows?: string[];
   setSelectedRows?: SetState<string[]>;
@@ -31,15 +37,20 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   isOverlayOpen,
   setIsOverlayOpen,
   overlayType,
+  setOverlayType,
   serviceOffering,
   instance,
+  instances,
   subscription,
 
   setSelectedRows = () => {},
   refetchData,
 }) => {
+  const [createInstanceModalData, setCreateInstanceModalData] = useState<{
+    instanceId?: string;
+    isCustomDNS?: boolean;
+  }>({});
   const snackbar = useSnackbar();
-  console.log(instance);
 
   // Resource of the Selected Instance
   const selectedResource = useMemo(() => {
@@ -75,6 +86,32 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
 
   return (
     <>
+      <CreateInstanceModal
+        open={isOverlayOpen && overlayType === "create-instance-dialog"}
+        handleClose={() => setIsOverlayOpen(false)}
+        data={createInstanceModalData}
+      />
+
+      <FullScreenDrawer
+        title={overlayType === "create-instance-form" ? "Create Deployment Instance" : "Modify Deployment Instance"}
+        description={
+          overlayType === "create-instance-form" ? "Create new Deployment Instance" : "Modify Deployment Instance"
+        }
+        open={isOverlayOpen && ["create-instance-form", "modify-instance-form"].includes(overlayType)}
+        closeDrawer={() => setIsOverlayOpen(false)}
+        RenderUI={
+          <InstanceForm
+            instances={instances}
+            formMode={overlayType === "create-instance-form" ? "create" : "modify"}
+            selectedInstance={instance}
+            refetchInstances={refetchData}
+            setCreateInstanceModalData={setCreateInstanceModalData}
+            setIsOverlayOpen={setIsOverlayOpen}
+            setOverlayType={setOverlayType}
+          />
+        }
+      />
+
       <UpgradeDialog
         open={isOverlayOpen && overlayType === "upgrade-dialog"}
         onClose={() => setIsOverlayOpen(false)}
