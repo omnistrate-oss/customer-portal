@@ -167,7 +167,7 @@ function Logs(props) {
     }
     renderTimeoutRef.current = setTimeout(() => {
       setRenderTrigger((prev) => prev + 1);
-    }, 50); // Update every 16ms max (~20fps)
+    }, 50); // Update every 50ms max (~20fps)
   }, []);
 
   // Clear timeout on node change or unmount
