@@ -39,6 +39,7 @@ export const LOG_PATTERNS: LogPattern[] = [
     description: "YAML configuration logs",
     detect: (line: string): boolean => {
       const trimmed = line.trim();
+      // More specific YAML patterns to avoid false positives with JSON
       return (
         // YAML document separators
         trimmed.includes("---") ||
