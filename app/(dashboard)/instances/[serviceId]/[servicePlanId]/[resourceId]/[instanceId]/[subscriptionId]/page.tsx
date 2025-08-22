@@ -288,7 +288,7 @@ const InstanceDetailsPage = ({
           highAvailability={resourceInstanceData.highAvailability}
           backupStatus={resourceInstanceData.backupStatus}
           autoscaling={resourceInstanceData.autoscaling}
-          serverlessEnabled={resourceInstanceData.serverlessEnabled}
+          autostopEnabled={resourceInstanceData.serverlessEnabled}
           isCliManagedResource={isCliManagedResource}
           maintenanceTasks={resourceInstanceData.maintenanceTasks}
           licenseDetails={resourceInstanceData?.subscriptionLicense}
@@ -326,6 +326,7 @@ const InstanceDetailsPage = ({
           subscriptionData={subscription}
           subscriptionId={subscription.id}
           isBYOAServicePlan={offering?.serviceModelType === "BYOA"}
+          isServerless={resourceInstanceData?.serverlessEnabled}
         />
       )}
       {currentTab === tabs.metrics && (
