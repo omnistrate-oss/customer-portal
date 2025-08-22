@@ -289,7 +289,10 @@ function Logs(props) {
       }
       flushBuffer();
     },
-    //prevent rerenders because of internal state changes in hook
+    // The filter function below always returns false to prevent the useWebSocket hook
+    // from triggering rerenders due to internal state changes (such as incoming messages).
+    // This is necessary for performance optimization, especially when handling large volumes
+    // of log data, as it avoids unnecessary UI updates and keeps the interface responsive.
     filter: () => false,
   });
 
