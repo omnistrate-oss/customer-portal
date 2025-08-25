@@ -86,7 +86,7 @@ export const getVersionSetResourceMenuItems = (versionSet?: TierVersionSet) => {
     return [];
   }
 
-  //filter out observability and injected account config resources
+  //filter out observability, injected account config, internal and managed proxy resources
   return versionSet.resources
     .filter(
       (resource) =>
