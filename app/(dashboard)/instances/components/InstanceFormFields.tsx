@@ -133,6 +133,7 @@ export const getStandardInformationFields = (
         }
 
         const resources = getResourceMenuItems(offering);
+        setFieldValue("productTierVersion", "");
         setFieldValue("resourceId", resources[0]?.value || "");
         setFieldValue("requestParams", {});
 
