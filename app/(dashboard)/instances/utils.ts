@@ -88,7 +88,13 @@ export const getVersionSetResourceMenuItems = (versionSet?: TierVersionSet) => {
 
   //filter out observability and injected account config resources
   return versionSet.resources
-    .filter((resource) => !resource.id.startsWith("r-obsrv") && !resource.id.startsWith("r-injectedaccountconfig"))
+    .filter(
+      (resource) =>
+        !resource.id.startsWith("r-obsrv") &&
+        !resource.id.startsWith("r-injectedaccountconfig") &&
+        resource.managedResourceType !== "PortsBasedProxy" &&
+        resource.isExternal === true
+    )
     .map((resource) => ({
       label: resource.name,
       value: resource.id,
