@@ -448,7 +448,7 @@ const CloudAccountsPage = () => {
     if (!isFetchingInstances && !isFetchingAccountConfigs) {
       refetchAccountConfigs();
     }
-    console.log("fetching account configs", isFetchingAccountConfigs);
+
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instances, isFetchingInstances]);
 
@@ -655,7 +655,7 @@ const CloudAccountsPage = () => {
         onClose={() => {
           setIsOverlayOpen(false);
         }}
-        isDeletingInstance={deleteCloudAccountInstanceMutation.isPending}
+        isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={selectedAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
@@ -676,6 +676,7 @@ const CloudAccountsPage = () => {
         }}
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
+        instanceId={selectedInstance?.id}
       />
 
       <ConnectAccountConfigDialog

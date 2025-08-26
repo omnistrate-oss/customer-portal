@@ -34,6 +34,7 @@ function useOrgServiceOfferings(queryOptions = {}) {
 
       return serviceOfferings;
     },
+    retry: 3,
     ...queryOptions,
   });
 

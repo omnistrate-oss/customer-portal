@@ -6,7 +6,6 @@ import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import FailoverIcon from "src/components/Icons/Failover/Failover";
 import GenerateTokenIcon from "src/components/Icons/GenerateToken/GenerateTokenIcon";
-import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 
 type NodesTableHeaderProps = {
   resourceName?: string;
@@ -29,7 +28,6 @@ type NodesTableHeaderProps = {
 const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
   resourceName,
   count,
-  refetchData,
   isRefetching,
   isFailoverDisabled,
   failoverDisabledMessage,
@@ -69,7 +67,6 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
             placeholder="Search by Node ID"
             width="250px"
           />
-          <RefreshWithToolTip refetch={refetchData} disabled={isRefetching} />
 
           {showFailoverButton && (
             <Button

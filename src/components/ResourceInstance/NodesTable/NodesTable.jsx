@@ -73,6 +73,7 @@ export default function NodesTable(props) {
     subscriptionId,
     isBYOAServicePlan,
     resourceInstancestatus,
+    isServerless,
   } = props;
 
   const isCustomTenancy = serviceOffering?.productTierType === productTierTypes.CUSTOM_TENANCY;
@@ -329,9 +330,6 @@ export default function NodesTable(props) {
 
   const failoverMutation = useMutation({
     mutationFn: (payload) => {
-      //if the context is inventory manage instance call failover endpoint of related to
-      //invetory otherwise call access related endpoint
-
       return failoverResourceInstanceNode(payload);
     },
     onSuccess: async () => {
@@ -389,7 +387,6 @@ export default function NodesTable(props) {
           header: {
             resourceName,
             count: filteredNodes.length,
-            refetchData,
             isRefetching,
             isFailoverDisabled:
               !isFailoverEnabled ||
@@ -439,7 +436,7 @@ export default function NodesTable(props) {
           }
         }}
         loading={isLoading}
-        noRowsText="No nodes"
+        noRowsText={isServerless ? "No nodes to show - serverless instances do not have dedicated nodes" : "No nodes"}
       />
       <GenerateTokenDialog
         dashboardEndpoint={dashboardEndpoint}

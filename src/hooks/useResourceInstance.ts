@@ -291,6 +291,7 @@ const useResourceInstance = (queryParams) => {
         const healthStatusPercent = calculateInstanceHealthPercentage(data?.detailedNetworkTopology, data?.status);
 
         const final = {
+          unprocessedData: data,
           resourceInstanceId: resourceInstanceId,
           resourceKey: topologyDetails?.resourceKey,
           region: data.region,

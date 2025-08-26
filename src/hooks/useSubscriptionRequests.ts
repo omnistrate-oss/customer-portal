@@ -9,6 +9,7 @@ const useSubscriptionRequests = (queryOptions = {}) => {
       select: (data) => {
         return data.subscriptionRequests;
       },
+      retry: 2,
       ...queryOptions,
     }
   );

@@ -27,6 +27,7 @@ import { theme as dashboardTheme } from "../styles/theme";
 import "../styles/globals.css";
 import "../styles/nprogress.css";
 import "../styles/quill-editor.css";
+import "../styles/lexical-editor.css";
 import "../styles/monaco-editor.css";
 import "../src/components/DateRangePicker/date-range-picker-styles.css";
 

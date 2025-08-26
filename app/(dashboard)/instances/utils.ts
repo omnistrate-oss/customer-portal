@@ -18,6 +18,7 @@ import {
   ResourceInstance,
   ResourceInstanceNetworkTopology,
 } from "src/types/resourceInstance";
+import { TierVersionSet } from "src/types/tier-version-set";
 
 import { loadStatusLabel, loadStatusMap } from "./constants";
 
@@ -78,6 +79,26 @@ export const getResourceMenuItems = (offering: ServiceOffering) => {
   });
 
   return menuItems.sort((a, b) => a.label.localeCompare(b.label));
+};
+
+export const getVersionSetResourceMenuItems = (versionSet?: TierVersionSet) => {
+  if (!versionSet || !versionSet.resources) {
+    return [];
+  }
+
+  //filter out observability, injected account config, internal and managed proxy resources
+  return versionSet.resources
+    .filter(
+      (resource) =>
+        !resource.id.startsWith("r-obsrv") &&
+        !resource.id.startsWith("r-injectedaccountconfig") &&
+        resource.managedResourceType !== "PortsBasedProxy" &&
+        resource.isExternal === true
+    )
+    .map((resource) => ({
+      label: resource.name,
+      value: resource.id,
+    }));
 };
 
 export const getRegionMenuItems = (offering: ServiceOffering, cloudProvider: CloudProvider) => {
@@ -226,7 +247,8 @@ export const getInitialValues = (
   subscriptions: Subscription[],
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   serviceOfferings: ServiceOffering[],
-  instances: ResourceInstance[]
+  instances: ResourceInstance[],
+  versionSets?: TierVersionSet[]
 ) => {
   if (instance) {
     const subscription = subscriptions.find((sub) => sub.id === instance?.subscriptionId);
@@ -250,6 +272,7 @@ export const getInitialValues = (
       cloudProvider: instance.cloud_provider,
       region: instance.region,
       network_type: instance.network_type || "",
+      productTierVersion: "", // Empty for existing instances
       requestParams,
     };
   }
@@ -289,6 +312,10 @@ export const getInitialValues = (
 
   const resources = getResourceMenuItems(offering);
 
+  // Find the preferred version if available
+  const preferredVersion = versionSets?.find((v) => v.status === "Preferred");
+  const defaultProductTierVersion = preferredVersion?.version || "";
+
   return {
     serviceId,
     servicePlanId,
@@ -296,6 +323,7 @@ export const getInitialValues = (
     resourceId: (resources[0]?.value as string) || "",
     cloudProvider,
     region: region || "",
+    productTierVersion: defaultProductTierVersion,
     requestParams: {},
   };
 };

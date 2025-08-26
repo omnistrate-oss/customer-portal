@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import { cloneDeep } from "lodash";
 import * as yup from "yup";
+import { StringSchema } from "yup";
+
+type ValidationSchema = StringSchema<string | undefined> | StringSchema<string | null | undefined>;
 
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
@@ -25,6 +28,7 @@ import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
+import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { getInitialValues } from "../utils";
 
@@ -44,6 +48,18 @@ const InstanceForm = ({
   setCreateInstanceModalData,
 }) => {
   const snackbar = useSnackbar();
+
+  // State for validation schema
+  const [validationSchema, setValidationSchema] = useState(() =>
+    yup.object({
+      serviceId: yup.string().required("Product is required"),
+      servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+      subscriptionId: yup.string().required("Subscription is required"),
+      resourceId: yup.string().required("Resource is required"),
+      // requestParams validation will be added dynamically
+    })
+  );
+
   const {
     subscriptions,
     serviceOfferings,
@@ -97,24 +113,52 @@ const InstanceForm = ({
       subscriptions,
       serviceOfferingsObj,
       serviceOfferings,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      [] // Will be updated later when customerVersionSets loads
     ),
     enableReinitialize: true,
-    validationSchema: yup.object({
-      serviceId: yup.string().required("Product is required"),
-      servicePlanId: yup.string().required("A plan with a valid subscription is required"),
-      subscriptionId: yup.string().required("Subscription is required"),
-      resourceId: yup.string().required("Resource is required"),
-    }),
+    validationSchema: validationSchema,
+    validateOnBlur: true,
+    validateOnChange: true,
     onSubmit: async (values) => {
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
-      const selectedResource = offering?.resourceParameters.find(
-        (resource) => resource.resourceId === values.resourceId
-      );
+
+      // Determine if we should use version set resources or service offering resources
+      // Check for VERSION_SET_OVERRIDE feature with CUSTOMER scope in productTierFeatures
+      const allowCustomerVersionOverride =
+        offering?.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        ) || false;
+
+      let resourceKey = "";
+
+      if (allowCustomerVersionOverride && values.productTierVersion) {
+        // Get resource from the selected version set
+        const selectedVersionSet = customerVersionSets.find(
+          (versionSet) => versionSet.version === values.productTierVersion
+        );
+        const selectedVersionSetResource = selectedVersionSet?.resources?.find(
+          (resource) => resource.id === values.resourceId
+        );
+        // For version set resources, use the resource id as the key
+        resourceKey = selectedVersionSetResource?.urlKey || "";
+      } else {
+        // Get resource from service offering
+        const selectedOfferingResource = offering?.resourceParameters.find(
+          (resource) => resource.resourceId === values.resourceId
+        );
+        // For service offering resources, use the urlKey
+        resourceKey = selectedOfferingResource?.urlKey || "";
+      }
 
       const data: any = {
         ...cloneDeep(values),
       };
+
+      // Remove productTierVersion if allowCustomerVersionOverride is false or if we're not creating
+      if (!allowCustomerVersionOverride || formMode !== "create") {
+        delete data.productTierVersion;
+      }
 
       const createSchema =
         // eslint-disable-next-line no-use-before-define
@@ -199,7 +243,7 @@ const InstanceForm = ({
 
         if (inputParametersObj["custom_dns_configuration"] && data.requestParams["custom_dns_configuration"]) {
           data.requestParams.custom_dns_configuration = {
-            [selectedResource?.urlKey || ""]: data.requestParams.custom_dns_configuration,
+            [resourceKey]: data.requestParams.custom_dns_configuration,
           };
         }
 
@@ -220,7 +264,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
               },
               query: {
                 subscriptionId: values.subscriptionId,
@@ -298,7 +342,7 @@ const InstanceForm = ({
                 serviceEnvironmentKey: offering?.serviceEnvironmentURLKey,
                 serviceModelKey: offering?.serviceModelURLKey,
                 productTierKey: offering?.productTierURLKey,
-                resourceKey: selectedResource?.urlKey || "",
+                resourceKey: resourceKey,
                 id: selectedInstance?.id,
               },
               query: {
@@ -313,6 +357,7 @@ const InstanceForm = ({
   });
 
   const { values } = formData;
+
   const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
@@ -320,13 +365,164 @@ const InstanceForm = ({
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
+  const allowCustomerVersionOverride =
+    offering?.productTierFeatures?.some(
+      (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+    ) || false;
+
+  //fetch product tier versions
+  const { data: customerVersionSets = [], isFetching: isFetchingVersionSets } = useCustomerVersionSets(
+    {
+      serviceId: values.serviceId,
+      productTierId: values.servicePlanId,
+    },
+    {
+      // Only fetch customer version sets if the offering supports VERSION_SET_OVERRIDE feature
+      enabled: allowCustomerVersionOverride,
+    }
+  );
+
   const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
     serviceId: values.serviceId,
     resourceId: selectedInstance?.resourceID || values.resourceId,
     instanceId: selectedInstance?.id,
+    productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
+    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
   });
 
-  const resourceSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
+  const resourceCreateSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
+  const resourceModifySchema = resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE") as APIEntity;
+
+  const requestParamsCreateValidationSchema = useMemo(() => {
+    const inputParams = resourceCreateSchema?.inputParameters || [];
+
+    // Create validation rules for requestParams
+    const requestParamsValidation: Record<string, ValidationSchema> = {};
+
+    inputParams.forEach((param) => {
+      if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
+        // Only add regex validation if regex is defined and not empty
+        if (param.regex && param.regex.trim()) {
+          // Test if the regex pattern is valid before adding validation
+          let isValidRegex = false;
+          try {
+            new RegExp(param.regex);
+            isValidRegex = true;
+          } catch (error) {
+            console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
+            isValidRegex = false;
+          }
+
+          if (isValidRegex) {
+            let fieldValidation: ValidationSchema = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
+                if (!value) return true; // Empty values handled by required validation
+
+                const regex = new RegExp(param.regex as string);
+
+                // Handle array values (for multi-select fields)
+                if (Array.isArray(value)) {
+                  if (value.length === 0) return true;
+                  return value.every((item) => !item || regex.test(item));
+                }
+
+                // Handle single values
+                return regex.test(value);
+              });
+
+            // Add nullable() if parameter has options
+            if (param.options) {
+              fieldValidation = fieldValidation.nullable();
+            }
+
+            requestParamsValidation[param.key] = fieldValidation;
+          }
+        }
+      }
+    });
+
+    return yup.object().shape(requestParamsValidation);
+  }, [resourceSchemaData]);
+
+  const requestParamsModifyValidationSchema = useMemo(() => {
+    const inputParams = resourceModifySchema?.inputParameters || [];
+
+    // Create validation rules for requestParams
+    const requestParamsValidation: Record<string, ValidationSchema> = {};
+
+    inputParams.forEach((param) => {
+      if (
+        param.custom === true &&
+        param.modifiable === true &&
+        ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())
+      ) {
+        // Only add regex validation if regex is defined and not empty
+        if (param.regex && param.regex.trim()) {
+          // Test if the regex pattern is valid before adding validation
+          let isValidRegex = false;
+          try {
+            new RegExp(param.regex);
+            isValidRegex = true;
+          } catch (error) {
+            console.warn(`Invalid regex pattern for parameter '${param.key}':`, param.regex, error);
+            isValidRegex = false;
+          }
+
+          if (isValidRegex) {
+            let fieldValidation: ValidationSchema = yup
+              .string()
+              .test("regex-validation", `Value does not match the required pattern: ${param.regex}`, function (value) {
+                if (!value) return true; // Empty values handled by required validation
+
+                const regex = new RegExp(param.regex as string);
+
+                // Handle array values (for multi-select fields)
+                if (Array.isArray(value)) {
+                  if (value.length === 0) return true;
+                  return value.every((item) => !item || regex.test(item));
+                }
+
+                // Handle single values
+                return regex.test(value);
+              });
+
+            // Add nullable() if parameter has options
+            if (param.options) {
+              fieldValidation = fieldValidation.nullable();
+            }
+
+            requestParamsValidation[param.key] = fieldValidation;
+          }
+        }
+      }
+    });
+
+    return yup.object().shape(requestParamsValidation);
+  }, [resourceSchemaData]);
+
+  // Update validation schema when requestParams validation changes
+  useEffect(() => {
+    if (formMode === "modify" && selectedInstance) {
+      const newValidationSchema = yup.object({
+        serviceId: yup.string().required("Product is required"),
+        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+        subscriptionId: yup.string().required("Subscription is required"),
+        resourceId: yup.string().required("Resource is required"),
+        requestParams: requestParamsModifyValidationSchema,
+      });
+      setValidationSchema(newValidationSchema);
+    } else {
+      const newValidationSchema = yup.object({
+        serviceId: yup.string().required("Product is required"),
+        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+        subscriptionId: yup.string().required("Subscription is required"),
+        resourceId: yup.string().required("Resource is required"),
+        requestParams: requestParamsCreateValidationSchema,
+      });
+      setValidationSchema(newValidationSchema);
+    }
+  }, [requestParamsCreateValidationSchema, requestParamsModifyValidationSchema, formMode, selectedInstance]);
 
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,
@@ -347,7 +543,7 @@ const InstanceForm = ({
 
   // Sets the Default Values for the Request Parameters
   useEffect(() => {
-    const inputParameters = resourceSchema?.inputParameters || [];
+    const inputParameters = resourceCreateSchema?.inputParameters || [];
 
     const defaultValues = inputParameters.reduce((acc: any, param: any) => {
       acc[param.key] = param.defaultValue || "";
@@ -373,7 +569,7 @@ const InstanceForm = ({
         formData.setFieldValue("network_type", "");
       }
     }
-  }, [resourceSchema, formMode, offering]);
+  }, [resourceCreateSchema, formMode, offering]);
 
   const customAvailabilityZones = useMemo(() => {
     // @ts-expect-error TODO: Ask someone on the backend to fix the docs
@@ -423,30 +619,41 @@ const InstanceForm = ({
       subscriptionsObj,
       isFetchingSubscriptions,
       formData,
-      resourceSchema,
+      resourceCreateSchema,
       formMode,
       customAvailabilityZones,
       isFetchingCustomAvailabilityZones,
-      nonCloudAccountInstances
+      nonCloudAccountInstances,
+      customerVersionSets,
+      isFetchingVersionSets
     );
-  }, [formMode, formData.values, resourceSchema, customAvailabilityZones, subscriptions, nonCloudAccountInstances]);
+  }, [
+    formMode,
+    formData.values,
+    resourceCreateSchema,
+    customAvailabilityZones,
+    subscriptions,
+    nonCloudAccountInstances,
+    customerVersionSets,
+    isFetchingVersionSets,
+  ]);
 
   const networkConfigurationFields = useMemo(() => {
     return getNetworkConfigurationFields(
       formMode,
       formData.values,
-      resourceSchema,
+      resourceCreateSchema,
       serviceOfferingsObj,
       customNetworks,
       isFetchingCustomNetworks
     );
-  }, [formMode, formData.values, resourceSchema, serviceOfferingsObj, customNetworks, isFetchingCustomNetworks]);
+  }, [formMode, formData.values, resourceCreateSchema, serviceOfferingsObj, customNetworks, isFetchingCustomNetworks]);
 
   const deploymentConfigurationFields = useMemo(() => {
     return getDeploymentConfigurationFields(
       formMode,
       formData.values,
-      resourceSchema,
+      resourceCreateSchema,
       resourceIdInstancesHashMap,
       isFetchingResourceInstanceIds,
       cloudAccountInstances
@@ -454,7 +661,7 @@ const InstanceForm = ({
   }, [
     formMode,
     formData.values,
-    resourceSchema,
+    resourceCreateSchema,
     resourceIdInstancesHashMap,
     isFetchingResourceInstanceIds,
     cloudAccountInstances,
@@ -494,7 +701,7 @@ const InstanceForm = ({
           </div>
         </CardWithTitle>
 
-        {isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
+        {isFetchingVersionSets || isFetchingResourceSchema || !networkConfigurationFields.length ? null : (
           <CardWithTitle title="Network Configuration">
             <div className="space-y-6">
               {networkConfigurationFields.map((field, index) => {
@@ -503,7 +710,7 @@ const InstanceForm = ({
             </div>
           </CardWithTitle>
         )}
-        {isFetchingResourceSchema ? (
+        {isFetchingVersionSets || isFetchingResourceSchema ? (
           <LoadingSpinner />
         ) : !deploymentConfigurationFields.length ? null : (
           <CardWithTitle title="Deployment Configuration">

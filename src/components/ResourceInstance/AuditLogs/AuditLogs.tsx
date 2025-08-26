@@ -19,7 +19,6 @@ import {
 import EventMessageChip from "src/components/EventsTable/EventMessageChip";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import JSONView from "src/components/JSONView/JSONView";
-import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import useUserData from "src/hooks/usersData";
 import { AuditEvent } from "src/types/auditEvent";
 import { SetState } from "src/types/common/reactGenerics";
@@ -55,8 +54,6 @@ const AuditLogsTableHeader: FC<AuditLogsTableHeaderProps> = (props) => {
     count,
     searchText,
     setSearchText,
-    refetchLogs,
-    isRefetching,
     selectedDateRange,
     setSelectedDateRange,
     selectedEventTypes,
@@ -87,7 +84,6 @@ const AuditLogsTableHeader: FC<AuditLogsTableHeaderProps> = (props) => {
           placeholder="Search by Message/User"
           width="250px"
         />
-        <RefreshWithToolTip refetch={refetchLogs} disabled={isRefetching} />
         <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
         <AuditLogsEventFilterDropdown
           selectedEventTypes={selectedEventTypes}

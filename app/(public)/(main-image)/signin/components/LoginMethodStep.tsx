@@ -10,9 +10,11 @@ import Button from "src/components/Button/Button";
 import FieldLabel from "src/components/FormElements/FieldLabel/FieldLabel";
 import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldContainer";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
+import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import { Text } from "src/components/Typography/Typography";
 import extractQueryParam from "src/constants/extractQueryParam";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
@@ -22,7 +24,6 @@ import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
 import { getIdentityProviderButtonLabel } from "../utils";
 
 import PasswordLoginFields from "./PasswordLoginFields";
-import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 
 const LogoImg = styled("img")({
   height: "24px",
@@ -325,159 +326,162 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
   const hasNoLoginMethodsForEmail = !allowPasswordLogin && domainFilteredIdentityProviders.length === 0;
 
   return (
-    <Stack gap="24px">
-      <FieldContainer>
-        <FieldLabel>Welcome</FieldLabel>
-        <TextField
-          inputProps={{
-            "data-testid": "email-input",
-          }}
-          name="email"
-          id="email"
-          placeholder="Enter your registered email"
-          value={formData.values.email}
-          onChange={formData.handleChange}
-          onBlur={formData.handleBlur}
-          error={formData.touched.email && formData.errors.email}
-          helperText={formData.touched.email && formData.errors.email}
-          disabled
-          InputProps={{
-            endAdornment: (
-              <InputAdornment
-                position="end"
-                sx={{
-                  borderLeft: "1px solid #D5D7DA",
-                  paddingLeft: "18px !important",
-                  paddingRight: "18px !important",
-                }}
-              >
-                <Text
-                  size="medium"
-                  weight="semibold"
-                  style={{
-                    color: "#414651",
-                    cursor: "pointer",
-                    userSelect: "none",
-                    textAlign: "center",
+    <>
+      <DisplayHeading mt="24px">Login to your account</DisplayHeading>
+      <Stack gap="24px">
+        <FieldContainer>
+          <FieldLabel>Welcome</FieldLabel>
+          <TextField
+            inputProps={{
+              "data-testid": "email-input",
+            }}
+            name="email"
+            id="email"
+            placeholder="Enter your registered email"
+            value={formData.values.email}
+            onChange={formData.handleChange}
+            onBlur={formData.handleBlur}
+            error={formData.touched.email && formData.errors.email}
+            helperText={formData.touched.email && formData.errors.email}
+            disabled
+            InputProps={{
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{
+                    borderLeft: "1px solid #D5D7DA",
+                    paddingLeft: "18px !important",
+                    paddingRight: "18px !important",
                   }}
-                  onClick={() => setCurrentStep(0)}
                 >
-                  Change{" "}
-                </Text>
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root.Mui-disabled": {
-              [`& .MuiOutlinedInput-input`]: {
-                background: colors.white,
+                  <Text
+                    size="medium"
+                    weight="semibold"
+                    style={{
+                      color: "#414651",
+                      cursor: "pointer",
+                      userSelect: "none",
+                      textAlign: "center",
+                    }}
+                    onClick={() => setCurrentStep(0)}
+                  >
+                    Change{" "}
+                  </Text>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root.Mui-disabled": {
+                [`& .MuiOutlinedInput-input`]: {
+                  background: colors.white,
+                },
               },
-            },
-          }}
-        />
-      </FieldContainer>
-      {hasNoLoginMethods ? (
-        <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
-          No login methods available. Please contact support
-        </Text>
-      ) : hasNoLoginMethodsForEmail ? (
-        <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
-          No login methods available for this email. Try another email or contact support
-        </Text>
-      ) : (
-        <>
-          {viewType === "password-login" ? (
-            <PasswordLoginFields
-              formData={formData}
-              isReCaptchaSetup={isReCaptchaSetup}
-              isRecaptchaScriptLoaded={isRecaptchaScriptLoaded}
-              isPasswordSignInLoading={isPasswordSignInLoading}
-            />
-          ) : (
-            <Stack gap="12px">
-              {defaultLoginMethodButton}
+            }}
+          />
+        </FieldContainer>
+        {hasNoLoginMethods ? (
+          <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+            No login methods available. Please contact support
+          </Text>
+        ) : hasNoLoginMethodsForEmail ? (
+          <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+            No login methods available for this email. Try another email or contact support
+          </Text>
+        ) : (
+          <>
+            {viewType === "password-login" ? (
+              <PasswordLoginFields
+                formData={formData}
+                isReCaptchaSetup={isReCaptchaSetup}
+                isRecaptchaScriptLoaded={isRecaptchaScriptLoaded}
+                isPasswordSignInLoading={isPasswordSignInLoading}
+              />
+            ) : (
+              <Stack gap="12px">
+                {defaultLoginMethodButton}
 
-              {idpOptionsExpanded &&
-                otherIdpSignInOptions.map((idp) => {
-                  const loginButtonIconUrl = idp.loginButtonIconUrl;
+                {idpOptionsExpanded &&
+                  otherIdpSignInOptions.map((idp) => {
+                    const loginButtonIconUrl = idp.loginButtonIconUrl;
 
-                  let LoginButtonIcon: ReactNode;
-                  if (loginButtonIconUrl) {
-                    LoginButtonIcon = <LogoImg src={loginButtonIconUrl} alt={idp.name} />;
-                  } else if (IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName]) {
-                    const IconComponent: FC = IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName];
-                    LoginButtonIcon = <IconComponent />;
-                  } else {
-                    LoginButtonIcon = <Box width="24px" height="24px" />;
-                  }
+                    let LoginButtonIcon: ReactNode;
+                    if (loginButtonIconUrl) {
+                      LoginButtonIcon = <LogoImg src={loginButtonIconUrl} alt={idp.name} />;
+                    } else if (IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName]) {
+                      const IconComponent: FC = IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName];
+                      LoginButtonIcon = <IconComponent />;
+                    } else {
+                      LoginButtonIcon = <Box width="24px" height="24px" />;
+                    }
 
-                  return (
-                    <Button
-                      variant="outlined"
-                      key={idp.name}
-                      size="xlarge"
-                      startIcon={LoginButtonIcon}
-                      sx={{ justifyContent: "flex-start" }}
-                      onClick={() => {
-                        handleIDPButtonClick(idp);
-                      }}
-                      data-testid={`idp-login-button-${idp.name}`}
-                    >
-                      <Box display="inline-flex" flexGrow={1} justifyContent="center">
-                        {getIdentityProviderButtonLabel(idp)}
-                      </Box>
-                    </Button>
-                  );
-                })}
-              {preferredLoginMethod?.type?.toLowerCase() !== "password" &&
-                allowPasswordLogin &&
-                idpOptionsExpanded &&
-                passwordLoginButton}
-            </Stack>
-          )}
-          {numOtherSignInOptions > 0 && (
-            <Button
-              data-testid="sign-in-options-button"
-              variant="text"
-              disableRipple
-              endIcon={
-                idpOptionsExpanded ? (
-                  <ExpandLessIcon style={{ color: "#414651", fontSize: "20px" }} />
-                ) : (
-                  <ExpandMoreIcon style={{ color: "#414651", fontSize: "20px" }} />
-                )
-              }
-              onClick={() => {
-                if (idpOptionsExpanded) {
-                  // If the options are expanded, we switch to password login
-                  if (preferredLoginMethod?.type?.toLowerCase() === "password") {
-                    setViewType("password-login");
+                    return (
+                      <Button
+                        variant="outlined"
+                        key={idp.name}
+                        size="xlarge"
+                        startIcon={LoginButtonIcon}
+                        sx={{ justifyContent: "flex-start" }}
+                        onClick={() => {
+                          handleIDPButtonClick(idp);
+                        }}
+                        data-testid={`idp-login-button-${idp.name}`}
+                      >
+                        <Box display="inline-flex" flexGrow={1} justifyContent="center">
+                          {getIdentityProviderButtonLabel(idp)}
+                        </Box>
+                      </Button>
+                    );
+                  })}
+                {preferredLoginMethod?.type?.toLowerCase() !== "password" &&
+                  allowPasswordLogin &&
+                  idpOptionsExpanded &&
+                  passwordLoginButton}
+              </Stack>
+            )}
+            {numOtherSignInOptions > 0 && (
+              <Button
+                data-testid="sign-in-options-button"
+                variant="text"
+                disableRipple
+                endIcon={
+                  idpOptionsExpanded ? (
+                    <ExpandLessIcon style={{ color: "#414651", fontSize: "20px" }} />
+                  ) : (
+                    <ExpandMoreIcon style={{ color: "#414651", fontSize: "20px" }} />
+                  )
+                }
+                onClick={() => {
+                  if (idpOptionsExpanded) {
+                    // If the options are expanded, we switch to password login
+                    if (preferredLoginMethod?.type?.toLowerCase() === "password") {
+                      setViewType("password-login");
+                    } else {
+                      setViewType("login-options");
+                    }
                   } else {
                     setViewType("login-options");
                   }
-                } else {
-                  setViewType("login-options");
-                }
 
-                setIdpOptionsExpanded((prev) => !prev);
-              }}
-            >
-              <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center" }}>
-                {idpOptionsExpanded ? "View less options" : "Other sign in options"}
+                  setIdpOptionsExpanded((prev) => !prev);
+                }}
+              >
+                <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center" }}>
+                  {idpOptionsExpanded ? "View less options" : "Other sign in options"}
+                </Text>
+              </Button>
+            )}
+            {environmentType === "PROD" && allowPasswordLogin && (
+              <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", fontSize: "15px" }}>
+                New {orgName ? "to " + orgName : "here"}?{" "}
+                <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
+                  Sign Up{" "}
+                </Link>
               </Text>
-            </Button>
-          )}
-          {environmentType === "PROD" && allowPasswordLogin && (
-            <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center" }}>
-              New {orgName ? "to " + orgName : "here"}?{" "}
-              <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
-                Sign Up{" "}
-              </Link>
-            </Text>
-          )}
-        </>
-      )}
-    </Stack>
+            )}
+          </>
+        )}
+      </Stack>
+    </>
   );
 };
 

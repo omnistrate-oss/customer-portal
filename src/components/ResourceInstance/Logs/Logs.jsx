@@ -3,7 +3,6 @@ import styled from "@emotion/styled";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, IconButton as MuiIconButton, Stack } from "@mui/material";
-// import Ansi from "ansi-to-react";
 import _ from "lodash";
 import { dataTestIds } from "page-objects/instance-details-page";
 import InfiniteScroll from "react-infinite-scroller";
@@ -25,7 +24,7 @@ import DataUnavailableMessage from "../DataUnavailableMessage";
 
 import SyntaxHighlightedLog from "./SyntaxHighlightedLog";
 
-const logsPerPage = 50;
+const logsPerPage = 1500;
 
 const connectionStatuses = {
   idle: "idle",
@@ -34,6 +33,7 @@ const connectionStatuses = {
   disconnected: "disconnected",
 };
 
+// Styled components moved before main component to avoid hoisting issues
 const Log = styled("pre")({
   fontWeight: 500,
   fontSize: "12px",
@@ -91,8 +91,8 @@ const IconButton = ({ direction, divRef, titleText, dataTestId }) => {
 
 function Logs(props) {
   const { nodes: nodesList = [], socketBaseURL, instanceStatus, resourceInstanceId } = props;
-  const [logs, setLogs] = useState([]);
-  const [, setLogBuffer] = useState(""); // Buffer for partial log lines
+  const logsRef = useRef([]); // Store logs in ref to avoid re-renders
+  const logsBuffer = useRef(""); // Buffer for partial log lines
   const bufferTimeoutRef = useRef(null); // Add this ref
   const [enableSyntaxHighlighting, setEnableSyntaxHighlighting] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -124,11 +124,18 @@ function Logs(props) {
   const [socketConnectionStatus, setConnectionStatus] = useState(connectionStatuses.idle);
   const [hasMoreLogs, setHasMoreLogs] = useState(true);
   const [records, setRecords] = useState(logsPerPage);
+  // eslint-disable-next-line no-unused-vars
+  const [, setRenderTrigger] = useState(0); // Force re-render when logs update
+  // renderTrigger is used implicitly to trigger re-renders - its value doesn't matter, just the fact that it changes
+
+  const renderTimeoutRef = useRef(null); // Throttle re-renders
   const startDivRef = useRef();
   const endDivRef = useRef();
 
-  // Filter logs based on search text
-  const filteredLogs = searchText ? logs.filter((log) => log.toLowerCase().includes(searchText.toLowerCase())) : logs;
+  // Filter logs based on search text - computed fresh each render
+  const filteredLogs = searchText
+    ? logsRef.current.filter((log) => log.toLowerCase().includes(searchText.toLowerCase()))
+    : logsRef.current;
 
   // Apply log order inversion if enabled
   const displayLogs = invertLogOrder ? [...filteredLogs].reverse() : filteredLogs;
@@ -145,20 +152,33 @@ function Logs(props) {
 
   // Helper function to flush buffer
   const flushBuffer = useCallback(() => {
-    setLogBuffer((currentBuffer) => {
-      if (currentBuffer.trim()) {
-        setLogs((prevLogs) => [...prevLogs, currentBuffer]);
-      }
-      return "";
-    });
+    if (logsBuffer.current.trim()) {
+      logsRef.current = [...logsRef.current, logsBuffer.current];
+      logsBuffer.current = ""; // Clear the buffer after flushing
+      // Trigger re-render when buffer is flushed
+      setRenderTrigger((prev) => prev + 1);
+    }
+  }, []);
+
+  // Throttled function to trigger re-renders for new logs
+  const throttledRenderUpdate = useCallback(() => {
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+    }
+    renderTimeoutRef.current = setTimeout(() => {
+      setRenderTrigger((prev) => prev + 1);
+    }, 50); // Update every 50ms max (~20fps)
   }, []);
 
   // Clear timeout on node change or unmount
   useEffect(() => {
-    setLogs([]);
-    setLogBuffer(""); // Clear buffer on new connection
+    logsRef.current = []; // Clear logs ref
+    logsBuffer.current = ""; // Clear buffer on new connection
     if (bufferTimeoutRef.current) {
       clearTimeout(bufferTimeoutRef.current);
+    }
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
     }
   }, [selectedNode]);
 
@@ -176,7 +196,13 @@ function Logs(props) {
   const { getWebSocket } = useWebSocket(logsSocketEndpoint, {
     onOpen: () => {
       setConnectionStatus(connectionStatuses.connected);
-      setLogs([]);
+      logsRef.current = []; // Clear logs ref
+      setRecords(logsPerPage); // Reset records count
+      logsBuffer.current = ""; // Clear buffer on new connection
+      // Clear any existing timeout
+      if (bufferTimeoutRef.current) {
+        clearTimeout(bufferTimeoutRef.current);
+      }
       // setIsLogsDataLoaded(true);
     },
     onError: (event) => {
@@ -191,37 +217,54 @@ function Logs(props) {
       if (bufferTimeoutRef.current) {
         clearTimeout(bufferTimeoutRef.current);
       }
+      //Process incoming data with buffering to combine incomplete logs
+      // Combine buffer with new data
+      const combinedData = logsBuffer.current + data;
 
-      // Process the incoming data with buffering
-      setLogBuffer((currentBuffer) => {
-        // Combine buffer with new data
-        const combinedData = currentBuffer + data;
+      // Split by line breaks (supporting both \r\n and \n)
+      const lines = combinedData.split(/\r?\n/);
 
-        // Split by line breaks (supporting both \r\n and \n)
-        const lines = combinedData.split(/\r?\n/);
+      // The last element might be incomplete if it doesn't end with a line break
+      const potentialIncompleteLog = lines.pop();
 
-        // The last element might be incomplete if it doesn't end with a line break
-        const potentialIncompleteLog = lines.pop();
+      // Add complete lines to logs (if any)
+      if (lines.length > 0) {
+        const previousLogCount = logsRef.current.length;
+        // Update ref instead of state to avoid re-renders
+        logsRef.current = [...logsRef.current, ...lines?.map((line) => (line ? line : "\n"))];
 
-        // Add complete lines to logs (if any)
-        if (lines.length > 0) {
-          setLogs((prevLogs) => [...prevLogs, ...lines?.map((line) => (line ? line : "\n"))]);
+        // Only trigger re-render if new logs would be visible in current view
+        // This is a huge performance optimization - we only re-render when necessary
+        const filteredPreviousCount = searchText
+          ? logsRef.current
+              .slice(0, previousLogCount)
+              .filter((log) => log.toLowerCase().includes(searchText.toLowerCase())).length
+          : previousLogCount;
+
+        if (filteredPreviousCount < records) {
+          // New logs would be visible, trigger a throttled re-render
+          throttledRenderUpdate();
         }
 
-        // Set timeout to flush buffer after 5 second of inactivity
-        if (potentialIncompleteLog && potentialIncompleteLog.trim()) {
-          bufferTimeoutRef.current = setTimeout(() => {
-            flushBuffer();
-          }, 5000);
+        // Only update hasMoreLogs if we're currently at the end and new logs are available
+        if (!hasMoreLogs && filteredPreviousCount >= records - logsPerPage) {
+          setHasMoreLogs(true);
         }
+      }
 
-        // Return the potentially incomplete line as the new buffer
-        // If the original data ended with a line break, this will be empty
-        return potentialIncompleteLog || "";
-      });
+      // Set timeout to flush buffer after 5 second of inactivity
+      if (potentialIncompleteLog && potentialIncompleteLog.trim()) {
+        bufferTimeoutRef.current = setTimeout(() => {
+          flushBuffer();
+        }, 5000);
+      }
+
+      // Update the buffer with the potentially incomplete log
+      // If the original data ended with a line break, this will be empty
+
+      logsBuffer.current = potentialIncompleteLog || "";
     },
     onClose: () => {
-      // console.log("Socket Connection closed", event);
       if (bufferTimeoutRef.current) {
         clearTimeout(bufferTimeoutRef.current);
       }
@@ -246,6 +289,11 @@ function Logs(props) {
       }
       flushBuffer();
     },
+    // The filter function below always returns false to prevent the useWebSocket hook
+    // from triggering rerenders due to internal state changes (such as incoming messages).
+    // This is necessary for performance optimization, especially when handling large volumes
+    // of log data, as it avoids unnecessary UI updates and keeps the interface responsive.
+    filter: () => false,
   });
 
   useEffect(() => {
@@ -264,9 +312,12 @@ function Logs(props) {
       if (bufferTimeoutRef.current) {
         clearTimeout(bufferTimeoutRef.current);
       }
-      setLogBuffer("");
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+      }
+      logsBuffer.current = "";
     };
-  }, [logsSocketEndpoint]);
+  }, [logsSocketEndpoint, getWebSocket, snackbar]);
 
   if (instanceStatus === "DISCONNECTED") {
     return (
@@ -321,7 +372,6 @@ function Logs(props) {
       mt={"32px"}
       sx={{
         padding: 0,
-
         minHeight: "500px",
         borderRadius: "8px",
       }}
@@ -364,6 +414,7 @@ function Logs(props) {
               </Select>
             </Box>
           )}
+
           <Stack direction="row" justifyContent="end" alignItems="center" gap="20px" flexWrap="wrap">
             <SearchInput
               placeholder="Search logs..."
@@ -412,13 +463,13 @@ function Logs(props) {
               <>
                 <IconButton
                   dataTestId="scroll-to-top-button"
-                  titleText="Navigate to top"
+                  titleText={"Navigate to top"}
                   direction="up"
                   divRef={startDivRef}
                 />
                 <IconButton
                   dataTestId="scroll-to-bottom-button"
-                  titleText="Navigate to bottom"
+                  titleText={"Navigate to bottom"}
                   direction="down"
                   divRef={endDivRef}
                 />
