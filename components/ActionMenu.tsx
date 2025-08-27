@@ -4,6 +4,7 @@ import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgres
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
 import Tooltip from "src/components/Tooltip/Tooltip";
+import { colors } from "src/themeConfig";
 
 export type ActionMenuItem = {
   icon?: React.FC<{ disabled?: boolean }>;
@@ -22,7 +23,7 @@ type ActionMenuProps = {
   sx?: SxProps;
 };
 
-const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMessage, isLoading = true, sx }) => {
+const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMessage, isLoading, sx }) => {
   const select = (
     <Select
       data-testid="actions-select"
@@ -46,10 +47,10 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
             padding: "4px 0px",
           },
           [`& .${menuClasses.paper}`]: {
-            border: "1px solid #e9eaeb",
+            border: `1px solid ${colors.gray200}`,
             boxShadow: "0px 2px 2px -1px #0A0D120A, 0px 4px 6px -2px #0A0D1208, 0px 12px 16px -4px #0A0D1214",
             borderRadius: "8px",
-            maxHeight: "250px",
+            maxHeight: "300px",
             "&::-webkit-scrollbar": {
               display: "none",
             },
@@ -61,7 +62,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
         height: "40px",
         minWidth: "110px",
         "&.Mui-focused": {
-          outline: "2px solid #9E77ED",
+          outline: `2px solid ${colors.success500}`,
           outlineOffset: "2px",
         },
         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -87,7 +88,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
               fontSize: "14px",
               color: isDisabled ? "#a4a7ae" : "",
               minWidth: "160px",
-              padding: "4px 12px",
+              padding: "8px 12px",
               mx: "4px",
             }}
             disabled={isDisabled}
