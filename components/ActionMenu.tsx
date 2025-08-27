@@ -1,16 +1,14 @@
-import { menuClasses, SxProps } from "@mui/material";
+import { Box, menuClasses, SxProps } from "@mui/material";
 
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
 import Tooltip from "src/components/Tooltip/Tooltip";
-import { colors } from "src/themeConfig";
 
 export type ActionMenuItem = {
   icon?: React.FC<{ disabled?: boolean }>;
   label: string;
   onClick: () => void;
-  isLoading?: boolean;
   isDisabled?: boolean;
   disabledMessage?: string;
   dataTestId?: string;
@@ -18,24 +16,27 @@ export type ActionMenuItem = {
 
 type ActionMenuProps = {
   disabled?: boolean;
+  disabledMessage?: string;
+  isLoading?: boolean;
   menuItems: ActionMenuItem[];
   sx?: SxProps;
 };
 
-const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
-  return (
+const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMessage, isLoading = true, sx }) => {
+  const select = (
     <Select
       data-testid="actions-select"
       value=""
       renderValue={(value: string) => {
-        if (!value) {
-          return "Actions";
-        } else {
-          return "";
-        }
+        return (
+          <Box display="flex" alignItems="center" gap="6px">
+            {isLoading && <LoadingSpinnerSmall sx={{ ml: 0 }} />}
+            {value ? "" : "Actions"}
+          </Box>
+        );
       }}
       displayEmpty
-      disabled={disabled}
+      disabled={disabled || isLoading}
       MenuProps={{
         anchorOrigin: { vertical: "bottom", horizontal: "right" },
         transformOrigin: { vertical: "top", horizontal: "right" },
@@ -45,10 +46,10 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
             padding: "4px 0px",
           },
           [`& .${menuClasses.paper}`]: {
-            border: `1px solid ${colors.gray200}`,
+            border: "1px solid #e9eaeb",
             boxShadow: "0px 2px 2px -1px #0A0D120A, 0px 4px 6px -2px #0A0D1208, 0px 12px 16px -4px #0A0D1214",
             borderRadius: "8px",
-            maxHeight: "300px",
+            maxHeight: "250px",
             "&::-webkit-scrollbar": {
               display: "none",
             },
@@ -60,7 +61,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
         height: "40px",
         minWidth: "110px",
         "&.Mui-focused": {
-          outline: `2px solid ${colors.success500}`,
+          outline: "2px solid #9E77ED",
           outlineOffset: "2px",
         },
         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -75,7 +76,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
         ...sx,
       }}
     >
-      {menuItems.map(({ icon: Icon, label, onClick, dataTestId, isLoading, isDisabled, disabledMessage }) => {
+      {menuItems.map(({ icon: Icon, label, onClick, dataTestId, isDisabled, disabledMessage }) => {
         const menuItem = (
           <MenuItem
             data-testid={dataTestId}
@@ -86,7 +87,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
               fontSize: "14px",
               color: isDisabled ? "#a4a7ae" : "",
               minWidth: "160px",
-              padding: "8px 12px",
+              padding: "4px 12px",
               mx: "4px",
             }}
             disabled={isDisabled}
@@ -94,7 +95,6 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
           >
             {Icon && <Icon disabled={isDisabled} />}
             {label}
-            {isLoading && <LoadingSpinnerSmall />}
           </MenuItem>
         );
 
@@ -110,6 +110,16 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
       })}
     </Select>
   );
+
+  if (disabled && disabledMessage) {
+    return (
+      <Tooltip title={disabledMessage} placement="top">
+        <span>{select}</span>
+      </Tooltip>
+    );
+  }
+
+  return select;
 };
 
 export default ActionMenu;

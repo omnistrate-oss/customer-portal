@@ -11,7 +11,6 @@ import RebootIcon from "src/components/Icons/Reboot/Reboot";
 import RestoreInstanceIcon from "src/components/Icons/RestoreInstance/RestoreInstanceIcon";
 import StopIcon from "src/components/Icons/Stop/Stop";
 import UpgradeIcon from "src/components/Icons/Upgrade/UpgradeIcon";
-import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
@@ -99,7 +98,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     stopInstanceMutation.isPending || startInstanceMutation.isPending || restartInstanceMutation.isPending;
 
   const actions = useMemo(() => {
-    const res: ActionMenuItem[] = [];
+    const res: (ActionMenuItem & { isLoading?: boolean })[] = [];
     const { status } = instance || {};
     const isComplexResource = CLI_MANAGED_RESOURCES.includes(selectedResource?.resourceType as string);
     const isProxyResource = selectedResource?.resourceType === "PortsBasedProxy";
@@ -326,15 +325,16 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     return res;
   }, [variant, instance, serviceOffering, selectedResource, subscription]);
 
-  return disabled && disabledMessage ? (
-    <Tooltip title={disabledMessage} placement="top">
-      <Box>
-        <ActionMenu disabled={disabled} menuItems={actions} />
-      </Box>
-    </Tooltip>
-  ) : (
+  return (
     <Box>
-      <ActionMenu disabled={disabled || pendingOperations} menuItems={actions} />
+      <ActionMenu
+        // On the Instances Page, only the Reboot Action is inside the Menu
+        // On the Details Page, all Actions (Start, Stop, Reboot) are inside the Menu
+        isLoading={variant === "details-page" ? pendingOperations : restartInstanceMutation.isPending}
+        disabledMessage={disabledMessage}
+        disabled={disabled}
+        menuItems={actions}
+      />
     </Box>
   );
 };
