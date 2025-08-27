@@ -11,9 +11,6 @@ export const Tabs = styled(MuiTabs)({
   [`& .${tabsClasses.indicator}`]: {
     backgroundColor: "transparent",
   },
-  [`& .${tabsClasses.scrollButtons}`]: {
-    paddingBottom: 14,
-  },
 });
 
 export const Tab = styled(MuiTab)({

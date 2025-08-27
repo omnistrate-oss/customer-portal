@@ -1,4 +1,4 @@
-import { menuClasses, SxProps } from "@mui/material";
+import { Box, menuClasses, SxProps } from "@mui/material";
 
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
@@ -10,7 +10,6 @@ export type ActionMenuItem = {
   icon?: React.FC<{ disabled?: boolean }>;
   label: string;
   onClick: () => void;
-  isLoading?: boolean;
   isDisabled?: boolean;
   disabledMessage?: string;
   dataTestId?: string;
@@ -18,24 +17,27 @@ export type ActionMenuItem = {
 
 type ActionMenuProps = {
   disabled?: boolean;
+  disabledMessage?: string;
+  isLoading?: boolean;
   menuItems: ActionMenuItem[];
   sx?: SxProps;
 };
 
-const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
-  return (
+const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMessage, isLoading, sx }) => {
+  const select = (
     <Select
       data-testid="actions-select"
       value=""
       renderValue={(value: string) => {
-        if (!value) {
-          return "Actions";
-        } else {
-          return "";
-        }
+        return (
+          <Box display="flex" alignItems="center" gap="6px">
+            {isLoading && <LoadingSpinnerSmall sx={{ ml: 0 }} />}
+            {value ? "" : "Actions"}
+          </Box>
+        );
       }}
       displayEmpty
-      disabled={disabled}
+      disabled={disabled || isLoading}
       MenuProps={{
         anchorOrigin: { vertical: "bottom", horizontal: "right" },
         transformOrigin: { vertical: "top", horizontal: "right" },
@@ -75,7 +77,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
         ...sx,
       }}
     >
-      {menuItems.map(({ icon: Icon, label, onClick, dataTestId, isLoading, isDisabled, disabledMessage }) => {
+      {menuItems.map(({ icon: Icon, label, onClick, dataTestId, isDisabled, disabledMessage }) => {
         const menuItem = (
           <MenuItem
             data-testid={dataTestId}
@@ -94,7 +96,6 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
           >
             {Icon && <Icon disabled={isDisabled} />}
             {label}
-            {isLoading && <LoadingSpinnerSmall />}
           </MenuItem>
         );
 
@@ -110,6 +111,16 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, sx }) => {
       })}
     </Select>
   );
+
+  if (disabled && disabledMessage) {
+    return (
+      <Tooltip title={disabledMessage} placement="top">
+        <span>{select}</span>
+      </Tooltip>
+    );
+  }
+
+  return select;
 };
 
 export default ActionMenu;
