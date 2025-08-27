@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Box } from "@mui/material";
 
 import ActionMenu, { ActionMenuItem } from "@/components/ActionMenu";
 import { $api } from "src/api/query";
@@ -326,16 +325,14 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   }, [variant, instance, serviceOffering, selectedResource, subscription]);
 
   return (
-    <Box>
-      <ActionMenu
-        // On the Instances Page, only the Reboot Action is inside the Menu
-        // On the Details Page, all Actions (Start, Stop, Reboot) are inside the Menu
-        isLoading={variant === "details-page" ? pendingOperations : restartInstanceMutation.isPending}
-        disabledMessage={disabledMessage}
-        disabled={disabled}
-        menuItems={actions}
-      />
-    </Box>
+    <ActionMenu
+      // On the Instances Page, only the Reboot Action is inside the Menu
+      // On the Details Page, all Actions (Start, Stop, Reboot) are inside the Menu
+      isLoading={variant === "details-page" ? pendingOperations : restartInstanceMutation.isPending}
+      disabledMessage={disabledMessage}
+      disabled={disabled}
+      menuItems={actions}
+    />
   );
 };
 

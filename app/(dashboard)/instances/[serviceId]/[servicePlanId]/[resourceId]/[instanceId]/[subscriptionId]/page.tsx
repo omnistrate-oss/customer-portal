@@ -238,7 +238,7 @@ const InstanceDetailsPage = ({
         />
       </Collapse>
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
-        <Tabs value={currentTab}>
+        <Tabs value={currentTab} variant="scrollable" scrollButtons="auto">
           {Object.entries(tabs).map(([key, value]) => {
             const isDisabled = disabledTabs?.includes(key);
             return (

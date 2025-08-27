@@ -340,7 +340,6 @@ const useResourceInstance = (queryParams) => {
 
         return final;
       },
-      refetchInterval: 60000,
       refetchOnMount: true,
       enabled: isEnabled,
     }
