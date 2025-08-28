@@ -274,7 +274,6 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
                     }
                   } catch (error) {
                     console.error(error);
-                    snackbar.showError("Failed to subscribe. Please try again");
                   }
                 }}
                 onClick={() => {
