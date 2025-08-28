@@ -241,7 +241,6 @@ const ManageSubscriptionsForm = ({ defaultServiceId, defaultServicePlanId, isFet
                   }
                 } catch (error) {
                   console.error(error);
-                  snackbar.showError("Failed to subscribe. Please try again");
                 }
               }}
               onUnsubscribeClick={() => {
