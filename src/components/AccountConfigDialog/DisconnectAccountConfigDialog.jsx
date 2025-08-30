@@ -7,6 +7,7 @@ import { useFormik } from "formik";
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
@@ -317,7 +318,7 @@ const Check = ({
                   </Text>
                   {instance?.result_params?.azure_disconnect_shell_script && (
                     <TextContainerToCopy
-                      text={instance?.result_params?.azure_disconnect_shell_script}
+                      text={addQuotesToShellCommand(instance?.result_params?.azure_disconnect_shell_script)}
                       marginTop="12px"
                     />
                   )}
@@ -337,7 +338,10 @@ const Check = ({
                     . Once the terminal is open, execute the following command:
                   </Text>
                   {instance?.result_params?.gcp_disconnect_shell_script && (
-                    <TextContainerToCopy text={instance?.result_params?.gcp_disconnect_shell_script} marginTop="12px" />
+                    <TextContainerToCopy
+                      text={addQuotesToShellCommand(instance?.result_params?.gcp_disconnect_shell_script)}
+                      marginTop="12px"
+                    />
                   )}
                 </Box>
               )}

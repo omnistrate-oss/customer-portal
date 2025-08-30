@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import TextField from "components/FormElements/TextField/TextField";
@@ -287,7 +288,10 @@ const Check = ({ instance, fetchClickedInstanceDetails, setClickedInstance, serv
                   . Once the terminal is open, execute the following command:
                 </Text>
                 {instance?.result_params?.azure_bootstrap_shell_script && (
-                  <TextContainerToCopy text={instance?.result_params?.azure_bootstrap_shell_script} marginTop="12px" />
+                  <TextContainerToCopy
+                    text={addQuotesToShellCommand(instance?.result_params?.azure_bootstrap_shell_script)}
+                    marginTop="12px"
+                  />
                 )}
               </Box>
             ) : (
@@ -305,7 +309,10 @@ const Check = ({ instance, fetchClickedInstanceDetails, setClickedInstance, serv
                   . Once the terminal is open, execute the following command:
                 </Text>
                 {instance?.result_params?.gcp_bootstrap_shell_script && (
-                  <TextContainerToCopy text={instance?.result_params?.gcp_bootstrap_shell_script} marginTop="12px" />
+                  <TextContainerToCopy
+                    text={addQuotesToShellCommand(instance?.result_params?.gcp_bootstrap_shell_script)}
+                    marginTop="12px"
+                  />
                 )}
               </Box>
             )}

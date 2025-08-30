@@ -36,3 +36,19 @@ export const AZURE_SHELL_SCRIPT_OFFBOARD_COMMAND = `bash -c "$(curl -fsSL '<BASE
 export const getAzureShellScriptOffboardCommand = (accountId) => {
   return AZURE_SHELL_SCRIPT_OFFBOARD_COMMAND.replace("<BASE_URL>", baseURL).replace("<ACCOUNT_CONFIG_ID>", accountId);
 };
+
+export const addQuotesToShellCommand = (command) => {
+  if (!command) return command;
+
+  // Replace https with 'https
+  if (!command.includes("'https")) {
+    command = command.replace("https", "'https");
+  }
+
+  // Replace ) with ')
+  if (!command.includes(`')"`)) {
+    command = command.replace(`)"`, `')"`);
+  }
+
+  return command;
+};
