@@ -16,6 +16,7 @@ function useMultiSubscriptionUsage(queryParams: { subscriptionIds: string[] }) {
           storageGiBHours: number;
           memoryGiBHours: number;
           cpuCoreHours: number;
+          podHours: number;
         }
       > = {};
 
@@ -28,6 +29,7 @@ function useMultiSubscriptionUsage(queryParams: { subscriptionIds: string[] }) {
               storageGiBHours: 0,
               memoryGiBHours: 0,
               cpuCoreHours: 0,
+              podHours: 0,
             };
             usage.forEach((usageDatapoint) => {
               //aggregate storage cpu and memory data points
@@ -39,6 +41,8 @@ function useMultiSubscriptionUsage(queryParams: { subscriptionIds: string[] }) {
                   usageData.storageGiBHours = total;
                 } else if (dimension === "CPU core hours") {
                   usageData.cpuCoreHours = total;
+                } else if (dimension === "Pod hours") {
+                  usageData.podHours = total;
                 }
               }
             });
