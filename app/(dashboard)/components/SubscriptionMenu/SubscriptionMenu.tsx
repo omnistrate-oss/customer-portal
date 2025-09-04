@@ -58,7 +58,9 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
             !["editor", "root"].includes(subscription.roleType) || isInstanceLimitReached || hasPaymentIssue;
 
           let disabledMessage: string | React.ReactNode = "";
-          if (isInstanceLimitReached) {
+          if (subscription.roleType === "reader") {
+            disabledMessage = "Readers cannot create instances";
+          } else if (isInstanceLimitReached) {
             disabledMessage = "Instance limit reached";
           } else if (hasPaymentIssue) {
             disabledMessage = (
@@ -75,9 +77,8 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
                 to configure
               </>
             );
-          } else if (subscription.roleType === "reader") {
-            disabledMessage = "Readers cannot create instances";
           }
+
           const role = subscription.roleType;
 
           const menuItem = (
