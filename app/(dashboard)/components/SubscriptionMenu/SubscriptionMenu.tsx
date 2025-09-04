@@ -63,20 +63,24 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
           } else if (isInstanceLimitReached) {
             disabledMessage = "Instance limit reached";
           } else if (hasPaymentIssue) {
-            disabledMessage = (
-              <>
-                Payment configuration required.{" "}
-                <Link
-                  onClick={(e) => e.stopPropagation()}
-                  className="underline underline-offset-2 pointer-events-auto"
-                  href={getBillingRoute()}
-                  target="_blank"
-                >
-                  Click here
-                </Link>{" "}
-                to configure
-              </>
-            );
+            if (subscription.roleType !== "root") {
+              disabledMessage = "Payment configuration required for subscription onwer";
+            } else {
+              disabledMessage = (
+                <>
+                  Payment configuration required.{" "}
+                  <Link
+                    onClick={(e) => e.stopPropagation()}
+                    className="underline underline-offset-2 pointer-events-auto"
+                    href={getBillingRoute()}
+                    target="_blank"
+                  >
+                    Click here
+                  </Link>{" "}
+                  to configure
+                </>
+              );
+            }
           }
 
           const role = subscription.roleType;
