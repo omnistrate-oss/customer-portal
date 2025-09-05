@@ -123,13 +123,10 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
     usage.forEach((usageDimensionData) => {
       const { startTime: date, dimension, total: value } = usageDimensionData;
 
-      // Map "Pod hours" dimension to "Replica hours" for display
-      const displayDimension = dimension === "Pod hours" ? "Replica hours" : dimension;
-
       if (dataHashByDate[date as string]) {
         dataHashByDate[date as string] = {
           ...dataHashByDate[date as string],
-          [displayDimension as string]: value,
+          [dimension as string]: value,
         };
       } else {
         dataHashByDate[date as string] = {
@@ -137,7 +134,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
           "Storage GiB hours": 0,
           "CPU core hours": 0,
           "Replica hours": 0,
-          [displayDimension as string]: value,
+          [dimension as string]: value,
           date: date as string,
         };
       }

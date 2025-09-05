@@ -17,7 +17,7 @@ export type SubscriptionUsageRow = {
   storageGiBHours: number;
   memoryGiBHours: number;
   cpuCoreHours: number;
-  podHours: number;
+  replicaHours: number;
   serviceLogoURL?: string;
 };
 
@@ -113,17 +113,17 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
           );
         },
       }),
-      columnHelper.accessor("podHours", {
-        id: "podHours",
+      columnHelper.accessor("replicaHours", {
+        id: "replicaHours",
         header: "Replica (hrs)",
         meta: {
           minWidth: 150,
         },
         cell: (data) => {
-          const podHours = data.row.original.podHours;
+          const replicaHours = data.row.original.replicaHours;
           return (
             <Text size="small" weight="regular" color="#475467" ellipsis>
-              {podHours}
+              {replicaHours}
             </Text>
           );
         },

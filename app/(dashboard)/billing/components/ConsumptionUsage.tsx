@@ -106,7 +106,7 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
           cpuCoreHours: usageData.cpuCoreHours,
           memoryGiBHours: usageData.memoryGiBHours,
           storageGiBHours: usageData.storageGiBHours,
-          podHours: usageData.podHours,
+          replicaHours: usageData.replicaHours,
           serviceName: serviceName,
           subscriptionPlanName: productTierName,
           serviceLogoURL: serviceLogoURL,
@@ -166,7 +166,7 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
           <UsageDimensionCard
             title="Replicas Usage"
             dimensionName="Replica hours"
-            value={aggregatedConsumptionDataHash["Pod hours"].total}
+            value={aggregatedConsumptionDataHash["Replica hours"].total}
           />
         </div>
       </div>
