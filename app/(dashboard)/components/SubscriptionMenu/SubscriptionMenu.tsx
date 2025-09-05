@@ -73,7 +73,6 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
                     onClick={(e) => e.stopPropagation()}
                     className="underline underline-offset-2 pointer-events-auto"
                     href={getBillingRoute()}
-                    target="_blank"
                   >
                     Click here
                   </Link>{" "}
