@@ -9,7 +9,7 @@ function useBillingDetails(isBillingEnabled = false) {
     queryKey: ["consumption-billing-details", baseURL],
     queryFn: async () => {
       const response = await getBillingDetails({
-        returnUrl: "https://omnistrate-dev-access-ui.fly.dev",
+        returnUrl: baseURL,
       });
 
       return response.data;
