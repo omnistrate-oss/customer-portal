@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Stack, tabClasses } from "@mui/material";
@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Tab, Tabs } from "src/components/Tab/Tab";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { colors } from "src/themeConfig";
 import Button from "components/Button/Button";
@@ -29,9 +30,12 @@ import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
 import useConsumptionUsage from "./hooks/useConsumptionUsage";
 
 const BillingPage = () => {
+  const { refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
   const selectUser = useSelector(selectUserrootData);
+  // Track previous paymentConfigured state to detect changes
+  const previousPaymentConfiguredRef = useRef<boolean | undefined>();
 
   const billingStatusQuery = useBillingStatus();
 
@@ -57,6 +61,18 @@ const BillingPage = () => {
       setPaymentURL(paymentURL);
     }
   }, [invoices]);
+
+  // Refetch subscriptions when paymentConfigured status changes
+  useEffect(() => {
+    const currentPaymentConfigured = billingDetails?.paymentConfigured;
+    const previousPaymentConfigured = previousPaymentConfiguredRef.current;
+
+    if (previousPaymentConfigured !== undefined && previousPaymentConfigured !== currentPaymentConfigured) {
+      refetchSubscriptions();
+    }
+
+    previousPaymentConfiguredRef.current = currentPaymentConfigured;
+  }, [billingDetails?.paymentConfigured, refetchSubscriptions]);
 
   const invoicesTotalAmount = invoices.reduce((acc, invoice) => {
     if (["open", "pastDue"].includes(invoice.invoiceStatus as string)) {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Box, Stack, styled } from "@mui/material";
 
 import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import { Text } from "components/Typography/Typography";
 
 const StyledLink = styled(Link)({
@@ -145,7 +146,10 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
                 remove remaining access from your cloud account.
               </Text>
               {offboardingInstructionDetails?.gcpOffboardCommand && (
-                <TextContainerToCopy text={offboardingInstructionDetails?.gcpOffboardCommand} marginTop="12px" />
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(offboardingInstructionDetails?.gcpOffboardCommand)}
+                  marginTop="12px"
+                />
               )}
             </Box>
           </ListItem>
@@ -169,7 +173,10 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               </Text>
 
               {offboardingInstructionDetails?.azureOffboardCommand && (
-                <TextContainerToCopy text={offboardingInstructionDetails?.azureOffboardCommand} marginTop="12px" />
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(offboardingInstructionDetails?.azureOffboardCommand)}
+                  marginTop="12px"
+                />
               )}
             </Box>
           </ListItem>

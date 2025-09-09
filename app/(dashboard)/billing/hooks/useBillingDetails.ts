@@ -15,6 +15,7 @@ function useBillingDetails(isBillingEnabled = false) {
       return response.data;
     },
     enabled: isBillingEnabled,
+    refetchOnWindowFocus: true,
   });
 
   return query;
