@@ -7,6 +7,8 @@ import EventTypeChip from "src/components/EventsTable/EventTypeChip";
 import Select from "src/components/FormElementsv2/Select/Select";
 import { SetState } from "src/types/common/reactGenerics";
 import { EventType } from "src/types/event";
+import { Text } from "src/components/Typography/Typography";
+import Chip from "src/components/Chip/Chip";
 
 const MenuItem = styled(MuiMenuItem)({
   borderRadius: 6,
@@ -53,11 +55,10 @@ const AuditLogsEventFilterDropdown: FC<DropdownProps> = (props) => {
       renderValue={() => {
         return (
           <Stack direction="row" gap="8px" alignItems="center">
-            {selectedEventTypes.length > 0
-              ? selectedEventTypes.map((eventType: EventType, index) => {
-                  return <EventTypeChip key={index} eventType={eventType} />;
-                })
-              : "Filter by Type"}
+            {selectedEventTypes.length > 0 && <Chip size="small" label={selectedEventTypes.length} />}
+            <Text size="small" weight="medium" color="#344054">
+              Filter by Type
+            </Text>
           </Stack>
         );
       }}
