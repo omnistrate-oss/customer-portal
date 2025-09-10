@@ -189,16 +189,18 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
-          if (!instance) return snackbar.showError("No instance selected");
+          if (!instance) snackbar.showError("No instance selected");
           if (!serviceOffering) {
-            return snackbar.showError("Offering not found");
+            snackbar.showError("Offering not found");
           }
           if (!subscription) {
-            return snackbar.showError("Subscription not found");
+            snackbar.showError("Subscription not found");
           }
           if (!selectedResource) {
-            return snackbar.showError("Resource not found");
+            snackbar.showError("Resource not found");
           }
+          if (!instance || !serviceOffering || !subscription || !selectedResource) return false;
+
           const pathData = {
             serviceProviderId: selectedInstanceData.serviceProviderId,
             serviceKey: selectedInstanceData.serviceKey,
@@ -226,6 +228,8 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
           } else {
             await stopInstanceMutation.mutateAsync(body);
           }
+
+          return true;
         }}
         IconComponent={DIALOG_DATA[overlayType]?.icon}
         title={DIALOG_DATA[overlayType]?.title}

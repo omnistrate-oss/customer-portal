@@ -65,8 +65,11 @@ const TextConfirmationDialog = (props) => {
     },
     onSubmit: async (values) => {
       if (values.confirmationText === confirmationText) {
-        await onConfirm();
-        formData.resetForm();
+        const res = await onConfirm();
+        if (res !== false) {
+          formData.resetForm();
+          handleClose();
+        }
       } else {
         snackbar.showError(`Please enter "${confirmationText}" to confirm`);
       }
