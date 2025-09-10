@@ -51,6 +51,8 @@ export type Overlay =
   | "restore-dialog"
   | "upgrade-dialog"
   | "generate-token-dialog"
+  | "reboot-dialog"
+  | "stop-dialog"
   | "create-instance-dialog";
 
 const InstancesPage = () => {

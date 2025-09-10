@@ -1,4 +1,4 @@
-function DeleteCirleIcon(props) {
+function DeleteCircleIcon(props) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={56} height={56} fill="none" {...props}>
       <rect width={48} height={48} x={4} y={4} fill="#FEE4E2" rx={24} />
@@ -14,4 +14,4 @@ function DeleteCirleIcon(props) {
   );
 }
 
-export default DeleteCirleIcon;
+export default DeleteCircleIcon;

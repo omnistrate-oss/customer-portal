@@ -7,7 +7,7 @@ import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import Form from "components/FormElements/Form/Form";
 import TextField from "components/FormElements/TextField/TextField";
-import DeleteCirleIcon from "components/Icons/DeleteCircle/DeleteCirleIcon";
+import DeleteCircleIcon from "components/Icons/DeleteCircle/DeleteCircleIcon";
 import { Text } from "components/Typography/Typography";
 
 import { TextContainerToCopy } from "../CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
@@ -258,7 +258,7 @@ function DeleteAccountConfigConfirmationDialog(props) {
     buttonLabel = "Delete",
     buttonColor = "#D92D20",
     isLoading,
-    IconComponent = DeleteCirleIcon,
+    IconComponent = DeleteCircleIcon,
     accountInstructionDetails,
   } = props;
 
