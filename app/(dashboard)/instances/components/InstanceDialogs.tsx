@@ -4,11 +4,15 @@ import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullSc
 
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
+import DeleteCircleIcon from "src/components/Icons/DeleteCircle/DeleteCircleIcon";
+import RebootCircleIcon from "src/components/Icons/Reboot/RebootCircleIcon";
+import StopCircleIcon from "src/components/Icons/Stop/StopCircleIcon";
 import CreateInstanceModal from "src/components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
 import AccessSideRestoreInstance from "src/components/RestoreInstance/AccessSideRestoreInstance";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import UpgradeDialog from "src/components/Upgrade/UpgradeDialog";
 import useSnackbar from "src/hooks/useSnackbar";
+import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance as DescribeResourceInstanceResponse } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
@@ -34,6 +38,33 @@ type InstanceDialogsProps = {
   selectedRows?: string[];
   setSelectedRows?: SetState<string[]>;
   refetchData: () => void;
+};
+
+const DIALOG_DATA = {
+  "delete-dialog": {
+    icon: DeleteCircleIcon,
+    title: "Delete Instance",
+    subtitle: "Are you sure you want to delete",
+    confirmationText: "deleteme",
+    buttonLabel: "Delete",
+    buttonColor: "#D92D20",
+  },
+  "reboot-dialog": {
+    icon: RebootCircleIcon,
+    title: "Reboot Instance",
+    subtitle: "Are you sure you want to reboot",
+    confirmationText: "reboot",
+    buttonLabel: "Reboot",
+    buttonColor: colors.success600,
+  },
+  "stop-dialog": {
+    icon: StopCircleIcon,
+    title: "Stop Instance",
+    subtitle: "Are you sure you want to stop",
+    confirmationText: "stop",
+    buttonLabel: "Stop",
+    buttonColor: "#D92D20",
+  },
 };
 
 const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
@@ -93,6 +124,30 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     }
   );
 
+  const stopInstanceMutation = $api.useMutation(
+    "post",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop",
+    {
+      onSuccess: async () => {
+        refetchData();
+        setSelectedRows([]);
+        snackbar.showSuccess("Stopping deployment instance...");
+      },
+    }
+  );
+
+  const restartInstanceMutation = $api.useMutation(
+    "post",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart",
+    {
+      onSuccess: async () => {
+        refetchData();
+        setSelectedRows([]);
+        snackbar.showSuccess("Restarting deployment instance...");
+      },
+    }
+  );
+
   return (
     <>
       <CreateInstanceModal
@@ -131,7 +186,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       />
 
       <TextConfirmationDialog
-        open={isOverlayOpen && overlayType === "delete-dialog"}
+        open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
           if (!instance) return snackbar.showError("No instance selected");
@@ -144,28 +199,43 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
           if (!selectedResource) {
             return snackbar.showError("Resource not found");
           }
-          await deleteInstanceMutation.mutateAsync({
+          const pathData = {
+            serviceProviderId: selectedInstanceData.serviceProviderId,
+            serviceKey: selectedInstanceData.serviceKey,
+            serviceAPIVersion: selectedInstanceData.serviceAPIVersion,
+            serviceEnvironmentKey: selectedInstanceData.serviceEnvironmentKey,
+            serviceModelKey: selectedInstanceData.serviceModelKey,
+            productTierKey: selectedInstanceData.productTierKey,
+            resourceKey: selectedInstanceData.resourceKey,
+            id: selectedInstanceData.id,
+          };
+
+          const body = {
             params: {
-              path: {
-                serviceProviderId: selectedInstanceData.serviceProviderId,
-                serviceKey: selectedInstanceData.serviceKey,
-                serviceAPIVersion: selectedInstanceData.serviceAPIVersion,
-                serviceEnvironmentKey: selectedInstanceData.serviceEnvironmentKey,
-                serviceModelKey: selectedInstanceData.serviceModelKey,
-                productTierKey: selectedInstanceData.productTierKey,
-                resourceKey: selectedInstanceData.resourceKey,
-                id: selectedInstanceData.id,
-              },
+              path: pathData,
               query: {
                 subscriptionId: subscription.id,
               },
             },
-          });
+          };
+
+          if (overlayType === "delete-dialog") {
+            await deleteInstanceMutation.mutateAsync(body);
+          } else if (overlayType === "reboot-dialog") {
+            await restartInstanceMutation.mutateAsync(body);
+          } else {
+            await stopInstanceMutation.mutateAsync(body);
+          }
         }}
-        title="Delete Instance"
-        subtitle={`Are you sure you want to delete - ${selectedInstanceData?.id}?`}
-        message="To confirm, please enter <b>deleteme</b>, in the field below:"
-        isLoading={deleteInstanceMutation.isPending}
+        IconComponent={DIALOG_DATA[overlayType]?.icon}
+        title={DIALOG_DATA[overlayType]?.title}
+        subtitle={`${DIALOG_DATA[overlayType]?.subtitle} - ${selectedInstanceData?.id}?`}
+        confirmationText={DIALOG_DATA[overlayType]?.confirmationText}
+        buttonLabel={DIALOG_DATA[overlayType]?.buttonLabel}
+        buttonColor={DIALOG_DATA[overlayType]?.buttonColor}
+        isLoading={
+          deleteInstanceMutation.isPending || stopInstanceMutation.isPending || restartInstanceMutation.isPending
+        }
       />
 
       <GenerateTokenDialog

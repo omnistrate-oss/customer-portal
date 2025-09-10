@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Box, Collapse, Stack } from "@mui/material";
+import { Box, CircularProgress, Collapse, Stack } from "@mui/material";
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
 import InstanceActionMenu from "app/(dashboard)/instances/components/InstanceActionMenu";
@@ -157,7 +157,7 @@ const InstanceDetailsPage = ({
     );
   }
 
-  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isFetching) {
+  if (isFetchingServiceOfferings || isFetchingSubscriptions || resourceInstanceQuery.isLoading) {
     return (
       <PageContainer>
         <LoadingSpinner />
@@ -258,6 +258,7 @@ const InstanceDetailsPage = ({
         </Tabs>
 
         <Stack direction="row" alignItems="center" gap="16px">
+          <div className="flex items-center">{resourceInstanceQuery.isFetching && <CircularProgress size={20} />}</div>
           <RefreshWithToolTip disabled={resourceInstanceQuery.isFetching} refetch={refetchInstance} />
           <InstanceActionMenu
             variant="details-page"

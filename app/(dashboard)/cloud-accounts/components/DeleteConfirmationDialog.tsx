@@ -11,7 +11,7 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { AccountConfig } from "src/types/account-config";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
-import DeleteCirleIcon from "components/Icons/DeleteCircle/DeleteCirleIcon";
+import DeleteCircleIcon from "components/Icons/DeleteCircle/DeleteCircleIcon";
 import { Text } from "components/Typography/Typography";
 
 import { cloudAccountOffboardingSteps } from "../constants";
@@ -143,7 +143,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   let step: "delete" | "offboard" = "delete";
 
   let buttonText = "Delete";
-  let IconComponent = DeleteCirleIcon;
+  let IconComponent = DeleteCircleIcon;
   let title = "Delete Confirmation";
 
   if (isMultiStepDialog) {
