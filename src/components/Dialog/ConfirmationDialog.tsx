@@ -3,6 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack } 
 import CSS from "csstype";
 
 import useSnackbar from "src/hooks/useSnackbar";
+import { colors } from "src/themeConfig";
 
 import Button from "../Button/Button";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
@@ -50,7 +51,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   content: Content,
   cancelButtonLabel = "Cancel",
   confirmButtonLabel = "Confirm",
-  confirmButtonColor = "#7F56D9",
+  confirmButtonColor = colors.success600,
   isLoading = false,
 
   confirmationText,
