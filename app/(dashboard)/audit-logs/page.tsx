@@ -72,6 +72,7 @@ const EventsPage = () => {
             "time",
             "type",
             "message",
+            "copyButton",
             "user",
             "subscriptionPlan",
             "subscriptionOwner",

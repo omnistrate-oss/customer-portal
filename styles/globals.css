@@ -137,12 +137,13 @@ a {
   left: 0;
 }
 
-.clamp_two_lines {
+.clamp_four_lines {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
-  word-break: break-word;
+  word-break: break-all;
 }

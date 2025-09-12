@@ -9,7 +9,7 @@ function EventMessageChip({ message }) {
     <Box sx={{ paddingY: "6px" }}>
       {/* wrapping parent box is required to fix the issues where lines after clamped are also visible  */}
       <Box
-        className="clamp_two_lines"
+        className="clamp_four_lines"
         sx={{
           color: messageStyles.color,
           overflowY: "hidden",

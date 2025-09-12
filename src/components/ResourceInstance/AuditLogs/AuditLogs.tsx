@@ -9,6 +9,7 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { pageElements } from "page-objects/instance-details-page";
 import { OnCopyProps } from "react-json-view";
 
+import CopyButton from "src/components/Button/CopyButton";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataTable from "src/components/DataTable/DataTable";
 import {
@@ -191,8 +192,24 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
           return data.row.original.message ? <EventMessageChip message={data.row.original.message} /> : "-";
         },
         meta: {
-          flex: 1.5,
+          flex: 2,
         },
+      }),
+      // @ts-ignore
+      columnHelper.accessor("copyButton", {
+        id: "copyButton",
+        header: "",
+        cell: (data) => {
+          const message = data.row.original.message;
+          return (
+            <CopyButton
+              defaultTooltipText="Copy message"
+              text={message}
+              iconProps={{ color: "#6941C6", width: 20, height: 20 }}
+            />
+          );
+        },
+        meta: { width: 60 }, // Width of Icon + Padding
       }),
       columnHelper.accessor("userName", {
         id: "userName",

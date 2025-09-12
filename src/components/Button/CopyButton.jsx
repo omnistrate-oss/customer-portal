@@ -6,15 +6,22 @@ import CopyIcon from "components/Icons/CopyIcon/DataGridCopyIcon";
 
 import Tooltip from "../Tooltip/Tooltip";
 
-const CopyButton = ({ text = "", tooltipProps = {}, iconProps = {}, iconButtonProps = {}, iconStyle = {} }) => {
-  const [tooltipText, setTooltipText] = useState("Click to copy");
+const CopyButton = ({
+  text = "",
+  defaultTooltipText = "Click to copy",
+  tooltipProps = {},
+  iconProps = {},
+  iconButtonProps = {},
+  iconStyle = {},
+}) => {
+  const [tooltipText, setTooltipText] = useState(defaultTooltipText);
 
   function handleClick() {
     clipboard
       .write(text)
       .then(() => setTooltipText("Copied"))
       .catch(() => setTooltipText("Unable to copy to clipboard"))
-      .finally(() => setTimeout(() => setTooltipText("Click to copy"), 1500)); // Reset the tooltip text after copying
+      .finally(() => setTimeout(() => setTooltipText(defaultTooltipText), 1500)); // Reset the tooltip text after copying
   }
 
   return (
