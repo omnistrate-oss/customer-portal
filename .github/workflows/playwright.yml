@@ -77,14 +77,9 @@ jobs:
     needs: test
     if: always()
     steps:
-      - uses: peppernode/action-mattermost-notify@v0.2.0
+      - name: Mattermost Notification
+        uses: tferreira/matterfy@v1.9
         with:
-          webhook_url: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-          channel: "Playwright Notifications"
-          message: |
-            ${{ 
-              needs.test.result == 'success' && '✅ SaaSBuilder tests passed!' || 
-              needs.test.result == 'failure' && '❌ SaaSBuilder tests failed!' || 
-              needs.test.result == 'cancelled' && '⚠️ SaaSBuilder tests were cancelled!' || 
-              format('ℹ️ SaaSBuilder tests completed with status: {0}', needs.test.result)
-            }}
+          type: ${{ job.status }}
+          job_name: '*Playwright Tests - SaaSBuilder*'
+          url: https://app.instance-6icq0s1ac.us-east-2.aws.omnistrate.cloud/hooks/ogzbx3i3mtbwfqipae5hn4h94e
