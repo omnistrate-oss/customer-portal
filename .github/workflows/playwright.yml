@@ -81,10 +81,10 @@ jobs:
         with:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
           MATTERMOST_CHANNEL: 'Playwright Notifications'
-          TEXT:
+          TEXT: |
             ${{ 
               needs.test.result == 'success' && '✅ SaaSBuilder tests passed!' || 
               needs.test.result == 'failure' && '❌ SaaSBuilder tests failed!' || 
               needs.test.result == 'cancelled' && '⚠️ SaaSBuilder tests were cancelled!' || 
-              'ℹ️ SaaSBuilder tests completed with status ' + needs.test.result 
+              format('ℹ️ SaaSBuilder tests completed with status: {0}', needs.test.result)
             }}
