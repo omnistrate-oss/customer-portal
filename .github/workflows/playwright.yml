@@ -77,11 +77,11 @@ jobs:
     needs: test
     if: always()
     steps:
-      - uses: mattermost/action-mattermost-notify@master
+      - uses: peppernode/action-mattermost-notify@v0.2.0
         with:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-          MATTERMOST_CHANNEL: 'Playwright Notifications'
-          TEXT: |
+          webhook_url: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          channel: "Playwright Notifications"
+          message: |
             ${{ 
               needs.test.result == 'success' && '✅ SaaSBuilder tests passed!' || 
               needs.test.result == 'failure' && '❌ SaaSBuilder tests failed!' || 
