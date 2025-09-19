@@ -71,7 +71,7 @@ jobs:
         path: playwright-report/
         retention-days: 7
   
-  notification:
+  mattermost-notification-1:
     name: Notify Mattermost
     runs-on: ubuntu-latest
     needs: test
@@ -80,6 +80,40 @@ jobs:
       - name: Mattermost Notification
         uses: tferreira/matterfy@v1.9
         with:
-          type: ${{ job.status }}
+          type: ${{ needs.test.result }}
           job_name: '*Playwright Tests - SaaSBuilder*'
           url: https://app.instance-6icq0s1ac.us-east-2.aws.omnistrate.cloud/hooks/ogzbx3i3mtbwfqipae5hn4h94e
+
+  mattermost-notification-2:
+    name: Notify Commits on Mattermost
+    runs-on: ubuntu-latest
+    needs: test
+    if: needs.test.result == 'failure'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mattermost Notification
+        run: |
+          # Get commits since last successful workflow run
+          # This gets commits from the last 8 hours as a fallback approach
+          SINCE_DATE=$(date -d '8 hours ago' --iso-8601)
+          COMMITS=$(git log --oneline --since="$SINCE_DATE" --pretty=format:"• %h %s (%an)")
+
+          # If no commits in last 8 hours, get last 3 commits
+          if [ -z "$COMMITS" ]; then
+            COMMITS=$(git log --oneline -3 --pretty=format:"• %h %s (%an)")
+          fi
+
+          MESSAGE="❌ @channel SaaSBuilder Playwright tests failed! Please investigate immediately.
+
+          **Recent commits:**
+          $COMMITS"
+
+          # Escape the message for JSON
+          MESSAGE_JSON=$(echo "$MESSAGE" | jq -Rs .)
+
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":$MESSAGE_JSON}" \
+          https://app.instance-6icq0s1ac.us-east-2.aws.omnistrate.cloud/hooks/ogzbx3i3mtbwfqipae5hn4h94e
