@@ -8,7 +8,6 @@ import CopyButton from "src/components/Button/CopyButton";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import CursorPaginatedDataTable from "src/components/DataTable/CursorPaginatedDataTable";
 import EventDetailsView from "src/components/EventsTable/EventDetailsView";
-import EventMessageChip from "src/components/EventsTable/EventMessageChip";
 import EventTypeChip from "src/components/EventsTable/EventTypeChip";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -16,6 +15,7 @@ import { AuditEvent } from "src/types/auditEvent";
 import { EventType } from "src/types/event";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getAccessControlRoute } from "src/utils/route/access/accessRoute";
+import MessageInput from "src/components/MessageInput/MessageInput";
 
 const columnHelper = createColumnHelper<AuditEvent>();
 
@@ -138,7 +138,7 @@ const EventsTable = ({
         id: "message",
         header: "Message",
         cell: (data) => {
-          return data.row.original.message ? <EventMessageChip message={data.row.original.message} /> : "-";
+          return data.row.original.message ? <MessageInput message={data.row.original.message} showCopyButton /> : "-";
         },
         meta: {
           flex: 2,

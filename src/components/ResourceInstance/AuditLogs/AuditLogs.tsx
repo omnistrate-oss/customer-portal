@@ -17,7 +17,6 @@ import {
   DateTimePickerPopover,
   initialRangeState,
 } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
-import EventMessageChip from "src/components/EventsTable/EventMessageChip";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import JSONView from "src/components/JSONView/JSONView";
 import useUserData from "src/hooks/usersData";
@@ -32,6 +31,7 @@ import EventTypeChip from "../../EventsTable/EventTypeChip";
 
 import AuditLogsEventFilterDropdown from "./components/AuditLogsEventFilterDropdown";
 import useAccessInstanceAuditLogs from "./hooks/useAccessInstanceAuditLogs";
+import MessageInput from "src/components/MessageInput/MessageInput";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -189,7 +189,7 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
         id: "message",
         header: "Message",
         cell: (data) => {
-          return data.row.original.message ? <EventMessageChip message={data.row.original.message} /> : "-";
+          return data.row.original.message ? <MessageInput message={data.row.original.message} showCopyButton /> : "-";
         },
         meta: {
           flex: 2,
