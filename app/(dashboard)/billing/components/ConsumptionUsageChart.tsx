@@ -29,6 +29,7 @@ const Legend = () => {
       <LegendItem bgColor="#3E97FF" title="Memory GiB hours" />
       <LegendItem bgColor="#10AA50" title="Storage GiB hours" />
       <LegendItem bgColor="#7239EA" title="CPU core hours" />
+      <LegendItem bgColor="#E25300" title="Replica hours" />
     </Box>
   );
 };
@@ -104,6 +105,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
     "Memory GiB hours": number;
     "Storage GiB hours": number;
     "CPU core hours": number;
+    "Replica hours": number;
     date: string;
   }[] = useMemo(() => {
     const usage = usagePerDayData?.usage || [];
@@ -113,12 +115,14 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
         "Memory GiB hours": number;
         "Storage GiB hours": number;
         "CPU core hours": number;
+        "Replica hours": number;
         date: string;
       }
     > = {};
 
     usage.forEach((usageDimensionData) => {
       const { startTime: date, dimension, total: value } = usageDimensionData;
+
       if (dataHashByDate[date as string]) {
         dataHashByDate[date as string] = {
           ...dataHashByDate[date as string],
@@ -129,6 +133,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
           "Memory GiB hours": 0,
           "Storage GiB hours": 0,
           "CPU core hours": 0,
+          "Replica hours": 0,
           [dimension as string]: value,
           date: date as string,
         };
@@ -143,9 +148,9 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
     chartMargins.left +
     chartMargins.right;
 
-  const keys = ["Memory GiB hours", "Storage GiB hours", "CPU core hours"];
-  const COLORS = ["#3E97FF", "#10AA50", "#7239EA"];
-  const translateX = [-14, -3, 8];
+  const keys = ["Memory GiB hours", "Storage GiB hours", "CPU core hours", "Replica hours"];
+  const COLORS = ["#3E97FF", "#10AA50", "#7239EA", "#E25300"];
+  const translateX = [-17, -6, 5, 16];
 
   return isFetchingUsagePerDay ? (
     <LoadingSpinner />

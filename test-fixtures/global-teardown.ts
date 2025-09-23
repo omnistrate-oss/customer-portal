@@ -120,6 +120,9 @@ async function globalTeardown() {
   const date = GlobalStateManager.getDate();
 
   const serviceOfferingsToDelete = serviceOfferings.filter((offering) => {
+    const isCreatedByCurrentTest = offering.serviceName.includes("SaaSBuilder") && offering.serviceName.includes(date);
+    if (isCreatedByCurrentTest) return true;
+
     const createdAt = new Date(offering.createdAt).getTime();
     if (date) {
       return createdAt < twoHoursAgo || offering.serviceName.includes(date);

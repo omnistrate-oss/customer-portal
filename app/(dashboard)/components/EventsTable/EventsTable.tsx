@@ -4,6 +4,7 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { IconButton } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import CopyButton from "src/components/Button/CopyButton";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import CursorPaginatedDataTable from "src/components/DataTable/CursorPaginatedDataTable";
 import EventDetailsView from "src/components/EventsTable/EventDetailsView";
@@ -143,6 +144,22 @@ const EventsTable = ({
           flex: 2,
         },
         enableSorting: false,
+      }),
+      // @ts-ignore
+      copyButton: columnHelper.accessor("copyButton", {
+        id: "copyButton",
+        header: "",
+        cell: (data) => {
+          const message = data.row.original.message;
+          return (
+            <CopyButton
+              defaultTooltipText="Copy message"
+              text={message}
+              iconProps={{ color: "#6941C6", width: 20, height: 20 }}
+            />
+          );
+        },
+        meta: { width: 60 }, // Width of Icon + Padding
       }),
       user: columnHelper.accessor("userName", {
         id: "userName",

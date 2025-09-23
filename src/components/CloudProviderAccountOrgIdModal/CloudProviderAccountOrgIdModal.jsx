@@ -592,36 +592,6 @@ function CloudProviderAccountOrgIdModal(props) {
     </StyledLink>
   );
 
-  // const terraformlink = isAccessPage ? (
-  //   <>
-  //     <Box
-  //       sx={{
-  //         cursor: "pointer",
-  //         textDecoration: "underline",
-  //         color: "#7F56D9",
-  //         fontWeight: 600,
-  //       }}
-  //       component="span"
-  //       onClick={() => {
-  //         downloadTerraformKitMutation.mutate();
-  //       }}
-  //     >
-  //       here
-  //     </Box>
-  //     {downloadTerraformKitMutation.isPending && (
-  //       <LoadingSpinnerSmall sx={{ color: "black", ml: "16px" }} size={12} />
-  //     )}
-  //   </>
-  // ) : (
-  //   <StyledLink
-  //     href="https://github.com/omnistrate-oss/account-setup"
-  //     target="_blank"
-  //     rel="noopener noreferrer"
-  //   >
-  //     here
-  //   </StyledLink>
-  // );
-
   // links pointing to guides for different methods
   const azureShellScriptGuide = isAccessPage ? (
     <StyledLink href="https://youtu.be/7A9WbZjuXgQ?si=y-AvMmtdFIycqzOS" target="_blank" rel="noopener noreferrer">

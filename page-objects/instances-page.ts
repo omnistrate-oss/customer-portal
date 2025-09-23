@@ -136,6 +136,8 @@ export class InstancesPage {
   async stopInstance(instanceId: string) {
     await this.selectInstance(instanceId);
     await this.page.getByTestId(this.dataTestIds.stopButton).click();
+    await this.page.locator("#confirmationText").fill("stop");
+    await this.page.getByRole("button", { name: "Stop" }).click();
   }
 
   async startInstance(instanceId: string) {
@@ -147,6 +149,9 @@ export class InstancesPage {
     await this.selectInstance(instanceId);
     await this.page.getByTestId(this.dataTestIds.actionsMenu).click();
     await this.page.getByTestId(this.dataTestIds.rebootButton).click();
+
+    await this.page.locator("#confirmationText").fill("reboot");
+    await this.page.getByRole("button", { name: "Reboot" }).click();
   }
 
   async changeCapacity(type: "add" | "remove", instanceId: string, newCapacity: number) {

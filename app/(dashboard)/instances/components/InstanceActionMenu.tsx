@@ -57,18 +57,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     return getMainResourceFromInstance(instance, serviceOffering);
   }, [instance, serviceOffering]);
 
-  const stopInstanceMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop",
-    {
-      onSuccess: async () => {
-        refetchData();
-        setSelectedRows([]);
-        snackbar.showSuccess("Stopping deployment instance...");
-      },
-    }
-  );
-
   const startInstanceMutation = $api.useMutation(
     "post",
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/start",
@@ -80,21 +68,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       },
     }
   );
-
-  const restartInstanceMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart",
-    {
-      onSuccess: async () => {
-        refetchData();
-        setSelectedRows([]);
-        snackbar.showSuccess("Restarting deployment instance...");
-      },
-    }
-  );
-
-  const pendingOperations =
-    stopInstanceMutation.isPending || startInstanceMutation.isPending || restartInstanceMutation.isPending;
 
   const actions = useMemo(() => {
     const res: (ActionMenuItem & { isLoading?: boolean })[] = [];
@@ -127,19 +100,11 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         dataTestId: "stop-button",
         label: "Stop",
         icon: StopIcon,
-        isLoading: stopInstanceMutation.isPending,
         isDisabled: !instance || status !== "RUNNING" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
-          if (!serviceOffering) return snackbar.showError("Product not found");
-          stopInstanceMutation.mutate({
-            params: {
-              path: pathData,
-              query: {
-                subscriptionId: subscription?.id,
-              },
-            },
-          });
+          setOverlayType("stop-dialog");
+          setIsOverlayOpen(true);
         },
         disabledMessage: !instance
           ? "Please select an instance"
@@ -236,20 +201,12 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         dataTestId: "reboot-button",
         label: "Reboot",
         icon: RebootIcon,
-        isLoading: restartInstanceMutation.isPending,
         isDisabled:
           !instance || (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") || !isUpdateAllowedByRBAC,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
-          if (!serviceOffering) return snackbar.showError("Product not found");
-          restartInstanceMutation.mutate({
-            params: {
-              path: pathData,
-              query: {
-                subscriptionId: subscription?.id,
-              },
-            },
-          });
+          setOverlayType("reboot-dialog");
+          setIsOverlayOpen(true);
         },
         disabledMessage: !instance
           ? "Please select an instance"
@@ -326,9 +283,9 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
 
   return (
     <ActionMenu
-      // On the Instances Page, only the Reboot Action is inside the Menu
-      // On the Details Page, all Actions (Start, Stop, Reboot) are inside the Menu
-      isLoading={variant === "details-page" ? pendingOperations : restartInstanceMutation.isPending}
+      // Only the Start Action is without a Confirmation Dialog. So only Show Loading for that Action
+      // On the Instances Page, the Start Action is Outside the Menu, so No Loading State Needed
+      isLoading={variant === "details-page" ? startInstanceMutation.isPending : false}
       disabledMessage={disabledMessage}
       disabled={disabled}
       menuItems={actions}

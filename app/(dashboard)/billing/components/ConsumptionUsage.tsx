@@ -42,6 +42,9 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
       "CPU core hours": {
         total: 0,
       },
+      "Replica hours": {
+        total: 0,
+      },
     };
 
     const usage = consumptionUsageData?.usage || [];
@@ -91,13 +94,19 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
     if (isSubscriptionUsageFetched && subscriptionUsageHashmap) {
       rows = rootSubscriptions.map((subscription) => {
         const { id, serviceName, serviceLogoURL, productTierName, serviceId } = subscription;
-        const usageData = subscriptionUsageHashmap[id] || { cpuCoreHours: 0, memoryGiBHours: 0, storageGiBHours: 0 };
+        const usageData = subscriptionUsageHashmap[id] || {
+          cpuCoreHours: 0,
+          memoryGiBHours: 0,
+          storageGiBHours: 0,
+          podHours: 0,
+        };
         const rowData: SubscriptionUsageRow = {
           subscriptionId: id,
           serviceId: serviceId,
           cpuCoreHours: usageData.cpuCoreHours,
           memoryGiBHours: usageData.memoryGiBHours,
           storageGiBHours: usageData.storageGiBHours,
+          replicaHours: usageData.replicaHours,
           serviceName: serviceName,
           subscriptionPlanName: productTierName,
           serviceLogoURL: serviceLogoURL,
@@ -153,6 +162,11 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
             title="CPU Usage"
             dimensionName="CPU core hours"
             value={aggregatedConsumptionDataHash["CPU core hours"].total}
+          />
+          <UsageDimensionCard
+            title="Replicas Usage"
+            dimensionName="Replica hours"
+            value={aggregatedConsumptionDataHash["Replica hours"].total}
           />
         </div>
       </div>

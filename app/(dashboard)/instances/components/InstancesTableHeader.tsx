@@ -120,15 +120,8 @@ const InstancesTableHeader = ({
         !isUpdateAllowedByRBAC,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
-        if (!selectedInstanceOffering) return snackbar.showError("Product not found");
-        stopInstanceMutation.mutate({
-          params: {
-            path: pathData,
-            query: {
-              subscriptionId: selectedInstance?.subscriptionId,
-            },
-          },
-        });
+        setOverlayType("stop-dialog");
+        setIsOverlayOpen(true);
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"

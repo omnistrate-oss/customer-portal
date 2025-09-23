@@ -18,7 +18,7 @@ import Form from "components/FormElements/Form/Form";
 import TextField from "components/FormElements/TextField/TextField";
 
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
-import DeleteCirleIcon from "../Icons/DeleteCircle/DeleteCirleIcon";
+import DeleteCircleIcon from "../Icons/DeleteCircle/DeleteCircleIcon";
 import { Text } from "../Typography/Typography";
 
 const Dialog = styled(MuiDialog)(() => ({
@@ -50,13 +50,13 @@ const TextConfirmationDialog = (props) => {
     onConfirm,
     title = "Delete",
     subtitle = "Are you sure you want to delete?",
-    message = "To confirm deletion, please enter <b>deleteme</b>, in the field below:",
     buttonLabel = "Delete",
     buttonColor = "#D92D20",
     isLoading,
-    IconComponent = DeleteCirleIcon,
+    IconComponent = DeleteCircleIcon,
   } = props;
 
+  const message = props.message || `To confirm, please enter <b>${confirmationText}</b>, in the field below:`;
   const snackbar = useSnackbar();
 
   const formData = useFormik({
@@ -65,10 +65,13 @@ const TextConfirmationDialog = (props) => {
     },
     onSubmit: async (values) => {
       if (values.confirmationText === confirmationText) {
-        await onConfirm();
-        formData.resetForm();
+        const res = await onConfirm();
+        if (res !== false) {
+          formData.resetForm();
+          handleClose();
+        }
       } else {
-        snackbar.showError(`Please enter "${confirmationText}" to confirm.`);
+        snackbar.showError(`Please enter "${confirmationText}" to confirm`);
       }
     },
     validateOnChange: false,

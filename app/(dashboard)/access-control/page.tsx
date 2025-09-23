@@ -246,7 +246,7 @@ const AccessControlPage = () => {
         onConfirm={async () => {
           if (!selectedUser) return snackbar.showError("No user selected");
 
-          deleteUserMutation.mutate({
+          await deleteUserMutation.mutateAsync({
             params: {
               path: {
                 subscriptionId: selectedUser.subscriptionId,

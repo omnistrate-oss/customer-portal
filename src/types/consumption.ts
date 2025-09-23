@@ -21,4 +21,4 @@ export type ConsumptionUsagePerDay = components["schemas"]["GetConsumptionUsageR
 
 export type ConsumptionUsage = components["schemas"]["GetConsumptionUsageResult"];
 
-export type UsageDimension = "Memory GiB hours" | "Storage GiB hours" | "CPU core hours";
+export type UsageDimension = "Memory GiB hours" | "Storage GiB hours" | "CPU core hours" | "Replica hours";
