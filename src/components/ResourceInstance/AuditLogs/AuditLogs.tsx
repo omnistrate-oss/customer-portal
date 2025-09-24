@@ -195,22 +195,7 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
           flex: 2,
         },
       }),
-      // @ts-ignore
-      columnHelper.accessor("copyButton", {
-        id: "copyButton",
-        header: "",
-        cell: (data) => {
-          const message = data.row.original.message;
-          return (
-            <CopyButton
-              defaultTooltipText="Copy message"
-              text={message}
-              iconProps={{ color: "#6941C6", width: 20, height: 20 }}
-            />
-          );
-        },
-        meta: { width: 60 }, // Width of Icon + Padding
-      }),
+
       columnHelper.accessor("userName", {
         id: "userName",
         header: "User",

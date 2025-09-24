@@ -145,22 +145,7 @@ const EventsTable = ({
         },
         enableSorting: false,
       }),
-      // @ts-ignore
-      copyButton: columnHelper.accessor("copyButton", {
-        id: "copyButton",
-        header: "",
-        cell: (data) => {
-          const message = data.row.original.message;
-          return (
-            <CopyButton
-              defaultTooltipText="Copy message"
-              text={message}
-              iconProps={{ color: "#6941C6", width: 20, height: 20 }}
-            />
-          );
-        },
-        meta: { width: 60 }, // Width of Icon + Padding
-      }),
+
       user: columnHelper.accessor("userName", {
         id: "userName",
         header: "User",
