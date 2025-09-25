@@ -26,7 +26,7 @@ const MessageInput: FC<MessageInputProps> = ({ message, showCopyButton = false }
   useLayoutEffect(() => {
     if (!textareaRef.current) return;
     const textarea = textareaRef.current;
-    textarea.value = message || " ";
+    textarea.value = message || "";
     const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight || "20");
     // Clamp auto-sizing to 4 rows, but allow drag up to MAX_ROWS
     const scrollRows = Math.max(MIN_ROWS, Math.min(Math.ceil(textarea.scrollHeight / lineHeight), 4));
