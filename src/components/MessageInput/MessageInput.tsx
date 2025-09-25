@@ -13,7 +13,7 @@ type MessageInputProps = {
 };
 
 const MIN_ROWS = 1;
-const MAX_ROWS = 50; // Allow drag up to 10 rows
+const MAX_ROWS = 50; // Allow drag up to 50 rows
 
 const MessageInput: FC<MessageInputProps> = ({ message, showCopyButton = false }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
