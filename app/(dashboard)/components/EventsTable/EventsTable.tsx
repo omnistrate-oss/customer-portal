@@ -145,13 +145,7 @@ const EventsTable = ({
         },
         enableSorting: false,
       }),
-      // @ts-ignore
-      copyButton: columnHelper.accessor("copyButton", {
-        id: "copyButton",
-        header: <span />, // or any React element
-        cell: () => "",
-        meta: { width: 1 },
-      }),
+
       user: columnHelper.accessor("userName", {
         id: "userName",
         header: "User",
