@@ -9,7 +9,6 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { pageElements } from "page-objects/instance-details-page";
 import { OnCopyProps } from "react-json-view";
 
-import CopyButton from "src/components/Button/CopyButton";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataTable from "src/components/DataTable/DataTable";
 import {
