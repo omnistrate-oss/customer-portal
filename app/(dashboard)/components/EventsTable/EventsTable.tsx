@@ -4,7 +4,6 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { IconButton } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import CopyButton from "src/components/Button/CopyButton";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import CursorPaginatedDataTable from "src/components/DataTable/CursorPaginatedDataTable";
 import EventDetailsView from "src/components/EventsTable/EventDetailsView";
