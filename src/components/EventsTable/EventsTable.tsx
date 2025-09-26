@@ -24,8 +24,8 @@ import DateRangePicker, { initialRangeState } from "../DateRangePicker/DateRange
 import GridCellExpand from "../GridCellExpand/GridCellExpand";
 import JSONView from "../JSONView/JSONView";
 
-import EventMessageChip from "./EventMessageChip";
 import EventTypeChip from "./EventTypeChip";
+import MessageInput from "../MessageInput/MessageInput";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -268,7 +268,7 @@ const EventsTable: FC<EventsTableProps> = (props) => {
         id: "message",
         header: "Message",
         cell: (data) => {
-          return data.row.original.message ? <EventMessageChip message={data.row.original.message} /> : "-";
+          return data.row.original.message ? <MessageInput message={data.row.original.message} showCopyButton /> : "-";
         },
       }),
     ];

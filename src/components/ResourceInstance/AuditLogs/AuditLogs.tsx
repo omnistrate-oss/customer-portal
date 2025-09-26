@@ -9,7 +9,6 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { pageElements } from "page-objects/instance-details-page";
 import { OnCopyProps } from "react-json-view";
 
-import CopyButton from "src/components/Button/CopyButton";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataTable from "src/components/DataTable/DataTable";
 import {
@@ -17,7 +16,6 @@ import {
   DateTimePickerPopover,
   initialRangeState,
 } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
-import EventMessageChip from "src/components/EventsTable/EventMessageChip";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import JSONView from "src/components/JSONView/JSONView";
 import useUserData from "src/hooks/usersData";
@@ -32,6 +30,7 @@ import EventTypeChip from "../../EventsTable/EventTypeChip";
 
 import AuditLogsEventFilterDropdown from "./components/AuditLogsEventFilterDropdown";
 import useAccessInstanceAuditLogs from "./hooks/useAccessInstanceAuditLogs";
+import MessageInput from "src/components/MessageInput/MessageInput";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -189,28 +188,13 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
         id: "message",
         header: "Message",
         cell: (data) => {
-          return data.row.original.message ? <EventMessageChip message={data.row.original.message} /> : "-";
+          return data.row.original.message ? <MessageInput message={data.row.original.message} showCopyButton /> : "-";
         },
         meta: {
           flex: 2,
         },
       }),
-      // @ts-ignore
-      columnHelper.accessor("copyButton", {
-        id: "copyButton",
-        header: "",
-        cell: (data) => {
-          const message = data.row.original.message;
-          return (
-            <CopyButton
-              defaultTooltipText="Copy message"
-              text={message}
-              iconProps={{ color: "#6941C6", width: 20, height: 20 }}
-            />
-          );
-        },
-        meta: { width: 60 }, // Width of Icon + Padding
-      }),
+
       columnHelper.accessor("userName", {
         id: "userName",
         header: "User",
