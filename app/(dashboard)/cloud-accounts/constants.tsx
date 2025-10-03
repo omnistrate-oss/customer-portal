@@ -31,20 +31,7 @@ export const CloudAccountValidationSchema = yup.object({
     then: yup
       .string()
       .required("GCP Project Number is required")
-      .matches(/^[1-9]\d*$/, "GCP Project Number must be a valid 64-bit positive integer (1–9,223,372,036,854,775,807)")
-      .test(
-        "int64",
-        "GCP Project Number must be a valid 64-bit positive integer (1–9,223,372,036,854,775,807)",
-        (value) => {
-          if (!value) return true;
-          const normalized = value.replace(/^0+/, "") || "0";
-          if (normalized === "0") return false;
-          const MAX = "9223372036854775807";
-          if (normalized.length > MAX.length) return false;
-          if (normalized.length < MAX.length) return true;
-          return normalized <= MAX;
-        }
-      ),
+      .matches(/^\d+$/, "GCP Project Number must be a number"),
   }),
   azureSubscriptionId: yup.string().when("cloudProvider", {
     is: "azure",
@@ -53,7 +40,7 @@ export const CloudAccountValidationSchema = yup.object({
       .required("Azure Subscription ID is required")
       .matches(
         /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-        "Azure Subscription ID must be a GUID: 32 hexadecimal characters in 5 groups (8-4-4-4-12) separated by hyphens (e.g., 123e4567-e89b-12d3-a456-426614174000)"
+        "Azure Subscription ID must be a GUID: 32 hexadecimal characters in 5 groups (8-4-4-4-12) separated by hyphens (e.g., 123e4567-e89b-12d3-a456-42661ea7400e)"
       ),
     otherwise: yup.string(),
   }),
@@ -64,7 +51,7 @@ export const CloudAccountValidationSchema = yup.object({
       .required("Azure Tenant ID is required")
       .matches(
         /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-        "Azure Tenant ID must be a GUID: 32 hexadecimal characters in 5 groups (8-4-4-4-12) separated by hyphens (e.g., 123e4567-e89b-12d3-a456-426614174000)"
+        "Azure Tenant ID must be a GUID: 32 hexadecimal characters in 5 groups (8-4-4-4-12) separated by hyphens (e.g., 123e4567-e89b-12d3-a456-42661ea7400e)"
       ),
     otherwise: yup.string(),
   }),
