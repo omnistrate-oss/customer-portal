@@ -75,7 +75,7 @@ jobs:
     name: Notify Mattermost
     runs-on: ubuntu-latest
     needs: test
-    if: always()
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'failure' || needs.test.result == 'cancelled')
     steps:
       - name: Mattermost Notification
         uses: tferreira/matterfy@v1.9
@@ -88,7 +88,7 @@ jobs:
     name: Notify Commits on Mattermost
     runs-on: ubuntu-latest
     needs: test
-    if: always() && needs.test.result != 'success'
+    if: always() && (needs.test.result == 'failure' || needs.test.result == 'cancelled')
     steps:
       - uses: actions/checkout@v4
         with:
