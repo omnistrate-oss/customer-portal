@@ -12,7 +12,7 @@ export class ProviderAPIClient {
   apiVersion = "2022-09-01-00";
 
   async providerLogin(email: string, password: string) {
-    const context = await request.newContext({ baseURL: this.baseURL });
+    const context = await request.newContext({ baseURL: this.baseURL, timeout: 60000 });
     const response = await context.post(`/${this.apiVersion}/signin`, {
       data: { email, password },
     });
@@ -38,6 +38,7 @@ export class ProviderAPIClient {
     return request.newContext({
       baseURL: this.baseURL,
       extraHTTPHeaders: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      timeout: 60000,
     });
   }
 
