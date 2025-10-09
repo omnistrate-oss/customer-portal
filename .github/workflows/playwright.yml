@@ -23,7 +23,7 @@ jobs:
     if: |
       (github.event_name == 'schedule' && vars.PAUSE_PLAYWRIGHT_TESTS != 'true' && github.event.pull_request.head.repo.full_name == github.repository) ||
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' && contains(github.event.label.name, 'ready to merge')
+      (github.event_name == 'pull_request' && contains(github.event.label.name, 'ready to merge'))
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
