@@ -40,3 +40,5 @@ export const loadStatusLabel = {
   Medium: "Normal",
   High: "High",
 };
+
+export const customTagsInitializer = { key: "", value: "" };

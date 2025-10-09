@@ -20,7 +20,7 @@ import {
 } from "src/types/resourceInstance";
 import { TierVersionSet } from "src/types/tier-version-set";
 
-import { loadStatusLabel, loadStatusMap } from "./constants";
+import { customTagsInitializer, loadStatusLabel, loadStatusMap } from "./constants";
 
 export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   const menuItems: MenuItem[] = [];
@@ -274,6 +274,7 @@ export const getInitialValues = (
       network_type: instance.network_type || "",
       productTierVersion: "", // Empty for existing instances
       requestParams,
+      customTags: instance.customTags?.length ? instance.customTags : [],
     };
   }
 
@@ -325,6 +326,7 @@ export const getInitialValues = (
     region: region || "",
     productTierVersion: defaultProductTierVersion,
     requestParams: {},
+    customTags: [{ ...customTagsInitializer }],
   };
 };
 
