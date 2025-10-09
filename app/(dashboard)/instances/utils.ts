@@ -356,7 +356,7 @@ export type FilterCategorySchema = {
 export const getIntialFiltersObject: () => Record<string, FilterCategorySchema> = () => {
   return {
     customTags: {
-      label: "Tags",
+      label: "Tag",
       name: "customTags",
       type: "list",
       options: [],
