@@ -22,6 +22,13 @@ import { TierVersionSet } from "src/types/tier-version-set";
 
 import { customTagsInitializer, loadStatusLabel, loadStatusMap } from "./constants";
 
+type CustomTag = NonNullable<ResourceInstance["customTags"]>[number];
+
+//fix the type
+export const joinCustomTag = (tag: CustomTag) => {
+  return tag?.key + ":" + tag?.value;
+};
+
 export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   const menuItems: MenuItem[] = [];
   if (!serviceOfferings?.length) {
@@ -348,6 +355,12 @@ export type FilterCategorySchema = {
 
 export const getIntialFiltersObject: () => Record<string, FilterCategorySchema> = () => {
   return {
+    customTags: {
+      label: "Tags",
+      name: "customTags",
+      type: "list",
+      options: [],
+    },
     services: {
       label: "Product Name",
       name: "services",
@@ -425,6 +438,7 @@ export const getInstanceFiltersObject = (
   const lifecycleStatusSet = new Set();
   const healthStatusSet = new Set();
   const loadSet = new Set();
+  const customTagsSet = new Set();
 
   instances?.forEach((instance) => {
     //add lifecylce status options
@@ -524,6 +538,19 @@ export const getInstanceFiltersObject = (
       });
       subOwnersSet.add(subscriptionOwnerName);
     }
+
+    //get customTag options
+    const customTags = instance?.customTags;
+
+    customTags?.forEach((tag) => {
+      const joinedTag = joinCustomTag(tag);
+      if (!customTagsSet.has(joinedTag)) {
+        result.customTags.options?.push({
+          value: joinedTag,
+          label: joinedTag,
+        });
+      }
+    });
   });
 
   return result;
@@ -643,6 +670,16 @@ export const getFilteredInstances = (
         dayjs(created_at).isSameOrAfter(startDateTime, "second") &&
         dayjs(created_at).isSameOrBefore(endDateTime, "second") //compare granularity is seconds
       );
+    });
+  }
+
+  //filter on custom tags
+  if (filterOptionsMap.customTags?.options?.length) {
+    const tagOptions = new Set(filterOptionsMap.customTags?.options?.map((option) => option.value));
+
+    result = result.filter((instance) => {
+      const instanceTags = instance.customTags;
+      return instanceTags?.some((tag) => tagOptions.has(joinCustomTag(tag)));
     });
   }
 
