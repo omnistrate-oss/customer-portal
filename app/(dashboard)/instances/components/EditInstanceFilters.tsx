@@ -1,11 +1,12 @@
-import { FC, useMemo } from "react";
-import { Close } from "@mui/icons-material";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { Close, ExpandMore } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import _ from "lodash";
 
 import { initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
+import Popover from "src/components/Popover/Popover";
 import { themeConfig } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 
@@ -41,6 +42,7 @@ const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
         color: themeConfig.colors.purple600,
         fontSize: "12px",
         fontWeight: 500,
+        minWidth: "fit-content",
       }}
     >
       {item.type === "list" && (
@@ -82,6 +84,14 @@ type EditInstanceFiltersProps = {
 };
 
 const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOptionsMap }: EditInstanceFiltersProps) => {
+  const [visibleChips, setVisibleChips] = useState<FilterChipItemSchema[]>([]);
+  const [hiddenChips, setHiddenChips] = useState<FilterChipItemSchema[]>([]);
+  const [moreAnchorEl, setMoreAnchorEl] = useState<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const resetButtonRef = useRef<HTMLDivElement>(null);
+  const moreButtonRef = useRef<HTMLDivElement>(null);
+
   const filterValues = useMemo(() => {
     const result: FilterChipItemSchema[] = [];
 
@@ -109,6 +119,71 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
     return result;
   }, [selectedFilters]);
 
+  // Calculate which chips can fit in one line
+  useEffect(() => {
+    if (!containerRef.current || filterValues.length === 0) {
+      setVisibleChips(filterValues);
+      setHiddenChips([]);
+      return;
+    }
+
+    const calculateVisibleChips = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.offsetWidth;
+      const resetButtonWidth = resetButtonRef.current?.offsetWidth || 140;
+      const moreButtonWidth = moreButtonRef.current?.offsetWidth || 100;
+      const gap = 8;
+
+      // Always reserve space for reset button at the end
+      const reservedWidth = resetButtonWidth + gap;
+      let usedWidth = 0;
+      let visibleCount = 0;
+
+      for (let i = 0; i < chipRefs.current.length; i++) {
+        const chipElement = chipRefs.current[i];
+        if (!chipElement) continue;
+
+        const chipWidth = chipElement.offsetWidth;
+        const remainingChips = filterValues.length - i - 1;
+
+        // Calculate space needed: current width + this chip + gap + (more button if needed) + reset button
+        let spaceNeeded = usedWidth + chipWidth + gap;
+
+        if (remainingChips > 0) {
+          // If there are more chips after this one, we need space for the "more" button
+          spaceNeeded += moreButtonWidth + gap;
+        }
+
+        spaceNeeded += reservedWidth; // Always need space for reset button
+
+        if (spaceNeeded <= containerWidth) {
+          usedWidth += chipWidth + gap;
+          visibleCount++;
+        } else {
+          break;
+        }
+      }
+      setVisibleChips(filterValues.slice(0, visibleCount));
+      setHiddenChips(filterValues.slice(visibleCount));
+    };
+
+    // Use setTimeout to ensure DOM elements are rendered
+    const timer = setTimeout(calculateVisibleChips, 0);
+
+    // Recalculate on window resize
+    const handleResize = () => {
+      calculateVisibleChips();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [filterValues]);
+
   const handleResetAll = () => {
     setSelectedFilters(getIntialFiltersObject());
   };
@@ -127,9 +202,166 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
     });
   };
 
+  const handleMoreClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleMoreClose = () => {
+    setMoreAnchorEl(null);
+  };
+
   return (
-    <div className="mt-2 flex justify-start items-center gap-2 flex-wrap">
-      {filterValues.length > 0
+    <div className="mt-2 flex justify-start items-center gap-2 overflow-hidden" ref={containerRef}>
+      {/* Hidden div to measure chip widths */}
+      <div
+        style={{
+          position: "absolute",
+          visibility: "hidden",
+          top: "-9999px",
+          display: "flex",
+          gap: "8px",
+          flexWrap: "nowrap",
+        }}
+      >
+        {filterValues.map((item, i) => (
+          <div key={`measure-${i}`} ref={(el) => (chipRefs.current[i] = el)}>
+            <FilterChipTwo item={item} handleRemoveItem={handleRemoveItem} />
+          </div>
+        ))}
+        {/* Measure reset button */}
+        <Box
+          ref={resetButtonRef}
+          sx={{
+            padding: "6px 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            color: themeConfig.colors.purple600,
+            borderRadius: "999px",
+            fontSize: "14px",
+            fontWeight: 600,
+            minWidth: "fit-content",
+          }}
+        >
+          <Close sx={{ fontSize: "20px" }} />
+          Reset Filters
+        </Box>
+
+        {/* Measure more button */}
+        <Box
+          ref={moreButtonRef}
+          sx={{
+            borderRadius: "16px",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            padding: "2px 8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            background: themeConfig.colors.purple50,
+            color: themeConfig.colors.purple600,
+            fontSize: "12px",
+            fontWeight: 500,
+            minWidth: "fit-content",
+          }}
+        >
+          +99 more
+          <ExpandMore sx={{ fontSize: "14px" }} />
+        </Box>
+      </div>
+
+      {/* Visible chips */}
+      {visibleChips.map((item, i) => (
+        <FilterChipTwo key={`visible-${i}`} item={item} handleRemoveItem={handleRemoveItem} />
+      ))}
+
+      {/* More button */}
+      {hiddenChips.length > 0 && (
+        <Box
+          onClick={handleMoreClick}
+          sx={{
+            borderRadius: "16px",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            padding: "2px 8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            background: themeConfig.colors.purple50,
+            color: themeConfig.colors.purple600,
+            fontSize: "12px",
+            fontWeight: 500,
+            cursor: "pointer",
+            minWidth: "fit-content",
+          }}
+        >
+          +{hiddenChips.length} more
+          <ExpandMore sx={{ fontSize: "14px" }} />
+        </Box>
+      )}
+
+      {/* Reset Filters button */}
+      <Box
+        onClick={handleResetAll}
+        sx={{
+          padding: "6px 14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "4px",
+          cursor: "pointer",
+          border: `1px solid ${themeConfig.colors.purple600}`,
+          color: themeConfig.colors.purple600,
+          borderRadius: "999px",
+          fontSize: "14px",
+          fontWeight: 600,
+          minWidth: "fit-content",
+        }}
+      >
+        <Close sx={{ fontSize: "20px" }} />
+        Reset Filters
+      </Box>
+
+      {/* Popover for hidden chips */}
+      <Popover
+        open={Boolean(moreAnchorEl)}
+        anchorEl={moreAnchorEl}
+        onClose={handleMoreClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        sx={{ marginTop: "8px" }}
+      >
+        <Box
+          sx={{
+            padding: "16px",
+            minWidth: "200px",
+            maxWidth: "400px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
+          {hiddenChips.map((item, i) => (
+            <FilterChipTwo
+              key={`hidden-${i}`}
+              item={item}
+              handleRemoveItem={(item) => {
+                handleRemoveItem(item);
+                handleMoreClose();
+              }}
+              // isInPopover={true}
+            />
+          ))}
+        </Box>
+      </Popover>
+
+      {/* {filterValues.length > 0
         ? filterValues.map((item, i) => <FilterChipTwo key={i} item={item} handleRemoveItem={handleRemoveItem} />)
         : null}
       <Box
@@ -154,7 +386,7 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
           }}
         />
         Reset Filters
-      </Box>
+      </Box> */}
 
       {/* <PopoverDynamicHeight
         id={id}
