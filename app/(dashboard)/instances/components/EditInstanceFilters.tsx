@@ -225,7 +225,13 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstan
         }}
       >
         {filterValues.map((item, i) => (
-          <div key={`measure-${i}`} ref={(el) => (chipRefs.current[i] = el)} style={{ minWidth: "fit-content" }}>
+          <div
+            key={`measure-${i}`}
+            ref={(el) => {
+              chipRefs.current[i] = el;
+            }}
+            style={{ minWidth: "fit-content" }}
+          >
             <FilterChipTwo item={item} handleRemoveItem={handleRemoveItem} />
           </div>
         ))}

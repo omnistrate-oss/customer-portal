@@ -22,13 +22,6 @@ import { TierVersionSet } from "src/types/tier-version-set";
 
 import { customTagsInitializer, loadStatusLabel, loadStatusMap } from "./constants";
 
-type CustomTag = NonNullable<ResourceInstance["customTags"]>[number];
-
-//fix the type
-export const joinCustomTag = (tag: CustomTag) => {
-  return tag?.key + ":" + tag?.value;
-};
-
 export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   const menuItems: MenuItem[] = [];
   if (!serviceOfferings?.length) {
@@ -351,6 +344,13 @@ export type FilterCategorySchema = {
   options?: { value: string; label: string; logoURL?: string }[];
   range?: DateRange;
   renderOption?: (...args: any) => React.ReactNode;
+};
+
+type CustomTag = NonNullable<ResourceInstance["customTags"]>[number];
+
+//fix the type
+export const joinCustomTag = (tag: CustomTag) => {
+  return tag?.key + ":" + tag?.value;
 };
 
 export const getIntialFiltersObject: () => Record<string, FilterCategorySchema> = () => {
