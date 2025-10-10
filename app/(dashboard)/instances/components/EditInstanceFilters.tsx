@@ -1,5 +1,6 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Close, ExpandMore } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -78,12 +79,12 @@ const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
 };
 
 type EditInstanceFiltersProps = {
-  filterOptionsMap: Record<string, FilterCategorySchema>;
+  // filterOptionsMap: Record<string, FilterCategorySchema>;
   setSelectedFilters: SetState<Record<string, FilterCategorySchema>>;
   selectedFilters: Record<string, FilterCategorySchema>;
 };
 
-const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOptionsMap }: EditInstanceFiltersProps) => {
+const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstanceFiltersProps) => {
   const [visibleChips, setVisibleChips] = useState<FilterChipItemSchema[]>([]);
   const [hiddenChips, setHiddenChips] = useState<FilterChipItemSchema[]>([]);
   const [moreAnchorEl, setMoreAnchorEl] = useState<HTMLElement | null>(null);
@@ -135,9 +136,8 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
       const moreButtonWidth = moreButtonRef.current?.offsetWidth || 100;
       const gap = 8;
 
-      // Always reserve space for reset button at the end
-      const reservedWidth = resetButtonWidth + gap;
-      let usedWidth = 0;
+      // Start with space reserved for reset button
+      let availableWidth = containerWidth - resetButtonWidth - gap;
       let visibleCount = 0;
 
       for (let i = 0; i < chipRefs.current.length; i++) {
@@ -145,20 +145,13 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
         if (!chipElement) continue;
 
         const chipWidth = chipElement.offsetWidth;
-        const remainingChips = filterValues.length - i - 1;
+        const hasMoreChips = i < filterValues.length - 1;
 
-        // Calculate space needed: current width + this chip + gap + (more button if needed) + reset button
-        let spaceNeeded = usedWidth + chipWidth + gap;
+        // Space needed for this chip + gap + (more button if there are remaining chips)
+        const spaceNeeded = chipWidth + gap + (hasMoreChips ? moreButtonWidth + gap : 0);
 
-        if (remainingChips > 0) {
-          // If there are more chips after this one, we need space for the "more" button
-          spaceNeeded += moreButtonWidth + gap;
-        }
-
-        spaceNeeded += reservedWidth; // Always need space for reset button
-
-        if (spaceNeeded <= containerWidth) {
-          usedWidth += chipWidth + gap;
+        if (spaceNeeded <= availableWidth) {
+          availableWidth -= chipWidth + gap;
           visibleCount++;
         } else {
           break;
@@ -210,8 +203,16 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
     setMoreAnchorEl(null);
   };
 
+  // Add this useEffect after the existing useEffects
+  useEffect(() => {
+    // Auto-close popover when no hidden chips remain
+    if (hiddenChips.length === 0 && moreAnchorEl) {
+      handleMoreClose();
+    }
+  }, [hiddenChips.length, moreAnchorEl]);
+
   return (
-    <div className="mt-2 flex justify-start items-center gap-2 overflow-hidden" ref={containerRef}>
+    <div className="flex justify-start items-center gap-2 overflow-hidden" ref={containerRef}>
       {/* Hidden div to measure chip widths */}
       <div
         style={{
@@ -224,7 +225,7 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
         }}
       >
         {filterValues.map((item, i) => (
-          <div key={`measure-${i}`} ref={(el) => (chipRefs.current[i] = el)}>
+          <div key={`measure-${i}`} ref={(el) => (chipRefs.current[i] = el)} style={{ minWidth: "fit-content" }}>
             <FilterChipTwo item={item} handleRemoveItem={handleRemoveItem} />
           </div>
         ))}
@@ -253,21 +254,11 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
         <Box
           ref={moreButtonRef}
           sx={{
-            borderRadius: "16px",
-            border: `1px solid ${themeConfig.colors.purple600}`,
-            padding: "2px 8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            background: themeConfig.colors.purple50,
+            cursor: "pointer",
             color: themeConfig.colors.purple600,
-            fontSize: "12px",
-            fontWeight: 500,
-            minWidth: "fit-content",
           }}
         >
-          +99 more
-          <ExpandMore sx={{ fontSize: "14px" }} />
+          <KeyboardDoubleArrowRightIcon />
         </Box>
       </div>
 
@@ -281,46 +272,37 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
         <Box
           onClick={handleMoreClick}
           sx={{
-            borderRadius: "16px",
-            border: `1px solid ${themeConfig.colors.purple600}`,
-            padding: "2px 8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            background: themeConfig.colors.purple50,
-            color: themeConfig.colors.purple600,
-            fontSize: "12px",
-            fontWeight: 500,
             cursor: "pointer",
-            minWidth: "fit-content",
+            color: themeConfig.colors.purple600,
           }}
         >
-          +{hiddenChips.length} more
-          <ExpandMore sx={{ fontSize: "14px" }} />
+          <KeyboardDoubleArrowRightIcon />
         </Box>
       )}
 
       {/* Reset Filters button */}
-      <Box
-        onClick={handleResetAll}
-        sx={{
-          padding: "6px 14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          cursor: "pointer",
-          border: `1px solid ${themeConfig.colors.purple600}`,
-          color: themeConfig.colors.purple600,
-          borderRadius: "999px",
-          fontSize: "14px",
-          fontWeight: 600,
-          minWidth: "fit-content",
-        }}
-      >
-        <Close sx={{ fontSize: "20px" }} />
-        Reset Filters
-      </Box>
+      {filterValues.length > 0 && (
+        <Box
+          onClick={handleResetAll}
+          sx={{
+            padding: "6px 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            cursor: "pointer",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            color: themeConfig.colors.purple600,
+            borderRadius: "999px",
+            fontSize: "14px",
+            fontWeight: 600,
+            minWidth: "fit-content",
+          }}
+        >
+          <Close sx={{ fontSize: "20px" }} />
+          Reset Filters
+        </Box>
+      )}
 
       {/* Popover for hidden chips */}
       <Popover
@@ -341,10 +323,12 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
           sx={{
             padding: "16px",
             minWidth: "200px",
-            maxWidth: "400px",
+            maxWidth: "500px",
+            maxHeight: "400px",
+            overflowY: "auto",
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
+            gap: "12px",
           }}
         >
           {hiddenChips.map((item, i) => (
@@ -353,73 +337,11 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOption
               item={item}
               handleRemoveItem={(item) => {
                 handleRemoveItem(item);
-                handleMoreClose();
               }}
-              // isInPopover={true}
             />
           ))}
         </Box>
       </Popover>
-
-      {/* {filterValues.length > 0
-        ? filterValues.map((item, i) => <FilterChipTwo key={i} item={item} handleRemoveItem={handleRemoveItem} />)
-        : null}
-      <Box
-        onClick={handleResetAll}
-        sx={{
-          padding: "6px 14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          cursor: "pointer",
-          border: `1px solid ${themeConfig.colors.purple600}`,
-          color: themeConfig.colors.purple600,
-          borderRadius: "999px",
-          fontSize: "14px",
-          fontWeight: 600,
-        }}
-      >
-        <Close
-          sx={{
-            fontSize: "20px",
-          }}
-        />
-        Reset Filters
-      </Box> */}
-
-      {/* <PopoverDynamicHeight
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        sx={{ marginTop: "8px" }}
-      >
-        {categoryToEdit && (
-          <div className="min-w-[470px]">
-            {categoryToEdit && selectedFilters[categoryToEdit].type === "list" && (
-              <SelectedCategoryOptions
-                selectedCategory={filterOptionsMap[categoryToEdit]}
-                setSelectedFilters={setSelectedFilters}
-                handleRemoveCategory={handleClose}
-                initialSelection={new Set(selectedFilters[categoryToEdit].options?.map((option) => option.value))}
-              />
-            )}
-
-            {categoryToEdit && selectedFilters[categoryToEdit].type === "date-range" && (
-              <SelectedCategoryDateTimeRange
-                setSelectedFilters={setSelectedFilters}
-                handleRemoveCategory={handleClose}
-                selectedCategory={selectedFilters[categoryToEdit]}
-              />
-            )}
-          </div>
-        )}
-      </PopoverDynamicHeight> */}
     </div>
   );
 };
