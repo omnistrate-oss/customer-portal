@@ -29,6 +29,30 @@ type FilterChipTwoProps = {
 };
 
 const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
+  const [showTitle, setShowTitle] = useState<boolean>(false);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  const getDisplayText = (): string => {
+    if (item.type === "list") {
+      return `${item.categoryLabel} = ${item.option?.label}`;
+    }
+    if (item.type === "date-range") {
+      return `${item.categoryLabel} = ${dayjs(new Date(item.range?.startDate ?? ""))
+        .utc()
+        .format("YYYY-MM-DD HH:mm:ss")} UTC to ${dayjs(new Date(item.range?.endDate ?? ""))
+        .utc()
+        .format("YYYY-MM-DD HH:mm:ss")} UTC`;
+    }
+    return "";
+  };
+
+  useEffect(() => {
+    if (textRef.current) {
+      const isOverflowing = textRef.current.scrollWidth > textRef.current.clientWidth;
+      setShowTitle(isOverflowing);
+    }
+  }, [item]);
+
   return (
     <Box
       sx={{
@@ -46,24 +70,14 @@ const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
         minWidth: "fit-content",
       }}
     >
-      {item.type === "list" && (
-        <p className="whitespace-pre-wrap">
-          {item.categoryLabel} = {item.option?.label}
-        </p>
-      )}
-      {item.type === "date-range" && (
-        <p className="whitespace-pre-wrap">
-          {item.categoryLabel} ={" "}
-          {dayjs(new Date(item.range?.startDate ?? ""))
-            .utc()
-            .format("YYYY-MM-DD HH:mm:ss")}{" "}
-          UTC to{" "}
-          {dayjs(new Date(item.range?.endDate ?? ""))
-            .utc()
-            .format("YYYY-MM-DD HH:mm:ss")}{" "}
-          UTC
-        </p>
-      )}
+      <p
+        className="whitespace-pre-wrap"
+        style={{ maxWidth: "320px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        ref={textRef}
+        title={showTitle ? getDisplayText() : ""}
+      >
+        {getDisplayText()}
+      </p>
       <Close
         onClick={(e) => {
           e.stopPropagation();
@@ -317,11 +331,11 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstan
         onClose={handleMoreClose}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left",
+          horizontal: "right",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "right",
         }}
         sx={{ marginTop: "8px" }}
       >
