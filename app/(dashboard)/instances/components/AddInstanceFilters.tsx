@@ -348,7 +348,7 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
         <div className="flex justify-start items-center gap-2">
           <FilterLinesIcon color={themeConfig.colors.gray700} />
           <p className="text-base font-medium" style={{ color: themeConfig.colors.gray700 }}>
-            Add Filter
+            Filter
           </p>
         </div>
       </div>
