@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft } from "@mui/icons-material";
 import { Box, MenuItem, MenuList, Stack, styled } from "@mui/material";
 
@@ -10,7 +10,7 @@ import {
   initialRangeState,
 } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import FilterFunnel from "src/components/Icons/Filter/FilterFunnel";
-import SearchLens from "src/components/Icons/SearchLens/SearchLens";
+import FilterLinesIcon from "src/components/Icons/FilterLines/FilterLines";
 import { PopoverDynamicHeight } from "src/components/Popover/Popover";
 import { themeConfig } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
@@ -297,17 +297,59 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
     setSelectedCategory(null);
   };
 
+  const filterValues = useMemo(() => {
+    const result: any[] = [];
+
+    Object.keys(selectedFilters).forEach((category) => {
+      const filter = selectedFilters[category];
+      if (!filter) return;
+
+      const type = filter.type;
+      if (type === "list" && Array.isArray(filter.options) && filter.options.length > 0) {
+        filter.options.forEach((option) => {
+          result.push({ category, categoryLabel: filter.label, option, type });
+        });
+      }
+
+      if (type === "date-range" && filter.range?.startDate) {
+        result.push({
+          category,
+          categoryLabel: filter.label,
+          range: { startDate: filter.range.startDate, endDate: filter.range.endDate ?? "" },
+          type,
+        });
+      }
+    });
+
+    return result;
+  }, [selectedFilters]);
+
   return (
     <>
       <div
         tabIndex={0}
-        className={`px-3 py-2 rounded-full border-2  border-solid  ${anchorEl ? "border-purple-600" : "border-gray-300"} focus:border-purple-600 outline-none  max-w-[470px]`}
+        className={`px-3 py-2 rounded-xl border-2  border-solid  ${anchorEl ? "border-purple-600" : "border-gray-300"} focus:border-purple-600 outline-none  max-w-[470px] relative `}
         onClick={(e) => handleOpen(e)}
         aria-describedby={id}
       >
+        {filterValues?.length > 0 && (
+          <div
+            className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full bg-[#F4F3FF] border-2 border-solid border-[#D9D6FE]"
+            style={{
+              fontSize: "12px",
+              lineHeight: "18px",
+              fontWeight: 500,
+              color: "#5925DC",
+            }}
+          >
+            {filterValues?.length}
+          </div>
+        )}
         <div className="flex justify-start items-center gap-2">
-          <SearchLens color={themeConfig.colors.gray500} />
-          <p className="text-base font-normal font-gray-500">Add Filter</p>
+          <FilterLinesIcon color={themeConfig.colors.gray700} />
+          <p className="text-base font-medium" style={{ color: themeConfig.colors.gray700 }}>
+            Add Filter
+          </p>
         </div>
       </div>
 

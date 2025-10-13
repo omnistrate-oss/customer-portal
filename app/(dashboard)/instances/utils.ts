@@ -549,6 +549,7 @@ export const getInstanceFiltersObject = (
           value: joinedTag,
           label: joinedTag,
         });
+        customTagsSet.add(joinedTag);
       }
     });
   });
