@@ -117,7 +117,7 @@ const InstancesPage = () => {
           return <CustomTagsCell customTags={tags} />;
         },
         meta: {
-          minWidth: 170,
+          minWidth: 200,
         },
       }),
       columnHelper.accessor(
