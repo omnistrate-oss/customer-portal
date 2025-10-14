@@ -326,7 +326,7 @@ export const getInitialValues = (
     region: region || "",
     productTierVersion: defaultProductTierVersion,
     requestParams: {},
-    customTags: [{ ...customTagsInitializer }],
+    customTags: [],
   };
 };
 

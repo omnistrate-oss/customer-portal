@@ -539,7 +539,7 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
         }}
         sx={{ marginTop: "8px" }}
       >
-        <div className="min-w-[500px] max-w-[500px]">
+        <div className={`min-w-[500px] ${selectedCategory?.type === "custom-tags" ? "max-w-[500px]" : ""}`}>
           {selectedCategory ? (
             <>
               {selectedCategory.type === "list" && (
