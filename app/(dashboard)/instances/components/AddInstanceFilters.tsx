@@ -132,7 +132,9 @@ export const SelectedCategoryCustomTags = ({
             <Box key={key}>
               <p className="text-sm font-medium text-[#181d27]">{key}</p>
               <Autocomplete
-                placeholder={`Select values`}
+                {...(!selected?.length && {
+                  placeholder: `Select values for ${key}`,
+                })}
                 key={key}
                 multiple
                 options={options}
@@ -537,7 +539,7 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
         }}
         sx={{ marginTop: "8px" }}
       >
-        <div className="min-w-[470px] max-w-[500px]">
+        <div className="min-w-[500px] max-w-[500px]">
           {selectedCategory ? (
             <>
               {selectedCategory.type === "list" && (
