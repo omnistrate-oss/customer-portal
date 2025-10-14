@@ -20,7 +20,7 @@ import {
 } from "src/types/resourceInstance";
 import { TierVersionSet } from "src/types/tier-version-set";
 
-import { customTagsInitializer, loadStatusLabel, loadStatusMap } from "./constants";
+import { loadStatusLabel, loadStatusMap } from "./constants";
 
 export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   const menuItems: MenuItem[] = [];
