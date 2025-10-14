@@ -1,21 +1,63 @@
-import { useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Close } from "@mui/icons-material";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import _ from "lodash";
 
 import { initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
-import { PopoverDynamicHeight } from "src/components/Popover/Popover";
+import Popover from "src/components/Popover/Popover";
 import { themeConfig } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 
 import { FilterCategorySchema, getIntialFiltersObject } from "../utils";
 
-import { SelectedCategoryDateTimeRange, SelectedCategoryOptions } from "./AddInstanceFilters";
 dayjs.extend(utc);
 
-const FilterChip = ({ categoryObj, handleRemoveCategory, popoverAnchor, categoryToEdit, handleEditCategory }) => {
+type FilterChipItemSchema = {
+  category: string;
+  categoryLabel: string;
+  option?: { value: string; label: string };
+  range?: { startDate: string; endDate: string };
+  customTagOption?: { key: string; value: string };
+  type?: "list" | "date-range" | "custom-tags";
+};
+
+type FilterChipTwoProps = {
+  item: FilterChipItemSchema;
+  handleRemoveItem: (item: FilterChipItemSchema) => void;
+};
+
+const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
+  const [showTitle, setShowTitle] = useState<boolean>(false);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  const getDisplayText = (): string => {
+    if (item.type === "list") {
+      return `${item.categoryLabel} = ${item.option?.label}`;
+    }
+    if (item.type === "date-range") {
+      return `${item.categoryLabel} = ${dayjs(new Date(item.range?.startDate ?? ""))
+        .utc()
+        .format("YYYY-MM-DD HH:mm:ss")} UTC to ${dayjs(new Date(item.range?.endDate ?? ""))
+        .utc()
+        .format("YYYY-MM-DD HH:mm:ss")} UTC`;
+    }
+
+    if (item.type === "custom-tags") {
+      return `${item.categoryLabel} = ${item.customTagOption?.key}:${item.customTagOption?.value}`;
+    }
+    return "";
+  };
+
+  useEffect(() => {
+    if (textRef.current) {
+      const isOverflowing = textRef.current.scrollWidth > textRef.current.clientWidth;
+      setShowTitle(isOverflowing);
+    }
+  }, [item]);
+
   return (
     <Box
       sx={{
@@ -30,27 +72,21 @@ const FilterChip = ({ categoryObj, handleRemoveCategory, popoverAnchor, category
         color: themeConfig.colors.purple600,
         fontSize: "12px",
         fontWeight: 500,
+        minWidth: "fit-content",
       }}
-      onClick={(event) => handleEditCategory(event, categoryObj.name)}
-      {...(categoryObj.name === categoryToEdit && {
-        "aria-describedby": popoverAnchor,
-      })}
     >
-      {categoryObj.type === "list" && (
-        <p className="whitespace-pre-wrap">
-          {categoryObj.label} = {categoryObj.options?.map((option) => option?.label)?.join(", ")}
-        </p>
-      )}
-      {categoryObj.type === "date-range" && (
-        <p className="whitespace-pre-wrap">
-          {categoryObj.label} = {dayjs(new Date(categoryObj.range.startDate)).utc().format("YYYY-MM-DD HH:mm:ss")} UTC
-          to {dayjs(new Date(categoryObj.range.endDate)).utc().format("YYYY-MM-DD HH:mm:ss")} UTC
-        </p>
-      )}
+      <p
+        className="whitespace-pre-wrap"
+        style={{ maxWidth: "320px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        ref={textRef}
+        title={showTitle ? getDisplayText() : ""}
+      >
+        {getDisplayText()}
+      </p>
       <Close
         onClick={(e) => {
           e.stopPropagation();
-          handleRemoveCategory(categoryObj.name);
+          handleRemoveItem(item);
         }}
         sx={{
           cursor: "pointer",
@@ -62,137 +98,299 @@ const FilterChip = ({ categoryObj, handleRemoveCategory, popoverAnchor, category
 };
 
 type EditInstanceFiltersProps = {
-  filterOptionsMap: Record<string, FilterCategorySchema>;
+  // filterOptionsMap: Record<string, FilterCategorySchema>;
   setSelectedFilters: SetState<Record<string, FilterCategorySchema>>;
   selectedFilters: Record<string, FilterCategorySchema>;
 };
 
-const EditInstanceFilters = ({ selectedFilters, setSelectedFilters, filterOptionsMap }: EditInstanceFiltersProps) => {
-  const [categoryToEdit, setCategoryToEdit] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstanceFiltersProps) => {
+  const [visibleChips, setVisibleChips] = useState<FilterChipItemSchema[]>([]);
+  const [hiddenChips, setHiddenChips] = useState<FilterChipItemSchema[]>([]);
+  const [moreAnchorEl, setMoreAnchorEl] = useState<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const resetButtonRef = useRef<HTMLDivElement>(null);
+  const moreButtonRef = useRef<HTMLDivElement>(null);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const filterValues = useMemo(() => {
+    const result: FilterChipItemSchema[] = [];
 
-  const open = Boolean(anchorEl);
-  const id = open ? "instance-filter-popover" : undefined;
-
-  const filtersWithValues = useMemo(() => {
-    return Object.keys(selectedFilters)?.filter((category) => {
-      const filter = selectedFilters[category]; // Safely access the category
-      if (!filter) return false; // Ensure it's defined before accessing properties
+    Object.keys(selectedFilters).forEach((category) => {
+      const filter = selectedFilters[category];
+      if (!filter) return;
 
       const type = filter.type;
-      if (type === "list") return Array.isArray(filter.options) && filter.options.length > 0;
-      if (type === "date-range") return !!filter.range?.startDate;
-      return false;
+      if (type === "list" && Array.isArray(filter.options) && filter.options.length > 0) {
+        filter.options.forEach((option) => {
+          result.push({ category, categoryLabel: filter.label, option, type });
+        });
+      }
+
+      if (type === "date-range" && filter.range?.startDate) {
+        result.push({
+          category,
+          categoryLabel: filter.label,
+          range: { startDate: filter.range.startDate, endDate: filter.range.endDate ?? "" },
+          type,
+        });
+      }
+
+      if (type === "custom-tags" && filter.customTagOptions?.size) {
+        Array.from(filter.customTagOptions.entries()).forEach(([key, values]) => {
+          values.forEach((value) => {
+            result.push({
+              category,
+              categoryLabel: filter.label,
+              customTagOption: { key, value },
+              type,
+            });
+          });
+        });
+      }
     });
+
+    return result;
   }, [selectedFilters]);
+
+  // Calculate which chips can fit in one line
+  useEffect(() => {
+    if (!containerRef.current || filterValues.length === 0) {
+      setVisibleChips(filterValues);
+      setHiddenChips([]);
+      return;
+    }
+
+    const calculateVisibleChips = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.offsetWidth;
+      const resetButtonWidth = resetButtonRef.current?.offsetWidth || 140;
+      const moreButtonWidth = moreButtonRef.current?.offsetWidth || 100;
+      const gap = 8;
+
+      // Start with space reserved for reset button
+      let availableWidth = containerWidth - resetButtonWidth - gap;
+      let visibleCount = 0;
+
+      for (let i = 0; i < chipRefs.current.length; i++) {
+        const chipElement = chipRefs.current[i];
+        if (!chipElement) continue;
+
+        const chipWidth = chipElement.offsetWidth;
+        const hasMoreChips = i < filterValues.length - 1;
+
+        // Space needed for this chip + gap + (more button if there are remaining chips)
+        const spaceNeeded = chipWidth + gap + (hasMoreChips ? moreButtonWidth + gap : 0);
+
+        if (spaceNeeded <= availableWidth) {
+          availableWidth -= chipWidth + gap;
+          visibleCount++;
+        } else {
+          break;
+        }
+      }
+      setVisibleChips(filterValues.slice(0, visibleCount));
+      setHiddenChips(filterValues.slice(visibleCount));
+    };
+
+    // Use setTimeout to ensure DOM elements are rendered
+    const timer = setTimeout(calculateVisibleChips, 0);
+
+    // Recalculate on window resize
+    const handleResize = () => {
+      calculateVisibleChips();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [filterValues]);
 
   const handleResetAll = () => {
     setSelectedFilters(getIntialFiltersObject());
   };
 
-  const handleEditCategory = (event, category) => {
-    setAnchorEl(event.target);
-    setCategoryToEdit(category);
-  };
-
-  const handleRemoveCategory = (category: string) => {
+  const handleRemoveItem = (item: FilterChipItemSchema) => {
     setSelectedFilters((prev) => {
       const copy = _.clone(prev);
-      if (copy[category].type === "list") {
-        copy[category].options = [];
-      } else if (copy[category].type === "date-range") {
-        copy[category].range = initialRangeState;
+      if (item.type === "list") {
+        copy[item.category].options = copy[item.category].options?.filter(
+          (option) => option.value !== item.option?.value
+        );
+      } else if (item.type === "date-range") {
+        copy[item.category].range = initialRangeState;
+      } else if (item.type === "custom-tags" && item.customTagOption) {
+        const { key, value } = item.customTagOption;
+        const existingSet = copy[item.category].customTagOptions?.get(key);
+        if (existingSet) {
+          existingSet.delete(value);
+          if (existingSet.size === 0) {
+            copy[item.category].customTagOptions?.delete(key);
+          } else {
+            copy[item.category].customTagOptions?.set(key, existingSet);
+          }
+        }
       }
       return copy;
     });
   };
 
-  //remove category when popver is closed
-  //do not remove category in handleclose function as the transition will not be smooth
-  useEffect(() => {
-    if (!anchorEl) {
-      setCategoryToEdit(null);
-    }
-  }, [anchorEl]);
+  const handleMoreClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMoreAnchorEl(event.currentTarget);
+  };
 
-  if (!filtersWithValues?.length) {
-    return null;
-  }
+  const handleMoreClose = () => {
+    setMoreAnchorEl(null);
+  };
+
+  // Add this useEffect after the existing useEffects
+  useEffect(() => {
+    // Auto-close popover when no hidden chips remain
+    if (hiddenChips.length === 0 && moreAnchorEl) {
+      handleMoreClose();
+    }
+  }, [hiddenChips.length, moreAnchorEl]);
 
   return (
-    <div className="mt-2 flex justify-start items-center gap-2 flex-wrap">
-      {filtersWithValues?.map((category, i) => {
-        return (
-          <FilterChip
-            key={i}
-            categoryObj={selectedFilters[category]}
-            handleRemoveCategory={handleRemoveCategory}
-            popoverAnchor={id}
-            categoryToEdit={categoryToEdit}
-            handleEditCategory={handleEditCategory}
-          />
-        );
-      })}
-      <Box
-        onClick={handleResetAll}
-        sx={{
-          padding: "6px 14px",
+    <div className="flex justify-start items-center gap-2 overflow-hidden" ref={containerRef}>
+      {/* Hidden div to measure chip widths */}
+      <div
+        style={{
+          position: "absolute",
+          visibility: "hidden",
+          top: "-9999px",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          cursor: "pointer",
-          border: `1px solid ${themeConfig.colors.purple600}`,
-          color: themeConfig.colors.purple600,
-          borderRadius: "999px",
-          fontSize: "14px",
-          fontWeight: 600,
+          gap: "8px",
+          flexWrap: "nowrap",
         }}
       >
-        <Close
+        {filterValues.map((item, i) => (
+          <div
+            key={`measure-${i}`}
+            ref={(el) => {
+              chipRefs.current[i] = el;
+            }}
+            style={{ minWidth: "fit-content" }}
+          >
+            <FilterChipTwo item={item} handleRemoveItem={handleRemoveItem} />
+          </div>
+        ))}
+        {/* Measure reset button */}
+        <Box
+          ref={resetButtonRef}
           sx={{
-            fontSize: "20px",
+            padding: "6px 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            color: themeConfig.colors.purple600,
+            borderRadius: "999px",
+            fontSize: "14px",
+            fontWeight: 600,
+            minWidth: "fit-content",
           }}
-        />
-        Reset Filters
-      </Box>
+        >
+          <Close sx={{ fontSize: "20px" }} />
+          Reset Filters
+        </Box>
 
-      <PopoverDynamicHeight
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
+        {/* Measure more button */}
+        <Box
+          ref={moreButtonRef}
+          sx={{
+            cursor: "pointer",
+            color: themeConfig.colors.purple600,
+          }}
+        >
+          <KeyboardDoubleArrowRightIcon />
+        </Box>
+      </div>
+
+      {/* Visible chips */}
+      {visibleChips.map((item, i) => (
+        <FilterChipTwo key={`visible-${i}`} item={item} handleRemoveItem={handleRemoveItem} />
+      ))}
+
+      {/* More button */}
+      {hiddenChips.length > 0 && (
+        <Box
+          onClick={handleMoreClick}
+          sx={{
+            cursor: "pointer",
+            color: themeConfig.colors.purple600,
+          }}
+        >
+          <KeyboardDoubleArrowRightIcon />
+        </Box>
+      )}
+
+      {/* Reset Filters button */}
+      {filterValues.length > 0 && (
+        <Box
+          onClick={handleResetAll}
+          sx={{
+            padding: "6px 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            cursor: "pointer",
+            border: `1px solid ${themeConfig.colors.purple600}`,
+            color: themeConfig.colors.purple600,
+            borderRadius: "999px",
+            fontSize: "14px",
+            fontWeight: 600,
+            minWidth: "fit-content",
+          }}
+        >
+          <Close sx={{ fontSize: "20px" }} />
+          Reset Filters
+        </Box>
+      )}
+
+      {/* Popover for hidden chips */}
+      <Popover
+        open={Boolean(moreAnchorEl)}
+        anchorEl={moreAnchorEl}
+        onClose={handleMoreClose}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
         }}
         sx={{ marginTop: "8px" }}
       >
-        {categoryToEdit && (
-          <div className="min-w-[470px]">
-            {categoryToEdit && selectedFilters[categoryToEdit].type === "list" && (
-              <SelectedCategoryOptions
-                selectedCategory={filterOptionsMap[categoryToEdit]}
-                setSelectedFilters={setSelectedFilters}
-                handleRemoveCategory={handleClose}
-                initialSelection={new Set(selectedFilters[categoryToEdit].options?.map((option) => option.value))}
-              />
-            )}
-
-            {categoryToEdit && selectedFilters[categoryToEdit].type === "date-range" && (
-              <SelectedCategoryDateTimeRange
-                setSelectedFilters={setSelectedFilters}
-                handleRemoveCategory={handleClose}
-                selectedCategory={selectedFilters[categoryToEdit]}
-              />
-            )}
-          </div>
-        )}
-      </PopoverDynamicHeight>
+        <Box
+          sx={{
+            padding: "16px",
+            minWidth: "200px",
+            maxWidth: "500px",
+            maxHeight: "400px",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+          }}
+        >
+          {hiddenChips.map((item, i) => (
+            <FilterChipTwo
+              key={`hidden-${i}`}
+              item={item}
+              handleRemoveItem={(item) => {
+                handleRemoveItem(item);
+              }}
+            />
+          ))}
+        </Box>
+      </Popover>
     </div>
   );
 };

@@ -28,6 +28,7 @@ import StatusChip from "components/StatusChip/StatusChip";
 
 import PageContainer from "../components/Layout/PageContainer";
 
+import CustomTagsCell from "./components/CustomTagsCell";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
@@ -105,6 +106,18 @@ const InstancesPage = () => {
         },
         meta: {
           minWidth: 240,
+        },
+      }),
+
+      columnHelper.accessor("customTags", {
+        id: "Tags",
+        header: "Tags",
+        cell: (data) => {
+          const tags = data.row.original.customTags;
+          return <CustomTagsCell customTags={tags} />;
+        },
+        meta: {
+          minWidth: 170,
         },
       }),
       columnHelper.accessor(

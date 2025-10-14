@@ -28,6 +28,7 @@ import {
 
 import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
+import CustomTagsField from "./CustomTagsField";
 
 export const getStandardInformationFields = (
   servicesObj,
@@ -383,6 +384,20 @@ export const getStandardInformationFields = (
       previewValue: requestParams.custom_availability_zone,
     });
   }
+
+  fields.push({
+    dataTestId: "instance-custom-tags",
+    label: "Tags",
+    subLabel: "Add tags to your instance",
+    name: "customTags",
+    customComponent: <CustomTagsField formData={formData} />,
+    previewValue: formData?.values.customTags?.filter((tag) => tag.key && tag.value)?.length
+      ? formData.values.customTags
+          ?.filter((tag) => tag.key && tag.value)
+          ?.map((tag) => `${tag.key}:${tag.value}`)
+          .join(", ")
+      : null,
+  });
 
   return fields;
 };

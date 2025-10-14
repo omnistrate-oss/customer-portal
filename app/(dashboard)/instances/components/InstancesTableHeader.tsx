@@ -306,18 +306,18 @@ const InstancesTableHeader = ({
         </div>
       </div>
 
-      <div className="px-6 py-4 border-b-[1px]">
-        <AddInstanceFilters
-          setSelectedFilters={setSelectedFilters}
-          filterOptionsMap={filterOptionsMap}
-          selectedFilters={selectedFilters}
-        />
+      <div className="px-6 py-4 border-b-[1px] flex justify-start items-center gap-4">
+        <div className="shrink-0">
+          <AddInstanceFilters
+            setSelectedFilters={setSelectedFilters}
+            filterOptionsMap={filterOptionsMap}
+            selectedFilters={selectedFilters}
+          />
+        </div>
 
-        <EditInstanceFilters
-          selectedFilters={selectedFilters}
-          setSelectedFilters={setSelectedFilters}
-          filterOptionsMap={filterOptionsMap}
-        />
+        <div className="flex-1">
+          <EditInstanceFilters selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+        </div>
       </div>
     </div>
   );

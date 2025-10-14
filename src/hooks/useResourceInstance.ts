@@ -336,6 +336,7 @@ const useResourceInstance = (queryParams) => {
           detailedNetworkTopology: data?.detailedNetworkTopology || {},
           maintenanceTasks: data.maintenanceTasks || {},
           subscriptionLicense: data?.subscriptionLicense || {},
+          customTags: data?.customTags,
         };
 
         return final;

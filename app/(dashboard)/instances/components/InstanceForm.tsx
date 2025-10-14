@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
-import { cloneDeep } from "lodash";
+import _, { cloneDeep } from "lodash";
 import * as yup from "yup";
 import { StringSchema } from "yup";
 
@@ -56,6 +56,12 @@ const InstanceForm = ({
       servicePlanId: yup.string().required("A plan with a valid subscription is required"),
       subscriptionId: yup.string().required("Subscription is required"),
       resourceId: yup.string().required("Resource is required"),
+      customTags: yup.array().of(
+        yup.object().shape({
+          key: yup.string().required("Name is required"),
+          value: yup.string().required("Value is required"),
+        })
+      ),
       // requestParams validation will be added dynamically
     })
   );
@@ -291,7 +297,21 @@ const InstanceForm = ({
         delete data.requestParams.custom_network_id;
         delete data.requestParams.custom_availability_zone;
 
-        if (!Object.keys(requestParams).length && data.network_type === selectedInstance?.network_type) {
+        // Include customTags if they have changed
+        const oldCustomTags = selectedInstance?.customTags || [];
+        const newCustomTags = data.customTags || [];
+
+        let hasCustomTagsChanged = false;
+        if (!_.isEqual(oldCustomTags, newCustomTags)) {
+          data.customTags = newCustomTags.filter((tag) => tag.key && tag.value);
+          hasCustomTagsChanged = true;
+        }
+
+        if (
+          !Object.keys(requestParams).length &&
+          data.network_type === selectedInstance?.network_type &&
+          !hasCustomTagsChanged
+        ) {
           return snackbar.showError("Please update at least one field before submitting");
         }
 
@@ -509,6 +529,12 @@ const InstanceForm = ({
         servicePlanId: yup.string().required("A plan with a valid subscription is required"),
         subscriptionId: yup.string().required("Subscription is required"),
         resourceId: yup.string().required("Resource is required"),
+        customTags: yup.array().of(
+          yup.object().shape({
+            key: yup.string().required("Name is required"),
+            value: yup.string().required("Value is required"),
+          })
+        ),
         requestParams: requestParamsModifyValidationSchema,
       });
       setValidationSchema(newValidationSchema);
@@ -518,6 +544,12 @@ const InstanceForm = ({
         servicePlanId: yup.string().required("A plan with a valid subscription is required"),
         subscriptionId: yup.string().required("Subscription is required"),
         resourceId: yup.string().required("Resource is required"),
+        customTags: yup.array().of(
+          yup.object().shape({
+            key: yup.string().required("Name is required"),
+            value: yup.string().required("Value is required"),
+          })
+        ),
         requestParams: requestParamsCreateValidationSchema,
       });
       setValidationSchema(newValidationSchema);
