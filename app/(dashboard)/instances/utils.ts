@@ -340,26 +340,26 @@ export const getResourceNameFromInstance = (instance: ResourceInstance) => {
 export type FilterCategorySchema = {
   label: string;
   name: string;
-  type: "list" | "date-range";
+  type: "list" | "date-range" | "custom-tags";
+  customTagOptions?: Map<string, Set<string>>;
   options?: { value: string; label: string; logoURL?: string }[];
   range?: DateRange;
   renderOption?: (...args: any) => React.ReactNode;
 };
 
-type CustomTag = NonNullable<ResourceInstance["customTags"]>[number];
+// type CustomTag = NonNullable<ResourceInstance["customTags"]>[number];
 
-//fix the type
-export const joinCustomTag = (tag: CustomTag) => {
-  return tag?.key + ":" + tag?.value;
-};
+// export const joinCustomTag = (tag: CustomTag) => {
+//   return tag?.key + ":" + tag?.value;
+// };
 
 export const getIntialFiltersObject: () => Record<string, FilterCategorySchema> = () => {
   return {
     customTags: {
       label: "Tag",
       name: "customTags",
-      type: "list",
-      options: [],
+      type: "custom-tags",
+      customTagOptions: new Map<string, Set<string>>(),
     },
     services: {
       label: "Product Name",
@@ -438,7 +438,7 @@ export const getInstanceFiltersObject = (
   const lifecycleStatusSet = new Set();
   const healthStatusSet = new Set();
   const loadSet = new Set();
-  const customTagsSet = new Set();
+  const customTagsMap = new Map<string, Set<string>>();
 
   instances?.forEach((instance) => {
     //add lifecylce status options
@@ -543,15 +543,15 @@ export const getInstanceFiltersObject = (
     const customTags = instance?.customTags;
 
     customTags?.forEach((tag) => {
-      const joinedTag = joinCustomTag(tag);
-      if (!customTagsSet.has(joinedTag)) {
-        result.customTags.options?.push({
-          value: joinedTag,
-          label: joinedTag,
-        });
-        customTagsSet.add(joinedTag);
+      if (tag?.key && tag?.value) {
+        if (!customTagsMap.has(tag.key)) {
+          customTagsMap.set(tag.key, new Set());
+        }
+        customTagsMap.get(tag.key)?.add(tag.value);
       }
     });
+
+    result.customTags.customTagOptions = customTagsMap;
   });
 
   return result;
@@ -675,12 +675,20 @@ export const getFilteredInstances = (
   }
 
   //filter on custom tags
-  if (filterOptionsMap.customTags?.options?.length) {
-    const tagOptions = new Set(filterOptionsMap.customTags?.options?.map((option) => option.value));
+  if (filterOptionsMap.customTags?.customTagOptions?.size) {
+    const selectedCustomTags = filterOptionsMap.customTags.customTagOptions;
 
     result = result.filter((instance) => {
       const instanceTags = instance.customTags;
-      return instanceTags?.some((tag) => tagOptions.has(joinCustomTag(tag)));
+      if (!instanceTags?.length) return false;
+
+      // Check if instance has any of the selected tag key-value combinations
+      return Array.from(selectedCustomTags.entries()).some(([selectedKey, selectedValuesSet]) =>
+        instanceTags.some(
+          (instanceTag) =>
+            instanceTag?.key === selectedKey && instanceTag?.value && selectedValuesSet.has(instanceTag.value)
+        )
+      );
     });
   }
 

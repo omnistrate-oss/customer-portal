@@ -9,6 +9,7 @@ import {
   DateTimeRangePickerStatic,
   initialRangeState,
 } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
+import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import FilterFunnel from "src/components/Icons/Filter/FilterFunnel";
 import FilterLinesIcon from "src/components/Icons/FilterLines/FilterLines";
 import { PopoverDynamicHeight } from "src/components/Popover/Popover";
@@ -26,6 +27,170 @@ const StyledIconCard = styled(Box)({
   justifyContent: "center",
   alignItems: "center",
 });
+
+type SelectedCategoryCustomTagsProps = {
+  selectedCategory: FilterCategorySchema;
+  handleRemoveCategory: () => void;
+  setSelectedFilters: SetState<Record<string, FilterCategorySchema>>;
+  filterOptionsMap: Record<string, FilterCategorySchema>;
+};
+
+export const SelectedCategoryCustomTags = ({
+  selectedCategory,
+  handleRemoveCategory,
+  setSelectedFilters,
+  filterOptionsMap,
+}: SelectedCategoryCustomTagsProps) => {
+  const [selectedOptionsMap, setSelectedOptionsMap] = useState<Map<string, Set<string>>>(
+    selectedCategory?.customTagOptions || new Map<string, Set<string>>()
+  );
+
+  const handleCancel = () => {
+    handleRemoveCategory();
+  };
+
+  const handleApply = () => {
+    //TODO: Handle Apply
+
+    setSelectedFilters((prev) => {
+      return {
+        ...prev,
+        [selectedCategory.name]: {
+          ...selectedCategory,
+          customTagOptions: selectedOptionsMap,
+        },
+      };
+    });
+
+    handleRemoveCategory();
+  };
+
+  const handleClearOptions = () => {
+    setSelectedOptionsMap(new Map<string, Set<string>>());
+
+    setSelectedFilters((prev) => {
+      return {
+        ...prev,
+        [selectedCategory.name]: {
+          ...selectedCategory,
+          customTagOptions: new Map<string, Set<string>>(),
+        },
+      };
+    });
+  };
+
+  const handleUpdateOption = (key: string, value: string) => {
+    setSelectedOptionsMap((prev) => {
+      const mapCopy = new Map(prev);
+      mapCopy.set(key, new Set(value));
+      return mapCopy;
+    });
+  };
+
+  return (
+    <>
+      <Stack
+        direction="row"
+        padding="16px"
+        justifyContent="flex-start"
+        alignItems="center"
+        gap="12px"
+        borderBottom={`1px solid ${themeConfig.colors.gray200}`}
+      >
+        <StyledIconCard sx={{ cursor: "pointer" }} onClick={handleCancel}>
+          <ChevronLeft
+            sx={{
+              fontSize: "20px",
+            }}
+          />
+        </StyledIconCard>
+        <p className="text-base font-semibold text-purple-600">Select {selectedCategory.label}s</p>
+      </Stack>
+
+      {!filterOptionsMap[selectedCategory.name]?.customTagOptions?.size && (
+        <Box
+          sx={{
+            marginY: "10px",
+            padding: "9px 24px",
+            fontSize: "14px",
+            lineHeight: "20px",
+            fontWeight: 500,
+            color: themeConfig.colors.gray900,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          No options available
+        </Box>
+      )}
+
+      <Stack direction="column" spacing={1} sx={{ padding: "10px 20px" }}>
+        {Array.from(filterOptionsMap[selectedCategory.name].customTagOptions?.entries() || []).map(([key, values]) => {
+          const options = Array.from(values);
+          const selected = Array.from(selectedOptionsMap.get(key) || []);
+          return (
+            <Box key={key}>
+              <p className="text-sm font-medium text-[#181d27]">{key}</p>
+              <Autocomplete
+                placeholder={`Select values`}
+                key={key}
+                multiple
+                options={options}
+                value={selected}
+                onChange={(e, newValue) => {
+                  handleUpdateOption(key, newValue);
+                }}
+                disableCloseOnSelect
+                limitTags={2}
+                renderOption={(props, option, { selected }) => {
+                  return (
+                    <li
+                      {...props}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Checkbox checked={selected} />
+                      {option}
+                    </li>
+                  );
+                }}
+              />
+            </Box>
+          );
+        })}
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        borderTop={`1px solid ${themeConfig.colors.gray200}`}
+        padding="16px"
+      >
+        <Button
+          variant="text"
+          fontColor={themeConfig.colors.success600}
+          bgColor={"#0794550a"}
+          onClick={handleClearOptions}
+        >
+          Clear
+        </Button>
+
+        <Stack direction="row" justifyContent="flex-end" alignItems="center" gap="12px">
+          <Button variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleApply} disabled={!selectedOptionsMap.size}>
+            Apply
+          </Button>
+        </Stack>
+      </Stack>
+    </>
+  );
+};
 
 type SelectedCategoryDateTimeRangeProps = {
   selectedCategory: FilterCategorySchema;
@@ -319,6 +484,14 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
           type,
         });
       }
+
+      if (type === "custom-tags" && filter.customTagOptions) {
+        filter.customTagOptions.forEach((values, key) => {
+          values.forEach((value) => {
+            result.push({ category, categoryLabel: filter.label, customTagOption: { key, value }, type });
+          });
+        });
+      }
     });
 
     return result;
@@ -364,7 +537,7 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
         }}
         sx={{ marginTop: "8px" }}
       >
-        <div className="min-w-[470px]">
+        <div className="min-w-[470px] max-w-[500px]">
           {selectedCategory ? (
             <>
               {selectedCategory.type === "list" && (
@@ -382,6 +555,15 @@ const AddInstanceFilters = ({ setSelectedFilters, filterOptionsMap, selectedFilt
                   selectedCategory={selectedFilters[selectedCategory?.name]}
                   handleRemoveCategory={handleRemoveCategory}
                   setSelectedFilters={setSelectedFilters}
+                />
+              )}
+
+              {selectedCategory.type === "custom-tags" && (
+                <SelectedCategoryCustomTags
+                  selectedCategory={selectedFilters[selectedCategory?.name]}
+                  handleRemoveCategory={handleRemoveCategory}
+                  setSelectedFilters={setSelectedFilters}
+                  filterOptionsMap={filterOptionsMap}
                 />
               )}
             </>

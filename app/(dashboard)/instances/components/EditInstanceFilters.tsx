@@ -20,7 +20,8 @@ type FilterChipItemSchema = {
   categoryLabel: string;
   option?: { value: string; label: string };
   range?: { startDate: string; endDate: string };
-  type?: "list" | "date-range";
+  customTagOption?: { key: string; value: string };
+  type?: "list" | "date-range" | "custom-tags";
 };
 
 type FilterChipTwoProps = {
@@ -42,6 +43,10 @@ const FilterChipTwo: FC<FilterChipTwoProps> = ({ item, handleRemoveItem }) => {
         .format("YYYY-MM-DD HH:mm:ss")} UTC to ${dayjs(new Date(item.range?.endDate ?? ""))
         .utc()
         .format("YYYY-MM-DD HH:mm:ss")} UTC`;
+    }
+
+    if (item.type === "custom-tags") {
+      return `${item.categoryLabel} = ${item.customTagOption?.key}:${item.customTagOption?.value}`;
     }
     return "";
   };
@@ -129,6 +134,19 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstan
           type,
         });
       }
+
+      if (type === "custom-tags" && filter.customTagOptions?.size) {
+        Array.from(filter.customTagOptions.entries()).forEach(([key, values]) => {
+          values.forEach((value) => {
+            result.push({
+              category,
+              categoryLabel: filter.label,
+              customTagOption: { key, value },
+              type,
+            });
+          });
+        });
+      }
     });
 
     return result;
@@ -204,6 +222,17 @@ const EditInstanceFilters = ({ selectedFilters, setSelectedFilters }: EditInstan
         );
       } else if (item.type === "date-range") {
         copy[item.category].range = initialRangeState;
+      } else if (item.type === "custom-tags" && item.customTagOption) {
+        const { key, value } = item.customTagOption;
+        const existingSet = copy[item.category].customTagOptions?.get(key);
+        if (existingSet) {
+          existingSet.delete(value);
+          if (existingSet.size === 0) {
+            copy[item.category].customTagOptions?.delete(key);
+          } else {
+            copy[item.category].customTagOptions?.set(key, existingSet);
+          }
+        }
       }
       return copy;
     });
