@@ -107,24 +107,23 @@ export const SelectedCategoryCustomTags = ({
         <p className="text-base font-semibold text-purple-600">Select {selectedCategory.label}s</p>
       </Stack>
 
-      {!filterOptionsMap[selectedCategory.name]?.customTagOptions?.size && (
-        <Box
-          sx={{
-            marginY: "10px",
-            padding: "9px 24px",
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: 500,
-            color: themeConfig.colors.gray900,
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          No options available
-        </Box>
-      )}
-
       <Stack direction="column" spacing={1} sx={{ padding: "10px 20px" }}>
+        {!filterOptionsMap[selectedCategory.name]?.customTagOptions?.size && (
+          <Box
+            sx={{
+              marginY: "10px !important",
+              padding: "9px 24px",
+              fontSize: "14px",
+              lineHeight: "20px",
+              fontWeight: 500,
+              color: themeConfig.colors.gray900,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            No options available
+          </Box>
+        )}
         {Array.from(filterOptionsMap[selectedCategory.name].customTagOptions?.entries() || []).map(([key, values]) => {
           const options = Array.from(values);
           const selected = Array.from(selectedOptionsMap.get(key) || []);
