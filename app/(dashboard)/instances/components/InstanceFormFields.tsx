@@ -497,7 +497,7 @@ export const getNetworkConfigurationFields = (
               textDecoration: "underline",
               color: "blue",
             }}
-            href="https://docs.omnistrate.com/usecases/byoa/?#bring-your-own-vpc-byo-vpc"
+            href="https://docs.omnistrate.com/usecases/byoc/?#bring-your-own-vpc-byo-vpc"
             target="_blank"
             rel="noopener noreferrer"
           >
