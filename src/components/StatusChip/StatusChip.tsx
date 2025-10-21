@@ -230,11 +230,11 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
   const displayLabel = label ? label : status ? (capitalize ? _.capitalize(status) : status) : "";
 
   useEffect(() => {
-    if (showOverflowTitle && (label || status) && textRef.current) {
+    if (showOverflowTitle && displayLabel && textRef.current) {
       const isOverflow = textRef.current.scrollWidth > textRef.current.clientWidth;
       setIsOverflowing(isOverflow);
     }
-  }, [showOverflowTitle, label, status]);
+  }, [showOverflowTitle, displayLabel]);
 
   return (
     <Chip
