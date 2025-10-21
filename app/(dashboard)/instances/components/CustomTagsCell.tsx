@@ -25,12 +25,11 @@ const CustomTagsCell: FC<CustomTagsCellProps> = ({ customTags = [], displayNumbe
 
   return (
     <WhiteTooltip
-      isVisible={remainingTags.length > 0}
       placement="top"
       title={
         <Stack direction="row" alignItems="center" flexWrap="wrap" gap="8px" padding="6px" width="100%">
           {customTags.map((tag, index) => (
-            <StatusChip key={index} label={`${tag.key}:${tag.value}`} {...defaultChipStyles} />
+            <StatusChip key={index} label={`${tag.key}:${tag.value}`} {...defaultChipStyles} showOverflowTitle />
           ))}
         </Stack>
       }
