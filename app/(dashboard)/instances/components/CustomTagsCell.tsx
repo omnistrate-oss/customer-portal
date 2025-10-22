@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react";
 import { Stack } from "@mui/material";
+import { Box } from "@mui/system";
 
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { WhiteTooltip } from "src/components/Tooltip/Tooltip";
@@ -25,22 +26,23 @@ const CustomTagsCell: FC<CustomTagsCellProps> = ({ customTags = [], displayNumbe
 
   return (
     <WhiteTooltip
-      isVisible={remainingTags.length > 0}
       placement="top"
       title={
         <Stack direction="row" alignItems="center" flexWrap="wrap" gap="8px" padding="6px" width="100%">
           {customTags.map((tag, index) => (
-            <StatusChip key={index} label={`${tag.key}:${tag.value}`} {...defaultChipStyles} />
+            <StatusChip key={index} label={`${tag.key}:${tag.value}`} {...defaultChipStyles} showOverflowTitle />
           ))}
         </Stack>
       }
     >
-      <Stack direction="row" alignItems="center" gap="8px" width="100%" flex={1} sx={sx}>
-        {displayTags.map((tag, index) => {
-          const label = `${tag.key}:${tag.value}`;
-          return <StatusChip key={index} label={label} {...defaultChipStyles} />;
-        })}
-        {remainingTags.length > 0 ? ` ....` : ""}
+      <Stack direction="row" alignItems="center" gap="4px" width="100%" flex={1} overflow={"hidden"} sx={sx}>
+        <Stack direction="row" alignItems="center" gap="8px" width="100%" overflow={"hidden"}>
+          {displayTags.map((tag, index) => {
+            const label = `${tag.key}:${tag.value}`;
+            return <StatusChip key={index} label={label} {...defaultChipStyles} />;
+          })}
+        </Stack>
+        <Box flexShrink={0}>{remainingTags.length > 0 ? ` ....` : ""}</Box>
       </Stack>
     </WhiteTooltip>
   );

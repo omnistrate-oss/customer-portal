@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from "react";
+import React, { FC, ReactNode, useEffect, useRef, useState } from "react";
 import { Box, chipClasses, ChipProps as MuiChipProps, Stack, SxProps, Theme } from "@mui/material";
 import _ from "lodash";
 
@@ -189,6 +189,7 @@ type StatusChipProps = {
   category?: Category;
   borderColor?: string;
   startIcon?: ReactNode;
+  showOverflowTitle?: boolean;
 };
 
 type ChipProps = Omit<MuiChipProps, "color">;
@@ -208,6 +209,7 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
     category,
     borderColor,
     startIcon,
+    showOverflowTitle,
     ...restProps
   } = props;
   let chipStyles = getChipStyles(status);
@@ -223,6 +225,17 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
   const fontColor = color ? color : chipStyles.color;
   const backgroundColor = bgColor ? bgColor : chipStyles.backgroundColor;
 
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const displayLabel = label ? label : status ? (capitalize ? _.capitalize(status) : status) : "";
+
+  useEffect(() => {
+    if (showOverflowTitle && displayLabel && textRef.current) {
+      const isOverflow = textRef.current.scrollWidth > textRef.current.clientWidth;
+      setIsOverflowing(isOverflow);
+    }
+  }, [showOverflowTitle, displayLabel]);
+
   return (
     <Chip
       label={
@@ -231,8 +244,13 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
           {dot && <Dot color={fontColor} />}
           {tick && <TickIcon />}
           {startIcon && startIcon}
-          <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-            {label ? label : capitalize ? _.capitalize(status) : status}
+          <Box
+            component="span"
+            sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            ref={textRef}
+            title={showOverflowTitle && isOverflowing ? displayLabel : undefined}
+          >
+            {displayLabel}
           </Box>
         </Stack>
       }
