@@ -24,9 +24,9 @@ export const WhiteTooltip = styled(({ className, ...props }) => (
     color: "#000000",
     fontSize: "14px",
     fontWeight: "400",
-    border: "1px solid #ffffff",
+    border: "1px solid #DBDBDB",
     borderRadius: "8px",
-    boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);",
+    boxShadow: "0px 3px 3px -1.5px #0A0D120A, 0px 8px 8px -4px #0A0D1208, 0px 20px 24px -4px #0A0D1214",
   },
   [`& .${tooltipClasses.arrow}`]: {
     color: "#fff",
