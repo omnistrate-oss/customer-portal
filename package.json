@@ -91,7 +91,7 @@
     "@flydotio/dockerfile": "^0.5.2",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "20.14.11",
+    "@types/node": "24.9.1",
     "@types/react": "^18.3.12",
     "@types/react-date-range": "1.4.0",
     "@types/react-dom": "^18.3.1",
