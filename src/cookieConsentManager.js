@@ -38,20 +38,17 @@ export const getCookieConsentInitialObject = (googleAnalyticsTagID) => {
   return base;
 };
 
-// Internal simple state flags to avoid repeated identical consent updates.
-let _analyticsGranted = false;
-
 const handlerMap = {
   grantAnalyticsConsent,
   revokeAnalyticsConsent,
+  removeGoogleAnalyticsScriptsAndCookies: revokeAnalyticsConsent,
+  addGoogleAnalytics: grantAnalyticsConsent,
 };
 
 function grantAnalyticsConsent() {
   if (typeof window === "undefined" || typeof window.gtag !== "function" || !this.gtag) return;
-  if (_analyticsGranted) return; // already granted
   window.gtag("consent", "update", { analytics_storage: "granted" });
   window.gtag("config", this.gtag);
-  _analyticsGranted = true;
 }
 
 const removeCookies = (cookieNames) => {
@@ -81,11 +78,9 @@ const removeCookies = (cookieNames) => {
 
 function revokeAnalyticsConsent() {
   if (typeof window === "undefined" || typeof window.gtag !== "function" || !this.gtag) return;
-  if (!_analyticsGranted) return;
 
   window.gtag("consent", "update", { analytics_storage: "denied" });
   if (this.cookies?.length) removeCookies(this.cookies);
-  _analyticsGranted = false;
 }
 
 export const handleConsentChanges = (categories) => {
