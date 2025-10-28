@@ -370,6 +370,26 @@ const InstanceDetailsPage = ({
               ? resourceInstanceData?.connectivity?.networkType.toUpperCase()
               : "PUBLIC") as NetworkType
           }
+          offering={offering}
+          cloudProvider={cloudProvider}
+          tab={"backups"}
+        />
+      )}
+      {currentTab === tabs.snapshots && (
+        <Backup
+          // @ts-ignore
+          backupStatus={resourceInstanceData.backupStatus}
+          instanceId={instanceId}
+          accessQueryParams={queryData}
+          resourceName={resourceName}
+          networkType={
+            (resourceInstanceData?.connectivity?.networkType
+              ? resourceInstanceData?.connectivity?.networkType.toUpperCase()
+              : "PUBLIC") as NetworkType
+          }
+          offering={offering}
+          cloudProvider={cloudProvider}
+          tab="snapshots"
         />
       )}
       {currentTab === tabs.customDNS && (

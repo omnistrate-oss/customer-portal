@@ -6,19 +6,23 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
-import { postInstanceRestoreAccess } from "src/api/resourceInstance";
+import { copyResourceInstanceSnapshot, postInstanceRestoreAccess } from "src/api/resourceInstance";
 import DataGrid, { selectSingleItem } from "src/components/DataGrid/DataGrid";
 import { DateRange, initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import InformationDialogTopCenter from "src/components/Dialog/InformationDialogTopCenter";
+import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import LinearProgress from "src/components/LinearProgress/LinearProgress";
+import CopySnapshotModal from "src/components/RestoreInstance/CopySnapshotModal";
 import RestoreInstanceSuccessStep from "src/components/RestoreInstance/RestoreInstanceSuccessStep";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { getResourceInstanceBackupStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceBackupStatus";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
 import { NetworkType } from "src/types/common/enums";
+import { ServiceOffering } from "src/types/serviceOffering";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
+import RegionIcon from "components/Region/RegionIcon";
 
 import BackupSummary from "./components/BackupSummary";
 import BackupsTableHeader from "./components/BackupTableHeader";
@@ -50,7 +54,10 @@ const Backup: FC<{
   accessQueryParams?: accessQueryParams;
   resourceName?: string;
   networkType: NetworkType;
-}> = ({ instanceId, backupStatus, accessQueryParams, resourceName, networkType }) => {
+  offering: ServiceOffering;
+  cloudProvider?: string;
+  tab?: "backups" | "snapshots";
+}> = ({ instanceId, backupStatus, accessQueryParams, resourceName, networkType, offering, cloudProvider, tab }) => {
   const snackbar = useSnackbar();
 
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
@@ -69,12 +76,33 @@ const Backup: FC<{
     instanceId,
     isEnable,
   });
-  const { data: restoreData = [], isRefetching, refetch } = restoreQuery;
+  const { data: restorequeryData, isRefetching, refetch } = restoreQuery;
+
+  const restoreData = useMemo(() => {
+    if (tab === "snapshots") return restorequeryData?.filter((item) => item?.snapshotType === "ManualSnapshot") ?? [];
+    else if (tab === "backups")
+      return restorequeryData?.filter((item) => item?.snapshotType === "AutomatedSnapshot") ?? [];
+
+    return restorequeryData ?? [];
+  }, [restorequeryData, tab]);
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>(initialRangeState);
+
+  const [copySnapshotModalOpen, setCopySnapshotModalOpen] = useState(false);
+
+  const handleOpenCopySnapshotModal = () => {
+    setCopySnapshotModalOpen(true);
+  };
 
   const handleClose = () => {
     setRestoreInstanceSuccess(false);
   };
+
+  const selectedSnapshot = useMemo(() => {
+    if (selectionModel.length > 0) {
+      return restoreData.find((snapshot) => snapshot.snapshotId === selectionModel[0]);
+    }
+    return null;
+  }, [selectionModel, restoreData]);
 
   const filteredsnapshots = useMemo(() => {
     let filtered = restoreData;
@@ -132,6 +160,47 @@ const Backup: FC<{
     },
   });
 
+  const copySnapshotMutation = useMutation({
+    mutationFn: async ({ targetRegion }: { targetRegion: string }) => {
+      if (selectionModel?.length > 0) {
+        const snapshotId = selectionModel[0];
+        const {
+          serviceProviderId,
+          serviceKey,
+          serviceAPIVersion,
+          serviceEnvironmentKey,
+          serviceModelKey,
+          productTierKey,
+          resourceKey,
+          subscriptionId,
+        } = accessQueryParams ?? {};
+
+        return await copyResourceInstanceSnapshot(
+          serviceProviderId,
+          serviceKey,
+          serviceAPIVersion,
+          serviceEnvironmentKey,
+          serviceModelKey,
+          productTierKey,
+          resourceKey,
+          instanceId,
+          {
+            sourceSnapshotId: snapshotId,
+            targetRegion,
+          },
+          {
+            subscriptionId,
+          }
+        );
+      }
+    },
+    onSuccess: () => {
+      snackbar.showSuccess(`Snapshot created successfully`);
+      refetch();
+      setCopySnapshotModalOpen(false);
+    },
+  });
+
   const columns = useMemo(
     () => [
       {
@@ -150,6 +219,16 @@ const Backup: FC<{
           return <StatusChip status={status} {...statusStylesAndMap} />;
         },
         minWidth: 100,
+      },
+      {
+        field: "region",
+        headerName: "Region",
+        flex: 0.5,
+        renderCell: (params: { row: SnapshotBase }) => {
+          const region = params.row.region || "Global";
+          return <GridCellExpand value={region} startIcon={<RegionIcon />} />;
+        },
+        minWidth: 170,
       },
       {
         field: "createdTime",
@@ -202,12 +281,14 @@ const Backup: FC<{
   return (
     <>
       <Box mt="32px" display={"flex"} flexDirection={"column"} gap="32px">
-        <BackupSummary
-          backupPeriodInHours={backupStatus?.backupPeriodInHours}
-          backupRetentionInDays={backupStatus?.backupRetentionInDays}
-          earliestRestoreTime={backupStatus?.earliestRestoreTime}
-          lastBackupTime={backupStatus?.lastBackupTime}
-        />
+        {tab === "backups" ? (
+          <BackupSummary
+            backupPeriodInHours={backupStatus?.backupPeriodInHours}
+            backupRetentionInDays={backupStatus?.backupRetentionInDays}
+            earliestRestoreTime={backupStatus?.earliestRestoreTime}
+            lastBackupTime={backupStatus?.lastBackupTime}
+          />
+        ) : null}
         <DataGrid
           checkboxSelection
           getRowId={(row: SnapshotBase) => row.snapshotId}
@@ -228,7 +309,11 @@ const Backup: FC<{
               resourceName,
               selectedDateRange,
               setSelectedDateRange,
-              isRestoreDisabled: selectionModel.length === 0,
+              handleOpenCopySnapshotModal,
+              cloudProvider,
+              copySnapshotMutation,
+              selectedSnapshotId: selectionModel[0],
+              tab,
             },
           }}
           getRowClassName={(params: { row: SnapshotBase }) => `${params.row.status}`}
@@ -244,12 +329,21 @@ const Backup: FC<{
             selectSingleItem(newSelection, selectionModel, setSelectionModel);
           }}
           loading={isRefetching}
-          noRowsText="No backups"
+          noRowsText={`No ${tab === "snapshots" ? "snapshots" : "backups"}`}
         />
       </Box>
       <InformationDialogTopCenter open={isRestoreInstanceSuccess} handleClose={handleClose} maxWidth={"550px"}>
         <RestoreInstanceSuccessStep handleClose={handleClose} restoredInstanceID={restoredInstanceID} />
       </InformationDialogTopCenter>
+
+      <CopySnapshotModal
+        open={copySnapshotModalOpen}
+        handleClose={() => setCopySnapshotModalOpen(false)}
+        selectedSnapshot={selectedSnapshot}
+        offering={offering}
+        cloudProvider={cloudProvider}
+        copySnapshotMutation={copySnapshotMutation}
+      />
     </>
   );
 };
