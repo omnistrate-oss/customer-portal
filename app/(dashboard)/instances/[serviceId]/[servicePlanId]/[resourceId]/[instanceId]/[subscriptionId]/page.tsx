@@ -49,6 +49,7 @@ export type CurrentTab =
   | "Logs"
   | "Audit Logs"
   | "Backups"
+  | "Snapshots"
   | "Custom DNS";
 
 const isResourceBYOA = false;
@@ -373,6 +374,7 @@ const InstanceDetailsPage = ({
           offering={offering}
           cloudProvider={cloudProvider}
           tab={"backups"}
+          setCurrentTab={setCurrentTab}
         />
       )}
       {currentTab === tabs.snapshots && (
@@ -390,6 +392,7 @@ const InstanceDetailsPage = ({
           offering={offering}
           cloudProvider={cloudProvider}
           tab="snapshots"
+          setCurrentTab={setCurrentTab}
         />
       )}
       {currentTab === tabs.customDNS && (

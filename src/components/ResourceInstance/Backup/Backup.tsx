@@ -2,6 +2,7 @@ import { FC, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { GridSelectionModel } from "@mui/x-data-grid";
 import { useMutation } from "@tanstack/react-query";
+import { CurrentTab } from "app/(dashboard)/instances/[serviceId]/[servicePlanId]/[resourceId]/[instanceId]/[subscriptionId]/page";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
@@ -19,6 +20,7 @@ import { getResourceInstanceBackupStatusStylesAndLabel } from "src/constants/sta
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
 import { NetworkType } from "src/types/common/enums";
+import { SetState } from "src/types/common/reactGenerics";
 import { ServiceOffering } from "src/types/serviceOffering";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
@@ -57,13 +59,31 @@ const Backup: FC<{
   offering: ServiceOffering;
   cloudProvider?: string;
   tab?: "backups" | "snapshots";
-}> = ({ instanceId, backupStatus, accessQueryParams, resourceName, networkType, offering, cloudProvider, tab }) => {
+  setCurrentTab: SetState<CurrentTab>;
+}> = ({
+  instanceId,
+  backupStatus,
+  accessQueryParams,
+  resourceName,
+  networkType,
+  offering,
+  cloudProvider,
+  tab,
+  setCurrentTab,
+}) => {
   const snackbar = useSnackbar();
 
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [searchText, setSearchText] = useState("");
   const [isRestoreInstanceSuccess, setRestoreInstanceSuccess] = useState(false);
   const [restoredInstanceID, setRestoredInstanceID] = useState("");
+
+  const [copySnapshotModalOpen, setCopySnapshotModalOpen] = useState(false);
+
+  const handleClose = () => {
+    setRestoreInstanceSuccess(false);
+  };
+
   const isEnable = useMemo(() => {
     if (backupStatus?.earliestRestoreTime) {
       return true;
@@ -71,11 +91,16 @@ const Backup: FC<{
     return false;
   }, [backupStatus?.earliestRestoreTime]);
 
-  const restoreQuery = useBackup({
-    accessQueryParams,
-    instanceId,
-    isEnable,
-  });
+  const restoreQuery = useBackup(
+    {
+      accessQueryParams,
+      instanceId,
+      isEnable,
+    },
+    {
+      refetchInterval: copySnapshotModalOpen ? false : 30000,
+    }
+  );
   const { data: restorequeryData, isRefetching, refetch } = restoreQuery;
 
   const restoreData = useMemo(() => {
@@ -86,16 +111,6 @@ const Backup: FC<{
     return restorequeryData ?? [];
   }, [restorequeryData, tab]);
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>(initialRangeState);
-
-  const [copySnapshotModalOpen, setCopySnapshotModalOpen] = useState(false);
-
-  const handleOpenCopySnapshotModal = () => {
-    setCopySnapshotModalOpen(true);
-  };
-
-  const handleClose = () => {
-    setRestoreInstanceSuccess(false);
-  };
 
   const selectedSnapshot = useMemo(() => {
     if (selectionModel.length > 0) {
@@ -197,6 +212,7 @@ const Backup: FC<{
     onSuccess: () => {
       snackbar.showSuccess(`Snapshot created successfully`);
       refetch();
+      setCurrentTab("Snapshots");
       setCopySnapshotModalOpen(false);
     },
   });
@@ -309,7 +325,7 @@ const Backup: FC<{
               resourceName,
               selectedDateRange,
               setSelectedDateRange,
-              handleOpenCopySnapshotModal,
+              handleOpenCopySnapshotModal: () => setCopySnapshotModalOpen(true),
               cloudProvider,
               copySnapshotMutation,
               selectedSnapshotId: selectionModel[0],

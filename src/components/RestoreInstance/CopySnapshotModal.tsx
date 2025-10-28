@@ -1,9 +1,9 @@
 import { FC, useEffect, useMemo } from "react";
 import { CircularProgress } from "@mui/material";
-import { Box, height, Stack } from "@mui/system";
+import { Box, Stack } from "@mui/system";
 import { UseMutationResult } from "@tanstack/react-query";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
-import { FormikProps, useFormik } from "formik";
+import { useFormik } from "formik";
 
 import { CloudProvider } from "src/types/common/enums";
 import { ServiceOffering } from "src/types/serviceOffering";
@@ -51,8 +51,6 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
     },
   });
 
-  console.log("formik", copySnapshotFormik);
-
   const regions = useMemo(
     () =>
       getRegionMenuItems(offering, cloudProvider as CloudProvider)?.filter(
@@ -65,6 +63,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
     if (!open) {
       copySnapshotFormik.resetForm();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
@@ -140,7 +139,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
 
         <Button
           variant="contained"
-          disabled={copySnapshotMutation.isPending || !copySnapshotFormik.isValid}
+          disabled={copySnapshotMutation.isPending || !copySnapshotFormik.isValid || !selectedSnapshot}
           onClick={copySnapshotFormik.handleSubmit}
         >
           Restore
