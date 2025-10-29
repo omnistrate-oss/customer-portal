@@ -1,5 +1,4 @@
 import { FC } from "react";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import { Stack } from "@mui/material";
 import { UseMutationResult } from "@tanstack/react-query";
 
@@ -9,6 +8,7 @@ import SearchInput from "src/components/DataGrid/SearchInput";
 import { DateRange, DateTimePickerPopover } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
+import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
 import { SetState } from "src/types/common/reactGenerics";
 
 type BackupsTableHeaderProps = {
@@ -21,7 +21,11 @@ type BackupsTableHeaderProps = {
   isRefetching: boolean;
   selectedDateRange: DateRange;
   setSelectedDateRange: SetState<DateRange>;
-  isRestoreDisabled: boolean;
+  handleOpenCopySnapshotModal: () => void;
+  cloudProvider: string | undefined;
+  copySnapshotMutation: UseMutationResult<void, Error, { targetRegion: string }, unknown>;
+  selectedSnapshotId: string | undefined;
+  tab: "backups" | "snapshots";
 };
 
 const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
@@ -34,7 +38,11 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
   resourceName,
   selectedDateRange,
   setSelectedDateRange,
-  isRestoreDisabled,
+  handleOpenCopySnapshotModal,
+  cloudProvider,
+  copySnapshotMutation,
+  selectedSnapshotId,
+  tab,
 }) => {
   return (
     <>
@@ -46,12 +54,16 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
         borderBottom="1px solid #EAECF0"
       >
         <DataGridHeaderTitle
-          title={`List of completed backups ${resourceName ? `for ${resourceName}` : ""}`}
-          desc="View and manage your backups"
+          title={`List of  ${tab === "snapshots" ? "snapshots" : "completed backups"} ${resourceName ? `for ${resourceName}` : ""}`}
+          desc={
+            tab === "snapshots"
+              ? "Snapshots are region-specific copies created from backups. Restore a snapshot to create a new instance in the snapshot’s region."
+              : "View completed backups for this instance. Select a backup to Restore or Copy it to another region"
+          }
           count={count}
           units={{
-            singular: "Backup",
-            plural: "Backups",
+            singular: tab === "snapshots" ? "Snapshot" : "Backup",
+            plural: tab === "snapshots" ? "Snapshots" : "Backups",
           }}
         />
         <Stack direction="row" alignItems="center" gap="12px" justifyContent="flex-end" flexGrow={1} flexWrap={"wrap"}>
@@ -69,9 +81,12 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
               height: "40px !important",
               padding: "10px 14px !important",
             }}
-            startIcon={<RefreshIcon />}
-            disabled={isRefetching || restoreMutation.isPending || isRestoreDisabled}
-            disabledMessage={restoreMutation.isPending ? "Restoring backup..." : "Please select a backup to restore"}
+            disabled={isRefetching || restoreMutation.isPending || !selectedSnapshotId}
+            disabledMessage={
+              restoreMutation.isPending
+                ? `Restoring ${tab === "snapshots" ? "snapshot" : "backup"}...`
+                : `Please select a ${tab === "snapshots" ? "snapshot" : "backup"} to restore`
+            }
             onClick={() => {
               restoreMutation.mutate();
             }}
@@ -79,6 +94,32 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             Restore
             {restoreMutation.isPending && <LoadingSpinnerSmall sx={{ color: "#7F56D9", marginLeft: "12px" }} />}
           </Button>
+
+          {tab === "backups" && (
+            <Button
+              variant="outlined"
+              sx={{
+                height: "40px !important",
+                padding: "10px 14px !important",
+              }}
+              onClick={handleOpenCopySnapshotModal}
+              disabled={
+                isRefetching ||
+                copySnapshotMutation.isPending ||
+                cloudProvider !== CLOUD_PROVIDERS.gcp ||
+                !selectedSnapshotId
+              }
+              disabledMessage={
+                copySnapshotMutation.isPending
+                  ? "Creating snapshot..."
+                  : cloudProvider !== CLOUD_PROVIDERS.gcp
+                    ? "Only supported for GCP cloud"
+                    : "Please select a backup to copy"
+              }
+            >
+              Copy snapshot
+            </Button>
+          )}
         </Stack>
       </Stack>
     </>

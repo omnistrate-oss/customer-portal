@@ -26,6 +26,7 @@ export const getTabs = (
   tabs["auditLogs"] = "Audit Logs";
   if (isBackup) {
     tabs["backups"] = "Backups";
+    tabs["snapshots"] = "Snapshots";
   }
   if (isCustomDNS) {
     tabs["customDNS"] = "Custom DNS";
