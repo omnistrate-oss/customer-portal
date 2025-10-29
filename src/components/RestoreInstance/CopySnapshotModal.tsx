@@ -20,13 +20,14 @@ import FieldTitle from "../FormElementsv2/FieldTitle/FieldTitle";
 import MenuItem from "../FormElementsv2/MenuItem/MenuItem";
 import Select from "../FormElementsv2/Select/Select";
 import CopySnapshotIcon from "../Icons/RestoreInstance/CopySnapshotIcon";
+import { SnapshotBase } from "../ResourceInstance/Backup/hooks/useBackup";
 import { copySnapshotValidationSchema } from "../ResourceInstance/Backup/utils";
 import { Text } from "../Typography/Typography";
 
 type CopySnapshotModalProps = {
   open: boolean;
   handleClose: () => void;
-  selectedSnapshot: any;
+  selectedSnapshot: SnapshotBase;
   offering: ServiceOffering;
   cloudProvider?: string;
   copySnapshotMutation: UseMutationResult<void, Error, { targetRegion: string }, unknown>;
@@ -103,7 +104,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
           <Select
             renderValue={() => {
               return (
-                regions?.find((option) => option.value == copySnapshotFormik.values.targetRegion)?.label ??
+                regions?.find((option) => option.value === copySnapshotFormik.values.targetRegion)?.label ??
                 "Select target region"
               );
             }}
