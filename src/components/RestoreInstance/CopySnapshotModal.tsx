@@ -99,6 +99,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
             Target Region
           </FieldTitle>
           <Select
+            displayEmpty
             renderValue={() => {
               return (
                 regions?.find((option) => option.value === copySnapshotFormik.values.targetRegion)?.label ??
@@ -140,7 +141,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
           disabled={copySnapshotMutation.isPending || !selectedSnapshot}
           onClick={copySnapshotFormik.handleSubmit}
         >
-          Restore
+          Create Snapshot
           {copySnapshotMutation.isPending && <CircularProgress size={16} sx={{ marginLeft: "8px" }} />}
         </Button>
       </DialogFooter>
