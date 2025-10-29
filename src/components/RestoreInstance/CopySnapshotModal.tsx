@@ -139,7 +139,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
 
         <Button
           variant="contained"
-          disabled={copySnapshotMutation.isPending || !copySnapshotFormik.isValid || !selectedSnapshot}
+          disabled={copySnapshotMutation.isPending || !selectedSnapshot}
           onClick={copySnapshotFormik.handleSubmit}
         >
           Restore
