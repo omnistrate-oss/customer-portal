@@ -169,12 +169,13 @@ const InstancesPage = () => {
         header: "Lifecycle Status",
         cell: (data) => {
           const status = data.row.original.status;
-          const statusSytlesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
+          const statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
 
-          return <StatusChip status={status} {...statusSytlesAndLabel} />;
+          return <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />;
         },
         meta: {
           minWidth: 170,
+          disableBrowserTooltip: true,
         },
       }),
       columnHelper.accessor(

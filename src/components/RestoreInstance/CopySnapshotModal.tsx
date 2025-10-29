@@ -53,11 +53,8 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
   });
 
   const regions = useMemo(
-    () =>
-      getRegionMenuItems(offering, cloudProvider as CloudProvider)?.filter(
-        (region) => region.value !== selectedSnapshot?.region
-      ),
-    [offering, cloudProvider, selectedSnapshot]
+    () => getRegionMenuItems(offering, cloudProvider as CloudProvider),
+    [offering, cloudProvider]
   );
 
   useEffect(() => {

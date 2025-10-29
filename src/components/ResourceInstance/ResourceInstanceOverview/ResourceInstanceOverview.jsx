@@ -92,7 +92,7 @@ function ResourceInstanceOverview(props) {
 
       <div style={{ padding: "14px" }} className="flex items-center justify-center">
         {status ? (
-          <StatusChip status={status} {...statusStylesAndLabel} />
+          <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
         ) : (
           <StatusChip status={"UNKNOWN"} label={"Unknown"} />
         )}
