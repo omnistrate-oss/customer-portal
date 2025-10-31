@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Stack } from "@mui/material";
 import { UseMutationResult } from "@tanstack/react-query";
 
@@ -46,6 +46,22 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
   selectedSnapshot,
   tab,
 }) => {
+  const createSnapShotDisabledMessage = useMemo(() => {
+    if (copySnapshotMutation.isPending) {
+      return "Creating snapshot...";
+    }
+    if (cloudProvider !== CLOUD_PROVIDERS.gcp) {
+      return "Snapshot creation is restricted to GCP deployments";
+    }
+    if (!selectedSnapshot) {
+      return `Select a ${tab === "snapshots" ? "snapshot" : "backup"} to create ${tab === "snapshots" ? "another snapshot" : "a snapshot"} from it`;
+    }
+    if (selectedSnapshot?.status !== "COMPLETE") {
+      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to create a new snapshot from it.`;
+    }
+    return "";
+  }, [cloudProvider, copySnapshotMutation.isPending, selectedSnapshot, tab]);
+
   return (
     <>
       <Stack
@@ -111,17 +127,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
               !selectedSnapshot ||
               selectedSnapshot?.status !== "COMPLETE"
             }
-            disabledMessage={
-              copySnapshotMutation.isPending
-                ? "Creating snapshot..."
-                : cloudProvider !== CLOUD_PROVIDERS.gcp
-                  ? "Snapshot creation is restricted to GCP deployments"
-                  : !selectedSnapshot
-                    ? `Select a ${tab === "snapshots" ? "snapshot" : "backup"} to create ${tab === "snapshots" ? "another snapshot" : "a snapshot"} from it`
-                    : selectedSnapshot?.status !== "COMPLETE"
-                      ? `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to create a new snapshot from it.`
-                      : ""
-            }
+            disabledMessage={createSnapShotDisabledMessage}
           >
             Create snapshot
           </Button>
