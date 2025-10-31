@@ -22,6 +22,11 @@ const BackupSummary: FC<BackupStatus> = (props) => {
         valueType: "text",
       },
       {
+        label: "RTO",
+        value: "Few minutes, typically <5 minutes",
+        valueType: "text",
+      },
+      {
         label: "Retention duration",
         value: `${backupRetentionInDays} ${Number(backupRetentionInDays) > 1 ? " days" : " day"}`,
         valueType: "text",
@@ -35,11 +40,6 @@ const BackupSummary: FC<BackupStatus> = (props) => {
         label: "Last Backup Time",
         value: lastBackupTime ? formatDateUTC(lastBackupTime) : "-",
         valueType: lastBackupTime ? "text" : "custom",
-      },
-      {
-        label: "RTO",
-        value: "Few minutes, typically <5 minutes",
-        valueType: "text",
       },
     ];
 
