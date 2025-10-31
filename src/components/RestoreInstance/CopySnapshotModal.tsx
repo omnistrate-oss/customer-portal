@@ -85,7 +85,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
           </Box>
           <Box>
             <Text size="large" weight="semibold" color="#181D27">
-              Copy Snapshot
+              Create Snapshot
             </Text>
             <Text size="small" weight="normal" color="#535862">
               A snapshot will be created in the selected region. You can restore it to create a new instance there.

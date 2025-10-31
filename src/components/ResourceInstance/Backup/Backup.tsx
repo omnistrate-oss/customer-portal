@@ -328,7 +328,7 @@ const Backup: FC<{
               handleOpenCopySnapshotModal: () => setCopySnapshotModalOpen(true),
               cloudProvider,
               copySnapshotMutation,
-              selectedSnapshotId: selectionModel[0],
+              selectedSnapshot,
               tab,
             },
           }}
@@ -349,7 +349,7 @@ const Backup: FC<{
         />
       </Box>
       <InformationDialogTopCenter open={isRestoreInstanceSuccess} handleClose={handleClose} maxWidth={"550px"}>
-        <RestoreInstanceSuccessStep handleClose={handleClose} restoredInstanceID={restoredInstanceID} />
+        <RestoreInstanceSuccessStep handleClose={handleClose} restoredInstanceID={restoredInstanceID} tab={tab} />
       </InformationDialogTopCenter>
 
       <CopySnapshotModal
