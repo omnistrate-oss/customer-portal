@@ -8,7 +8,7 @@ import CopyButton from "../Button/CopyButton";
 import { DialogContent, DialogFooter, DialogHeader } from "../Dialog/InformationDialogTopCenter";
 import { Text } from "../Typography/Typography";
 
-function RestoreInstanceSuccessStep({ handleClose, restoredInstanceID, tab }) {
+function RestoreInstanceSuccessStep({ handleClose, restoredInstanceID, tab = "backups" }) {
   return (
     <>
       <DialogHeader>
