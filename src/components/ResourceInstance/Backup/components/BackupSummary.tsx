@@ -22,7 +22,7 @@ const BackupSummary: FC<BackupStatus> = (props) => {
         valueType: "text",
       },
       {
-        label: "RTO",
+        label: "Recovery Time Objective",
         value: "Few minutes, typically <5 minutes",
         valueType: "text",
       },
