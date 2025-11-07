@@ -28,6 +28,7 @@ import {
 
 import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
+import CustomTagsField from "./CustomTagsField";
 
 export const getStandardInformationFields = (
   servicesObj,
@@ -384,6 +385,20 @@ export const getStandardInformationFields = (
     });
   }
 
+  fields.push({
+    dataTestId: "instance-custom-tags",
+    label: "Tags",
+    subLabel: "Add tags to your instance",
+    name: "customTags",
+    customComponent: <CustomTagsField formData={formData} />,
+    previewValue: formData?.values.customTags?.filter((tag) => tag.key && tag.value)?.length
+      ? formData.values.customTags
+          ?.filter((tag) => tag.key && tag.value)
+          ?.map((tag) => `${tag.key}:${tag.value}`)
+          .join(", ")
+      : null,
+  });
+
   return fields;
 };
 
@@ -482,7 +497,7 @@ export const getNetworkConfigurationFields = (
               textDecoration: "underline",
               color: "blue",
             }}
-            href="https://docs.omnistrate.com/usecases/byoa/?#bring-your-own-vpc-byo-vpc"
+            href="https://docs.omnistrate.com/usecases/byoc/?#bring-your-own-vpc-byo-vpc"
             target="_blank"
             rel="noopener noreferrer"
           >

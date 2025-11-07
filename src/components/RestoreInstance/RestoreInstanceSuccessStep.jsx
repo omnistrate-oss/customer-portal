@@ -8,7 +8,7 @@ import CopyButton from "../Button/CopyButton";
 import { DialogContent, DialogFooter, DialogHeader } from "../Dialog/InformationDialogTopCenter";
 import { Text } from "../Typography/Typography";
 
-function RestoreInstanceSuccessStep({ handleClose, restoredInstanceID }) {
+function RestoreInstanceSuccessStep({ handleClose, restoredInstanceID, tab = "backups" }) {
   return (
     <>
       <DialogHeader>
@@ -31,7 +31,7 @@ function RestoreInstanceSuccessStep({ handleClose, restoredInstanceID }) {
       <DialogContent>
         <Box>
           <Text size="medium" weight="semibold" color="344054">
-            Your backup has been successfully restored to a new instance.{" "}
+            Your {tab === "snapshots" ? "snapshot" : "backup"} has been successfully restored to a new instance.{" "}
           </Text>
 
           <Text size="medium" weight="regular" color="344054" mt={0.1}>

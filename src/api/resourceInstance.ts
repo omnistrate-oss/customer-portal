@@ -328,3 +328,24 @@ export const getAllResourceInstances = (
 ): Promise<AxiosResponse<ListAllResourceInstancesSuccessResponse>> => {
   return axios.get("/resource-instance", { params });
 };
+
+export const copyResourceInstanceSnapshot = (
+  serviceProviderId,
+  serviceKey,
+  serviceAPIVersion,
+  serviceEnvironmentKey,
+  serviceModelKey,
+  productTierKey,
+  resourceKey,
+  instanceId,
+  data = {},
+  queryParams = {}
+) => {
+  return axios.post(
+    `/resource-instance/${serviceProviderId}/${serviceKey}/${serviceAPIVersion}/${serviceEnvironmentKey}/${serviceModelKey}/${productTierKey}/${resourceKey}/${instanceId}/copy-snapshot`,
+    data,
+    {
+      params: queryParams,
+    }
+  );
+};

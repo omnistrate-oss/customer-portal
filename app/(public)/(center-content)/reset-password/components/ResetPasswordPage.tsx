@@ -89,7 +89,7 @@ const ResetPasswordPage = (props) => {
         <Image src={Confetti} alt="Confetti" width={265} height={140} style={{ margin: "0 auto" }} />
 
         <Stack gap="16px">
-          <DisplayHeading >Check Your Email for a Password Reset Link</DisplayHeading>
+          <DisplayHeading>Check Your Email for a Password Reset Link</DisplayHeading>
           <PageDescription>
             If an account is associated with the provided email, a password reset link will be sent. Please follow the
             instructions to reset your password.
@@ -114,7 +114,7 @@ const ResetPasswordPage = (props) => {
     <>
       <Box textAlign="center">
         {orgLogoURL ? (
-          <Logo src={orgLogoURL} alt={orgName} style={{ width: "120px", height: "auto", maxHeight: "unset" }} />
+          <Logo src={orgLogoURL} alt={orgName} style={{ maxWidth: "300px", maxHeight: "120px", height: "auto" }} />
         ) : (
           ""
         )}

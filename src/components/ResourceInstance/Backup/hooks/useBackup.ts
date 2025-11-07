@@ -18,6 +18,7 @@ export type SnapshotBase = {
   progress: number;
   snapshotId: string;
   status: string;
+  region: string;
 };
 
 // Access-specific properties

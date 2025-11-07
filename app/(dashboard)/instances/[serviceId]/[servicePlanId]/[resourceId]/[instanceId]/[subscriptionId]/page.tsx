@@ -49,6 +49,7 @@ export type CurrentTab =
   | "Logs"
   | "Audit Logs"
   | "Backups"
+  | "Snapshots"
   | "Custom DNS";
 
 const isResourceBYOA = false;
@@ -301,6 +302,7 @@ const InstanceDetailsPage = ({
           maintenanceTasks={resourceInstanceData.maintenanceTasks}
           licenseDetails={resourceInstanceData?.subscriptionLicense}
           tierVersion={resourceInstanceData?.unprocessedData?.tierVersion}
+          customTags={resourceInstanceData?.customTags}
         />
       )}
       {currentTab === tabs.connectivity && (
@@ -369,6 +371,28 @@ const InstanceDetailsPage = ({
               ? resourceInstanceData?.connectivity?.networkType.toUpperCase()
               : "PUBLIC") as NetworkType
           }
+          offering={offering}
+          cloudProvider={cloudProvider}
+          tab={"backups"}
+          setCurrentTab={setCurrentTab}
+        />
+      )}
+      {currentTab === tabs.snapshots && (
+        <Backup
+          // @ts-ignore
+          backupStatus={resourceInstanceData.backupStatus}
+          instanceId={instanceId}
+          accessQueryParams={queryData}
+          resourceName={resourceName}
+          networkType={
+            (resourceInstanceData?.connectivity?.networkType
+              ? resourceInstanceData?.connectivity?.networkType.toUpperCase()
+              : "PUBLIC") as NetworkType
+          }
+          offering={offering}
+          cloudProvider={cloudProvider}
+          tab="snapshots"
+          setCurrentTab={setCurrentTab}
         />
       )}
       {currentTab === tabs.customDNS && (

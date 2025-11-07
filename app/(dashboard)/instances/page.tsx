@@ -28,6 +28,7 @@ import StatusChip from "components/StatusChip/StatusChip";
 
 import PageContainer from "../components/Layout/PageContainer";
 
+import CustomTagsCell from "./components/CustomTagsCell";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
@@ -107,6 +108,18 @@ const InstancesPage = () => {
           minWidth: 240,
         },
       }),
+
+      columnHelper.accessor("customTags", {
+        id: "Tags",
+        header: "Tags",
+        cell: (data) => {
+          const tags = data.row.original.customTags;
+          return <CustomTagsCell customTags={tags} />;
+        },
+        meta: {
+          minWidth: 200,
+        },
+      }),
       columnHelper.accessor(
         (row) => {
           const subscription = subscriptionsObj[row.subscriptionId as string];
@@ -156,12 +169,13 @@ const InstancesPage = () => {
         header: "Lifecycle Status",
         cell: (data) => {
           const status = data.row.original.status;
-          const statusSytlesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
+          const statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
 
-          return <StatusChip status={status} {...statusSytlesAndLabel} />;
+          return <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />;
         },
         meta: {
           minWidth: 170,
+          disableBrowserTooltip: true,
         },
       }),
       columnHelper.accessor(

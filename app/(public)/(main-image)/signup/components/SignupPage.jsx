@@ -183,7 +183,7 @@ const SignupPage = (props) => {
     <>
       <Box textAlign="center">
         {orgLogoURL ? (
-          <Logo src={orgLogoURL} alt={orgName} style={{ width: "120px", height: "auto", maxHeight: "unset" }} />
+          <Logo src={orgLogoURL} alt={orgName} style={{ maxWidth: "300px", maxHeight: "120px", height: "auto" }} />
         ) : (
           ""
         )}

@@ -41,44 +41,37 @@ export default function CookieConsentProvider({ children, googleAnalyticsTagID }
       const parsedConsent = storedConsent ? JSON.parse(storedConsent) : null;
 
       if (parsedConsent) {
-        //user gave some consent preference
-        //check parsed content, if the gtag is undefined and googleAnalyticsTagID has a non undefined value, update the localstorage
-        let isGTagSet = false;
-        if (parsedConsent) {
-          const analyticsSettings = (parsedConsent.categories || []).find(
-            (settingsObj) => settingsObj.category === "analytics"
-          );
-          if (analyticsSettings) {
-            const gtagConfig = (analyticsSettings.services || []).find((config) => config.name === "googletagmanager");
+        // Sync presence/absence or change of GA measurement ID.
+        const analyticsCategoryIndex = parsedConsent.categories.findIndex((c) => c.category === "analytics");
+        const analyticsCategory = analyticsCategoryIndex >= 0 ? parsedConsent.categories[analyticsCategoryIndex] : null;
+        const gaService = analyticsCategory?.services?.find((s) => s.name === "googletagmanager");
 
-            if (gtagConfig && gtagConfig.gtag && gtagConfig.gtag?.toLowerCase() !== "undefined") {
-              isGTagSet = true;
-            }
-
-            if (!isGTagSet && googleAnalyticsTagID) {
-              //update the gtag value in parsedConsentlocal storage
-              gtagConfig.gtag = googleAnalyticsTagID;
-              gtagConfig.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsTagID}`;
-            } else if (isGTagSet && !googleAnalyticsTagID) {
-              gtagConfig.gtag = undefined;
-              gtagConfig.src = "https://www.googletagmanager.com/gtag/js?id=undefined";
-            } else if (isGTagSet && gtagConfig.gtag !== googleAnalyticsTagID) {
-              gtagConfig.gtag = googleAnalyticsTagID;
-              gtagConfig.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsTagID}`;
-            }
+        if (googleAnalyticsTagID) {
+          // GA ID provided now.
+          if (!gaService) {
+            // Add analytics category fresh.
+            const newAnalytics = getCookieConsentInitialObject(googleAnalyticsTagID).categories.find(
+              (c) => c.category === "analytics"
+            );
+            if (newAnalytics) parsedConsent.categories.push(newAnalytics);
+          } else if (gaService.gtag !== googleAnalyticsTagID) {
+            gaService.gtag = googleAnalyticsTagID; // update id only; handlers unchanged
           }
-          localStorage.setItem("cookieConsent", JSON.stringify(parsedConsent));
+        } else if (gaService) {
+          // GA ID removed from environment; remove analytics category entirely.
+          parsedConsent.categories = parsedConsent.categories.filter((c) => c.category !== "analytics");
         }
 
-        // if there is consent in local storage set it to state
+        localStorage.setItem("cookieConsent", JSON.stringify(parsedConsent));
         handleConsentChanges(parsedConsent.categories);
         setConsentState(parsedConsent);
       } else {
-        //otherwise set the initial object to consent in local storage
         localStorage.setItem("cookieConsent", JSON.stringify(getCookieConsentInitialObject(googleAnalyticsTagID)));
       }
       if (!parsedConsent?.consentGiven) setIsConsentModalOpen(true);
-    } catch {}
+    } catch {
+      // swallow errors silently
+    }
   }, [googleAnalyticsTagID]);
 
   useEffect(() => {

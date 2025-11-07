@@ -151,6 +151,31 @@ function Autocomplete(props) {
           </StyledListOption>
         );
       }}
+      ListboxProps={{
+        sx: {
+          "&.MuiAutocomplete-listbox": {
+            marginTop: "4px",
+            border: "1px solid #EAECF0",
+            boxShadow: "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
+            borderRadius: "8px",
+            padding: "4px",
+          },
+        },
+      }}
+      componentsProps={{
+        paper: {
+          sx: {
+            border: "none",
+            boxShadow: "none",
+            "& .MuiAutocomplete-noOptions": {
+              marginTop: "4px",
+              border: "1px solid #EAECF0",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
+            },
+          },
+        },
+      }}
       {...restProps}
     />
   );

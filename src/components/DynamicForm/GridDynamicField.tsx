@@ -58,7 +58,7 @@ const GridDynamicField: React.FC<GridDynamicFieldProps> = ({ field, formData }) 
       <div className="col-span-4">
         {Field}
         {field.description && field.description}
-        <FieldError marginTop="4px">{fieldTouched && fieldError}</FieldError>
+        {typeof fieldError === "string" && fieldTouched && <FieldError marginTop="4px">{fieldError}</FieldError>}
       </div>
     </div>
   );

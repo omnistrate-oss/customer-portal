@@ -27,6 +27,8 @@ export const resourceInstanceStatusMap: Record<string, { category: Category; lab
   DISCONNECTING: { category: "inProgress", label: "Disconnecting" },
   CONNECTING: { category: "pending", label: "Connecting" },
   ATTACHING: { category: "pending", label: "Attaching" },
+  COPYING_SNAPSHOT: { category: "inProgress", label: "Copying Snapshot" },
+  BACKING_UP: { category: "inProgress", label: "Backing Up" },
 };
 
 export const getResourceInstanceStatusStylesAndLabel = (status: string): ColorObject & { label?: string } => {

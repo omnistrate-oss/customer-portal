@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Box } from "@mui/material";
+import CustomTagsCell from "app/(dashboard)/instances/components/CustomTagsCell";
 import { Base64 } from "js-base64";
 
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
@@ -35,6 +36,7 @@ function ResourceInstanceDetails(props) {
     maintenanceTasks,
     licenseDetails,
     tierVersion,
+    customTags,
   } = props;
 
   const isResourceBYOA = resultParameters.gcp_project_id || resultParameters.aws_account_id;
@@ -136,6 +138,12 @@ function ResourceInstanceDetails(props) {
         value: tierVersion || "-",
       });
     }
+    res.push({
+      dataTestId: "custom-tags",
+      label: "Tags",
+      valueType: "custom",
+      value: <CustomTagsCell customTags={customTags} displayNumber={2} sx={{ marginTop: "8px", flexWrap: "wrap" }} />,
+    });
     return res;
   }, [
     resourceInstanceId,
