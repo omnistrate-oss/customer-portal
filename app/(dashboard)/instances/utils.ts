@@ -42,6 +42,52 @@ export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   return menuItems.sort((a, b) => a.label.localeCompare(b.label));
 };
 
+type SchemaParameter = {
+  key: string;
+  scope?: {
+    cloudProviders?: string[];
+  };
+  [key: string]: any;
+};
+
+/**
+ * Filters schema parameters based on the selected cloud provider and scope
+ * @param schemaParameters - Array of schema parameters to filter
+ * @param selectedCloudProvider - The currently selected cloud provider (e.g., "aws", "gcp", "azure")
+ * @returns Filtered array of schema parameters that match the cloud provider scope
+ */
+export const filterSchemaByCloudProvider = (
+  schemaParameters: SchemaParameter[],
+  selectedCloudProvider?: string
+): SchemaParameter[] => {
+  if (!schemaParameters) {
+    return [];
+  }
+
+  return schemaParameters.filter((param) => {
+    // If scope.cloudProviders exists
+    if (param.scope?.cloudProviders) {
+      const cloudProvidersList = param.scope.cloudProviders;
+
+      // If cloudProviders list is empty or null, show the parameter (applies to all providers)
+      if (!cloudProvidersList || cloudProvidersList.length === 0) {
+        return true;
+      }
+
+      // If cloudProviders list has values, check if selected cloud provider is in the list
+      if (selectedCloudProvider && cloudProvidersList.includes(selectedCloudProvider)) {
+        return true;
+      }
+
+      // If selected cloud provider is not in the list, filter out this parameter
+      return false;
+    }
+
+    // If no scope.cloudProviders, show the parameter (no restrictions)
+    return true;
+  });
+};
+
 export const getServicePlanMenuItems = (serviceOfferings: ServiceOffering[], serviceId: string) => {
   const menuItems: MenuItem[] = [];
   if (!serviceOfferings?.length) {

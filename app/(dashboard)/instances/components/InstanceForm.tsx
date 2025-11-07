@@ -30,7 +30,7 @@ import { Text } from "components/Typography/Typography";
 
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
-import { getInitialValues } from "../utils";
+import { filterSchemaByCloudProvider, getInitialValues } from "../utils";
 
 import {
   getDeploymentConfigurationFields,
@@ -175,7 +175,8 @@ const InstanceForm = ({
         resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE")?.inputParameters || [];
 
       const schema = formMode === "create" ? createSchema : updateSchema;
-      const inputParametersObj = schema.reduce((acc: any, param: any) => {
+      const filterSchema = filterSchemaByCloudProvider(schema, data.cloudProvider);
+      const inputParametersObj = filterSchema.reduce((acc: any, param: any) => {
         acc[param.key] = param;
         return acc;
       }, {});
@@ -183,7 +184,7 @@ const InstanceForm = ({
       if (formMode === "create") {
         let isTypeError = false;
         Object.keys(data.requestParams).forEach((key) => {
-          const result = schema.find((schemaParam) => {
+          const result = filterSchema.find((schemaParam) => {
             return schemaParam.key === key;
           });
 
@@ -223,7 +224,7 @@ const InstanceForm = ({
         }
 
         // Check for Required Fields
-        const requiredFields = schema
+        const requiredFields = filterSchema
           .filter((field) => !["cloud_provider", "region"].includes(field.key))
           .filter((schemaParam) => schemaParam.required);
 
@@ -414,7 +415,10 @@ const InstanceForm = ({
   const resourceModifySchema = resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE") as APIEntity;
 
   const requestParamsCreateValidationSchema = useMemo(() => {
-    const inputParams = resourceCreateSchema?.inputParameters || [];
+    const inputParams = filterSchemaByCloudProvider(
+      resourceCreateSchema?.inputParameters || [],
+      formData.values.cloudProvider
+    );
 
     // Create validation rules for requestParams
     const requestParamsValidation: Record<string, ValidationSchema> = {};
@@ -463,10 +467,13 @@ const InstanceForm = ({
     });
 
     return yup.object().shape(requestParamsValidation);
-  }, [resourceSchemaData]);
+  }, [resourceSchemaData, formData.values.cloudProvider]);
 
   const requestParamsModifyValidationSchema = useMemo(() => {
-    const inputParams = resourceModifySchema?.inputParameters || [];
+    const inputParams = filterSchemaByCloudProvider(
+      resourceModifySchema?.inputParameters || [],
+      formData.values.cloudProvider
+    );
 
     // Create validation rules for requestParams
     const requestParamsValidation: Record<string, ValidationSchema> = {};
@@ -519,7 +526,7 @@ const InstanceForm = ({
     });
 
     return yup.object().shape(requestParamsValidation);
-  }, [resourceSchemaData]);
+  }, [resourceSchemaData, formData.values.cloudProvider]);
 
   // Update validation schema when requestParams validation changes
   useEffect(() => {
@@ -575,7 +582,10 @@ const InstanceForm = ({
 
   // Sets the Default Values for the Request Parameters
   useEffect(() => {
-    const inputParameters = resourceCreateSchema?.inputParameters || [];
+    const inputParameters = filterSchemaByCloudProvider(
+      resourceCreateSchema?.inputParameters || [],
+      formData.values.cloudProvider
+    );
 
     const defaultValues = inputParameters.reduce((acc: any, param: any) => {
       acc[param.key] = param.defaultValue || "";
@@ -601,7 +611,7 @@ const InstanceForm = ({
         formData.setFieldValue("network_type", "");
       }
     }
-  }, [resourceCreateSchema, formMode, offering]);
+  }, [resourceCreateSchema, formMode, offering, formData.values.cloudProvider]);
 
   const customAvailabilityZones = useMemo(() => {
     // @ts-expect-error TODO: Ask someone on the backend to fix the docs

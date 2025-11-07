@@ -18,6 +18,7 @@ import { TierVersionSet } from "src/types/tier-version-set";
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import {
+  filterSchemaByCloudProvider,
   getCustomNetworksMenuItems,
   getRegionMenuItems,
   getResourceMenuItems,
@@ -544,7 +545,7 @@ export const getDeploymentConfigurationFields = (
   const fields: Field[] = [];
   if (!resourceSchema?.inputParameters) return fields;
 
-  const filteredSchema = resourceSchema?.inputParameters
+  const filteredSchema = filterSchemaByCloudProvider(resourceSchema?.inputParameters || [], values.cloudProvider)
     .filter(
       (param) =>
         param.key !== "cloud_provider" &&
