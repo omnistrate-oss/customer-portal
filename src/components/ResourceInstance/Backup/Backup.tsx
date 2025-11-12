@@ -168,7 +168,7 @@ const Backup: FC<{
   }, [restoreData, searchText, selectedDateRange]);
 
   const restoreMutation = useMutation({
-    mutationFn: async ({ customNetwork }: { customNetwork: string }) => {
+    mutationFn: async ({ customNetwork }: { customNetwork?: string }) => {
       if (selectionModel?.length > 0) {
         const snapshotId = selectionModel[0];
         const {

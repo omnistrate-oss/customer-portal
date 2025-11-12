@@ -23,7 +23,7 @@ import { Text } from "../Typography/Typography";
 
 type CustomNetworkSelectionStepProps = {
   handleClose: () => void;
-  restoreInstanceMutation: UseMutationResult<void, Error, { customNetwork: string }, unknown>;
+  restoreInstanceMutation: UseMutationResult<void, Error, { customNetwork?: string }, unknown>;
   cloudProvider?: string;
   region: string;
   customNetworks: CustomNetwork[];
