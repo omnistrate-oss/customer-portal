@@ -189,17 +189,19 @@ export const getCustomNetworksMenuItems = (
 ) => {
   let options = customNetworks;
   if (cloudProvider) {
-    options = customNetworks.filter((customNetwork) => {
+    options = options.filter((customNetwork) => {
       return customNetwork.cloudProviderName === cloudProvider;
     });
+  }
 
-    options = customNetworks.filter((customNetwork) => {
+  if (cloudProviderRegions.length > 0) {
+    options = options.filter((customNetwork) => {
       return cloudProviderRegions.includes(customNetwork.cloudProviderRegion);
     });
   }
 
   if (region) {
-    options = customNetworks.filter((customNetwork) => {
+    options = options.filter((customNetwork) => {
       return customNetwork.cloudProviderRegion === region;
     });
   }

@@ -258,7 +258,7 @@ const Backup: FC<{
     },
     onSuccess: () => {
       snackbar.showSuccess(
-        `Snapshot ${snapshotCreationType === "copyFromExisting" || tab === "snapshots" ? "copied" : "created"} successfully`
+        `Snapshot ${snapshotCreationType === "copyFromExisting" && tab === "snapshots" ? "copied" : "created"} successfully`
       );
       refetch();
       setCurrentTab("Snapshots");
