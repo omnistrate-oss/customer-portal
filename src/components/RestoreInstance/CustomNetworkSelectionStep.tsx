@@ -30,6 +30,7 @@ type CustomNetworkSelectionStepProps = {
   offering: ServiceOffering;
   isFetchingCustomNetworks?: boolean;
   selectedSnapshot: SnapshotBase | null;
+  open: boolean;
 };
 
 const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
@@ -41,6 +42,7 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
   offering,
   isFetchingCustomNetworks,
   selectedSnapshot,
+  open,
 }) => {
   const customNetworkFormik = useFormik({
     initialValues: {

@@ -182,7 +182,7 @@ const Backup: FC<{
           subscriptionId,
         } = accessQueryParams ?? {};
 
-        const payload = {
+        const payload: { network_type: NetworkType; custom_network_id?: string } = {
           network_type: networkType,
         };
 
@@ -233,12 +233,12 @@ const Backup: FC<{
         subscriptionId,
       } = accessQueryParams ?? {};
 
-      const payload = {
+      const payload: { targetRegion: string; sourceSnapshotId?: string } = {
         targetRegion,
       };
 
       if (snapshotCreationType === "copyFromExisting") {
-        payload["sourceSnapshotId"] = snapshotId;
+        payload["sourceSnapshotId"] = snapshotId as string;
       }
 
       return await copyResourceInstanceSnapshot(
@@ -413,6 +413,7 @@ const Backup: FC<{
             offering={offering}
             isFetchingCustomNetworks={isFetchingCustomNetworks}
             selectedSnapshot={selectedSnapshot}
+            open={isRestoreInstanceModalOpen}
           />
         )}
         {restoreInstanceModalStep === "success" && (
