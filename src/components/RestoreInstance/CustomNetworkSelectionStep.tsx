@@ -53,8 +53,6 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
     },
   });
 
-  console.log("custom network formik values", customNetworkFormik.values);
-
   const customNetworkOptions = useMemo(() => {
     return getCustomNetworksMenuItems(
       customNetworks,
@@ -99,7 +97,7 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
               Restore Instance
             </Text>
             <Text size="small" weight="normal" color="#535862">
-              Restore instance in the selected custom network.
+              Restore this instance from the selected snapshot
             </Text>
           </Box>
         </Stack>
@@ -107,14 +105,14 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
       <DialogContent>
         <FieldContainer marginTop="0">
           <FieldTitle required sx={{ marginBottom: "6px" }}>
-            Custom Network
+            Select Custom Network
           </FieldTitle>
           <Select
             displayEmpty
             renderValue={() => {
               return (
                 customNetworkOptions?.find((option) => option.value === customNetworkFormik.values.customNetwork)
-                  ?.label ?? "Select custom network"
+                  ?.label ?? "Select target network"
               );
             }}
             name="customNetwork"

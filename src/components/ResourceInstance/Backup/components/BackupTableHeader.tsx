@@ -88,7 +88,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
           title={`List of  ${tab === "snapshots" ? "snapshots" : "completed backups"} ${resourceName ? `for ${resourceName}` : ""}`}
           desc={
             tab === "snapshots"
-              ? "View all snapshots. Select a snapshot to restore an instance or to create a new snapshot from it."
+              ? "View, restore, copy, or create snapshots for this instance"
               : "View completed backups for this instance. Select a backup to restore or create a snapshot."
           }
           count={count}
@@ -140,7 +140,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             }
             disabledMessage={copySnapshotDisabledMessage}
           >
-            {tab === "backups" ? "Create snapshot" : "Copy snapshot"}
+            {tab === "backups" ? "Create Snapshot" : "Copy Snapshot"}
           </Button>
 
           {tab === "snapshots" && (
@@ -154,7 +154,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
               disabled={isRefetching || copySnapshotMutation.isPending || cloudProvider !== CLOUD_PROVIDERS.gcp}
               disabledMessage={createSnapshotDisabledMessage}
             >
-              Create snapshot
+              Create Snapshot
             </Button>
           )}
         </Stack>
