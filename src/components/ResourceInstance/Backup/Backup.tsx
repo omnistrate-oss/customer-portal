@@ -13,14 +13,17 @@ import DataGrid, { selectSingleItem } from "src/components/DataGrid/DataGrid";
 import { DateRange, initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import InformationDialogTopCenter from "src/components/Dialog/InformationDialogTopCenter";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
+import RestoreInstanceIcon from "src/components/Icons/RestoreInstance/RestoreInstanceIcon";
 import LinearProgress from "src/components/LinearProgress/LinearProgress";
 import CopySnapshotModal from "src/components/RestoreInstance/CopySnapshotModal";
 import CustomNetworkSelectionStep from "src/components/RestoreInstance/CustomNetworkSelectionStep";
 import RestoreInstanceSuccessStep from "src/components/RestoreInstance/RestoreInstanceSuccessStep";
 import StatusChip from "src/components/StatusChip/StatusChip";
+import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import { getResourceInstanceBackupStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceBackupStatus";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
+import { colors } from "src/themeConfig";
 import { NetworkType } from "src/types/common/enums";
 import { SetState } from "src/types/common/reactGenerics";
 import { ServiceOffering } from "src/types/serviceOffering";
@@ -87,7 +90,9 @@ const Backup: FC<{
   const [snapshotCreationType, setSnapshotCreationType] = useState<SnapshotCreationType | null>(null);
 
   const [isRestoreInstanceModalOpen, setIsRestoreInstanceModalOpen] = useState(false);
-  const [restoreInstanceModalStep, setRestoreInstanceModalStep] = useState<"custom-network" | "success" | null>(null);
+  const [restoreInstanceModalStep, setRestoreInstanceModalStep] = useState<
+    "custom-network" | "restore-confirmation" | "success" | null
+  >(null);
 
   const handleOpenCopySnapshotModal = (creationType: SnapshotCreationType) => {
     setSnapshotCreationType(creationType);
@@ -99,7 +104,7 @@ const Backup: FC<{
     setSnapshotCreationType(null);
   };
 
-  const handleRestoreInstanceModalOpen = (step: "custom-network" | "success" | null) => {
+  const handleRestoreInstanceModalOpen = (step: "custom-network" | "restore-confirmation" | "success" | null) => {
     setRestoreInstanceModalStep(step);
     setIsRestoreInstanceModalOpen(true);
   };
@@ -123,10 +128,10 @@ const Backup: FC<{
       isEnable,
     },
     {
-      refetchInterval: copySnapshotModalOpen || isRestoreInstanceModalOpen ? false : 30000,
+      refetchInterval: copySnapshotModalOpen || isRestoreInstanceModalOpen ? false : 60000,
     }
   );
-  const { data: restorequeryData, isRefetching, refetch } = restoreQuery;
+  const { data: restorequeryData, isRefetching, refetch, isFetching } = restoreQuery;
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
     enabled: customNetworkExists, // Fetch only if custom_network_id is present
@@ -215,7 +220,7 @@ const Backup: FC<{
     if (customNetworkExists) {
       handleRestoreInstanceModalOpen("custom-network");
     } else {
-      restoreMutation.mutate({ customNetwork: "" });
+      handleRestoreInstanceModalOpen("restore-confirmation");
     }
   };
 
@@ -258,7 +263,7 @@ const Backup: FC<{
     },
     onSuccess: () => {
       snackbar.showSuccess(
-        `Snapshot ${snapshotCreationType === "copyFromExisting" || tab === "snapshots" ? "copied" : "created"} successfully`
+        `Snapshot ${snapshotCreationType === "copyFromExisting" && tab === "snapshots" ? "copied" : "created"} successfully`
       );
       refetch();
       setCurrentTab("Snapshots");
@@ -307,7 +312,8 @@ const Backup: FC<{
         headerName: "Completion Time",
         flex: 1,
         minWidth: 170,
-        valueGetter: (params: { row: SnapshotBase }) => formatDateUTC(params.row.completeTime),
+        valueGetter: (params: { row: SnapshotBase }) =>
+          params.row.status === "COMPLETE" ? formatDateUTC(params.row.completeTime) : "-",
       },
       {
         field: "progress",
@@ -359,7 +365,7 @@ const Backup: FC<{
           getRowId={(row: SnapshotBase) => row.snapshotId}
           disableSelectionOnClick
           columns={columns}
-          rows={isRefetching ? [] : filteredsnapshots}
+          rows={filteredsnapshots}
           components={{
             Header: BackupsTableHeader,
           }}
@@ -394,12 +400,43 @@ const Backup: FC<{
           onSelectionModelChange={(newSelection: GridSelectionModel) => {
             selectSingleItem(newSelection, selectionModel, setSelectionModel);
           }}
-          loading={isRefetching}
+          loading={isFetching}
           noRowsText={`No ${tab === "snapshots" ? "snapshots" : "backups"}`}
         />
       </Box>
+      <TextConfirmationDialog
+        open={isRestoreInstanceModalOpen && restoreInstanceModalStep === "restore-confirmation"}
+        handleClose={handleRestoreInstanceModalClose}
+        onConfirm={async () => {
+          await restoreMutation.mutateAsync({});
+          return false;
+        }}
+        IconComponent={() => (
+          <Box
+            sx={{
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              p: "8px",
+              border: "1px solid #E9EAEB",
+              borderRadius: "10px",
+              boxShadow:
+                "box-shadow: 0px 1px 2px 0px #0A0D120D, 0px -2px 0px 0px #0A0D120D inset,0px 0px 0px 1px #0A0D122E inset",
+            }}
+          >
+            <RestoreInstanceIcon width={20} height={20} />
+          </Box>
+        )}
+        title={"Restore Instance"}
+        subtitle={`Are you sure you want to restore this instance?`}
+        confirmationText={"restore"}
+        buttonLabel={"Restore"}
+        buttonColor={colors.success600}
+        isLoading={restoreMutation.isPending}
+      />
       <InformationDialogTopCenter
-        open={isRestoreInstanceModalOpen}
+        open={isRestoreInstanceModalOpen && restoreInstanceModalStep !== "restore-confirmation"}
         handleClose={handleRestoreInstanceModalClose}
         maxWidth={"550px"}
       >
