@@ -261,11 +261,11 @@ const Backup: FC<{
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       snackbar.showSuccess(
         `Snapshot ${snapshotCreationType === "copyFromExisting" && tab === "snapshots" ? "copied" : "created"} successfully`
       );
-      refetch();
+      await refetch();
       setCurrentTab("Snapshots");
       setCopySnapshotModalOpen(false);
     },
