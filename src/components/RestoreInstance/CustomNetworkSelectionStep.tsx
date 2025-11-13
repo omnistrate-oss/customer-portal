@@ -90,8 +90,7 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
               p: "8px",
               border: "1px solid #E9EAEB",
               borderRadius: "10px",
-              boxShadow:
-                "box-shadow: 0px 1px 2px 0px #0A0D120D, 0px -2px 0px 0px #0A0D120D inset,0px 0px 0px 1px #0A0D122E inset",
+              boxShadow: "0px 1px 2px 0px #0A0D120D, 0px -2px 0px 0px #0A0D120D inset",
             }}
           >
             <RestoreInstanceCustomNetwork width={24} height={24} />

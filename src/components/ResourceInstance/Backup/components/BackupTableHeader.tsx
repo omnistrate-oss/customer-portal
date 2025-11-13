@@ -83,7 +83,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
       return `Please select a ${tab === "snapshots" ? "snapshot" : "backup"} to restore`;
     }
     if (selectedSnapshot?.status !== "COMPLETE") {
-      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'complete' to restore from it`;
+      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to restore from it`;
     }
     return "";
   }, [restoreMutation.isPending, selectedSnapshot, tab]);
