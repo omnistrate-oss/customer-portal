@@ -60,7 +60,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
       return `Select a ${tab === "snapshots" ? "snapshot" : "backup"} to create ${tab === "snapshots" ? "another snapshot" : "a snapshot"} from it`;
     }
     if (selectedSnapshot?.status !== "COMPLETE") {
-      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to create a new snapshot from it.`;
+      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to create a new snapshot from it`;
     }
     return "";
   }, [cloudProvider, copySnapshotMutation.isPending, selectedSnapshot, tab]);
@@ -74,6 +74,19 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
     }
     return "";
   }, [cloudProvider, copySnapshotMutation.isPending]);
+
+  const restoreDisabledMessage = useMemo(() => {
+    if (restoreMutation.isPending) {
+      return `Restoring ${tab === "snapshots" ? "snapshot" : "backup"}...`;
+    }
+    if (!selectedSnapshot) {
+      return `Please select a ${tab === "snapshots" ? "snapshot" : "backup"} to restore`;
+    }
+    if (selectedSnapshot?.status !== "COMPLETE") {
+      return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to restore from it`;
+    }
+    return "";
+  }, [restoreMutation.isPending, selectedSnapshot, tab]);
 
   return (
     <>
@@ -112,12 +125,10 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
               height: "40px !important",
               padding: "10px 14px !important",
             }}
-            disabled={isRefetching || restoreMutation.isPending || !selectedSnapshot}
-            disabledMessage={
-              restoreMutation.isPending
-                ? `Restoring ${tab === "snapshots" ? "snapshot" : "backup"}...`
-                : `Please select a ${tab === "snapshots" ? "snapshot" : "backup"} to restore`
+            disabled={
+              isRefetching || restoreMutation.isPending || !selectedSnapshot || selectedSnapshot?.status !== "COMPLETE"
             }
+            disabledMessage={restoreDisabledMessage}
             onClick={handleRestoreInstanceClick}
           >
             Restore
