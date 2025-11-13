@@ -37,16 +37,23 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userData, isLoadingUserData, 
       orgDescription: userData?.orgDescription || "",
       orgURL: userData?.orgURL || "",
       orgId: userData?.orgId || "",
+      affiliateCode: userData?.attributes?.affiliateCode || "",
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      const data = { ...values };
+      const data: typeof values & { attributes?: Record<string, string> } = { ...values };
       // Remove Empty Fields
       for (const key in data) {
-        if (data[key] === "") {
+        if (data[key] === "" && key !== "affiliateCode") {
           delete data[key];
         }
       }
+
+      data.attributes = {
+        affiliateCode: data.affiliateCode,
+      };
+
+      delete data.affiliateCode;
 
       updateProfileMutation.mutate({
         params: {
@@ -123,6 +130,23 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userData, isLoadingUserData, 
               name="orgURL"
               id="orgURL"
               value={values.orgURL}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              disabled={isLoadingUserData || userData.roleType !== "root"}
+              sx={{ mt: 0 }}
+            />
+            <FieldError>{touched.orgURL && errors.orgURL}</FieldError>
+          </FieldCell>
+
+          <FieldTitleCell>
+            <FieldTitle>Affiliation Code</FieldTitle>
+          </FieldTitleCell>
+          <FieldCell>
+            <TextField
+              data-testid="affiliate-code"
+              name="affiliateCode"
+              id="affiliateCode"
+              value={values.affiliateCode}
               onChange={handleChange}
               onBlur={handleBlur}
               disabled={isLoadingUserData || userData.roleType !== "root"}
