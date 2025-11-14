@@ -63,9 +63,7 @@ jobs:
           platforms: ${{ env.PLATFORMS }}
 
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1          
+        uses: actions/checkout@v4       
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -133,9 +131,7 @@ jobs:
         run: docker system prune -af --volumes || true
 
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1        
+        uses: actions/checkout@v4    
         
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
