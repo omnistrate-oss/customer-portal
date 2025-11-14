@@ -294,8 +294,6 @@ const SignupPage = (props) => {
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
           </FieldContainer>
-        </FormGrid>
-        <Box sx={{ marginTop: "24px" }}>
           <FieldContainer>
             <FieldLabel>Affiliation Code</FieldLabel>
             <TextField
@@ -308,7 +306,7 @@ const SignupPage = (props) => {
               error={touched.affiliateCode && errors.affiliateCode}
             />
           </FieldContainer>
-        </Box>
+        </FormGrid>
 
         {/* Login and Google Button */}
         <Stack mt="32px" width="480px" mx="auto">
