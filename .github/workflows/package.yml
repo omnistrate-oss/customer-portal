@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   package:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name != 'release' }}
     runs-on: ubicloud-standard-2
     permissions:
       contents: read
@@ -75,7 +75,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   package-multi-arch:
-    if: ${{ github.event_name != 'pull_request' }}
+    if: ${{ github.event_name == 'release' }}
     runs-on: ubicloud-standard-8
     permissions:
       contents: read
