@@ -60,6 +60,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
   const orgUrl = searchParams?.get("orgUrl");
   const email = searchParams?.get("email");
   const destination = searchParams?.get("destination");
+  const affiliateCode = searchParams?.get("affiliateCode");
   const { setLoginMethod } = useLastLoginDetails();
   const [idpOptionsExpanded, setIdpOptionsExpanded] = useState(false);
   const router = useRouter();
@@ -201,6 +202,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     invitedEmail?: string;
     legalCompanyName?: string;
     companyUrl?: string;
+    affiliateCode?: string;
   } = {};
 
   if (email || org || orgUrl) {
@@ -242,13 +244,18 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
       identityProvider: string;
       invitationInfo: any;
       nonce?: string;
+      affiliateCode?: string;
     } = {
       destination: destination,
       identityProvider: idp.name || idp.identityProviderName,
       invitationInfo,
     };
+
     if (stateFromURL || state) {
       localAuthState.nonce = stateFromURL || state;
+    }
+    if (affiliateCode) {
+      localAuthState.affiliateCode = decodeURIComponent(affiliateCode).trim();
     }
 
     const encodedLocalAuthState = Buffer.from(JSON.stringify(localAuthState), "utf8").toString("base64");

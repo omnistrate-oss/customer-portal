@@ -57,6 +57,7 @@ const SignupPage = (props) => {
   const orgUrl = searchParams?.get("orgUrl");
   const email = searchParams?.get("email");
   const userSource = searchParams?.get("userSource");
+  const affiliateCode = searchParams?.get("affiliateCode");
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
@@ -98,6 +99,15 @@ const SignupPage = (props) => {
       }
     }
 
+    data.confirmPassword = undefined;
+
+    if (data.affiliateCode.trim()) {
+      data.attributes = {
+        affiliateCode: data.affiliateCode,
+      };
+    }
+    delete data.affiliateCode;
+
     signupMutation.mutate(data);
   }
 
@@ -131,6 +141,10 @@ const SignupPage = (props) => {
     }
     if (userSource) {
       updatedValues.userSource = userSource.trim();
+    }
+
+    if (affiliateCode) {
+      updatedValues.affiliateCode = affiliateCode.trim();
     }
 
     formik.setValues((values) => ({
@@ -281,6 +295,20 @@ const SignupPage = (props) => {
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
           </FieldContainer>
         </FormGrid>
+        <Box sx={{ marginTop: "24px" }}>
+          <FieldContainer>
+            <FieldLabel>Affiliation Code</FieldLabel>
+            <TextField
+              id="affiliateCode"
+              name="affiliateCode"
+              placeholder="Affiliation Code"
+              value={values.affiliateCode}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.affiliateCode && errors.affiliateCode}
+            />
+          </FieldContainer>
+        </Box>
 
         {/* Login and Google Button */}
         <Stack mt="32px" width="480px" mx="auto">
