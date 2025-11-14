@@ -159,8 +159,6 @@ jobs:
 
   tag:
     if: github.event_name == 'push'
-    needs:
-      - package-multi-arch
     runs-on: ubuntu-latest
     permissions:
       contents: write
