@@ -65,15 +65,15 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
     return "";
   }, [cloudProvider, copySnapshotMutation.isPending, selectedSnapshot, tab]);
 
-  const createSnapshotDisabledMessage = useMemo(() => {
-    if (copySnapshotMutation.isPending) {
-      return "Creating snapshot...";
-    }
-    if (cloudProvider !== CLOUD_PROVIDERS.gcp) {
-      return "Snapshot creation is restricted to GCP deployments";
-    }
-    return "";
-  }, [cloudProvider, copySnapshotMutation.isPending]);
+  // const createSnapshotDisabledMessage = useMemo(() => {
+  //   if (copySnapshotMutation.isPending) {
+  //     return "Creating snapshot...";
+  //   }
+  //   if (cloudProvider !== CLOUD_PROVIDERS.gcp) {
+  //     return "Snapshot creation is restricted to GCP deployments";
+  //   }
+  //   return "";
+  // }, [cloudProvider, copySnapshotMutation.isPending]);
 
   const restoreDisabledMessage = useMemo(() => {
     if (restoreMutation.isPending) {
@@ -154,7 +154,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             {tab === "backups" ? "Create Snapshot" : "Copy Snapshot"}
           </Button>
 
-          {tab === "snapshots" && (
+          {/* {tab === "snapshots" && (
             <Button
               variant="outlined"
               sx={{
@@ -167,7 +167,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             >
               Create Snapshot
             </Button>
-          )}
+          )} */}
         </Stack>
       </Stack>
     </>

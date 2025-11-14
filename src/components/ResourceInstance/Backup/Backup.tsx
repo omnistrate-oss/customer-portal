@@ -262,10 +262,10 @@ const Backup: FC<{
       );
     },
     onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       snackbar.showSuccess(
         `Snapshot ${snapshotCreationType === "copyFromExisting" && tab === "snapshots" ? "copied" : "created"} successfully`
       );
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       await refetch();
       setCurrentTab("Snapshots");
       setCopySnapshotModalOpen(false);
