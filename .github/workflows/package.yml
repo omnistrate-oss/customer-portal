@@ -57,13 +57,14 @@ jobs:
       - name: Prune Docker (images/containers/volumes/cache)
         run: docker system prune -af --volumes || true
 
+      - name: Checkout repository
+        uses: actions/checkout@v4        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with: 
           platforms: ${{ env.PLATFORMS }}
-
-      - name: Checkout repository
-        uses: actions/checkout@v4       
+ 
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
