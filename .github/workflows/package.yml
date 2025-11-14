@@ -40,11 +40,6 @@ jobs:
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
       # ----- Guardrails: reclaim & inspect disk space -----
       - name: Show disk usage (pre)
         run: |
@@ -66,6 +61,11 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with: 
           platforms: ${{ env.PLATFORMS }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1          
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -114,10 +114,6 @@ jobs:
       cancel-in-progress: false
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       # ----- Guardrails: reclaim & inspect disk space -----
       - name: Show disk usage (pre)
@@ -134,7 +130,12 @@ jobs:
           root-reserve-mb: 1024
 
       - name: Prune Docker (images/containers/volumes/cache)
-        run: docker system prune -af --volumes || true        
+        run: docker system prune -af --volumes || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1        
         
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
