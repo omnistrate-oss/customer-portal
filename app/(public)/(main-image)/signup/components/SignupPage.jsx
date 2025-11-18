@@ -101,7 +101,7 @@ const SignupPage = (props) => {
 
     data.confirmPassword = undefined;
 
-    if (data.affiliateCode.trim()) {
+    if (data.affiliateCode?.trim()) {
       data.attributes = {
         affiliateCode: data.affiliateCode,
       };
