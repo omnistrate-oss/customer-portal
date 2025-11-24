@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Checkout repository
         timeout-minutes: 5
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup flyctl
         timeout-minutes: 5
