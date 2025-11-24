@@ -5,12 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Stack } from "@mui/material";
 import { Buffer } from "buffer";
-import Cookies from "js-cookie";
 
 import { customerSignInWithIdentityProvider } from "src/api/customer-user";
 import axios from "src/axios";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
+import { useAuthTokenContext } from "src/providers/AuthTokenProvider";
 import checkRouteValidity from "src/utils/route/checkRouteValidity";
 import { getInstancesRoute } from "src/utils/routes";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -25,6 +25,8 @@ const IDPAuthPage = () => {
   const snackbar = useSnackbar();
   const isAPICallInprogress = useRef(false);
 
+  const { handleSetToken } = useAuthTokenContext();
+
   const handleSignIn = useCallback(
     async (payload, destination) => {
       try {
@@ -34,7 +36,7 @@ const IDPAuthPage = () => {
         const jwtToken = response.data.jwtToken;
         sessionStorage.removeItem("authState");
         if (jwtToken) {
-          Cookies.set("token", jwtToken, { sameSite: "Lax", secure: true });
+          handleSetToken(jwtToken);
           axios.defaults.headers["Authorization"] = "Bearer " + jwtToken;
 
           try {

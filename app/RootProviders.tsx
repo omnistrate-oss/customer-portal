@@ -22,6 +22,7 @@ import { EnvironmentType } from "src/types/common/enums";
 import { ProviderUser } from "src/types/users";
 import { cleanupRecaptchaErrorHandler, suppressRecaptchaErrors } from "src/utils/suppressRecaptchaErrors";
 
+import AuthTokenProvider from "../src/providers/AuthTokenProvider";
 import { theme as dashboardTheme } from "../styles/theme";
 
 import "../styles/globals.css";
@@ -78,23 +79,25 @@ const RootProviders = ({
       <Provider store={store}>
         <QueryClientProvider client={queryQlient}>
           <Suspense>
-            <ProviderFavicon />
-            <SnackbarProvider>
-              <NotificationBarProvider>
-                <AxiosGlobalErrorHandler />
-                <GlobalErrorHandler />
-                <ThemeProvider theme={dashboardTheme}>
-                  <EnvironmentTypeProvider envType={envType}>
-                    <ProviderOrgDetailsProvider details={providerOrgDetails}>
-                      <CookieConsentProvider googleAnalyticsTagID={googleAnalyticsTagID}>
-                        {children}
-                        <ProgressBar height="3px" color="#8d67df" options={{ showSpinner: false }} />
-                      </CookieConsentProvider>
-                    </ProviderOrgDetailsProvider>
-                  </EnvironmentTypeProvider>
-                </ThemeProvider>
-              </NotificationBarProvider>
-            </SnackbarProvider>
+            <AuthTokenProvider>
+              <ProviderFavicon />
+              <SnackbarProvider>
+                <NotificationBarProvider>
+                  <AxiosGlobalErrorHandler />
+                  <GlobalErrorHandler />
+                  <ThemeProvider theme={dashboardTheme}>
+                    <EnvironmentTypeProvider envType={envType}>
+                      <ProviderOrgDetailsProvider details={providerOrgDetails}>
+                        <CookieConsentProvider googleAnalyticsTagID={googleAnalyticsTagID}>
+                          {children}
+                          <ProgressBar height="3px" color="#8d67df" options={{ showSpinner: false }} />
+                        </CookieConsentProvider>
+                      </ProviderOrgDetailsProvider>
+                    </EnvironmentTypeProvider>
+                  </ThemeProvider>
+                </NotificationBarProvider>
+              </SnackbarProvider>
+            </AuthTokenProvider>
           </Suspense>
         </QueryClientProvider>
       </Provider>

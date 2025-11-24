@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 
 import axios from "src/axios";
 import { logoutBroadcastChannel } from "src/broadcastChannel";
+import { useAuthTokenContext } from "src/providers/AuthTokenProvider";
 import { initialiseUserData } from "src/slices/userDataSlice";
 
 function useLogout() {
@@ -13,10 +14,15 @@ function useLogout() {
   const dispatch = useDispatch();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const { handleRemoveToken } = useAuthTokenContext();
 
   // remove token from cookies, remove other user data and redirect to signin
   function handleLogout() {
+    // 1. Cancel queries FIRST - before removing token
+    queryClient.cancelQueries();
+
     Cookies.remove("token");
+    handleRemoveToken();
     localStorage.removeItem("paymentNotificationHidden");
     try {
       localStorage.removeItem("loggedInUsingSSO");

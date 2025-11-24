@@ -4,12 +4,12 @@ import { useRouter } from "next-nprogress-bar";
 import { Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import Cookies from "js-cookie";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import { customerUserSignin } from "src/api/customer-user";
 import axios from "src/axios";
 import useSnackbar from "src/hooks/useSnackbar";
+import { useAuthTokenContext } from "src/providers/AuthTokenProvider";
 import { IdentityProvider } from "src/types/identityProvider";
 import checkRouteValidity from "src/utils/route/checkRouteValidity";
 import { getInstancesRoute } from "src/utils/routes";
@@ -46,6 +46,8 @@ const SignInForm: FC<SignInFormProps> = ({
   const destination = searchParams?.get("destination");
   const snackbar = useSnackbar();
 
+  const { handleSetToken } = useAuthTokenContext();
+
   const reCaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ const SignInForm: FC<SignInFormProps> = ({
 
   function handlePasswordSignInSuccess(jwtToken) {
     if (jwtToken) {
-      Cookies.set("token", jwtToken, { sameSite: "Lax", secure: true });
+      handleSetToken(jwtToken);
 
       try {
         localStorage.removeItem("loggedInUsingSSO");
