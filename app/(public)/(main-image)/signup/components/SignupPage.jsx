@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Box, Stack, styled } from "@mui/material";
+import { Box, Collapse, Stack, styled } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -48,7 +48,7 @@ const signupValidationSchema = Yup.object({
 });
 
 const SignupPage = (props) => {
-  const { googleReCaptchaSiteKey, isReCaptchaSetup } = props;
+  const { googleReCaptchaSiteKey, isReCaptchaSetup, isPasswordLoginEnabled, identityProviders } = props;
   const { orgName, orgLogoURL } = useProviderOrgDetails();
   const { email: loginStepOneEmail } = useLastLoginDetails();
 
@@ -127,6 +127,26 @@ const SignupPage = (props) => {
     validationSchema: signupValidationSchema,
   });
 
+  const { values, touched, errors, handleChange, handleBlur } = formik;
+
+  // Check if email domain matches any identity provider's email identifiers
+  const emailDomainMatchesIdp = useMemo(() => {
+    const userEmail = values.email;
+    if (!userEmail || !userEmail.includes("@")) return { isMatching: false, domain: "" };
+
+    const emailDomain = userEmail.split("@")[1] || "";
+    if (!emailDomain) return { isMatching: false, domain: "" };
+
+    const matchingIdp = identityProviders?.some((idp) => {
+      if (!idp.emailIdentifiers || idp.emailIdentifiers === "") return false;
+
+      const emailIdentifiersList = idp.emailIdentifiers.split(",").map((identifier) => identifier.trim());
+      return emailIdentifiersList.includes(emailDomain);
+    });
+
+    return { isMatching: matchingIdp, domain: emailDomain };
+  }, [values.email, identityProviders]);
+
   useEffect(() => {
     const updatedValues = {};
 
@@ -164,8 +184,6 @@ const SignupPage = (props) => {
     }
     /*eslint-disable-next-line react-hooks/exhaustive-deps*/
   }, [org, orgUrl, email, userSource]);
-
-  const { values, touched, errors, handleChange, handleBlur } = formik;
 
   const policyAgreementText = `By creating your account, you agree to our`;
 
@@ -217,6 +235,7 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.name && errors.name}
+              disabled={!isPasswordLoginEnabled}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.name && errors.name}</FieldError>
           </FieldContainer>
@@ -231,7 +250,7 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.email && errors.email}
-              disabled={email ? true : false}
+              disabled={Boolean(!isPasswordLoginEnabled || email)}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.email && errors.email}</FieldError>
           </FieldContainer>
@@ -245,7 +264,7 @@ const SignupPage = (props) => {
               value={values.legalcompanyname}
               onChange={handleChange}
               onBlur={handleBlur}
-              disabled={org ? true : false}
+              disabled={Boolean(!isPasswordLoginEnabled || org)}
               error={touched.legalcompanyname && errors.legalcompanyname}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.legalcompanyname && errors.legalcompanyname}</FieldError>
@@ -261,7 +280,7 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.companyurl && errors.companyurl}
-              disabled={orgUrl ? true : false}
+              disabled={Boolean(!isPasswordLoginEnabled || orgUrl)}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.companyurl && errors.companyurl}</FieldError>
           </FieldContainer>
@@ -277,6 +296,7 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.password && errors.password}
+              disabled={!isPasswordLoginEnabled}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.password && errors.password}</FieldError>
           </FieldContainer>
@@ -291,6 +311,7 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.confirmPassword && errors.confirmPassword}
+              disabled={!isPasswordLoginEnabled}
             />
             <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
           </FieldContainer>
@@ -304,16 +325,47 @@ const SignupPage = (props) => {
               onChange={handleChange}
               onBlur={handleBlur}
               error={touched.affiliateCode && errors.affiliateCode}
+              disabled={!isPasswordLoginEnabled}
             />
           </FieldContainer>
         </FormGrid>
 
+        {/* Signup Restriction Messages */}
+        <Collapse in={!isPasswordLoginEnabled || emailDomainMatchesIdp.isMatching} timeout={300}>
+          <Box mt="32px" maxWidth="480px" mx="auto">
+            <Text size="medium" weight="regular" sx={{ color: "#535862", textAlign: "center" }}>
+              {!isPasswordLoginEnabled ? (
+                <>
+                  Password-based signup is disabled for this portal. You can use one of the sign-in options on the{" "}
+                  <Link href="/signin" style={{ color: "#364152", fontWeight: 600 }}>
+                    Login page
+                  </Link>
+                  .
+                </>
+              ) : (
+                <>
+                  You cannot create a password account using @{emailDomainMatchesIdp.domain} domain. Please{" "}
+                  <Link href="/signin" style={{ color: "#364152", fontWeight: 600 }}>
+                    sign in
+                  </Link>{" "}
+                  using your organization&apos;s identity provider.
+                </>
+              )}
+            </Text>
+          </Box>
+        </Collapse>
+
         {/* Login and Google Button */}
-        <Stack mt="32px" width="480px" mx="auto">
+        <Stack mt="32px" maxWidth="480px" mx="auto">
           <SubmitButton
             type="submit"
             onClick={formik.handleSubmit}
-            disabled={!formik.isValid || (isReCaptchaSetup && !isScriptLoaded)}
+            disabled={
+              !formik.isValid ||
+              (isReCaptchaSetup && !isScriptLoaded) ||
+              !isPasswordLoginEnabled ||
+              emailDomainMatchesIdp.matches
+            }
             loading={signupMutation.isPending}
           >
             Create Account

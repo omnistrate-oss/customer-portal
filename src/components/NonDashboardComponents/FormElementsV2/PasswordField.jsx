@@ -32,6 +32,12 @@ const PasswordField = (props) => {
             },
           },
         },
+        [`& .MuiOutlinedInput-input:disabled`]: {
+          background: "#F9FAFB",
+          color: "#667085",
+          // color: "#4a505d",
+          WebkitTextFillColor: "#667085",
+        },
         ".MuiInputAdornment-root": {
           border: "none",
           paddingRight: 0,

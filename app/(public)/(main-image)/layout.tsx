@@ -37,7 +37,7 @@ const MainImageLayout = ({ children }: { children: React.ReactNode }) => {
           position: "relative", // For the Footer
           display: "grid",
           placeItems: "center",
-          padding: "24px 55px 60px",
+          padding: "24px 55px 100px",
         }}
       >
         <Box maxWidth={contentMaxWidth} width="100%" mx="auto">
