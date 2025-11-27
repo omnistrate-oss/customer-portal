@@ -1,7 +1,13 @@
 import { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 
-export const AuthTokenContext = createContext<string | undefined>(undefined);
+type AuthTokenContextType = {
+  token?: string | undefined;
+  handleSetToken?: (newToken: string | undefined) => void;
+  handleRemoveToken?: () => void;
+};
+
+export const AuthTokenContext = createContext<AuthTokenContextType>({});
 
 export const useAuthTokenContext = () => {
   const context = useContext(AuthTokenContext);
