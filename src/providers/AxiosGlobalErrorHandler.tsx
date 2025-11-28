@@ -17,7 +17,9 @@ const AxiosGlobalErrorHandler = () => {
 
   useEffect(() => {
     axios.interceptors.request.use((config) => {
-      if (!config.url.startsWith("/api") && config.url.startsWith("/")) {
+      const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url);
+
+      if (!config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
         //the original request url
         const originalRequestURL = config.url;
         //the original request method
