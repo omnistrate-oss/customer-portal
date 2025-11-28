@@ -187,7 +187,7 @@ export const getCustomNetworksMenuItems = (
   cloudProviderRegions?: string[],
   region?: string
 ) => {
-  let options = customNetworks;
+  let options = customNetworks.filter((customNetwork) => customNetwork.status !== "DELETING");
   if (cloudProvider) {
     options = options.filter((customNetwork) => {
       return customNetwork.cloudProviderName === cloudProvider;
