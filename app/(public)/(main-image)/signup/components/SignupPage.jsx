@@ -364,7 +364,7 @@ const SignupPage = (props) => {
               !formik.isValid ||
               (isReCaptchaSetup && !isScriptLoaded) ||
               !isPasswordLoginEnabled ||
-              emailDomainMatchesIdp.matches
+              emailDomainMatchesIdp.isMatching
             }
             loading={signupMutation.isPending}
           >
