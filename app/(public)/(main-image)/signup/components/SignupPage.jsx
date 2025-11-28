@@ -26,6 +26,8 @@ import SuccessBox from "components/SuccessBox/SuccessBox";
 
 import { useLastLoginDetails } from "../../signin/hooks/useLastLoginDetails";
 
+import AlertIcon from "./AlertIcon";
+
 const FormGrid = styled(Box)(() => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
@@ -332,23 +334,41 @@ const SignupPage = (props) => {
 
         {/* Signup Restriction Messages */}
         <Collapse in={!isPasswordLoginEnabled || emailDomainMatchesIdp.isMatching} timeout={300}>
-          <Box mt="32px" maxWidth="480px" mx="auto">
-            <Text size="medium" weight="regular" sx={{ color: "#535862", textAlign: "center" }}>
+          <Box
+            mt="32px"
+            display="flex"
+            gap="16px"
+            borderRadius="12px"
+            p="16px"
+            border="1px solid #D5D7DA"
+            boxShadow="0 1px 2px 0 #0A0D120D"
+          >
+            <AlertIcon className="shrink-0" />
+            <Text size="medium" weight="regular" sx={{ color: "#535862" }}>
               {!isPasswordLoginEnabled ? (
                 <>
-                  Password-based signup is disabled for this portal. You can use one of the sign-in options on the{" "}
-                  <Link href="/signin" style={{ color: "#364152", fontWeight: 600 }}>
-                    Login page
-                  </Link>
-                  .
+                  Password-based signup is disabled for this portal.
+                  <br />
+                  <span className="text-[#414651] font-semibold">
+                    You can use one of the sign-in options on the{" "}
+                    <Link href="/signin" style={{ textDecoration: "underline" }}>
+                      Login page
+                    </Link>
+                    .
+                  </span>
                 </>
               ) : (
                 <>
-                  You cannot create a password account using @{emailDomainMatchesIdp.domain} domain. Please{" "}
-                  <Link href="/signin" style={{ color: "#364152", fontWeight: 600 }}>
-                    sign in
-                  </Link>{" "}
-                  using your organization&apos;s identity provider.
+                  You cannot create a password account using{" "}
+                  <span className="font-semibold">@{emailDomainMatchesIdp.domain}</span> domain.
+                  <br />
+                  <span className="text-[#414651] font-semibold">
+                    Please{" "}
+                    <Link href="/signin" style={{ textDecoration: "underline" }}>
+                      sign in
+                    </Link>{" "}
+                    using your organization&apos;s identity provider.
+                  </span>
                 </>
               )}
             </Text>
