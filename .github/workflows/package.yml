@@ -2,13 +2,13 @@ name: Package
 
 on:
   push:
-    branches: 
-    - master
+    branches:
+      - master
   pull_request:
-    branches: 
-    - master
+    branches:
+      - master
   release:
-    types: [ "published" ]
+    types: ["published"]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -19,15 +19,15 @@ env:
   PLATFORMS: linux/amd64, linux/arm64
   # default platform of the runners, used to mitigate time of building on x arch during PRs
   PR_PLATFORMS: linux/amd64
-  
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
   package:
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'release' }}
+    runs-on: ubicloud-standard-2
     permissions:
       contents: read
       packages: write
@@ -45,7 +45,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with: 
+        with:
           platforms: ${{ env.PLATFORMS }}
 
       # Extract metadata (tags, labels) for Docker
@@ -55,7 +55,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |         
+          tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -73,10 +73,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-                  
+
   package-multi-arch:
-    if: ${{ github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    runs-on: ubicloud-standard-8
     permissions:
       contents: read
       packages: write
@@ -91,7 +91,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
@@ -106,7 +106,7 @@ jobs:
       - name: Set up Docker Buildx
         timeout-minutes: 5
         uses: docker/setup-buildx-action@v3
-        with: 
+        with:
           platforms: ${{ env.PLATFORMS }}
 
       # Extract metadata (tags, labels) for Docker
@@ -117,7 +117,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |         
+          tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -147,7 +147,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          
+
       # Sign the resulting Docker image digest except on PRs.
       # https://github.com/sigstore/cosign
       - name: Sign the images with GitHub OIDC Token **not production ready**
@@ -159,8 +159,6 @@ jobs:
 
   tag:
     if: github.event_name == 'push'
-    needs: 
-      - package-multi-arch
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -174,4 +172,4 @@ jobs:
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          github_token: ${{ secrets.GITHUB_TOKEN }}

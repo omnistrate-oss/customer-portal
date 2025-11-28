@@ -21,7 +21,7 @@ jobs:
     name: Playwright Tests - SaaSBuilder
     # Run tests only if not paused and on specific events
     if: |
-      (github.event_name == 'schedule' && vars.PAUSE_PLAYWRIGHT_TESTS != 'true' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'schedule' && vars.RUN_PLAYWRIGHT_TESTS == 'true') ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && contains(github.event.label.name, 'ready to merge'))
     timeout-minutes: 60
