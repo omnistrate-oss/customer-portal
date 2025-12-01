@@ -112,6 +112,7 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
   package-multi-arch:
     if: github.event_name == 'release'
     name: Package customer portal ${{ matrix.platform }}
