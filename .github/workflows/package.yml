@@ -76,7 +76,7 @@ jobs:
 
   package-multi-arch:
     if: ${{ github.event_name == 'release' }}
-    runs-on: ubicloud-standard-16
+    runs-on: ubicloud-standard-8
     permissions:
       contents: read
       packages: write
