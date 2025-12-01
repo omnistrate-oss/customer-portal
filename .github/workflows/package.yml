@@ -25,7 +25,6 @@ concurrency:
 jobs:
   package:
     if: ${{ github.event_name != 'release' }}
-    name: Package customer portal on ${{ env.PR_PLATFORMS }}
     runs-on: ubicloud-standard-2
     permissions:
       contents: read
