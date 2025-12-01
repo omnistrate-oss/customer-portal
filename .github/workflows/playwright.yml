@@ -6,9 +6,9 @@ permissions:
 on:
   schedule:
     # 6:00 PM IST - Monday to Friday
-    - cron: '30 12 * * 1-5'
+    - cron: "30 12 * * 1-5"
   pull_request:
-    types: [ labeled ]
+    types: [labeled]
   workflow_dispatch:
     inputs:
       reason:
@@ -27,53 +27,53 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
 
-    - name: Install dependencies
-      run: npm install -g yarn && yarn
+      - name: Install dependencies
+        run: npm install -g yarn && yarn
 
-    - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
 
-    - name: Setup and start saasbuilder server
-      run: |
-        yarn build
-        yarn start & sleep 15
-      env:
-        PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
-        PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
-        NEXT_PUBLIC_BACKEND_BASE_DOMAIN: https://api.omnistrate.dev
-        ENVIRONMENT_TYPE: DEV
-        MAIL_USER_EMAIL: ${{ secrets.MAIL_USER_EMAIL }}
-        MAIL_USER_PASSWORD: ${{ secrets.MAIL_USER_PASSWORD }}
+      - name: Setup and start saasbuilder server
+        run: |
+          yarn build
+          yarn start & sleep 15
+        env:
+          PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
+          PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
+          NEXT_PUBLIC_BACKEND_BASE_DOMAIN: https://api.omnistrate.dev
+          ENVIRONMENT_TYPE: DEV
+          MAIL_USER_EMAIL: ${{ secrets.MAIL_USER_EMAIL }}
+          MAIL_USER_PASSWORD: ${{ secrets.MAIL_USER_PASSWORD }}
 
-    - name: Run Playwright tests
-      run: yarn playwright test
-      env: 
-        YOUR_SAAS_DOMAIN_URL: http://localhost:8080
-        USER_EMAIL: ${{ secrets.USER_EMAIL }}
-        USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
-        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-        GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
-        BYOA_AWS_ACCOUNT_ID: ${{ secrets.BYOA_AWS_ACCOUNT_ID }}
+      - name: Run Playwright tests
+        run: yarn playwright test
+        env:
+          YOUR_SAAS_DOMAIN_URL: http://localhost:8080
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+          BYOA_AWS_ACCOUNT_ID: ${{ secrets.BYOA_AWS_ACCOUNT_ID }}
 
-        NEXT_PUBLIC_BACKEND_BASE_DOMAIN: "https://api.omnistrate.dev"
-        ENVIRONMENT_TYPE: DEV
-        PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
-        PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
+          NEXT_PUBLIC_BACKEND_BASE_DOMAIN: "https://api.omnistrate.dev"
+          ENVIRONMENT_TYPE: DEV
+          PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
+          PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
 
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 7
-  
+      - uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   mattermost-notification-1:
     name: Notify Mattermost
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
         uses: tferreira/matterfy@v1.9
         with:
           type: ${{ needs.test.result }}
-          job_name: '*Playwright Tests - SaaSBuilder*'
+          job_name: "*Playwright Tests - SaaSBuilder*"
           url: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
 
   mattermost-notification-2:
@@ -93,7 +93,7 @@ jobs:
     needs: test
     if: always() && (needs.test.result == 'failure' || needs.test.result == 'cancelled')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
