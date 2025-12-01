@@ -25,6 +25,7 @@ concurrency:
 jobs:
   package:
     if: ${{ github.event_name != 'release' }}
+    name: Package customer portal on ${{ env.PR_PLATFORMS }}
     runs-on: ubicloud-standard-2
     permissions:
       contents: read
@@ -144,7 +145,6 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
-        if: github.event_name == 'release'
         uses: actions/upload-artifact@v5
         with:
           name: digests-${{ matrix.runner }}
