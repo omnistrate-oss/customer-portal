@@ -29,7 +29,7 @@ jobs:
 
     concurrency:
       group: package-${{ github.workflow }}-${{ github.head_ref }}
-      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout repository
@@ -74,8 +74,8 @@ jobs:
       contents: read
 
     concurrency:
-      group: package-${{ github.workflow }}-${{ github.head_ref }}
-      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+      group: package-arm-${{ github.workflow }}-${{ github.head_ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout repository
