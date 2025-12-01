@@ -15,8 +15,6 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  # default platform of the runners, used to mitigate time of building on x arch during PRs
-  PR_PLATFORMS: linux/amd64
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -31,7 +29,7 @@ jobs:
 
     concurrency:
       group: package-${{ github.workflow }}-${{ github.head_ref }}
-      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout repository
@@ -40,7 +38,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: ${{ env.PR_PLATFORMS }}
+          platforms: linux/amd64
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -55,13 +53,59 @@ jobs:
             type=semver,pattern={{major}}
             type=sha,format=long
 
-      - name: Build on ${{ env.PR_PLATFORMS }} only
+      - name: Build on linux/amd64 only
         timeout-minutes: 20
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          platforms: ${{ env.PR_PLATFORMS }}
+          platforms: linux/amd64
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  package-arm:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubicloud-standard-2-arm
+    permissions:
+      contents: read
+
+    concurrency:
+      group: package-arm-${{ github.workflow }}-${{ github.head_ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/arm64
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,format=long
+
+      - name: Build on linux/arm64 only
+        timeout-minutes: 20
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -77,9 +121,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubicloud-standard-8
+          - runner: ubicloud-standard-4
             platform: linux/amd64
-          - runner: ubicloud-standard-8-arm
+          - runner: ubicloud-standard-4-arm
             platform: linux/arm64
     permissions:
       contents: read
