@@ -479,10 +479,15 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
             )}
             {environmentType === "PROD" && allowPasswordLogin && (
               <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", fontSize: "15px" }}>
-                New {orgName ? "to " + orgName : "here"}?{" "}
+                New {orgName ? `to ${orgName}` : "here"}?{" "}
                 <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
-                  Sign Up{" "}
+                  Sign up with a password
                 </Link>
+                {domainFilteredIdentityProviders.length > 0 && (
+                  <>
+                    <br /> — or sign in directly above
+                  </>
+                )}
               </Text>
             )}
           </>
