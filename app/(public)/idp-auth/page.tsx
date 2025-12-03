@@ -23,12 +23,12 @@ const IDPAuthPage = () => {
   const state = searchParams?.get("state");
   const code = searchParams?.get("code");
   const snackbar = useSnackbar();
-  const isAPICallInprogress = useRef(false);
+  const hasAttemptedSignIn = useRef(false);
 
   const handleSignIn = useCallback(
     async (payload, destination) => {
       try {
-        isAPICallInprogress.current = true;
+        hasAttemptedSignIn.current = true;
         const response = await customerSignInWithIdentityProvider(payload);
         // @ts-ignore
         const jwtToken = response.data.jwtToken;
@@ -43,6 +43,7 @@ const IDPAuthPage = () => {
             console.warn("Failed to set SSO state:", error);
           }
           const decodedDestination = decodeURIComponent(destination);
+          hasAttemptedSignIn.current = false;
 
           // Redirect to the Destination URL
           if (destination && checkRouteValidity(decodedDestination)) {
@@ -52,7 +53,6 @@ const IDPAuthPage = () => {
           }
         }
       } catch (error) {
-        isAPICallInprogress.current = false;
         sessionStorage.removeItem("authState");
         if (error.response && error.response.status === 409) {
           snackbar.showError(
@@ -60,6 +60,8 @@ const IDPAuthPage = () => {
           );
           router.replace("/signup");
         } else {
+          const errorMessage = error.response?.data?.message || "Something went wrong during sign in. Please try again";
+          snackbar.showError(errorMessage);
           router.replace("/signin?redirect_reason=idp_auth_error");
         }
       }
@@ -68,7 +70,7 @@ const IDPAuthPage = () => {
   );
 
   useEffect(() => {
-    if (state && code) {
+    if (state && code && hasAttemptedSignIn.current !== true) {
       try {
         //get local auth state from session storage and compare the nonce values
         const localAuthStateString = sessionStorage.getItem("authState");
@@ -95,9 +97,7 @@ const IDPAuthPage = () => {
           if (affiliateCode) {
             payload["attributes"] = { affiliateCode };
           }
-          if (isAPICallInprogress.current !== true) {
-            handleSignIn(payload, destination);
-          }
+          handleSignIn(payload, destination);
         }
       } catch (error) {
         console.log(error);
