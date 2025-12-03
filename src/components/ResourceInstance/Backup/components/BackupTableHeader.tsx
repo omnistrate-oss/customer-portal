@@ -30,6 +30,8 @@ type BackupsTableHeaderProps = {
   selectedSnapshot: SnapshotBase | null;
   tab: "backups" | "snapshots";
   handleRestoreInstanceClick?: () => void;
+  handleDeleteSnapshotDialogOpen?: () => void;
+  isDeleting?: boolean;
 };
 
 const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
@@ -48,6 +50,8 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
   selectedSnapshot,
   tab,
   handleRestoreInstanceClick,
+  handleDeleteSnapshotDialogOpen,
+  isDeleting,
 }) => {
   const copySnapshotDisabledMessage = useMemo(() => {
     if (copySnapshotMutation.isPending) {
@@ -87,6 +91,16 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
     }
     return "";
   }, [restoreMutation.isPending, selectedSnapshot, tab]);
+
+  const deleteSnapshotDisabledMessage = useMemo(() => {
+    if (isDeleting) {
+      return `Deleting snapshot...`;
+    }
+    if (!selectedSnapshot) {
+      return `Please select a snapshot to delete`;
+    }
+    return "";
+  }, [isDeleting, selectedSnapshot]);
 
   return (
     <>
@@ -168,6 +182,20 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
               Create Snapshot
             </Button>
           )} */}
+          {tab === "snapshots" && (
+            <Button
+              variant="outlined"
+              sx={{
+                height: "40px !important",
+                padding: "10px 14px !important",
+              }}
+              onClick={handleDeleteSnapshotDialogOpen}
+              disabled={isRefetching || isDeleting || !selectedSnapshot}
+              disabledMessage={deleteSnapshotDisabledMessage}
+            >
+              Delete Snapshot
+            </Button>
+          )}
         </Stack>
       </Stack>
     </>

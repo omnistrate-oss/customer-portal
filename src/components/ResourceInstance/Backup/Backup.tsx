@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
+import { $api } from "src/api/query";
 import { copyResourceInstanceSnapshot, postInstanceRestoreAccess } from "src/api/resourceInstance";
 import DataGrid, { selectSingleItem } from "src/components/DataGrid/DataGrid";
 import { DateRange, initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
@@ -94,6 +95,8 @@ const Backup: FC<{
     "custom-network" | "restore-confirmation" | "success" | null
   >(null);
 
+  const [isDeleteSnapshotDialogOpen, setIsDeleteSnapshotDialogOpen] = useState(false);
+
   const handleOpenCopySnapshotModal = (creationType: SnapshotCreationType) => {
     setSnapshotCreationType(creationType);
     setCopySnapshotModalOpen(true);
@@ -112,6 +115,14 @@ const Backup: FC<{
   const handleRestoreInstanceModalClose = () => {
     setIsRestoreInstanceModalOpen(false);
     setRestoreInstanceModalStep(null);
+  };
+
+  const handleDeleteSnapshotDialogOpen = () => {
+    setIsDeleteSnapshotDialogOpen(true);
+  };
+
+  const handleDeleteSnapshotDialogClose = () => {
+    setIsDeleteSnapshotDialogOpen(false);
   };
 
   const isEnable = useMemo(() => {
@@ -272,6 +283,16 @@ const Backup: FC<{
     },
   });
 
+  const deleteSnapshotMutation = $api.useMutation("delete", "/2022-09-01-00/resource-instance/snapshot/{snapshotId}", {
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      snackbar.showSuccess(`Snapshot deletion initiated successfully`);
+      await refetch();
+      setSelectionModel([]);
+      return true;
+    },
+  });
+
   const columns = useMemo(
     () => [
       {
@@ -387,6 +408,8 @@ const Backup: FC<{
               selectedSnapshot,
               tab,
               handleRestoreInstanceClick,
+              handleDeleteSnapshotDialogOpen,
+              isDeleting: deleteSnapshotMutation.isPending,
             },
           }}
           getRowClassName={(params: { row: SnapshotBase }) => `${params.row.status}`}
@@ -434,6 +457,23 @@ const Backup: FC<{
         buttonLabel={"Restore"}
         buttonColor={colors.success600}
         isLoading={restoreMutation.isPending}
+      />
+
+      <TextConfirmationDialog
+        open={isDeleteSnapshotDialogOpen}
+        handleClose={handleDeleteSnapshotDialogClose}
+        onConfirm={async () => {
+          return await deleteSnapshotMutation.mutateAsync({
+            params: {
+              path: {
+                snapshotId: selectedSnapshot?.snapshotId || "",
+              },
+            },
+          });
+        }}
+        title={`Delete Snapshot`}
+        subtitle={`Are you sure you want to delete this snapshot?`}
+        isLoading={deleteSnapshotMutation.isPending}
       />
       <InformationDialogTopCenter
         open={isRestoreInstanceModalOpen && restoreInstanceModalStep !== "restore-confirmation"}
