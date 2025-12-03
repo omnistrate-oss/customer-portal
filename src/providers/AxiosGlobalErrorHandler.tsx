@@ -5,7 +5,7 @@ import _ from "lodash";
 
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
-import { checkIfNonProtectedRequest } from "src/utils/authUtils";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
   const { handleLogout } = useLogout();
@@ -22,7 +22,7 @@ const AxiosGlobalErrorHandler = () => {
       const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url);
 
       // cancel the request if auth cookie is missing for protected endpoints
-      const isProtectedEndpoint = !checkIfNonProtectedRequest(config.url || "");
+      const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
       const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
 
       if (isProtectedEndpoint && !hasAuthToken) {

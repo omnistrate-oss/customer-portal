@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import createFetchClient from "openapi-fetch";
 
 import { paths } from "src/types/schema";
-import { checkIfNonProtectedRequest } from "src/utils/authUtils";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 export const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -18,7 +18,7 @@ apiClient.use({
     const url = new URL(request.url);
     const pathname = url.pathname;
 
-    const isProtectedEndpoint = !checkIfNonProtectedRequest(pathname);
+    const isProtectedEndpoint = !checkIsNonProtectedEndpoint(pathname);
     const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
 
     if (isProtectedEndpoint && !hasAuthToken) {

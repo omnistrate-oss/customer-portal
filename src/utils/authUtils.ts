@@ -5,14 +5,14 @@ export const removeBaseDomainFromUrl = (url: string, baseDomain: string): string
   return url;
 };
 
-export function checkIfNonProtectedRequest(url: string): boolean {
+export function checkIsNonProtectedEndpoint(url: string): boolean {
   const baseDomain = "/2022-09-01-00";
   url = removeBaseDomainFromUrl(url, baseDomain);
-  const protectedEndpoints = [
+  const nonProtectedEndpoints = [
     "/change-password",
     "/contactus",
     "/health",
-    "json-schema",
+    "/json-schema",
     "/login-with-identity-provider",
     "/reset-password",
     "/resource-instance/health",
@@ -24,5 +24,5 @@ export function checkIfNonProtectedRequest(url: string): boolean {
     "/logout",
   ];
 
-  return protectedEndpoints.some((endpoint) => url.startsWith(endpoint));
+  return nonProtectedEndpoints.some((endpoint) => url.startsWith(endpoint));
 }
