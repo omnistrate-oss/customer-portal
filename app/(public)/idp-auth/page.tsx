@@ -60,7 +60,7 @@ const IDPAuthPage = () => {
           );
           router.replace("/signup");
         } else {
-          const errorMessage = error.response?.data?.message || "Something went wrong during sign in. Please try again";
+          const errorMessage = error.response?.data?.message || "Something went wrong. Please try again";
           snackbar.showError(errorMessage);
           router.replace("/signin?redirect_reason=idp_auth_error");
         }
