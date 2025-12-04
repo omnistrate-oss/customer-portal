@@ -125,7 +125,7 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
                 : document.getElementById("monaco-editor-container")?.requestFullscreen()
             }
           >
-            <Tooltip title="Full Screen" placement="top">
+            <Tooltip title="Full Screen">
               <span>{isFullScreen ? <ExitFullScreenIcon /> : <FullScreenIcon />}</span>
             </Tooltip>
           </IconButton>
@@ -134,7 +134,7 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
               navigator.clipboard.writeText(value);
             }}
           >
-            <Tooltip title="Copy" placement="top">
+            <Tooltip title="Copy">
               <span>
                 <CopyIcon />
               </span>

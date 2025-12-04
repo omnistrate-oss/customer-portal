@@ -1,9 +1,7 @@
 import { useRouter } from "next/navigation";
-import { Box } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 
 import GithubLoginIcon from "src/components/Icons/GithubLogin/GithubLogin";
-import Tooltip from "src/components/Tooltip/Tooltip";
 
 import { IDENTITY_PROVIDER_TYPES } from "../constants";
 
@@ -34,19 +32,16 @@ function GithubLogin(props) {
   }
 
   return (
-    <Tooltip isVisible={disabled} title="Temporarily Unavailable" placement="top">
-      <Box>
-        <SSOLoginButton
-          data-testid="github-signin-button"
-          onClick={() => {
-            handleGitHubLogin();
-          }}
-          disabled={disabled}
-        >
-          <GithubLoginIcon disabled={disabled} />
-        </SSOLoginButton>
-      </Box>
-    </Tooltip>
+    <SSOLoginButton
+      data-testid="github-signin-button"
+      onClick={() => {
+        handleGitHubLogin();
+      }}
+      disabled={disabled}
+      disabledMessage="Temporarily Unavailable"
+    >
+      <GithubLoginIcon disabled={disabled} />
+    </SSOLoginButton>
   );
 }
 

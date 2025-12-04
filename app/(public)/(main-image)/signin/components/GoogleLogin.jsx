@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Box } from "@mui/material";
 import { useGoogleLogin } from "@react-oauth/google";
 import { Buffer } from "buffer";
 import { flushSync } from "react-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import GoogleLoginIcon from "src/components/Icons/GoogleLogin/GoogleLogin";
-import Tooltip from "src/components/Tooltip/Tooltip";
 
 import { IDENTITY_PROVIDER_TYPES } from "../constants";
 
@@ -48,19 +46,16 @@ function GoogleLogin(props) {
   }
 
   return (
-    <Tooltip isVisible={disabled} title="Temporarily Unavailable" placement="top">
-      <Box>
-        <SSOLoginButton
-          data-testid="google-signin-button"
-          onClick={() => {
-            handleGoogleLogin();
-          }}
-          disabled={disabled}
-        >
-          <GoogleLoginIcon disabled={disabled} />
-        </SSOLoginButton>
-      </Box>
-    </Tooltip>
+    <SSOLoginButton
+      data-testid="google-signin-button"
+      onClick={() => {
+        handleGoogleLogin();
+      }}
+      disabled={disabled}
+      disabledMessage="Temporarily Unavailable"
+    >
+      <GoogleLoginIcon disabled={disabled} />
+    </SSOLoginButton>
   );
 }
 

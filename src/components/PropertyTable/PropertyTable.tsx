@@ -99,7 +99,7 @@ const PropertyTable: FC<PropertyTableProps> = ({ rows }) => {
         if (!!row.value && (valueType === "text" || valueType === "link")) {
           value = (
             <Box p="16px 24px" display="flex" gap="8px" justifyContent="flex-end" alignItems="center">
-              <Tooltip title={row.value} placement="top" arrow>
+              <Tooltip title={row.value}>
                 {/* Div is Necessary for the Tooltip */}
                 <div>{value}</div>
               </Tooltip>

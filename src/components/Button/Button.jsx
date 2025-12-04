@@ -19,7 +19,7 @@ const Button = styled(
 
     if (disabledMessage && restProps.disabled) {
       return (
-        <Tooltip title={disabledMessage} placement="top" arrow>
+        <Tooltip title={disabledMessage}>
           {/* Wrapper Necessary for Tooltip */}
           <span>{button}</span>
         </Tooltip>

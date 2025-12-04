@@ -75,10 +75,7 @@ const IconButton = ({ direction, divRef, titleText, dataTestId }) => {
         ...position,
       }}
     >
-      <Tooltip
-        title={<Text sx={{ padding: "4px", color: "white" }}>{titleText}</Text>}
-        placement={direction === "up" ? "bottom-start" : "top-start"}
-      >
+      <Tooltip title={titleText} placement={direction === "up" ? "bottom-start" : "top-start"}>
         {direction === "up" ? (
           <KeyboardArrowUpIcon sx={{ color: "#DCE1E8" }} />
         ) : (

@@ -22,7 +22,7 @@ export const PasswordWithOutBorderField = (props) => {
     <Stack direction="row" alignItems="center" justifyContent="flex-end">
       <div>
         {isPasswordVisible ? (
-          <Tooltip title={children} placement="top" arrow>
+          <Tooltip title={children}>
             <div>
               <Text
                 size="small"

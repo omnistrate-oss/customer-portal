@@ -93,7 +93,7 @@ const SearchInput: FC<SearchInputProps> = ({ placeholder, searchText, setSearchT
           ),
         }}
       />
-      <Tooltip placement={"top"} title={"Search"} isVisible={!isExpanded}>
+      <Tooltip title={"Search"} isVisible={!isExpanded}>
         <IconButton
           data-testid="search-button"
           size="small"
