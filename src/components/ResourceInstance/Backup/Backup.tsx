@@ -468,6 +468,9 @@ const Backup: FC<{
               path: {
                 snapshotId: selectedSnapshot?.snapshotId || "",
               },
+              query: {
+                subscriptionId: accessQueryParams?.subscriptionId,
+              },
             },
           });
         }}
