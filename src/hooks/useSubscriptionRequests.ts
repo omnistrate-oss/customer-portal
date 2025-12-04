@@ -9,7 +9,11 @@ const useSubscriptionRequests = (queryOptions = {}) => {
       select: (data) => {
         return data.subscriptionRequests;
       },
-      retry: 2,
+      retry: (failureCount, error) => {
+        console.warn("/2022-09-01-00/subscription/request", `[Attempt ${failureCount + 1} Failed] Retrying...`, error);
+        const MAX_RETRIES = 3;
+        return failureCount < MAX_RETRIES;
+      },
       ...queryOptions,
     }
   );

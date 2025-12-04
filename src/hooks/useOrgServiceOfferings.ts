@@ -34,7 +34,11 @@ function useOrgServiceOfferings(queryOptions = {}) {
 
       return serviceOfferings;
     },
-    retry: 3,
+    retry: (failureCount, error) => {
+      console.warn("/2022-09-01-00/service-offering", `[Attempt ${failureCount + 1} Failed] Retrying...`, error);
+      const MAX_RETRIES = 3;
+      return failureCount < MAX_RETRIES;
+    },
     ...queryOptions,
   });
 

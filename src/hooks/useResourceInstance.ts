@@ -341,7 +341,6 @@ const useResourceInstance = (queryParams) => {
 
         return final;
       },
-      refetchOnMount: true,
       enabled: isEnabled,
     }
   );
