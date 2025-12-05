@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 
 import ProviderFavicon from "src/components/ProviderFavicon/ProviderFavicon";
@@ -39,6 +39,11 @@ const queryQlient = new QueryClient({
       retryOnMount: false,
     },
   },
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      console.warn(`[CRITICAL] Query Failed Permanently: key: [${JSON.stringify(query.queryKey)}]`, error);
+    },
+  }),
 });
 
 // const nonDashboardRoutes = ["/404", "/signin", "/signup", "/change-password", "/reset-password"];

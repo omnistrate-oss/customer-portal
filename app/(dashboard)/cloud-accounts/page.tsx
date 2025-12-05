@@ -6,7 +6,6 @@ import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 
-// import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
@@ -266,7 +265,7 @@ const CloudAccountsPage = () => {
                 <StatusChip status={status} {...statusStylesAndLabel} />
               </Box>
               {isReadyToOffboard && (
-                <Tooltip title="View offboarding instructions" placement="top">
+                <Tooltip title="View offboarding instructions">
                   <Box
                     sx={{
                       cursor: "pointer",
@@ -285,7 +284,7 @@ const CloudAccountsPage = () => {
                 </Tooltip>
               )}
               {showInstructions && (
-                <Tooltip title="View account configuration instructions" placement="top">
+                <Tooltip title="View account configuration instructions">
                   <Box
                     sx={{
                       cursor: "pointer",
@@ -303,7 +302,7 @@ const CloudAccountsPage = () => {
                 </Tooltip>
               )}
               {showDisconnectInstructions && (
-                <Tooltip title="View disconnect cloud account" placement="top">
+                <Tooltip title="View disconnect cloud account">
                   <Box
                     sx={{
                       cursor: "pointer",
@@ -321,7 +320,7 @@ const CloudAccountsPage = () => {
                 </Tooltip>
               )}
               {showConnectInstructions && (
-                <Tooltip title="View connect cloud account" placement="top">
+                <Tooltip title="View connect cloud account">
                   <Box
                     sx={{
                       cursor: "pointer",

@@ -211,7 +211,7 @@ export const MultilinePasswordInput = ({ field, formData }) => {
               {isPasswordVisible ? "Hide" : "Show"}
             </Text>
             {field.showPasswordGenerator && !field.disabled && (
-              <Tooltip title="Password Generator" placement="top-end" arrow>
+              <Tooltip title="Password Generator" placement="top-end">
                 <Box
                   sx={{
                     cursor: "pointer",
@@ -334,7 +334,7 @@ export const SelectField = ({ field, formData }) => {
 
           if (option.disabled && option.disabledMessage) {
             return (
-              <Tooltip title={option.disabledMessage} key={option.value} placement="top">
+              <Tooltip title={option.disabledMessage} key={option.value}>
                 <span>{menuItem}</span>
               </Tooltip>
             );

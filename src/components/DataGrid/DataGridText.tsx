@@ -91,7 +91,7 @@ const DataGridText: FC<DataGridTextProps> = ({
     <Stack direction="row" alignItems="center" justifyContent={justifyContent} gap="4px" width="100%">
       <Content />
       {children && showCopyButton && (
-        <Tooltip title={tooltipText} placement="top">
+        <Tooltip title={tooltipText}>
           <IconButton onClick={onCopyIconClick}>
             <DataGridCopyIcon />
           </IconButton>

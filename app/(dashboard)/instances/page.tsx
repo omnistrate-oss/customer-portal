@@ -11,7 +11,7 @@ import InstanceHealthStatusChip, {
   getInstanceHealthStatus,
 } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
-import { BlackTooltip } from "src/components/Tooltip/Tooltip";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -235,14 +235,14 @@ const InstancesPage = () => {
               {instanceLoadStatus === "Unknown" && <Box>-</Box>}
 
               {instanceLoadStatus === "Low" && (
-                <BlackTooltip title="Idle" placement="top">
+                <Tooltip title="Idle">
                   <span style={{ display: "flex", alignItems: "center" }}>
                     <LoadIndicatorIdle />
                   </span>
-                </BlackTooltip>
+                </Tooltip>
               )}
               {instanceLoadStatus === "Medium" && (
-                <BlackTooltip title="Normal" placement="top">
+                <Tooltip title="Normal">
                   <span
                     style={{
                       display: "flex",
@@ -252,10 +252,10 @@ const InstancesPage = () => {
                   >
                     <LoadIndicatorNormal />
                   </span>
-                </BlackTooltip>
+                </Tooltip>
               )}
               {instanceLoadStatus === "High" && (
-                <BlackTooltip title="High" placement="top">
+                <Tooltip title="High">
                   <span
                     style={{
                       display: "flex",
@@ -265,7 +265,7 @@ const InstancesPage = () => {
                   >
                     <LoadIndicatorHigh />
                   </span>
-                </BlackTooltip>
+                </Tooltip>
               )}
             </Stack>
           );

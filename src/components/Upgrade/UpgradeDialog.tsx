@@ -116,7 +116,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
 
                   if (option.disabled && option.disabledMessage) {
                     return (
-                      <Tooltip title={option.disabledMessage} key={option.value} placement="top" arrow>
+                      <Tooltip title={option.disabledMessage} key={option.value}>
                         <span>{menuItem}</span>
                       </Tooltip>
                     );

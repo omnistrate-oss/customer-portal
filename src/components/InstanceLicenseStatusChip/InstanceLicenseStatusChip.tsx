@@ -7,7 +7,8 @@ import { getResourceInstanceLicenseStatusStylesAndLabel } from "src/constants/st
 import { InstanceLicenseStatus } from "src/types/resourceInstance";
 
 import StatusChip from "../StatusChip/StatusChip";
-import { BlackTooltip } from "../Tooltip/Tooltip";
+import Tooltip from "../Tooltip/Tooltip";
+
 dayjs.extend(utc);
 
 type LicenseStatusChipProps = {
@@ -44,15 +45,11 @@ const InstanceLicenseStatusChip: FC<LicenseStatusChipProps> = ({
 
   return (
     <Stack direction="row" alignItems="center" gap="6px" minWidth="94px" justifyContent="space-between">
-      <BlackTooltip
-        isVisible={showExpirationDateTooltip}
-        title={`Expires on ${formattedExpirationDate}  UTC`}
-        placement="top"
-      >
+      <Tooltip isVisible={showExpirationDateTooltip} title={`Expires on ${formattedExpirationDate} UTC`}>
         <span>
           <StatusChip status={licenseStatus} {...statusSytlesAndLabel} />
         </span>
-      </BlackTooltip>
+      </Tooltip>
     </Stack>
   );
 };

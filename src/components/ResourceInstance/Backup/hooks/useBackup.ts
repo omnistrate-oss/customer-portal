@@ -61,9 +61,6 @@ function useBackup(queryParams: QueryParams = {}, queryOptions = {}) {
       );
     },
     enabled: enabled,
-    refetchOnWindowFocus: false,
-    retry: false,
-    refetchOnMount: true,
     refetchInterval: 30000,
     select: (response) => {
       return response?.data?.snapshots || [];

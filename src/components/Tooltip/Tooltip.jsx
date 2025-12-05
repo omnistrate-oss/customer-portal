@@ -1,15 +1,23 @@
 import { styled } from "@mui/material";
 import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
 
-const Tooltip = styled(({ className, ...props }) => <MuiTooltip {...props} arrow classes={{ popper: className }} />, {
-  shouldForwardProp: (prop) => prop !== "isVisible",
-})(({ isVisible = true }) => ({
+const Tooltip = styled(
+  ({ className, ...props }) => <MuiTooltip arrow placement="top" {...props} classes={{ popper: className }} />,
+  {
+    shouldForwardProp: (prop) => prop !== "isVisible",
+  }
+)(({ isVisible = true }) => ({
   display: isVisible ? "block" : "none",
-  [`& .${tooltipClasses.arrow}`]: {},
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#464D5B",
+  },
   [`& .${tooltipClasses.tooltip}`]: {
-    padding: "6px 10px",
-    fontWeight: "500",
+    padding: "8px 12px",
+    fontWeight: "600",
     borderRadius: "8px",
+    backgroundColor: "#464D5B",
+    fontSize: "12px",
+    color: "#FFFFFF",
   },
 }));
 
@@ -30,26 +38,5 @@ export const WhiteTooltip = styled(({ className, ...props }) => (
   },
   [`& .${tooltipClasses.arrow}`]: {
     color: "#fff",
-  },
-}));
-
-export const BlackTooltip = styled(
-  ({ className, ...props }) => <MuiTooltip {...props} arrow classes={{ popper: className }} />,
-  {
-    shouldForwardProp: (prop) => prop !== "isVisible",
-  }
-)(({ isVisible = true }) => ({
-  display: isVisible ? "block" : "none",
-  [`& .${tooltipClasses.arrow}`]: {
-    color: "#0C111D",
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#0C111D",
-    fontSize: "12px",
-    lineHeight: "18px",
-    fontWeight: 600,
-    padding: "12px",
-    borderRadius: "8px",
-    color: "#FFF",
   },
 }));

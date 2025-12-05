@@ -129,27 +129,15 @@ const SubscriptionPlanCard = ({
   );
 
   if (disabled && disabledMessage) {
-    return (
-      <Tooltip placement="top" title={disabledMessage}>
-        {card}
-      </Tooltip>
-    );
+    return <Tooltip title={disabledMessage}>{card}</Tooltip>;
   }
 
   if (!subscriptions.length && !subscriptionRequest) {
-    return (
-      <Tooltip placement="top" title="Subscribe to this plan before you can use it">
-        {card}
-      </Tooltip>
-    );
+    return <Tooltip title="Subscribe to this plan before you can use it">{card}</Tooltip>;
   }
 
   if (!subscriptions.length && subscriptionRequest) {
-    return (
-      <Tooltip placement="top" title="Subscription request is pending approval">
-        {card}
-      </Tooltip>
-    );
+    return <Tooltip title="Subscription request is pending approval">{card}</Tooltip>;
   }
 
   return card;
