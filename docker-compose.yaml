@@ -19,6 +19,7 @@ services:
       - GOOGLE_ANALYTICS_TAG_ID=$var.googleAnalyticsTagID
       - GOOGLE_RECAPTCHA_SITE_KEY=$var.googleReCaptchaSiteKey
       - GOOGLE_RECAPTCHA_SECRET_KEY=$var.googleReCaptchaSecretKey
+      - ENVIRONMENT_TYPE=$var.environmentType
     x-omnistrate-compute:
       instanceTypes:
         - cloudProvider: aws
@@ -54,7 +55,7 @@ services:
       - key: providerPassword
         description: Service provider Omnistrate account password
         name: Omnistrate password
-        type: String
+        type: Password
         modifiable: true
         required: true
         export: false
@@ -84,7 +85,7 @@ services:
       - key: senderPassword
         description: Password to authorize against the SMTS provider
         name: SMTS password
-        type: String
+        type: Password
         modifiable: true
         required: true
         export: false
@@ -120,3 +121,18 @@ services:
         required: false
         export: true
         defaultValue: DISABLED
+      - key: environmentType
+        description: The environment type for your application
+        name: Environment Type
+        type: String
+        modifiable: true
+        required: false
+        export: true
+        defaultValue: Production
+        labeledOptions:
+          Canary: CANARY
+          Dev: DEV
+          Private: PRIVATE
+          Production: PROD
+          QA: QA
+          Staging: STAGING
