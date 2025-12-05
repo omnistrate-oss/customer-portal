@@ -2,6 +2,7 @@ import Cookies from "js-cookie";
 import createFetchClient from "openapi-fetch";
 
 import { paths } from "src/types/schema";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 export const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -14,13 +15,22 @@ export const apiClient = createFetchClient<paths>();
 
 apiClient.use({
   async onRequest({ request }) {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+
+    const isProtectedEndpoint = !checkIsNonProtectedEndpoint(pathname);
+    const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+
+    if (isProtectedEndpoint && !hasAuthToken) {
+      const controller = new AbortController();
+      controller.abort("Request aborted due to missing auth token");
+      return new Request(request, { signal: controller.signal });
+    }
+
     const token = Cookies.get("token");
     if (token) {
       request.headers.set("Authorization", `Bearer ${token}`);
     }
-
-    const url = new URL(request.url);
-    const pathname = url.pathname;
 
     if (!pathname.startsWith("/api") && pathname.startsWith("/")) {
       // Store original request details

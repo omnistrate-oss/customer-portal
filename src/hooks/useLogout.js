@@ -36,17 +36,22 @@ function useLogout() {
 
   // make backend call and invalidate the token
   function logout() {
-    axios.post("/logout").finally(() => {
-      handleLogout();
-      //broadcasts the logout event to other windows and tabs to log them out
-      if (logoutBroadcastChannel) {
-        try {
-          logoutBroadcastChannel.postMessage("logout");
-        } catch (error) {
-          console.error("Failed to post message on broadcast channel:", error);
+    axios
+      .post("/logout")
+      .catch((error) => {
+        console.log("Logout request failed", error);
+      })
+      .finally(() => {
+        handleLogout();
+        //broadcasts the logout event to other windows and tabs to log them out
+        if (logoutBroadcastChannel) {
+          try {
+            logoutBroadcastChannel.postMessage("logout");
+          } catch (error) {
+            console.error("Failed to post message on broadcast channel:", error);
+          }
         }
-      }
-    });
+      });
   }
 
   return { handleLogout, logout };
