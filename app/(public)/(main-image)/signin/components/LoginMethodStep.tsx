@@ -485,7 +485,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                 </Link>
                 {domainFilteredIdentityProviders.length > 0 && (
                   <>
-                    <br /> — or sign in directly above
+                    <br /> — or use the other sign-in options above
                   </>
                 )}
               </Text>
