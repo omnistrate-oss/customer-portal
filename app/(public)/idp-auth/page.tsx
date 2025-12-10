@@ -47,9 +47,9 @@ const IDPAuthPage = () => {
 
           // Redirect to the Destination URL
           if (destination && checkRouteValidity(decodedDestination)) {
-            router.replace(decodedDestination, {}, { showProgressBar: true });
+            window.location.href = decodedDestination;
           } else {
-            router.replace(getInstancesRoute(), {}, { showProgressBar: true });
+            window.location.href = getInstancesRoute();
           }
         }
       } catch (error) {
