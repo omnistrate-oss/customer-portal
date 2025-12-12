@@ -6,7 +6,7 @@ The Customer Portal project, provided by Omnistrate, is an open-source platform 
 
 ## Getting Started
 
-To get started with the Customer Portal open-source project, begin by configuring your service on the Omnistrate Platform to make it ready for use. While familiarity with Next.js and Docker enhances your ability to customize the application, lack of expertise in these areas won't hinder your ability to deploy the SaaS Builder application with basic customizations. The process involves cloning the project's repository, setting up your development environment, and configuring the necessary environment variables to tailor the application to your requirements.
+To get started with the Customer Portal open-source project, begin by configuring your service on the Omnistrate Platform to make it ready for use. While familiarity with Next.js and Docker enhances your ability to customize the application, lack of expertise in these areas won't hinder your ability to deploy the Customer Portal application with basic customizations. The process involves cloning the project's repository, setting up your development environment, and configuring the necessary environment variables to tailor the application to your requirements.
 
 ### Pre-requisites
 
@@ -27,8 +27,8 @@ These details are crucial as they will be presented to customers accessing your 
 | Organization Support Email  | Email address to which customers can reach out for support |
 | Organization Logo URL       | Your organization's logo URL                               |
 | Organization Favicon URL    | Your organization's favicon URL                            |
-| Organization Privacy Policy | Your organization's privacy policy for Customer Portal         |
-| Organization Terms of use   | Your organization's terms of use for Customer Portal           |
+| Organization Privacy Policy | Your organization's privacy policy for Customer Portal     |
+| Organization Terms of use   | Your organization's terms of use for Customer Portal       |
 
 ### Customizations
 
@@ -48,7 +48,7 @@ These details are crucial as they will be presented to customers accessing your 
 
 ## Build and Run Locally
 
-To build and run the SaaS Builder locally
+To build and run the Customer Portal locally
 
 1. You'll need Node.js installed on your system. Download the latest LTS version (20.11.1 as of March 13, 2024) from <https://nodejs.org/>. Check the node version to confirm successful installation.
 
@@ -77,20 +77,21 @@ yarn install
 5. Configure .env.local: Create a .env.local file in the root directory. Populate it with necessary environment variables
 
 | Environment Variables       | Description                                                                                                                                                                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PROVIDER_EMAIL              | Service provider's Omnistrate email address                                                                                                                                                                                                                               |
 | PROVIDER_PASSWORD           | Service provider's Omnistrate account password                                                                                                                                                                                                                            |
 | ENVIRONMENT_TYPE            | The environment type for your application. Defaults to _PROD_. Learn more about environments [here](https://docs.omnistrate.com/operate-guides/pipelines/)                                                                                                                |
-| YOUR_SAAS_DOMAIN_URL        | The secure domain URL where this application will be deployed eg. <https://www.yourcloud.com>. When working locally, it should be <http://localhost:3000>                                                                                                                     |
+| YOUR_SAAS_DOMAIN_URL        | The secure domain URL where this application will be deployed eg. <https://www.yourcloud.com>. When working locally, it should be <http://localhost:3000>                                                                                                                 |
 | YOUR_SAAS_DOMAIN_ALIAS      | The domain alias for your deployment                                                                                                                                                                                                                                      |
-| MAIL_SMTP_HOST              | The the hostname or IP address of the mail service provider. Defaults to _smtp.gmail.com_                                                                                                                                                                                 |     |
-| MAIL_SMTP_PORT              | The port to be used for creating the SMTP connection. Defaults to _587_                                                                                                                                                                                                   |     |
+| MAIL_SMTP_HOST              | The the hostname or IP address of the mail service provider. Defaults to _smtp.gmail.com_                                                                                                                                                                                 |
+| MAIL_SMTP_PORT              | The port to be used for creating the SMTP connection. Defaults to _587_                                                                                                                                                                                                   |
 | MAIL_USER_EMAIL             | The email account to be used to authenticate to send mails (signup, reset password etc) to your customers. Check the following [section](#how-to-configure-google-account-for-sending-out-emails) for instructions to configure gmail account for sending out the emails. |
 | MAIL_USER_PASSWORD          | The email account password                                                                                                                                                                                                                                                |
 | MAIL_FROM                   | Gmail account from which emails will be sent (might be different than MAIL_USER_EMAIL). If this environment variable is not configured, the mails will be sent using MAIL_USER_EMAIL                                                                                      |
 | GOOGLE_ANALYTICS_TAG_ID     | Google Analytics tag ID                                                                                                                                                                                                                                                   |
 | GOOGLE_RECAPTCHA_SITE_KEY   | Google reCAPTCHA v2 (Invisible) Site Key                                                                                                                                                                                                                                  |
 | GOOGLE_RECAPTCHA_SECRET_KEY | Google reCAPTCHA v2 (Invisible) Secret Key                                                                                                                                                                                                                                |
+| DISABLE_PASSWORD_LOGIN      | Set this environment variable to true to disable password login                                                                                                                                                                                                           |
 
 6. Run the development server:
 

@@ -17,7 +17,7 @@ import {
 import AlertTriangle from "../Icons/AlertTriangle/AlertTriangle";
 import CircleCheckOutlineIcon from "../Icons/CircleCheckOutline/CircleCheckOutline";
 import StatusChip from "../StatusChip/StatusChip";
-import { BlackTooltip } from "../Tooltip/Tooltip";
+import Tooltip from "../Tooltip/Tooltip";
 import { Text } from "../Typography/Typography";
 
 function getInstanceNodes(detailedNetworkTopology: Record<string, ResourceInstanceNetworkTopology> = {}) {
@@ -322,11 +322,11 @@ const InstanceHealthStatusChip: FC<InstanceHealthStatusChipProps> = (props) => {
   }
 
   return (
-    <BlackTooltip title={tooltipContent} isVisible={!isCLIManagedResource}>
+    <Tooltip title={tooltipContent} isVisible={!isCLIManagedResource}>
       <Box display="inline-block">
         <StatusChip {...chipStylesAndLabel} startIcon={startIcon} />
       </Box>
-    </BlackTooltip>
+    </Tooltip>
   );
 };
 

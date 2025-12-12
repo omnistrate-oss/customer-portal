@@ -30,7 +30,6 @@ const CopyToClipboardButton = (props) => {
       onOpen={() => {
         setTooltipText("Click to copy");
       }}
-      placement="top"
     >
       <IconButton onClick={handleClick} sx={buttonStyles}>
         <DataGridCopyIcon color="#7F56D9" {...iconProps} />

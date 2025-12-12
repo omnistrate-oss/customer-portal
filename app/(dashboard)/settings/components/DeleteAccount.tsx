@@ -6,7 +6,6 @@ import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { deleteUser } from "src/api/users";
 import Button from "src/components/Button/Button";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
-import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
 import useLogout from "src/hooks/useLogout";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -93,22 +92,15 @@ function DeleteAccount() {
             </div>
           </div>
           <div className="ml-5 mr-5 p-5 border-t border-[#E9EAEB] flex justify-end gap-3">
-            <Tooltip
-              isVisible={instances.length > 0}
-              placement="top"
-              title="Please delete all instances to continue with account deletion"
+            <Button
+              bgColor="#D92D20"
+              variant="contained"
+              onClick={handleDialogOpen}
+              disabled={instances.length > 0}
+              disabledMessage="Please delete all instances to continue with account deletion"
             >
-              <span>
-                <Button
-                  bgColor="#D92D20"
-                  variant="contained"
-                  onClick={handleDialogOpen}
-                  disabled={instances.length > 0}
-                >
-                  Delete Account
-                </Button>
-              </span>
-            </Tooltip>
+              Delete Account
+            </Button>
           </div>
         </div>
       </div>

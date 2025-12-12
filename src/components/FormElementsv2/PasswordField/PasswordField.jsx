@@ -58,7 +58,7 @@ export const PasswordField = (props) => {
               {isPasswordVisible ? "Hide" : "Show"}
             </Text>
             {showPasswordGenerator && (
-              <Tooltip title="Password Generator" placement="top-end" arrow>
+              <Tooltip title="Password Generator" placement="top-end">
                 <Box
                   sx={{
                     cursor: "pointer",

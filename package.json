@@ -58,11 +58,11 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.52.0",
-    "next": "14.2.30",
+    "next": "14.2.35",
     "next-nprogress-bar": "^2.4.3",
     "next-plugin-yaml": "^1.0.1",
     "node-cron": "^3.0.3",
-    "nodemailer": "^7.0.7",
+    "nodemailer": "^7.0.11",
     "openapi-fetch": "^0.14.0",
     "openapi-react-query": "^0.5.0",
     "prop-types": "^15.6.0",
@@ -117,6 +117,8 @@
     "@babel/runtime-corejs3": "7.26.10",
     "@babel/runtime": "7.26.10",
     "prismjs": "1.30.0",
-    "brace-expansion": "^2.0.2"
+    "brace-expansion": "^2.0.2",
+    "glob": "10.5.0",
+    "js-yaml": "4.1.1"
   }
 }

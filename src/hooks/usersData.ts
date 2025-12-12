@@ -28,7 +28,6 @@ function useUserData() {
       dispatch(setUserDataLoadingStatus(loadingStatuses.success));
       return response.data;
     },
-    refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 

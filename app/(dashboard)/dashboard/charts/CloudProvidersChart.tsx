@@ -57,7 +57,7 @@ const CloudProvidersChart: React.FC<CloudProvidersChartProps> = ({ instances }) 
                         } as React.CSSProperties
                       }
                     />
-                    {chartConfig[item.payload.cloud].label}
+                    {chartConfig[item.payload.cloud]?.label}
                     <div className="ml-auto font-mono font-medium tabular-nums text-foreground">{value}</div>
                   </>
                 )}

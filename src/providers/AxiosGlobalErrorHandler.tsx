@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Alert, Snackbar } from "@mui/material";
+import Cookies from "js-cookie";
 import _ from "lodash";
 
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
   const { handleLogout } = useLogout();
@@ -18,6 +20,18 @@ const AxiosGlobalErrorHandler = () => {
   useEffect(() => {
     axios.interceptors.request.use((config) => {
       const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url);
+
+      // cancel the request if auth cookie is missing for protected endpoints
+      const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
+      const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+
+      if (isProtectedEndpoint && !hasAuthToken) {
+        // Abort this request with AbortController
+        const controller = new AbortController();
+        config.signal = controller.signal;
+        controller.abort("Request aborted due to missing auth token");
+        return config; // Axios will reject the request after seeing the aborted signal
+      }
 
       if (!config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
         //the original request url

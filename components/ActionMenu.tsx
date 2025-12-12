@@ -101,7 +101,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
 
         if (isDisabled && disabledMessage) {
           return (
-            <Tooltip key={label} title={disabledMessage} placement="top">
+            <Tooltip key={label} title={disabledMessage}>
               <span>{menuItem}</span>
             </Tooltip>
           );
@@ -114,7 +114,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
 
   if (disabled && disabledMessage) {
     return (
-      <Tooltip title={disabledMessage} placement="top">
+      <Tooltip title={disabledMessage}>
         <span>{select}</span>
       </Tooltip>
     );

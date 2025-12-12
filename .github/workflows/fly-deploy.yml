@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         type: environment
-        default: 'access-ui'
+        default: "access-ui"
         required: true
   workflow_call:
     inputs:
@@ -28,12 +28,12 @@ jobs:
     steps:
       - name: Checkout repository
         timeout-minutes: 5
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup flyctl
         timeout-minutes: 5
         uses: superfly/flyctl-actions/setup-flyctl@1.5
-      
+
       - name: Deploy to Fly
         timeout-minutes: 30
         run: flyctl deploy --remote-only --config fly.${{ inputs.environment }}.toml
