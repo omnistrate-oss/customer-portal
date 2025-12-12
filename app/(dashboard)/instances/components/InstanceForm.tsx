@@ -210,14 +210,6 @@ const InstanceForm = ({
           }
         });
 
-        for (const key in data.requestParams) {
-          const value = data.requestParams[key];
-
-          if (value === undefined || (typeof value === "string" && !value.trim())) {
-            delete data.requestParams[key];
-          }
-        }
-
         // Remove cloud_provider_native_network_id if cloudProvider is gcp or azure
         if (data.cloudProvider === "gcp" || data.cloudProvider === "azure") {
           delete data.requestParams.cloud_provider_native_network_id;
@@ -343,15 +335,6 @@ const InstanceForm = ({
               break;
           }
         });
-
-        // Remove Empty Fields from data.requestParams
-        for (const key in data.requestParams) {
-          const value = data.requestParams[key];
-
-          if (value === undefined || (typeof value === "string" && !value.trim())) {
-            delete data.requestParams[key];
-          }
-        }
 
         if (!isTypeError) {
           updateInstanceMutation.mutate({
