@@ -344,15 +344,6 @@ const InstanceForm = ({
           }
         });
 
-        // Remove Empty Fields from data.requestParams
-        for (const key in data.requestParams) {
-          const value = data.requestParams[key];
-
-          if (value === undefined || (typeof value === "string" && !value.trim())) {
-            delete data.requestParams[key];
-          }
-        }
-
         if (!isTypeError) {
           updateInstanceMutation.mutate({
             params: {
