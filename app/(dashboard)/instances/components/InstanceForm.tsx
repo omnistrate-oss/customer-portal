@@ -322,6 +322,13 @@ const InstanceForm = ({
             return schemaParam.key === key;
           });
 
+          // Check if required field is missing or empty
+          if (result?.required && (!data.requestParams[key] || data.requestParams[key] === "")) {
+            snackbar.showError(`${result.displayName || key} is required`);
+            isTypeError = true;
+            return;
+          }
+
           switch (result?.type?.toLowerCase()) {
             case "number":
               if (data.requestParams[key] === "") break;
