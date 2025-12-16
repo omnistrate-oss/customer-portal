@@ -128,8 +128,8 @@ const InstanceForm = ({
     validateOnChange: true,
     onSubmit: async (values) => {
       // Clean up requestParams cloud_provider_native_network_id before submitting
-      if (values.requestParams.cloud_provider_native_network_id === "") {
-        delete values.requestParams.cloud_provider_native_network_id;
+      if (values.requestParams?.cloud_provider_native_network_id === "") {
+        delete values.requestParams?.cloud_provider_native_network_id;
       }
 
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
