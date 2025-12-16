@@ -257,7 +257,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
                 <Tooltip title={row.value}>
                   <Box maxWidth="calc(100% - 36px)">
                     <Text ellipsis size="small" weight="medium" color="#535862">
-                      {row.value}
+                      {row.value ? row.value : "-"}
                     </Text>
                   </Box>
                 </Tooltip>
@@ -350,7 +350,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
                 </Box>
               </Tooltip>
               <Box flex="1 1 auto" display="flex" alignItems="center" maxWidth="100%">
-                {value}
+                {value ? value : "-"}
               </Box>
             </Box>
           );

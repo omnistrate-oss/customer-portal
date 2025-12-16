@@ -127,6 +127,11 @@ const InstanceForm = ({
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: async (values) => {
+      // Clean up requestParams cloud_provider_native_network_id before submitting
+      if (values.requestParams?.cloud_provider_native_network_id === "") {
+        delete values.requestParams?.cloud_provider_native_network_id;
+      }
+
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
       // Determine if we should use version set resources or service offering resources
@@ -321,6 +326,18 @@ const InstanceForm = ({
           const result = schema.find((schemaParam) => {
             return schemaParam.key === key;
           });
+
+          // Check if required field is missing or empty
+          if (
+            result?.required &&
+            (data.requestParams[key] === undefined ||
+              data.requestParams[key] === null ||
+              data.requestParams[key] === "")
+          ) {
+            snackbar.showError(`${result.displayName || key} is required`);
+            isTypeError = true;
+            return;
+          }
 
           switch (result?.type?.toLowerCase()) {
             case "number":
