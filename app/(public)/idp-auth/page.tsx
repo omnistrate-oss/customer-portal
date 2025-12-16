@@ -46,10 +46,12 @@ const IDPAuthPage = () => {
           hasAttemptedSignIn.current = false;
 
           // Redirect to the Destination URL
+          // Use window.location for full page reload to ensure middleware runs with fresh cookies
+          // This prevents race conditions where middleware might execute with stale cookies
           if (destination && checkRouteValidity(decodedDestination)) {
-            router.replace(decodedDestination, {}, { showProgressBar: true });
+            window.location.href = decodedDestination;
           } else {
-            router.replace(getInstancesRoute(), {}, { showProgressBar: true });
+            window.location.href = getInstancesRoute();
           }
         }
       } catch (error) {
