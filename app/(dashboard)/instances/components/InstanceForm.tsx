@@ -328,7 +328,12 @@ const InstanceForm = ({
           });
 
           // Check if required field is missing or empty
-          if (result?.required && (!data.requestParams[key] || data.requestParams[key] === "")) {
+          if (
+            result?.required &&
+            (data.requestParams[key] === undefined ||
+              data.requestParams[key] === null ||
+              data.requestParams[key] === "")
+          ) {
             snackbar.showError(`${result.displayName || key} is required`);
             isTypeError = true;
             return;
