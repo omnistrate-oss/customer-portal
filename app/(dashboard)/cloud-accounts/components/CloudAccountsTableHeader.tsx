@@ -114,7 +114,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
       : "";
 
   return (
-    <div className="py-5 px-6 flex items justify-between gap-4">
+    <div className="py-5 px-6 flex items-center justify-between gap-4">
       <DataGridHeaderTitle
         title="List of Cloud Accounts"
         desc="Details of cloud account instances"

@@ -7,8 +7,11 @@ const useInstanceSnapshots = (queryOptions = {}) => {
     {},
     {
       select: (data) =>
-        // @ts-expect-error createdTime exists on InstanceSnapshot but is marked optional
-        data.snapshots?.sort((a, b) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()) || [],
+        data.snapshots?.sort((a, b) => {
+          const timeB = new Date(b.createdTime ?? 0).getTime();
+          const timeA = new Date(a.createdTime ?? 0).getTime();
+          return timeB - timeA;
+        }) || [],
       ...queryOptions,
     }
   );

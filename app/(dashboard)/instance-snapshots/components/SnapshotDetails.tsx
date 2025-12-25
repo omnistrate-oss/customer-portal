@@ -102,7 +102,7 @@ const SnapshotDetails: React.FC<SnapshotDetailsProps> = ({ selectedSnapshot, ins
       },
       {
         label: "Completion Time",
-        value: completeTime ? formatDateUTC(completeTime) : "-",
+        value: completeTime && completeTime !== "0001-01-01T00:00:00Z" ? formatDateUTC(completeTime) : "-",
         valueType: "text",
       },
       {

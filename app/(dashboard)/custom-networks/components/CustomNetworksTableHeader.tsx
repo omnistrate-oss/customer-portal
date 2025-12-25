@@ -21,7 +21,7 @@ const CustomNetworksTableHeader = ({
   selectedRows,
 }) => {
   return (
-    <div className="py-5 px-6 flex items justify-between gap-4 border-b border-[#EAECF0]">
+    <div className="py-5 px-6 flex items-center justify-between gap-4 border-b border-[#EAECF0]">
       <DataGridHeaderTitle
         title="List of Customer Networks"
         desc="List of configured customer networks"

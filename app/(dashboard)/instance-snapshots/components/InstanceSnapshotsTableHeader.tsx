@@ -38,7 +38,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
   copyDisabledMessage,
 }) => {
   return (
-    <div className="py-5 px-6 flex items justify-between gap-4 border-b border-[#EAECF0]">
+    <div className="py-5 px-6 flex items-center justify-between gap-4 border-b border-[#EAECF0]">
       <DataGridHeaderTitle
         title="List of Instance Snapshots"
         desc="View and manage all snapshots, including their creation status, progress, region, and encryption details"
