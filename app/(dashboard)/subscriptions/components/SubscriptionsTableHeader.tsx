@@ -31,7 +31,7 @@ const SubscriptionsTableHeader = ({
 
       <div className="flex items-center gap-4 flex-shrink-0">
         <SearchInput
-          placeholder="Search by Product Name"
+          placeholder="Search by ID/Product Name"
           searchText={searchText}
           setSearchText={setSearchText}
           width="250px"

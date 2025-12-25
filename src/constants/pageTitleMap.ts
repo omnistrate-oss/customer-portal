@@ -1,5 +1,13 @@
 import { getNotificationsRoute } from "src/utils/route/access/accessRoute";
-import { getEventsRoute } from "src/utils/routes";
+import {
+  getAccessControlRoute,
+  getBillingRoute,
+  getCloudAccountsRoute,
+  getCustomNetworksRoute,
+  getEventsRoute,
+  getInstanceSnapshotsRoute,
+  getSettingsRoute,
+} from "src/utils/routes";
 
 export const PAGE_TITLE_MAP = {
   "/signin": "Sign In",
@@ -13,13 +21,14 @@ export const PAGE_TITLE_MAP = {
 
   "/dashboard": "Dashboard",
   "/instances": "Instances",
-  "/cloud-accounts": "Cloud Accounts",
-  "/custom-networks": "Customer Networks",
-  "/access-control": "Access Control",
+  [getInstanceSnapshotsRoute()]: "Instance Snapshots",
+  [getCloudAccountsRoute({})]: "Cloud Accounts",
+  [getCustomNetworksRoute({})]: "Customer Networks",
+  [getAccessControlRoute()]: "Access Control",
   [getEventsRoute()]: "Audit Logs",
   [getNotificationsRoute()]: "Alerts",
-  "/settings": "Profile Settings",
-  "/billing": "Billing",
+  [getSettingsRoute()]: "Profile Settings",
+  [getBillingRoute()]: "Billing",
   "/subscriptions": "Subscriptions",
   "/cost-explorer": "Cost Explorer",
 };

@@ -1611,7 +1611,43 @@ export interface paths {
         patch: operations["services-orchestration-api/ModifyServicesOrchestration"];
         trace?: never;
     };
-    "/2022-09-01-00/resource-instance/snapshot/{snapshotId}": {
+    "/2022-09-01-00/resource-instance/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ListAllInstanceSnapshots instance-snapshot-api */
+        get: operations["instance-snapshot-api/ListAllInstanceSnapshots"];
+        put?: never;
+        /** CreateInstanceSnapshot instance-snapshot-api */
+        post: operations["instance-snapshot-api/CreateInstanceSnapshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/snapshot/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DescribeInstanceSnapshot instance-snapshot-api */
+        get: operations["instance-snapshot-api/DescribeInstanceSnapshot"];
+        put?: never;
+        post?: never;
+        /** DeleteInstanceSnapshot instance-snapshot-api */
+        delete: operations["instance-snapshot-api/DeleteInstanceSnapshot"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/snapshot/{snapshotId}/restore": {
         parameters: {
             query?: never;
             header?: never;
@@ -1620,9 +1656,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post?: never;
-        /** DeleteResourceInstanceSnapshot instance-snapshot-api */
-        delete: operations["instance-snapshot-api/DeleteResourceInstanceSnapshot"];
+        /** RestoreResourceInstanceFromSnapshot instance-snapshot-api */
+        post: operations["instance-snapshot-api/RestoreResourceInstanceFromSnapshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/snapshot/{sourceSnapshotId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** CopyInstanceSnapshot instance-snapshot-api */
+        post: operations["instance-snapshot-api/CopyInstanceSnapshot"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -4047,6 +4100,10 @@ export interface components {
          *       {
          *         "port": 80,
          *         "targetGroupName": "my-target-group"
+         *       },
+         *       {
+         *         "port": 80,
+         *         "targetGroupName": "my-target-group"
          *       }
          *     ]
          */
@@ -4074,13 +4131,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "7"
+         *       "token": "lrm"
          *     }
          */
         AccountConfigIdentityIDRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example w
+             * @example bn
              */
             token: string;
         };
@@ -4092,25 +4149,25 @@ export interface components {
         AccountConfigIdentityIDResult: {
             /**
              * @description ID of an Org
-             * @example Temporibus quibusdam voluptate voluptatem amet dicta qui.
+             * @example Atque iusto nihil atque quos totam quidem.
              */
             id: string;
         };
         /**
          * @example {
          *       "id": "e-123456",
-         *       "token": "j"
+         *       "token": "go8"
          *     }
          */
         AcknowledgeEventRequest: {
             /**
              * @description ID of a Event
-             * @example Quaerat vel at.
+             * @example Doloremque ex qui similique sint eos.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example uz
+             * @example o
              */
             token: string;
         };
@@ -4161,18 +4218,18 @@ export interface components {
          *       "accountConfigId": "ac-12345678",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "m"
+         *       "token": "11"
          *     }
          */
         AddAccountConfigToServiceModelRequest: {
             /**
              * @description ID of an Account Config
-             * @example Aut totam odio.
+             * @example Adipisci nulla quidem et id quis.
              */
             accountConfigId: string;
             /**
              * @description ID of a Service Model
-             * @example Possimus dignissimos voluptatibus dolorem.
+             * @example Qui possimus dolores reiciendis velit.
              */
             id: string;
             /**
@@ -4182,19 +4239,19 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example pz
+             * @example m
              */
             token: string;
         };
         /**
          * @example {
-         *       "accountConfigId": "Possimus impedit ratione ea vel doloribus placeat."
+         *       "accountConfigId": "Consequatur animi illum vitae corporis qui."
          *     }
          */
         AddAccountConfigToServiceModelRequest2: {
             /**
              * @description The infrastructure account configuration ID
-             * @example Quos qui.
+             * @example Et ea dolorem amet tempore.
              */
             accountConfigId: string;
         };
@@ -4210,7 +4267,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "kzr"
+         *       "token": "h"
          *     }
          */
         AddCapacityToResourceInstanceRequest: {
@@ -4257,7 +4314,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example In et dolore magnam sunt non.
+             * @example Aliquam ipsum consequatur.
              */
             serviceProviderId: string;
             /**
@@ -4267,7 +4324,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example s
+             * @example 3w
              */
             token: string;
         };
@@ -4307,7 +4364,7 @@ export interface components {
          *       "id": "cc-12345678",
          *       "instanceType": "t3.micro",
          *       "serviceId": "s-12345678",
-         *       "token": "a56"
+         *       "token": "dry"
          *     }
          */
         AddComputeInstanceTypeRequest: {
@@ -4319,7 +4376,7 @@ export interface components {
             configOverride?: components["schemas"]["ComputeInstanceTypeConfigOverride"];
             /**
              * @description ID of a Compute Config
-             * @example Itaque enim cupiditate tempora quisquam voluptatem.
+             * @example Fuga et atque facilis.
              */
             id: string;
             /**
@@ -4334,7 +4391,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k
+             * @example k5
              */
             token: string;
         };
@@ -4387,7 +4444,7 @@ export interface components {
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
          *       "targetPort": 8080,
-         *       "token": "gs"
+         *       "token": "kw9"
          *     }
          */
         AddCustomDNSToResourceInstanceRequest: {
@@ -4433,7 +4490,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Reprehenderit accusantium optio debitis quam.
+             * @example Et repellendus beatae consequuntur et et incidunt.
              */
             serviceProviderId: string;
             /**
@@ -4449,7 +4506,7 @@ export interface components {
             targetPort?: number;
             /**
              * @description JWT token used to perform authorization
-             * @example km7
+             * @example 36q
              */
             token: string;
         };
@@ -4481,7 +4538,7 @@ export interface components {
          *       "mountPath": "/etc/config",
          *       "name": "file.txt",
          *       "serviceId": "s-12345678",
-         *       "token": "xf"
+         *       "token": "h"
          *     }
          */
         AddFileRequest: {
@@ -4503,7 +4560,7 @@ export interface components {
             fileType: string;
             /**
              * @description ID of a resource
-             * @example Quis maxime nam minima et nam consequatur.
+             * @example Laborum est iusto exercitationem ut.
              */
             id: string;
             /**
@@ -4523,7 +4580,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example upf
+             * @example 0h
              */
             token: string;
         };
@@ -4536,13 +4593,13 @@ export interface components {
          *       },
          *       "resourceDependencyId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "rfg"
+         *       "token": "8j"
          *     }
          */
         AddResourceDependencyRequest: {
             /**
              * @description ID of a resource
-             * @example Libero autem facilis qui earum recusandae id.
+             * @example Consequatur in.
              */
             id: string;
             /**
@@ -4557,7 +4614,7 @@ export interface components {
             };
             /**
              * @description ID of a resource
-             * @example Eius omnis.
+             * @example Consequuntur id quaerat.
              */
             resourceDependencyId: string;
             /**
@@ -4567,7 +4624,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example jx1
+             * @example 1
              */
             token: string;
         };
@@ -4597,13 +4654,13 @@ export interface components {
          *       "mountPath": "/data",
          *       "serviceId": "s-12345678",
          *       "storageVolumeConfigId": "svc-12345678",
-         *       "token": "6"
+         *       "token": "ur"
          *     }
          */
         AddStorageVolumeConfigRequest: {
             /**
              * @description ID of a Storage Config
-             * @example Excepturi maiores optio aperiam.
+             * @example Nihil aut dolore inventore porro earum in.
              */
             id: string;
             /**
@@ -4618,12 +4675,12 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Storage Volume Config
-             * @example Sunt nostrum nostrum unde placeat aliquid.
+             * @example Error molestiae.
              */
             storageVolumeConfigId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example j
+             * @example lq
              */
             token: string;
         };
@@ -4736,7 +4793,7 @@ export interface components {
          *         "numpy",
          *         "matplotlib"
          *       ],
-         *       "enabled": true,
+         *       "enabled": false,
          *       "provider": "agentcore",
          *       "timeout": 60
          *     }
@@ -4862,14 +4919,27 @@ export interface components {
         };
         /**
          * @example {
-         *       "enabled": true
+         *       "enabled": false
          *     }
          */
         AgentMemoryConfiguration: {
             /**
              * @description Enable memory store for agent context persistence
              * @default false
-             * @example false
+             * @example true
+             */
+            enabled: boolean;
+        };
+        /**
+         * @example {
+         *       "enabled": true
+         *     }
+         */
+        AgentMonitoringConfiguration: {
+            /**
+             * @description Enable monitoring for the agent
+             * @default false
+             * @example true
              */
             enabled: boolean;
         };
@@ -4878,24 +4948,11 @@ export interface components {
          *       "enabled": false
          *     }
          */
-        AgentMonitoringConfiguration: {
-            /**
-             * @description Enable monitoring for the agent
-             * @default false
-             * @example false
-             */
-            enabled: boolean;
-        };
-        /**
-         * @example {
-         *       "enabled": true
-         *     }
-         */
         AgentVectorStoreConfiguration: {
             /**
              * @description Enable vector store for the agent
              * @default false
-             * @example true
+             * @example false
              */
             enabled: boolean;
         };
@@ -4905,9 +4962,7 @@ export interface components {
          *       "IsManaged": true,
          *       "Name": "Prometheus",
          *       "Properties": {
-         *         "Eos voluptas eveniet culpa et eaque.": "Minus repudiandae.",
-         *         "Et ea nesciunt.": "Ea ullam eveniet aut.",
-         *         "Ipsam quia molestiae tempora occaecati quod enim.": "Nulla et accusamus."
+         *         "Veniam labore facere eum quo.": "Tempore ex et ut voluptas."
          *       },
          *       "Type": "HelmChart"
          *     }
@@ -4931,9 +4986,8 @@ export interface components {
             /**
              * @description The properties of the amenity.
              * @example {
-             *       "Esse officiis.": "Error ad.",
-             *       "Sed rerum et id delectus.": "Nostrum labore quibusdam.",
-             *       "Velit tempora ut quibusdam non eos.": "Dolor reiciendis aliquam quis omnis incidunt."
+             *       "Est vero.": "Et et optio non possimus nihil.",
+             *       "Libero sunt.": "Voluptatem pariatur."
              *     }
              */
             Properties?: {
@@ -5210,32 +5264,35 @@ export interface components {
         /**
          * @example {
          *       "configs": {
-         *         "Sint delectus molestiae accusantium et ipsum.": "Et ut."
+         *         "Fugit et voluptatem vel est quaerat debitis.": "Sit vel excepturi.",
+         *         "Qui iusto accusantium esse assumenda et illum.": "Odit voluptas.",
+         *         "Recusandae et mollitia.": "Omnis voluptas."
          *       },
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "DEV",
-         *       "fileContent": "Dolorem id error aut.",
+         *       "fileContent": "Delectus in fuga assumenda autem esse.",
          *       "forceCreateNewServicePlanVersion": true,
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
          *       "secrets": {
-         *         "Incidunt aut.": "Id eos minima aut explicabo placeat.",
-         *         "Magnam qui dolores quis ducimus.": "Quaerat quo velit ut dolor.",
-         *         "Modi sed sint voluptates inventore voluptas.": "Earum qui repellendus voluptatem nihil."
+         *         "Perferendis natus enim architecto et aut.": "Dolores illo est eum.",
+         *         "Quia veniam vitae iure delectus omnis.": "Dolore aliquid eius et exercitationem."
          *       },
-         *       "serviceLogoURL": "http://dickinson.net/marcel",
-         *       "token": "6t"
+         *       "serviceLogoURL": "http://mccullough.com/blanche_considine",
+         *       "token": "dvj"
          *     }
          */
         BuildServiceFromComposeSpecRequest: {
             /**
              * @description Configs for the service. Key is the compose spec name of the config and value is base64 encoded config content
              * @example {
-             *       "Est culpa totam dolorem aut sed.": "Labore id voluptatum."
+             *       "Dolores et omnis soluta.": "Dolor aut.",
+             *       "Illum aut officiis est provident aspernatur.": "Voluptas doloremque aperiam ab illo.",
+             *       "Quasi sunt libero iusto a aperiam est.": "Velit est asperiores deleniti."
              *     }
              */
             configs?: {
@@ -5263,7 +5320,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Consectetur saepe cum tempora nihil.
+             * @example Sint eius voluptas sed exercitationem temporibus.
              */
             fileContent: string;
             /**
@@ -5294,8 +5351,8 @@ export interface components {
             /**
              * @description Secrets for the service. Key is the compose spec name of the secret and value is base64 encoded secret content
              * @example {
-             *       "Aliquid nesciunt ut.": "Nam enim adipisci reprehenderit et.",
-             *       "Omnis qui quis.": "Similique a facilis."
+             *       "Aut nemo dolorem dolorum aspernatur vel.": "Aut perspiciatis ut ut.",
+             *       "Cupiditate quos ea.": "Sed voluptatum officia hic modi soluta."
              *     }
              */
             secrets?: {
@@ -5304,43 +5361,43 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://marquardt.com/amalia
+             * @example http://pollichritchie.name/mervin.streich
              */
             serviceLogoURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5d
+             * @example 4
              */
             token: string;
         };
         /**
          * @example {
          *       "configs": {
-         *         "Ut mollitia.": "Ratione atque ipsa vero voluptatibus praesentium."
+         *         "Voluptas magni et eligendi.": "Maxime ipsam impedit."
          *       },
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-         *       "fileContent": "Ipsa eius iste asperiores quas eveniet.",
+         *       "fileContent": "Eaque possimus qui.",
          *       "forceCreateNewServicePlanVersion": true,
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
          *       "secrets": {
-         *         "Laboriosam et id minus quo perferendis quae.": "Nobis quia ex mollitia exercitationem quidem.",
-         *         "Molestiae molestiae id voluptates.": "Inventore quisquam quis.",
-         *         "Quisquam aut doloribus minus explicabo veniam.": "Quis excepturi rem repudiandae quia."
+         *         "Eius harum itaque ex ullam.": "Rerum tempora perferendis.",
+         *         "Eos architecto ab quia harum quia ipsam.": "Deleniti quod.",
+         *         "Ut pariatur animi accusamus.": "Harum nesciunt recusandae."
          *       },
-         *       "serviceLogoURL": "http://ebertupton.biz/lessie"
+         *       "serviceLogoURL": "http://ferryhackett.biz/elton_lueilwitz"
          *     }
          */
         BuildServiceFromComposeSpecRequest2: {
             /**
              * @description Configs for the service. Key is the compose spec name of the config and value is base64 encoded config content
              * @example {
-             *       "Fuga iure laudantium dolorum voluptatum consequatur hic.": "Tempore iure expedita corrupti."
+             *       "Inventore dolorem ut consequatur.": "Cum quis."
              *     }
              */
             configs?: {
@@ -5368,7 +5425,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Et qui debitis.
+             * @example Est velit blanditiis qui deserunt doloribus.
              */
             fileContent: string;
             /**
@@ -5399,8 +5456,8 @@ export interface components {
             /**
              * @description Secrets for the service. Key is the compose spec name of the secret and value is base64 encoded secret content
              * @example {
-             *       "Soluta velit iusto ipsam blanditiis earum quis.": "Itaque voluptates illum vitae ea deserunt aliquid.",
-             *       "Voluptatem voluptatem.": "Necessitatibus qui ut quisquam."
+             *       "Aut et illum repudiandae totam qui quis.": "Quia alias dolorem et consequuntur.",
+             *       "Sint molestias cumque.": "Voluptatem nulla ipsa tenetur commodi."
              *     }
              */
             secrets?: {
@@ -5409,7 +5466,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://effertzmckenzie.com/gabriella_dibbert
+             * @example http://hintzwolf.net/gabriel
              */
             serviceLogoURL?: string;
         };
@@ -5432,7 +5489,7 @@ export interface components {
             isNewServicePlanVersionCreated?: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Mollitia rerum voluptatem blanditiis.
+             * @example Ea architecto quia.
              */
             productTierID: string;
             /**
@@ -5461,13 +5518,13 @@ export interface components {
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "DEV",
-         *       "fileContent": "Nihil modi libero nisi.",
+         *       "fileContent": "Et maxime sint et vitae aut dolorem.",
          *       "forceCreateNewServicePlanVersion": true,
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
-         *       "serviceLogoURL": "http://krisswaniawski.info/rhett",
+         *       "serviceLogoURL": "http://krajcik.org/kevin",
          *       "token": "2"
          *     }
          */
@@ -5494,7 +5551,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in service plan configuration format
-             * @example Minus accusamus pariatur.
+             * @example Minus ut perferendis.
              */
             fileContent: string;
             /**
@@ -5525,12 +5582,12 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://waterscronin.biz/tessie_mclaughlin
+             * @example http://auersmith.net/keeley.robel
              */
             serviceLogoURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example si
+             * @example 27a
              */
             token: string;
         };
@@ -5540,13 +5597,13 @@ export interface components {
          *       "dryrun": true,
          *       "environment": "dev",
          *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-         *       "fileContent": "Earum ut illo et.",
+         *       "fileContent": "Pariatur non.",
          *       "forceCreateNewServicePlanVersion": true,
          *       "name": "MySQL multi-writer service",
          *       "release": true,
          *       "releaseAsPreferred": true,
          *       "releaseVersionName": "mysql",
-         *       "serviceLogoURL": "http://bernier.com/sofia_wisozk"
+         *       "serviceLogoURL": "http://blandarippin.biz/myron"
          *     }
          */
         BuildServiceFromServicePlanSpecRequest2: {
@@ -5572,7 +5629,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description Base64 encoded Compose Spec YAML in service plan configuration format
-             * @example Ut voluptas sit dignissimos quia doloribus nesciunt.
+             * @example Eum consequuntur sunt temporibus est.
              */
             fileContent: string;
             /**
@@ -5603,7 +5660,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://paucek.biz/manley_gutkowski
+             * @example http://bergstrom.net/christopher
              */
             serviceLogoURL?: string;
         };
@@ -5626,7 +5683,7 @@ export interface components {
             isNewServicePlanVersionCreated?: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Laudantium laboriosam minima repudiandae porro ut dolorem.
+             * @example Assumenda inventore.
              */
             productTierID: string;
             /**
@@ -5652,18 +5709,18 @@ export interface components {
         /**
          * @example {
          *       "id": "subr-12345678",
-         *       "token": "bgo"
+         *       "token": "2q"
          *     }
          */
         CancelSubscriptionRequestRequest: {
             /**
              * @description ID of a Subscription Request
-             * @example Quidem accusamus et voluptatibus consequatur.
+             * @example Laboriosam dolores qui et.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example z8
+             * @example m1g
              */
             token: string;
         };
@@ -5718,7 +5775,7 @@ export interface components {
         /**
          * @example {
          *       "planName": "STARTER",
-         *       "token": "7"
+         *       "token": "w89"
          *     }
          */
         ChangePlanRequest: {
@@ -5729,7 +5786,7 @@ export interface components {
             planName: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2
+             * @example ww
              */
             token: string;
         };
@@ -5795,7 +5852,7 @@ export interface components {
          *       "overallResourceStatus": "PENDING_UPDATE",
          *       "productTierFeatureChanges": "PENDING_UPDATE",
          *       "resourceChanges": "PENDING_DELETE",
-         *       "resourceName": "Rerum exercitationem error et sed facere."
+         *       "resourceName": "Eos dicta nulla."
          *     }
          */
         ChangeSet: {
@@ -5859,20 +5916,13 @@ export interface components {
             resourceChanges?: string;
             /**
              * @description The name of the resource
-             * @example Perferendis architecto modi.
+             * @example Et assumenda aut.
              */
             resourceName?: string;
         };
         /**
          * @example {
          *       "changes": [
-         *         {
-         *           "attributes": {
-         *             "resourceId": "r-12345678"
-         *           },
-         *           "changeType": "PENDING_NEW",
-         *           "name": "Customer metrics"
-         *         },
          *         {
          *           "attributes": {
          *             "resourceId": "r-12345678"
@@ -6008,7 +6058,7 @@ export interface components {
          *       "image": "library/mysql:5.7",
          *       "imageRegistry": "docker.io",
          *       "password": "password",
-         *       "token": "g",
+         *       "token": "fra",
          *       "username": "username"
          *     }
          */
@@ -6030,7 +6080,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example y
+             * @example d2
              */
             token: string;
             /**
@@ -6041,100 +6091,100 @@ export interface components {
         };
         /**
          * @example {
-         *       "errorMsg": "Minima nemo.",
+         *       "errorMsg": "Vero rem a quam.",
          *       "imageAccessible": false
          *     }
          */
         CheckIfContainerImageAccessibleResult: {
             /**
              * @description Error message if the image is not accessible
-             * @example Dolorem quae eveniet ut.
+             * @example Expedita nam beatae magni veritatis aut eos.
              */
             errorMsg?: string;
             /**
              * @description Indicates if the image is accessible
-             * @example false
+             * @example true
              */
             imageAccessible: boolean;
         };
         /**
          * @example {
          *       "cloudProvider": "aws",
-         *       "deployingInstances": 6000540776935539000,
-         *       "healthyInstances": 7975430644061758000,
+         *       "deployingInstances": 4285380457797935600,
+         *       "healthyInstances": 1137569328318346900,
          *       "message": "Cloud provider is healthy",
          *       "regionalHealthSummary": {
-         *         "Eveniet reprehenderit.": {
-         *           "deployingInstances": 4269911446912672000,
+         *         "Molestiae eos eum et fugit.": {
+         *           "deployingInstances": 5113054056419677000,
          *           "deploymentCellHealthSummary": {
-         *             "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *               "deployingInstances": 2695512266003194400,
-         *               "healthyInstances": 1179518186880526800,
+         *             "Perspiciatis iure alias iste et ea.": {
+         *               "deployingInstances": 5731182758697466000,
+         *               "healthyInstances": 6294965754346287000,
          *               "hostClusterID": "hc-12345678",
          *               "message": "Cell is healthy",
          *               "status": "Healthy",
-         *               "totalInstances": 4963653456427229000,
-         *               "unhealthyInstances": 939936190848595700,
-         *               "unknownInstances": 6821726574141972000
+         *               "totalInstances": 415269972141220350,
+         *               "unhealthyInstances": 4048093111193924600,
+         *               "unknownInstances": 112597297833528370
          *             }
          *           },
-         *           "healthyInstances": 1020092016261208200,
+         *           "healthyInstances": 5105492144551250000,
          *           "message": "Region is healthy",
          *           "region": "us-east-1",
          *           "status": "Healthy",
-         *           "totalInstances": 2554731705631966000,
-         *           "unhealthyInstances": 1291772252767614500,
-         *           "unknownInstances": 5903418013056205000
+         *           "totalInstances": 4323423005147863000,
+         *           "unhealthyInstances": 5167448156807537000,
+         *           "unknownInstances": 8916355211072841000
          *         },
-         *         "Necessitatibus aliquid consequatur tempore nihil cupiditate.": {
-         *           "deployingInstances": 4269911446912672000,
+         *         "Praesentium et voluptatibus ducimus ab et aliquam.": {
+         *           "deployingInstances": 5113054056419677000,
          *           "deploymentCellHealthSummary": {
-         *             "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *               "deployingInstances": 2695512266003194400,
-         *               "healthyInstances": 1179518186880526800,
+         *             "Perspiciatis iure alias iste et ea.": {
+         *               "deployingInstances": 5731182758697466000,
+         *               "healthyInstances": 6294965754346287000,
          *               "hostClusterID": "hc-12345678",
          *               "message": "Cell is healthy",
          *               "status": "Healthy",
-         *               "totalInstances": 4963653456427229000,
-         *               "unhealthyInstances": 939936190848595700,
-         *               "unknownInstances": 6821726574141972000
+         *               "totalInstances": 415269972141220350,
+         *               "unhealthyInstances": 4048093111193924600,
+         *               "unknownInstances": 112597297833528370
          *             }
          *           },
-         *           "healthyInstances": 1020092016261208200,
+         *           "healthyInstances": 5105492144551250000,
          *           "message": "Region is healthy",
          *           "region": "us-east-1",
          *           "status": "Healthy",
-         *           "totalInstances": 2554731705631966000,
-         *           "unhealthyInstances": 1291772252767614500,
-         *           "unknownInstances": 5903418013056205000
+         *           "totalInstances": 4323423005147863000,
+         *           "unhealthyInstances": 5167448156807537000,
+         *           "unknownInstances": 8916355211072841000
          *         },
-         *         "Temporibus autem esse ea numquam ut.": {
-         *           "deployingInstances": 4269911446912672000,
+         *         "Vel minima tempora corporis autem voluptatem.": {
+         *           "deployingInstances": 5113054056419677000,
          *           "deploymentCellHealthSummary": {
-         *             "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *               "deployingInstances": 2695512266003194400,
-         *               "healthyInstances": 1179518186880526800,
+         *             "Perspiciatis iure alias iste et ea.": {
+         *               "deployingInstances": 5731182758697466000,
+         *               "healthyInstances": 6294965754346287000,
          *               "hostClusterID": "hc-12345678",
          *               "message": "Cell is healthy",
          *               "status": "Healthy",
-         *               "totalInstances": 4963653456427229000,
-         *               "unhealthyInstances": 939936190848595700,
-         *               "unknownInstances": 6821726574141972000
+         *               "totalInstances": 415269972141220350,
+         *               "unhealthyInstances": 4048093111193924600,
+         *               "unknownInstances": 112597297833528370
          *             }
          *           },
-         *           "healthyInstances": 1020092016261208200,
+         *           "healthyInstances": 5105492144551250000,
          *           "message": "Region is healthy",
          *           "region": "us-east-1",
          *           "status": "Healthy",
-         *           "totalInstances": 2554731705631966000,
-         *           "unhealthyInstances": 1291772252767614500,
-         *           "unknownInstances": 5903418013056205000
+         *           "totalInstances": 4323423005147863000,
+         *           "unhealthyInstances": 5167448156807537000,
+         *           "unknownInstances": 8916355211072841000
          *         }
          *       },
          *       "status": "Healthy",
-         *       "totalInstances": 9023638997878557000,
-         *       "unhealthyInstances": 5951736393258833000,
-         *       "unknownInstances": 7115256895972312000
+         *       "totalInstances": 2458830981005082000,
+         *       "unhealthyInstances": 2842819686028376600,
+         *       "unknownInstances": 7510246800611309000
          *     }
          */
         CloudProviderHealthSummary: {
@@ -6146,13 +6196,13 @@ export interface components {
             /**
              * Format: int64
              * @description The number of instances currently deploying
-             * @example 6420874199731029000
+             * @example 2230058166280294100
              */
             deployingInstances: number;
             /**
              * Format: int64
              * @description The number of healthy instances in the cloud provider
-             * @example 9038985246135042000
+             * @example 6435836713405982000
              */
             healthyInstances: number;
             /**
@@ -6163,71 +6213,27 @@ export interface components {
             /**
              * @description The summary of health by region
              * @example {
-             *       "Commodi et velit delectus.": {
-             *         "deployingInstances": 4269911446912672000,
+             *       "Aut asperiores vel ipsam ratione velit maiores.": {
+             *         "deployingInstances": 5113054056419677000,
              *         "deploymentCellHealthSummary": {
-             *           "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *             "deployingInstances": 2695512266003194400,
-             *             "healthyInstances": 1179518186880526800,
+             *           "Perspiciatis iure alias iste et ea.": {
+             *             "deployingInstances": 5731182758697466000,
+             *             "healthyInstances": 6294965754346287000,
              *             "hostClusterID": "hc-12345678",
              *             "message": "Cell is healthy",
              *             "status": "Healthy",
-             *             "totalInstances": 4963653456427229000,
-             *             "unhealthyInstances": 939936190848595700,
-             *             "unknownInstances": 6821726574141972000
+             *             "totalInstances": 415269972141220350,
+             *             "unhealthyInstances": 4048093111193924600,
+             *             "unknownInstances": 112597297833528370
              *           }
              *         },
-             *         "healthyInstances": 1020092016261208200,
+             *         "healthyInstances": 5105492144551250000,
              *         "message": "Region is healthy",
              *         "region": "us-east-1",
              *         "status": "Healthy",
-             *         "totalInstances": 2554731705631966000,
-             *         "unhealthyInstances": 1291772252767614500,
-             *         "unknownInstances": 5903418013056205000
-             *       },
-             *       "Natus molestias.": {
-             *         "deployingInstances": 4269911446912672000,
-             *         "deploymentCellHealthSummary": {
-             *           "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *             "deployingInstances": 2695512266003194400,
-             *             "healthyInstances": 1179518186880526800,
-             *             "hostClusterID": "hc-12345678",
-             *             "message": "Cell is healthy",
-             *             "status": "Healthy",
-             *             "totalInstances": 4963653456427229000,
-             *             "unhealthyInstances": 939936190848595700,
-             *             "unknownInstances": 6821726574141972000
-             *           }
-             *         },
-             *         "healthyInstances": 1020092016261208200,
-             *         "message": "Region is healthy",
-             *         "region": "us-east-1",
-             *         "status": "Healthy",
-             *         "totalInstances": 2554731705631966000,
-             *         "unhealthyInstances": 1291772252767614500,
-             *         "unknownInstances": 5903418013056205000
-             *       },
-             *       "Qui quisquam qui.": {
-             *         "deployingInstances": 4269911446912672000,
-             *         "deploymentCellHealthSummary": {
-             *           "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *             "deployingInstances": 2695512266003194400,
-             *             "healthyInstances": 1179518186880526800,
-             *             "hostClusterID": "hc-12345678",
-             *             "message": "Cell is healthy",
-             *             "status": "Healthy",
-             *             "totalInstances": 4963653456427229000,
-             *             "unhealthyInstances": 939936190848595700,
-             *             "unknownInstances": 6821726574141972000
-             *           }
-             *         },
-             *         "healthyInstances": 1020092016261208200,
-             *         "message": "Region is healthy",
-             *         "region": "us-east-1",
-             *         "status": "Healthy",
-             *         "totalInstances": 2554731705631966000,
-             *         "unhealthyInstances": 1291772252767614500,
-             *         "unknownInstances": 5903418013056205000
+             *         "totalInstances": 4323423005147863000,
+             *         "unhealthyInstances": 5167448156807537000,
+             *         "unknownInstances": 8916355211072841000
              *       }
              *     }
              */
@@ -6242,19 +6248,19 @@ export interface components {
             /**
              * Format: int64
              * @description The total number of instances in the cloud provider
-             * @example 7572020694481885000
+             * @example 8934618301000941000
              */
             totalInstances: number;
             /**
              * Format: int64
              * @description The number of unhealthy instances in the cloud provider
-             * @example 3321367840337207000
+             * @example 7329272501374635000
              */
             unhealthyInstances: number;
             /**
              * Format: int64
              * @description The number of instances with unknown status
-             * @example 1354193554867767000
+             * @example 5822099258356386000
              */
             unknownInstances?: number;
         };
@@ -6318,7 +6324,7 @@ export interface components {
          * @example {
          *       "code": "ac_12345678",
          *       "state": "12345678",
-         *       "token": "oi"
+         *       "token": "w"
          *     }
          */
         CompleteOAuthConnectionRequest: {
@@ -6334,7 +6340,7 @@ export interface components {
             state?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example em
+             * @example bl
              */
             token: string;
         };
@@ -6434,25 +6440,25 @@ export interface components {
         };
         /**
          * @example {
-         *       "password": "Nisi et numquam nostrum architecto.",
-         *       "username": "Consequatur tenetur repellat fugiat."
+         *       "password": "Exercitationem ad ut dolores ipsum eaque.",
+         *       "username": "Commodi quisquam facere."
          *     }
          */
         ConsumptionServiceAuthRequest: {
-            /** @example Non est iste inventore odit qui repellendus. */
+            /** @example Neque eaque maiores modi. */
             password: string;
-            /** @example Aut quis soluta aut accusantium. */
+            /** @example In non et et quis. */
             username: string;
         };
         /**
          * @example {
-         *       "token": "oi"
+         *       "token": "8"
          *     }
          */
         ConsumptionServiceAuthResult: {
             /**
              * @description JWT token used to perform authorization
-             * @example pl
+             * @example ths
              */
             token: string;
         };
@@ -6546,14 +6552,6 @@ export interface components {
          *         {
          *           "imageName": "postgres",
          *           "imageTag": "16"
-         *         },
-         *         {
-         *           "imageName": "postgres",
-         *           "imageTag": "16"
-         *         },
-         *         {
-         *           "imageName": "postgres",
-         *           "imageTag": "16"
          *         }
          *       ],
          *       "pullMode": "INSTALLER_EMBED|RUNTIME_PULL",
@@ -6586,10 +6584,6 @@ export interface components {
              *       {
              *         "imageName": "postgres",
              *         "imageTag": "16"
-             *       },
-             *       {
-             *         "imageName": "postgres",
-             *         "imageTag": "16"
              *       }
              *     ]
              */
@@ -6601,6 +6595,48 @@ export interface components {
             pullMode?: string;
             pullSource?: components["schemas"]["ContainerImagesRegistry"];
             pushTarget?: components["schemas"]["ContainerImagesRegistry"];
+        };
+        /**
+         * @example {
+         *       "sourceSnapshotId": "instance-ss-abcd1234",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "targetRegion": "us-west-2",
+         *       "token": "c"
+         *     }
+         */
+        CopyInstanceSnapshotRequest: {
+            /**
+             * @description ID of a Resource Instance Snapshot
+             * @example Vitae voluptatem.
+             */
+            sourceSnapshotId: string;
+            /**
+             * @description The subscription ID
+             * @example sub-abcd1234
+             */
+            subscriptionId?: string;
+            /**
+             * @description The target region to copy the snapshot to
+             * @example us-west-2
+             */
+            targetRegion: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example w
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "targetRegion": "us-west-2"
+         *     }
+         */
+        CopyInstanceSnapshotRequest2: {
+            /**
+             * @description The target region to copy the snapshot to
+             * @example us-west-2
+             */
+            targetRegion: string;
         };
         /**
          * @example {
@@ -6668,7 +6704,7 @@ export interface components {
          *       "sourceId": "pt-12345678",
          *       "support": "Any support",
          *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY",
-         *       "token": "fe"
+         *       "token": "q"
          *     }
          */
         CopyProductTierRequest: {
@@ -6815,12 +6851,12 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Voluptatum cum voluptas commodi assumenda.
+             * @example Et aliquam est voluptates deserunt.
              */
             serviceModelId: string;
             /**
              * @description ID of a Product Tier
-             * @example Tempore similique hic tempore at.
+             * @example Architecto earum eaque voluptatum sequi eum magnam.
              */
             sourceId: string;
             /**
@@ -6835,7 +6871,7 @@ export interface components {
             targetTierType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gb
+             * @example vjg
              */
             token: string;
         };
@@ -6900,7 +6936,7 @@ export interface components {
          *       "privateRegions": [
          *         "n/a"
          *       ],
-         *       "serviceModelId": "Mollitia sunt aliquid et.",
+         *       "serviceModelId": "Explicabo non dolor.",
          *       "support": "Any support",
          *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
          *     }
@@ -7044,7 +7080,7 @@ export interface components {
             privateRegions?: string[];
             /**
              * @description Service model ID
-             * @example Est molestias ea recusandae est.
+             * @example Ut voluptas doloremque.
              */
             serviceModelId: string;
             /**
@@ -7071,7 +7107,7 @@ export interface components {
          *       "sourceSnapshotId": "instance-ss-abcd1234",
          *       "subscriptionId": "sub-abcd1234",
          *       "targetRegion": "us-west-2",
-         *       "token": "q"
+         *       "token": "s"
          *     }
          */
         CopyResourceInstanceSnapshotRequest: {
@@ -7112,12 +7148,12 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Voluptatibus adipisci.
+             * @example Minima ea quaerat eveniet ut cupiditate ut.
              */
             serviceProviderId: string;
             /**
              * @description ID of a Resource Instance Snapshot
-             * @example Ipsam quos sit omnis fugiat possimus temporibus.
+             * @example Dolorem vitae quaerat deleniti.
              */
             sourceSnapshotId?: string;
             /**
@@ -7132,20 +7168,20 @@ export interface components {
             targetRegion: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ykd
+             * @example l
              */
             token: string;
         };
         /**
          * @example {
-         *       "sourceSnapshotId": "Voluptate quae omnis.",
+         *       "sourceSnapshotId": "Pariatur sit ut vitae officiis.",
          *       "targetRegion": "us-west-2"
          *     }
          */
         CopyResourceInstanceSnapshotRequest2: {
             /**
              * @description The source snapshot ID
-             * @example Unde sapiente.
+             * @example Temporibus rem vitae ex voluptatum quos.
              */
             sourceSnapshotId?: string;
             /**
@@ -7156,13 +7192,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "snapshotId": "Molestias dolor et suscipit recusandae."
+         *       "snapshotId": "Est incidunt."
          *     }
          */
         CopyResourceInstanceSnapshotResponseBody: {
             /**
              * @description The new snapshot ID created as a result of the copy operation
-             * @example Sint impedit quia eligendi enim suscipit enim.
+             * @example Laudantium deserunt fugiat maiores enim pariatur.
              */
             snapshotId: string;
         };
@@ -7185,6 +7221,18 @@ export interface components {
          *             "status": "ON"
          *           },
          *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
          *         }
          *       ],
          *       "name": "MySQL multi-writer service hosted model",
@@ -7192,7 +7240,7 @@ export interface components {
          *       "sourceId": "sm-12345678",
          *       "targetServiceModelType": "CUSTOMER_HOSTED",
          *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY",
-         *       "token": "a"
+         *       "token": "r0r"
          *     }
          */
         CopyServiceModelRequest: {
@@ -7223,12 +7271,6 @@ export interface components {
              *           "status": "ON"
              *         },
              *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
              *       }
              *     ]
              */
@@ -7245,7 +7287,7 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Saepe distinctio dolor itaque molestiae eum et.
+             * @example Fugiat eveniet reprehenderit eos amet et fuga.
              */
             sourceId: string;
             /**
@@ -7260,7 +7302,7 @@ export interface components {
             targetTierType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example u36
+             * @example w9
              */
             token: string;
         };
@@ -7272,12 +7314,6 @@ export interface components {
          *       ],
          *       "description": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
          *       "features": [
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-         *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
@@ -7347,10 +7383,10 @@ export interface components {
         /**
          * @description Account configuration including the role required to access
          * @example {
-         *       "awsAccessKey": "Qui facilis consequatur et accusantium maiores dolor.",
+         *       "awsAccessKey": "Consequatur quis cupiditate corrupti rerum eligendi.",
          *       "awsAccountID": "123456789012",
          *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-         *       "awsSecretKey": "Perspiciatis esse accusamus et aut voluptatem.",
+         *       "awsSecretKey": "Illo illum quia.",
          *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
          *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
          *       "byoaInstanceID": "instance-12345678",
@@ -7359,17 +7395,17 @@ export interface components {
          *       "gcpProjectID": "my-project",
          *       "gcpProjectNumber": "123456789012",
          *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-         *       "gcpServiceAccountKey": "Et saepe fuga.",
+         *       "gcpServiceAccountKey": "Voluptatibus officiis ducimus minima.",
          *       "name": "Dev AWS account",
          *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
          *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-         *       "token": "ll1"
+         *       "token": "tk"
          *     }
          */
         CreateAccountConfigRequest: {
             /**
              * @description The AWS access key
-             * @example Quia qui repellat.
+             * @example Dolorum est veritatis quos fugit eos.
              */
             awsAccessKey?: string;
             /**
@@ -7384,7 +7420,7 @@ export interface components {
             awsBootstrapRoleARN?: string;
             /**
              * @description The AWS secret key
-             * @example Eum temporibus labore asperiores.
+             * @example Odit fugiat officia quia reiciendis.
              */
             awsSecretKey?: string;
             /**
@@ -7404,7 +7440,7 @@ export interface components {
             byoaInstanceID?: string;
             /**
              * @description ID of an CloudProvider
-             * @example Dolores est magnam eum assumenda.
+             * @example Autem et nemo repellendus.
              */
             cloudProviderId: string;
             /**
@@ -7429,7 +7465,7 @@ export interface components {
             gcpServiceAccountEmail?: string;
             /**
              * @description The GCP service account key
-             * @example Pariatur tempore atque.
+             * @example Harum sit ut facilis.
              */
             gcpServiceAccountKey?: string;
             /**
@@ -7449,25 +7485,25 @@ export interface components {
             ociTenancyID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gh
+             * @example f
              */
             token: string;
         };
         /**
          * @example {
-         *       "awsAccessKey": "Veritatis est voluptatum.",
+         *       "awsAccessKey": "Repellat autem quae nulla omnis consequatur.",
          *       "awsAccountID": "123456789012",
          *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-         *       "awsSecretKey": "Natus ut eum ut necessitatibus commodi aut.",
+         *       "awsSecretKey": "Sint eaque explicabo inventore.",
          *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
          *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
          *       "byoaInstanceID": "instance-12345678",
-         *       "cloudProviderId": "Eligendi quis quas nobis ut fugit.",
+         *       "cloudProviderId": "Aut a ut eum sapiente facere.",
          *       "description": "An AWS account hosting multiple dev environments",
          *       "gcpProjectID": "my-project",
          *       "gcpProjectNumber": "123456789012",
          *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-         *       "gcpServiceAccountKey": "Quasi quod.",
+         *       "gcpServiceAccountKey": "Debitis deserunt vitae dolor.",
          *       "name": "Dev AWS account",
          *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
          *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -7476,7 +7512,7 @@ export interface components {
         CreateAccountConfigRequest2: {
             /**
              * @description The AWS access key
-             * @example Enim autem.
+             * @example Sint quod voluptas.
              */
             awsAccessKey?: string;
             /**
@@ -7491,7 +7527,7 @@ export interface components {
             awsBootstrapRoleARN?: string;
             /**
              * @description The AWS secret key
-             * @example Sapiente dolor perspiciatis sit.
+             * @example Consequatur illo ut.
              */
             awsSecretKey?: string;
             /**
@@ -7511,7 +7547,7 @@ export interface components {
             byoaInstanceID?: string;
             /**
              * @description Cloud Provider ID to operate on
-             * @example Vero facilis officia odit magnam voluptatem.
+             * @example Dignissimos id praesentium necessitatibus aut autem ea.
              */
             cloudProviderId: string;
             /**
@@ -7536,7 +7572,7 @@ export interface components {
             gcpServiceAccountEmail?: string;
             /**
              * @description The GCP service account key
-             * @example Distinctio dolore ea.
+             * @example Quis et magni distinctio vel et autem.
              */
             gcpServiceAccountKey?: string;
             /**
@@ -7577,7 +7613,7 @@ export interface components {
          *       },
          *       "rootVolumeSizeGi": 10,
          *       "serviceId": "s-12345678",
-         *       "token": "sfn",
+         *       "token": "8dq",
          *       "warmPoolConfiguration": {
          *         "minimumNodesInPool": 1
          *       }
@@ -7619,7 +7655,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xba
+             * @example e1
              */
             token: string;
             warmPoolConfiguration?: components["schemas"]["WarmPoolConfiguration"];
@@ -7690,7 +7726,7 @@ export interface components {
          *       "route53Configuration": {
          *         "awsAccountID": "123456789012"
          *       },
-         *       "token": "mg"
+         *       "token": "xs"
          *     }
          */
         CreateCustomDomainRequest: {
@@ -7712,7 +7748,7 @@ export interface components {
             route53Configuration: components["schemas"]["Route53Configuration"];
             /**
              * @description JWT token used to perform authorization
-             * @example 5jy
+             * @example f
              */
             token: string;
         };
@@ -7754,7 +7790,7 @@ export interface components {
          *         "isPrivateLinkEnabled": true
          *       },
          *       "orgId": "org-12345678",
-         *       "token": "wa"
+         *       "token": "kv"
          *     }
          */
         CreateCustomNetworkRequest: {
@@ -7783,12 +7819,12 @@ export interface components {
             networkFeaturesConfiguration?: components["schemas"]["NetworkFeaturesConfiguration"];
             /**
              * @description ID of an Org
-             * @example Maiores et inventore laudantium fugit.
+             * @example Quae hic.
              */
             orgId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q7
+             * @example 5
              */
             token: string;
         };
@@ -7801,7 +7837,7 @@ export interface components {
          *       "networkFeaturesConfiguration": {
          *         "isPrivateLinkEnabled": true
          *       },
-         *       "orgId": "Ratione aut et aliquam iusto qui dolorem."
+         *       "orgId": "Ut placeat recusandae."
          *     }
          */
         CreateCustomNetworkRequest2: {
@@ -7830,7 +7866,7 @@ export interface components {
             networkFeaturesConfiguration?: components["schemas"]["NetworkFeaturesConfiguration"];
             /**
              * @description The ID of the organization that owns the custom network
-             * @example Adipisci autem omnis culpa.
+             * @example Minima corrupti.
              */
             orgId?: string;
         };
@@ -7848,7 +7884,7 @@ export interface components {
          *         "region-abcd1234",
          *         "region-3c3c3c3c"
          *       ],
-         *       "token": "4nc"
+         *       "token": "3"
          *     }
          */
         CreateDeploymentConfigRequest: {
@@ -7873,7 +7909,7 @@ export interface components {
             rolloutPriorityList?: string[];
             /**
              * @description JWT token used to perform authorization
-             * @example s
+             * @example z
              */
             token: string;
         };
@@ -7921,13 +7957,13 @@ export interface components {
          *       "clientSecret": "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",
          *       "disabled": false,
          *       "emailIdentifiers": "company.com",
-         *       "environmentType": "Quibusdam adipisci nam.",
+         *       "environmentType": "Illum debitis sit.",
          *       "identityProviderName": "Google",
          *       "loginButtonIconUrl": "https://example.com/icon.png",
          *       "loginButtonText": "Login with Google",
          *       "name": "Google for my company",
          *       "scopes": "openid email profile",
-         *       "token": "024",
+         *       "token": "0kx",
          *       "tokenEndpoint": "https://oauth2.googleapis.com/token",
          *       "userInfoEndpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
          *     }
@@ -7960,7 +7996,7 @@ export interface components {
             emailIdentifiers?: string;
             /**
              * @description The type of environment to filter costs by
-             * @example Inventore ad sit.
+             * @example Aut fugit tempore tempore suscipit ad ex.
              */
             environmentType?: string;
             /**
@@ -7990,7 +8026,7 @@ export interface components {
             scopes?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9w
+             * @example 2p4
              */
             token: string;
             /**
@@ -8011,7 +8047,7 @@ export interface components {
          *       "clientSecret": "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",
          *       "disabled": false,
          *       "emailIdentifiers": "company.com",
-         *       "environmentType": "Est eaque ut eligendi voluptatibus aperiam.",
+         *       "environmentType": "Blanditiis inventore maxime placeat sint et soluta.",
          *       "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
          *       "loginButtonIconUrl": "https://example.com/icon.png",
          *       "loginButtonText": "Login with Google",
@@ -8049,7 +8085,7 @@ export interface components {
             emailIdentifiers?: string;
             /**
              * @description The type of environment to filter costs by
-             * @example Quos vero consequuntur ipsa in qui accusamus.
+             * @example Quam nostrum maxime consectetur hic ut itaque.
              */
             environmentType?: string;
             /**
@@ -8108,7 +8144,7 @@ export interface components {
          *       "imageTag": "latest",
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "9o"
+         *       "token": "aoy"
          *     }
          */
         CreateImageConfigRequest: {
@@ -8125,7 +8161,7 @@ export interface components {
             imageName: string;
             /**
              * @description ID of an Image Registry
-             * @example Rerum impedit aut quasi.
+             * @example Sint excepturi maiores.
              */
             imageRegistryId?: string;
             /**
@@ -8154,7 +8190,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 6k
+             * @example qi
              */
             token: string;
         };
@@ -8172,7 +8208,7 @@ export interface components {
          *       },
          *       "description": "A image configuration for my new entity",
          *       "imageName": "mysql",
-         *       "imageRegistryId": "Non alias aut nostrum earum.",
+         *       "imageRegistryId": "Est eaque ut eligendi voluptatibus aperiam.",
          *       "imageSignaturePublicKeyPEM": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "imageTag": "latest",
          *       "serviceEnvironmentId": "se-123456"
@@ -8192,7 +8228,7 @@ export interface components {
             imageName: string;
             /**
              * @description The image registry ID to use for the infra
-             * @example Sit aliquam ab iste rerum quasi autem.
+             * @example Quos vero consequuntur ipsa in qui accusamus.
              */
             imageRegistryId?: string;
             /**
@@ -8222,7 +8258,7 @@ export interface components {
          *       "host": "docker.io",
          *       "name": "DockerHub",
          *       "password": "mypassword",
-         *       "token": "8dq",
+         *       "token": "6a7",
          *       "username": "myusername"
          *     }
          */
@@ -8249,7 +8285,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example e1
+             * @example zl
              */
             token: string;
             /**
@@ -8308,13 +8344,13 @@ export interface components {
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
          *       "storageConfigId": "sc-12345678",
-         *       "token": "s"
+         *       "token": "pq"
          *     }
          */
         CreateInfraConfigRequest: {
             /**
              * @description ID of a Compute Config
-             * @example Suscipit sapiente.
+             * @example Laboriosam reprehenderit enim harum commodi sapiente assumenda.
              */
             computeConfigId?: string;
             customTag?: components["schemas"]["CustomTag"];
@@ -8330,7 +8366,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a Network Config
-             * @example Sunt minima porro molestias mollitia.
+             * @example Amet a tenetur aut.
              */
             networkConfigId?: string;
             /**
@@ -8345,33 +8381,33 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Storage Config
-             * @example Et ad error voluptatem optio ratione.
+             * @example Quaerat similique aliquam consectetur ut iusto.
              */
             storageConfigId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xaw
+             * @example 4vi
              */
             token: string;
         };
         /**
          * @example {
-         *       "computeConfigId": "Eius harum itaque ex ullam.",
+         *       "computeConfigId": "Veritatis est voluptatum.",
          *       "customTag": {
          *         "key": "customKey",
          *         "value": "customValue"
          *       },
          *       "description": "Infra config used for the base tier MySQL service",
          *       "name": "MySQL Writer Infra Config",
-         *       "networkConfigId": "Sit vel et.",
+         *       "networkConfigId": "Quasi quod.",
          *       "serviceEnvironmentId": "se-123456",
-         *       "storageConfigId": "Rerum tempora perferendis."
+         *       "storageConfigId": "Natus ut eum ut necessitatibus commodi aut."
          *     }
          */
         CreateInfraConfigRequest2: {
             /**
              * @description The compute config ID
-             * @example Harum nesciunt recusandae.
+             * @example Ut sapiente dolor perspiciatis sit.
              */
             computeConfigId?: string;
             customTag?: components["schemas"]["CustomTag"];
@@ -8387,7 +8423,7 @@ export interface components {
             name: string;
             /**
              * @description The network config ID
-             * @example Deleniti quod.
+             * @example Eligendi quis quas nobis ut fugit.
              */
             networkConfigId?: string;
             /**
@@ -8397,7 +8433,7 @@ export interface components {
             serviceEnvironmentId: string;
             /**
              * @description The storage config ID
-             * @example Eos architecto ab quia harum quia ipsam.
+             * @example Distinctio dolore ea.
              */
             storageConfigId?: string;
         };
@@ -8405,10 +8441,10 @@ export interface components {
          * @example {
          *       "defaultValue": "default value",
          *       "dependentResourceId": "r-12345678",
-         *       "description": "Exercitationem dolores consequuntur expedita pariatur quas non.",
-         *       "hasOptions": false,
-         *       "isList": true,
-         *       "key": "lpo",
+         *       "description": "Suscipit dignissimos dolorem nobis expedita enim.",
+         *       "hasOptions": true,
+         *       "isList": false,
+         *       "key": "eh",
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
          *         "medium": "t3.large",
@@ -8421,7 +8457,7 @@ export interface components {
          *         "minLength": "Eveniet architecto assumenda et voluptas perferendis enim."
          *       },
          *       "modifiable": false,
-         *       "name": "7r",
+         *       "name": "9",
          *       "options": [
          *         "a",
          *         "b",
@@ -8429,7 +8465,7 @@ export interface components {
          *         "default value"
          *       ],
          *       "regex": "^[a-zA-Z0-9_-]+$",
-         *       "required": false,
+         *       "required": true,
          *       "resourceId": "r-12345678",
          *       "scope": {
          *         "cloudProviders": [
@@ -8440,7 +8476,7 @@ export interface components {
          *       },
          *       "serviceId": "s-12345678",
          *       "tabIndex": 1,
-         *       "token": "z6",
+         *       "token": "byt",
          *       "type": "Boolean|Float64|String|Resource|Secret|Password"
          *     }
          */
@@ -8452,12 +8488,12 @@ export interface components {
             defaultValue?: string;
             /**
              * @description ID of a resource
-             * @example Et omnis voluptatibus facilis.
+             * @example Et qui debitis et incidunt suscipit.
              */
             dependentResourceId?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Sed reiciendis ex qui sunt.
+             * @example Laudantium quis.
              */
             description: string;
             /**
@@ -8469,12 +8505,12 @@ export interface components {
             /**
              * @description Marks the input parameter as a list of values
              * @default false
-             * @example true
+             * @example false
              */
             isList: boolean;
             /**
              * @description Key of the input parameter
-             * @example o
+             * @example w
              */
             key: string;
             /**
@@ -8491,12 +8527,12 @@ export interface components {
             limits?: components["schemas"]["Limits"];
             /**
              * @description Marks the input parameter as immutable
-             * @example false
+             * @example true
              */
             modifiable: boolean;
             /**
              * @description External name for the input parameter
-             * @example ut
+             * @example ff
              */
             name: string;
             /**
@@ -8521,7 +8557,7 @@ export interface components {
             required: boolean;
             /**
              * @description ID of a resource
-             * @example Vitae nam dolorem aut id in natus.
+             * @example Unde laborum accusantium ut.
              */
             resourceId: string;
             scope?: components["schemas"]["InputParameterScope"];
@@ -8539,7 +8575,7 @@ export interface components {
             tabIndex: number;
             /**
              * @description JWT token used to perform authorization
-             * @example h52
+             * @example 4tz
              */
             token: string;
             /**
@@ -8551,11 +8587,11 @@ export interface components {
         /**
          * @example {
          *       "defaultValue": "default value",
-         *       "dependentResourceId": "Vel voluptatum aut.",
-         *       "description": "Enim cumque.",
+         *       "dependentResourceId": "Sed dolores aut est.",
+         *       "description": "Optio velit.",
          *       "hasOptions": false,
-         *       "isList": true,
-         *       "key": "s",
+         *       "isList": false,
+         *       "key": "ct",
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
          *         "medium": "t3.large",
@@ -8568,7 +8604,7 @@ export interface components {
          *         "minLength": "Ab sint."
          *       },
          *       "modifiable": false,
-         *       "name": "a1",
+         *       "name": "sle",
          *       "options": [
          *         "a",
          *         "b",
@@ -8576,8 +8612,8 @@ export interface components {
          *         "default value"
          *       ],
          *       "regex": "^[a-zA-Z0-9_-]+$",
-         *       "required": false,
-         *       "resourceId": "Commodi reiciendis et.",
+         *       "required": true,
+         *       "resourceId": "Quam eligendi sit laboriosam beatae.",
          *       "scope": {
          *         "cloudProviders": [
          *           "aws",
@@ -8597,12 +8633,12 @@ export interface components {
             defaultValue?: string;
             /**
              * @description The ID of the resource whose instance this input parameter depends on
-             * @example Tenetur commodi sequi.
+             * @example Veniam architecto vitae qui quos aspernatur.
              */
             dependentResourceId?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Aut et illum repudiandae totam qui quis.
+             * @example Porro voluptate sit qui quis et quia.
              */
             description: string;
             /**
@@ -8614,12 +8650,12 @@ export interface components {
             /**
              * @description Marks the input parameter as a list of values
              * @default false
-             * @example false
+             * @example true
              */
             isList: boolean;
             /**
              * @description Key of the input parameter
-             * @example dp
+             * @example dkb
              */
             key: string;
             /**
@@ -8641,7 +8677,7 @@ export interface components {
             modifiable: boolean;
             /**
              * @description External name for the input parameter
-             * @example 5
+             * @example qau
              */
             name: string;
             /**
@@ -8661,12 +8697,12 @@ export interface components {
             regex?: string;
             /**
              * @description Enforces the input parameter as a required parameter
-             * @example true
+             * @example false
              */
             required: boolean;
             /**
              * @description The ID of the resource that this input parameter belongs to
-             * @example Ut debitis amet quasi.
+             * @example Modi quasi ut et voluptates est adipisci.
              */
             resourceId: string;
             scope?: components["schemas"]["InputParameterScope"];
@@ -8679,6 +8715,54 @@ export interface components {
             tabIndex: number;
             /** @example Boolean|Float64|String|Resource|Secret|Password */
             type: string;
+        };
+        /**
+         * @example {
+         *       "instanceId": "instance-abcd1234",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "targetRegion": "us-west-2",
+         *       "token": "jr"
+         *     }
+         */
+        CreateInstanceSnapshotRequest: {
+            /**
+             * @description The instance ID
+             * @example instance-abcd1234
+             */
+            instanceId: string;
+            /**
+             * @description The subscription ID
+             * @example sub-abcd1234
+             */
+            subscriptionId?: string;
+            /**
+             * @description The target region to create the snapshot in. If not specified, use the same region as the instance
+             * @example us-west-2
+             */
+            targetRegion?: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example ho
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "instanceId": "instance-abcd1234",
+         *       "targetRegion": "us-west-2"
+         *     }
+         */
+        CreateInstanceSnapshotRequest2: {
+            /**
+             * @description The instance ID
+             * @example instance-abcd1234
+             */
+            instanceId: string;
+            /**
+             * @description The target region to create the snapshot in. If not specified, use the same region as the instance
+             * @example us-west-2
+             */
+            targetRegion?: string;
         };
         /**
          * @example {
@@ -8719,7 +8803,7 @@ export interface components {
          *       "serviceId": "s-12345678",
          *       "stableEgressIP": true,
          *       "tlsTerminationPort": 443,
-         *       "token": "bgb",
+         *       "token": "hc",
          *       "zoneConfiguration": "SINGLE_ZONE_OMNISTRATE_RECOMMENDED|SINGLE_ZONE_CUSTOMER_PROVIDED|MULTI_ZONE"
          *     }
          */
@@ -8773,7 +8857,7 @@ export interface components {
             tlsTerminationPort?: number;
             /**
              * @description JWT token used to perform authorization
-             * @example 23n
+             * @example 1r
              */
             token: string;
             /**
@@ -8895,7 +8979,7 @@ export interface components {
          *       "name": "Username",
          *       "resourceId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "e7",
+         *       "token": "94l",
          *       "value": "johndoe",
          *       "valueRef": "$var.username",
          *       "valueType": "Boolean|Float64|String|Secret|Password"
@@ -8921,7 +9005,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a resource
-             * @example Dolorem nemo at.
+             * @example Voluptatum ab laudantium.
              */
             resourceId: string;
             /**
@@ -8931,7 +9015,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example rbg
+             * @example 5
              */
             token: string;
             /**
@@ -8979,7 +9063,7 @@ export interface components {
          *         "timeout": 30
          *       },
          *       "name": "Username",
-         *       "resourceId": "Ipsam impedit eos assumenda.",
+         *       "resourceId": "Facilis officia.",
          *       "value": "johndoe",
          *       "valueRef": "$var.username",
          *       "valueType": "Boolean|Float64|String|Secret|Password"
@@ -9005,7 +9089,7 @@ export interface components {
             name: string;
             /**
              * @description The ID of the resource that this output parameter belongs to
-             * @example Enim sed voluptas magni et eligendi ex.
+             * @example Alias consequatur hic quia veritatis facere.
              */
             resourceId: string;
             /**
@@ -9030,7 +9114,7 @@ export interface components {
          *         "se-23456789"
          *       ],
          *       "serviceId": "s-12345678",
-         *       "token": "z4"
+         *       "token": "j7l"
          *     }
          */
         CreatePipelineRequest: {
@@ -9059,7 +9143,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example o8
+             * @example ao
              */
             token: string;
         };
@@ -9144,7 +9228,7 @@ export interface components {
          *       "serviceModelId": "sm-12345678",
          *       "support": "Any support",
          *       "tierType": "OMNISTRATE_DEDICATED_TENANCY",
-         *       "token": "b"
+         *       "token": "c"
          *     }
          */
         CreateProductTierRequest: {
@@ -9310,7 +9394,7 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Impedit vitae.
+             * @example Nihil debitis necessitatibus.
              */
             serviceModelId: string;
             /**
@@ -9325,7 +9409,7 @@ export interface components {
             tierType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 6sc
+             * @example q
              */
             token: string;
         };
@@ -9406,7 +9490,7 @@ export interface components {
          *       "privateRegions": [
          *         "n/a"
          *       ],
-         *       "serviceModelId": "Eius voluptatem.",
+         *       "serviceModelId": "Quia porro impedit commodi.",
          *       "support": "Any support",
          *       "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
          *     }
@@ -9569,7 +9653,7 @@ export interface components {
             privateRegions?: string[];
             /**
              * @description Service model ID
-             * @example Ut quibusdam.
+             * @example Laudantium vero.
              */
             serviceModelId: string;
             /**
@@ -9614,7 +9698,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "e"
+         *       "token": "70"
          *     }
          */
         CreateResourceInstanceRequest: {
@@ -9707,7 +9791,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Vero molestiae hic fugiat et dolor dolorem.
+             * @example Est velit et est.
              */
             serviceProviderId: string;
             /**
@@ -9717,7 +9801,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2mz
+             * @example gk1
              */
             token: string;
         };
@@ -10017,7 +10101,7 @@ export interface components {
          *       },
          *       "imageConfigId": "imgc-12345678",
          *       "infraConfigId": "ic-12345678",
-         *       "internal": false,
+         *       "internal": true,
          *       "isProxy": false,
          *       "jobConfig": {
          *         "activeDeadlineSeconds": 300,
@@ -10208,7 +10292,7 @@ export interface components {
          *           "terraformPath": "/project1/tf"
          *         }
          *       },
-         *       "token": "s"
+         *       "token": "70y"
          *     }
          */
         CreateResourceRequest: {
@@ -10275,12 +10359,12 @@ export interface components {
             helmChartConfiguration?: components["schemas"]["HelmChartConfiguration"];
             /**
              * @description ID of an Image Config
-             * @example Et sunt alias et est aut.
+             * @example Quidem vitae minus.
              */
             imageConfigId?: string;
             /**
              * @description ID of an Infra Config
-             * @example Assumenda iusto eveniet quis labore rerum.
+             * @example Sit error ea voluptatibus nihil odio.
              */
             infraConfigId?: string;
             /**
@@ -10313,7 +10397,7 @@ export interface components {
             operatorCRDConfiguration?: components["schemas"]["OperatorCRDConfiguration"];
             /**
              * @description ID of a Product Tier
-             * @example Qui fugiat aspernatur amet et et.
+             * @example Libero eius labore mollitia incidunt consequatur.
              */
             productTierId: string;
             /**
@@ -10354,7 +10438,7 @@ export interface components {
             terraformConfigurations?: components["schemas"]["TerraformConfigurations"];
             /**
              * @description JWT token used to perform authorization
-             * @example 5pq
+             * @example 3t4
              */
             token: string;
         };
@@ -10576,9 +10660,9 @@ export interface components {
          *         },
          *         "username": "my-user"
          *       },
-         *       "imageConfigId": "Ea consequatur blanditiis perspiciatis.",
-         *       "infraConfigId": "Vel est reiciendis architecto.",
-         *       "internal": false,
+         *       "imageConfigId": "Ut aliquid sunt et explicabo.",
+         *       "infraConfigId": "Nam saepe.",
+         *       "internal": true,
          *       "isProxy": false,
          *       "jobConfig": {
          *         "activeDeadlineSeconds": 300,
@@ -10737,7 +10821,7 @@ export interface components {
          *         ],
          *         "template": "apiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-prod\nspec:\n  acme:\n    server: https://acme-v02.api.letsencrypt.org/directory\n    email: test@example.com\n    privateKeySecretRef:\n      name: letsencrypt-prod\n    solvers:\n    - http01:\n        ingress:\n          class: nginx"
          *       },
-         *       "productTierId": "Fugit ut aut quas rem corrupti adipisci.",
+         *       "productTierId": "Aut iure et illo molestiae dolor et.",
          *       "proxyType": "PortsBasedProxy",
          *       "resourceDependencies": [
          *         {
@@ -10834,12 +10918,12 @@ export interface components {
             helmChartConfiguration?: components["schemas"]["HelmChartConfiguration"];
             /**
              * @description The ID of the image configuration that this resource refers to
-             * @example Qui possimus sint quia quaerat qui.
+             * @example Earum iusto.
              */
             imageConfigId?: string;
             /**
              * @description The ID of the infrastructure configuration that this resource refers to
-             * @example Et ad aspernatur dolorum voluptatem voluptatem.
+             * @example Velit et.
              */
             infraConfigId?: string;
             /**
@@ -10851,7 +10935,7 @@ export interface components {
             /**
              * @description Whether this resource is a proxy or not
              * @default false
-             * @example true
+             * @example false
              */
             isProxy: boolean;
             jobConfig?: components["schemas"]["JobConfig"];
@@ -10889,7 +10973,7 @@ export interface components {
             operatorCRDConfiguration?: components["schemas"]["OperatorCRDConfiguration"];
             /**
              * @description The product tier ID
-             * @example Quas doloribus ad est illo.
+             * @example Iste error minus.
              */
             productTierId: string;
             /**
@@ -10947,7 +11031,7 @@ export interface components {
          *       "description": "My custom domain description",
          *       "environmentType": "DEV",
          *       "name": "MyCustomDomain",
-         *       "token": "w22"
+         *       "token": "x"
          *     }
          */
         CreateSaaSPortalCustomDomainRequest: {
@@ -10973,7 +11057,7 @@ export interface components {
             name: string;
             /**
              * @description JWT token used to perform authorization
-             * @example i
+             * @example dm6
              */
             token: string;
         };
@@ -11012,7 +11096,7 @@ export interface components {
          *       "description": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "282"
+         *       "token": "pqg"
          *     }
          */
         CreateServiceAPIRequest: {
@@ -11033,7 +11117,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 983
+             * @example 5e
              */
             token: string;
         };
@@ -11064,7 +11148,7 @@ export interface components {
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "serviceId": "s-12345678",
          *       "sourceEnvironmentId": "se-12345678",
-         *       "token": "jr",
+         *       "token": "k9w",
          *       "type": "DEV",
          *       "visibility": "PUBLIC"
          *     }
@@ -11077,7 +11161,7 @@ export interface components {
             autoApproveSubscription?: boolean;
             /**
              * @description ID of a Deployment Config
-             * @example Eveniet nulla inventore officiis enim.
+             * @example Voluptatem quis quia dolorem.
              */
             deploymentConfigId: string;
             /**
@@ -11110,7 +11194,7 @@ export interface components {
             sourceEnvironmentId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9th
+             * @example 45
              */
             token: string;
             /**
@@ -11127,7 +11211,7 @@ export interface components {
         /**
          * @example {
          *       "autoApproveSubscription": false,
-         *       "deploymentConfigId": "Inventore suscipit eum.",
+         *       "deploymentConfigId": "Atque inventore quo dolores consequatur.",
          *       "description": "The production environment for the MySQL multi-writer service",
          *       "name": "Production",
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
@@ -11144,7 +11228,7 @@ export interface components {
             autoApproveSubscription?: boolean;
             /**
              * @description The deployment configuration ID
-             * @example Labore id ex eos sapiente rerum.
+             * @example Nemo vero ad blanditiis a quis fugiat.
              */
             deploymentConfigId: string;
             /**
@@ -11181,12 +11265,12 @@ export interface components {
         /**
          * @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "fileContent": "Ex magni possimus eos.",
+         *       "fileContent": "Rerum reiciendis labore itaque.",
          *       "fileFormat": "text/plain",
          *       "fileName": "mysql.yaml",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://batzrohan.org/fern",
-         *       "token": "l3n"
+         *       "serviceLogoURL": "http://turner.org/alia.crooks",
+         *       "token": "ec"
          *     }
          */
         CreateServiceFromComposeSpecRequest: {
@@ -11197,7 +11281,7 @@ export interface components {
             description: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Est delectus sit aperiam.
+             * @example Quia voluptas totam voluptatem velit exercitationem.
              */
             fileContent: string;
             /**
@@ -11218,23 +11302,23 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://denesik.com/makenzie
+             * @example http://bechtelarcorwin.net/augustus_lind
              */
             serviceLogoURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example kl
+             * @example 2
              */
             token: string;
         };
         /**
          * @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "fileContent": "Facere ratione et qui omnis vitae.",
+         *       "fileContent": "Beatae eligendi quia consequatur cupiditate ex.",
          *       "fileFormat": "text/plain",
          *       "fileName": "mysql.yaml",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://schneider.com/bernhard_mayer"
+         *       "serviceLogoURL": "http://jenkins.name/kimberly_rath"
          *     }
          */
         CreateServiceFromComposeSpecRequest2: {
@@ -11245,7 +11329,7 @@ export interface components {
             description: string;
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Laboriosam sed quaerat.
+             * @example Sit et dolor.
              */
             fileContent: string;
             /**
@@ -11266,7 +11350,7 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://cormierpollich.info/ron_o'connell
+             * @example http://bergegorczany.org/herminio
              */
             serviceLogoURL?: string;
         };
@@ -11295,13 +11379,19 @@ export interface components {
          *             "status": "ON"
          *           },
          *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
          *         }
          *       ],
          *       "modelType": "CUSTOMER_HOSTED",
          *       "name": "MySQL multi-writer service hosted model",
          *       "serviceApiId": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "vbn"
+         *       "token": "79z"
          *     }
          */
         CreateServiceModelRequest: {
@@ -11338,6 +11428,12 @@ export interface components {
              *           "status": "ON"
              *         },
              *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *       },
+             *       {
+             *         "configuration": {
+             *           "status": "ON"
+             *         },
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
              *       }
              *     ]
              */
@@ -11354,7 +11450,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a Service API
-             * @example Cumque maiores nesciunt.
+             * @example Est illo consequuntur quasi.
              */
             serviceApiId: string;
             /**
@@ -11364,7 +11460,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example t
+             * @example 7
              */
             token: string;
         };
@@ -11393,17 +11489,11 @@ export interface components {
          *             "status": "ON"
          *           },
          *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-         *         },
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
          *         }
          *       ],
          *       "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
          *       "name": "MySQL multi-writer service hosted model",
-         *       "serviceApiId": "Qui tempore."
+         *       "serviceApiId": "Assumenda inventore sit aliquam ab iste."
          *     }
          */
         CreateServiceModelRequest2: {
@@ -11434,12 +11524,6 @@ export interface components {
              *           "status": "ON"
              *         },
              *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
              *       }
              *     ]
              */
@@ -11456,7 +11540,7 @@ export interface components {
             name: string;
             /**
              * @description The service API this model is for
-             * @example Placeat voluptas laborum.
+             * @example Incidunt at et.
              */
             serviceApiId: string;
         };
@@ -11464,8 +11548,8 @@ export interface components {
          * @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://hellerluettgen.name/wilhelm",
-         *       "token": "j9"
+         *       "serviceLogoURL": "http://ullrich.biz/carlotta.nader",
+         *       "token": "g"
          *     }
          */
         CreateServiceRequest: {
@@ -11482,12 +11566,12 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://lockman.name/darrell
+             * @example http://romaguera.info/berniece
              */
             serviceLogoURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ar
+             * @example o
              */
             token: string;
         };
@@ -11495,7 +11579,7 @@ export interface components {
          * @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://krajcikoconnell.org/evie"
+         *       "serviceLogoURL": "http://bartoletti.info/khalid.ortiz"
          *     }
          */
         CreateServiceRequest2: {
@@ -11512,49 +11596,49 @@ export interface components {
             /**
              * Format: uri
              * @description The logo for the service
-             * @example http://williamson.org/sigmund
+             * @example http://lind.biz/lamont.leffler
              */
             serviceLogoURL?: string;
         };
         /**
          * @example {
-         *       "orchestrationCreateDSL": "Ea repellat ea molestiae autem eos.",
-         *       "token": "7"
+         *       "orchestrationCreateDSL": "Aut delectus sint officia.",
+         *       "token": "l8"
          *     }
          */
         CreateServicesOrchestrationRequest: {
             /**
              * @description base64 encoded content of service orchestration create DSL
-             * @example Nihil consectetur a assumenda veniam.
+             * @example Enim quas sint unde dolorum aliquam.
              */
             orchestrationCreateDSL: string;
             /**
              * @description JWT token used to perform authorization
-             * @example u
+             * @example yu
              */
             token: string;
         };
         /**
          * @example {
-         *       "orchestrationCreateDSL": "Vero doloribus optio velit atque amet."
+         *       "orchestrationCreateDSL": "Ipsam voluptatem earum at."
          *     }
          */
         CreateServicesOrchestrationRequest2: {
             /**
              * @description base64 encoded content of service orchestration create DSL
-             * @example Eligendi sit laboriosam beatae.
+             * @example Vel dolorem quia corrupti at.
              */
             orchestrationCreateDSL: string;
         };
         /**
          * @example {
-         *       "id": "Ut sed vitae et quasi."
+         *       "id": "Magnam nostrum nesciunt unde."
          *     }
          */
         CreateServicesOrchestrationResponseBody: {
             /**
              * @description Services Orchestration Id
-             * @example Sed dolores aut est.
+             * @example Soluta non inventore in eaque consequatur repellendus.
              */
             id?: string;
         };
@@ -11563,7 +11647,7 @@ export interface components {
          *       "description": "my-storage-config-description",
          *       "name": "my-storage-config",
          *       "serviceId": "s-12345678",
-         *       "token": "5d"
+         *       "token": "oa"
          *     }
          */
         CreateStorageConfigRequest: {
@@ -11584,7 +11668,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5jj
+             * @example gma
              */
             token: string;
         };
@@ -11618,7 +11702,7 @@ export interface components {
          *       "name": "MySQL Data Volume",
          *       "serviceId": "s-12345678",
          *       "storageResourceID": "r-12345678",
-         *       "token": "fn"
+         *       "token": "aas"
          *     }
          */
         CreateStorageVolumeConfigRequest: {
@@ -11674,7 +11758,7 @@ export interface components {
             storageResourceID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example nql
              */
             token: string;
         };
@@ -11742,13 +11826,13 @@ export interface components {
          * @example {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "yq9"
+         *       "token": "fak"
          *     }
          */
         CreateSubscriptionRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Laboriosam fuga nisi.
+             * @example Sint voluptas illum.
              */
             productTierId: string;
             /**
@@ -11758,20 +11842,20 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example z
+             * @example 490
              */
             token: string;
         };
         /**
          * @example {
-         *       "productTierId": "Ipsa consequuntur consequatur voluptate modi.",
+         *       "productTierId": "Ipsum magni fugit ipsum debitis quia.",
          *       "serviceId": "s-123456"
          *     }
          */
         CreateSubscriptionRequest2: {
             /**
              * @description The product tier ID
-             * @example Delectus recusandae et debitis praesentium id aperiam.
+             * @example Est assumenda.
              */
             productTierId: string;
             /**
@@ -11784,13 +11868,13 @@ export interface components {
          * @example {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "a67"
+         *       "token": "9o"
          *     }
          */
         CreateSubscriptionRequestRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Est nostrum perferendis praesentium incidunt repellat.
+             * @example Eos magnam et in dicta.
              */
             productTierId: string;
             /**
@@ -11800,20 +11884,20 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example tat
+             * @example 9
              */
             token: string;
         };
         /**
          * @example {
-         *       "productTierId": "Dolor illo voluptas est.",
+         *       "productTierId": "Officia exercitationem asperiores nulla.",
          *       "serviceId": "s-123456"
          *     }
          */
         CreateSubscriptionRequestRequest2: {
             /**
              * @description The product tier ID
-             * @example Omnis in officia.
+             * @example Et non sit.
              */
             productTierId: string;
             /**
@@ -11824,19 +11908,19 @@ export interface components {
         };
         /**
          * @example {
-         *       "description": "Tempora consequatur debitis.",
+         *       "description": "Illo natus nisi dolor libero corporis.",
          *       "name": "Major version set",
          *       "parentVersion": "2.0",
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "5h",
+         *       "token": "wt",
          *       "type": "Major|Incremental|UserDefined"
          *     }
          */
         CreateTierVersionSetRequest: {
             /**
              * @description A brief description of the product-tier version set.
-             * @example Magni nisi nulla quod.
+             * @example Eveniet laboriosam pariatur dolore atque.
              */
             description?: string;
             /**
@@ -11851,7 +11935,7 @@ export interface components {
             parentVersion?: string;
             /**
              * @description ID of a Product Tier
-             * @example Quod et tempora qui alias.
+             * @example Est voluptas dolorum consectetur non iure.
              */
             productTierId: string;
             /**
@@ -11861,7 +11945,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example 4k3
              */
             token: string;
             /**
@@ -11872,7 +11956,7 @@ export interface components {
         };
         /**
          * @example {
-         *       "description": "Blanditiis qui.",
+         *       "description": "Autem est exercitationem placeat vel voluptatem.",
          *       "name": "Major version set",
          *       "parentVersion": "2.0",
          *       "type": "Major|Incremental|UserDefined"
@@ -11881,7 +11965,7 @@ export interface components {
         CreateTierVersionSetRequest2: {
             /**
              * @description A brief description of the product-tier version set.
-             * @example Porro est.
+             * @example Tempore est dicta temporibus voluptatem.
              */
             description?: string;
             /**
@@ -11920,7 +12004,7 @@ export interface components {
          *       "serviceId": "s-12345678",
          *       "sourceVersion": "567.0",
          *       "targetVersion": "589.0",
-         *       "token": "7"
+         *       "token": "bjs"
          *     }
          */
         CreateUpgradePathRequest: {
@@ -11956,7 +12040,7 @@ export interface components {
             targetVersion: string;
             /**
              * @description JWT token used to perform authorization
-             * @example or
+             * @example 26r
              */
             token: string;
         };
@@ -12037,13 +12121,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "zf"
+         *       "token": "j"
          *     }
          */
         CustomDomainIdentityIDRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example x
+             * @example 9
              */
             token: string;
         };
@@ -12055,7 +12139,7 @@ export interface components {
         CustomDomainIdentityIDResult: {
             /**
              * @description ID of an Org
-             * @example Doloribus eos iste sint vel.
+             * @example Impedit in et et.
              */
             id: string;
         };
@@ -12109,7 +12193,9 @@ export interface components {
          *           "cloudProviderNativeNetworkId": "vpc-12345678",
          *           "gcpProjectID": "my-project",
          *           "gcpProjectNumber": "123456789012",
-         *           "hostClusterID": "hc-12345678"
+         *           "hostClusterID": "hc-12345678",
+         *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *         },
          *         {
          *           "awsAccountID": "123456789012",
@@ -12118,25 +12204,9 @@ export interface components {
          *           "cloudProviderNativeNetworkId": "vpc-12345678",
          *           "gcpProjectID": "my-project",
          *           "gcpProjectNumber": "123456789012",
-         *           "hostClusterID": "hc-12345678"
-         *         },
-         *         {
-         *           "awsAccountID": "123456789012",
-         *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *           "cloudProviderNativeNetworkId": "vpc-12345678",
-         *           "gcpProjectID": "my-project",
-         *           "gcpProjectNumber": "123456789012",
-         *           "hostClusterID": "hc-12345678"
-         *         },
-         *         {
-         *           "awsAccountID": "123456789012",
-         *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *           "cloudProviderNativeNetworkId": "vpc-12345678",
-         *           "gcpProjectID": "my-project",
-         *           "gcpProjectNumber": "123456789012",
-         *           "hostClusterID": "hc-12345678"
+         *           "hostClusterID": "hc-12345678",
+         *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *         }
          *       ],
          *       "owningUserId": "user-12345678",
@@ -12163,7 +12233,7 @@ export interface components {
             cloudProviderRegion: string;
             /**
              * @description ID of a custom network
-             * @example Ducimus et consequatur quod possimus provident quis.
+             * @example Expedita sapiente eaque vero.
              */
             id: string;
             /**
@@ -12187,7 +12257,9 @@ export interface components {
              *         "cloudProviderNativeNetworkId": "vpc-12345678",
              *         "gcpProjectID": "my-project",
              *         "gcpProjectNumber": "123456789012",
-             *         "hostClusterID": "hc-12345678"
+             *         "hostClusterID": "hc-12345678",
+             *         "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *       },
              *       {
              *         "awsAccountID": "123456789012",
@@ -12196,23 +12268,16 @@ export interface components {
              *         "cloudProviderNativeNetworkId": "vpc-12345678",
              *         "gcpProjectID": "my-project",
              *         "gcpProjectNumber": "123456789012",
-             *         "hostClusterID": "hc-12345678"
-             *       },
-             *       {
-             *         "awsAccountID": "123456789012",
-             *         "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *         "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *         "cloudProviderNativeNetworkId": "vpc-12345678",
-             *         "gcpProjectID": "my-project",
-             *         "gcpProjectNumber": "123456789012",
-             *         "hostClusterID": "hc-12345678"
+             *         "hostClusterID": "hc-12345678",
+             *         "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *       }
              *     ]
              */
             networkInstances?: components["schemas"]["CustomNetworkInstance"][];
             /**
              * @description ID of a User
-             * @example Delectus sunt voluptatem.
+             * @example Recusandae laboriosam aspernatur iste sit ex.
              */
             owningUserId?: string;
             /**
@@ -12234,7 +12299,9 @@ export interface components {
          *       "cloudProviderNativeNetworkId": "vpc-12345678",
          *       "gcpProjectID": "my-project",
          *       "gcpProjectNumber": "123456789012",
-         *       "hostClusterID": "hc-12345678"
+         *       "hostClusterID": "hc-12345678",
+         *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *     }
          */
         CustomNetworkInstance: {
@@ -12270,9 +12337,19 @@ export interface components {
             gcpProjectNumber?: string;
             /**
              * @description ID of a Host Cluster
-             * @example Non voluptatem voluptatem et.
+             * @example Blanditiis veritatis qui quidem.
              */
             hostClusterID?: string;
+            /**
+             * @description The Domain OCID for Oracle Cloud Infrastructure
+             * @example ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+             */
+            ociDomainID?: string;
+            /**
+             * @description The Tenancy OCID for Oracle Cloud Infrastructure
+             * @example ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+             */
+            ociTenancyID?: string;
         };
         /**
          * @description Details of custom network used for instance
@@ -12290,7 +12367,7 @@ export interface components {
             cidr?: string;
             /**
              * @description ID of a custom network
-             * @example Quia vitae consequuntur quia sed debitis suscipit.
+             * @example Illo ea repellat.
              */
             id?: string;
             /**
@@ -12390,20 +12467,20 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "o"
+         *       "token": "ut"
          *     }
          */
         CustomerDeleteUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example c4
+             * @example u
              */
             token: string;
         };
         /**
          * @example {
          *       "email": "abc@example.com",
-         *       "token": "rds"
+         *       "token": "rq"
          *     }
          */
         CustomerInviteUserRequest: {
@@ -12414,7 +12491,7 @@ export interface components {
             email: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9
+             * @example b3z
              */
             token: string;
         };
@@ -12436,7 +12513,7 @@ export interface components {
          *       "pageSize": 10,
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "5q"
+         *       "token": "0t"
          *     }
          */
         CustomerListTierVersionSetsRequest: {
@@ -12453,7 +12530,7 @@ export interface components {
             pageSize?: number;
             /**
              * @description ID of a Product Tier
-             * @example Esse delectus rem esse eligendi ipsam quis.
+             * @example Nihil nihil possimus.
              */
             productTierId: string;
             /**
@@ -12463,7 +12540,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example sf4
+             * @example 5
              */
             token: string;
         };
@@ -12471,6 +12548,82 @@ export interface components {
          * @example {
          *       "nextPageToken": "next-token",
          *       "tierVersionSets": [
+         *         {
+         *           "autoApproveSubscription": false,
+         *           "baseVersion": "3.0",
+         *           "createdAt": "2020-01-01T00:00:00Z",
+         *           "createdBy": "John Doe",
+         *           "description": "Facilis officia placeat autem.",
+         *           "enabledFeatures": [
+         *             {
+         *               "configuration": {
+         *                 "provider": "native"
+         *               },
+         *               "feature": "LOGS",
+         *               "scope": "INTERNAL"
+         *             },
+         *             {
+         *               "configuration": {
+         *                 "provider": "native"
+         *               },
+         *               "feature": "LOGS",
+         *               "scope": "INTERNAL"
+         *             },
+         *             {
+         *               "configuration": {
+         *                 "provider": "native"
+         *               },
+         *               "feature": "LOGS",
+         *               "scope": "INTERNAL"
+         *             },
+         *             {
+         *               "configuration": {
+         *                 "provider": "native"
+         *               },
+         *               "feature": "LOGS",
+         *               "scope": "INTERNAL"
+         *             }
+         *           ],
+         *           "features": {
+         *             "LOGS": true,
+         *             "METRICS": false
+         *           },
+         *           "instanceCount": 12,
+         *           "latestUpgradePathId": "upgrade-12345678",
+         *           "name": "Regular version set",
+         *           "parentVersion": "2.0",
+         *           "productTierId": "Beatae beatae.",
+         *           "releasedAt": "2020-01-01T00:00:00Z",
+         *           "releasedBy": "John Doe",
+         *           "resources": [
+         *             {
+         *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *               "id": "r-12345678",
+         *               "imageConfigId": "imgc-12345678",
+         *               "infraConfigId": "ic-12345678",
+         *               "isExternal": true,
+         *               "managedResourceType": "PortsBasedProxy",
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
+         *             },
+         *             {
+         *               "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *               "id": "r-12345678",
+         *               "imageConfigId": "imgc-12345678",
+         *               "infraConfigId": "ic-12345678",
+         *               "isExternal": true,
+         *               "managedResourceType": "PortsBasedProxy",
+         *               "name": "MySQL multi-writer service",
+         *               "urlKey": "myResource"
+         *             }
+         *           ],
+         *           "serviceId": "s-12345678",
+         *           "serviceModelId": "Porro ut deserunt ab.",
+         *           "status": "Preferred|Active|Deprecated|Pending",
+         *           "type": "Major|Incremental|UserDefined",
+         *           "updatedAt": "2020-01-01T00:00:00Z",
+         *           "version": "3.0"
+         *         },
          *         {
          *           "autoApproveSubscription": false,
          *           "baseVersion": "3.0",
@@ -12862,158 +13015,6 @@ export interface components {
              *         "type": "Major|Incremental|UserDefined",
              *         "updatedAt": "2020-01-01T00:00:00Z",
              *         "version": "3.0"
-             *       },
-             *       {
-             *         "autoApproveSubscription": false,
-             *         "baseVersion": "3.0",
-             *         "createdAt": "2020-01-01T00:00:00Z",
-             *         "createdBy": "John Doe",
-             *         "description": "Facilis officia placeat autem.",
-             *         "enabledFeatures": [
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           }
-             *         ],
-             *         "features": {
-             *           "LOGS": true,
-             *           "METRICS": false
-             *         },
-             *         "instanceCount": 12,
-             *         "latestUpgradePathId": "upgrade-12345678",
-             *         "name": "Regular version set",
-             *         "parentVersion": "2.0",
-             *         "productTierId": "Beatae beatae.",
-             *         "releasedAt": "2020-01-01T00:00:00Z",
-             *         "releasedBy": "John Doe",
-             *         "resources": [
-             *           {
-             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-             *             "id": "r-12345678",
-             *             "imageConfigId": "imgc-12345678",
-             *             "infraConfigId": "ic-12345678",
-             *             "isExternal": true,
-             *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service",
-             *             "urlKey": "myResource"
-             *           },
-             *           {
-             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-             *             "id": "r-12345678",
-             *             "imageConfigId": "imgc-12345678",
-             *             "infraConfigId": "ic-12345678",
-             *             "isExternal": true,
-             *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service",
-             *             "urlKey": "myResource"
-             *           }
-             *         ],
-             *         "serviceId": "s-12345678",
-             *         "serviceModelId": "Porro ut deserunt ab.",
-             *         "status": "Preferred|Active|Deprecated|Pending",
-             *         "type": "Major|Incremental|UserDefined",
-             *         "updatedAt": "2020-01-01T00:00:00Z",
-             *         "version": "3.0"
-             *       },
-             *       {
-             *         "autoApproveSubscription": false,
-             *         "baseVersion": "3.0",
-             *         "createdAt": "2020-01-01T00:00:00Z",
-             *         "createdBy": "John Doe",
-             *         "description": "Facilis officia placeat autem.",
-             *         "enabledFeatures": [
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "provider": "native"
-             *             },
-             *             "feature": "LOGS",
-             *             "scope": "INTERNAL"
-             *           }
-             *         ],
-             *         "features": {
-             *           "LOGS": true,
-             *           "METRICS": false
-             *         },
-             *         "instanceCount": 12,
-             *         "latestUpgradePathId": "upgrade-12345678",
-             *         "name": "Regular version set",
-             *         "parentVersion": "2.0",
-             *         "productTierId": "Beatae beatae.",
-             *         "releasedAt": "2020-01-01T00:00:00Z",
-             *         "releasedBy": "John Doe",
-             *         "resources": [
-             *           {
-             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-             *             "id": "r-12345678",
-             *             "imageConfigId": "imgc-12345678",
-             *             "infraConfigId": "ic-12345678",
-             *             "isExternal": true,
-             *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service",
-             *             "urlKey": "myResource"
-             *           },
-             *           {
-             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-             *             "id": "r-12345678",
-             *             "imageConfigId": "imgc-12345678",
-             *             "infraConfigId": "ic-12345678",
-             *             "isExternal": true,
-             *             "managedResourceType": "PortsBasedProxy",
-             *             "name": "MySQL multi-writer service",
-             *             "urlKey": "myResource"
-             *           }
-             *         ],
-             *         "serviceId": "s-12345678",
-             *         "serviceModelId": "Porro ut deserunt ab.",
-             *         "status": "Preferred|Active|Deprecated|Pending",
-             *         "type": "Major|Incremental|UserDefined",
-             *         "updatedAt": "2020-01-01T00:00:00Z",
-             *         "version": "3.0"
              *       }
              *     ]
              */
@@ -13033,7 +13034,7 @@ export interface components {
          *       "legalCompanyName": "mywebsite",
          *       "redirectUri": "https://www.example/redirect",
          *       "state": "state",
-         *       "token": "ws"
+         *       "token": "js0"
          *     }
          */
         CustomerLoginWithIdentityProviderRequest: {
@@ -13085,7 +13086,7 @@ export interface components {
             state?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example kfy
+             * @example s
              */
             token: string;
         };
@@ -13168,7 +13169,7 @@ export interface components {
         /**
          * @example {
          *       "email": "abc@example.com",
-         *       "token": "kt"
+         *       "token": "0"
          *     }
          */
         CustomerResetPasswordRequest: {
@@ -13179,7 +13180,7 @@ export interface components {
             email: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 61
+             * @example 1fv
              */
             token: string;
         };
@@ -13201,7 +13202,7 @@ export interface components {
          *       "environmentType": "DEV",
          *       "hashedPassword": "deprecated",
          *       "password": "password",
-         *       "token": "4"
+         *       "token": "v"
          *     }
          */
         CustomerSigninRequest: {
@@ -13221,7 +13222,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example t
+             * @example o01
              */
             token: string;
         };
@@ -13272,7 +13273,7 @@ export interface components {
          *       "legalCompanyName": "mywebsite",
          *       "name": "John Doe",
          *       "password": "password",
-         *       "token": "ex"
+         *       "token": "u"
          *     }
          */
         CustomerSignupRequest: {
@@ -13309,7 +13310,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example sp
+             * @example ku2
              */
             token: string;
         };
@@ -13363,13 +13364,13 @@ export interface components {
          * @example {
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "gc"
+         *       "token": "4"
          *     }
          */
         DeRegisterResourceMetricsConfigRequest: {
             /**
              * @description ID of a resource
-             * @example Ratione velit voluptas.
+             * @example Quo excepturi nisi suscipit quis maxime nam.
              */
             id: string;
             /**
@@ -13379,25 +13380,25 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example yu9
+             * @example z0
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "ac-12345678",
-         *       "token": "z"
+         *       "token": "mws"
          *     }
          */
         DeleteAccountConfigRequest: {
             /**
              * @description ID of an Account Config
-             * @example Enim error aut.
+             * @example Omnis quas placeat ea est nostrum molestiae.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 26
+             * @example go
              */
             token: string;
         };
@@ -13405,13 +13406,13 @@ export interface components {
          * @example {
          *       "id": "cc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "wdg"
+         *       "token": "ohi"
          *     }
          */
         DeleteComputeConfigRequest: {
             /**
              * @description ID of a Compute Config
-             * @example A provident.
+             * @example Omnis sed aut consequatur nobis.
              */
             id: string;
             /**
@@ -13421,61 +13422,61 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example i
+             * @example sx
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "cd-12345678",
-         *       "token": "5"
+         *       "token": "3"
          *     }
          */
         DeleteCustomDomainRequest: {
             /**
              * @description ID of an Custom Domain
-             * @example Sapiente quaerat illo hic suscipit asperiores.
+             * @example Et voluptatem necessitatibus culpa maiores.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3h8
+             * @example qv
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "n-12345678",
-         *       "token": "z"
+         *       "token": "a"
          *     }
          */
         DeleteCustomNetworkRequest: {
             /**
              * @description ID of a custom network
-             * @example Occaecati magni natus.
+             * @example Et animi fuga et ut sed assumenda.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 1
+             * @example t
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "dc-12345678",
-         *       "token": "f"
+         *       "token": "kn"
          *     }
          */
         DeleteDeploymentConfigRequest: {
             /**
              * @description ID of a Deployment Config
-             * @example Dignissimos atque iusto nihil atque quos totam.
+             * @example Porro in vero autem sed et fugiat.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r
+             * @example h
              */
             token: string;
         };
@@ -13483,7 +13484,7 @@ export interface components {
          * @example {
          *       "chartName": "my-chart",
          *       "chartVersion": "1.0.0",
-         *       "token": "bla"
+         *       "token": "5jj"
          *     }
          */
         DeleteHelmPackageRequest: {
@@ -13499,25 +13500,25 @@ export interface components {
             chartVersion: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ld4
+             * @example oa
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "oy"
+         *       "token": "32"
          *     }
          */
         DeleteIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Libero aspernatur et repellat voluptas consequuntur.
+             * @example Et eaque.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example i6
+             * @example zhi
              */
             token: string;
         };
@@ -13526,13 +13527,13 @@ export interface components {
          * @example {
          *       "id": "imgc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "mws"
+         *       "token": "qxj"
          *     }
          */
         DeleteImageConfigRequest: {
             /**
              * @description ID of an Image Config
-             * @example Nostrum molestiae.
+             * @example Repellat voluptas totam.
              */
             id: string;
             /**
@@ -13542,7 +13543,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example qlx
+             * @example r
              */
             token: string;
         };
@@ -13550,18 +13551,18 @@ export interface components {
          * @description Delete an HTTP API v2 Docker Image Registry
          * @example {
          *       "id": "ir-12345678",
-         *       "token": "v"
+         *       "token": "2jw"
          *     }
          */
         DeleteImageRegistryRequest: {
             /**
              * @description ID of an Image Registry
-             * @example Corrupti doloremque qui.
+             * @example Expedita rerum vel ut ea odit.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example p
+             * @example 4u
              */
             token: string;
         };
@@ -13569,13 +13570,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "bu"
+         *       "token": "dr"
          *     }
          */
         DeleteInfraConfigRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Sed eius iusto nobis et error.
+             * @example Laboriosam ea distinctio at reprehenderit dolorem nesciunt.
              */
             id: string;
             /**
@@ -13585,7 +13586,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example lh
+             * @example sb2
              */
             token: string;
         };
@@ -13593,13 +13594,13 @@ export interface components {
          * @example {
          *       "id": "var-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "f"
+         *       "token": "ne"
          *     }
          */
         DeleteInputParameterRequest: {
             /**
              * @description ID of an Input Parameter
-             * @example Mollitia qui sit veritatis.
+             * @example Ea ipsam quos aut.
              */
             id: string;
             /**
@@ -13609,7 +13610,31 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example m
+             * @example e
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "id": "instance-ss-12345678",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "token": "tat"
+         *     }
+         */
+        DeleteInstanceSnapshotRequest: {
+            /**
+             * @description The instance snapshot ID
+             * @example instance-ss-12345678
+             */
+            id: string;
+            /**
+             * @description The subscription ID
+             * @example sub-abcd1234
+             */
+            subscriptionId?: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example 3s
              */
             token: string;
         };
@@ -13617,7 +13642,7 @@ export interface components {
          * @example {
          *       "family": "COMPUTE_INFRA",
          *       "key": "MAX_VIRTUAL_CORES_PER_RESOURCE",
-         *       "token": "m06"
+         *       "token": "z"
          *     }
          */
         DeleteLimitRequest: {
@@ -13633,7 +13658,7 @@ export interface components {
             key: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3
+             * @example wjp
              */
             token: string;
         };
@@ -13641,13 +13666,13 @@ export interface components {
          * @example {
          *       "id": "nc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "a"
+         *       "token": "w6"
          *     }
          */
         DeleteNetworkConfigRequest: {
             /**
              * @description ID of a Network Config
-             * @example Voluptatem amet.
+             * @example Ea nam iusto et est nostrum.
              */
             id: string;
             /**
@@ -13657,7 +13682,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example omz
              */
             token: string;
         };
@@ -13665,13 +13690,13 @@ export interface components {
          * @example {
          *       "id": "op-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "r41"
+         *       "token": "p"
          *     }
          */
         DeleteOutputParameterRequest: {
             /**
              * @description ID of an Output Parameter
-             * @example Consectetur molestias.
+             * @example Neque nihil.
              */
             id: string;
             /**
@@ -13681,7 +13706,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example g
+             * @example exu
              */
             token: string;
         };
@@ -13689,13 +13714,13 @@ export interface components {
          * @example {
          *       "id": "p-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "uoe"
+         *       "token": "vv"
          *     }
          */
         DeletePipelineRequest: {
             /**
              * @description ID of a Pipeline
-             * @example Et ut et quo eum blanditiis animi.
+             * @example Tenetur adipisci voluptatum.
              */
             id?: string;
             /**
@@ -13705,7 +13730,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example e9c
+             * @example pz
              */
             token: string;
         };
@@ -13713,13 +13738,13 @@ export interface components {
          * @example {
          *       "id": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "p"
+         *       "token": "84b"
          *     }
          */
         DeleteProductTierRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Est explicabo.
+             * @example Qui quis sunt similique.
              */
             id: string;
             /**
@@ -13729,7 +13754,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9z
+             * @example gji
              */
             token: string;
         };
@@ -13744,7 +13769,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "kt9"
+         *       "token": "9"
          *     }
          */
         DeleteResourceInstanceRequest: {
@@ -13785,7 +13810,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Ratione perspiciatis ut eius dignissimos velit eius.
+             * @example Unde ut.
              */
             serviceProviderId: string;
             /**
@@ -13795,45 +13820,28 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4n
+             * @example b8z
              */
             token: string;
         };
         /**
          * @example {
-         *       "snapshotId": "instance-ss-12345678",
-         *       "subscriptionId": "sub-abcd1234",
-         *       "token": "4o"
-         *     }
-         */
-        DeleteResourceInstanceSnapshotRequest: {
-            /**
-             * @description The instance snapshot ID
-             * @example instance-ss-12345678
-             */
-            snapshotId: string;
-            /**
-             * @description The subscription ID
-             * @example sub-abcd1234
-             */
-            subscriptionId?: string;
-            /**
-             * @description JWT token used to perform authorization
-             * @example yf
-             */
-            token: string;
-        };
-        /**
-         * @example {
+         *       "dryRun": false,
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "0"
+         *       "token": "se"
          *     }
          */
         DeleteResourceRequest: {
             /**
+             * @description If true, validates the deletion without actually deleting the resource
+             * @default false
+             * @example false
+             */
+            dryRun: boolean;
+            /**
              * @description ID of a resource
-             * @example Corporis enim.
+             * @example Voluptatum facere exercitationem architecto.
              */
             id: string;
             /**
@@ -13843,14 +13851,14 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2n4
+             * @example z
              */
             token: string;
         };
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "4"
+         *       "token": "j"
          *     }
          */
         DeleteSaaSPortalCustomDomainRequest: {
@@ -13861,7 +13869,7 @@ export interface components {
             environmentType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example lyy
+             * @example m
              */
             token: string;
         };
@@ -13869,7 +13877,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "name": "my-secret",
-         *       "token": "hg0"
+         *       "token": "n"
          *     }
          */
         DeleteSecretRequest: {
@@ -13885,7 +13893,7 @@ export interface components {
             name: string;
             /**
              * @description JWT token used to perform authorization
-             * @example fpo
+             * @example qw
              */
             token: string;
         };
@@ -13893,13 +13901,13 @@ export interface components {
          * @example {
          *       "id": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "4y"
+         *       "token": "hl7"
          *     }
          */
         DeleteServiceAPIRequest: {
             /**
              * @description ID of a Service API
-             * @example Error ea voluptatibus nihil odio.
+             * @example Est et ducimus suscipit maiores ipsa.
              */
             id: string;
             /**
@@ -13909,7 +13917,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example wqj
+             * @example qq7
              */
             token: string;
         };
@@ -13917,7 +13925,7 @@ export interface components {
          * @example {
          *       "id": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "1m"
+         *       "token": "w"
          *     }
          */
         DeleteServiceEnvironmentRequest: {
@@ -13933,7 +13941,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example e
+             * @example m92
              */
             token: string;
         };
@@ -13941,13 +13949,13 @@ export interface components {
          * @example {
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "zyg"
+         *       "token": "x5t"
          *     }
          */
         DeleteServiceModelRequest: {
             /**
              * @description ID of a Service Model
-             * @example Pariatur possimus et eum.
+             * @example Et porro repellendus et enim similique excepturi.
              */
             id: string;
             /**
@@ -13957,14 +13965,14 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example mw2
+             * @example wr
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "s-12345678",
-         *       "token": "t"
+         *       "token": "5t"
          *     }
          */
         DeleteServiceRequest: {
@@ -13975,25 +13983,25 @@ export interface components {
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xn
+             * @example ez
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "so-12345678",
-         *       "token": "hy"
+         *       "token": "nj"
          *     }
          */
         DeleteServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Perspiciatis voluptas.
+             * @example Doloremque dolorum assumenda.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example id9
+             * @example s
              */
             token: string;
         };
@@ -14001,13 +14009,13 @@ export interface components {
          * @example {
          *       "id": "sc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "2"
+         *       "token": "eu7"
          *     }
          */
         DeleteStorageConfigRequest: {
             /**
              * @description ID of a Storage Config
-             * @example Quis doloribus consequuntur.
+             * @example Pariatur aut rerum illo porro.
              */
             id: string;
             /**
@@ -14017,7 +14025,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example cbq
+             * @example tgw
              */
             token: string;
         };
@@ -14025,13 +14033,13 @@ export interface components {
          * @example {
          *       "id": "svc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "h7"
+         *       "token": "sy"
          *     }
          */
         DeleteStorageVolumeConfigRequest: {
             /**
              * @description ID of a Storage Volume Config
-             * @example Praesentium enim sint est laborum commodi dolores.
+             * @example Corporis quidem.
              */
             id: string;
             /**
@@ -14041,25 +14049,25 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 13s
+             * @example p
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "sub-12345678",
-         *       "token": "3s"
+         *       "token": "ws"
          *     }
          */
         DeleteSubscriptionRequest: {
             /**
              * @description ID of a Subscription
-             * @example Et fugit itaque neque.
+             * @example Quia et repellat est.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 23
+             * @example wy
              */
             token: string;
         };
@@ -14067,13 +14075,13 @@ export interface components {
          * @example {
          *       "id": "up-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "5k"
+         *       "token": "v"
          *     }
          */
         DeleteUpgradePathRequest: {
             /**
              * @description ID of an Upgrade Path
-             * @example Dolores veritatis est sit officiis eveniet iure.
+             * @example Nostrum optio et quae velit molestiae sunt.
              */
             id?: string;
             /**
@@ -14083,19 +14091,19 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gps
+             * @example s
              */
             token: string;
         };
         /**
          * @example {
-         *       "token": "7h"
+         *       "token": "v71"
          *     }
          */
         DeleteUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example ayc
              */
             token: string;
         };
@@ -14128,7 +14136,8 @@ export interface components {
          *           "IsManaged": true,
          *           "Name": "Prometheus",
          *           "Properties": {
-         *             "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+         *             "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *             "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
          *           },
          *           "Type": "HelmChart"
          *         },
@@ -14137,7 +14146,28 @@ export interface components {
          *           "IsManaged": true,
          *           "Name": "Prometheus",
          *           "Properties": {
-         *             "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+         *             "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *             "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
+         *           },
+         *           "Type": "HelmChart"
+         *         },
+         *         {
+         *           "Description": "Ensures high availability across multiple zones.",
+         *           "IsManaged": true,
+         *           "Name": "Prometheus",
+         *           "Properties": {
+         *             "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *             "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
+         *           },
+         *           "Type": "HelmChart"
+         *         },
+         *         {
+         *           "Description": "Ensures high availability across multiple zones.",
+         *           "IsManaged": true,
+         *           "Name": "Prometheus",
+         *           "Properties": {
+         *             "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *             "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
          *           },
          *           "Type": "HelmChart"
          *         }
@@ -14153,7 +14183,8 @@ export interface components {
              *         "IsManaged": true,
              *         "Name": "Prometheus",
              *         "Properties": {
-             *           "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+             *           "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+             *           "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
              *         },
              *         "Type": "HelmChart"
              *       },
@@ -14162,25 +14193,8 @@ export interface components {
              *         "IsManaged": true,
              *         "Name": "Prometheus",
              *         "Properties": {
-             *           "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
-             *         },
-             *         "Type": "HelmChart"
-             *       },
-             *       {
-             *         "Description": "Ensures high availability across multiple zones.",
-             *         "IsManaged": true,
-             *         "Name": "Prometheus",
-             *         "Properties": {
-             *           "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
-             *         },
-             *         "Type": "HelmChart"
-             *       },
-             *       {
-             *         "Description": "Ensures high availability across multiple zones.",
-             *         "IsManaged": true,
-             *         "Name": "Prometheus",
-             *         "Properties": {
-             *           "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+             *           "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+             *           "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
              *         },
              *         "Type": "HelmChart"
              *       }
@@ -14198,7 +14212,8 @@ export interface components {
          *               "IsManaged": true,
          *               "Name": "Prometheus",
          *               "Properties": {
-         *                 "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+         *                 "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *                 "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
          *               },
          *               "Type": "HelmChart"
          *             },
@@ -14207,7 +14222,18 @@ export interface components {
          *               "IsManaged": true,
          *               "Name": "Prometheus",
          *               "Properties": {
-         *                 "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+         *                 "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *                 "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
+         *               },
+         *               "Type": "HelmChart"
+         *             },
+         *             {
+         *               "Description": "Ensures high availability across multiple zones.",
+         *               "IsManaged": true,
+         *               "Name": "Prometheus",
+         *               "Properties": {
+         *                 "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+         *                 "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
          *               },
          *               "Type": "HelmChart"
          *             }
@@ -14227,7 +14253,8 @@ export interface components {
              *             "IsManaged": true,
              *             "Name": "Prometheus",
              *             "Properties": {
-             *               "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+             *               "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+             *               "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
              *             },
              *             "Type": "HelmChart"
              *           },
@@ -14236,7 +14263,18 @@ export interface components {
              *             "IsManaged": true,
              *             "Name": "Prometheus",
              *             "Properties": {
-             *               "Tempore tempore suscipit ad ex officiis.": "Quibusdam officiis veniam illum debitis sit esse."
+             *               "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+             *               "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
+             *             },
+             *             "Type": "HelmChart"
+             *           },
+             *           {
+             *             "Description": "Ensures high availability across multiple zones.",
+             *             "IsManaged": true,
+             *             "Name": "Prometheus",
+             *             "Properties": {
+             *               "Doloribus magni.": "Aut quidem accusamus et voluptatibus consequatur.",
+             *               "Est veniam possimus aliquam.": "Nulla sunt aut dicta non error."
              *             },
              *             "Type": "HelmChart"
              *           }
@@ -14253,13 +14291,33 @@ export interface components {
          *       "cloudProvider": "aws",
          *       "hostClusterID": "hc-12345678",
          *       "instanceHealth": {
-         *         "Dolore aliquid eius et exercitationem.": {
+         *         "Dolore eum mollitia.": {
          *           "instanceID": "instance-12345678",
          *           "lifeCycleStatus": "RUNNING",
          *           "resourcesHealth": {
-         *             "Dolores illo est eum.": {
+         *             "Laborum iure voluptatum ut ex.": {
          *               "nodesHealth": {
-         *                 "Quasi quaerat delectus in fuga.": {
+         *                 "Distinctio fugiat.": {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "connectivityStatus": "HEALTHY",
+         *                   "diskHealth": "HEALTHY",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "integrationsHealth": {
+         *                     "CustomerObservabilityHealth": "HEALTHY",
+         *                     "InternalObservabilityHealth": "HEALTHY"
+         *                   },
+         *                   "loadStatus": "LOAD_NORMAL",
+         *                   "nodeHealth": "HEALTHY",
+         *                   "nodeName": "postgres-0",
+         *                   "ports": [
+         *                     80,
+         *                     443
+         *                   ],
+         *                   "processHealth": "HEALTHY",
+         *                   "processLiveness": "HEALTHY",
+         *                   "status": "HEALTHY"
+         *                 },
+         *                 "Rerum est dolorum reprehenderit enim dolorem.": {
          *                   "availabilityZone": "us-east-2a",
          *                   "connectivityStatus": "HEALTHY",
          *                   "diskHealth": "HEALTHY",
@@ -14285,9 +14343,29 @@ export interface components {
          *               "resourceType": "Kustomize",
          *               "status": "HEALTHY"
          *             },
-         *             "Perferendis natus enim architecto et aut.": {
+         *             "Nisi cumque magni autem reiciendis modi.": {
          *               "nodesHealth": {
-         *                 "Quasi quaerat delectus in fuga.": {
+         *                 "Distinctio fugiat.": {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "connectivityStatus": "HEALTHY",
+         *                   "diskHealth": "HEALTHY",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "integrationsHealth": {
+         *                     "CustomerObservabilityHealth": "HEALTHY",
+         *                     "InternalObservabilityHealth": "HEALTHY"
+         *                   },
+         *                   "loadStatus": "LOAD_NORMAL",
+         *                   "nodeHealth": "HEALTHY",
+         *                   "nodeName": "postgres-0",
+         *                   "ports": [
+         *                     80,
+         *                     443
+         *                   ],
+         *                   "processHealth": "HEALTHY",
+         *                   "processLiveness": "HEALTHY",
+         *                   "status": "HEALTHY"
+         *                 },
+         *                 "Rerum est dolorum reprehenderit enim dolorem.": {
          *                   "availabilityZone": "us-east-2a",
          *                   "connectivityStatus": "HEALTHY",
          *                   "diskHealth": "HEALTHY",
@@ -14316,13 +14394,33 @@ export interface components {
          *           },
          *           "status": "HEALTHY"
          *         },
-         *         "Veniam vitae iure delectus omnis.": {
+         *         "Sit veritatis quia aliquid.": {
          *           "instanceID": "instance-12345678",
          *           "lifeCycleStatus": "RUNNING",
          *           "resourcesHealth": {
-         *             "Dolores illo est eum.": {
+         *             "Laborum iure voluptatum ut ex.": {
          *               "nodesHealth": {
-         *                 "Quasi quaerat delectus in fuga.": {
+         *                 "Distinctio fugiat.": {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "connectivityStatus": "HEALTHY",
+         *                   "diskHealth": "HEALTHY",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "integrationsHealth": {
+         *                     "CustomerObservabilityHealth": "HEALTHY",
+         *                     "InternalObservabilityHealth": "HEALTHY"
+         *                   },
+         *                   "loadStatus": "LOAD_NORMAL",
+         *                   "nodeHealth": "HEALTHY",
+         *                   "nodeName": "postgres-0",
+         *                   "ports": [
+         *                     80,
+         *                     443
+         *                   ],
+         *                   "processHealth": "HEALTHY",
+         *                   "processLiveness": "HEALTHY",
+         *                   "status": "HEALTHY"
+         *                 },
+         *                 "Rerum est dolorum reprehenderit enim dolorem.": {
          *                   "availabilityZone": "us-east-2a",
          *                   "connectivityStatus": "HEALTHY",
          *                   "diskHealth": "HEALTHY",
@@ -14348,9 +14446,29 @@ export interface components {
          *               "resourceType": "Kustomize",
          *               "status": "HEALTHY"
          *             },
-         *             "Perferendis natus enim architecto et aut.": {
+         *             "Nisi cumque magni autem reiciendis modi.": {
          *               "nodesHealth": {
-         *                 "Quasi quaerat delectus in fuga.": {
+         *                 "Distinctio fugiat.": {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "connectivityStatus": "HEALTHY",
+         *                   "diskHealth": "HEALTHY",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "integrationsHealth": {
+         *                     "CustomerObservabilityHealth": "HEALTHY",
+         *                     "InternalObservabilityHealth": "HEALTHY"
+         *                   },
+         *                   "loadStatus": "LOAD_NORMAL",
+         *                   "nodeHealth": "HEALTHY",
+         *                   "nodeName": "postgres-0",
+         *                   "ports": [
+         *                     80,
+         *                     443
+         *                   ],
+         *                   "processHealth": "HEALTHY",
+         *                   "processLiveness": "HEALTHY",
+         *                   "status": "HEALTHY"
+         *                 },
+         *                 "Rerum est dolorum reprehenderit enim dolorem.": {
          *                   "availabilityZone": "us-east-2a",
          *                   "connectivityStatus": "HEALTHY",
          *                   "diskHealth": "HEALTHY",
@@ -14393,19 +14511,39 @@ export interface components {
             cloudProvider?: string;
             /**
              * @description ID of a Host Cluster
-             * @example Esse assumenda et illum dolores.
+             * @example Aut et perspiciatis veritatis odit.
              */
             hostClusterID?: string;
             /**
              * @description The health summary of the instances by instance ID
              * @example {
-             *       "Voluptatem recusandae et mollitia alias omnis voluptas.": {
+             *       "Qui adipisci.": {
              *         "instanceID": "instance-12345678",
              *         "lifeCycleStatus": "RUNNING",
              *         "resourcesHealth": {
-             *           "Dolores illo est eum.": {
+             *           "Laborum iure voluptatum ut ex.": {
              *             "nodesHealth": {
-             *               "Quasi quaerat delectus in fuga.": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
              *                 "availabilityZone": "us-east-2a",
              *                 "connectivityStatus": "HEALTHY",
              *                 "diskHealth": "HEALTHY",
@@ -14431,9 +14569,235 @@ export interface components {
              *             "resourceType": "Kustomize",
              *             "status": "HEALTHY"
              *           },
-             *           "Perferendis natus enim architecto et aut.": {
+             *           "Nisi cumque magni autem reiciendis modi.": {
              *             "nodesHealth": {
-             *               "Quasi quaerat delectus in fuga.": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               }
+             *             },
+             *             "resourceID": "resource-12345678",
+             *             "resourceKey": "primary",
+             *             "resourceType": "Kustomize",
+             *             "status": "HEALTHY"
+             *           }
+             *         },
+             *         "status": "HEALTHY"
+             *       },
+             *       "Ullam incidunt voluptatem et molestias.": {
+             *         "instanceID": "instance-12345678",
+             *         "lifeCycleStatus": "RUNNING",
+             *         "resourcesHealth": {
+             *           "Laborum iure voluptatum ut ex.": {
+             *             "nodesHealth": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               }
+             *             },
+             *             "resourceID": "resource-12345678",
+             *             "resourceKey": "primary",
+             *             "resourceType": "Kustomize",
+             *             "status": "HEALTHY"
+             *           },
+             *           "Nisi cumque magni autem reiciendis modi.": {
+             *             "nodesHealth": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               }
+             *             },
+             *             "resourceID": "resource-12345678",
+             *             "resourceKey": "primary",
+             *             "resourceType": "Kustomize",
+             *             "status": "HEALTHY"
+             *           }
+             *         },
+             *         "status": "HEALTHY"
+             *       },
+             *       "Voluptatum rem qui eveniet.": {
+             *         "instanceID": "instance-12345678",
+             *         "lifeCycleStatus": "RUNNING",
+             *         "resourcesHealth": {
+             *           "Laborum iure voluptatum ut ex.": {
+             *             "nodesHealth": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               }
+             *             },
+             *             "resourceID": "resource-12345678",
+             *             "resourceKey": "primary",
+             *             "resourceType": "Kustomize",
+             *             "status": "HEALTHY"
+             *           },
+             *           "Nisi cumque magni autem reiciendis modi.": {
+             *             "nodesHealth": {
+             *               "Distinctio fugiat.": {
+             *                 "availabilityZone": "us-east-2a",
+             *                 "connectivityStatus": "HEALTHY",
+             *                 "diskHealth": "HEALTHY",
+             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *                 "integrationsHealth": {
+             *                   "CustomerObservabilityHealth": "HEALTHY",
+             *                   "InternalObservabilityHealth": "HEALTHY"
+             *                 },
+             *                 "loadStatus": "LOAD_NORMAL",
+             *                 "nodeHealth": "HEALTHY",
+             *                 "nodeName": "postgres-0",
+             *                 "ports": [
+             *                   80,
+             *                   443
+             *                 ],
+             *                 "processHealth": "HEALTHY",
+             *                 "processLiveness": "HEALTHY",
+             *                 "status": "HEALTHY"
+             *               },
+             *               "Rerum est dolorum reprehenderit enim dolorem.": {
              *                 "availabilityZone": "us-east-2a",
              *                 "connectivityStatus": "HEALTHY",
              *                 "diskHealth": "HEALTHY",
@@ -14488,13 +14852,13 @@ export interface components {
          *       "hostClusterID": "hc-12345678",
          *       "serviceEnvironmentID": "se-12345678",
          *       "serviceID": "s-12345678",
-         *       "token": "g"
+         *       "token": "9"
          *     }
          */
         DeploymentCellHealthRequest: {
             /**
              * @description ID of a Host Cluster
-             * @example Aperiam autem officiis corporis amet molestias voluptas.
+             * @example Voluptas sequi ut.
              */
             hostClusterID?: string;
             /**
@@ -14509,38 +14873,38 @@ export interface components {
             serviceID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k36
+             * @example x55
              */
             token: string;
         };
         /**
          * @example {
-         *       "deployingInstances": 1587454124393106700,
-         *       "healthyInstances": 6037959791697068000,
+         *       "deployingInstances": 3091151713256063000,
+         *       "healthyInstances": 7473905497747120000,
          *       "hostClusterID": "hc-12345678",
          *       "message": "Cell is healthy",
          *       "status": "Healthy",
-         *       "totalInstances": 8416923397874056000,
-         *       "unhealthyInstances": 1222678245181673700,
-         *       "unknownInstances": 6908407308927433000
+         *       "totalInstances": 1082822046804648700,
+         *       "unhealthyInstances": 7762814657340618000,
+         *       "unknownInstances": 8351684784915824000
          *     }
          */
         DeploymentCellHealthSummary: {
             /**
              * Format: int64
              * @description The number of instances currently deploying
-             * @example 8116577666133728000
+             * @example 4080594334121950000
              */
             deployingInstances: number;
             /**
              * Format: int64
              * @description The number of healthy instances in the cell
-             * @example 4894418580990109000
+             * @example 3267004690070396000
              */
             healthyInstances: number;
             /**
              * @description ID of a Host Cluster
-             * @example Qui sit culpa ut ut dolorem accusantium.
+             * @example At voluptas dolor.
              */
             hostClusterID: string;
             /**
@@ -14556,19 +14920,19 @@ export interface components {
             /**
              * Format: int64
              * @description The total number of instances in the cell
-             * @example 4683117435574420000
+             * @example 4777527083674157000
              */
             totalInstances: number;
             /**
              * Format: int64
              * @description The number of unhealthy instances in the cell
-             * @example 9182184232819669000
+             * @example 4808994623718217000
              */
             unhealthyInstances: number;
             /**
              * Format: int64
              * @description The number of instances with unknown status
-             * @example 498571299701489700
+             * @example 8142744796326682000
              */
             unknownInstances?: number;
         };
@@ -14576,13 +14940,13 @@ export interface components {
          * @example {
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "evl"
+         *       "token": "y"
          *     }
          */
         DeprecateResourceRequest: {
             /**
              * @description ID of a resource
-             * @example Ut ea ipsam quos aut blanditiis.
+             * @example Officia nihil incidunt modi.
              */
             id: string;
             /**
@@ -14592,7 +14956,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xeo
+             * @example 5l
              */
             token: string;
         };
@@ -14600,13 +14964,13 @@ export interface components {
          * @example {
          *       "id": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "09v"
+         *       "token": "0"
          *     }
          */
         DeprecateServiceAPIRequest: {
             /**
              * @description ID of a Service API
-             * @example Quasi explicabo nostrum corporis doloremque.
+             * @example Quos autem.
              */
             id: string;
             /**
@@ -14616,7 +14980,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xsm
+             * @example y
              */
             token: string;
         };
@@ -14624,14 +14988,14 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "0",
+         *       "token": "nz",
          *       "version": "3.0"
          *     }
          */
         DeprecateTierVersionSetRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Hic quo.
+             * @example Pariatur quo nostrum error esse et.
              */
             productTierId: string;
             /**
@@ -14641,7 +15005,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example x
+             * @example iq7
              */
             token: string;
             /**
@@ -14655,14 +15019,14 @@ export interface components {
          *       "id": "r-12345678",
          *       "scope": "CLUSTER",
          *       "serviceId": "s-12345678",
-         *       "token": "kdk",
+         *       "token": "9ls",
          *       "type": "ADD"
          *     }
          */
         DeregisterActionHookRequest: {
             /**
              * @description ID of a resource
-             * @example Incidunt ut.
+             * @example Exercitationem qui fugiat aspernatur amet et.
              */
             id: string;
             /**
@@ -14677,7 +15041,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example b5p
              */
             token: string;
             /**
@@ -14707,7 +15071,7 @@ export interface components {
         /**
          * @example {
          *       "awsAccountID": "123456789012",
-         *       "token": "5"
+         *       "token": "6o"
          *     }
          */
         DescribeAccountConfigByAWSAccountIDRequest: {
@@ -14718,7 +15082,7 @@ export interface components {
             awsAccountID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example yp
+             * @example ce0
              */
             token: string;
         };
@@ -14772,7 +15136,7 @@ export interface components {
             byoaInstanceIDs?: string[];
             /**
              * @description ID of an CloudProvider
-             * @example Quo sunt sed ut.
+             * @example Recusandae delectus distinctio rerum impedit.
              */
             cloudProviderId: string;
             /**
@@ -14782,7 +15146,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Account Config
-             * @example Enim rerum.
+             * @example Aliquid soluta.
              */
             id: string;
             /**
@@ -14804,7 +15168,7 @@ export interface components {
         /**
          * @example {
          *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *       "token": "n"
+         *       "token": "a5d"
          *     }
          */
         DescribeAccountConfigByAzureSubscriptionIDRequest: {
@@ -14815,7 +15179,7 @@ export interface components {
             azureSubscriptionID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3
+             * @example f
              */
             token: string;
         };
@@ -14857,7 +15221,7 @@ export interface components {
             byoaInstanceIDs?: string[];
             /**
              * @description ID of an CloudProvider
-             * @example Sunt harum commodi sint enim sapiente velit.
+             * @example Maiores fugit vero eum doloremque veritatis cum.
              */
             cloudProviderId: string;
             /**
@@ -14867,7 +15231,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Account Config
-             * @example Ut dolor.
+             * @example Ullam officia nam.
              */
             id: string;
             /**
@@ -14889,7 +15253,7 @@ export interface components {
         /**
          * @example {
          *       "gcpProjectID": "my-project",
-         *       "token": "4y"
+         *       "token": "qt"
          *     }
          */
         DescribeAccountConfigByGCPProjectIDRequest: {
@@ -14900,7 +15264,7 @@ export interface components {
             gcpProjectID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ug
+             * @example q
              */
             token: string;
         };
@@ -14933,7 +15297,7 @@ export interface components {
             byoaInstanceIDs?: string[];
             /**
              * @description ID of an CloudProvider
-             * @example Aut laboriosam.
+             * @example Reprehenderit culpa qui ipsum fuga illum.
              */
             cloudProviderId: string;
             /**
@@ -14958,7 +15322,7 @@ export interface components {
             gcpServiceAccountEmail: string;
             /**
              * @description ID of an Account Config
-             * @example Molestiae placeat.
+             * @example Laudantium voluptatem error alias repudiandae non.
              */
             id: string;
             /**
@@ -14980,7 +15344,7 @@ export interface components {
         /**
          * @example {
          *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-         *       "token": "zf"
+         *       "token": "og"
          *     }
          */
         DescribeAccountConfigByOCITenancyIDRequest: {
@@ -14991,7 +15355,7 @@ export interface components {
             ociTenancyID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ydr
+             * @example s
              */
             token: string;
         };
@@ -15023,7 +15387,7 @@ export interface components {
             byoaInstanceIDs?: string[];
             /**
              * @description ID of an CloudProvider
-             * @example Ipsum ut rerum molestias.
+             * @example Sunt velit inventore nobis sint.
              */
             cloudProviderId: string;
             /**
@@ -15033,7 +15397,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Account Config
-             * @example Tempore culpa et aut cumque dicta rem.
+             * @example Sint expedita.
              */
             id: string;
             /**
@@ -15065,18 +15429,18 @@ export interface components {
         /**
          * @example {
          *       "id": "ac-12345678",
-         *       "token": "d"
+         *       "token": "gbk"
          *     }
          */
         DescribeAccountConfigRequest: {
             /**
              * @description ID of an Account Config
-             * @example Veritatis enim quasi modi vel officia ipsam.
+             * @example Eos repellat temporibus cumque repellendus.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4u
+             * @example d
              */
             token: string;
         };
@@ -15163,7 +15527,7 @@ export interface components {
             byoaInstanceIDs?: string[];
             /**
              * @description ID of an CloudProvider
-             * @example Illum accusantium vel molestiae natus nulla iusto.
+             * @example Sit possimus doloremque suscipit itaque dolor earum.
              */
             cloudProviderId: string;
             /**
@@ -15198,7 +15562,7 @@ export interface components {
             gcpServiceAccountEmail?: string;
             /**
              * @description ID of an Account Config
-             * @example Nam omnis praesentium inventore minus quis tempora.
+             * @example Sed sint facilis mollitia aut temporibus.
              */
             id: string;
             /**
@@ -15241,13 +15605,13 @@ export interface components {
          * @example {
          *       "id": "event-12345678",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "f"
+         *       "token": "z9"
          *     }
          */
         DescribeAuditEventRequest: {
             /**
              * @description ID of a Event
-             * @example Ut commodi labore.
+             * @example Accusantium optio debitis quam qui et.
              */
             id: string;
             /**
@@ -15257,7 +15621,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8
+             * @example m7l
              */
             token: string;
         };
@@ -15294,7 +15658,7 @@ export interface components {
             eventSource?: string;
             /**
              * @description ID of a Event
-             * @example Ipsam itaque.
+             * @example Atque sint.
              */
             id: string;
             /**
@@ -15304,7 +15668,7 @@ export interface components {
             message: string;
             /**
              * @description ID of an Org
-             * @example Voluptatem vitae aspernatur odit animi placeat atque.
+             * @example Voluptas neque et culpa reiciendis vel.
              */
             orgId?: string;
             /**
@@ -15334,7 +15698,7 @@ export interface components {
             time: string;
             /**
              * @description ID of a User
-             * @example Ipsa quod consequatur odit.
+             * @example Eligendi dolor ut temporibus.
              */
             userId?: string;
             /**
@@ -15360,18 +15724,18 @@ export interface components {
         /**
          * @example {
          *       "id": "az-12345678",
-         *       "token": "6gm"
+         *       "token": "kzr"
          *     }
          */
         DescribeAvailabilityZoneRequest: {
             /**
              * @description ID of an AZ
-             * @example Consectetur et eos exercitationem id.
+             * @example Magnam sunt non.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example y
+             * @example h
              */
             token: string;
         };
@@ -15402,7 +15766,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an AZ
-             * @example Iure hic illum velit harum magnam.
+             * @example Dolorem corporis officiis alias quo rerum sequi.
              */
             id: string;
             /**
@@ -15414,18 +15778,18 @@ export interface components {
         /**
          * @example {
          *       "id": "infra-12345678",
-         *       "token": "ay"
+         *       "token": "hca"
          *     }
          */
         DescribeCloudProviderRequest: {
             /**
              * @description ID of an CloudProvider
-             * @example Ipsum amet quaerat.
+             * @example Eum eum deserunt autem illo ut consequuntur.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8h1
+             * @example ue
              */
             token: string;
         };
@@ -15444,7 +15808,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an CloudProvider
-             * @example Nihil aliquam deserunt aut exercitationem.
+             * @example Quaerat rerum.
              */
             id: string;
             /**
@@ -15456,26 +15820,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Deleniti ipsa accusantium.",
+         *       "ProductTierVersion": "Non in.",
          *       "id": "cc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "p"
+         *       "token": "s"
          *     }
          */
         DescribeComputeConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Iste explicabo amet deleniti et non minus.
+             * @example Sunt minima porro molestias mollitia.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Tempora sed quidem.
+             * @example Et ad error voluptatem optio ratione.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a Compute Config
-             * @example Qui amet.
+             * @example Quam architecto error veritatis suscipit sapiente.
              */
             id: string;
             /**
@@ -15485,7 +15849,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 92
+             * @example v
              */
             token: string;
         };
@@ -15606,7 +15970,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a Compute Config
-             * @example Blanditiis molestias.
+             * @example Rerum sed cum sapiente tenetur tenetur ducimus.
              */
             id: string;
             /**
@@ -15663,7 +16027,7 @@ export interface components {
         /**
          * @example {
          *       "returnUrl": "https://mysaasportal.com",
-         *       "token": "v"
+         *       "token": "yf"
          *     }
          */
         DescribeConsumptionBillingDetailsRequest: {
@@ -15674,7 +16038,7 @@ export interface components {
             returnUrl?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4q
+             * @example ce
              */
             token: string;
         };
@@ -15736,13 +16100,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "o8w"
+         *       "token": "t"
          *     }
          */
         DescribeConsumptionBillingStatusRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example d
+             * @example 4o
              */
             token: string;
         };
@@ -15761,18 +16125,18 @@ export interface components {
         /**
          * @example {
          *       "id": "user-abcd1234",
-         *       "token": "n76"
+         *       "token": "r"
          *     }
          */
         DescribeConsumptionUserBillingDetailsRequest: {
             /**
              * @description ID of a User
-             * @example Et quam mollitia.
+             * @example Itaque neque quia.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example p
+             * @example k
              */
             token: string;
         };
@@ -15808,25 +16172,25 @@ export interface components {
             paymentInfoPortalURL?: string;
             /**
              * @description ID of a User
-             * @example Non aliquam ut.
+             * @example Molestiae quasi iste dolorem occaecati aut esse.
              */
             userId?: string;
         };
         /**
          * @example {
          *       "id": "cd-12345678",
-         *       "token": "rfk"
+         *       "token": "mms"
          *     }
          */
         DescribeCustomDomainRequest: {
             /**
              * @description ID of an Custom Domain
-             * @example Et eaque odit soluta.
+             * @example Et nemo modi quis.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ba
+             * @example zar
              */
             token: string;
         };
@@ -15858,7 +16222,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Custom Domain
-             * @example Sunt rerum.
+             * @example Voluptas et ab alias.
              */
             id: string;
             /**
@@ -15878,25 +16242,25 @@ export interface components {
         /**
          * @example {
          *       "id": "n-12345678",
-         *       "token": "gm"
+         *       "token": "6"
          *     }
          */
         DescribeCustomNetworkRequest: {
             /**
              * @description ID of a custom network
-             * @example Ea recusandae ut voluptas architecto qui.
+             * @example Impedit quasi aut sed dolores.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example e9
+             * @example 72
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "default",
-         *       "token": "23a"
+         *       "token": "9g"
          *     }
          */
         DescribeDeploymentConfigRequest: {
@@ -15907,7 +16271,7 @@ export interface components {
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example i1
+             * @example 1r3
              */
             token: string;
         };
@@ -15936,7 +16300,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a Deployment Config
-             * @example Optio voluptatem consequatur.
+             * @example Id aspernatur mollitia neque suscipit necessitatibus.
              */
             id: string;
             infraRollConfiguration: components["schemas"]["InfraRollConfiguration"];
@@ -15958,7 +16322,7 @@ export interface components {
          * @example {
          *       "chartName": "my-chart",
          *       "chartVersion": "1.0.0",
-         *       "token": "y"
+         *       "token": "8uq"
          *     }
          */
         DescribeHelmPackageRequest: {
@@ -15974,25 +16338,25 @@ export interface components {
             chartVersion: string;
             /**
              * @description JWT token used to perform authorization
-             * @example kdq
+             * @example l
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "g"
+         *       "token": "j3"
          *     }
          */
         DescribeIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Quia sed nostrum error aut est non.
+             * @example Quibusdam error ad.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example dp
+             * @example yhs
              */
             token: string;
         };
@@ -16048,7 +16412,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description ID of an Identity Provider
-             * @example Praesentium necessitatibus quia enim omnis.
+             * @example Et saepe quas magnam officia.
              */
             id: string;
             /**
@@ -16120,26 +16484,26 @@ export interface components {
          * @description Describe an image configuration
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Maiores fugit vero eum doloremque veritatis cum.",
+         *       "ProductTierVersion": "Consectetur sunt velit placeat.",
          *       "id": "imgc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "r7"
+         *       "token": "j"
          *     }
          */
         DescribeImageConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Ipsam inventore voluptatem libero.
+             * @example Qui qui.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Cumque natus.
+             * @example Ratione non iusto omnis.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of an Image Config
-             * @example Rerum dolore rerum.
+             * @example Sit deleniti.
              */
             id: string;
             /**
@@ -16149,7 +16513,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example f
+             * @example z1d
              */
             token: string;
         };
@@ -16184,7 +16548,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Image Config
-             * @example Aut asperiores fugiat dolor in vero qui.
+             * @example Fugiat libero autem tempore sunt explicabo cupiditate.
              */
             id: string;
             /**
@@ -16194,7 +16558,7 @@ export interface components {
             imageName: string;
             /**
              * @description ID of an Image Registry
-             * @example Autem omnis quaerat.
+             * @example Aut voluptatem odio quas ea voluptatem.
              */
             imageRegistryId: string;
             /**
@@ -16226,18 +16590,18 @@ export interface components {
          * @description Describe an HTTP API v2 Docker Image Registry
          * @example {
          *       "id": "ir-12345678",
-         *       "token": "n"
+         *       "token": "p"
          *     }
          */
         DescribeImageRegistryRequest: {
             /**
              * @description ID of an Image Registry
-             * @example Neque molestias quia.
+             * @example Quis nisi qui earum dolorum quidem et.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 30
+             * @example 6
              */
             token: string;
         };
@@ -16264,7 +16628,7 @@ export interface components {
             host: string;
             /**
              * @description ID of an Image Registry
-             * @example Atque facilis consequatur exercitationem possimus iste est.
+             * @example Assumenda illum.
              */
             id: string;
             /**
@@ -16286,26 +16650,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Cupiditate quod.",
+         *       "ProductTierVersion": "Quia temporibus.",
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "fx"
+         *       "token": "t"
          *     }
          */
         DescribeInfraConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Quo autem quia.
+             * @example Qui impedit aliquam.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Odit aliquid sunt.
+             * @example Quia voluptate id.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of an Infra Config
-             * @example Alias sed qui aut excepturi.
+             * @example Voluptas vero voluptatibus deserunt sint quis aperiam.
              */
             id: string;
             /**
@@ -16315,7 +16679,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gl
+             * @example b6
              */
             token: string;
         };
@@ -16338,7 +16702,7 @@ export interface components {
         DescribeInfraConfigResult: {
             /**
              * @description ID of a Compute Config
-             * @example Necessitatibus culpa maiores maiores optio asperiores.
+             * @example Quibusdam ipsa enim cupiditate modi.
              */
             computeConfigId?: string;
             customTag?: components["schemas"]["CustomTag"];
@@ -16349,7 +16713,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an Infra Config
-             * @example Sequi culpa alias doloribus voluptatem iste et.
+             * @example Nobis omnis alias.
              */
             id: string;
             /**
@@ -16359,7 +16723,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a Network Config
-             * @example Amet repudiandae iusto.
+             * @example Velit iusto quod in.
              */
             networkConfigId?: string;
             /**
@@ -16374,33 +16738,33 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Storage Config
-             * @example Soluta et voluptas quae hic laboriosam.
+             * @example Eius laborum nihil tenetur nobis blanditiis consequatur.
              */
             storageConfigId?: string;
         };
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Porro iusto facere sunt.",
+         *       "ProductTierVersion": "Reprehenderit accusantium qui odit dolor debitis beatae.",
          *       "id": "var-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "vbb"
+         *       "token": "h6"
          *     }
          */
         DescribeInputParameterRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Consequatur dolores illum suscipit aspernatur qui voluptatem.
+             * @example Eum sit officia voluptatum ducimus sequi.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Neque id et sed id est.
+             * @example Occaecati culpa vitae et velit mollitia.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of an Input Parameter
-             * @example Labore repellendus et quaerat.
+             * @example Assumenda ab.
              */
             id: string;
             /**
@@ -16410,7 +16774,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5cr
+             * @example si
              */
             token: string;
         };
@@ -16418,11 +16782,11 @@ export interface components {
          * @example {
          *       "defaultValue": "true",
          *       "dependentResourceId": "r-12345678",
-         *       "description": "Id accusantium.",
-         *       "hasOptions": true,
+         *       "description": "Non quisquam velit omnis.",
+         *       "hasOptions": false,
          *       "id": "var-12345678",
-         *       "isList": false,
-         *       "key": "o",
+         *       "isList": true,
+         *       "key": "8",
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
          *         "medium": "t3.large",
@@ -16435,13 +16799,13 @@ export interface components {
          *         "minLength": "Eveniet architecto assumenda et voluptas perferendis enim."
          *       },
          *       "modifiable": true,
-         *       "name": "5",
+         *       "name": "9bp",
          *       "options": [
          *         "true",
          *         "false"
          *       ],
          *       "regex": "^[a-zA-Z0-9_-]+$",
-         *       "required": true,
+         *       "required": false,
          *       "resourceId": "r-12345678",
          *       "scope": {
          *         "cloudProviders": [
@@ -16463,23 +16827,23 @@ export interface components {
             defaultValue?: string;
             /**
              * @description ID of a resource
-             * @example Eius assumenda qui porro quasi.
+             * @example Voluptas cumque est.
              */
             dependentResourceId?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Aperiam doloremque provident qui.
+             * @example Illo autem rem.
              */
             description: string;
             /**
              * @description Marks the input parameter to be selectable from a list of values
              * @default false
-             * @example true
+             * @example false
              */
             hasOptions: boolean;
             /**
              * @description ID of an Input Parameter
-             * @example Est doloribus sit voluptatum cum.
+             * @example Et quam fugit molestiae rem.
              */
             id: string;
             /**
@@ -16490,7 +16854,7 @@ export interface components {
             isList: boolean;
             /**
              * @description Key of the input parameter
-             * @example 5
+             * @example k
              */
             key: string;
             /**
@@ -16512,7 +16876,7 @@ export interface components {
             modifiable: boolean;
             /**
              * @description External name for the input parameter
-             * @example uv
+             * @example s3
              */
             name: string;
             /**
@@ -16530,12 +16894,12 @@ export interface components {
             regex?: string;
             /**
              * @description Enforces the input parameter as a required parameter
-             * @example true
+             * @example false
              */
             required: boolean;
             /**
              * @description ID of a resource
-             * @example Optio rerum aut ab non.
+             * @example Eos voluptas reprehenderit nostrum quia.
              */
             resourceId: string;
             scope?: components["schemas"]["InputParameterScope"];
@@ -16559,8 +16923,197 @@ export interface components {
         };
         /**
          * @example {
+         *       "id": "instance-ss-12345678",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "token": "r1k"
+         *     }
+         */
+        DescribeInstanceSnapshotRequest: {
+            /**
+             * @description ID of a Resource Instance Snapshot
+             * @example Doloribus quo voluptatem ab nihil ut.
+             */
+            id: string;
+            /**
+             * @description The subscription ID
+             * @example sub-abcd1234
+             */
+            subscriptionId?: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example s
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "cloudProvider": "aws",
+         *       "completeTime": "2021-09-01T00:00:00Z",
+         *       "createdTime": "2021-09-01T00:00:00Z",
+         *       "encrypted": true,
+         *       "outputParams": [
+         *         {
+         *           "displayName": "Server Name",
+         *           "key": "serverName",
+         *           "type": "string",
+         *           "value": "server1"
+         *         },
+         *         {
+         *           "displayName": "Server Type",
+         *           "key": "serverType",
+         *           "type": "string",
+         *           "value": "db.t3.micro"
+         *         }
+         *       ],
+         *       "productTierId": "pt-12345678",
+         *       "productTierName": "Premium",
+         *       "productTierVersion": "1.0",
+         *       "productTierVersionDescription": "Version 1.0",
+         *       "progress": 99,
+         *       "region": "us-west-2",
+         *       "serviceId": "pt-12345678",
+         *       "serviceName": "Postgres",
+         *       "snapshotId": "instance-ss-12345678",
+         *       "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *       "sourceInstanceId": "instance-12345678",
+         *       "status": "completed",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "subscriptionOwnerOrgId": "org-abcd1234",
+         *       "subscriptionOwnerOrgName": "Example Inc.",
+         *       "subscriptionOwnerUserId": "user-abcd1234",
+         *       "subscriptionOwnerUserName": "Admin"
+         *     }
+         */
+        DescribeInstanceSnapshotResult: {
+            /**
+             * @description Name of the Infra Provider
+             * @example aws|azure|gcp|all
+             */
+            cloudProvider?: string;
+            /**
+             * @description The snapshot time
+             * @example 2021-09-01T00:00:00Z
+             */
+            completeTime?: string;
+            /**
+             * @description The snapshot creation time
+             * @example 2021-09-01T00:00:00Z
+             */
+            createdTime?: string;
+            /**
+             * @description Whether the snapshot is encrypted
+             * @example true
+             */
+            encrypted?: boolean;
+            /**
+             * @description Custom output parameters
+             * @example [
+             *       {
+             *         "displayName": "Server Name",
+             *         "key": "serverName",
+             *         "type": "string",
+             *         "value": "server1"
+             *       },
+             *       {
+             *         "displayName": "Server Type",
+             *         "key": "serverType",
+             *         "type": "string",
+             *         "value": "db.t3.micro"
+             *       }
+             *     ]
+             */
+            outputParams?: components["schemas"]["OutputParameter"][];
+            /**
+             * @description ID of a Product Tier
+             * @example Et facilis suscipit sit.
+             */
+            productTierId?: string;
+            /**
+             * @description The product tier name
+             * @example Premium
+             */
+            productTierName?: string;
+            /**
+             * @description The product tier version
+             * @example 1.0
+             */
+            productTierVersion?: string;
+            /**
+             * @description The product tier version description
+             * @example Version 1.0
+             */
+            productTierVersionDescription?: string;
+            /**
+             * Format: int64
+             * @description The backup progress. 0-100
+             * @example 99
+             */
+            progress?: number;
+            /**
+             * @description The region name where the snapshot is stored
+             * @example us-west-2
+             */
+            region?: string;
+            /**
+             * @description ID of a Service
+             * @example s-123456
+             */
+            serviceId?: string;
+            /**
+             * @description The service name
+             * @example Postgres
+             */
+            serviceName?: string;
+            /**
+             * @description ID of a Resource Instance Snapshot
+             * @example Est dolores saepe rerum blanditiis.
+             */
+            snapshotId?: string;
+            /**
+             * @description The snapshot type
+             * @example AutomatedSnapshot|ManualSnapshot
+             */
+            snapshotType?: string;
+            /**
+             * @description ID of a Resource Instance
+             * @example instance-12345678
+             */
+            sourceInstanceId?: string;
+            /**
+             * @description The snapshot status
+             * @example completed
+             */
+            status?: string;
+            /**
+             * @description ID of a Subscription
+             * @example Consequuntur asperiores consequatur.
+             */
+            subscriptionId?: string;
+            /**
+             * @description ID of an Org
+             * @example Unde ut libero saepe et.
+             */
+            subscriptionOwnerOrgId?: string;
+            /**
+             * @description The subscription owner org name
+             * @example Example Inc.
+             */
+            subscriptionOwnerOrgName?: string;
+            /**
+             * @description ID of a User
+             * @example Magnam omnis dolorem blanditiis est error voluptatem.
+             */
+            subscriptionOwnerUserId?: string;
+            /**
+             * @description The subscription owner user name
+             * @example Admin
+             */
+            subscriptionOwnerUserName?: string;
+        };
+        /**
+         * @example {
          *       "id": "in_1234568",
-         *       "token": "o"
+         *       "token": "99"
          *     }
          */
         DescribeInvoiceRequest: {
@@ -16571,7 +17124,7 @@ export interface components {
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2dy
+             * @example k1
              */
             token: string;
         };
@@ -16579,7 +17132,7 @@ export interface components {
          * @example {
          *       "family": "COMPUTE_INFRA",
          *       "key": "MAX_VIRTUAL_CORES_PER_RESOURCE",
-         *       "token": "wcr"
+         *       "token": "2q"
          *     }
          */
         DescribeLimitRequest: {
@@ -16595,7 +17148,7 @@ export interface components {
             key: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 72
+             * @example s
              */
             token: string;
         };
@@ -16645,26 +17198,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Repellat quia ratione aut porro in.",
+         *       "ProductTierVersion": "Est enim.",
          *       "id": "nc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "x8h"
+         *       "token": "r"
          *     }
          */
         DescribeNetworkConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Nihil a magnam.
+             * @example Eos consequuntur consectetur autem tempora.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Cum ut.
+             * @example Qui eveniet saepe voluptas.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a Network Config
-             * @example Id aspernatur mollitia neque suscipit necessitatibus.
+             * @example Vel et quidem.
              */
             id: string;
             /**
@@ -16674,7 +17227,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9g
+             * @example ku
              */
             token: string;
         };
@@ -16738,7 +17291,7 @@ export interface components {
             endpointPerReplica: boolean;
             /**
              * @description ID of a Network Config
-             * @example Autem sed.
+             * @example Consequatur harum eum mollitia fuga.
              */
             id: string;
             /**
@@ -16795,13 +17348,13 @@ export interface components {
          * @example {
          *       "id": "n-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "2ft"
+         *       "token": "y"
          *     }
          */
         DescribeNetworkRequest: {
             /**
              * @description ID of a Network
-             * @example Dolorem fugit aut nemo.
+             * @example Voluptas pariatur earum.
              */
             id: string;
             /**
@@ -16811,7 +17364,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gf
+             * @example c5
              */
             token: string;
         };
@@ -16833,12 +17386,12 @@ export interface components {
             cidr?: string;
             /**
              * @description ID of a Network
-             * @example Aut perspiciatis ut ut.
+             * @example Ea qui qui dolore delectus modi.
              */
             id?: string;
             /**
              * @description ID of a Network Config
-             * @example Sed voluptatum officia hic modi soluta.
+             * @example Et quaerat laudantium neque id.
              */
             networkConfigId?: string;
             /**
@@ -16853,33 +17406,33 @@ export interface components {
             type?: string;
             /**
              * @description ID of a VUnit
-             * @example Cupiditate quos ea.
+             * @example In quam labore.
              */
             vunitId?: string;
         };
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Et sed aut.",
+         *       "ProductTierVersion": "Id ea nihil et sed.",
          *       "id": "op-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "l"
+         *       "token": "bb"
          *     }
          */
         DescribeOutputParameterRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Iusto beatae quia iusto nam.
+             * @example Voluptates at adipisci.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Totam eum rerum unde impedit necessitatibus.
+             * @example Nostrum repudiandae quia fugit.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of an Output Parameter
-             * @example Perspiciatis iure alias iste et ea.
+             * @example Aut est nisi laudantium.
              */
             id: string;
             /**
@@ -16889,7 +17442,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k
+             * @example 4r6
              */
             token: string;
         };
@@ -16939,7 +17492,7 @@ export interface components {
             genericCommandValueProvider?: components["schemas"]["GenericCommandValueProviderConfig"];
             /**
              * @description ID of an Output Parameter
-             * @example Vel ipsam ratione.
+             * @example Est nobis similique voluptas ullam dolorem sed.
              */
             id: string;
             /**
@@ -16955,7 +17508,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a resource
-             * @example Maiores dolores.
+             * @example Et ratione.
              */
             resourceId: string;
             /**
@@ -16984,18 +17537,18 @@ export interface components {
          *       "id": "sa-12345678",
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "j"
+         *       "token": "gbm"
          *     }
          */
         DescribePendingChangesRequest: {
             /**
              * @description ID of a Service API
-             * @example Sint explicabo ipsa ut facilis qui.
+             * @example Laudantium ipsa magni omnis eos accusamus voluptate.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Molestiae beatae.
+             * @example Quos amet aut quam voluptate doloremque.
              */
             productTierId?: string;
             /**
@@ -17005,7 +17558,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example n
+             * @example 49
              */
             token: string;
         };
@@ -17071,7 +17624,7 @@ export interface components {
         DescribePendingChangesResult: {
             /**
              * @description ID of a Service API
-             * @example Accusantium esse.
+             * @example Laboriosam ut voluptatum.
              */
             id: string;
             /**
@@ -17143,13 +17696,13 @@ export interface components {
          * @example {
          *       "id": "p-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "g52"
+         *       "token": "uof"
          *     }
          */
         DescribePipelineRequest: {
             /**
              * @description ID of a Pipeline
-             * @example Aut quia temporibus voluptatem nobis omnis.
+             * @example Et facere itaque non qui cumque est.
              */
             id?: string;
             /**
@@ -17159,7 +17712,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example c
+             * @example jb
              */
             token: string;
         };
@@ -17183,7 +17736,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Pipeline
-             * @example Cupiditate modi dignissimos eius.
+             * @example Quo molestiae explicabo et nihil aut.
              */
             id?: string;
             /**
@@ -17207,13 +17760,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ue"
+         *       "token": "yov"
          *     }
          */
         DescribePlanRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example n6n
+             * @example 6
              */
             token: string;
         };
@@ -17283,14 +17836,14 @@ export interface components {
          * @example {
          *       "id": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "1f",
+         *       "token": "yz",
          *       "version": "3.0"
          *     }
          */
         DescribeProductTierRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Quia consequatur velit.
+             * @example Sunt sit dolores.
              */
             id: string;
             /**
@@ -17300,7 +17853,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ma
+             * @example at
              */
             token: string;
             /**
@@ -17515,13 +18068,6 @@ export interface components {
              *         },
              *         "feature": "LOGS",
              *         "scope": "INTERNAL"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "provider": "native"
-             *         },
-             *         "feature": "LOGS",
-             *         "scope": "INTERNAL"
              *       }
              *     ]
              */
@@ -17565,7 +18111,7 @@ export interface components {
             gcpRegions?: string[];
             /**
              * @description ID of a Product Tier
-             * @example Accusantium deleniti.
+             * @example Odit voluptates voluptate dolores ea ad.
              */
             id: string;
             /**
@@ -17654,7 +18200,7 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Blanditiis voluptatem nihil aut.
+             * @example Rerum temporibus.
              */
             serviceModelId: string;
             /**
@@ -17671,18 +18217,18 @@ export interface components {
         /**
          * @example {
          *       "id": "region-12345678",
-         *       "token": "y1z"
+         *       "token": "0"
          *     }
          */
         DescribeRegionRequest: {
             /**
              * @description ID of a Region
-             * @example Quia quaerat.
+             * @example Necessitatibus dolore deleniti.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8hc
+             * @example ykk
              */
             token: string;
         };
@@ -17698,7 +18244,7 @@ export interface components {
         DescribeRegionResult: {
             /**
              * @description ID of an CloudProvider
-             * @example Officiis modi optio voluptas quod velit fugit.
+             * @example Perspiciatis expedita maiores possimus eligendi nesciunt.
              */
             cloudProviderId: string;
             /**
@@ -17718,7 +18264,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a Region
-             * @example Aspernatur consequatur.
+             * @example Deleniti minima expedita molestias provident.
              */
             id: string;
         };
@@ -17733,7 +18279,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "pup"
+         *       "token": "ar"
          *     }
          */
         DescribeResourceInstanceRequest: {
@@ -17774,7 +18320,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Quaerat odio deleniti aperiam autem deleniti.
+             * @example Quisquam earum id nihil consectetur a.
              */
             serviceProviderId: string;
             /**
@@ -17784,7 +18330,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xh
+             * @example i
              */
             token: string;
         };
@@ -17907,6 +18453,12 @@ export interface components {
          *       "maxReplicas": "1",
          *       "minReplicas": "1",
          *       "network_type": "PUBLIC|INTERNAL",
+         *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *       "onPremInstallerDetails": {
+         *         "downloadURL": "https://example.com/installer/download",
+         *         "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *       },
+         *       "onpremPlatform": "EKS",
          *       "productTierFeatures": {
          *         "LOGS": {
          *           "auth": {
@@ -17978,7 +18530,7 @@ export interface components {
             created_at?: string;
             /**
              * @description ID of a User
-             * @example Et aut rerum eaque.
+             * @example Voluptate voluptatem corporis pariatur rerum sint sed.
              */
             createdByUserId?: string;
             /**
@@ -18112,6 +18664,17 @@ export interface components {
              */
             network_type?: string;
             /**
+             * @description The Tenancy OCID for Oracle Cloud Infrastructure
+             * @example ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+             */
+            ociTenancyID?: string;
+            onPremInstallerDetails?: components["schemas"]["OnPremInstallerDetails"];
+            /**
+             * @description OnPrem model platform
+             * @example EKS|GKE|AKS|Generic
+             */
+            onpremPlatform?: string;
+            /**
              * @description The product tier features
              * @example {
              *       "LOGS": {
@@ -18138,7 +18701,7 @@ export interface components {
             region?: string;
             /**
              * @description ID of a resource
-             * @example Eos possimus libero itaque.
+             * @example Qui laboriosam fuga nisi labore autem nam.
              */
             resourceID?: string;
             /**
@@ -18184,26 +18747,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Ex qui similique.",
+         *       "ProductTierVersion": "Suscipit deleniti est aliquid ullam explicabo vel.",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "7"
+         *       "token": "n"
          *     }
          */
         DescribeResourceMetricsConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Numquam sint.
+             * @example Maiores expedita iusto quam magni.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Quidem ut quidem laudantium a facilis.
+             * @example Quia distinctio culpa tenetur non asperiores.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Corrupti dolores ut sit pariatur delectus dolores.
+             * @example Odit qui atque nostrum harum.
              */
             id: string;
             /**
@@ -18213,33 +18776,33 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example f
+             * @example w
              */
             token: string;
         };
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Quia aut.",
+         *       "ProductTierVersion": "Nulla consequatur.",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "d"
+         *       "token": "9w"
          *     }
          */
         DescribeResourceRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Rem alias eos.
+             * @example Exercitationem veniam aut.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Dolor debitis beatae saepe et quam fugit.
+             * @example Qui et qui officia dolor sunt.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Impedit qui odio sint reprehenderit accusantium qui.
+             * @example Quis aut.
              */
             id: string;
             /**
@@ -18249,7 +18812,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example z7p
+             * @example 6
              */
             token: string;
         };
@@ -18317,6 +18880,20 @@ export interface components {
          *         "S3Configuration": {}
          *       },
          *       "capabilities": [
+         *         {
+         *           "capability": "SERVERLESS",
+         *           "configuration": {
+         *             "EnableAutoStop": true,
+         *             "MinimumNodesInPool": 5,
+         *             "PortsMappingProxyConfig": {
+         *               "MaxNumberOfClustersPerProxyInstance": 50,
+         *               "NumberOfPortsPerCluster": 4
+         *             },
+         *             "ProxyId": "r-123456",
+         *             "ReferenceProxyKey": "resource-proxy",
+         *             "TargetPort": 5432
+         *           }
+         *         },
          *         {
          *           "capability": "SERVERLESS",
          *           "configuration": {
@@ -18519,7 +19096,7 @@ export interface components {
          *       "id": "r-12345678",
          *       "imageConfigId": "imgc-12345678",
          *       "infraConfigId": "ic-12345678",
-         *       "internal": true,
+         *       "internal": false,
          *       "isDeprecated": true,
          *       "jobConfig": {
          *         "activeDeadlineSeconds": 300,
@@ -18838,29 +19415,29 @@ export interface components {
             helmChartConfiguration?: components["schemas"]["HelmChartConfiguration"];
             /**
              * @description ID of a resource
-             * @example Id illo.
+             * @example Corporis sunt consequatur.
              */
             id: string;
             /**
              * @description ID of an Image Config
-             * @example Et fuga quod.
+             * @example Assumenda sint dolores autem autem.
              */
             imageConfigId?: string;
             /**
              * @description ID of an Infra Config
-             * @example Nostrum sunt voluptas.
+             * @example Distinctio nemo.
              */
             infraConfigId?: string;
             /**
              * @description Whether this resource is internal or not
              * @default false
-             * @example false
+             * @example true
              */
             internal: boolean;
             /**
              * @description Whether this resource is deprecated or not
              * @default false
-             * @example true
+             * @example false
              */
             isDeprecated: boolean;
             jobConfig?: components["schemas"]["JobConfig"];
@@ -18881,7 +19458,7 @@ export interface components {
             operatorCRDConfiguration?: components["schemas"]["OperatorCRDConfiguration"];
             /**
              * @description ID of a Product Tier
-             * @example Voluptatem illo autem rem rerum.
+             * @example Quo doloribus aut et adipisci in nobis.
              */
             productTierId: string;
             /**
@@ -18905,13 +19482,13 @@ export interface components {
          * @example {
          *       "id": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "0m4"
+         *       "token": "r43"
          *     }
          */
         DescribeServiceAPIRequest: {
             /**
              * @description ID of a Service API
-             * @example At rerum quasi.
+             * @example Exercitationem fuga quos rerum.
              */
             id: string;
             /**
@@ -18921,7 +19498,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example hc
+             * @example q
              */
             token: string;
         };
@@ -18944,7 +19521,7 @@ export interface components {
             apiVersion: string;
             /**
              * @description ID of a Deployment Config
-             * @example Vero doloremque unde ea est temporibus.
+             * @example Aut sint blanditiis magnam odit quia.
              */
             deploymentConfigId: string;
             /**
@@ -18954,7 +19531,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a Service API
-             * @example Ex et voluptatem voluptatem excepturi asperiores.
+             * @example Omnis eaque est in itaque facere officiis.
              */
             id: string;
             /**
@@ -18977,7 +19554,7 @@ export interface components {
          * @example {
          *       "id": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "j"
+         *       "token": "ta"
          *     }
          */
         DescribeServiceEnvironmentRequest: {
@@ -18993,7 +19570,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example l
+             * @example 7d
              */
             token: string;
         };
@@ -19023,7 +19600,7 @@ export interface components {
             autoApproveSubscription?: boolean;
             /**
              * @description ID of a Deployment Config
-             * @example Expedita pariatur at aut voluptate nulla dolores.
+             * @example Eligendi reprehenderit corrupti.
              */
             deploymentConfigId: string;
             /**
@@ -19094,13 +19671,13 @@ export interface components {
          * @example {
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "5"
+         *       "token": "06"
          *     }
          */
         DescribeServiceModelRequest: {
             /**
              * @description ID of a Service Model
-             * @example Dolore fugit excepturi consequatur.
+             * @example Ut aut ullam fugit cupiditate id.
              */
             id: string;
             /**
@@ -19110,7 +19687,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4pa
+             * @example o
              */
             token: string;
         };
@@ -19189,13 +19766,19 @@ export interface components {
              *           "status": "ON"
              *         },
              *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *       },
+             *       {
+             *         "configuration": {
+             *           "status": "ON"
+             *         },
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
              *       }
              *     ]
              */
             features?: components["schemas"]["ServiceModelFeatureDetail"][];
             /**
              * @description ID of a Service Model
-             * @example Iure est nostrum mollitia repudiandae nam sunt.
+             * @example Neque repudiandae nam.
              */
             id: string;
             /**
@@ -19223,7 +19806,7 @@ export interface components {
             productTiers?: string[];
             /**
              * @description ID of a Service API
-             * @example Commodi repellendus veritatis.
+             * @example Excepturi voluptatem rerum.
              */
             serviceApiId: string;
             /**
@@ -19236,7 +19819,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "serviceId": "s-12345678",
-         *       "token": "u",
+         *       "token": "h",
          *       "visibility": "PRIVATE"
          *     }
          */
@@ -19253,7 +19836,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example qt
+             * @example j
              */
             token: string;
             /**
@@ -19269,7 +19852,7 @@ export interface components {
          *       "productTierVersion": "1.0.0",
          *       "resourceId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "1pl"
+         *       "token": "sj"
          *     }
          */
         DescribeServiceOfferingResourceRequest: {
@@ -19281,7 +19864,7 @@ export interface components {
             instanceId: string;
             /**
              * @description ID of a Product Tier
-             * @example Et excepturi autem amet.
+             * @example Non a voluptatem dolores.
              */
             productTierId?: string;
             /**
@@ -19291,7 +19874,7 @@ export interface components {
             productTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Cupiditate ut quis dolorem vitae quaerat.
+             * @example Est ipsum incidunt mollitia rerum sit.
              */
             resourceId: string;
             /**
@@ -19301,7 +19884,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example w1z
+             * @example 7
              */
             token: string;
         };
@@ -19633,7 +20216,7 @@ export interface components {
             serviceName: string;
             /**
              * @description ID of an Org
-             * @example Illo reprehenderit quasi et excepturi facere aspernatur.
+             * @example Sunt autem maxime minima officiis corporis.
              */
             serviceOrgId: string;
             /**
@@ -19654,13 +20237,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ka9"
+         *       "token": "vsh"
          *     }
          */
         DescribeServiceProviderOrganizationRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example ioe
+             * @example w
              */
             token: string;
         };
@@ -19800,7 +20383,7 @@ export interface components {
             };
             /**
              * @description ID of an Org
-             * @example Id tenetur inventore voluptatem fugit quis facilis.
+             * @example Quaerat ut esse qui.
              */
             id?: string;
             /**
@@ -19812,7 +20395,7 @@ export interface components {
         /**
          * @example {
          *       "id": "s-12345678",
-         *       "token": "8v"
+         *       "token": "22"
          *     }
          */
         DescribeServiceRequest: {
@@ -19823,7 +20406,7 @@ export interface components {
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example dv
+             * @example mls
              */
             token: string;
         };
@@ -19916,36 +20499,9 @@ export interface components {
          *           "sourceEnvironmentName": "dev",
          *           "type": "DEV",
          *           "visibility": "private"
-         *         },
-         *         {
-         *           "id": "se-12345678",
-         *           "name": "dev",
-         *           "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
-         *           "saasPortalStatus": "READY",
-         *           "saasPortalUrl": "https://saas-portal.example.com",
-         *           "servicePlans": [
-         *             {
-         *               "description": "A Basic product tier",
-         *               "modelType": "CUSTOMER_HOSTED",
-         *               "name": "Basic",
-         *               "productTierID": "pt-12345678",
-         *               "tierType": "OMNISTRATE_DEDICATED_TENANCY"
-         *             },
-         *             {
-         *               "description": "A Basic product tier",
-         *               "modelType": "CUSTOMER_HOSTED",
-         *               "name": "Basic",
-         *               "productTierID": "pt-12345678",
-         *               "tierType": "OMNISTRATE_DEDICATED_TENANCY"
-         *             }
-         *           ],
-         *           "sourceEnvironmentID": "se-12345678",
-         *           "sourceEnvironmentName": "dev",
-         *           "type": "DEV",
-         *           "visibility": "private"
          *         }
          *       ],
-         *       "serviceLogoURL": "Officiis ea aliquid ut deleniti.",
+         *       "serviceLogoURL": "Nihil ut.",
          *       "serviceProviderID": "sp-12345678",
          *       "serviceProviderName": "Omnistrate, Inc."
          *     }
@@ -20037,18 +20593,45 @@ export interface components {
              *         "sourceEnvironmentName": "dev",
              *         "type": "DEV",
              *         "visibility": "private"
+             *       },
+             *       {
+             *         "id": "se-12345678",
+             *         "name": "dev",
+             *         "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+             *         "saasPortalStatus": "READY",
+             *         "saasPortalUrl": "https://saas-portal.example.com",
+             *         "servicePlans": [
+             *           {
+             *             "description": "A Basic product tier",
+             *             "modelType": "CUSTOMER_HOSTED",
+             *             "name": "Basic",
+             *             "productTierID": "pt-12345678",
+             *             "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+             *           },
+             *           {
+             *             "description": "A Basic product tier",
+             *             "modelType": "CUSTOMER_HOSTED",
+             *             "name": "Basic",
+             *             "productTierID": "pt-12345678",
+             *             "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+             *           }
+             *         ],
+             *         "sourceEnvironmentID": "se-12345678",
+             *         "sourceEnvironmentName": "dev",
+             *         "type": "DEV",
+             *         "visibility": "private"
              *       }
              *     ]
              */
             serviceEnvironments: components["schemas"]["ServiceEnvironment"][];
             /**
              * @description The logo for the service
-             * @example Optio accusamus cum provident ut voluptas dolore.
+             * @example Quo dignissimos aperiam autem officiis corporis.
              */
             serviceLogoURL?: string;
             /**
              * @description ID of a Service Provider
-             * @example Molestiae ut ipsa ex molestias delectus occaecati.
+             * @example Voluptas quam vel voluptatem tempora.
              */
             serviceProviderID: string;
             /**
@@ -20060,18 +20643,18 @@ export interface components {
         /**
          * @example {
          *       "id": "so-12345678",
-         *       "token": "ne"
+         *       "token": "d3"
          *     }
          */
         DescribeServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Quisquam nisi quod.
+             * @example Magnam laborum doloremque.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example cp
+             * @example 9
              */
             token: string;
         };
@@ -20158,19 +20741,6 @@ export interface components {
              *         "status": "PENDING",
              *         "statusMessage": "Creating deployment",
              *         "subscriptionId": "Neque sed id magnam."
-             *       },
-             *       {
-             *         "dependsOnDeployment": [
-             *           "instanceDeploymentAlias1",
-             *           "instanceDeploymentAlias2"
-             *         ],
-             *         "failedReason": "Invalid inputs",
-             *         "instanceDeploymentAlias": "instanceDeploymentAlias",
-             *         "instanceId": "i-12345678",
-             *         "serviceId": "s-12345678",
-             *         "status": "PENDING",
-             *         "statusMessage": "Creating deployment",
-             *         "subscriptionId": "Neque sed id magnam."
              *       }
              *     ]
              */
@@ -20182,7 +20752,7 @@ export interface components {
             createdAt: string;
             /**
              * @description ID of a Services Orchestration
-             * @example Quasi ad sint in.
+             * @example Dolores reiciendis at odio sit.
              */
             id: string;
             /**
@@ -20212,26 +20782,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Consequatur aut voluptatem.",
+         *       "ProductTierVersion": "Nam neque quisquam.",
          *       "id": "sc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "ti"
+         *       "token": "g"
          *     }
          */
         DescribeStorageConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Libero autem.
+             * @example Enim velit nobis molestias culpa.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Sunt velit placeat dolor.
+             * @example Quasi sunt non quibusdam doloremque.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a Storage Config
-             * @example Qui nihil possimus sed.
+             * @example Rerum quam asperiores quae qui ut.
              */
             id: string;
             /**
@@ -20241,7 +20811,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example f9l
+             * @example 9
              */
             token: string;
         };
@@ -20274,7 +20844,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a Storage Config
-             * @example Quas ea voluptatem eius modi ullam.
+             * @example Assumenda repellendus consequuntur totam consequatur.
              */
             id: string;
             /**
@@ -20314,26 +20884,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Consequuntur quaerat similique aliquam.",
+         *       "ProductTierVersion": "Voluptas temporibus nulla est maiores.",
          *       "id": "svc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "uoq"
+         *       "token": "9o"
          *     }
          */
         DescribeStorageVolumeConfigRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Eveniet est eum ut itaque laboriosam reprehenderit.
+             * @example Architecto libero.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Ea odit commodi et possimus.
+             * @example Excepturi qui.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a Storage Volume Config
-             * @example Sed et labore molestiae expedita rerum vel.
+             * @example Vel similique voluptates ut est iure ea.
              */
             id: string;
             /**
@@ -20343,7 +20913,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example jvh
              */
             token: string;
         };
@@ -20386,7 +20956,7 @@ export interface components {
             disableBackup?: boolean;
             /**
              * @description ID of a Storage Volume Config
-             * @example Ut iusto aut amet.
+             * @example Illum dolor eligendi neque sit aut.
              */
             id: string;
             /**
@@ -20428,36 +20998,36 @@ export interface components {
         /**
          * @example {
          *       "id": "sub-12345678",
-         *       "token": "jr"
+         *       "token": "r"
          *     }
          */
         DescribeSubscriptionRequest: {
             /**
              * @description ID of a Subscription
-             * @example Unde et quas ipsam nemo sed.
+             * @example Odit est soluta cumque vero et molestiae.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 0mx
+             * @example 0e7
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "subr-12345678",
-         *       "token": "sh"
+         *       "token": "rsk"
          *     }
          */
         DescribeSubscriptionRequestRequest: {
             /**
              * @description ID of a Subscription Request
-             * @example Eos exercitationem est.
+             * @example Vel sapiente nisi.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 1p9
+             * @example 27w
              */
             token: string;
         };
@@ -20471,7 +21041,7 @@ export interface components {
          *       "rootUserId": "org-12345678",
          *       "rootUserName": "John Doe",
          *       "serviceId": "s-12345678",
-         *       "serviceLogoURL": "Et ut voluptas eum repellat ut.",
+         *       "serviceLogoURL": "Sequi voluptates at ipsam sint adipisci esse.",
          *       "serviceName": "MySQL multi-writer service",
          *       "status": "PENDING",
          *       "updatedAt": "2019-01-01T00:00:00Z",
@@ -20487,12 +21057,12 @@ export interface components {
             createdAt: string;
             /**
              * @description ID of a Subscription Request
-             * @example Et libero sunt et voluptatem pariatur non.
+             * @example Nihil consequatur ducimus impedit.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Possimus nihil qui eius.
+             * @example Quia soluta deleniti.
              */
             productTierId: string;
             /**
@@ -20507,7 +21077,7 @@ export interface components {
             rootUserEmail: string;
             /**
              * @description ID of a User
-             * @example Labore facere eum.
+             * @example Quos ullam autem qui ab.
              */
             rootUserId: string;
             /**
@@ -20522,7 +21092,7 @@ export interface components {
             serviceId: string;
             /**
              * @description The logo for the service
-             * @example Vero neque et et optio.
+             * @example Assumenda vitae vel.
              */
             serviceLogoURL?: string;
             /**
@@ -20542,7 +21112,7 @@ export interface components {
             updatedAt: string;
             /**
              * @description ID of a User
-             * @example Eaque tempore.
+             * @example Omnis eos praesentium suscipit beatae ut commodi.
              */
             updatedByUserId: string;
             /**
@@ -20572,7 +21142,7 @@ export interface components {
          *       "rootUserOrgId": "org-12345678",
          *       "rootUserOrgName": "Example Inc.",
          *       "serviceId": "s-12345678",
-         *       "serviceLogoURL": "Magnam omnis dolorem blanditiis est error voluptatem.",
+         *       "serviceLogoURL": "Omnis aliquam tempora culpa id ut autem.",
          *       "serviceName": "MySQL multi-writer service",
          *       "serviceOrgId": "org-12345678",
          *       "serviceOrgName": "Omnistrate",
@@ -20583,7 +21153,7 @@ export interface components {
         DescribeSubscriptionResult: {
             /**
              * @description ID of an Org
-             * @example Veniam consequuntur asperiores consequatur.
+             * @example Similique voluptatibus aspernatur tenetur ut voluptas.
              */
             accountConfigIdentityId: string;
             /**
@@ -20611,7 +21181,7 @@ export interface components {
             defaultSubscription: boolean;
             /**
              * @description ID of a Subscription
-             * @example Totam quo vitae voluptatem hic quasi earum.
+             * @example Rerum mollitia voluptas omnis sequi qui.
              */
             id: string;
             /**
@@ -20627,7 +21197,7 @@ export interface components {
             paymentMethodConfigured?: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Porro quis dolorum nesciunt.
+             * @example Cumque nesciunt aliquid totam consequuntur aut.
              */
             productTierId: string;
             /**
@@ -20642,7 +21212,7 @@ export interface components {
             roleType: string;
             /**
              * @description ID of a User
-             * @example Nihil nostrum aliquid repellat.
+             * @example Praesentium explicabo sed.
              */
             rootUserId: string;
             /**
@@ -20652,7 +21222,7 @@ export interface components {
             rootUserName?: string;
             /**
              * @description ID of a User
-             * @example Sint unde.
+             * @example Tempora inventore.
              */
             rootUserOrgId?: string;
             /**
@@ -20667,7 +21237,7 @@ export interface components {
             serviceId: string;
             /**
              * @description The logo for the service
-             * @example Quia blanditiis ab qui est.
+             * @example Voluptatem iste quia qui.
              */
             serviceLogoURL: string;
             /**
@@ -20677,7 +21247,7 @@ export interface components {
             serviceName: string;
             /**
              * @description ID of an Org
-             * @example Doloribus quo voluptatem ab nihil ut.
+             * @example Hic minima repellendus.
              */
             serviceOrgId: string;
             /**
@@ -20700,14 +21270,14 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "nty",
+         *       "token": "jkk",
          *       "version": "3.0"
          *     }
          */
         DescribeTierVersionSetMetadataRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Rerum sunt ex qui quo.
+             * @example Ratione mollitia incidunt amet quia aut.
              */
             productTierId: string;
             /**
@@ -20717,7 +21287,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example o1
+             * @example t
              */
             token: string;
             /**
@@ -20730,14 +21300,14 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "80q",
+         *       "token": "ytc",
          *       "version": "3.0"
          *     }
          */
         DescribeTierVersionSetRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Et ut quos repellat.
+             * @example Provident totam ut architecto dolorum quis.
              */
             productTierId: string;
             /**
@@ -20747,7 +21317,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xwf
+             * @example re
              */
             token: string;
             /**
@@ -20760,13 +21330,13 @@ export interface components {
          * @example {
          *       "id": "up-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "3f"
+         *       "token": "j"
          *     }
          */
         DescribeUpgradePathRequest: {
             /**
              * @description ID of an Upgrade Path
-             * @example Iste nulla cum nihil.
+             * @example Est voluptate quam.
              */
             id?: string;
             /**
@@ -20776,7 +21346,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example t
+             * @example y
              */
             token: string;
         };
@@ -20799,7 +21369,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of an Upgrade Path
-             * @example Cum itaque.
+             * @example Et commodi esse qui commodi in.
              */
             id?: string;
             /**
@@ -20830,13 +21400,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "d"
+         *       "token": "4lo"
          *     }
          */
         DescribeUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example yov
+             * @example y5
              */
             token: string;
         };
@@ -20861,15 +21431,15 @@ export interface components {
          *       "id": "user-abcd1234",
          *       "lastModifiedAt": "2023-01-20T00:00:00Z",
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Sit iusto rerum illo nulla doloremque.",
+         *       "orgCookiePolicy": "Quidem ut minus quis sunt.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "Qui facere nihil.",
+         *       "orgFavIconURL": "Officia cum blanditiis doloribus blanditiis excepturi ipsam.",
          *       "orgId": "org-aKQ8G13QeR",
-         *       "orgLogoURL": "Incidunt eos enim et aut ut autem.",
+         *       "orgLogoURL": "Quis culpa.",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Quis deserunt sunt doloremque at.",
+         *       "orgPrivacyPolicy": "Sunt est culpa libero pariatur excepturi.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Totam qui numquam.",
+         *       "orgTermsOfUse": "Amet mollitia alias.",
          *       "orgURL": "something.acme",
          *       "planName": "STARTER",
          *       "roleType": "reader",
@@ -20920,7 +21490,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns
-             * @example Velit ea qui mollitia maiores et aut.
+             * @example Dolorem explicabo.
              */
             orgCookiePolicy?: string;
             /**
@@ -20930,7 +21500,7 @@ export interface components {
             orgDescription?: string;
             /**
              * @description The favicon of the org that this user owns
-             * @example Quam ab deleniti minima expedita molestias.
+             * @example Reiciendis modi illo deleniti animi aut.
              */
             orgFavIconURL?: string;
             /**
@@ -20940,7 +21510,7 @@ export interface components {
             orgId?: string;
             /**
              * @description The logo of the org that this user owns
-             * @example Necessitatibus dolore deleniti.
+             * @example Aut deleniti rerum a consequatur.
              */
             orgLogoURL?: string;
             /**
@@ -20950,7 +21520,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns
-             * @example Maiores possimus eligendi nesciunt distinctio pariatur.
+             * @example Aut fugit.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -20960,7 +21530,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns
-             * @example Qui perspiciatis.
+             * @example Qui voluptas provident minus sed consequatur.
              */
             orgTermsOfUse?: string;
             /**
@@ -20986,13 +21556,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ykk"
+         *       "token": "jr"
          *     }
          */
         DescribeUsersByOrgRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example wo
+             * @example dv
              */
             token: string;
         };
@@ -21033,7 +21603,7 @@ export interface components {
         /**
          * @example {
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "w8x"
+         *       "token": "mbr"
          *     }
          */
         DescribeUsersBySubscriptionRequest: {
@@ -21044,7 +21614,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example d
+             * @example fn
              */
             token: string;
         };
@@ -21086,13 +21656,13 @@ export interface components {
          * @example {
          *       "id": "vu-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "en3"
+         *       "token": "i"
          *     }
          */
         DescribeVUnitRequest: {
             /**
              * @description ID of a VUnit
-             * @example Provident aspernatur est voluptas doloremque aperiam ab.
+             * @example Accusantium molestias dolores consequatur maxime et.
              */
             id: string;
             /**
@@ -21102,7 +21672,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ud
+             * @example f
              */
             token: string;
         };
@@ -21128,7 +21698,7 @@ export interface components {
             cloudProvider: string;
             /**
              * @description ID of a VUnit
-             * @example Iusto a aperiam est quis velit.
+             * @example Dolor aut tenetur voluptas cupiditate eos delectus.
              */
             id?: string;
             /**
@@ -21152,7 +21722,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description ID of a Service Model
-             * @example Asperiores deleniti itaque dolores et omnis.
+             * @example Alias et dignissimos non.
              */
             serviceModelId: string;
         };
@@ -21166,7 +21736,7 @@ export interface components {
         Describeresourcemetricsconfigresult: {
             /**
              * @description ID of a resource
-             * @example Eum illo alias ut.
+             * @example Voluptatem aut molestiae.
              */
             id: string;
             /**
@@ -21184,13 +21754,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "qcm"
+         *       "token": "oti"
          *     }
          */
         DetachComputeConfigRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Dolor non qui aut.
+             * @example Laudantium est ex rerum quis.
              */
             id: string;
             /**
@@ -21200,7 +21770,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4gh
+             * @example 2g
              */
             token: string;
         };
@@ -21208,13 +21778,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "y"
+         *       "token": "h"
          *     }
          */
         DetachNetworkConfigRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Nobis eaque reprehenderit sed.
+             * @example Omnis illum beatae blanditiis.
              */
             id: string;
             /**
@@ -21224,7 +21794,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example uco
+             * @example m16
              */
             token: string;
         };
@@ -21232,13 +21802,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "33a"
+         *       "token": "ubu"
          *     }
          */
         DetachStorageConfigRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Inventore illum amet non et.
+             * @example Deleniti enim placeat cum itaque aut in.
              */
             id: string;
             /**
@@ -21248,7 +21818,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example nv
+             * @example tab
              */
             token: string;
         };
@@ -21304,7 +21874,7 @@ export interface components {
          *       "anotherVersion": "3.1",
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "mdd",
+         *       "token": "z",
          *       "version": "3.0"
          *     }
          */
@@ -21316,7 +21886,7 @@ export interface components {
             anotherVersion: string;
             /**
              * @description ID of a Product Tier
-             * @example Omnis doloremque dolorum deleniti et iusto atque.
+             * @example Quis voluptas.
              */
             productTierId: string;
             /**
@@ -21326,7 +21896,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example bb
+             * @example w
              */
             token: string;
             /**
@@ -21404,7 +21974,7 @@ export interface components {
             anotherVersion: string;
             /**
              * @description ID of a Product Tier
-             * @example Quas et ut facilis mollitia.
+             * @example Tempore accusamus odit nisi qui.
              */
             productTierId: string;
             /**
@@ -21480,7 +22050,7 @@ export interface components {
         /**
          * @example {
          *       "billingProviderType": "STRIPE",
-         *       "token": "2"
+         *       "token": "4n"
          *     }
          */
         DisableBillingProviderRequest: {
@@ -21491,7 +22061,7 @@ export interface components {
             billingProviderType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example d
+             * @example 9q
              */
             token: string;
         };
@@ -21501,7 +22071,7 @@ export interface components {
          *       "id": "pt-12345678",
          *       "scope": "INTERNAL",
          *       "serviceId": "s-12345678",
-         *       "token": "2"
+         *       "token": "v"
          *     }
          */
         DisableProductTierFeatureRequest: {
@@ -21512,7 +22082,7 @@ export interface components {
             feature: string;
             /**
              * @description ID of a Product Tier
-             * @example Et est nostrum accusantium est.
+             * @example Nostrum voluptate.
              */
             id: string;
             /**
@@ -21527,7 +22097,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ewf
+             * @example pi8
              */
             token: string;
         };
@@ -21554,7 +22124,7 @@ export interface components {
          *       "capability": "SERVERLESS",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "lu3"
+         *       "token": "q"
          *     }
          */
         DisableResourceCapabilityRequest: {
@@ -21565,7 +22135,7 @@ export interface components {
             capability: string;
             /**
              * @description ID of a resource
-             * @example Deleniti cumque rem et quae.
+             * @example Aut dignissimos.
              */
             id: string;
             /**
@@ -21575,7 +22145,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4j
+             * @example zg
              */
             token: string;
         };
@@ -21596,7 +22166,7 @@ export interface components {
          *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "5qd"
+         *       "token": "rn"
          *     }
          */
         DisableServiceModelFeatureRequest: {
@@ -21607,7 +22177,7 @@ export interface components {
             feature: string;
             /**
              * @description ID of a Service Model
-             * @example Et voluptatem error aut.
+             * @example Necessitatibus aliquid consequatur tempore nihil cupiditate.
              */
             id: string;
             /**
@@ -21617,7 +22187,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5lt
+             * @example 5
              */
             token: string;
         };
@@ -21632,13 +22202,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "rk3"
+         *       "token": "d"
          *     }
          */
         DisableTenantBillingRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 89
+             * @example q7o
              */
             token: string;
         };
@@ -21647,18 +22217,18 @@ export interface components {
          *       "id": "sa-12345678",
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "u4"
+         *       "token": "q"
          *     }
          */
         DiscardPendingChangesRequest: {
             /**
              * @description ID of a Service API
-             * @example Reprehenderit praesentium doloremque labore.
+             * @example Et odit a quis ex cumque.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Quisquam mollitia.
+             * @example Sapiente veniam et pariatur sed ex illum.
              */
             productTierId?: string;
             /**
@@ -21668,7 +22238,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4
+             * @example t3
              */
             token: string;
         };
@@ -21703,7 +22273,7 @@ export interface components {
          *       "billingProviderType": "STRIPE",
          *       "logoURL": "https://example.com/logo.png",
          *       "name": "Stripe",
-         *       "token": "jf"
+         *       "token": "6"
          *     }
          */
         EnableBillingProviderRequest: {
@@ -21729,7 +22299,7 @@ export interface components {
             name?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example yl
+             * @example j
              */
             token: string;
         };
@@ -21766,7 +22336,7 @@ export interface components {
          *       "id": "pt-12345678",
          *       "scope": "INTERNAL",
          *       "serviceId": "s-12345678",
-         *       "token": "m"
+         *       "token": "z"
          *     }
          */
         EnableProductTierFeatureRequest: {
@@ -21786,7 +22356,7 @@ export interface components {
             feature: string;
             /**
              * @description ID of a Product Tier
-             * @example Sit aut vel soluta id sit.
+             * @example Quae est.
              */
             id: string;
             /**
@@ -21801,7 +22371,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5p
+             * @example 8y5
              */
             token: string;
         };
@@ -21850,7 +22420,7 @@ export interface components {
          *       },
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "byt"
+         *       "token": "40s"
          *     }
          */
         EnableResourceCapabilityRequest: {
@@ -21877,7 +22447,7 @@ export interface components {
             };
             /**
              * @description ID of a resource
-             * @example Illo et qui debitis et incidunt suscipit.
+             * @example Maiores deserunt placeat veritatis mollitia et.
              */
             id: string;
             /**
@@ -21887,7 +22457,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example 6
              */
             token: string;
         };
@@ -21937,7 +22507,7 @@ export interface components {
          *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "cy"
+         *       "token": "wsi"
          *     }
          */
         EnableServiceModelFeatureRequest: {
@@ -21949,7 +22519,7 @@ export interface components {
             feature: string;
             /**
              * @description ID of a Service Model
-             * @example Incidunt maiores.
+             * @example Qui quisquam qui.
              */
             id: string;
             /**
@@ -21959,7 +22529,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example s4v
              */
             token: string;
         };
@@ -21985,13 +22555,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ug"
+         *       "token": "9p"
          *     }
          */
         EnableTenantBillingRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 8r
+             * @example o
              */
             token: string;
         };
@@ -22016,7 +22586,7 @@ export interface components {
         EndCustomerEvent: {
             /**
              * @description ID of a Event
-             * @example Tempora corporis nihil.
+             * @example Nisi iure et ut ratione velit voluptas.
              */
             eventID: string;
             /**
@@ -22036,7 +22606,7 @@ export interface components {
             eventType: string;
             /**
              * @description ID of an Org
-             * @example Quia et nostrum et perferendis nihil.
+             * @example Repellat cumque placeat illo et corrupti.
              */
             orgID: string;
             /**
@@ -22066,7 +22636,7 @@ export interface components {
             userEmail?: string;
             /**
              * @description ID of a User
-             * @example Voluptatem quis quia dolorem.
+             * @example Ut sit pariatur delectus dolores.
              */
             userID?: string;
             /**
@@ -22080,18 +22650,21 @@ export interface components {
          *       "disableMonitoring": false,
          *       "host": "https://my-endpoint.com",
          *       "networkingType": "PUBLIC|PRIVATE",
+         *       "portExpressions": [
+         *         "{{ $func.randomminmax(5000, 6000, 1234) }}"
+         *       ],
          *       "ports": [
          *         8080,
          *         8081
          *       ],
-         *       "primary": true
+         *       "primary": false
          *     }
          */
         Endpoint: {
             /**
              * @description Whether to disable monitoring for this endpoint
              * @default false
-             * @example true
+             * @example false
              */
             disableMonitoring: boolean;
             /**
@@ -22106,6 +22679,13 @@ export interface components {
              * @example PUBLIC|PRIVATE
              */
             networkingType: string;
+            /**
+             * @description The port expressions that will be evaluated to generate dynamic ports
+             * @example [
+             *       "{{ $func.randomminmax(5000, 6000, 1234) }}"
+             *     ]
+             */
+            portExpressions?: string[];
             /**
              * @description The ports of the endpoint
              * @example [
@@ -22191,13 +22771,13 @@ export interface components {
          *       "message": "parameter 'p' must be an integer",
          *       "name": "bad_request",
          *       "temporary": false,
-         *       "timeout": false
+         *       "timeout": true
          *     }
          */
         Error: {
             /**
              * @description Is the error a server-side fault?
-             * @example true
+             * @example false
              */
             fault: boolean;
             /**
@@ -22222,7 +22802,7 @@ export interface components {
             temporary: boolean;
             /**
              * @description Is the error a timeout?
-             * @example false
+             * @example true
              */
             timeout: boolean;
         };
@@ -22238,13 +22818,13 @@ export interface components {
          *       "productTierID": "pt-12345678",
          *       "resourceKey": "mysql",
          *       "serviceID": "s-12345678",
-         *       "token": "m"
+         *       "token": "ka9"
          *     }
          */
         ExpressionEvaluatorRequest: {
             /**
              * @description ID of a Host Cluster
-             * @example A optio et.
+             * @example Enim esse magni dolores.
              */
             deploymentCellID?: string;
             /**
@@ -22269,7 +22849,7 @@ export interface components {
             instanceID?: string;
             /**
              * @description ID of a Product Tier
-             * @example Voluptatum enim.
+             * @example Illum assumenda ut vel nihil quis.
              */
             productTierID?: string;
             /**
@@ -22284,20 +22864,20 @@ export interface components {
             serviceID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 04g
+             * @example i0
              */
             token: string;
         };
         /**
          * @example {
-         *       "deploymentCellID": "Dolores qui hic ipsa.",
+         *       "deploymentCellID": "Ut a.",
          *       "expression": "{{ $sys.network.externalClusterEndpoint }}",
          *       "expressionMap": {
          *         "dbHost": "{{ $sys.database.host }}",
          *         "dbPort": "{{ $var.port }}"
          *       },
          *       "instanceID": "instance-12345678",
-         *       "productTierID": "Nemo porro.",
+         *       "productTierID": "Autem omnis.",
          *       "resourceKey": "mysql",
          *       "serviceID": "s-123456"
          *     }
@@ -22305,7 +22885,7 @@ export interface components {
         ExpressionEvaluatorRequest2: {
             /**
              * @description Either this or the instanceID must be provided to evaluate the expression(s)
-             * @example Odit architecto et ipsum fugiat tempore.
+             * @example Neque sunt culpa est ducimus et sed.
              */
             deploymentCellID?: string;
             /**
@@ -22330,7 +22910,7 @@ export interface components {
             instanceID?: string;
             /**
              * @description Mandatory if the instanceID is not provided
-             * @example Omnis laboriosam eos iusto vel facilis officia.
+             * @example Ipsam quis.
              */
             productTierID?: string;
             /**
@@ -22375,7 +22955,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "8"
+         *       "token": "rr"
          *     }
          */
         FailoverResourceInstanceRequest: {
@@ -22426,7 +23006,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Velit in magni nemo numquam rerum.
+             * @example Nisi vel aut minima ullam pariatur debitis.
              */
             serviceProviderId: string;
             /**
@@ -22436,7 +23016,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xa
+             * @example 1r
              */
             token: string;
         };
@@ -22478,7 +23058,7 @@ export interface components {
             description: string;
             /**
              * @description ID of a File
-             * @example Tempora ex.
+             * @example Sed quae recusandae.
              */
             fileId: string;
             /**
@@ -22575,7 +23155,7 @@ export interface components {
          *       "image": "library/mysql:5.7",
          *       "imageRegistry": "docker.io",
          *       "password": "password",
-         *       "token": "4",
+         *       "token": "77g",
          *       "username": "username"
          *     }
          */
@@ -22607,7 +23187,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example rz
+             * @example 6k
              */
             token: string;
             /**
@@ -22664,13 +23244,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "fileContent": "Maxime animi iusto est."
+         *       "fileContent": "Voluptas iure sit."
          *     }
          */
         GenerateComposeSpecFromContainerImageResult: {
             /**
              * @description Base64 encoded Compose Spec YAML in docker compose format
-             * @example Suscipit et repellat animi consequuntur ipsam.
+             * @example Sit sit at voluptas.
              */
             fileContent: string;
         };
@@ -22678,7 +23258,7 @@ export interface components {
          * @example {
          *       "id": "instance-abcd1234",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "u"
+         *       "token": "8i"
          *     }
          */
         GenerateTokenForDeploymentCellDashboardRequest: {
@@ -22694,7 +23274,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example s
+             * @example pw
              */
             token: string;
         };
@@ -22792,7 +23372,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "code": "us-east-1a",
-         *       "token": "ui7"
+         *       "token": "h"
          *     }
          */
         GetAvailabilityZoneByCodeRequest: {
@@ -22808,14 +23388,14 @@ export interface components {
             code: string;
             /**
              * @description JWT token used to perform authorization
-             * @example g
+             * @example 22d
              */
             token: string;
         };
         /**
          * @example {
          *       "name": "aws",
-         *       "token": "1"
+         *       "token": "b"
          *     }
          */
         GetCloudProviderByNameRequest: {
@@ -22826,7 +23406,7 @@ export interface components {
             name: string;
             /**
              * @description JWT token used to perform authorization
-             * @example g35
+             * @example 1z
              */
             token: string;
         };
@@ -22835,7 +23415,7 @@ export interface components {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "startDate": "2023-01-01T10:00:00Z",
          *       "subscriptionID": "sub-12345678",
-         *       "token": "98"
+         *       "token": "c25"
          *     }
          */
         GetConsumptionUsageRequest: {
@@ -22853,12 +23433,12 @@ export interface components {
             startDate?: string;
             /**
              * @description ID of a Subscription
-             * @example Ut error in rem.
+             * @example Cum suscipit in aut.
              */
             subscriptionID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ppt
+             * @example sa
              */
             token: string;
         };
@@ -22903,30 +23483,30 @@ export interface components {
         /**
          * @example {
          *       "subscriptionID": "sub-12345678",
-         *       "token": "ahj"
+         *       "token": "9ot"
          *     }
          */
         GetCurrentConsumptionUsageRequest: {
             /**
              * @description ID of a Subscription
-             * @example Illo repudiandae at eum dolorum.
+             * @example Beatae consectetur atque omnis.
              */
             subscriptionID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example j
+             * @example 7z
              */
             token: string;
         };
         /**
          * @example {
-         *       "token": "rl"
+         *       "token": "46d"
          *     }
          */
         GetCurrentUsageRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example ci
+             * @example g3k
              */
             token: string;
         };
@@ -22937,23 +23517,23 @@ export interface components {
          *       "productTierId": "pt-12345678",
          *       "productTierVersion": "1.0",
          *       "serviceId": "s-12345678",
-         *       "token": "wp"
+         *       "token": "xrp"
          *     }
          */
         GetFileRequest: {
             /**
              * @description ID of a File
-             * @example Ea nihil et sed ut.
+             * @example Dicta tempore at doloribus.
              */
             fileId: string;
             /**
              * @description ID of a resource
-             * @example Eum nostrum repudiandae quia fugit vel.
+             * @example Rerum officiis vel ut debitis.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example At adipisci labore minus dolor alias.
+             * @example Corrupti et perferendis magni laudantium.
              */
             productTierId?: string;
             /**
@@ -22968,7 +23548,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2
+             * @example p
              */
             token: string;
         };
@@ -22976,7 +23556,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "code": "us-east-1",
-         *       "token": "80"
+         *       "token": "wo"
          *     }
          */
         GetRegionByCodeRequest: {
@@ -22992,7 +23572,7 @@ export interface components {
             code: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 628
+             * @example d
              */
             token: string;
         };
@@ -23000,7 +23580,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "name": "my-secret",
-         *       "token": "6"
+         *       "token": "gb0"
          *     }
          */
         GetSecretRequest: {
@@ -23016,7 +23596,7 @@ export interface components {
             name: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example s7
              */
             token: string;
         };
@@ -23048,13 +23628,13 @@ export interface components {
          * @example {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "k"
+         *       "token": "kdk"
          *     }
          */
         GetServicePlanRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Aut provident nobis sint a laudantium.
+             * @example Incidunt ut.
              */
             productTierId: string;
             /**
@@ -23064,7 +23644,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example rng
+             * @example 5
              */
             token: string;
         };
@@ -23135,6 +23715,12 @@ export interface components {
          *             "status": "ON"
          *           },
          *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
          *         }
          *       ],
          *       "serviceModelId": "sm-12345678",
@@ -23189,7 +23775,7 @@ export interface components {
             azureRegions?: string[];
             /**
              * @description ID of a Deployment Config
-             * @example Quasi ut vel quia dolor sed totam.
+             * @example Voluptas deleniti fuga.
              */
             deploymentConfigId: string;
             /**
@@ -23263,7 +23849,7 @@ export interface components {
             };
             /**
              * @description ID of a Product Tier
-             * @example Delectus tempore dolores.
+             * @example Aut id in natus sed et sit.
              */
             productTierId: string;
             /**
@@ -23300,7 +23886,7 @@ export interface components {
             serviceApiDescription: string;
             /**
              * @description ID of a Service API
-             * @example Maxime sint et vitae aut dolorem iste.
+             * @example Beatae hic.
              */
             serviceApiId: string;
             /**
@@ -23333,13 +23919,19 @@ export interface components {
              *           "status": "ON"
              *         },
              *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *       },
+             *       {
+             *         "configuration": {
+             *           "status": "ON"
+             *         },
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
              *       }
              *     ]
              */
             serviceModelFeatures?: components["schemas"]["ServiceModelFeatureDetail"][];
             /**
              * @description ID of a Service Model
-             * @example Voluptas est id est tenetur repellat.
+             * @example Maiores qui quasi est sit hic vitae.
              */
             serviceModelId: string;
             /**
@@ -23360,13 +23952,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "s2g"
+         *       "token": "n"
          *     }
          */
         GetTenantBillingStatusRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 9
+             * @example 55f
              */
             token: string;
         };
@@ -23420,14 +24012,14 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "tn",
+         *       "token": "wq1",
          *       "version": "3.0"
          *     }
          */
         GetTierVersionSetSpecRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Voluptatem expedita quisquam ut ullam nobis.
+             * @example Sed dolores.
              */
             productTierId: string;
             /**
@@ -23437,7 +24029,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example qky
+             * @example yxo
              */
             token: string;
             /**
@@ -23448,11 +24040,11 @@ export interface components {
         };
         /**
          * @example {
-         *       "createdAt": "2002-11-24T09:48:32Z",
+         *       "createdAt": "2014-02-08T10:33:51Z",
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
          *       "specContent": "{\"RawYAML\":\"bmFtZTogbXktc2VydmljZQpkZXBsb3ltZW50OgogIGhvc3RlZDoKICAgIGFjY291bnQ6IC4uLg==\",\"Configs\":{\"database_url\":\"cG9zdGdyZXM6Ly9sb2NhbGhvc3Q6NTQzMi9teWRi\"},\"Secrets\":{\"api_key\":\"c2VjcmV0X2FwaV9rZXlfdjEyMzQ1\"}}",
-         *       "updatedAt": "1978-08-12T06:09:30Z",
+         *       "updatedAt": "1993-08-25T20:30:26Z",
          *       "version": "1.0"
          *     }
          */
@@ -23460,12 +24052,12 @@ export interface components {
             /**
              * Format: date-time
              * @description When the version was created
-             * @example 2005-08-06T11:27:38Z
+             * @example 2008-01-17T00:47:00Z
              */
             createdAt?: string;
             /**
              * @description ID of a Product Tier
-             * @example Tempore ut reiciendis ut et ut.
+             * @example Voluptatem provident unde aut doloribus quas.
              */
             productTierId: string;
             /**
@@ -23481,7 +24073,7 @@ export interface components {
             /**
              * Format: date-time
              * @description When the version was last updated
-             * @example 2011-02-28T15:44:30Z
+             * @example 1993-05-26T22:30:36Z
              */
             updatedAt?: string;
             /**
@@ -23494,7 +24086,7 @@ export interface components {
          * @example {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "startDate": "2023-01-01T10:00:00Z",
-         *       "token": "ym"
+         *       "token": "jw"
          *     }
          */
         GetUsageRequest: {
@@ -23512,7 +24104,7 @@ export interface components {
             startDate?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example hj
+             * @example c
              */
             token: string;
         };
@@ -23894,84 +24486,6 @@ export interface components {
          *             },
          *             "path": "helm/values/production.yaml"
          *           }
-         *         },
-         *         {
-         *           "name": "my-layer",
-         *           "scope": {
-         *             "{{ $sys.cloudProviderName }}": "aws"
-         *           },
-         *           "values": {
-         *             "global": {
-         *               "affinity": {
-         *                 "nodeAffinity": {
-         *                   "requiredDuringSchedulingIgnoredDuringExecution": {
-         *                     "nodeSelectorTerms": [
-         *                       {
-         *                         "matchExpressions": [
-         *                           {
-         *                             "key": "omnistrate.com/managed-by",
-         *                             "operator": "In",
-         *                             "values": [
-         *                               "omnistrate"
-         *                             ]
-         *                           }
-         *                         ]
-         *                       }
-         *                     ]
-         *                   }
-         *                 }
-         *               }
-         *             }
-         *           },
-         *           "valuesFile": {
-         *             "gitConfiguration": {
-         *               "accessToken": "my-token",
-         *               "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-         *               "referenceName": "tags/v1.0.0",
-         *               "repositoryUrl": "https://github.com/username/myrepo",
-         *               "userName": "my-user"
-         *             },
-         *             "path": "helm/values/production.yaml"
-         *           }
-         *         },
-         *         {
-         *           "name": "my-layer",
-         *           "scope": {
-         *             "{{ $sys.cloudProviderName }}": "aws"
-         *           },
-         *           "values": {
-         *             "global": {
-         *               "affinity": {
-         *                 "nodeAffinity": {
-         *                   "requiredDuringSchedulingIgnoredDuringExecution": {
-         *                     "nodeSelectorTerms": [
-         *                       {
-         *                         "matchExpressions": [
-         *                           {
-         *                             "key": "omnistrate.com/managed-by",
-         *                             "operator": "In",
-         *                             "values": [
-         *                               "omnistrate"
-         *                             ]
-         *                           }
-         *                         ]
-         *                       }
-         *                     ]
-         *                   }
-         *                 }
-         *               }
-         *             }
-         *           },
-         *           "valuesFile": {
-         *             "gitConfiguration": {
-         *               "accessToken": "my-token",
-         *               "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-         *               "referenceName": "tags/v1.0.0",
-         *               "repositoryUrl": "https://github.com/username/myrepo",
-         *               "userName": "my-user"
-         *             },
-         *             "path": "helm/values/production.yaml"
-         *           }
          *         }
          *       ],
          *       "namespace": "default",
@@ -24240,7 +24754,7 @@ export interface components {
             changeState?: string;
             /**
              * @description ID of an Image Config
-             * @example Sit voluptates.
+             * @example Ab aut nihil quos qui.
              */
             imageConfigId?: string;
             /**
@@ -24264,7 +24778,7 @@ export interface components {
             changeState?: string;
             /**
              * @description ID of an Infra Config
-             * @example Qui eum velit beatae sed.
+             * @example Recusandae tenetur qui amet veniam tempora sed.
              */
             infraConfigId?: string;
             /**
@@ -24428,9 +24942,9 @@ export interface components {
          *       "instanceID": "instance-12345678",
          *       "lifeCycleStatus": "RUNNING",
          *       "resourcesHealth": {
-         *         "Esse quis aperiam fugit et.": {
+         *         "Et id accusantium natus culpa.": {
          *           "nodesHealth": {
-         *             "Quasi quaerat delectus in fuga.": {
+         *             "Distinctio fugiat.": {
          *               "availabilityZone": "us-east-2a",
          *               "connectivityStatus": "HEALTHY",
          *               "diskHealth": "HEALTHY",
@@ -24449,44 +24963,8 @@ export interface components {
          *               "processHealth": "HEALTHY",
          *               "processLiveness": "HEALTHY",
          *               "status": "HEALTHY"
-         *             }
-         *           },
-         *           "resourceID": "resource-12345678",
-         *           "resourceKey": "primary",
-         *           "resourceType": "Kustomize",
-         *           "status": "HEALTHY"
-         *         },
-         *         "Non sit vel excepturi quasi qui iusto.": {
-         *           "nodesHealth": {
-         *             "Quasi quaerat delectus in fuga.": {
-         *               "availabilityZone": "us-east-2a",
-         *               "connectivityStatus": "HEALTHY",
-         *               "diskHealth": "HEALTHY",
-         *               "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-         *               "integrationsHealth": {
-         *                 "CustomerObservabilityHealth": "HEALTHY",
-         *                 "InternalObservabilityHealth": "HEALTHY"
-         *               },
-         *               "loadStatus": "LOAD_NORMAL",
-         *               "nodeHealth": "HEALTHY",
-         *               "nodeName": "postgres-0",
-         *               "ports": [
-         *                 80,
-         *                 443
-         *               ],
-         *               "processHealth": "HEALTHY",
-         *               "processLiveness": "HEALTHY",
-         *               "status": "HEALTHY"
-         *             }
-         *           },
-         *           "resourceID": "resource-12345678",
-         *           "resourceKey": "primary",
-         *           "resourceType": "Kustomize",
-         *           "status": "HEALTHY"
-         *         },
-         *         "Vel est quaerat.": {
-         *           "nodesHealth": {
-         *             "Quasi quaerat delectus in fuga.": {
+         *             },
+         *             "Rerum est dolorum reprehenderit enim dolorem.": {
          *               "availabilityZone": "us-east-2a",
          *               "connectivityStatus": "HEALTHY",
          *               "diskHealth": "HEALTHY",
@@ -24530,9 +25008,125 @@ export interface components {
             /**
              * @description The health summary of the resources by resource ID
              * @example {
-             *       "Sit non corporis velit.": {
+             *       "Accusantium eius assumenda qui.": {
              *         "nodesHealth": {
-             *           "Quasi quaerat delectus in fuga.": {
+             *           "Distinctio fugiat.": {
+             *             "availabilityZone": "us-east-2a",
+             *             "connectivityStatus": "HEALTHY",
+             *             "diskHealth": "HEALTHY",
+             *             "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *             "integrationsHealth": {
+             *               "CustomerObservabilityHealth": "HEALTHY",
+             *               "InternalObservabilityHealth": "HEALTHY"
+             *             },
+             *             "loadStatus": "LOAD_NORMAL",
+             *             "nodeHealth": "HEALTHY",
+             *             "nodeName": "postgres-0",
+             *             "ports": [
+             *               80,
+             *               443
+             *             ],
+             *             "processHealth": "HEALTHY",
+             *             "processLiveness": "HEALTHY",
+             *             "status": "HEALTHY"
+             *           },
+             *           "Rerum est dolorum reprehenderit enim dolorem.": {
+             *             "availabilityZone": "us-east-2a",
+             *             "connectivityStatus": "HEALTHY",
+             *             "diskHealth": "HEALTHY",
+             *             "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *             "integrationsHealth": {
+             *               "CustomerObservabilityHealth": "HEALTHY",
+             *               "InternalObservabilityHealth": "HEALTHY"
+             *             },
+             *             "loadStatus": "LOAD_NORMAL",
+             *             "nodeHealth": "HEALTHY",
+             *             "nodeName": "postgres-0",
+             *             "ports": [
+             *               80,
+             *               443
+             *             ],
+             *             "processHealth": "HEALTHY",
+             *             "processLiveness": "HEALTHY",
+             *             "status": "HEALTHY"
+             *           }
+             *         },
+             *         "resourceID": "resource-12345678",
+             *         "resourceKey": "primary",
+             *         "resourceType": "Kustomize",
+             *         "status": "HEALTHY"
+             *       },
+             *       "Quasi ut in.": {
+             *         "nodesHealth": {
+             *           "Distinctio fugiat.": {
+             *             "availabilityZone": "us-east-2a",
+             *             "connectivityStatus": "HEALTHY",
+             *             "diskHealth": "HEALTHY",
+             *             "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *             "integrationsHealth": {
+             *               "CustomerObservabilityHealth": "HEALTHY",
+             *               "InternalObservabilityHealth": "HEALTHY"
+             *             },
+             *             "loadStatus": "LOAD_NORMAL",
+             *             "nodeHealth": "HEALTHY",
+             *             "nodeName": "postgres-0",
+             *             "ports": [
+             *               80,
+             *               443
+             *             ],
+             *             "processHealth": "HEALTHY",
+             *             "processLiveness": "HEALTHY",
+             *             "status": "HEALTHY"
+             *           },
+             *           "Rerum est dolorum reprehenderit enim dolorem.": {
+             *             "availabilityZone": "us-east-2a",
+             *             "connectivityStatus": "HEALTHY",
+             *             "diskHealth": "HEALTHY",
+             *             "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *             "integrationsHealth": {
+             *               "CustomerObservabilityHealth": "HEALTHY",
+             *               "InternalObservabilityHealth": "HEALTHY"
+             *             },
+             *             "loadStatus": "LOAD_NORMAL",
+             *             "nodeHealth": "HEALTHY",
+             *             "nodeName": "postgres-0",
+             *             "ports": [
+             *               80,
+             *               443
+             *             ],
+             *             "processHealth": "HEALTHY",
+             *             "processLiveness": "HEALTHY",
+             *             "status": "HEALTHY"
+             *           }
+             *         },
+             *         "resourceID": "resource-12345678",
+             *         "resourceKey": "primary",
+             *         "resourceType": "Kustomize",
+             *         "status": "HEALTHY"
+             *       },
+             *       "Qui eaque.": {
+             *         "nodesHealth": {
+             *           "Distinctio fugiat.": {
+             *             "availabilityZone": "us-east-2a",
+             *             "connectivityStatus": "HEALTHY",
+             *             "diskHealth": "HEALTHY",
+             *             "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+             *             "integrationsHealth": {
+             *               "CustomerObservabilityHealth": "HEALTHY",
+             *               "InternalObservabilityHealth": "HEALTHY"
+             *             },
+             *             "loadStatus": "LOAD_NORMAL",
+             *             "nodeHealth": "HEALTHY",
+             *             "nodeName": "postgres-0",
+             *             "ports": [
+             *               80,
+             *               443
+             *             ],
+             *             "processHealth": "HEALTHY",
+             *             "processLiveness": "HEALTHY",
+             *             "status": "HEALTHY"
+             *           },
+             *           "Rerum est dolorum reprehenderit enim dolorem.": {
              *             "availabilityZone": "us-east-2a",
              *             "connectivityStatus": "HEALTHY",
              *             "diskHealth": "HEALTHY",
@@ -24610,7 +25204,7 @@ export interface components {
             region: string;
             /**
              * @description ID of a Resource Instance Snapshot
-             * @example Aut ullam odit nisi.
+             * @example In officia.
              */
             snapshotId: string;
             /**
@@ -24647,7 +25241,7 @@ export interface components {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "vv4"
+         *       "token": "z"
          *     }
          */
         InviteConsumptionUserRequest: {
@@ -24668,7 +25262,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3l
+             * @example t6
              */
             token: string;
         };
@@ -24691,7 +25285,7 @@ export interface components {
          * @example {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
-         *       "token": "9o6"
+         *       "token": "170"
          *     }
          */
         InviteUserRequest: {
@@ -24707,7 +25301,7 @@ export interface components {
             roleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example whw
+             * @example te
              */
             token: string;
         };
@@ -25007,7 +25601,7 @@ export interface components {
         KustomizeConfiguration: {
             /**
              * @description Flag to disable drift reconciliation for the Kustomize deployment
-             * @example true
+             * @example false
              */
             disableReconciliation?: boolean;
             /**
@@ -25154,50 +25748,50 @@ export interface components {
         /**
          * @description Limit of a parameter
          * @example {
-         *       "max": "Omnis temporibus sunt accusantium aut ducimus.",
-         *       "maxLength": "Libero dolor fuga.",
-         *       "min": "Exercitationem excepturi asperiores.",
-         *       "minLength": "Autem suscipit dolor quibusdam vitae."
+         *       "max": "Quis velit delectus sunt voluptatem.",
+         *       "maxLength": "Non atque blanditiis placeat et et.",
+         *       "min": "Quod possimus.",
+         *       "minLength": "Est id."
          *     }
          */
         Limits: {
             /**
              * @description Maximum value for an integer or floating-point parameter
-             * @example Veritatis hic et nulla a.
+             * @example Voluptas dolorem vero est occaecati magni.
              */
             max?: string;
             /**
              * @description Maximum length of a string parameter
-             * @example Autem saepe est modi tenetur in.
+             * @example Maiores ducimus et.
              */
             maxLength?: string;
             /**
              * @description Minimum value for an integer or floating-point parameter
-             * @example Natus debitis ea rerum.
+             * @example Ducimus doloremque cumque sit dolorem.
              */
             min?: string;
             /**
              * @description Minimum length of a string parameter
-             * @example Aut enim eius a.
+             * @example Consequuntur provident et non voluptatem voluptatem.
              */
             minLength?: string;
         };
         /**
          * @example {
-         *       "token": "e8"
+         *       "token": "ff9"
          *     }
          */
         List: {
             /**
              * @description JWT token used to perform authorization
-             * @example 2
+             * @example 4x
              */
             token: string;
         };
         /**
          * @example {
          *       "cloudProviderName": "aws",
-         *       "token": "j"
+         *       "token": "0tg"
          *     }
          */
         ListAccountConfigRequest: {
@@ -25208,7 +25802,7 @@ export interface components {
             cloudProviderName: string;
             /**
              * @description JWT token used to perform authorization
-             * @example z
+             * @example h2
              */
             token: string;
         };
@@ -25344,64 +25938,6 @@ export interface components {
              *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
              *         "status": "READY",
              *         "statusMessage": "Account is ready"
-             *       },
-             *       {
-             *         "awsAccountID": "123456789012",
-             *         "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-             *         "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
-             *         "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
-             *         "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *         "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *         "byoaInstanceIDs": [
-             *           "instance-12345678",
-             *           "instance-abcdefgh"
-             *         ],
-             *         "cloudProviderId": "infra-12345678",
-             *         "description": "An AWS account hosting multiple dev environments",
-             *         "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpProjectID": "my-project",
-             *         "gcpProjectNumber": "123456789012",
-             *         "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-             *         "id": "ac-12345678",
-             *         "name": "Dev AWS account",
-             *         "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "status": "READY",
-             *         "statusMessage": "Account is ready"
-             *       },
-             *       {
-             *         "awsAccountID": "123456789012",
-             *         "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-             *         "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
-             *         "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
-             *         "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *         "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *         "byoaInstanceIDs": [
-             *           "instance-12345678",
-             *           "instance-abcdefgh"
-             *         ],
-             *         "cloudProviderId": "infra-12345678",
-             *         "description": "An AWS account hosting multiple dev environments",
-             *         "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpProjectID": "my-project",
-             *         "gcpProjectNumber": "123456789012",
-             *         "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-             *         "id": "ac-12345678",
-             *         "name": "Dev AWS account",
-             *         "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "status": "READY",
-             *         "statusMessage": "Account is ready"
              *       }
              *     ]
              */
@@ -25424,13 +25960,13 @@ export interface components {
          * @example {
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "2"
+         *       "token": "3"
          *     }
          */
         ListActionHooksRequest: {
             /**
              * @description ID of a resource
-             * @example Beatae hic.
+             * @example Qui et.
              */
             id: string;
             /**
@@ -25440,23 +25976,13 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2lp
+             * @example 3b
              */
             token: string;
         };
         /**
          * @example {
          *       "hooks": [
-         *         {
-         *           "commandTemplate": "ZWNobyAiaGVsbG8gd29ybGQi",
-         *           "customCommand": [
-         *             "/bin/sh",
-         *             "-c"
-         *           ],
-         *           "customImage": "my-custom-image:latest",
-         *           "scope": "CLUSTER",
-         *           "type": "ADD"
-         *         },
          *         {
          *           "commandTemplate": "ZWNobyAiaGVsbG8gd29ybGQi",
          *           "customCommand": [
@@ -25513,16 +26039,6 @@ export interface components {
              *         "customImage": "my-custom-image:latest",
              *         "scope": "CLUSTER",
              *         "type": "ADD"
-             *       },
-             *       {
-             *         "commandTemplate": "ZWNobyAiaGVsbG8gd29ybGQi",
-             *         "customCommand": [
-             *           "/bin/sh",
-             *           "-c"
-             *         ],
-             *         "customImage": "my-custom-image:latest",
-             *         "scope": "CLUSTER",
-             *         "type": "ADD"
              *       }
              *     ]
              */
@@ -25533,15 +26049,16 @@ export interface components {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
          *       "eventSourceTypes": [
-         *         "Voluptatibus neque nobis quaerat qui.",
-         *         "Ad fuga."
+         *         "Aperiam corrupti velit in magni nemo numquam.",
+         *         "Rerum dolore.",
+         *         "Repudiandae voluptatem."
          *       ],
          *       "instanceID": "instance-12345678",
          *       "nextPageToken": "token",
          *       "pageSize": 10,
          *       "serviceID": "s-123456",
          *       "startDate": "2023-01-01T10:00:00Z",
-         *       "token": "29"
+         *       "token": "v"
          *     }
          */
         ListAllAuditEventsRequest: {
@@ -25559,9 +26076,8 @@ export interface components {
             /**
              * @description The event types to filter by
              * @example [
-             *       "Est velit aliquam aut et sunt ipsum.",
-             *       "A velit id accusantium.",
-             *       "Illum quo occaecati nemo necessitatibus laudantium."
+             *       "Id quia.",
+             *       "Soluta autem molestiae."
              *     ]
              */
             eventSourceTypes?: string[];
@@ -25594,14 +26110,38 @@ export interface components {
             startDate?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8
+             * @example mfq
              */
             token: string;
         };
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "q"
+         *       "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *       "token": "oa9"
+         *     }
+         */
+        ListAllInstanceSnapshotsRequest: {
+            /**
+             * @description The type of service environment
+             * @example PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL
+             */
+            environmentType?: string;
+            /**
+             * @description The snapshot type
+             * @example AutomatedSnapshot|ManualSnapshot
+             */
+            snapshotType?: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example y
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "environmentType": "DEV",
+         *       "token": "yey"
          *     }
          */
         ListAllResourceInstancesRequest: {
@@ -25612,7 +26152,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 1
+             * @example q
              */
             token: string;
         };
@@ -25738,6 +26278,12 @@ export interface components {
          *           "maxReplicas": "1",
          *           "minReplicas": "1",
          *           "network_type": "PUBLIC|INTERNAL",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "onPremInstallerDetails": {
+         *             "downloadURL": "https://example.com/installer/download",
+         *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *           },
+         *           "onpremPlatform": "EKS",
          *           "productTierFeatures": {
          *             "LOGS": {
          *               "auth": {
@@ -25892,6 +26438,332 @@ export interface components {
          *           "maxReplicas": "1",
          *           "minReplicas": "1",
          *           "network_type": "PUBLIC|INTERNAL",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "onPremInstallerDetails": {
+         *             "downloadURL": "https://example.com/installer/download",
+         *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *           },
+         *           "onpremPlatform": "EKS",
+         *           "productTierFeatures": {
+         *             "LOGS": {
+         *               "auth": {
+         *                 "password": "px3c4d5f6g7h8i",
+         *                 "username": "abcd1234"
+         *               },
+         *               "enabled": true,
+         *               "websocketBaseUrl": "wss://r-injectedobserve.instance-abcdefgh.us-east-2.aws.omnistrate.cloud/logs"
+         *             },
+         *             "METRICS": {
+         *               "enabled": false
+         *             }
+         *           },
+         *           "productTierVersionDetail": {
+         *             "description": "Standard product tier providing baseline features",
+         *             "name": "standard",
+         *             "version": "v1"
+         *           },
+         *           "region": "us-east-1",
+         *           "resourceID": "r-abcd1234",
+         *           "result_params": {
+         *             "param1": "value1",
+         *             "param2": "value2"
+         *           },
+         *           "serverlessEnabled": true,
+         *           "sourceSnapshotID": "instance-ss-abcd1234",
+         *           "status": "RUNNING",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionLicense": {
+         *             "certificateBase64": "public-cert",
+         *             "expirationDate": "2024-01-01T10:00:00Z",
+         *             "licenseBase64": "license-file"
+         *           },
+         *           "subscriptionStatus": "ACTIVE",
+         *           "tierVersion": "1.0"
+         *         },
+         *         {
+         *           "active": true,
+         *           "autoscalingEnabled": true,
+         *           "awsAccountID": "123456789012",
+         *           "azureSubscriptionID": "0fa05079-dd73-4b88-babc-05537817604a",
+         *           "backupStatus": {
+         *             "backupPeriodInHours": 2,
+         *             "backupRetentionInDays": 7,
+         *             "earliestRestoreTime": "2021-09-01T00:00:00Z",
+         *             "lastBackupTime": "2021-09-01T00:00:00Z"
+         *           },
+         *           "cloud_provider": "aws",
+         *           "created_at": "2023-01-10T00:00:00Z",
+         *           "createdByUserId": "user-12345678",
+         *           "createdByUserName": "John Doe",
+         *           "currentReplicas": "2",
+         *           "customNetworkDetail": {
+         *             "cidr": "10.177.0.0/16",
+         *             "id": "n-12345678",
+         *             "name": "Prod us-east-1"
+         *           },
+         *           "customTags": [
+         *             {
+         *               "key": "customKey1",
+         *               "value": "customValue1"
+         *             },
+         *             {
+         *               "key": "customKey2",
+         *               "value": "customValue2"
+         *             }
+         *           ],
+         *           "detailedNetworkTopology": {
+         *             "r-abcd1234": {
+         *               "allowedIPRanges": [
+         *                 "0.0.0.0/0"
+         *               ],
+         *               "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *               "clusterPorts": [
+         *                 3306
+         *               ],
+         *               "isJob": false,
+         *               "jobMetrics": [
+         *                 {
+         *                   "additionalData": {
+         *                     "exitCode": 0,
+         *                     "status": "Succeeded"
+         *                   },
+         *                   "endTime": "2023-01-01T10:05:00Z",
+         *                   "metricType": "cpu_core_seconds",
+         *                   "startTime": "2023-01-01T10:00:00Z",
+         *                   "value": 120.5
+         *                 },
+         *                 {
+         *                   "additionalData": {
+         *                     "peakMemoryUsage": "512MB"
+         *                   },
+         *                   "endTime": "2023-01-01T10:05:00Z",
+         *                   "metricType": "memory_mb_seconds",
+         *                   "startTime": "2023-01-01T10:00:00Z",
+         *                   "value": 2560
+         *                 }
+         *               ],
+         *               "main": true,
+         *               "networkingType": "PUBLIC",
+         *               "nodes": [
+         *                 {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "healthStatus": "healthy",
+         *                   "id": "primary-0",
+         *                   "ports": [
+         *                     3306
+         *                   ],
+         *                   "status": "RUNNING"
+         *                 }
+         *               ],
+         *               "privateNetworkCIDR": "10.0.0.2/24",
+         *               "privateNetworkID": "n-1234abcd",
+         *               "publiclyAccessible": true,
+         *               "resourceKey": "primary",
+         *               "resourceName": "Primary MySQL Instance"
+         *             }
+         *           },
+         *           "externalPayerId": "external-payer-id-1234",
+         *           "gcpProjectID": "my-project",
+         *           "highAvailability": true,
+         *           "id": "instance-abcd1234",
+         *           "instanceLoadStatus": "LOAD_NORMAL|LOAD_IDLE|LOAD_OVERLOADED|STOPPED|UNKNOWN|N/A",
+         *           "kubernetesDashboardEndpoint": {
+         *             "dashboardEndpoint": "https://kubernetes-dashboard.hc-12345678.region.cloudprovider.f2e0a955bb84.cloud/#/pod?namespace=instance-abcdefgh",
+         *             "deploymentCellID": "hc-12345678"
+         *           },
+         *           "last_modified_at": "2023-01-20T00:00:00Z",
+         *           "maintenanceTasks": {
+         *             "backups": [
+         *               {
+         *                 "backup_id": "bk-12345678"
+         *               }
+         *             ],
+         *             "upgrade_paths": [
+         *               {
+         *                 "upgrade_path_id": "up-9876543",
+         *                 "upgrade_path_instance_status": "PENDING",
+         *                 "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
+         *                 "upgrade_path_status": "IN_PROGRESS"
+         *               },
+         *               {
+         *                 "upgrade_path_id": "up-12345548",
+         *                 "upgrade_path_instance_status": "PENDING",
+         *                 "upgrade_path_released_at": "2023-01-01T09:00:00Z",
+         *                 "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
+         *                 "upgrade_path_status": "SCHEDULED"
+         *               }
+         *             ]
+         *           },
+         *           "maxReplicas": "1",
+         *           "minReplicas": "1",
+         *           "network_type": "PUBLIC|INTERNAL",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "onPremInstallerDetails": {
+         *             "downloadURL": "https://example.com/installer/download",
+         *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *           },
+         *           "onpremPlatform": "EKS",
+         *           "productTierFeatures": {
+         *             "LOGS": {
+         *               "auth": {
+         *                 "password": "px3c4d5f6g7h8i",
+         *                 "username": "abcd1234"
+         *               },
+         *               "enabled": true,
+         *               "websocketBaseUrl": "wss://r-injectedobserve.instance-abcdefgh.us-east-2.aws.omnistrate.cloud/logs"
+         *             },
+         *             "METRICS": {
+         *               "enabled": false
+         *             }
+         *           },
+         *           "productTierVersionDetail": {
+         *             "description": "Standard product tier providing baseline features",
+         *             "name": "standard",
+         *             "version": "v1"
+         *           },
+         *           "region": "us-east-1",
+         *           "resourceID": "r-abcd1234",
+         *           "result_params": {
+         *             "param1": "value1",
+         *             "param2": "value2"
+         *           },
+         *           "serverlessEnabled": true,
+         *           "sourceSnapshotID": "instance-ss-abcd1234",
+         *           "status": "RUNNING",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionLicense": {
+         *             "certificateBase64": "public-cert",
+         *             "expirationDate": "2024-01-01T10:00:00Z",
+         *             "licenseBase64": "license-file"
+         *           },
+         *           "subscriptionStatus": "ACTIVE",
+         *           "tierVersion": "1.0"
+         *         },
+         *         {
+         *           "active": true,
+         *           "autoscalingEnabled": true,
+         *           "awsAccountID": "123456789012",
+         *           "azureSubscriptionID": "0fa05079-dd73-4b88-babc-05537817604a",
+         *           "backupStatus": {
+         *             "backupPeriodInHours": 2,
+         *             "backupRetentionInDays": 7,
+         *             "earliestRestoreTime": "2021-09-01T00:00:00Z",
+         *             "lastBackupTime": "2021-09-01T00:00:00Z"
+         *           },
+         *           "cloud_provider": "aws",
+         *           "created_at": "2023-01-10T00:00:00Z",
+         *           "createdByUserId": "user-12345678",
+         *           "createdByUserName": "John Doe",
+         *           "currentReplicas": "2",
+         *           "customNetworkDetail": {
+         *             "cidr": "10.177.0.0/16",
+         *             "id": "n-12345678",
+         *             "name": "Prod us-east-1"
+         *           },
+         *           "customTags": [
+         *             {
+         *               "key": "customKey1",
+         *               "value": "customValue1"
+         *             },
+         *             {
+         *               "key": "customKey2",
+         *               "value": "customValue2"
+         *             }
+         *           ],
+         *           "detailedNetworkTopology": {
+         *             "r-abcd1234": {
+         *               "allowedIPRanges": [
+         *                 "0.0.0.0/0"
+         *               ],
+         *               "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *               "clusterPorts": [
+         *                 3306
+         *               ],
+         *               "isJob": false,
+         *               "jobMetrics": [
+         *                 {
+         *                   "additionalData": {
+         *                     "exitCode": 0,
+         *                     "status": "Succeeded"
+         *                   },
+         *                   "endTime": "2023-01-01T10:05:00Z",
+         *                   "metricType": "cpu_core_seconds",
+         *                   "startTime": "2023-01-01T10:00:00Z",
+         *                   "value": 120.5
+         *                 },
+         *                 {
+         *                   "additionalData": {
+         *                     "peakMemoryUsage": "512MB"
+         *                   },
+         *                   "endTime": "2023-01-01T10:05:00Z",
+         *                   "metricType": "memory_mb_seconds",
+         *                   "startTime": "2023-01-01T10:00:00Z",
+         *                   "value": 2560
+         *                 }
+         *               ],
+         *               "main": true,
+         *               "networkingType": "PUBLIC",
+         *               "nodes": [
+         *                 {
+         *                   "availabilityZone": "us-east-2a",
+         *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
+         *                   "healthStatus": "healthy",
+         *                   "id": "primary-0",
+         *                   "ports": [
+         *                     3306
+         *                   ],
+         *                   "status": "RUNNING"
+         *                 }
+         *               ],
+         *               "privateNetworkCIDR": "10.0.0.2/24",
+         *               "privateNetworkID": "n-1234abcd",
+         *               "publiclyAccessible": true,
+         *               "resourceKey": "primary",
+         *               "resourceName": "Primary MySQL Instance"
+         *             }
+         *           },
+         *           "externalPayerId": "external-payer-id-1234",
+         *           "gcpProjectID": "my-project",
+         *           "highAvailability": true,
+         *           "id": "instance-abcd1234",
+         *           "instanceLoadStatus": "LOAD_NORMAL|LOAD_IDLE|LOAD_OVERLOADED|STOPPED|UNKNOWN|N/A",
+         *           "kubernetesDashboardEndpoint": {
+         *             "dashboardEndpoint": "https://kubernetes-dashboard.hc-12345678.region.cloudprovider.f2e0a955bb84.cloud/#/pod?namespace=instance-abcdefgh",
+         *             "deploymentCellID": "hc-12345678"
+         *           },
+         *           "last_modified_at": "2023-01-20T00:00:00Z",
+         *           "maintenanceTasks": {
+         *             "backups": [
+         *               {
+         *                 "backup_id": "bk-12345678"
+         *               }
+         *             ],
+         *             "upgrade_paths": [
+         *               {
+         *                 "upgrade_path_id": "up-9876543",
+         *                 "upgrade_path_instance_status": "PENDING",
+         *                 "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
+         *                 "upgrade_path_status": "IN_PROGRESS"
+         *               },
+         *               {
+         *                 "upgrade_path_id": "up-12345548",
+         *                 "upgrade_path_instance_status": "PENDING",
+         *                 "upgrade_path_released_at": "2023-01-01T09:00:00Z",
+         *                 "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
+         *                 "upgrade_path_status": "SCHEDULED"
+         *               }
+         *             ]
+         *           },
+         *           "maxReplicas": "1",
+         *           "minReplicas": "1",
+         *           "network_type": "PUBLIC|INTERNAL",
+         *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *           "onPremInstallerDetails": {
+         *             "downloadURL": "https://example.com/installer/download",
+         *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *           },
+         *           "onpremPlatform": "EKS",
          *           "productTierFeatures": {
          *             "LOGS": {
          *               "auth": {
@@ -26058,6 +26930,12 @@ export interface components {
              *         "maxReplicas": "1",
              *         "minReplicas": "1",
              *         "network_type": "PUBLIC|INTERNAL",
+             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *         "onPremInstallerDetails": {
+             *           "downloadURL": "https://example.com/installer/download",
+             *           "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+             *         },
+             *         "onpremPlatform": "EKS",
              *         "productTierFeatures": {
              *           "LOGS": {
              *             "auth": {
@@ -26212,314 +27090,12 @@ export interface components {
              *         "maxReplicas": "1",
              *         "minReplicas": "1",
              *         "network_type": "PUBLIC|INTERNAL",
-             *         "productTierFeatures": {
-             *           "LOGS": {
-             *             "auth": {
-             *               "password": "px3c4d5f6g7h8i",
-             *               "username": "abcd1234"
-             *             },
-             *             "enabled": true,
-             *             "websocketBaseUrl": "wss://r-injectedobserve.instance-abcdefgh.us-east-2.aws.omnistrate.cloud/logs"
-             *           },
-             *           "METRICS": {
-             *             "enabled": false
-             *           }
+             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *         "onPremInstallerDetails": {
+             *           "downloadURL": "https://example.com/installer/download",
+             *           "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
              *         },
-             *         "productTierVersionDetail": {
-             *           "description": "Standard product tier providing baseline features",
-             *           "name": "standard",
-             *           "version": "v1"
-             *         },
-             *         "region": "us-east-1",
-             *         "resourceID": "r-abcd1234",
-             *         "result_params": {
-             *           "param1": "value1",
-             *           "param2": "value2"
-             *         },
-             *         "serverlessEnabled": true,
-             *         "sourceSnapshotID": "instance-ss-abcd1234",
-             *         "status": "RUNNING",
-             *         "subscriptionId": "sub-abcd1234",
-             *         "subscriptionLicense": {
-             *           "certificateBase64": "public-cert",
-             *           "expirationDate": "2024-01-01T10:00:00Z",
-             *           "licenseBase64": "license-file"
-             *         },
-             *         "subscriptionStatus": "ACTIVE",
-             *         "tierVersion": "1.0"
-             *       },
-             *       {
-             *         "active": true,
-             *         "autoscalingEnabled": true,
-             *         "awsAccountID": "123456789012",
-             *         "azureSubscriptionID": "0fa05079-dd73-4b88-babc-05537817604a",
-             *         "backupStatus": {
-             *           "backupPeriodInHours": 2,
-             *           "backupRetentionInDays": 7,
-             *           "earliestRestoreTime": "2021-09-01T00:00:00Z",
-             *           "lastBackupTime": "2021-09-01T00:00:00Z"
-             *         },
-             *         "cloud_provider": "aws",
-             *         "created_at": "2023-01-10T00:00:00Z",
-             *         "createdByUserId": "user-12345678",
-             *         "createdByUserName": "John Doe",
-             *         "currentReplicas": "2",
-             *         "customNetworkDetail": {
-             *           "cidr": "10.177.0.0/16",
-             *           "id": "n-12345678",
-             *           "name": "Prod us-east-1"
-             *         },
-             *         "customTags": [
-             *           {
-             *             "key": "customKey1",
-             *             "value": "customValue1"
-             *           },
-             *           {
-             *             "key": "customKey2",
-             *             "value": "customValue2"
-             *           }
-             *         ],
-             *         "detailedNetworkTopology": {
-             *           "r-abcd1234": {
-             *             "allowedIPRanges": [
-             *               "0.0.0.0/0"
-             *             ],
-             *             "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-             *             "clusterPorts": [
-             *               3306
-             *             ],
-             *             "isJob": false,
-             *             "jobMetrics": [
-             *               {
-             *                 "additionalData": {
-             *                   "exitCode": 0,
-             *                   "status": "Succeeded"
-             *                 },
-             *                 "endTime": "2023-01-01T10:05:00Z",
-             *                 "metricType": "cpu_core_seconds",
-             *                 "startTime": "2023-01-01T10:00:00Z",
-             *                 "value": 120.5
-             *               },
-             *               {
-             *                 "additionalData": {
-             *                   "peakMemoryUsage": "512MB"
-             *                 },
-             *                 "endTime": "2023-01-01T10:05:00Z",
-             *                 "metricType": "memory_mb_seconds",
-             *                 "startTime": "2023-01-01T10:00:00Z",
-             *                 "value": 2560
-             *               }
-             *             ],
-             *             "main": true,
-             *             "networkingType": "PUBLIC",
-             *             "nodes": [
-             *               {
-             *                 "availabilityZone": "us-east-2a",
-             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-             *                 "healthStatus": "healthy",
-             *                 "id": "primary-0",
-             *                 "ports": [
-             *                   3306
-             *                 ],
-             *                 "status": "RUNNING"
-             *               }
-             *             ],
-             *             "privateNetworkCIDR": "10.0.0.2/24",
-             *             "privateNetworkID": "n-1234abcd",
-             *             "publiclyAccessible": true,
-             *             "resourceKey": "primary",
-             *             "resourceName": "Primary MySQL Instance"
-             *           }
-             *         },
-             *         "externalPayerId": "external-payer-id-1234",
-             *         "gcpProjectID": "my-project",
-             *         "highAvailability": true,
-             *         "id": "instance-abcd1234",
-             *         "instanceLoadStatus": "LOAD_NORMAL|LOAD_IDLE|LOAD_OVERLOADED|STOPPED|UNKNOWN|N/A",
-             *         "kubernetesDashboardEndpoint": {
-             *           "dashboardEndpoint": "https://kubernetes-dashboard.hc-12345678.region.cloudprovider.f2e0a955bb84.cloud/#/pod?namespace=instance-abcdefgh",
-             *           "deploymentCellID": "hc-12345678"
-             *         },
-             *         "last_modified_at": "2023-01-20T00:00:00Z",
-             *         "maintenanceTasks": {
-             *           "backups": [
-             *             {
-             *               "backup_id": "bk-12345678"
-             *             }
-             *           ],
-             *           "upgrade_paths": [
-             *             {
-             *               "upgrade_path_id": "up-9876543",
-             *               "upgrade_path_instance_status": "PENDING",
-             *               "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
-             *               "upgrade_path_status": "IN_PROGRESS"
-             *             },
-             *             {
-             *               "upgrade_path_id": "up-12345548",
-             *               "upgrade_path_instance_status": "PENDING",
-             *               "upgrade_path_released_at": "2023-01-01T09:00:00Z",
-             *               "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
-             *               "upgrade_path_status": "SCHEDULED"
-             *             }
-             *           ]
-             *         },
-             *         "maxReplicas": "1",
-             *         "minReplicas": "1",
-             *         "network_type": "PUBLIC|INTERNAL",
-             *         "productTierFeatures": {
-             *           "LOGS": {
-             *             "auth": {
-             *               "password": "px3c4d5f6g7h8i",
-             *               "username": "abcd1234"
-             *             },
-             *             "enabled": true,
-             *             "websocketBaseUrl": "wss://r-injectedobserve.instance-abcdefgh.us-east-2.aws.omnistrate.cloud/logs"
-             *           },
-             *           "METRICS": {
-             *             "enabled": false
-             *           }
-             *         },
-             *         "productTierVersionDetail": {
-             *           "description": "Standard product tier providing baseline features",
-             *           "name": "standard",
-             *           "version": "v1"
-             *         },
-             *         "region": "us-east-1",
-             *         "resourceID": "r-abcd1234",
-             *         "result_params": {
-             *           "param1": "value1",
-             *           "param2": "value2"
-             *         },
-             *         "serverlessEnabled": true,
-             *         "sourceSnapshotID": "instance-ss-abcd1234",
-             *         "status": "RUNNING",
-             *         "subscriptionId": "sub-abcd1234",
-             *         "subscriptionLicense": {
-             *           "certificateBase64": "public-cert",
-             *           "expirationDate": "2024-01-01T10:00:00Z",
-             *           "licenseBase64": "license-file"
-             *         },
-             *         "subscriptionStatus": "ACTIVE",
-             *         "tierVersion": "1.0"
-             *       },
-             *       {
-             *         "active": true,
-             *         "autoscalingEnabled": true,
-             *         "awsAccountID": "123456789012",
-             *         "azureSubscriptionID": "0fa05079-dd73-4b88-babc-05537817604a",
-             *         "backupStatus": {
-             *           "backupPeriodInHours": 2,
-             *           "backupRetentionInDays": 7,
-             *           "earliestRestoreTime": "2021-09-01T00:00:00Z",
-             *           "lastBackupTime": "2021-09-01T00:00:00Z"
-             *         },
-             *         "cloud_provider": "aws",
-             *         "created_at": "2023-01-10T00:00:00Z",
-             *         "createdByUserId": "user-12345678",
-             *         "createdByUserName": "John Doe",
-             *         "currentReplicas": "2",
-             *         "customNetworkDetail": {
-             *           "cidr": "10.177.0.0/16",
-             *           "id": "n-12345678",
-             *           "name": "Prod us-east-1"
-             *         },
-             *         "customTags": [
-             *           {
-             *             "key": "customKey1",
-             *             "value": "customValue1"
-             *           },
-             *           {
-             *             "key": "customKey2",
-             *             "value": "customValue2"
-             *           }
-             *         ],
-             *         "detailedNetworkTopology": {
-             *           "r-abcd1234": {
-             *             "allowedIPRanges": [
-             *               "0.0.0.0/0"
-             *             ],
-             *             "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-             *             "clusterPorts": [
-             *               3306
-             *             ],
-             *             "isJob": false,
-             *             "jobMetrics": [
-             *               {
-             *                 "additionalData": {
-             *                   "exitCode": 0,
-             *                   "status": "Succeeded"
-             *                 },
-             *                 "endTime": "2023-01-01T10:05:00Z",
-             *                 "metricType": "cpu_core_seconds",
-             *                 "startTime": "2023-01-01T10:00:00Z",
-             *                 "value": 120.5
-             *               },
-             *               {
-             *                 "additionalData": {
-             *                   "peakMemoryUsage": "512MB"
-             *                 },
-             *                 "endTime": "2023-01-01T10:05:00Z",
-             *                 "metricType": "memory_mb_seconds",
-             *                 "startTime": "2023-01-01T10:00:00Z",
-             *                 "value": 2560
-             *               }
-             *             ],
-             *             "main": true,
-             *             "networkingType": "PUBLIC",
-             *             "nodes": [
-             *               {
-             *                 "availabilityZone": "us-east-2a",
-             *                 "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-             *                 "healthStatus": "healthy",
-             *                 "id": "primary-0",
-             *                 "ports": [
-             *                   3306
-             *                 ],
-             *                 "status": "RUNNING"
-             *               }
-             *             ],
-             *             "privateNetworkCIDR": "10.0.0.2/24",
-             *             "privateNetworkID": "n-1234abcd",
-             *             "publiclyAccessible": true,
-             *             "resourceKey": "primary",
-             *             "resourceName": "Primary MySQL Instance"
-             *           }
-             *         },
-             *         "externalPayerId": "external-payer-id-1234",
-             *         "gcpProjectID": "my-project",
-             *         "highAvailability": true,
-             *         "id": "instance-abcd1234",
-             *         "instanceLoadStatus": "LOAD_NORMAL|LOAD_IDLE|LOAD_OVERLOADED|STOPPED|UNKNOWN|N/A",
-             *         "kubernetesDashboardEndpoint": {
-             *           "dashboardEndpoint": "https://kubernetes-dashboard.hc-12345678.region.cloudprovider.f2e0a955bb84.cloud/#/pod?namespace=instance-abcdefgh",
-             *           "deploymentCellID": "hc-12345678"
-             *         },
-             *         "last_modified_at": "2023-01-20T00:00:00Z",
-             *         "maintenanceTasks": {
-             *           "backups": [
-             *             {
-             *               "backup_id": "bk-12345678"
-             *             }
-             *           ],
-             *           "upgrade_paths": [
-             *             {
-             *               "upgrade_path_id": "up-9876543",
-             *               "upgrade_path_instance_status": "PENDING",
-             *               "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
-             *               "upgrade_path_status": "IN_PROGRESS"
-             *             },
-             *             {
-             *               "upgrade_path_id": "up-12345548",
-             *               "upgrade_path_instance_status": "PENDING",
-             *               "upgrade_path_released_at": "2023-01-01T09:00:00Z",
-             *               "upgrade_path_scheduled_at": "2023-01-01T10:00:00Z",
-             *               "upgrade_path_status": "SCHEDULED"
-             *             }
-             *           ]
-             *         },
-             *         "maxReplicas": "1",
-             *         "minReplicas": "1",
-             *         "network_type": "PUBLIC|INTERNAL",
+             *         "onpremPlatform": "EKS",
              *         "productTierFeatures": {
              *           "LOGS": {
              *             "auth": {
@@ -26563,7 +27139,7 @@ export interface components {
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "c7j"
+         *       "token": "sq0"
          *     }
          */
         ListAllSubscriptionUsersRequest: {
@@ -26574,7 +27150,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example m
+             * @example c
              */
             token: string;
         };
@@ -26608,13 +27184,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "t"
+         *       "token": "z5"
          *     }
          */
         ListAssociatedResourcesRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Saepe non soluta unde quibusdam.
+             * @example Quam et ut et quo eum.
              */
             id: string;
             /**
@@ -26624,7 +27200,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example df
+             * @example we9
              */
             token: string;
         };
@@ -26641,7 +27217,7 @@ export interface components {
         ListAssociatedResourcesResult: {
             /**
              * @description ID of an Infra Config
-             * @example Et animi fuga et ut sed assumenda.
+             * @example Et inventore.
              */
             id: string;
             /**
@@ -26662,7 +27238,7 @@ export interface components {
          * @example {
          *       "instanceId": "instance-12345678",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "fl"
+         *       "token": "8u"
          *     }
          */
         ListAuditEventsForInstanceRequest: {
@@ -26678,7 +27254,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example rn3
+             * @example cf
              */
             token: string;
         };
@@ -26691,7 +27267,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "j"
+         *       "token": "w"
          *     }
          */
         ListAuditEventsForServicePlanRequest: {
@@ -26722,7 +27298,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Provident labore aut.
+             * @example Nisi consequatur doloribus perferendis.
              */
             serviceProviderId: string;
             /**
@@ -26732,36 +27308,13 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example p
+             * @example n
              */
             token: string;
         };
         /**
          * @example {
          *       "events": [
-         *         {
-         *           "eventSource": "Customer, Infra or Maintenance",
-         *           "id": "event-12345678",
-         *           "message": "instance-abcd1234 created",
-         *           "orgId": "org-12345678",
-         *           "orgName": "Acme Corporation",
-         *           "resourceInstanceId": "instance-abcd1234",
-         *           "resourceName": "Galera",
-         *           "subscriptionId": "sub-abcd1234",
-         *           "time": "2023-01-10T00:00:00Z",
-         *           "userId": "user-12345678",
-         *           "userName": "John Doe",
-         *           "workflowFailures": [
-         *             {
-         *               "eventTime": "2020-01-01T00:00:00Z",
-         *               "message": "Bootstrap failed for reason X"
-         *             },
-         *             {
-         *               "eventTime": "2020-01-01T00:01:00Z",
-         *               "message": "Compute failed for reason Y"
-         *             }
-         *           ]
-         *         },
          *         {
          *           "eventSource": "Customer, Infra or Maintenance",
          *           "id": "event-12345678",
@@ -26908,7 +27461,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "regionCode": "us-east-1",
-         *       "token": "b3"
+         *       "token": "osf"
          *     }
          */
         ListAvailabilityZonesByRegionCodeRequest: {
@@ -26921,7 +27474,7 @@ export interface components {
             regionCode: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 48s
+             * @example baw
              */
             token: string;
         };
@@ -26951,7 +27504,7 @@ export interface components {
         /**
          * @example {
          *       "cloudProviderName": "aws",
-         *       "token": "vtz"
+         *       "token": "ieb"
          *     }
          */
         ListAvailabilityZonesRequest: {
@@ -26962,7 +27515,7 @@ export interface components {
             cloudProviderName: string;
             /**
              * @description JWT token used to perform authorization
-             * @example x
+             * @example v
              */
             token: string;
         };
@@ -26992,7 +27545,7 @@ export interface components {
         /**
          * @example {
          *       "cloudProviderName": "aws",
-         *       "token": "4v"
+         *       "token": "m"
          *     }
          */
         ListBYOAConfigRequest: {
@@ -27003,7 +27556,7 @@ export interface components {
             cloudProviderName: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2
+             * @example v
              */
             token: string;
         };
@@ -27151,35 +27704,6 @@ export interface components {
              *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
              *         "status": "READY",
              *         "statusMessage": "Account is ready"
-             *       },
-             *       {
-             *         "awsAccountID": "123456789012",
-             *         "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-             *         "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
-             *         "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
-             *         "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *         "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *         "byoaInstanceIDs": [
-             *           "instance-12345678",
-             *           "instance-abcdefgh"
-             *         ],
-             *         "cloudProviderId": "infra-12345678",
-             *         "description": "An AWS account hosting multiple dev environments",
-             *         "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "gcpProjectID": "my-project",
-             *         "gcpProjectNumber": "123456789012",
-             *         "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-             *         "id": "ac-12345678",
-             *         "name": "Dev AWS account",
-             *         "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-             *         "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-             *         "status": "READY",
-             *         "statusMessage": "Account is ready"
              *       }
              *     ]
              */
@@ -27203,13 +27727,13 @@ export interface components {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
          *       "serviceModelId": "sm-12345678",
-         *       "token": "978"
+         *       "token": "s"
          *     }
          */
         ListCloudProvidersRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Aspernatur quibusdam.
+             * @example Praesentium ad vero possimus velit at ratione.
              */
             productTierId?: string;
             /**
@@ -27219,12 +27743,12 @@ export interface components {
             serviceId?: string;
             /**
              * @description ID of a Service Model
-             * @example Excepturi quaerat debitis sint voluptas nesciunt accusantium.
+             * @example Voluptas quod velit fugit aut quas labore.
              */
             serviceModelId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example p
+             * @example q4h
              */
             token: string;
         };
@@ -27255,7 +27779,7 @@ export interface components {
          * @example {
          *       "managed": false,
          *       "serviceId": "s-12345678",
-         *       "token": "a8v"
+         *       "token": "r"
          *     }
          */
         ListComputeConfigsRequest: {
@@ -27271,7 +27795,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r
+             * @example vca
              */
             token: string;
         };
@@ -27305,7 +27829,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "serviceId": "s-12345678",
-         *       "token": "f2"
+         *       "token": "4w"
          *     }
          */
         ListComputeInstanceTypesRequest: {
@@ -27321,7 +27845,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9h
+             * @example uco
              */
             token: string;
         };
@@ -27353,13 +27877,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "3we"
+         *       "token": "x5"
          *     }
          */
         ListCustomDomainRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example q
              */
             token: string;
         };
@@ -27367,18 +27891,6 @@ export interface components {
          * @description List of custom domain IDs
          * @example {
          *       "CustomDomains": [
-         *         {
-         *           "customDomain": "mydomain.dev",
-         *           "description": "Description of the domain",
-         *           "id": "cd-12345678",
-         *           "name": "Dev domain",
-         *           "route53Configuration": {
-         *             "awsAccountID": "123456789012",
-         *             "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/my-bucket/my-template.json"
-         *           },
-         *           "status": "READY",
-         *           "statusMessage": "Account is ready"
-         *         },
          *         {
          *           "customDomain": "mydomain.dev",
          *           "description": "Description of the domain",
@@ -27463,7 +27975,7 @@ export interface components {
          *       "cloudProviderRegion": "us-east-1",
          *       "customNetworksOnly": false,
          *       "subscriptionId": "sub-12345678",
-         *       "token": "o"
+         *       "token": "s"
          *     }
          */
         ListCustomNetworksRequest: {
@@ -27484,12 +27996,12 @@ export interface components {
             customNetworksOnly?: boolean;
             /**
              * @description ID of a Subscription
-             * @example Blanditiis placeat et et eligendi.
+             * @example Earum rerum quaerat ipsa.
              */
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example uq
+             * @example 9l2
              */
             token: string;
         };
@@ -27514,7 +28026,9 @@ export interface components {
          *               "cloudProviderNativeNetworkId": "vpc-12345678",
          *               "gcpProjectID": "my-project",
          *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
+         *               "hostClusterID": "hc-12345678",
+         *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *             },
          *             {
          *               "awsAccountID": "123456789012",
@@ -27523,25 +28037,9 @@ export interface components {
          *               "cloudProviderNativeNetworkId": "vpc-12345678",
          *               "gcpProjectID": "my-project",
          *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
-         *             },
-         *             {
-         *               "awsAccountID": "123456789012",
-         *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *               "cloudProviderNativeNetworkId": "vpc-12345678",
-         *               "gcpProjectID": "my-project",
-         *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
-         *             },
-         *             {
-         *               "awsAccountID": "123456789012",
-         *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *               "cloudProviderNativeNetworkId": "vpc-12345678",
-         *               "gcpProjectID": "my-project",
-         *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
+         *               "hostClusterID": "hc-12345678",
+         *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *             }
          *           ],
          *           "owningUserId": "user-12345678",
@@ -27566,7 +28064,9 @@ export interface components {
          *               "cloudProviderNativeNetworkId": "vpc-12345678",
          *               "gcpProjectID": "my-project",
          *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
+         *               "hostClusterID": "hc-12345678",
+         *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *             },
          *             {
          *               "awsAccountID": "123456789012",
@@ -27575,25 +28075,9 @@ export interface components {
          *               "cloudProviderNativeNetworkId": "vpc-12345678",
          *               "gcpProjectID": "my-project",
          *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
-         *             },
-         *             {
-         *               "awsAccountID": "123456789012",
-         *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *               "cloudProviderNativeNetworkId": "vpc-12345678",
-         *               "gcpProjectID": "my-project",
-         *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
-         *             },
-         *             {
-         *               "awsAccountID": "123456789012",
-         *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-         *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-         *               "cloudProviderNativeNetworkId": "vpc-12345678",
-         *               "gcpProjectID": "my-project",
-         *               "gcpProjectNumber": "123456789012",
-         *               "hostClusterID": "hc-12345678"
+         *               "hostClusterID": "hc-12345678",
+         *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          *             }
          *           ],
          *           "owningUserId": "user-12345678",
@@ -27625,7 +28109,9 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           },
              *           {
              *             "awsAccountID": "123456789012",
@@ -27634,25 +28120,9 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
-             *           },
-             *           {
-             *             "awsAccountID": "123456789012",
-             *             "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *             "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *             "cloudProviderNativeNetworkId": "vpc-12345678",
-             *             "gcpProjectID": "my-project",
-             *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
-             *           },
-             *           {
-             *             "awsAccountID": "123456789012",
-             *             "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-             *             "azureTenantID": "12345678-1234-1234-1234-123456789012",
-             *             "cloudProviderNativeNetworkId": "vpc-12345678",
-             *             "gcpProjectID": "my-project",
-             *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           }
              *         ],
              *         "owningUserId": "user-12345678",
@@ -27677,7 +28147,9 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           },
              *           {
              *             "awsAccountID": "123456789012",
@@ -27686,7 +28158,36 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+             *           }
+             *         ],
+             *         "owningUserId": "user-12345678",
+             *         "owningUserName": "John Doe",
+             *         "status": "Ready"
+             *       },
+             *       {
+             *         "cidr": "10.0.0.0/16",
+             *         "cloudProviderName": "aws",
+             *         "cloudProviderRegion": "us-east-1",
+             *         "id": "n-12345678",
+             *         "name": "Prod us-east-1",
+             *         "networkDefinitionType": "Custom",
+             *         "networkFeaturesConfiguration": {
+             *           "isPrivateLinkEnabled": true
+             *         },
+             *         "networkInstances": [
+             *           {
+             *             "awsAccountID": "123456789012",
+             *             "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+             *             "azureTenantID": "12345678-1234-1234-1234-123456789012",
+             *             "cloudProviderNativeNetworkId": "vpc-12345678",
+             *             "gcpProjectID": "my-project",
+             *             "gcpProjectNumber": "123456789012",
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           },
              *           {
              *             "awsAccountID": "123456789012",
@@ -27695,7 +28196,36 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+             *           }
+             *         ],
+             *         "owningUserId": "user-12345678",
+             *         "owningUserName": "John Doe",
+             *         "status": "Ready"
+             *       },
+             *       {
+             *         "cidr": "10.0.0.0/16",
+             *         "cloudProviderName": "aws",
+             *         "cloudProviderRegion": "us-east-1",
+             *         "id": "n-12345678",
+             *         "name": "Prod us-east-1",
+             *         "networkDefinitionType": "Custom",
+             *         "networkFeaturesConfiguration": {
+             *           "isPrivateLinkEnabled": true
+             *         },
+             *         "networkInstances": [
+             *           {
+             *             "awsAccountID": "123456789012",
+             *             "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+             *             "azureTenantID": "12345678-1234-1234-1234-123456789012",
+             *             "cloudProviderNativeNetworkId": "vpc-12345678",
+             *             "gcpProjectID": "my-project",
+             *             "gcpProjectNumber": "123456789012",
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           },
              *           {
              *             "awsAccountID": "123456789012",
@@ -27704,7 +28234,9 @@ export interface components {
              *             "cloudProviderNativeNetworkId": "vpc-12345678",
              *             "gcpProjectID": "my-project",
              *             "gcpProjectNumber": "123456789012",
-             *             "hostClusterID": "hc-12345678"
+             *             "hostClusterID": "hc-12345678",
+             *             "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+             *             "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
              *           }
              *         ],
              *         "owningUserId": "user-12345678",
@@ -27719,13 +28251,13 @@ export interface components {
          * @example {
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "nqy"
+         *       "token": "c"
          *     }
          */
         ListDependentResourcesRequest: {
             /**
              * @description ID of a resource
-             * @example Non sapiente.
+             * @example Et aspernatur sed sint quo sint.
              */
             id: string;
             /**
@@ -27735,7 +28267,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example z1z
+             * @example uo
              */
             token: string;
         };
@@ -27754,7 +28286,7 @@ export interface components {
         ListDependentResourcesResult: {
             /**
              * @description ID of a resource
-             * @example Sit dolorum.
+             * @example Fuga id.
              */
             id?: string;
             /**
@@ -27779,13 +28311,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "0n"
+         *       "token": "ex8"
          *     }
          */
         ListDeploymentConfigsRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example ev
+             * @example r0
              */
             token: string;
         };
@@ -27814,7 +28346,7 @@ export interface components {
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "xn"
+         *       "token": "nj"
          *     }
          */
         ListEndCustomerEvents: {
@@ -27825,13 +28357,29 @@ export interface components {
             environmentType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k9w
+             * @example pd5
              */
             token: string;
         };
         /**
          * @example {
          *       "events": [
+         *         {
+         *           "eventID": "e-123456",
+         *           "eventPayload": {
+         *             "eventType": "CustomerSignUp",
+         *             "token": "123456"
+         *           },
+         *           "eventType": "InviteUser",
+         *           "orgID": "o-123456",
+         *           "orgName": "Acme Corp",
+         *           "orgURL": "https://acme.com",
+         *           "priority": "Critical",
+         *           "time": "2023-01-10T00:00:00Z",
+         *           "userEmail": "user@example.com",
+         *           "userID": "user-123456",
+         *           "userName": "user"
+         *         },
          *         {
          *           "eventID": "e-123456",
          *           "eventPayload": {
@@ -27918,22 +28466,6 @@ export interface components {
              *         "userEmail": "user@example.com",
              *         "userID": "user-123456",
              *         "userName": "user"
-             *       },
-             *       {
-             *         "eventID": "e-123456",
-             *         "eventPayload": {
-             *           "eventType": "CustomerSignUp",
-             *           "token": "123456"
-             *         },
-             *         "eventType": "InviteUser",
-             *         "orgID": "o-123456",
-             *         "orgName": "Acme Corp",
-             *         "orgURL": "https://acme.com",
-             *         "priority": "Critical",
-             *         "time": "2023-01-10T00:00:00Z",
-             *         "userEmail": "user@example.com",
-             *         "userID": "user-123456",
-             *         "userName": "user"
              *       }
              *     ]
              */
@@ -27945,18 +28477,18 @@ export interface components {
          *       "productTierId": "pt-12345678",
          *       "productTierVersion": "1.0",
          *       "serviceId": "s-12345678",
-         *       "token": "r6"
+         *       "token": "zz6"
          *     }
          */
         ListFilesRequest: {
             /**
              * @description ID of a resource
-             * @example Soluta quo officiis ut sit omnis.
+             * @example Voluptatem voluptatibus molestiae explicabo quis est.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Voluptas consequatur culpa voluptatem id delectus a.
+             * @example Dolorum cupiditate aliquam accusamus.
              */
             productTierId?: string;
             /**
@@ -27971,7 +28503,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example ok
              */
             token: string;
         };
@@ -28054,6 +28586,16 @@ export interface components {
              *         "type": "Config",
              *         "uploadTime": "2023-01-10T00:00:00Z",
              *         "uploadedBy": "user"
+             *       },
+             *       {
+             *         "description": "A file to store the configuration for the resource",
+             *         "fileId": "f-12345678",
+             *         "mountPath": "/etc/config",
+             *         "name": "file.txt",
+             *         "size": 1234,
+             *         "type": "Config",
+             *         "uploadTime": "2023-01-10T00:00:00Z",
+             *         "uploadedBy": "user"
              *       }
              *     ]
              */
@@ -28062,7 +28604,7 @@ export interface components {
         /**
          * @example {
          *       "chartName": "my-chart",
-         *       "token": "duw"
+         *       "token": "a"
          *     }
          */
         ListHelmPackagesRequest: {
@@ -28073,7 +28615,7 @@ export interface components {
             chartName?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example pi
+             * @example 8z
              */
             token: string;
         };
@@ -28170,6 +28712,45 @@ export interface components {
          *                 },
          *                 "path": "helm/values/production.yaml"
          *               }
+         *             },
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
          *             }
          *           ],
          *           "namespace": "default",
@@ -28266,6 +28847,45 @@ export interface components {
          *                 },
          *                 "path": "helm/values/production.yaml"
          *               }
+         *             },
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
          *             }
          *           ],
          *           "namespace": "default",
@@ -28285,6 +28905,180 @@ export interface components {
          *           },
          *           "chartVersion": "1.0.0",
          *           "layeredChartValues": [
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
+         *             },
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
+         *             },
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
+         *             }
+         *           ],
+         *           "namespace": "default",
+         *           "password": "my-password",
+         *           "username": "my-user"
+         *         },
+         *         {
+         *           "chartName": "my-chart",
+         *           "chartRepoName": "my-repo",
+         *           "chartRepoUrl": "https://my-repo.com",
+         *           "chartValues": {
+         *             "key1": "value1",
+         *             "key2": 3,
+         *             "key3": {
+         *               "key4": "value4"
+         *             }
+         *           },
+         *           "chartVersion": "1.0.0",
+         *           "layeredChartValues": [
+         *             {
+         *               "name": "my-layer",
+         *               "scope": {
+         *                 "{{ $sys.cloudProviderName }}": "aws"
+         *               },
+         *               "values": {
+         *                 "global": {
+         *                   "affinity": {
+         *                     "nodeAffinity": {
+         *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                         "nodeSelectorTerms": [
+         *                           {
+         *                             "matchExpressions": [
+         *                               {
+         *                                 "key": "omnistrate.com/managed-by",
+         *                                 "operator": "In",
+         *                                 "values": [
+         *                                   "omnistrate"
+         *                                 ]
+         *                               }
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     }
+         *                   }
+         *                 }
+         *               },
+         *               "valuesFile": {
+         *                 "gitConfiguration": {
+         *                   "accessToken": "my-token",
+         *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                   "referenceName": "tags/v1.0.0",
+         *                   "repositoryUrl": "https://github.com/username/myrepo",
+         *                   "userName": "my-user"
+         *                 },
+         *                 "path": "helm/values/production.yaml"
+         *               }
+         *             },
          *             {
          *               "name": "my-layer",
          *               "scope": {
@@ -28465,63 +29259,6 @@ export interface components {
              *               },
              *               "path": "helm/values/production.yaml"
              *             }
-             *           }
-             *         ],
-             *         "namespace": "default",
-             *         "password": "my-password",
-             *         "username": "my-user"
-             *       },
-             *       {
-             *         "chartName": "my-chart",
-             *         "chartRepoName": "my-repo",
-             *         "chartRepoUrl": "https://my-repo.com",
-             *         "chartValues": {
-             *           "key1": "value1",
-             *           "key2": 3,
-             *           "key3": {
-             *             "key4": "value4"
-             *           }
-             *         },
-             *         "chartVersion": "1.0.0",
-             *         "layeredChartValues": [
-             *           {
-             *             "name": "my-layer",
-             *             "scope": {
-             *               "{{ $sys.cloudProviderName }}": "aws"
-             *             },
-             *             "values": {
-             *               "global": {
-             *                 "affinity": {
-             *                   "nodeAffinity": {
-             *                     "requiredDuringSchedulingIgnoredDuringExecution": {
-             *                       "nodeSelectorTerms": [
-             *                         {
-             *                           "matchExpressions": [
-             *                             {
-             *                               "key": "omnistrate.com/managed-by",
-             *                               "operator": "In",
-             *                               "values": [
-             *                                 "omnistrate"
-             *                               ]
-             *                             }
-             *                           ]
-             *                         }
-             *                       ]
-             *                     }
-             *                   }
-             *                 }
-             *               }
-             *             },
-             *             "valuesFile": {
-             *               "gitConfiguration": {
-             *                 "accessToken": "my-token",
-             *                 "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-             *                 "referenceName": "tags/v1.0.0",
-             *                 "repositoryUrl": "https://github.com/username/myrepo",
-             *                 "userName": "my-user"
-             *               },
-             *               "path": "helm/values/production.yaml"
-             *             }
              *           },
              *           {
              *             "name": "my-layer",
@@ -28580,6 +29317,45 @@ export interface components {
              *         },
              *         "chartVersion": "1.0.0",
              *         "layeredChartValues": [
+             *           {
+             *             "name": "my-layer",
+             *             "scope": {
+             *               "{{ $sys.cloudProviderName }}": "aws"
+             *             },
+             *             "values": {
+             *               "global": {
+             *                 "affinity": {
+             *                   "nodeAffinity": {
+             *                     "requiredDuringSchedulingIgnoredDuringExecution": {
+             *                       "nodeSelectorTerms": [
+             *                         {
+             *                           "matchExpressions": [
+             *                             {
+             *                               "key": "omnistrate.com/managed-by",
+             *                               "operator": "In",
+             *                               "values": [
+             *                                 "omnistrate"
+             *                               ]
+             *                             }
+             *                           ]
+             *                         }
+             *                       ]
+             *                     }
+             *                   }
+             *                 }
+             *               }
+             *             },
+             *             "valuesFile": {
+             *               "gitConfiguration": {
+             *                 "accessToken": "my-token",
+             *                 "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+             *                 "referenceName": "tags/v1.0.0",
+             *                 "repositoryUrl": "https://github.com/username/myrepo",
+             *                 "userName": "my-user"
+             *               },
+             *               "path": "helm/values/production.yaml"
+             *             }
+             *           },
              *           {
              *             "name": "my-layer",
              *             "scope": {
@@ -28669,24 +29445,19 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "pfg"
+         *       "token": "p1"
          *     }
          */
         ListIdentityProviderTypesRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example lei
+             * @example x8v
              */
             token: string;
         };
         /**
          * @example {
          *       "identityProviderTypes": [
-         *         {
-         *           "SupportCustomEndpoints": true,
-         *           "SupportCustomScopes": false,
-         *           "identityProviderName": "Google"
-         *         },
          *         {
          *           "SupportCustomEndpoints": true,
          *           "SupportCustomScopes": false,
@@ -28713,6 +29484,11 @@ export interface components {
              *         "SupportCustomEndpoints": true,
              *         "SupportCustomScopes": false,
              *         "identityProviderName": "Google"
+             *       },
+             *       {
+             *         "SupportCustomEndpoints": true,
+             *         "SupportCustomScopes": false,
+             *         "identityProviderName": "Google"
              *       }
              *     ]
              */
@@ -28720,13 +29496,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "5o"
+         *       "token": "pn"
          *     }
          */
         ListIdentityProvidersRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example j
+             * @example m6
              */
             token: string;
         };
@@ -28807,23 +29583,6 @@ export interface components {
              *         "status": "Ready",
              *         "tokenEndpoint": "https://oauth2.googleapis.com/token",
              *         "userInfoEndpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
-             *       },
-             *       {
-             *         "authorizationEndpoint": "https://accounts.google.com/o/oauth2/auth",
-             *         "clientId": "205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com",
-             *         "clientSecret": "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",
-             *         "disabled": false,
-             *         "emailIdentifiers": "company.com",
-             *         "environmentType": "production",
-             *         "id": "idp-12345678",
-             *         "identityProviderName": "Google",
-             *         "loginButtonIconUrl": "https://example.com/icon.png",
-             *         "loginButtonText": "Login with Google",
-             *         "name": "Google for my company",
-             *         "scopes": "openid email profile",
-             *         "status": "Ready",
-             *         "tokenEndpoint": "https://oauth2.googleapis.com/token",
-             *         "userInfoEndpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
              *       }
              *     ]
              */
@@ -28833,7 +29592,7 @@ export interface components {
          * @example {
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "4l"
+         *       "token": "b"
          *     }
          */
         ListImageConfigsRequest: {
@@ -28849,7 +29608,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example irr
+             * @example 5ii
              */
             token: string;
         };
@@ -28879,13 +29638,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ku"
+         *       "token": "y8"
          *     }
          */
         ListImageRegistryRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example u
+             * @example 6hs
              */
             token: string;
         };
@@ -28921,7 +29680,7 @@ export interface components {
          *       "managed": false,
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "1t"
+         *       "token": "fq"
          *     }
          */
         ListInfraConfigRequest: {
@@ -28942,7 +29701,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example u
              */
             token: string;
         };
@@ -28975,26 +29734,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Voluptatum ut ex et ullam.",
+         *       "ProductTierVersion": "Fugiat est corporis.",
          *       "resourceId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "psl"
+         *       "token": "9n2"
          *     }
          */
         ListInputParametersRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Cumque magni autem.
+             * @example Quam in rerum veritatis.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Eveniet eveniet neque.
+             * @example Nihil autem libero laboriosam nihil et id.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Odit alias minus voluptatum rem.
+             * @example Facilis eius ea.
              */
             resourceId: string;
             /**
@@ -29004,7 +29763,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example h
+             * @example ph1
              */
             token: string;
         };
@@ -29015,6 +29774,45 @@ export interface components {
          *         "ip-12345679"
          *       ],
          *       "inputParameters": [
+         *         {
+         *           "defaultValue": "true",
+         *           "dependentResourceId": "r-12345678",
+         *           "description": "Magni deleniti.",
+         *           "hasOptions": true,
+         *           "id": "var-12345678",
+         *           "isList": true,
+         *           "key": "a",
+         *           "labeledOptions": {
+         *             "large": "t3.xlarge",
+         *             "medium": "t3.large",
+         *             "small": "t3.medium"
+         *           },
+         *           "limits": {
+         *             "max": "Non nemo inventore.",
+         *             "maxLength": "Accusamus unde asperiores architecto sit natus sed.",
+         *             "min": "Rerum nisi beatae voluptas mollitia nostrum vel.",
+         *             "minLength": "Eveniet architecto assumenda et voluptas perferendis enim."
+         *           },
+         *           "modifiable": true,
+         *           "name": "7p",
+         *           "options": [
+         *             "true",
+         *             "false"
+         *           ],
+         *           "regex": "^[a-zA-Z0-9_-]+$",
+         *           "required": false,
+         *           "resourceId": "r-12345678",
+         *           "scope": {
+         *             "cloudProviders": [
+         *               "aws",
+         *               "azure",
+         *               "gcp"
+         *             ]
+         *           },
+         *           "serviceId": "s-12345678",
+         *           "tabIndex": 1,
+         *           "type": "Boolean|Float64|String|Resource|Secret|Password"
+         *         },
          *         {
          *           "defaultValue": "true",
          *           "dependentResourceId": "r-12345678",
@@ -29237,8 +30035,281 @@ export interface components {
         };
         /**
          * @example {
+         *       "snapshots": [
+         *         {
+         *           "cloudProvider": "aws",
+         *           "completeTime": "2021-09-01T00:00:00Z",
+         *           "createdTime": "2021-09-01T00:00:00Z",
+         *           "encrypted": true,
+         *           "outputParams": [
+         *             {
+         *               "displayName": "Server Name",
+         *               "key": "serverName",
+         *               "type": "string",
+         *               "value": "server1"
+         *             },
+         *             {
+         *               "displayName": "Server Type",
+         *               "key": "serverType",
+         *               "type": "string",
+         *               "value": "db.t3.micro"
+         *             }
+         *           ],
+         *           "productTierId": "pt-12345678",
+         *           "productTierName": "Premium",
+         *           "productTierVersion": "1.0",
+         *           "productTierVersionDescription": "Version 1.0",
+         *           "progress": 99,
+         *           "region": "us-west-2",
+         *           "serviceId": "pt-12345678",
+         *           "serviceName": "Postgres",
+         *           "snapshotId": "instance-ss-12345678",
+         *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *           "sourceInstanceId": "instance-12345678",
+         *           "status": "completed",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionOwnerOrgId": "org-abcd1234",
+         *           "subscriptionOwnerOrgName": "Example Inc.",
+         *           "subscriptionOwnerUserId": "user-abcd1234",
+         *           "subscriptionOwnerUserName": "Admin"
+         *         },
+         *         {
+         *           "cloudProvider": "aws",
+         *           "completeTime": "2021-09-01T00:00:00Z",
+         *           "createdTime": "2021-09-01T00:00:00Z",
+         *           "encrypted": true,
+         *           "outputParams": [
+         *             {
+         *               "displayName": "Server Name",
+         *               "key": "serverName",
+         *               "type": "string",
+         *               "value": "server1"
+         *             },
+         *             {
+         *               "displayName": "Server Type",
+         *               "key": "serverType",
+         *               "type": "string",
+         *               "value": "db.t3.micro"
+         *             }
+         *           ],
+         *           "productTierId": "pt-12345678",
+         *           "productTierName": "Premium",
+         *           "productTierVersion": "1.0",
+         *           "productTierVersionDescription": "Version 1.0",
+         *           "progress": 99,
+         *           "region": "us-west-2",
+         *           "serviceId": "pt-12345678",
+         *           "serviceName": "Postgres",
+         *           "snapshotId": "instance-ss-12345678",
+         *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *           "sourceInstanceId": "instance-12345678",
+         *           "status": "completed",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionOwnerOrgId": "org-abcd1234",
+         *           "subscriptionOwnerOrgName": "Example Inc.",
+         *           "subscriptionOwnerUserId": "user-abcd1234",
+         *           "subscriptionOwnerUserName": "Admin"
+         *         },
+         *         {
+         *           "cloudProvider": "aws",
+         *           "completeTime": "2021-09-01T00:00:00Z",
+         *           "createdTime": "2021-09-01T00:00:00Z",
+         *           "encrypted": true,
+         *           "outputParams": [
+         *             {
+         *               "displayName": "Server Name",
+         *               "key": "serverName",
+         *               "type": "string",
+         *               "value": "server1"
+         *             },
+         *             {
+         *               "displayName": "Server Type",
+         *               "key": "serverType",
+         *               "type": "string",
+         *               "value": "db.t3.micro"
+         *             }
+         *           ],
+         *           "productTierId": "pt-12345678",
+         *           "productTierName": "Premium",
+         *           "productTierVersion": "1.0",
+         *           "productTierVersionDescription": "Version 1.0",
+         *           "progress": 99,
+         *           "region": "us-west-2",
+         *           "serviceId": "pt-12345678",
+         *           "serviceName": "Postgres",
+         *           "snapshotId": "instance-ss-12345678",
+         *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *           "sourceInstanceId": "instance-12345678",
+         *           "status": "completed",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionOwnerOrgId": "org-abcd1234",
+         *           "subscriptionOwnerOrgName": "Example Inc.",
+         *           "subscriptionOwnerUserId": "user-abcd1234",
+         *           "subscriptionOwnerUserName": "Admin"
+         *         },
+         *         {
+         *           "cloudProvider": "aws",
+         *           "completeTime": "2021-09-01T00:00:00Z",
+         *           "createdTime": "2021-09-01T00:00:00Z",
+         *           "encrypted": true,
+         *           "outputParams": [
+         *             {
+         *               "displayName": "Server Name",
+         *               "key": "serverName",
+         *               "type": "string",
+         *               "value": "server1"
+         *             },
+         *             {
+         *               "displayName": "Server Type",
+         *               "key": "serverType",
+         *               "type": "string",
+         *               "value": "db.t3.micro"
+         *             }
+         *           ],
+         *           "productTierId": "pt-12345678",
+         *           "productTierName": "Premium",
+         *           "productTierVersion": "1.0",
+         *           "productTierVersionDescription": "Version 1.0",
+         *           "progress": 99,
+         *           "region": "us-west-2",
+         *           "serviceId": "pt-12345678",
+         *           "serviceName": "Postgres",
+         *           "snapshotId": "instance-ss-12345678",
+         *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+         *           "sourceInstanceId": "instance-12345678",
+         *           "status": "completed",
+         *           "subscriptionId": "sub-abcd1234",
+         *           "subscriptionOwnerOrgId": "org-abcd1234",
+         *           "subscriptionOwnerOrgName": "Example Inc.",
+         *           "subscriptionOwnerUserId": "user-abcd1234",
+         *           "subscriptionOwnerUserName": "Admin"
+         *         }
+         *       ]
+         *     }
+         */
+        ListInstanceSnapshotResult: {
+            /**
+             * @description The list of instance snapshots.
+             * @example [
+             *       {
+             *         "cloudProvider": "aws",
+             *         "completeTime": "2021-09-01T00:00:00Z",
+             *         "createdTime": "2021-09-01T00:00:00Z",
+             *         "encrypted": true,
+             *         "outputParams": [
+             *           {
+             *             "displayName": "Server Name",
+             *             "key": "serverName",
+             *             "type": "string",
+             *             "value": "server1"
+             *           },
+             *           {
+             *             "displayName": "Server Type",
+             *             "key": "serverType",
+             *             "type": "string",
+             *             "value": "db.t3.micro"
+             *           }
+             *         ],
+             *         "productTierId": "pt-12345678",
+             *         "productTierName": "Premium",
+             *         "productTierVersion": "1.0",
+             *         "productTierVersionDescription": "Version 1.0",
+             *         "progress": 99,
+             *         "region": "us-west-2",
+             *         "serviceId": "pt-12345678",
+             *         "serviceName": "Postgres",
+             *         "snapshotId": "instance-ss-12345678",
+             *         "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+             *         "sourceInstanceId": "instance-12345678",
+             *         "status": "completed",
+             *         "subscriptionId": "sub-abcd1234",
+             *         "subscriptionOwnerOrgId": "org-abcd1234",
+             *         "subscriptionOwnerOrgName": "Example Inc.",
+             *         "subscriptionOwnerUserId": "user-abcd1234",
+             *         "subscriptionOwnerUserName": "Admin"
+             *       },
+             *       {
+             *         "cloudProvider": "aws",
+             *         "completeTime": "2021-09-01T00:00:00Z",
+             *         "createdTime": "2021-09-01T00:00:00Z",
+             *         "encrypted": true,
+             *         "outputParams": [
+             *           {
+             *             "displayName": "Server Name",
+             *             "key": "serverName",
+             *             "type": "string",
+             *             "value": "server1"
+             *           },
+             *           {
+             *             "displayName": "Server Type",
+             *             "key": "serverType",
+             *             "type": "string",
+             *             "value": "db.t3.micro"
+             *           }
+             *         ],
+             *         "productTierId": "pt-12345678",
+             *         "productTierName": "Premium",
+             *         "productTierVersion": "1.0",
+             *         "productTierVersionDescription": "Version 1.0",
+             *         "progress": 99,
+             *         "region": "us-west-2",
+             *         "serviceId": "pt-12345678",
+             *         "serviceName": "Postgres",
+             *         "snapshotId": "instance-ss-12345678",
+             *         "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+             *         "sourceInstanceId": "instance-12345678",
+             *         "status": "completed",
+             *         "subscriptionId": "sub-abcd1234",
+             *         "subscriptionOwnerOrgId": "org-abcd1234",
+             *         "subscriptionOwnerOrgName": "Example Inc.",
+             *         "subscriptionOwnerUserId": "user-abcd1234",
+             *         "subscriptionOwnerUserName": "Admin"
+             *       },
+             *       {
+             *         "cloudProvider": "aws",
+             *         "completeTime": "2021-09-01T00:00:00Z",
+             *         "createdTime": "2021-09-01T00:00:00Z",
+             *         "encrypted": true,
+             *         "outputParams": [
+             *           {
+             *             "displayName": "Server Name",
+             *             "key": "serverName",
+             *             "type": "string",
+             *             "value": "server1"
+             *           },
+             *           {
+             *             "displayName": "Server Type",
+             *             "key": "serverType",
+             *             "type": "string",
+             *             "value": "db.t3.micro"
+             *           }
+             *         ],
+             *         "productTierId": "pt-12345678",
+             *         "productTierName": "Premium",
+             *         "productTierVersion": "1.0",
+             *         "productTierVersionDescription": "Version 1.0",
+             *         "progress": 99,
+             *         "region": "us-west-2",
+             *         "serviceId": "pt-12345678",
+             *         "serviceName": "Postgres",
+             *         "snapshotId": "instance-ss-12345678",
+             *         "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+             *         "sourceInstanceId": "instance-12345678",
+             *         "status": "completed",
+             *         "subscriptionId": "sub-abcd1234",
+             *         "subscriptionOwnerOrgId": "org-abcd1234",
+             *         "subscriptionOwnerOrgName": "Example Inc.",
+             *         "subscriptionOwnerUserId": "user-abcd1234",
+             *         "subscriptionOwnerUserName": "Admin"
+             *       }
+             *     ]
+             */
+            snapshots?: components["schemas"]["DescribeInstanceSnapshotResult"][];
+        };
+        /**
+         * @example {
          *       "billingProvider": "STRIPE",
-         *       "token": "i0"
+         *       "token": "6qh"
          *     }
          */
         ListInvoicesRequest: {
@@ -29249,27 +30320,13 @@ export interface components {
             billingProvider?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example t
+             * @example zpe
              */
             token: string;
         };
         /**
          * @example {
          *       "invoices": [
-         *         {
-         *           "currency": "USD",
-         *           "dueDate": "2023-10-01T00:00:00Z",
-         *           "invoiceDate": "2021-01-01T00:00:00.000Z",
-         *           "invoiceId": "in_1234568",
-         *           "invoiceNumber": "2021-01-01-1234567890",
-         *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-         *           "invoiceStatus": "Open",
-         *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-         *           "paymentTerms": "Net 30",
-         *           "taxAmount": 10,
-         *           "totalAmount": 110,
-         *           "totalAmountWithoutTax": 100
-         *         },
          *         {
          *           "currency": "USD",
          *           "dueDate": "2023-10-01T00:00:00Z",
@@ -29346,20 +30403,6 @@ export interface components {
              *         "taxAmount": 10,
              *         "totalAmount": 110,
              *         "totalAmountWithoutTax": 100
-             *       },
-             *       {
-             *         "currency": "USD",
-             *         "dueDate": "2023-10-01T00:00:00Z",
-             *         "invoiceDate": "2021-01-01T00:00:00.000Z",
-             *         "invoiceId": "in_1234568",
-             *         "invoiceNumber": "2021-01-01-1234567890",
-             *         "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-             *         "invoiceStatus": "Open",
-             *         "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-             *         "paymentTerms": "Net 30",
-             *         "taxAmount": 10,
-             *         "totalAmount": 110,
-             *         "totalAmountWithoutTax": 100
              *       }
              *     ]
              */
@@ -29368,7 +30411,7 @@ export interface components {
         /**
          * @example {
          *       "family": "COMPUTE_INFRA",
-         *       "token": "o"
+         *       "token": "e6s"
          *     }
          */
         ListLimitRequest: {
@@ -29379,7 +30422,7 @@ export interface components {
             family: string;
             /**
              * @description JWT token used to perform authorization
-             * @example uf
+             * @example d1f
              */
             token: string;
         };
@@ -29421,7 +30464,7 @@ export interface components {
          * @example {
          *       "managed": false,
          *       "serviceId": "s-12345678",
-         *       "token": "ht"
+         *       "token": "wdd"
          *     }
          */
         ListNetworkConfigsRequest: {
@@ -29437,14 +30480,13 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ut
+             * @example w
              */
             token: string;
         };
         /**
          * @example {
          *       "ids": [
-         *         "Quos iure veniam omnis et dolor.",
          *         "Quos iure veniam omnis et dolor.",
          *         "Quos iure veniam omnis et dolor.",
          *         "Quos iure veniam omnis et dolor."
@@ -29472,26 +30514,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Voluptatem non praesentium et.",
+         *       "ProductTierVersion": "Maiores deserunt.",
          *       "resourceId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "p"
+         *       "token": "yz"
          *     }
          */
         ListOutputParametersRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Eum et fugit qui vel minima.
+             * @example Autem facilis qui earum recusandae id.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Mollitia eaque corporis molestiae.
+             * @example Facilis voluptas quae odit fugiat dolor.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Architecto dignissimos temporibus aut.
+             * @example Nihil a accusantium consequatur quibusdam voluptas vel.
              */
             resourceId: string;
             /**
@@ -29501,7 +30543,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5y
+             * @example 3z
              */
             token: string;
         };
@@ -29512,6 +30554,41 @@ export interface components {
          *       ],
          *       "nextPageToken": "next-token",
          *       "outputParameters": [
+         *         {
+         *           "description": "Username of the user created in the target system",
+         *           "genericCommandValueProvider": {
+         *             "args": [
+         *               "-s",
+         *               "http://example.com/api/username"
+         *             ],
+         *             "command": "curl",
+         *             "environment": {
+         *               "PATH": "/usr/local/bin:/usr/bin:/bin"
+         *             },
+         *             "retryCount": 3,
+         *             "shell": "/bin/bash",
+         *             "timeout": 30,
+         *             "workingDir": "/tmp"
+         *           },
+         *           "id": "op-12345678",
+         *           "key": "username",
+         *           "kubectlValueProvider": {
+         *             "command": "get secret {{ $sys.id }}-creds -o jsonpath='{.data.username}'",
+         *             "context": "production",
+         *             "environment": {
+         *               "KUBECONFIG": "/path/to/config"
+         *             },
+         *             "namespace": "default",
+         *             "retryCount": 3,
+         *             "timeout": 30
+         *           },
+         *           "name": "Username",
+         *           "resourceId": "r-12345678",
+         *           "serviceId": "s-12345678",
+         *           "value": "johndoe",
+         *           "valueRef": "$var.username",
+         *           "valueType": "Boolean|Float64|String|Secret|Password"
+         *         },
          *         {
          *           "description": "Username of the user created in the target system",
          *           "genericCommandValueProvider": {
@@ -29670,6 +30747,76 @@ export interface components {
              *         "value": "johndoe",
              *         "valueRef": "$var.username",
              *         "valueType": "Boolean|Float64|String|Secret|Password"
+             *       },
+             *       {
+             *         "description": "Username of the user created in the target system",
+             *         "genericCommandValueProvider": {
+             *           "args": [
+             *             "-s",
+             *             "http://example.com/api/username"
+             *           ],
+             *           "command": "curl",
+             *           "environment": {
+             *             "PATH": "/usr/local/bin:/usr/bin:/bin"
+             *           },
+             *           "retryCount": 3,
+             *           "shell": "/bin/bash",
+             *           "timeout": 30,
+             *           "workingDir": "/tmp"
+             *         },
+             *         "id": "op-12345678",
+             *         "key": "username",
+             *         "kubectlValueProvider": {
+             *           "command": "get secret {{ $sys.id }}-creds -o jsonpath='{.data.username}'",
+             *           "context": "production",
+             *           "environment": {
+             *             "KUBECONFIG": "/path/to/config"
+             *           },
+             *           "namespace": "default",
+             *           "retryCount": 3,
+             *           "timeout": 30
+             *         },
+             *         "name": "Username",
+             *         "resourceId": "r-12345678",
+             *         "serviceId": "s-12345678",
+             *         "value": "johndoe",
+             *         "valueRef": "$var.username",
+             *         "valueType": "Boolean|Float64|String|Secret|Password"
+             *       },
+             *       {
+             *         "description": "Username of the user created in the target system",
+             *         "genericCommandValueProvider": {
+             *           "args": [
+             *             "-s",
+             *             "http://example.com/api/username"
+             *           ],
+             *           "command": "curl",
+             *           "environment": {
+             *             "PATH": "/usr/local/bin:/usr/bin:/bin"
+             *           },
+             *           "retryCount": 3,
+             *           "shell": "/bin/bash",
+             *           "timeout": 30,
+             *           "workingDir": "/tmp"
+             *         },
+             *         "id": "op-12345678",
+             *         "key": "username",
+             *         "kubectlValueProvider": {
+             *           "command": "get secret {{ $sys.id }}-creds -o jsonpath='{.data.username}'",
+             *           "context": "production",
+             *           "environment": {
+             *             "KUBECONFIG": "/path/to/config"
+             *           },
+             *           "namespace": "default",
+             *           "retryCount": 3,
+             *           "timeout": 30
+             *         },
+             *         "name": "Username",
+             *         "resourceId": "r-12345678",
+             *         "serviceId": "s-12345678",
+             *         "value": "johndoe",
+             *         "valueRef": "$var.username",
+             *         "valueType": "Boolean|Float64|String|Secret|Password"
              *       }
              *     ]
              */
@@ -29678,7 +30825,7 @@ export interface components {
         /**
          * @example {
          *       "serviceId": "s-12345678",
-         *       "token": "1"
+         *       "token": "i7"
          *     }
          */
         ListPipelinesRequest: {
@@ -29689,7 +30836,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 20
+             * @example 6yt
              */
             token: string;
         };
@@ -29721,7 +30868,7 @@ export interface components {
          * @example {
          *       "serviceId": "s-12345678",
          *       "serviceModelId": "sm-12345678",
-         *       "token": "krg"
+         *       "token": "11x"
          *     }
          */
         ListProductTiersRequest: {
@@ -29732,12 +30879,12 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Doloremque perspiciatis enim velit nobis.
+             * @example Culpa totam.
              */
             serviceModelId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ex
+             * @example x2
              */
             token: string;
         };
@@ -29757,6 +30904,7 @@ export interface components {
              * @description List of product tier IDs
              * @example [
              *       "Beatae beatae.",
+             *       "Beatae beatae.",
              *       "Beatae beatae."
              *     ]
              */
@@ -29774,7 +30922,7 @@ export interface components {
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
          *       "serviceModelId": "sm-12345678",
-         *       "token": "km2"
+         *       "token": "dd"
          *     }
          */
         ListRegionsRequest: {
@@ -29790,7 +30938,7 @@ export interface components {
             modelType?: string;
             /**
              * @description ID of a Product Tier
-             * @example Molestiae consectetur quas accusantium quam.
+             * @example Aut aut nam.
              */
             productTierId?: string;
             /**
@@ -29800,12 +30948,12 @@ export interface components {
             serviceId?: string;
             /**
              * @description ID of a Service Model
-             * @example Ad vero possimus velit at.
+             * @example Qui mollitia maiores.
              */
             serviceModelId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example mea
+             * @example gy1
              */
             token: string;
         };
@@ -29835,26 +30983,26 @@ export interface components {
         /**
          * @example {
          *       "ProductTierId": "Beatae beatae.",
-         *       "ProductTierVersion": "Id sed ea veritatis quam laborum mollitia.",
+         *       "ProductTierVersion": "Nisi nulla quod id.",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "3"
+         *       "token": "y"
          *     }
          */
         ListResourceCapabilitiesRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Eius sit fugit.
+             * @example Et tempora qui.
              */
             ProductTierId?: string;
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Suscipit dignissimos dolorem nobis expedita enim.
+             * @example Ratione et rem.
              */
             ProductTierVersion?: string;
             /**
              * @description ID of a resource
-             * @example Animi minima quod.
+             * @example Et aut magnam.
              */
             id: string;
             /**
@@ -29864,13 +31012,41 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example eh
+             * @example s76
              */
             token: string;
         };
         /**
          * @example {
          *       "capabilities": [
+         *         {
+         *           "capability": "SERVERLESS",
+         *           "configuration": {
+         *             "EnableAutoStop": true,
+         *             "MinimumNodesInPool": 5,
+         *             "PortsMappingProxyConfig": {
+         *               "MaxNumberOfClustersPerProxyInstance": 50,
+         *               "NumberOfPortsPerCluster": 4
+         *             },
+         *             "ProxyId": "r-123456",
+         *             "ReferenceProxyKey": "resource-proxy",
+         *             "TargetPort": 5432
+         *           }
+         *         },
+         *         {
+         *           "capability": "SERVERLESS",
+         *           "configuration": {
+         *             "EnableAutoStop": true,
+         *             "MinimumNodesInPool": 5,
+         *             "PortsMappingProxyConfig": {
+         *               "MaxNumberOfClustersPerProxyInstance": 50,
+         *               "NumberOfPortsPerCluster": 4
+         *             },
+         *             "ProxyId": "r-123456",
+         *             "ReferenceProxyKey": "resource-proxy",
+         *             "TargetPort": 5432
+         *           }
+         *         },
          *         {
          *           "capability": "SERVERLESS",
          *           "configuration": {
@@ -29933,6 +31109,34 @@ export interface components {
              *           "ReferenceProxyKey": "resource-proxy",
              *           "TargetPort": 5432
              *         }
+             *       },
+             *       {
+             *         "capability": "SERVERLESS",
+             *         "configuration": {
+             *           "EnableAutoStop": true,
+             *           "MinimumNodesInPool": 5,
+             *           "PortsMappingProxyConfig": {
+             *             "MaxNumberOfClustersPerProxyInstance": 50,
+             *             "NumberOfPortsPerCluster": 4
+             *           },
+             *           "ProxyId": "r-123456",
+             *           "ReferenceProxyKey": "resource-proxy",
+             *           "TargetPort": 5432
+             *         }
+             *       },
+             *       {
+             *         "capability": "SERVERLESS",
+             *         "configuration": {
+             *           "EnableAutoStop": true,
+             *           "MinimumNodesInPool": 5,
+             *           "PortsMappingProxyConfig": {
+             *             "MaxNumberOfClustersPerProxyInstance": 50,
+             *             "NumberOfPortsPerCluster": 4
+             *           },
+             *           "ProxyId": "r-123456",
+             *           "ReferenceProxyKey": "resource-proxy",
+             *           "TargetPort": 5432
+             *         }
              *       }
              *     ]
              */
@@ -29949,7 +31153,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "t6"
+         *       "token": "jzz"
          *     }
          */
         ListResourceInstanceSnapshotsRequest: {
@@ -29990,7 +31194,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Consectetur eius fuga voluptatum.
+             * @example Autem ratione dolore provident nobis.
              */
             serviceProviderId: string;
             /**
@@ -30000,7 +31204,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example n
+             * @example s
              */
             token: string;
         };
@@ -30048,7 +31252,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "q7o"
+         *       "token": "iw"
          *     }
          */
         ListResourceInstancesRequest: {
@@ -30084,7 +31288,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Optio dolores explicabo.
+             * @example Vel enim.
              */
             serviceProviderId: string;
             /**
@@ -30094,7 +31298,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example m7f
+             * @example hy
              */
             token: string;
         };
@@ -30124,17 +31328,17 @@ export interface components {
         };
         /**
          * @example {
-         *       "ProductTierVersion": "Autem libero laboriosam nihil et id.",
+         *       "ProductTierVersion": "Rerum earum eveniet recusandae.",
          *       "managed": false,
          *       "productTierId": "pt-12345678",
          *       "serviceId": "si-12345678",
-         *       "token": "t"
+         *       "token": "5"
          *     }
          */
         ListResourcesRequest: {
             /**
              * @description The product tier version of the infra config to describe. If not specified, the latest version is described.
-             * @example Qui facilis eius.
+             * @example Aut voluptatem expedita quisquam.
              */
             ProductTierVersion?: string;
             /**
@@ -30144,7 +31348,7 @@ export interface components {
             managed?: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Aperiam nesciunt nostrum ratione ut.
+             * @example Facilis mollitia qui necessitatibus dignissimos nemo similique.
              */
             productTierId: string;
             /**
@@ -30154,7 +31358,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example h
              */
             token: string;
         };
@@ -32462,461 +33666,6 @@ export interface components {
              *             "terraformPath": "/project1/tf"
              *           }
              *         }
-             *       },
-             *       {
-             *         "actionHooks": [
-             *           {
-             *             "command": "curl -v -X POST https://$HOSTNAME:8080/cluster/init",
-             *             "scope": "CLUSTER",
-             *             "type": "INIT"
-             *           }
-             *         ],
-             *         "additionalSecurityContext": {
-             *           "AddCapabilities": [
-             *             "CAP_NET_ADMIN",
-             *             "CAP_NET_RAW"
-             *           ],
-             *           "DropCapabilities": [
-             *             "CAP_NET_ADMIN",
-             *             "CAP_NET_RAW"
-             *           ],
-             *           "SupplementalGroupIDs": [
-             *             1001,
-             *             999
-             *           ]
-             *         },
-             *         "agentConfiguration": {
-             *           "codeInterpreter": {
-             *             "allowedPackages": [
-             *               "pandas",
-             *               "numpy",
-             *               "matplotlib"
-             *             ],
-             *             "enabled": true,
-             *             "provider": "agentcore",
-             *             "timeout": 60
-             *           },
-             *           "dockerfile": "Dockerfile",
-             *           "evaluations": [
-             *             {
-             *               "metrics": [
-             *                 "relevance",
-             *                 "helpfulness"
-             *               ],
-             *               "name": "response-quality",
-             *               "schedule": "every 6 hours"
-             *             }
-             *           ],
-             *           "memory": {
-             *             "enabled": true
-             *           },
-             *           "monitoring": {
-             *             "enabled": true
-             *           },
-             *           "vectorStore": {
-             *             "enabled": true
-             *           }
-             *         },
-             *         "backupConfiguration": {
-             *           "backupPeriodInHours": 24,
-             *           "backupRetentionInDays": 7
-             *         },
-             *         "blobStorageConfiguration": {
-             *           "GCSConfiguration": {},
-             *           "S3Configuration": {}
-             *         },
-             *         "capabilities": [
-             *           {
-             *             "capability": "SERVERLESS",
-             *             "configuration": {
-             *               "EnableAutoStop": true,
-             *               "MinimumNodesInPool": 5,
-             *               "PortsMappingProxyConfig": {
-             *                 "MaxNumberOfClustersPerProxyInstance": 50,
-             *                 "NumberOfPortsPerCluster": 4
-             *               },
-             *               "ProxyId": "r-123456",
-             *               "ReferenceProxyKey": "resource-proxy",
-             *               "TargetPort": 5432
-             *             }
-             *           },
-             *           {
-             *             "capability": "SERVERLESS",
-             *             "configuration": {
-             *               "EnableAutoStop": true,
-             *               "MinimumNodesInPool": 5,
-             *               "PortsMappingProxyConfig": {
-             *                 "MaxNumberOfClustersPerProxyInstance": 50,
-             *                 "NumberOfPortsPerCluster": 4
-             *               },
-             *               "ProxyId": "r-123456",
-             *               "ReferenceProxyKey": "resource-proxy",
-             *               "TargetPort": 5432
-             *             }
-             *           },
-             *           {
-             *             "capability": "SERVERLESS",
-             *             "configuration": {
-             *               "EnableAutoStop": true,
-             *               "MinimumNodesInPool": 5,
-             *               "PortsMappingProxyConfig": {
-             *                 "MaxNumberOfClustersPerProxyInstance": 50,
-             *                 "NumberOfPortsPerCluster": 4
-             *               },
-             *               "ProxyId": "r-123456",
-             *               "ReferenceProxyKey": "resource-proxy",
-             *               "TargetPort": 5432
-             *             }
-             *           }
-             *         ],
-             *         "containerImagesRegistryCopyConfiguration": {
-             *           "images": [
-             *             {
-             *               "imageName": "postgres",
-             *               "imageTag": "16"
-             *             },
-             *             {
-             *               "imageName": "postgres",
-             *               "imageTag": "16"
-             *             }
-             *           ],
-             *           "pullMode": "INSTALLER_EMBED|RUNTIME_PULL",
-             *           "pullSource": {
-             *             "credentials": {
-             *               "password": "my-password",
-             *               "username": "my-user"
-             *             },
-             *             "registryURL": "https://my-registry.com",
-             *             "repositoryName": "library"
-             *           },
-             *           "pushTarget": {
-             *             "credentials": {
-             *               "password": "my-password",
-             *               "username": "my-user"
-             *             },
-             *             "registryURL": "https://my-registry.com",
-             *             "repositoryName": "library"
-             *           }
-             *         },
-             *         "customLabels": {
-             *           "key": "value"
-             *         },
-             *         "customSysCTLs": {
-             *           "net.ipv4.tcp_syncookies": "1"
-             *         },
-             *         "customULimits": [
-             *           {
-             *             "ULimitsName": "NoProc",
-             *             "ULimitsType": "Soft",
-             *             "ULimitsValue": 1000
-             *           },
-             *           {
-             *             "ULimitsName": "NoFile",
-             *             "ULimitsType": "Hard",
-             *             "ULimitsValue": 2048
-             *           }
-             *         ],
-             *         "dependencies": [
-             *           {
-             *             "parameterMap": {
-             *               "clusterId": "writerId",
-             *               "clusterOrg": "userDatabase"
-             *             },
-             *             "resourceId": "r-12345678"
-             *           },
-             *           {
-             *             "parameterMap": {
-             *               "clusterId": "readerId",
-             *               "clusterOrg": "userDatabase"
-             *             },
-             *             "resourceId": "r-abcdef12"
-             *           }
-             *         ],
-             *         "description": "An resource to manage a hosted public SaaS offering of a multi-writer MySQL service",
-             *         "disable": "{{ $var.disableExtraComponents }}",
-             *         "environmentVariables": [
-             *           {
-             *             "name": "MYSQL_ROOT_PASSWORD",
-             *             "value": "password"
-             *           }
-             *         ],
-             *         "fileSystemConfiguration": {
-             *           "AzureFileShareConfiguration": {
-             *             "Redundancy": "LRS|ZRS|GRS|GZRS",
-             *             "ShareQuota": 1024,
-             *             "Tier": "Standard|Premium"
-             *           },
-             *           "EFSFileSystemConfiguration": {
-             *             "PerformanceMode": "generalPurpose|maxIO",
-             *             "ProvisionedThroughputInMibps": 125,
-             *             "ThroughputMode": "provisioned|bursting|elastic"
-             *           },
-             *           "GCPFilestoreConfiguration": {
-             *             "Capacity": "1024GiB",
-             *             "MaxIopsPerTb": 3000,
-             *             "Tier": "BASIC_HDD|BASIC_SSD|ENTERPRISE|REGIONAL|ZONAL"
-             *           }
-             *         },
-             *         "helmChartConfiguration": {
-             *           "autoDiscoverImagesTag": "omnistrate/images",
-             *           "chartName": "my-chart",
-             *           "chartRepoName": "my-repo",
-             *           "chartRepoUrl": "https://my-repo.com",
-             *           "chartValues": {
-             *             "key1": "value1",
-             *             "key2": 3,
-             *             "key3": {
-             *               "key4": "value4"
-             *             }
-             *           },
-             *           "chartVersion": "1.0.0",
-             *           "endpointConfiguration": {
-             *             "admin": {
-             *               "host": "https://{{ $sys.network.externalClusterEndpoint }}/admin",
-             *               "networkingType": "PRIVATE",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": false
-             *             },
-             *             "cluster": {
-             *               "host": "https://my-endpoint.com",
-             *               "networkingType": "PUBLIC",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": true
-             *             }
-             *           },
-             *           "layeredChartValues": [
-             *             {
-             *               "values": {
-             *                 "global": {
-             *                   "image": {
-             *                     "tag": "v1.0.0"
-             *                   },
-             *                   "replicaCount": 1,
-             *                   "resources": {
-             *                     "requests": {
-             *                       "cpu": "100m",
-             *                       "memory": "128Mi"
-             *                     }
-             *                   }
-             *                 }
-             *               }
-             *             },
-             *             {
-             *               "scope": {
-             *                 "{{ $sys.cloudProviderName }}": "aws"
-             *               },
-             *               "valuesFile": {
-             *                 "gitConfiguration": {
-             *                   "accessToken": "ghp_...",
-             *                   "commitSHA": "a1b2c3d4e5f6",
-             *                   "path": "aws/production.yaml",
-             *                   "referenceName": "refs/heads/main",
-             *                   "repositoryUrl": "https://github.com/org/helm-values"
-             *                 }
-             *               }
-             *             }
-             *           ],
-             *           "namespace": "postgres",
-             *           "password": "my-password",
-             *           "releaseName": "my-release",
-             *           "runtimeConfiguration": {
-             *             "disableHooks": true,
-             *             "recreate": true,
-             *             "resetThenReuseValues": true,
-             *             "resetValues": true,
-             *             "reuseValues": true,
-             *             "skipCRDs": true,
-             *             "timeoutNanos": 1000000000,
-             *             "upgradeCRDs": true,
-             *             "wait": true,
-             *             "waitForJobs": true
-             *           },
-             *           "username": "my-user"
-             *         },
-             *         "id": "r-12345678",
-             *         "imageConfigId": "imgc-12345678",
-             *         "infraConfigId": "ic-12345678",
-             *         "internal": true,
-             *         "isDeprecated": false,
-             *         "jobConfig": {
-             *           "activeDeadlineSeconds": 300,
-             *           "backoffLimit": 5
-             *         },
-             *         "key": "galera",
-             *         "kustomizeConfiguration": {
-             *           "disableReconciliation": false,
-             *           "endpointConfiguration": {
-             *             "admin": {
-             *               "host": "https://{{ $sys.network.externalClusterEndpoint }}/admin",
-             *               "networkingType": "PRIVATE",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": false
-             *             },
-             *             "cluster": {
-             *               "host": "https://my-endpoint.com",
-             *               "networkingType": "PUBLIC",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": true
-             *             }
-             *           },
-             *           "gitConfiguration": {
-             *             "accessToken": "my-token",
-             *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-             *             "referenceName": "tags/v1.0.0",
-             *             "repositoryUrl": "https://github.com/username/myrepo",
-             *             "userName": "my-user"
-             *           },
-             *           "helmChartDependencies": [
-             *             {
-             *               "chartName": "cert-manager",
-             *               "chartVersion": "v1.5.3"
-             *             },
-             *             {
-             *               "chartName": "nginx-ingress",
-             *               "chartVersion": "v0.48.1"
-             *             },
-             *             {
-             *               "chartName": "external-dns",
-             *               "chartVersion": "v0.7.0"
-             *             },
-             *             {
-             *               "chartName": "cnpg-operator",
-             *               "chartVersion": "v0.23.1"
-             *             }
-             *           ],
-             *           "kustomizePath": "/kustomize"
-             *         },
-             *         "l4LoadBalancerConfiguration": {
-             *           "ingressPortConfiguration": [
-             *             {
-             *               "associatedResourceIDs": [
-             *                 "r-12345678",
-             *                 "r-abcdef12"
-             *               ],
-             *               "backendPort": 8080,
-             *               "ingressPort": 1234
-             *             },
-             *             {
-             *               "associatedResourceIDs": [
-             *                 "r-12345678",
-             *                 "r-abcdef12"
-             *               ],
-             *               "backendPort": 8081,
-             *               "ingressPort": 5678
-             *             },
-             *             {
-             *               "associatedResourceIDs": [
-             *                 "r-vwxybz12",
-             *                 "r-poij122v"
-             *               ],
-             *               "backendPort": 8082,
-             *               "ingressPort": 9012
-             *             }
-             *           ]
-             *         },
-             *         "l7LoadBalancerConfiguration": {
-             *           "paths": [
-             *             {
-             *               "associatedResourceID": "r-12345678",
-             *               "path": "/path",
-             *               "port": 8080
-             *             }
-             *           ]
-             *         },
-             *         "name": "Galera",
-             *         "onPremTerraformConfigurations": {
-             *           "OpenShift": {
-             *             "gitConfiguration": {
-             *               "referenceName": "ref",
-             *               "repositoryUrl": "gitUrl"
-             *             },
-             *             "privateModuleGitAccessTokens": {
-             *               "tokenName": "accessToken"
-             *             },
-             *             "terraformPath": "/project1/tf"
-             *           }
-             *         },
-             *         "operatorCRDConfiguration": {
-             *           "disableReconciliation": false,
-             *           "endpointConfiguration": {
-             *             "admin": {
-             *               "host": "https://{{ $sys.network.externalClusterEndpoint }}/admin",
-             *               "networkingType": "PRIVATE",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": false
-             *             },
-             *             "cluster": {
-             *               "host": "https://my-endpoint.com",
-             *               "networkingType": "PUBLIC",
-             *               "ports": [
-             *                 8080,
-             *                 8081
-             *               ],
-             *               "primary": true
-             *             }
-             *           },
-             *           "helmChartDependencies": [
-             *             {
-             *               "chartName": "cert-manager",
-             *               "chartVersion": "v1.5.3"
-             *             },
-             *             {
-             *               "chartName": "nginx-ingress",
-             *               "chartVersion": "v0.48.1"
-             *             },
-             *             {
-             *               "chartName": "external-dns",
-             *               "chartVersion": "v0.7.0"
-             *             },
-             *             {
-             *               "chartName": "cnpg-operator",
-             *               "chartVersion": "v0.23.1"
-             *             }
-             *           ],
-             *           "outputParameters": {
-             *             "expiresAt": "$out.status.notAfter",
-             *             "issuerName": "letsencrypt-prod"
-             *           },
-             *           "readinessConditions": {
-             *             "$out.status.conditions[?(@.type=='Ready')].status": true
-             *           },
-             *           "supplementalFiles": [
-             *             "apiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-prod\nspec:\n  acme:\n    server: https://acme-v02.api.letsencrypt.org/directory\n",
-             *             "apiVersion: ingress.nginx.io/v1\nkind: IngressClass\nmetadata:\n  name: nginx\nspec:\n  controller: nginx.org/ingress-controller"
-             *           ],
-             *           "template": "apiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-prod\nspec:\n  acme:\n    server: https://acme-v02.api.letsencrypt.org/directory\n    email: test@example.com\n    privateKeySecretRef:\n      name: letsencrypt-prod\n    solvers:\n    - http01:\n        ingress:\n          class: nginx"
-             *         },
-             *         "productTierId": "pt-12345678",
-             *         "proxyType": "PortsBasedProxy",
-             *         "resourceType": "Generic",
-             *         "serviceId": "s-12345678",
-             *         "terraformConfigurations": {
-             *           "aws": {
-             *             "gitConfiguration": {
-             *               "referenceName": "ref",
-             *               "repositoryUrl": "gitUrl"
-             *             },
-             *             "privateModuleGitAccessTokens": {
-             *               "tokenName": "accessToken"
-             *             },
-             *             "terraformPath": "/project1/tf"
-             *           }
-             *         }
              *       }
              *     ]
              */
@@ -32924,27 +33673,19 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "cn"
+         *       "token": "dq"
          *     }
          */
         ListSaaSPortalCustomDomainsRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example z
+             * @example i1m
              */
             token: string;
         };
         /**
          * @example {
          *       "customDomains": [
-         *         {
-         *           "clusterEndpoint": "example.com",
-         *           "customDomain": "mycustomdomain.com",
-         *           "description": "My custom domain description",
-         *           "environmentType": "DEV",
-         *           "name": "MyCustomDomain",
-         *           "status": "READY"
-         *         },
          *         {
          *           "clusterEndpoint": "example.com",
          *           "customDomain": "mycustomdomain.com",
@@ -32999,14 +33740,6 @@ export interface components {
              *         "environmentType": "DEV",
              *         "name": "MyCustomDomain",
              *         "status": "READY"
-             *       },
-             *       {
-             *         "clusterEndpoint": "example.com",
-             *         "customDomain": "mycustomdomain.com",
-             *         "description": "My custom domain description",
-             *         "environmentType": "DEV",
-             *         "name": "MyCustomDomain",
-             *         "status": "READY"
              *       }
              *     ]
              */
@@ -33014,13 +33747,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "vu"
+         *       "token": "fo1"
          *     }
          */
         ListSaaSPortalsRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example bc
+             * @example c6
              */
             token: string;
         };
@@ -33296,7 +34029,7 @@ export interface components {
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "lr"
+         *       "token": "q"
          *     }
          */
         ListSecretsRequest: {
@@ -33307,13 +34040,18 @@ export interface components {
             environmentType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example c32
+             * @example 9ox
              */
             token: string;
         };
         /**
          * @example {
          *       "secrets": [
+         *         {
+         *           "environmentType": "DEV",
+         *           "name": "my-secret",
+         *           "value": "super-secret-value"
+         *         },
          *         {
          *           "environmentType": "DEV",
          *           "name": "my-secret",
@@ -33340,6 +34078,11 @@ export interface components {
              *         "environmentType": "DEV",
              *         "name": "my-secret",
              *         "value": "super-secret-value"
+             *       },
+             *       {
+             *         "environmentType": "DEV",
+             *         "name": "my-secret",
+             *         "value": "super-secret-value"
              *       }
              *     ]
              */
@@ -33349,7 +34092,7 @@ export interface components {
          * @example {
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "uin"
+         *       "token": "p89"
          *     }
          */
         ListServiceAPIsRequest: {
@@ -33365,7 +34108,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example dto
+             * @example bll
              */
             token: string;
         };
@@ -33394,7 +34137,7 @@ export interface components {
         /**
          * @example {
          *       "serviceId": "s-12345678",
-         *       "token": "l"
+         *       "token": "c2"
          *     }
          */
         ListServiceEnvironmentsRequest: {
@@ -33405,7 +34148,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example v
+             * @example q8
              */
             token: string;
         };
@@ -33437,13 +34180,13 @@ export interface components {
          * @example {
          *       "serviceApiId": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "fsn"
+         *       "token": "kar"
          *     }
          */
         ListServiceModelsRequest: {
             /**
              * @description ID of a Service API
-             * @example Esse veniam nulla sint distinctio veritatis.
+             * @example Ea sit aut omnis eum molestias hic.
              */
             serviceApiId: string;
             /**
@@ -33453,7 +34196,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example px2
+             * @example ff
              */
             token: string;
         };
@@ -33485,7 +34228,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "orgId": "org-12345678",
-         *       "token": "h",
+         *       "token": "x8u",
          *       "visibility": "PRIVATE"
          *     }
          */
@@ -33497,12 +34240,12 @@ export interface components {
             environmentType?: string;
             /**
              * @description ID of an Org
-             * @example Aliquam ipsum consequatur.
+             * @example Maiores distinctio quo earum nostrum dolor quia.
              */
             orgId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3w
+             * @example i
              */
             token: string;
             /**
@@ -33519,67 +34262,6 @@ export interface components {
          *         "s-abcdefgh"
          *       ],
          *       "services": [
-         *         {
-         *           "createdAt": "2019-01-01T00:00:00Z",
-         *           "isDeprecated": false,
-         *           "offerings": [
-         *             {
-         *               "allowCreatesWhenPaymentNotConfigured": true,
-         *               "assets": {
-         *                 "cloudFormationURL": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa",
-         *                 "cloudFormationURLNoLB": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa&param_CreateLoadBalancerPolicy=false"
-         *               },
-         *               "maxNumberOfInstances": 4,
-         *               "productTierName": "Premium",
-         *               "productTierURLKey": "premium",
-         *               "resourceParameters": [
-         *                 {
-         *                   "name": "MySQL",
-         *                   "urlKey": "mysql"
-         *                 },
-         *                 {
-         *                   "name": "Redis",
-         *                   "urlKey": "redis"
-         *                 }
-         *               ],
-         *               "serviceAPIID": "sa-12345678",
-         *               "serviceAPIVersion": "v1",
-         *               "serviceEnvironmentName": "Production",
-         *               "serviceEnvironmentURLKey": "prod",
-         *               "serviceEnvironmentVisibility": "PRIVATE",
-         *               "serviceModelName": "Bring Your Own Account",
-         *               "serviceModelURLKey": "byoa"
-         *             },
-         *             {
-         *               "productTierName": "Basic",
-         *               "productTierURLKey": "basic",
-         *               "resourceParameters": [
-         *                 {
-         *                   "name": "MySQL",
-         *                   "urlKey": "mysql"
-         *                 },
-         *                 {
-         *                   "name": "Redis",
-         *                   "urlKey": "redis"
-         *                 }
-         *               ],
-         *               "serviceAPIID": "sa-abcdefgh",
-         *               "serviceAPIVersion": "v1",
-         *               "serviceEnvironmentName": "Production",
-         *               "serviceEnvironmentURLKey": "prod",
-         *               "serviceEnvironmentVisibility": "PUBLIC",
-         *               "serviceModelName": "Hosted",
-         *               "serviceModelURLKey": "hosted"
-         *             }
-         *           ],
-         *           "serviceDescription": "MySQL is a relational database",
-         *           "serviceId": "s-12345678",
-         *           "serviceName": "MySQL",
-         *           "serviceOrgId": "org-12345678",
-         *           "serviceProviderId": "sp-9zrg9W8Are",
-         *           "serviceProviderName": "Omnistrate, Inc.",
-         *           "serviceURLKey": "mysql"
-         *         },
          *         {
          *           "createdAt": "2019-01-01T00:00:00Z",
          *           "isDeprecated": false,
@@ -33855,7 +34537,7 @@ export interface components {
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
          *       "skipHasPendingChangesCheck": false,
-         *       "token": "gx"
+         *       "token": "n"
          *     }
          */
         ListServicePlansRequest: {
@@ -33887,7 +34569,7 @@ export interface components {
             skipHasPendingChangesCheck?: boolean;
             /**
              * @description JWT token used to perform authorization
-             * @example y8
+             * @example g
              */
             token: string;
         };
@@ -33895,6 +34577,152 @@ export interface components {
          * @example {
          *       "nextPageToken": "next-token",
          *       "servicePlans": [
+         *         {
+         *           "AutoApproveSubscription": false,
+         *           "accountConfigIds": [
+         *             "ac-12345678",
+         *             "ac-23456789"
+         *           ],
+         *           "activeAccountConfigIds": {
+         *             "aws": "ac-12345678",
+         *             "gcp": "ac-23456789"
+         *           },
+         *           "apiVersion": "v1",
+         *           "awsRegions": [
+         *             "us-east-2",
+         *             "ca-central-1"
+         *           ],
+         *           "azureRegions": [
+         *             "northcentralus"
+         *           ],
+         *           "deploymentConfigId": "dc-12345678",
+         *           "gcpRegions": [
+         *             "us-central1"
+         *           ],
+         *           "hasPendingChanges": true,
+         *           "isProductTierDisabled": true,
+         *           "latestMajorVersion": "3.0",
+         *           "modelType": "CUSTOMER_HOSTED",
+         *           "ociRegions": [
+         *             "us-sanjose-1"
+         *           ],
+         *           "onPremPlatforms": [
+         *             "EKS",
+         *             "Generic"
+         *           ],
+         *           "privateRegions": [
+         *             "n/a"
+         *           ],
+         *           "productTierDescription": "A premium product tier",
+         *           "productTierDocumentation": "Any documentation",
+         *           "productTierFeatures": {
+         *             "LOGS": true,
+         *             "METRICS": false
+         *           },
+         *           "productTierId": "pt-12345678",
+         *           "productTierKey": "premium",
+         *           "productTierName": "Premium",
+         *           "productTierPlanDescription": "A premium plan",
+         *           "productTierPricing": {
+         *             "price1": "value1"
+         *           },
+         *           "productTierSupport": "Any support",
+         *           "serviceApiDescription": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
+         *           "serviceApiId": "sa-12345678",
+         *           "serviceEnvironmentId": "se-12345678",
+         *           "serviceModelDescription": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
+         *           "serviceModelFeatures": [
+         *             {
+         *               "configuration": {
+         *                 "status": "ON"
+         *               },
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *             },
+         *             {
+         *               "configuration": {
+         *                 "status": "ON"
+         *               },
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *             }
+         *           ],
+         *           "serviceModelId": "sm-12345678",
+         *           "serviceModelName": "MySQL multi-writer service hosted model",
+         *           "tierType": "OMNISTRATE_DEDICATED_TENANCY",
+         *           "versionSetStatus": "Preferred|Active|Deprecated|Pending"
+         *         },
+         *         {
+         *           "AutoApproveSubscription": false,
+         *           "accountConfigIds": [
+         *             "ac-12345678",
+         *             "ac-23456789"
+         *           ],
+         *           "activeAccountConfigIds": {
+         *             "aws": "ac-12345678",
+         *             "gcp": "ac-23456789"
+         *           },
+         *           "apiVersion": "v1",
+         *           "awsRegions": [
+         *             "us-east-2",
+         *             "ca-central-1"
+         *           ],
+         *           "azureRegions": [
+         *             "northcentralus"
+         *           ],
+         *           "deploymentConfigId": "dc-12345678",
+         *           "gcpRegions": [
+         *             "us-central1"
+         *           ],
+         *           "hasPendingChanges": true,
+         *           "isProductTierDisabled": true,
+         *           "latestMajorVersion": "3.0",
+         *           "modelType": "CUSTOMER_HOSTED",
+         *           "ociRegions": [
+         *             "us-sanjose-1"
+         *           ],
+         *           "onPremPlatforms": [
+         *             "EKS",
+         *             "Generic"
+         *           ],
+         *           "privateRegions": [
+         *             "n/a"
+         *           ],
+         *           "productTierDescription": "A premium product tier",
+         *           "productTierDocumentation": "Any documentation",
+         *           "productTierFeatures": {
+         *             "LOGS": true,
+         *             "METRICS": false
+         *           },
+         *           "productTierId": "pt-12345678",
+         *           "productTierKey": "premium",
+         *           "productTierName": "Premium",
+         *           "productTierPlanDescription": "A premium plan",
+         *           "productTierPricing": {
+         *             "price1": "value1"
+         *           },
+         *           "productTierSupport": "Any support",
+         *           "serviceApiDescription": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
+         *           "serviceApiId": "sa-12345678",
+         *           "serviceEnvironmentId": "se-12345678",
+         *           "serviceModelDescription": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
+         *           "serviceModelFeatures": [
+         *             {
+         *               "configuration": {
+         *                 "status": "ON"
+         *               },
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *             },
+         *             {
+         *               "configuration": {
+         *                 "status": "ON"
+         *               },
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *             }
+         *           ],
+         *           "serviceModelId": "sm-12345678",
+         *           "serviceModelName": "MySQL multi-writer service hosted model",
+         *           "tierType": "OMNISTRATE_DEDICATED_TENANCY",
+         *           "versionSetStatus": "Preferred|Active|Deprecated|Pending"
+         *         },
          *         {
          *           "AutoApproveSubscription": false,
          *           "accountConfigIds": [
@@ -34198,152 +35026,6 @@ export interface components {
              *         "serviceModelName": "MySQL multi-writer service hosted model",
              *         "tierType": "OMNISTRATE_DEDICATED_TENANCY",
              *         "versionSetStatus": "Preferred|Active|Deprecated|Pending"
-             *       },
-             *       {
-             *         "AutoApproveSubscription": false,
-             *         "accountConfigIds": [
-             *           "ac-12345678",
-             *           "ac-23456789"
-             *         ],
-             *         "activeAccountConfigIds": {
-             *           "aws": "ac-12345678",
-             *           "gcp": "ac-23456789"
-             *         },
-             *         "apiVersion": "v1",
-             *         "awsRegions": [
-             *           "us-east-2",
-             *           "ca-central-1"
-             *         ],
-             *         "azureRegions": [
-             *           "northcentralus"
-             *         ],
-             *         "deploymentConfigId": "dc-12345678",
-             *         "gcpRegions": [
-             *           "us-central1"
-             *         ],
-             *         "hasPendingChanges": true,
-             *         "isProductTierDisabled": true,
-             *         "latestMajorVersion": "3.0",
-             *         "modelType": "CUSTOMER_HOSTED",
-             *         "ociRegions": [
-             *           "us-sanjose-1"
-             *         ],
-             *         "onPremPlatforms": [
-             *           "EKS",
-             *           "Generic"
-             *         ],
-             *         "privateRegions": [
-             *           "n/a"
-             *         ],
-             *         "productTierDescription": "A premium product tier",
-             *         "productTierDocumentation": "Any documentation",
-             *         "productTierFeatures": {
-             *           "LOGS": true,
-             *           "METRICS": false
-             *         },
-             *         "productTierId": "pt-12345678",
-             *         "productTierKey": "premium",
-             *         "productTierName": "Premium",
-             *         "productTierPlanDescription": "A premium plan",
-             *         "productTierPricing": {
-             *           "price1": "value1"
-             *         },
-             *         "productTierSupport": "Any support",
-             *         "serviceApiDescription": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
-             *         "serviceApiId": "sa-12345678",
-             *         "serviceEnvironmentId": "se-12345678",
-             *         "serviceModelDescription": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
-             *         "serviceModelFeatures": [
-             *           {
-             *             "configuration": {
-             *               "status": "ON"
-             *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "status": "ON"
-             *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *           }
-             *         ],
-             *         "serviceModelId": "sm-12345678",
-             *         "serviceModelName": "MySQL multi-writer service hosted model",
-             *         "tierType": "OMNISTRATE_DEDICATED_TENANCY",
-             *         "versionSetStatus": "Preferred|Active|Deprecated|Pending"
-             *       },
-             *       {
-             *         "AutoApproveSubscription": false,
-             *         "accountConfigIds": [
-             *           "ac-12345678",
-             *           "ac-23456789"
-             *         ],
-             *         "activeAccountConfigIds": {
-             *           "aws": "ac-12345678",
-             *           "gcp": "ac-23456789"
-             *         },
-             *         "apiVersion": "v1",
-             *         "awsRegions": [
-             *           "us-east-2",
-             *           "ca-central-1"
-             *         ],
-             *         "azureRegions": [
-             *           "northcentralus"
-             *         ],
-             *         "deploymentConfigId": "dc-12345678",
-             *         "gcpRegions": [
-             *           "us-central1"
-             *         ],
-             *         "hasPendingChanges": true,
-             *         "isProductTierDisabled": true,
-             *         "latestMajorVersion": "3.0",
-             *         "modelType": "CUSTOMER_HOSTED",
-             *         "ociRegions": [
-             *           "us-sanjose-1"
-             *         ],
-             *         "onPremPlatforms": [
-             *           "EKS",
-             *           "Generic"
-             *         ],
-             *         "privateRegions": [
-             *           "n/a"
-             *         ],
-             *         "productTierDescription": "A premium product tier",
-             *         "productTierDocumentation": "Any documentation",
-             *         "productTierFeatures": {
-             *           "LOGS": true,
-             *           "METRICS": false
-             *         },
-             *         "productTierId": "pt-12345678",
-             *         "productTierKey": "premium",
-             *         "productTierName": "Premium",
-             *         "productTierPlanDescription": "A premium plan",
-             *         "productTierPricing": {
-             *           "price1": "value1"
-             *         },
-             *         "productTierSupport": "Any support",
-             *         "serviceApiDescription": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
-             *         "serviceApiId": "sa-12345678",
-             *         "serviceEnvironmentId": "se-12345678",
-             *         "serviceModelDescription": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
-             *         "serviceModelFeatures": [
-             *           {
-             *             "configuration": {
-             *               "status": "ON"
-             *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *           },
-             *           {
-             *             "configuration": {
-             *               "status": "ON"
-             *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *           }
-             *         ],
-             *         "serviceModelId": "sm-12345678",
-             *         "serviceModelName": "MySQL multi-writer service hosted model",
-             *         "tierType": "OMNISTRATE_DEDICATED_TENANCY",
-             *         "versionSetStatus": "Preferred|Active|Deprecated|Pending"
              *       }
              *     ]
              */
@@ -34355,6 +35037,8 @@ export interface components {
          *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
          *       "eventTypes": [
          *         "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
+         *         "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
+         *         "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
          *         "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription"
          *       ],
          *       "instanceID": "instance-12345678",
@@ -34364,7 +35048,7 @@ export interface components {
          *       "serviceEnvironmentID": "se-123456",
          *       "serviceID": "s-123456",
          *       "startDate": "2023-01-01T10:00:00Z",
-         *       "token": "hm"
+         *       "token": "5so"
          *     }
          */
         ListServiceProviderEvents: {
@@ -34382,6 +35066,8 @@ export interface components {
             /**
              * @description The event types to filter by
              * @example [
+             *       "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
+             *       "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
              *       "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription",
              *       "UnhealthyInstance|FailedDeployment|ScaleOut|UserSignUp|UserSubscription"
              *     ]
@@ -34405,7 +35091,7 @@ export interface components {
             pageSize?: number;
             /**
              * @description ID of a Product Tier
-             * @example Rerum dolores laboriosam consequatur fugiat laborum.
+             * @example Nobis placeat eaque sequi ut.
              */
             productTierID?: string;
             /**
@@ -34426,7 +35112,7 @@ export interface components {
             startDate?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example ep3
              */
             token: string;
         };
@@ -34438,8 +35124,9 @@ export interface components {
          *           "eventCategory": "InstanceEvent",
          *           "eventID": "e-123456",
          *           "eventPayload": {
-         *             "Aut voluptatem et rem vitae iste.": "Id eos omnis blanditiis ea sit.",
-         *             "Omnis eum molestias hic ut.": "Omnis sed excepturi aliquid blanditiis est velit."
+         *             "A aliquid libero sit dolores.": "Saepe ut saepe nulla eaque.",
+         *             "Consectetur distinctio odio magnam temporibus nemo est.": "Ipsa dolorem.",
+         *             "Ex blanditiis alias et et.": "Nesciunt ut sed."
          *           },
          *           "eventType": "UnhealthyInstance",
          *           "expiryTime": "2023-01-10T00:00:00Z",
@@ -34459,8 +35146,9 @@ export interface components {
          *           "eventCategory": "InstanceEvent",
          *           "eventID": "e-123456",
          *           "eventPayload": {
-         *             "Aut voluptatem et rem vitae iste.": "Id eos omnis blanditiis ea sit.",
-         *             "Omnis eum molestias hic ut.": "Omnis sed excepturi aliquid blanditiis est velit."
+         *             "A aliquid libero sit dolores.": "Saepe ut saepe nulla eaque.",
+         *             "Consectetur distinctio odio magnam temporibus nemo est.": "Ipsa dolorem.",
+         *             "Ex blanditiis alias et et.": "Nesciunt ut sed."
          *           },
          *           "eventType": "UnhealthyInstance",
          *           "expiryTime": "2023-01-10T00:00:00Z",
@@ -34494,8 +35182,9 @@ export interface components {
              *         "eventCategory": "InstanceEvent",
              *         "eventID": "e-123456",
              *         "eventPayload": {
-             *           "Aut voluptatem et rem vitae iste.": "Id eos omnis blanditiis ea sit.",
-             *           "Omnis eum molestias hic ut.": "Omnis sed excepturi aliquid blanditiis est velit."
+             *           "A aliquid libero sit dolores.": "Saepe ut saepe nulla eaque.",
+             *           "Consectetur distinctio odio magnam temporibus nemo est.": "Ipsa dolorem.",
+             *           "Ex blanditiis alias et et.": "Nesciunt ut sed."
              *         },
              *         "eventType": "UnhealthyInstance",
              *         "expiryTime": "2023-01-10T00:00:00Z",
@@ -34515,8 +35204,9 @@ export interface components {
              *         "eventCategory": "InstanceEvent",
              *         "eventID": "e-123456",
              *         "eventPayload": {
-             *           "Aut voluptatem et rem vitae iste.": "Id eos omnis blanditiis ea sit.",
-             *           "Omnis eum molestias hic ut.": "Omnis sed excepturi aliquid blanditiis est velit."
+             *           "A aliquid libero sit dolores.": "Saepe ut saepe nulla eaque.",
+             *           "Consectetur distinctio odio magnam temporibus nemo est.": "Ipsa dolorem.",
+             *           "Ex blanditiis alias et et.": "Nesciunt ut sed."
              *         },
              *         "eventType": "UnhealthyInstance",
              *         "expiryTime": "2023-01-10T00:00:00Z",
@@ -34550,6 +35240,127 @@ export interface components {
          *       ],
          *       "nextPageToken": "next-token",
          *       "services": [
+         *         {
+         *           "createdAt": "2019-01-01T00:00:00Z",
+         *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *           "id": "s-12345678",
+         *           "key": "mysql",
+         *           "name": "MySQL multi-writer service",
+         *           "roleType": "admin",
+         *           "serviceEnvironments": [
+         *             {
+         *               "id": "se-12345678",
+         *               "name": "dev",
+         *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+         *               "saasPortalStatus": "READY",
+         *               "saasPortalUrl": "https://saas-portal.example.com",
+         *               "servicePlans": [
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 },
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 }
+         *               ],
+         *               "sourceEnvironmentID": "se-12345678",
+         *               "sourceEnvironmentName": "dev",
+         *               "type": "DEV",
+         *               "visibility": "private"
+         *             },
+         *             {
+         *               "id": "se-12345678",
+         *               "name": "dev",
+         *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+         *               "saasPortalStatus": "READY",
+         *               "saasPortalUrl": "https://saas-portal.example.com",
+         *               "servicePlans": [
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 },
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 }
+         *               ],
+         *               "sourceEnvironmentID": "se-12345678",
+         *               "sourceEnvironmentName": "dev",
+         *               "type": "DEV",
+         *               "visibility": "private"
+         *             },
+         *             {
+         *               "id": "se-12345678",
+         *               "name": "dev",
+         *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+         *               "saasPortalStatus": "READY",
+         *               "saasPortalUrl": "https://saas-portal.example.com",
+         *               "servicePlans": [
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 },
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 }
+         *               ],
+         *               "sourceEnvironmentID": "se-12345678",
+         *               "sourceEnvironmentName": "dev",
+         *               "type": "DEV",
+         *               "visibility": "private"
+         *             },
+         *             {
+         *               "id": "se-12345678",
+         *               "name": "dev",
+         *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+         *               "saasPortalStatus": "READY",
+         *               "saasPortalUrl": "https://saas-portal.example.com",
+         *               "servicePlans": [
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 },
+         *                 {
+         *                   "description": "A Basic product tier",
+         *                   "modelType": "CUSTOMER_HOSTED",
+         *                   "name": "Basic",
+         *                   "productTierID": "pt-12345678",
+         *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *                 }
+         *               ],
+         *               "sourceEnvironmentID": "se-12345678",
+         *               "sourceEnvironmentName": "dev",
+         *               "type": "DEV",
+         *               "visibility": "private"
+         *             }
+         *           ],
+         *           "serviceLogoURL": "Deleniti et enim autem sunt.",
+         *           "serviceProviderID": "sp-12345678",
+         *           "serviceProviderName": "Omnistrate, Inc."
+         *         },
          *         {
          *           "createdAt": "2019-01-01T00:00:00Z",
          *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
@@ -35182,71 +35993,19 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "pc"
+         *       "token": "n"
          *     }
          */
         ListServicesOrchestrationsRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example b1
+             * @example crf
              */
             token: string;
         };
         /**
          * @description List of service orchestrations
          * @example [
-         *       {
-         *         "ServicesTopology": [
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Neque sed id magnam."
-         *           },
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Neque sed id magnam."
-         *           },
-         *           {
-         *             "dependsOnDeployment": [
-         *               "instanceDeploymentAlias1",
-         *               "instanceDeploymentAlias2"
-         *             ],
-         *             "failedReason": "Invalid inputs",
-         *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-         *             "instanceId": "i-12345678",
-         *             "serviceId": "s-12345678",
-         *             "status": "PENDING",
-         *             "statusMessage": "Creating deployment",
-         *             "subscriptionId": "Neque sed id magnam."
-         *           }
-         *         ],
-         *         "createdAt": "2021-01-01T00:00:00Z",
-         *         "id": "so-12345678",
-         *         "orchestrationFailedReason": "Invalid DSL",
-         *         "resultParams": {
-         *           "param1": "value1",
-         *           "param2": "value2"
-         *         },
-         *         "status": "PENDING",
-         *         "updatedAt": "2021-01-01T00:00:00Z"
-         *       },
          *       {
          *         "ServicesTopology": [
          *           {
@@ -35358,7 +36117,7 @@ export interface components {
          * @example {
          *       "managed": false,
          *       "serviceId": "s-12345678",
-         *       "token": "84"
+         *       "token": "8"
          *     }
          */
         ListStorageConfigsRequest: {
@@ -35374,7 +36133,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example caj
              */
             token: string;
         };
@@ -35404,7 +36163,7 @@ export interface components {
          * @example {
          *       "managed": false,
          *       "serviceId": "s-12345678",
-         *       "token": "7pq"
+         *       "token": "030"
          *     }
          */
         ListStorageVolumeConfigsRequest: {
@@ -35420,7 +36179,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example f
+             * @example kl
              */
             token: string;
         };
@@ -35449,7 +36208,7 @@ export interface components {
         /**
          * @example {
          *       "status": "PENDING",
-         *       "token": "o9"
+         *       "token": "8"
          *     }
          */
         ListSubscriptionRequestsRequest: {
@@ -35460,7 +36219,7 @@ export interface components {
             status?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example dv
+             * @example 7u
              */
             token: string;
         };
@@ -35482,7 +36241,7 @@ export interface components {
          *           "rootUserId": "org-12345678",
          *           "rootUserName": "John Doe",
          *           "serviceId": "s-12345678",
-         *           "serviceLogoURL": "Necessitatibus sit sit.",
+         *           "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
          *           "serviceName": "MySQL multi-writer service",
          *           "status": "PENDING",
          *           "updatedAt": "2019-01-01T00:00:00Z",
@@ -35498,7 +36257,7 @@ export interface components {
          *           "rootUserId": "org-12345678",
          *           "rootUserName": "John Doe",
          *           "serviceId": "s-12345678",
-         *           "serviceLogoURL": "Necessitatibus sit sit.",
+         *           "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
          *           "serviceName": "MySQL multi-writer service",
          *           "status": "PENDING",
          *           "updatedAt": "2019-01-01T00:00:00Z",
@@ -35514,7 +36273,7 @@ export interface components {
          *           "rootUserId": "org-12345678",
          *           "rootUserName": "John Doe",
          *           "serviceId": "s-12345678",
-         *           "serviceLogoURL": "Necessitatibus sit sit.",
+         *           "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
          *           "serviceName": "MySQL multi-writer service",
          *           "status": "PENDING",
          *           "updatedAt": "2019-01-01T00:00:00Z",
@@ -35551,7 +36310,7 @@ export interface components {
              *         "rootUserId": "org-12345678",
              *         "rootUserName": "John Doe",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Necessitatibus sit sit.",
+             *         "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
              *         "serviceName": "MySQL multi-writer service",
              *         "status": "PENDING",
              *         "updatedAt": "2019-01-01T00:00:00Z",
@@ -35567,7 +36326,7 @@ export interface components {
              *         "rootUserId": "org-12345678",
              *         "rootUserName": "John Doe",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Necessitatibus sit sit.",
+             *         "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
              *         "serviceName": "MySQL multi-writer service",
              *         "status": "PENDING",
              *         "updatedAt": "2019-01-01T00:00:00Z",
@@ -35583,7 +36342,7 @@ export interface components {
              *         "rootUserId": "org-12345678",
              *         "rootUserName": "John Doe",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Necessitatibus sit sit.",
+             *         "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
              *         "serviceName": "MySQL multi-writer service",
              *         "status": "PENDING",
              *         "updatedAt": "2019-01-01T00:00:00Z",
@@ -35599,7 +36358,7 @@ export interface components {
              *         "rootUserId": "org-12345678",
              *         "rootUserName": "John Doe",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Necessitatibus sit sit.",
+             *         "serviceLogoURL": "Et ratione nihil ipsa sed totam est.",
              *         "serviceName": "MySQL multi-writer service",
              *         "status": "PENDING",
              *         "updatedAt": "2019-01-01T00:00:00Z",
@@ -35614,7 +36373,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "serviceId": "service-12345678",
-         *       "token": "4x"
+         *       "token": "4"
          *     }
          */
         ListSubscriptionsRequest: {
@@ -35630,7 +36389,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example t
              */
             token: string;
         };
@@ -35663,7 +36422,7 @@ export interface components {
          *           "rootUserOrgId": "org-12345678",
          *           "rootUserOrgName": "Example Inc.",
          *           "serviceId": "s-12345678",
-         *           "serviceLogoURL": "Nobis aut et ullam.",
+         *           "serviceLogoURL": "Temporibus nostrum.",
          *           "serviceName": "MySQL multi-writer service",
          *           "serviceOrgId": "org-12345678",
          *           "serviceOrgName": "Omnistrate",
@@ -35690,7 +36449,7 @@ export interface components {
          *           "rootUserOrgId": "org-12345678",
          *           "rootUserOrgName": "Example Inc.",
          *           "serviceId": "s-12345678",
-         *           "serviceLogoURL": "Nobis aut et ullam.",
+         *           "serviceLogoURL": "Temporibus nostrum.",
          *           "serviceName": "MySQL multi-writer service",
          *           "serviceOrgId": "org-12345678",
          *           "serviceOrgName": "Omnistrate",
@@ -35738,7 +36497,7 @@ export interface components {
              *         "rootUserOrgId": "org-12345678",
              *         "rootUserOrgName": "Example Inc.",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Nobis aut et ullam.",
+             *         "serviceLogoURL": "Temporibus nostrum.",
              *         "serviceName": "MySQL multi-writer service",
              *         "serviceOrgId": "org-12345678",
              *         "serviceOrgName": "Omnistrate",
@@ -35765,7 +36524,61 @@ export interface components {
              *         "rootUserOrgId": "org-12345678",
              *         "rootUserOrgName": "Example Inc.",
              *         "serviceId": "s-12345678",
-             *         "serviceLogoURL": "Nobis aut et ullam.",
+             *         "serviceLogoURL": "Temporibus nostrum.",
+             *         "serviceName": "MySQL multi-writer service",
+             *         "serviceOrgId": "org-12345678",
+             *         "serviceOrgName": "Omnistrate",
+             *         "status": "ACTIVE",
+             *         "subscriptionOwnerName": "John Doe"
+             *       },
+             *       {
+             *         "accountConfigIdentityId": "org-12345678",
+             *         "allowCreatesWhenPaymentNotConfigured": true,
+             *         "cloudProviderNames": [
+             *           "aws",
+             *           "gcp"
+             *         ],
+             *         "createdAt": "2019-01-01T00:00:00Z",
+             *         "defaultSubscription": true,
+             *         "id": "sub-12345678",
+             *         "maxNumberOfInstances": 10,
+             *         "paymentMethodConfigured": true,
+             *         "productTierId": "pt-12345678",
+             *         "productTierName": "Omnistrate Multi Tenancy",
+             *         "roleType": "root",
+             *         "rootUserId": "user-12345678",
+             *         "rootUserName": "John Doe",
+             *         "rootUserOrgId": "org-12345678",
+             *         "rootUserOrgName": "Example Inc.",
+             *         "serviceId": "s-12345678",
+             *         "serviceLogoURL": "Temporibus nostrum.",
+             *         "serviceName": "MySQL multi-writer service",
+             *         "serviceOrgId": "org-12345678",
+             *         "serviceOrgName": "Omnistrate",
+             *         "status": "ACTIVE",
+             *         "subscriptionOwnerName": "John Doe"
+             *       },
+             *       {
+             *         "accountConfigIdentityId": "org-12345678",
+             *         "allowCreatesWhenPaymentNotConfigured": true,
+             *         "cloudProviderNames": [
+             *           "aws",
+             *           "gcp"
+             *         ],
+             *         "createdAt": "2019-01-01T00:00:00Z",
+             *         "defaultSubscription": true,
+             *         "id": "sub-12345678",
+             *         "maxNumberOfInstances": 10,
+             *         "paymentMethodConfigured": true,
+             *         "productTierId": "pt-12345678",
+             *         "productTierName": "Omnistrate Multi Tenancy",
+             *         "roleType": "root",
+             *         "rootUserId": "user-12345678",
+             *         "rootUserName": "John Doe",
+             *         "rootUserOrgId": "org-12345678",
+             *         "rootUserOrgName": "Example Inc.",
+             *         "serviceId": "s-12345678",
+             *         "serviceLogoURL": "Temporibus nostrum.",
              *         "serviceName": "MySQL multi-writer service",
              *         "serviceOrgId": "org-12345678",
              *         "serviceOrgName": "Omnistrate",
@@ -35780,13 +36593,13 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "c"
+         *       "token": "n76"
          *     }
          */
         ListTierVersionSetSpecsRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Laudantium ipsa magni omnis eos accusamus voluptate.
+             * @example Sequi recusandae et quam mollitia.
              */
             productTierId: string;
             /**
@@ -35796,22 +36609,13 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 49
+             * @example 5
              */
             token: string;
         };
         /**
          * @example {
          *       "specs": [
-         *         {
-         *           "createdAt": "1999-11-05T01:30:37Z",
-         *           "hasSpecFile": true,
-         *           "productTierId": "Beatae beatae.",
-         *           "serviceId": "s-12345678",
-         *           "status": "Active",
-         *           "updatedAt": "2003-04-10T08:31:23Z",
-         *           "version": "1.0"
-         *         },
          *         {
          *           "createdAt": "1999-11-05T01:30:37Z",
          *           "hasSpecFile": true,
@@ -35876,7 +36680,7 @@ export interface components {
          *       "pageSize": 10,
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "6"
+         *       "token": "u"
          *     }
          */
         ListTierVersionSetsRequest: {
@@ -35903,7 +36707,7 @@ export interface components {
             pageSize?: number;
             /**
              * @description ID of a Product Tier
-             * @example Ea assumenda molestias quod quos voluptatem.
+             * @example Et qui.
              */
             productTierId: string;
             /**
@@ -35913,7 +36717,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example s
+             * @example b6
              */
             token: string;
         };
@@ -36388,6 +37192,82 @@ export interface components {
              *         "type": "Major|Incremental|UserDefined",
              *         "updatedAt": "2020-01-01T00:00:00Z",
              *         "version": "3.0"
+             *       },
+             *       {
+             *         "autoApproveSubscription": false,
+             *         "baseVersion": "3.0",
+             *         "createdAt": "2020-01-01T00:00:00Z",
+             *         "createdBy": "John Doe",
+             *         "description": "Facilis officia placeat autem.",
+             *         "enabledFeatures": [
+             *           {
+             *             "configuration": {
+             *               "provider": "native"
+             *             },
+             *             "feature": "LOGS",
+             *             "scope": "INTERNAL"
+             *           },
+             *           {
+             *             "configuration": {
+             *               "provider": "native"
+             *             },
+             *             "feature": "LOGS",
+             *             "scope": "INTERNAL"
+             *           },
+             *           {
+             *             "configuration": {
+             *               "provider": "native"
+             *             },
+             *             "feature": "LOGS",
+             *             "scope": "INTERNAL"
+             *           },
+             *           {
+             *             "configuration": {
+             *               "provider": "native"
+             *             },
+             *             "feature": "LOGS",
+             *             "scope": "INTERNAL"
+             *           }
+             *         ],
+             *         "features": {
+             *           "LOGS": true,
+             *           "METRICS": false
+             *         },
+             *         "instanceCount": 12,
+             *         "latestUpgradePathId": "upgrade-12345678",
+             *         "name": "Regular version set",
+             *         "parentVersion": "2.0",
+             *         "productTierId": "Beatae beatae.",
+             *         "releasedAt": "2020-01-01T00:00:00Z",
+             *         "releasedBy": "John Doe",
+             *         "resources": [
+             *           {
+             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+             *             "id": "r-12345678",
+             *             "imageConfigId": "imgc-12345678",
+             *             "infraConfigId": "ic-12345678",
+             *             "isExternal": true,
+             *             "managedResourceType": "PortsBasedProxy",
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
+             *           },
+             *           {
+             *             "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+             *             "id": "r-12345678",
+             *             "imageConfigId": "imgc-12345678",
+             *             "infraConfigId": "ic-12345678",
+             *             "isExternal": true,
+             *             "managedResourceType": "PortsBasedProxy",
+             *             "name": "MySQL multi-writer service",
+             *             "urlKey": "myResource"
+             *           }
+             *         ],
+             *         "serviceId": "s-12345678",
+             *         "serviceModelId": "Porro ut deserunt ab.",
+             *         "status": "Preferred|Active|Deprecated|Pending",
+             *         "type": "Major|Incremental|UserDefined",
+             *         "updatedAt": "2020-01-01T00:00:00Z",
+             *         "version": "3.0"
              *       }
              *     ]
              */
@@ -36397,7 +37277,7 @@ export interface components {
          * @example {
          *       "serviceEnvironmentId": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "b"
+         *       "token": "b1"
          *     }
          */
         ListUpgradePathRequest: {
@@ -36413,7 +37293,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 35
+             * @example kpc
              */
             token: string;
         };
@@ -36447,7 +37327,7 @@ export interface components {
          *       "region": "us-west-2",
          *       "serviceId": "s-12345678",
          *       "serviceModelId": "sm-12345678",
-         *       "token": "h"
+         *       "token": "itu"
          *     }
          */
         ListVUnitsRequest: {
@@ -36468,12 +37348,12 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Rerum ducimus.
+             * @example Est quae consequatur dolores illum.
              */
             serviceModelId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example dvj
+             * @example f
              */
             token: string;
         };
@@ -36547,7 +37427,7 @@ export interface components {
             associatedKubernetesServiceName?: string;
             /**
              * @description ID of a resource
-             * @example Aliquid libero sit.
+             * @example Nobis et consequuntur consequatur non.
              */
             associatedResourceID: string;
             /**
@@ -36634,13 +37514,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "gj"
+         *       "token": "n"
          *     }
          */
         LogoutRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example zr
+             * @example iwq
              */
             token: string;
         };
@@ -36677,7 +37557,7 @@ export interface components {
          *           }
          *         }
          *       },
-         *       "token": "9fa"
+         *       "token": "rl"
          *     }
          */
         ModifyServiceProviderOrganizationRequest: {
@@ -36720,7 +37600,7 @@ export interface components {
             };
             /**
              * @description JWT token used to perform authorization
-             * @example 2
+             * @example ci
              */
             token: string;
         };
@@ -36801,36 +37681,36 @@ export interface components {
         /**
          * @example {
          *       "id": "so-12345678",
-         *       "orchestrationModifyDSL": "Iure rem in.",
-         *       "token": "ey"
+         *       "orchestrationModifyDSL": "Sit vel ducimus dolorem incidunt aut occaecati.",
+         *       "token": "e9"
          *     }
          */
         ModifyServicesOrchestrationRequest: {
             /**
              * @description ID of a Services Orchestration
-             * @example Id est ex non adipisci.
+             * @example Aut eaque.
              */
             id: string;
             /**
              * @description base64 encoded content of services orchestration modify DSL
-             * @example Nesciunt nisi voluptate qui est ullam.
+             * @example Eligendi animi quaerat voluptatibus.
              */
             orchestrationModifyDSL: string;
             /**
              * @description JWT token used to perform authorization
-             * @example l1
+             * @example q
              */
             token: string;
         };
         /**
          * @example {
-         *       "orchestrationModifyDSL": "Ad voluptates inventore nihil."
+         *       "orchestrationModifyDSL": "Sed velit delectus vel officia."
          *     }
          */
         ModifyServicesOrchestrationRequest2: {
             /**
              * @description base64 encoded content of services orchestration modify DSL
-             * @example Voluptatum qui voluptas nulla.
+             * @example Non odio fugiat.
              */
             orchestrationModifyDSL: string;
         };
@@ -36842,7 +37722,7 @@ export interface components {
         NetworkFeaturesConfiguration: {
             /**
              * @description Indicates if PrivateLink is enabled for the network
-             * @example true
+             * @example false
              */
             isPrivateLinkEnabled?: boolean;
         };
@@ -37158,6 +38038,24 @@ export interface components {
         };
         /**
          * @example {
+         *       "downloadURL": "https://example.com/installer/download",
+         *       "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+         *     }
+         */
+        OnPremInstallerDetails: {
+            /**
+             * @description The download URL for the installer
+             * @example https://example.com/installer/download
+             */
+            downloadURL?: string;
+            /**
+             * @description Instructions for installation
+             * @example Please follow the steps outlined in the documentation to install the on-premise agent...
+             */
+            installerInstructions?: string;
+        };
+        /**
+         * @example {
          *       "helperUserScript": {
          *         "content": "echo 'Hello World'"
          *       }
@@ -37430,6 +38328,84 @@ export interface components {
          *             },
          *             "path": "helm/values/production.yaml"
          *           }
+         *         },
+         *         {
+         *           "name": "my-layer",
+         *           "scope": {
+         *             "{{ $sys.cloudProviderName }}": "aws"
+         *           },
+         *           "values": {
+         *             "global": {
+         *               "affinity": {
+         *                 "nodeAffinity": {
+         *                   "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                     "nodeSelectorTerms": [
+         *                       {
+         *                         "matchExpressions": [
+         *                           {
+         *                             "key": "omnistrate.com/managed-by",
+         *                             "operator": "In",
+         *                             "values": [
+         *                               "omnistrate"
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     ]
+         *                   }
+         *                 }
+         *               }
+         *             }
+         *           },
+         *           "valuesFile": {
+         *             "gitConfiguration": {
+         *               "accessToken": "my-token",
+         *               "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *               "referenceName": "tags/v1.0.0",
+         *               "repositoryUrl": "https://github.com/username/myrepo",
+         *               "userName": "my-user"
+         *             },
+         *             "path": "helm/values/production.yaml"
+         *           }
+         *         },
+         *         {
+         *           "name": "my-layer",
+         *           "scope": {
+         *             "{{ $sys.cloudProviderName }}": "aws"
+         *           },
+         *           "values": {
+         *             "global": {
+         *               "affinity": {
+         *                 "nodeAffinity": {
+         *                   "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                     "nodeSelectorTerms": [
+         *                       {
+         *                         "matchExpressions": [
+         *                           {
+         *                             "key": "omnistrate.com/managed-by",
+         *                             "operator": "In",
+         *                             "values": [
+         *                               "omnistrate"
+         *                             ]
+         *                           }
+         *                         ]
+         *                       }
+         *                     ]
+         *                   }
+         *                 }
+         *               }
+         *             }
+         *           },
+         *           "valuesFile": {
+         *             "gitConfiguration": {
+         *               "accessToken": "my-token",
+         *               "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *               "referenceName": "tags/v1.0.0",
+         *               "repositoryUrl": "https://github.com/username/myrepo",
+         *               "userName": "my-user"
+         *             },
+         *             "path": "helm/values/production.yaml"
+         *           }
          *         }
          *       ],
          *       "password": "my-password",
@@ -37473,45 +38449,6 @@ export interface components {
             /**
              * @description Layered chart values configuration with conditional scoping (mutually exclusive with chartValues). Values are processed in order - later entries override earlier ones for the same keys.
              * @example [
-             *       {
-             *         "name": "my-layer",
-             *         "scope": {
-             *           "{{ $sys.cloudProviderName }}": "aws"
-             *         },
-             *         "values": {
-             *           "global": {
-             *             "affinity": {
-             *               "nodeAffinity": {
-             *                 "requiredDuringSchedulingIgnoredDuringExecution": {
-             *                   "nodeSelectorTerms": [
-             *                     {
-             *                       "matchExpressions": [
-             *                         {
-             *                           "key": "omnistrate.com/managed-by",
-             *                           "operator": "In",
-             *                           "values": [
-             *                             "omnistrate"
-             *                           ]
-             *                         }
-             *                       ]
-             *                     }
-             *                   ]
-             *                 }
-             *               }
-             *             }
-             *           }
-             *         },
-             *         "valuesFile": {
-             *           "gitConfiguration": {
-             *             "accessToken": "my-token",
-             *             "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-             *             "referenceName": "tags/v1.0.0",
-             *             "repositoryUrl": "https://github.com/username/myrepo",
-             *             "userName": "my-user"
-             *           },
-             *           "path": "helm/values/production.yaml"
-             *         }
-             *       },
              *       {
              *         "name": "my-layer",
              *         "scope": {
@@ -37678,6 +38615,36 @@ export interface components {
              * @example user-abcd1234
              */
             userId: string;
+        };
+        /**
+         * @example {
+         *       "displayName": "Server Name",
+         *       "key": "serverName",
+         *       "type": "Boolean|Float64|String|JSON|Resource",
+         *       "value": "server1"
+         *     }
+         */
+        OutputParameter: {
+            /**
+             * @description The parameter display name
+             * @example Server Name
+             */
+            displayName?: string;
+            /**
+             * @description The parameter key
+             * @example serverName
+             */
+            key?: string;
+            /**
+             * @description The parameter type
+             * @example Boolean|Float64|String|JSON|Resource
+             */
+            type?: string;
+            /**
+             * @description The parameter value
+             * @example server1
+             */
+            value?: unknown;
         };
         /**
          * @example {
@@ -37871,7 +38838,7 @@ export interface components {
          *       "id": "se-12345678",
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "w9"
+         *       "token": "2y"
          *     }
          */
         PromoteServiceEnvironmentRequest: {
@@ -37882,7 +38849,7 @@ export interface components {
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Dolore aut.
+             * @example Qui sit culpa ut ut dolorem accusantium.
              */
             productTierId?: string;
             /**
@@ -37892,19 +38859,19 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ed2
+             * @example rj
              */
             token: string;
         };
         /**
          * @example {
-         *       "productTierId": "Ea sit ut est."
+         *       "productTierId": "Aperiam repudiandae rerum."
          *     }
          */
         PromoteServiceEnvironmentRequest2: {
             /**
              * @description The ID of the product tier to use for the promotion
-             * @example Qui alias dolorem odio consectetur aut.
+             * @example Quidem et optio quisquam impedit nesciunt optio.
              */
             productTierId?: string;
         };
@@ -37912,7 +38879,7 @@ export interface components {
          * @example {
          *       "id": "se-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "xs7"
+         *       "token": "sme"
          *     }
          */
         PromoteServiceEnvironmentStatusRequest: {
@@ -37928,16 +38895,12 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example wa
+             * @example 8hb
              */
             token: string;
         };
         /**
          * @example [
-         *       {
-         *         "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
-         *         "targetEnvironmentID": "se-12345678"
-         *       },
          *       {
          *         "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
          *         "targetEnvironmentID": "se-12345678"
@@ -37957,14 +38920,14 @@ export interface components {
          * @example {
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "r6",
+         *       "token": "s0i",
          *       "version": "3.0"
          *     }
          */
         PromoteTierVersionSetRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Veniam aut aut nesciunt tenetur deserunt.
+             * @example Facilis corrupti sed.
              */
             productTierId: string;
             /**
@@ -37974,7 +38937,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example baq
+             * @example n
              */
             token: string;
             /**
@@ -38052,47 +39015,47 @@ export interface components {
         };
         /**
          * @example {
-         *       "deployingInstances": 8554028558347110000,
+         *       "deployingInstances": 2203565767929881600,
          *       "deploymentCellHealthSummary": {
-         *         "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *           "deployingInstances": 2695512266003194400,
-         *           "healthyInstances": 1179518186880526800,
+         *         "Perspiciatis iure alias iste et ea.": {
+         *           "deployingInstances": 5731182758697466000,
+         *           "healthyInstances": 6294965754346287000,
          *           "hostClusterID": "hc-12345678",
          *           "message": "Cell is healthy",
          *           "status": "Healthy",
-         *           "totalInstances": 4963653456427229000,
-         *           "unhealthyInstances": 939936190848595700,
-         *           "unknownInstances": 6821726574141972000
+         *           "totalInstances": 415269972141220350,
+         *           "unhealthyInstances": 4048093111193924600,
+         *           "unknownInstances": 112597297833528370
          *         }
          *       },
-         *       "healthyInstances": 8745505622822750000,
+         *       "healthyInstances": 8802649043870458000,
          *       "message": "Region is healthy",
          *       "region": "us-east-1",
          *       "status": "Healthy",
-         *       "totalInstances": 362270425161149630,
-         *       "unhealthyInstances": 8169898776961504000,
-         *       "unknownInstances": 2447255543458500600
+         *       "totalInstances": 3407357903896910000,
+         *       "unhealthyInstances": 5907650556664334000,
+         *       "unknownInstances": 1104338715217352700
          *     }
          */
         RegionalHealthSummary: {
             /**
              * Format: int64
              * @description The number of instances currently deploying
-             * @example 8850535458273375000
+             * @example 3292126980138264600
              */
             deployingInstances: number;
             /**
              * @description The summary of health by deployment cell
              * @example {
-             *       "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *         "deployingInstances": 2695512266003194400,
-             *         "healthyInstances": 1179518186880526800,
+             *       "Perspiciatis iure alias iste et ea.": {
+             *         "deployingInstances": 5731182758697466000,
+             *         "healthyInstances": 6294965754346287000,
              *         "hostClusterID": "hc-12345678",
              *         "message": "Cell is healthy",
              *         "status": "Healthy",
-             *         "totalInstances": 4963653456427229000,
-             *         "unhealthyInstances": 939936190848595700,
-             *         "unknownInstances": 6821726574141972000
+             *         "totalInstances": 415269972141220350,
+             *         "unhealthyInstances": 4048093111193924600,
+             *         "unknownInstances": 112597297833528370
              *       }
              *     }
              */
@@ -38102,7 +39065,7 @@ export interface components {
             /**
              * Format: int64
              * @description The number of healthy instances in the region
-             * @example 8752513245080074
+             * @example 2588901942734984700
              */
             healthyInstances: number;
             /**
@@ -38123,19 +39086,19 @@ export interface components {
             /**
              * Format: int64
              * @description The total number of instances in the region
-             * @example 3291178735673343500
+             * @example 4829047741370459000
              */
             totalInstances: number;
             /**
              * Format: int64
              * @description The number of unhealthy instances in the region
-             * @example 7411652430249977000
+             * @example 3977965727485908000
              */
             unhealthyInstances: number;
             /**
              * Format: int64
              * @description The number of instances with unknown status
-             * @example 5169045855622978000
+             * @example 8084765474155606000
              */
             unknownInstances?: number;
         };
@@ -38150,7 +39113,7 @@ export interface components {
          *       "id": "r-12345678",
          *       "scope": "CLUSTER",
          *       "serviceId": "s-12345678",
-         *       "token": "x5t",
+         *       "token": "ky",
          *       "type": "ADD"
          *     }
          */
@@ -38175,7 +39138,7 @@ export interface components {
             customImage?: string;
             /**
              * @description ID of a resource
-             * @example Quo dolorem vel ipsum quasi.
+             * @example Inventore in ea unde cumque quia.
              */
             id: string;
             /**
@@ -38190,7 +39153,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3xz
+             * @example 6sv
              */
             token: string;
             /**
@@ -38246,13 +39209,13 @@ export interface components {
          *       "id": "r-12345678",
          *       "metricEndpoint": "http://localhost:9187/metrics",
          *       "serviceId": "s-12345678",
-         *       "token": "9"
+         *       "token": "yxl"
          *     }
          */
         RegisterResourceMetricsConfigRequest: {
             /**
              * @description ID of a resource
-             * @example Voluptas sequi ut.
+             * @example Est commodi qui aut harum animi.
              */
             id: string;
             /**
@@ -38267,7 +39230,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example x55
+             * @example lt
              */
             token: string;
         };
@@ -38289,18 +39252,18 @@ export interface components {
          *       "id": "imgc-12345678",
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "b0t"
+         *       "token": "v0"
          *     }
          */
         ReleaseImageConfigRequest: {
             /**
              * @description ID of an Image Config
-             * @example Consequatur sunt velit.
+             * @example Et sed error sit.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Nobis sint minima quo rerum esse harum.
+             * @example Labore et optio cum.
              */
             productTierId?: string;
             /**
@@ -38310,19 +39273,19 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r5
+             * @example 2v
              */
             token: string;
         };
         /**
          * @example {
-         *       "productTierId": "Tempore nihil consequatur."
+         *       "productTierId": "Omnis laboriosam eos iusto vel facilis officia."
          *     }
          */
         ReleaseImageConfigRequest2: {
             /**
              * @description The product tier ID
-             * @example Ea dolorem.
+             * @example Odit architecto et ipsum fugiat tempore.
              */
             productTierId?: string;
         };
@@ -38331,18 +39294,18 @@ export interface components {
          *       "id": "ic-12345678",
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "f"
+         *       "token": "8"
          *     }
          */
         ReleaseInfraConfigRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Omnis sed aut consequatur nobis.
+             * @example Officiis eveniet iure asperiores cupiditate dolore.
              */
             id: string;
             /**
              * @description ID of a Product Tier
-             * @example Placeat ullam hic.
+             * @example Est et nihil voluptatem vel suscipit.
              */
             productTierId?: string;
             /**
@@ -38352,19 +39315,19 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example sx
+             * @example b
              */
             token: string;
         };
         /**
          * @example {
-         *       "productTierId": "Assumenda veniam aperiam dolorem recusandae facilis assumenda."
+         *       "productTierId": "Voluptatem sequi aliquam odit ratione aspernatur quam."
          *     }
          */
         ReleaseInfraConfigRequest2: {
             /**
              * @description The product tier ID
-             * @example Quo incidunt at et ea animi.
+             * @example Dolor illo voluptas est.
              */
             productTierId?: string;
         };
@@ -38376,7 +39339,7 @@ export interface components {
          *       "isPreferred": true,
          *       "productTierId": "pt-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "7dz",
+         *       "token": "o",
          *       "versionSetName": "v1",
          *       "versionSetType": "Major|Incremental|UserDefined"
          *     }
@@ -38396,7 +39359,7 @@ export interface components {
             dryRun: boolean;
             /**
              * @description ID of a Service API
-             * @example Placeat nobis et consequuntur consequatur non nulla.
+             * @example Laboriosam velit facilis dolor exercitationem qui.
              */
             id: string;
             /**
@@ -38407,7 +39370,7 @@ export interface components {
             isPreferred: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Ab et et libero voluptates.
+             * @example Omnis esse.
              */
             productTierId?: string;
             /**
@@ -38417,7 +39380,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example tij
+             * @example 3
              */
             token: string;
             /**
@@ -38436,7 +39399,7 @@ export interface components {
          *       "copySpecFromPreviousVersion": false,
          *       "dryRun": false,
          *       "isPreferred": true,
-         *       "productTierId": "Quia et quibusdam aliquid.",
+         *       "productTierId": "Voluptas laudantium reiciendis.",
          *       "versionSetName": "v1",
          *       "versionSetType": "Major|Incremental|UserDefined"
          *     }
@@ -38462,7 +39425,7 @@ export interface components {
             isPreferred: boolean;
             /**
              * @description The product tier ID
-             * @example Delectus eum consequuntur sunt temporibus.
+             * @example Debitis saepe at quod deleniti doloremque quisquam.
              */
             productTierId?: string;
             /**
@@ -38480,13 +39443,13 @@ export interface components {
          * @example {
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "itb"
+         *       "token": "x9d"
          *     }
          */
         ReleaseServiceModelRequest: {
             /**
              * @description ID of a Service Model
-             * @example Est tenetur saepe rerum ut.
+             * @example Ut architecto.
              */
             id: string;
             /**
@@ -38496,7 +39459,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example x7
+             * @example t
              */
             token: string;
         };
@@ -38518,7 +39481,7 @@ export interface components {
          *       "name": "Major version set",
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "ynl",
+         *       "token": "ael",
          *       "version": "3.0"
          *     }
          */
@@ -38535,7 +39498,7 @@ export interface components {
             name?: string;
             /**
              * @description ID of a Product Tier
-             * @example Quis rerum perspiciatis sit pariatur.
+             * @example Aut suscipit ea provident ipsa.
              */
             productTierId: string;
             /**
@@ -38545,7 +39508,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gq
+             * @example e0o
              */
             token: string;
             /**
@@ -38577,18 +39540,18 @@ export interface components {
          *       "accountConfigId": "ac-12345678",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "7aa"
+         *       "token": "u"
          *     }
          */
         RemoveAccountConfigFromServiceModelRequest: {
             /**
              * @description ID of an Account Config
-             * @example Qui enim.
+             * @example Quos pariatur delectus mollitia necessitatibus.
              */
             accountConfigId: string;
             /**
              * @description ID of a Service Model
-             * @example Itaque quas quo.
+             * @example Hic adipisci.
              */
             id: string;
             /**
@@ -38598,19 +39561,19 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example yvg
+             * @example r1
              */
             token: string;
         };
         /**
          * @example {
-         *       "accountConfigId": "Recusandae quia itaque est."
+         *       "accountConfigId": "Quae et enim in est."
          *     }
          */
         RemoveAccountConfigFromServiceModelRequest2: {
             /**
              * @description The infrastructure account configuration ID
-             * @example Et quia reprehenderit quam quaerat praesentium.
+             * @example Est at voluptate.
              */
             accountConfigId: string;
         };
@@ -38626,7 +39589,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "w22"
+         *       "token": "55"
          *     }
          */
         RemoveCapacityFromResourceInstanceRequest: {
@@ -38673,7 +39636,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Quo rerum.
+             * @example Et quis illo reprehenderit quasi.
              */
             serviceProviderId: string;
             /**
@@ -38683,7 +39646,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example wnz
+             * @example qt
              */
             token: string;
         };
@@ -38706,7 +39669,7 @@ export interface components {
          *       "id": "cc-12345678",
          *       "instanceType": "t3.micro",
          *       "serviceId": "s-12345678",
-         *       "token": "ft"
+         *       "token": "g15"
          *     }
          */
         RemoveComputeInstanceTypeRequest: {
@@ -38717,7 +39680,7 @@ export interface components {
             cloudProviderName: string;
             /**
              * @description ID of a Compute Config
-             * @example Dolorum rerum totam veritatis iste aspernatur praesentium.
+             * @example Dolorum fugiat perspiciatis iure similique enim nemo.
              */
             id: string;
             /**
@@ -38732,7 +39695,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example 9u
              */
             token: string;
         };
@@ -38765,7 +39728,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "r1"
+         *       "token": "24"
          *     }
          */
         RemoveCustomDNSToResourceInstanceRequest: {
@@ -38806,7 +39769,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Debitis eligendi dolor ut temporibus.
+             * @example Iure qui architecto sed fuga.
              */
             serviceProviderId: string;
             /**
@@ -38816,7 +39779,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9te
+             * @example 9r
              */
             token: string;
         };
@@ -38825,18 +39788,18 @@ export interface components {
          *       "fileId": "file-12345678",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "6di"
+         *       "token": "fh"
          *     }
          */
         RemoveFileRequest: {
             /**
              * @description ID of a File
-             * @example Et nihil a accusantium consequatur quibusdam.
+             * @example Ut distinctio consequatur animi voluptatem omnis voluptates.
              */
             fileId: string;
             /**
              * @description ID of a resource
-             * @example Sed laboriosam et ratione deserunt eum.
+             * @example Qui illo vitae necessitatibus inventore sed.
              */
             id: string;
             /**
@@ -38846,7 +39809,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example j
+             * @example qzo
              */
             token: string;
         };
@@ -38855,18 +39818,18 @@ export interface components {
          *       "id": "r-12345678",
          *       "resourceDependencyId": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "olh"
+         *       "token": "j"
          *     }
          */
         RemoveResourceDependencyRequest: {
             /**
              * @description ID of a resource
-             * @example Aliquam quis eaque fugiat.
+             * @example Eaque itaque voluptate.
              */
             id: string;
             /**
              * @description ID of a resource
-             * @example Nihil adipisci sapiente sit aperiam est.
+             * @example Eum similique.
              */
             resourceDependencyId: string;
             /**
@@ -38876,7 +39839,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8ty
+             * @example va
              */
             token: string;
         };
@@ -38886,13 +39849,13 @@ export interface components {
          *       "mountPath": "/data",
          *       "serviceId": "s-12345678",
          *       "storageVolumeConfigId": "svc-12345678",
-         *       "token": "2y"
+         *       "token": "s52"
          *     }
          */
         RemoveStorageVolumeConfigRequest: {
             /**
              * @description ID of a Storage Config
-             * @example Sit excepturi temporibus aut quam eum.
+             * @example In quae.
              */
             id: string;
             /**
@@ -38907,12 +39870,12 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Storage Volume Config
-             * @example Libero velit sit.
+             * @example Sit odio ducimus.
              */
             storageVolumeConfigId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 1ss
+             * @example l
              */
             token: string;
         };
@@ -38933,7 +39896,7 @@ export interface components {
          *       "environmentType": "production",
          *       "loginHint": "user@domain.com",
          *       "redirectUrl": "https://example.com/redirect",
-         *       "token": "ks9"
+         *       "token": "b"
          *     }
          */
         RenderIdentityProvidersRequest: {
@@ -38954,7 +39917,7 @@ export interface components {
             redirectUrl?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example eqi
+             * @example jg
              */
             token: string;
         };
@@ -39027,26 +39990,6 @@ export interface components {
              *         "name": "Google for my company",
              *         "renderedAuthorizationEndpoint": "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com&redirect_uri=https://example.com/redirect&scope=openid email profile&state=idpName-guid",
              *         "state": "state"
-             *       },
-             *       {
-             *         "emailIdentifiers": "company.com",
-             *         "id": "idp-12345678",
-             *         "identityProviderName": "Google",
-             *         "loginButtonIconUrl": "https://example.com/icon.png",
-             *         "loginButtonText": "Login with Google",
-             *         "name": "Google for my company",
-             *         "renderedAuthorizationEndpoint": "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com&redirect_uri=https://example.com/redirect&scope=openid email profile&state=idpName-guid",
-             *         "state": "state"
-             *       },
-             *       {
-             *         "emailIdentifiers": "company.com",
-             *         "id": "idp-12345678",
-             *         "identityProviderName": "Google",
-             *         "loginButtonIconUrl": "https://example.com/icon.png",
-             *         "loginButtonText": "Login with Google",
-             *         "name": "Google for my company",
-             *         "renderedAuthorizationEndpoint": "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com&redirect_uri=https://example.com/redirect&scope=openid email profile&state=idpName-guid",
-             *         "state": "state"
              *       }
              *     ]
              */
@@ -39072,7 +40015,7 @@ export interface components {
             emailIdentifiers: string;
             /**
              * @description ID of an Identity Provider
-             * @example Architecto sequi qui ut enim.
+             * @example Facilis laborum saepe praesentium laborum reiciendis a.
              */
             id: string;
             /**
@@ -39109,7 +40052,7 @@ export interface components {
         /**
          * @example {
          *       "id": "s-12345678",
-         *       "token": "b6"
+         *       "token": "g"
          *     }
          */
         ReportHealthRequest: {
@@ -39120,7 +40063,7 @@ export interface components {
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 3m
+             * @example p
              */
             token: string;
         };
@@ -39223,9 +40166,8 @@ export interface components {
          * @description Resource dependency relation specification
          * @example {
          *       "parameterMap": {
-         *         "Nobis placeat eaque sequi ut.": "Reprehenderit tempora in omnis praesentium molestiae saepe.",
-         *         "Reprehenderit quo odio alias.": "Nesciunt officia et natus dignissimos.",
-         *         "Saepe iusto fugit ullam iusto eos molestias.": "Placeat voluptate et quos."
+         *         "Esse voluptas corrupti qui et.": "Aliquid explicabo.",
+         *         "Facilis qui in molestiae beatae.": "Modi atque."
          *       },
          *       "resourceId": "Dolores sit aut repellendus eveniet recusandae fugit."
          *     }
@@ -39234,8 +40176,9 @@ export interface components {
             /**
              * @description A map of the source parameter to the resource dependency parameter
              * @example {
-             *       "Ratione fugiat illum voluptatem.": "Voluptatem ducimus quis eum debitis totam.",
-             *       "Temporibus ut.": "Harum commodi dolores quis."
+             *       "Minima itaque autem sunt.": "Nesciunt dolore nobis.",
+             *       "Minus ullam autem.": "Reprehenderit praesentium doloremque labore.",
+             *       "Quisquam mollitia.": "Et officiis ut facere soluta sint explicabo."
              *     }
              */
             parameterMap?: {
@@ -39243,7 +40186,7 @@ export interface components {
             };
             /**
              * @description ID of a resource
-             * @example Autem quia molestias.
+             * @example Et est quasi enim et.
              */
             resourceId: string;
         };
@@ -39282,7 +40225,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a resource
-             * @example Et est.
+             * @example Quod sit id dolorum quibusdam.
              */
             resourceId: string;
             /**
@@ -39299,27 +40242,7 @@ export interface components {
         /**
          * @example {
          *       "nodesHealth": {
-         *         "Culpa totam non illo neque.": {
-         *           "availabilityZone": "us-east-2a",
-         *           "connectivityStatus": "HEALTHY",
-         *           "diskHealth": "HEALTHY",
-         *           "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-         *           "integrationsHealth": {
-         *             "CustomerObservabilityHealth": "HEALTHY",
-         *             "InternalObservabilityHealth": "HEALTHY"
-         *           },
-         *           "loadStatus": "LOAD_NORMAL",
-         *           "nodeHealth": "HEALTHY",
-         *           "nodeName": "postgres-0",
-         *           "ports": [
-         *             80,
-         *             443
-         *           ],
-         *           "processHealth": "HEALTHY",
-         *           "processLiveness": "HEALTHY",
-         *           "status": "HEALTHY"
-         *         },
-         *         "Quaerat sunt inventore sint dolor non molestiae.": {
+         *         "Magni aperiam.": {
          *           "availabilityZone": "us-east-2a",
          *           "connectivityStatus": "HEALTHY",
          *           "diskHealth": "HEALTHY",
@@ -39350,7 +40273,7 @@ export interface components {
             /**
              * @description The health summary of the nodes by node name
              * @example {
-             *       "Consequuntur modi et dolor nihil quibusdam placeat.": {
+             *       "Aut ab non sint eius ad.": {
              *         "availabilityZone": "us-east-2a",
              *         "connectivityStatus": "HEALTHY",
              *         "diskHealth": "HEALTHY",
@@ -39377,7 +40300,7 @@ export interface components {
             };
             /**
              * @description ID of a resource
-             * @example Error non ad tenetur.
+             * @example Doloribus sit voluptatum cum ut.
              */
             resourceID?: string;
             /**
@@ -39404,7 +40327,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "zx"
+         *       "token": "q"
          *     }
          */
         ResourceInstanceProvisionerSetupKitRequest: {
@@ -39430,7 +40353,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Quia qui perferendis numquam ut.
+             * @example Nisi illo.
              */
             serviceProviderId: string;
             /**
@@ -39440,7 +40363,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example f
              */
             token: string;
         };
@@ -39872,43 +40795,6 @@ export interface components {
              *           "os": "linux",
              *           "providerID": "aws:///ap-south-1b/i-06h696g4a643ahf01"
              *         }
-             *       },
-             *       {
-             *         "availabilityZone": "us-east-2a",
-             *         "detailedHealth": {
-             *           "ConnectivityStatus": "UNHEALTHY",
-             *           "DiskHealth": "UNKNOWN",
-             *           "LoadStatus": "LOAD_NORMAL",
-             *           "NodeHealth": "HEALTHY",
-             *           "ProcessHealth": "HEALTHY",
-             *           "ProcessLiveness": "HEALTHY"
-             *         },
-             *         "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-             *         "healthStatus": "HEALTHY",
-             *         "id": "primary-0",
-             *         "kubernetesDashboardEndpoint": {
-             *           "dashboardEndpoint": "https://kubernetes-dashboard.hc-12345678.region.cloudprovider.f2e0a955bb84.cloud/#/pod/instance-abcdefgh/primary-0?namespace=instance-abcdefgh",
-             *           "deploymentCellID": "hc-12345678"
-             *         },
-             *         "ports": [
-             *           80,
-             *           443
-             *         ],
-             *         "status": "RUNNING",
-             *         "storageSize": 10,
-             *         "vmInfo": {
-             *           "architecture": "amd64",
-             *           "azCode": "us-east-1a",
-             *           "azID": "use1-az1",
-             *           "externalIP": "3.44.113.6",
-             *           "instanceType": "t2.small",
-             *           "internalIP": "192.168.1.4",
-             *           "k8sNodeName": "my-k8s-node",
-             *           "kernelVersion": "5.10.228",
-             *           "kubeletVersion": "1.31.3",
-             *           "os": "linux",
-             *           "providerID": "aws:///ap-south-1b/i-06h696g4a643ahf01"
-             *         }
              *       }
              *     ]
              */
@@ -39920,7 +40806,7 @@ export interface components {
             privateNetworkCIDR?: string;
             /**
              * @description ID of a Network
-             * @example Sit harum.
+             * @example Et dolorem ex consequatur.
              */
             privateNetworkID?: string;
             proxyEndpoint?: components["schemas"]["ProxyEndpoint"];
@@ -40026,17 +40912,17 @@ export interface components {
             description: string;
             /**
              * @description ID of a resource
-             * @example Blanditiis aut ut sit.
+             * @example Ut consectetur expedita voluptatum modi.
              */
             id: string;
             /**
              * @description ID of an Image Config
-             * @example Pariatur magnam dolore.
+             * @example Provident dolores rem ut amet voluptatem.
              */
             imageConfigId?: string;
             /**
              * @description ID of an Infra Config
-             * @example Rerum eaque maxime eligendi aut.
+             * @example Sit distinctio libero quo ab temporibus deleniti.
              */
             infraConfigId?: string;
             /**
@@ -40071,7 +40957,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "v"
+         *       "token": "e"
          *     }
          */
         RestartResourceInstanceRequest: {
@@ -40112,7 +40998,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Soluta autem molestiae.
+             * @example Inventore a.
              */
             serviceProviderId: string;
             /**
@@ -40122,9 +41008,63 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example z1
              */
             token: string;
+        };
+        /**
+         * @example {
+         *       "custom_network_id": "n-1234567890",
+         *       "network_type": "PUBLIC|INTERNAL",
+         *       "snapshotId": "instance-ss-abcd1234",
+         *       "subscriptionId": "sub-abcd1234",
+         *       "token": "hp"
+         *     }
+         */
+        RestoreFromInstanceSnapshotRequest: {
+            /**
+             * @description Custom network for resource
+             * @example n-1234567890
+             */
+            custom_network_id?: string;
+            /**
+             * @description The network type
+             * @example PUBLIC|INTERNAL
+             */
+            network_type?: string;
+            /**
+             * @description ID of a Resource Instance Snapshot
+             * @example Nostrum aliquid repellat nam sint unde.
+             */
+            snapshotId: string;
+            /**
+             * @description The subscription ID
+             * @example sub-abcd1234
+             */
+            subscriptionId?: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example 7
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "custom_network_id": "n-1234567890",
+         *       "network_type": "PUBLIC|INTERNAL"
+         *     }
+         */
+        RestoreFromInstanceSnapshotRequest2: {
+            /**
+             * @description Custom network for resource
+             * @example n-1234567890
+             */
+            custom_network_id?: string;
+            /**
+             * @description The network type
+             * @example PUBLIC|INTERNAL
+             */
+            network_type?: string;
         };
         /**
          * @example {
@@ -40139,7 +41079,7 @@ export interface components {
          *       "serviceProviderId": "omnistrate",
          *       "snapshotId": "instance-ss-abcd1234",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "x1x"
+         *       "token": "p"
          *     }
          */
         RestoreResourceInstanceFromSnapshotRequest: {
@@ -40185,12 +41125,12 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Ut et laboriosam voluptas sit consequuntur.
+             * @example Quia necessitatibus maiores.
              */
             serviceProviderId: string;
             /**
              * @description ID of a Resource Instance Snapshot
-             * @example Vel quas assumenda.
+             * @example Enim sint voluptatem qui.
              */
             snapshotId: string;
             /**
@@ -40200,7 +41140,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example bsz
+             * @example lr
              */
             token: string;
         };
@@ -40224,6 +41164,18 @@ export interface components {
         };
         /**
          * @example {
+         *       "instanceId": "Laborum dolores incidunt similique officia provident distinctio."
+         *     }
+         */
+        RestoreResourceInstanceFromSnapshotResponseBody: {
+            /**
+             * @description Resource Instance Id
+             * @example Harum quia quia a.
+             */
+            instanceId?: string;
+        };
+        /**
+         * @example {
          *       "id": "instance-abcd1234",
          *       "network_type": "PUBLIC|INTERNAL",
          *       "productTierKey": "premium",
@@ -40235,7 +41187,7 @@ export interface components {
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
          *       "targetRestoreTime": "2021-09-01T00:00:00Z",
-         *       "token": "kjk"
+         *       "token": "c32"
          *     }
          */
         RestoreResourceInstanceRequest: {
@@ -40281,7 +41233,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Ut ratione mollitia incidunt amet quia.
+             * @example Provident praesentium.
              */
             serviceProviderId: string;
             /**
@@ -40296,7 +41248,7 @@ export interface components {
             targetRestoreTime: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xx
+             * @example t9
              */
             token: string;
         };
@@ -40323,7 +41275,7 @@ export interface components {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "5"
+         *       "token": "5pa"
          *     }
          */
         RevokeConsumptionUserRoleRequest: {
@@ -40344,7 +41296,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9xy
+             * @example vjc
              */
             token: string;
         };
@@ -40367,7 +41319,7 @@ export interface components {
          * @example {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
-         *       "token": "p2"
+         *       "token": "qj"
          *     }
          */
         RevokeUserRoleRequest: {
@@ -40383,7 +41335,7 @@ export interface components {
             roleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example l
+             * @example xh
              */
             token: string;
         };
@@ -40407,13 +41359,13 @@ export interface components {
          * @example {
          *       "id": "imgc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "sb"
+         *       "token": "w"
          *     }
          */
         RolloutFleetImageConfigRequest: {
             /**
              * @description ID of an Image Config
-             * @example Dignissimos ut accusamus itaque rerum.
+             * @example Ea quos.
              */
             id: string;
             /**
@@ -40423,7 +41375,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example fx
+             * @example ov
              */
             token: string;
         };
@@ -40431,13 +41383,13 @@ export interface components {
          * @example {
          *       "id": "imgc-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "o"
+         *       "token": "f"
          *     }
          */
         RolloutFleetImageStatusRequest: {
             /**
              * @description ID of an Image Config
-             * @example Architecto ad.
+             * @example Et saepe culpa quos dolorem repudiandae.
              */
             id: string;
             /**
@@ -40447,7 +41399,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 9
+             * @example ow
              */
             token: string;
         };
@@ -40467,13 +41419,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "mnz"
+         *       "token": "a"
          *     }
          */
         RolloutFleetInfraRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Dolore voluptas impedit debitis impedit in.
+             * @example Animi iusto est sit est voluptate ad.
              */
             id: string;
             /**
@@ -40483,7 +41435,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xs
+             * @example zhb
              */
             token: string;
         };
@@ -40491,13 +41443,13 @@ export interface components {
          * @example {
          *       "id": "ic-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "mms"
+         *       "token": "v3m"
          *     }
          */
         RolloutFleetInfraStatusRequest: {
             /**
              * @description ID of an Infra Config
-             * @example Nemo modi quis.
+             * @example Vero accusantium minima.
              */
             id: string;
             /**
@@ -40507,7 +41459,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r6
+             * @example zd
              */
             token: string;
         };
@@ -40836,20 +41788,59 @@ export interface components {
          *               },
          *               "path": "helm/values/production.yaml"
          *             }
+         *           },
+         *           {
+         *             "name": "my-layer",
+         *             "scope": {
+         *               "{{ $sys.cloudProviderName }}": "aws"
+         *             },
+         *             "values": {
+         *               "global": {
+         *                 "affinity": {
+         *                   "nodeAffinity": {
+         *                     "requiredDuringSchedulingIgnoredDuringExecution": {
+         *                       "nodeSelectorTerms": [
+         *                         {
+         *                           "matchExpressions": [
+         *                             {
+         *                               "key": "omnistrate.com/managed-by",
+         *                               "operator": "In",
+         *                               "values": [
+         *                                 "omnistrate"
+         *                               ]
+         *                             }
+         *                           ]
+         *                         }
+         *                       ]
+         *                     }
+         *                   }
+         *                 }
+         *               }
+         *             },
+         *             "valuesFile": {
+         *               "gitConfiguration": {
+         *                 "accessToken": "my-token",
+         *                 "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+         *                 "referenceName": "tags/v1.0.0",
+         *                 "repositoryUrl": "https://github.com/username/myrepo",
+         *                 "userName": "my-user"
+         *               },
+         *               "path": "helm/values/production.yaml"
+         *             }
          *           }
          *         ],
          *         "namespace": "default",
          *         "password": "my-password",
          *         "username": "my-user"
          *       },
-         *       "token": "a5g"
+         *       "token": "ht"
          *     }
          */
         SaveHelmPackageRequest: {
             helmPackage: components["schemas"]["HelmPackage"];
             /**
              * @description JWT token used to perform authorization
-             * @example ip
+             * @example ut
              */
             token: string;
         };
@@ -41131,7 +42122,7 @@ export interface components {
             statusMessage?: string;
             /**
              * @description ID of a Subscription
-             * @example Iste autem qui praesentium autem ratione dolore.
+             * @example Aut unde animi est id.
              */
             subscriptionId: string;
         };
@@ -41143,6 +42134,20 @@ export interface components {
          *       "saasPortalStatus": "READY",
          *       "saasPortalUrl": "https://saas-portal.example.com",
          *       "servicePlans": [
+         *         {
+         *           "description": "A Basic product tier",
+         *           "modelType": "CUSTOMER_HOSTED",
+         *           "name": "Basic",
+         *           "productTierID": "pt-12345678",
+         *           "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *         },
+         *         {
+         *           "description": "A Basic product tier",
+         *           "modelType": "CUSTOMER_HOSTED",
+         *           "name": "Basic",
+         *           "productTierID": "pt-12345678",
+         *           "tierType": "OMNISTRATE_DEDICATED_TENANCY"
+         *         },
          *         {
          *           "description": "A Basic product tier",
          *           "modelType": "CUSTOMER_HOSTED",
@@ -41249,7 +42254,7 @@ export interface components {
          * @example {
          *       "serviceEnvironmentID": "se-123456",
          *       "serviceID": "s-123456",
-         *       "token": "fq"
+         *       "token": "nr"
          *     }
          */
         ServiceHealthRequest: {
@@ -41265,7 +42270,7 @@ export interface components {
             serviceID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ic
+             * @example sr
              */
             token: string;
         };
@@ -41274,69 +42279,91 @@ export interface components {
          *       "cloudProviderHealthSummary": {
          *         "aws|azure|gcp|all": {
          *           "cloudProvider": "aws",
-         *           "deployingInstances": 374862597242548800,
-         *           "healthyInstances": 3376461084750113000,
+         *           "deployingInstances": 2463796148883940000,
+         *           "healthyInstances": 8776507645802514000,
          *           "message": "Cloud provider is healthy",
          *           "regionalHealthSummary": {
-         *             "Rem adipisci cumque ut consequatur eligendi molestias.": {
-         *               "deployingInstances": 4269911446912672000,
+         *             "Doloribus pariatur.": {
+         *               "deployingInstances": 5113054056419677000,
          *               "deploymentCellHealthSummary": {
-         *                 "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *                   "deployingInstances": 2695512266003194400,
-         *                   "healthyInstances": 1179518186880526800,
+         *                 "Perspiciatis iure alias iste et ea.": {
+         *                   "deployingInstances": 5731182758697466000,
+         *                   "healthyInstances": 6294965754346287000,
          *                   "hostClusterID": "hc-12345678",
          *                   "message": "Cell is healthy",
          *                   "status": "Healthy",
-         *                   "totalInstances": 4963653456427229000,
-         *                   "unhealthyInstances": 939936190848595700,
-         *                   "unknownInstances": 6821726574141972000
+         *                   "totalInstances": 415269972141220350,
+         *                   "unhealthyInstances": 4048093111193924600,
+         *                   "unknownInstances": 112597297833528370
          *                 }
          *               },
-         *               "healthyInstances": 1020092016261208200,
+         *               "healthyInstances": 5105492144551250000,
          *               "message": "Region is healthy",
          *               "region": "us-east-1",
          *               "status": "Healthy",
-         *               "totalInstances": 2554731705631966000,
-         *               "unhealthyInstances": 1291772252767614500,
-         *               "unknownInstances": 5903418013056205000
+         *               "totalInstances": 4323423005147863000,
+         *               "unhealthyInstances": 5167448156807537000,
+         *               "unknownInstances": 8916355211072841000
          *             },
-         *             "Rem minima atque et.": {
-         *               "deployingInstances": 4269911446912672000,
+         *             "Laboriosam consequuntur.": {
+         *               "deployingInstances": 5113054056419677000,
          *               "deploymentCellHealthSummary": {
-         *                 "Voluptas ex eligendi reprehenderit corrupti enim.": {
-         *                   "deployingInstances": 2695512266003194400,
-         *                   "healthyInstances": 1179518186880526800,
+         *                 "Perspiciatis iure alias iste et ea.": {
+         *                   "deployingInstances": 5731182758697466000,
+         *                   "healthyInstances": 6294965754346287000,
          *                   "hostClusterID": "hc-12345678",
          *                   "message": "Cell is healthy",
          *                   "status": "Healthy",
-         *                   "totalInstances": 4963653456427229000,
-         *                   "unhealthyInstances": 939936190848595700,
-         *                   "unknownInstances": 6821726574141972000
+         *                   "totalInstances": 415269972141220350,
+         *                   "unhealthyInstances": 4048093111193924600,
+         *                   "unknownInstances": 112597297833528370
          *                 }
          *               },
-         *               "healthyInstances": 1020092016261208200,
+         *               "healthyInstances": 5105492144551250000,
          *               "message": "Region is healthy",
          *               "region": "us-east-1",
          *               "status": "Healthy",
-         *               "totalInstances": 2554731705631966000,
-         *               "unhealthyInstances": 1291772252767614500,
-         *               "unknownInstances": 5903418013056205000
+         *               "totalInstances": 4323423005147863000,
+         *               "unhealthyInstances": 5167448156807537000,
+         *               "unknownInstances": 8916355211072841000
+         *             },
+         *             "Rem quae vero tempore.": {
+         *               "deployingInstances": 5113054056419677000,
+         *               "deploymentCellHealthSummary": {
+         *                 "Perspiciatis iure alias iste et ea.": {
+         *                   "deployingInstances": 5731182758697466000,
+         *                   "healthyInstances": 6294965754346287000,
+         *                   "hostClusterID": "hc-12345678",
+         *                   "message": "Cell is healthy",
+         *                   "status": "Healthy",
+         *                   "totalInstances": 415269972141220350,
+         *                   "unhealthyInstances": 4048093111193924600,
+         *                   "unknownInstances": 112597297833528370
+         *                 }
+         *               },
+         *               "healthyInstances": 5105492144551250000,
+         *               "message": "Region is healthy",
+         *               "region": "us-east-1",
+         *               "status": "Healthy",
+         *               "totalInstances": 4323423005147863000,
+         *               "unhealthyInstances": 5167448156807537000,
+         *               "unknownInstances": 8916355211072841000
          *             }
          *           },
          *           "status": "Healthy",
-         *           "totalInstances": 3073823606720058000,
-         *           "unhealthyInstances": 4675642646204044000,
-         *           "unknownInstances": 3139227852439534600
+         *           "totalInstances": 8510322164800731000,
+         *           "unhealthyInstances": 5626159578997479000,
+         *           "unknownInstances": 7773206575138310000
          *         }
          *       },
-         *       "healthyInstances": 8079694463171833000,
+         *       "healthyInstances": 5939200597658394000,
          *       "message": "Service is healthy",
          *       "serviceEnvironmentID": "se-123456",
          *       "serviceID": "s-123456",
          *       "status": "Healthy",
-         *       "totalInstances": 554891890530632200,
-         *       "unhealthyInstances": 6722260786407953000,
-         *       "unknownInstances": 4715525541958118000
+         *       "totalInstances": 4406345709138388000,
+         *       "unhealthyInstances": 2532376766322700300,
+         *       "unknownInstances": 7350088284848692000
          *     }
          */
         ServiceHealthSummary: {
@@ -41345,59 +42372,81 @@ export interface components {
              * @example {
              *       "aws|azure|gcp|all": {
              *         "cloudProvider": "aws",
-             *         "deployingInstances": 374862597242548800,
-             *         "healthyInstances": 3376461084750113000,
+             *         "deployingInstances": 2463796148883940000,
+             *         "healthyInstances": 8776507645802514000,
              *         "message": "Cloud provider is healthy",
              *         "regionalHealthSummary": {
-             *           "Rem adipisci cumque ut consequatur eligendi molestias.": {
-             *             "deployingInstances": 4269911446912672000,
+             *           "Doloribus pariatur.": {
+             *             "deployingInstances": 5113054056419677000,
              *             "deploymentCellHealthSummary": {
-             *               "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *                 "deployingInstances": 2695512266003194400,
-             *                 "healthyInstances": 1179518186880526800,
+             *               "Perspiciatis iure alias iste et ea.": {
+             *                 "deployingInstances": 5731182758697466000,
+             *                 "healthyInstances": 6294965754346287000,
              *                 "hostClusterID": "hc-12345678",
              *                 "message": "Cell is healthy",
              *                 "status": "Healthy",
-             *                 "totalInstances": 4963653456427229000,
-             *                 "unhealthyInstances": 939936190848595700,
-             *                 "unknownInstances": 6821726574141972000
+             *                 "totalInstances": 415269972141220350,
+             *                 "unhealthyInstances": 4048093111193924600,
+             *                 "unknownInstances": 112597297833528370
              *               }
              *             },
-             *             "healthyInstances": 1020092016261208200,
+             *             "healthyInstances": 5105492144551250000,
              *             "message": "Region is healthy",
              *             "region": "us-east-1",
              *             "status": "Healthy",
-             *             "totalInstances": 2554731705631966000,
-             *             "unhealthyInstances": 1291772252767614500,
-             *             "unknownInstances": 5903418013056205000
+             *             "totalInstances": 4323423005147863000,
+             *             "unhealthyInstances": 5167448156807537000,
+             *             "unknownInstances": 8916355211072841000
              *           },
-             *           "Rem minima atque et.": {
-             *             "deployingInstances": 4269911446912672000,
+             *           "Laboriosam consequuntur.": {
+             *             "deployingInstances": 5113054056419677000,
              *             "deploymentCellHealthSummary": {
-             *               "Voluptas ex eligendi reprehenderit corrupti enim.": {
-             *                 "deployingInstances": 2695512266003194400,
-             *                 "healthyInstances": 1179518186880526800,
+             *               "Perspiciatis iure alias iste et ea.": {
+             *                 "deployingInstances": 5731182758697466000,
+             *                 "healthyInstances": 6294965754346287000,
              *                 "hostClusterID": "hc-12345678",
              *                 "message": "Cell is healthy",
              *                 "status": "Healthy",
-             *                 "totalInstances": 4963653456427229000,
-             *                 "unhealthyInstances": 939936190848595700,
-             *                 "unknownInstances": 6821726574141972000
+             *                 "totalInstances": 415269972141220350,
+             *                 "unhealthyInstances": 4048093111193924600,
+             *                 "unknownInstances": 112597297833528370
              *               }
              *             },
-             *             "healthyInstances": 1020092016261208200,
+             *             "healthyInstances": 5105492144551250000,
              *             "message": "Region is healthy",
              *             "region": "us-east-1",
              *             "status": "Healthy",
-             *             "totalInstances": 2554731705631966000,
-             *             "unhealthyInstances": 1291772252767614500,
-             *             "unknownInstances": 5903418013056205000
+             *             "totalInstances": 4323423005147863000,
+             *             "unhealthyInstances": 5167448156807537000,
+             *             "unknownInstances": 8916355211072841000
+             *           },
+             *           "Rem quae vero tempore.": {
+             *             "deployingInstances": 5113054056419677000,
+             *             "deploymentCellHealthSummary": {
+             *               "Perspiciatis iure alias iste et ea.": {
+             *                 "deployingInstances": 5731182758697466000,
+             *                 "healthyInstances": 6294965754346287000,
+             *                 "hostClusterID": "hc-12345678",
+             *                 "message": "Cell is healthy",
+             *                 "status": "Healthy",
+             *                 "totalInstances": 415269972141220350,
+             *                 "unhealthyInstances": 4048093111193924600,
+             *                 "unknownInstances": 112597297833528370
+             *               }
+             *             },
+             *             "healthyInstances": 5105492144551250000,
+             *             "message": "Region is healthy",
+             *             "region": "us-east-1",
+             *             "status": "Healthy",
+             *             "totalInstances": 4323423005147863000,
+             *             "unhealthyInstances": 5167448156807537000,
+             *             "unknownInstances": 8916355211072841000
              *           }
              *         },
              *         "status": "Healthy",
-             *         "totalInstances": 3073823606720058000,
-             *         "unhealthyInstances": 4675642646204044000,
-             *         "unknownInstances": 3139227852439534600
+             *         "totalInstances": 8510322164800731000,
+             *         "unhealthyInstances": 5626159578997479000,
+             *         "unknownInstances": 7773206575138310000
              *       }
              *     }
              */
@@ -41407,7 +42456,7 @@ export interface components {
             /**
              * Format: int64
              * @description The number of healthy instances in the region
-             * @example 4903979105091125000
+             * @example 8410515911220594000
              */
             healthyInstances: number;
             /**
@@ -41433,19 +42482,19 @@ export interface components {
             /**
              * Format: int64
              * @description The total number of instances in the region
-             * @example 244123965946182600
+             * @example 6439566646616645000
              */
             totalInstances: number;
             /**
              * Format: int64
              * @description The number of unhealthy instances in the region
-             * @example 22286938798554516
+             * @example 6050026363925740000
              */
             unhealthyInstances: number;
             /**
              * Format: int64
              * @description The number of instances with unknown status
-             * @example 3399481516196965000
+             * @example 6993730141587826000
              */
             unknownInstances?: number;
         };
@@ -41555,7 +42604,7 @@ export interface components {
          *       "serviceEnvironmentType": "DEV",
          *       "serviceEnvironmentURLKey": "dev",
          *       "serviceEnvironmentVisibility": "PRIVATE",
-         *       "serviceLogoURL": "Minima ullam pariatur debitis vel vel quia.",
+         *       "serviceLogoURL": "Nihil neque est rerum quas.",
          *       "serviceModelFeatures": [
          *         {
          *           "configuration": {
@@ -41687,27 +42736,13 @@ export interface components {
              *         },
              *         "feature": "LOGS",
              *         "scope": "INTERNAL"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "provider": "native"
-             *         },
-             *         "feature": "LOGS",
-             *         "scope": "INTERNAL"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "provider": "native"
-             *         },
-             *         "feature": "LOGS",
-             *         "scope": "INTERNAL"
              *       }
              *     ]
              */
             productTierFeatures?: components["schemas"]["ProductTierFeatureDetail"][];
             /**
              * @description ID of a Product Tier
-             * @example Architecto sed fuga aut repellendus nam.
+             * @example Sint dolorem ratione nesciunt.
              */
             productTierID: string;
             /**
@@ -41765,7 +42800,7 @@ export interface components {
             resourceParameters: components["schemas"]["ResourceEntity"][];
             /**
              * @description ID of a Service API
-             * @example Nam explicabo ducimus rerum nisi nemo.
+             * @example Necessitatibus possimus.
              */
             serviceAPIID: string;
             /**
@@ -41800,24 +42835,12 @@ export interface components {
             serviceEnvironmentVisibility: string;
             /**
              * @description The logo for the service
-             * @example Consequatur omnis aliquam quas nostrum iure.
+             * @example Aut et suscipit dolor.
              */
             serviceLogoURL: string;
             /**
              * @description Enabled service model features
              * @example [
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
-             *       {
-             *         "configuration": {
-             *           "status": "ON"
-             *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-             *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
@@ -41835,7 +42858,7 @@ export interface components {
             serviceModelFeatures?: components["schemas"]["ServiceModelFeatureDetail"][];
             /**
              * @description ID of a Service Model
-             * @example Et repellendus beatae consequuntur et et incidunt.
+             * @example Voluptatem dolore perferendis sunt.
              */
             serviceModelID: string;
             /**
@@ -41891,7 +42914,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a Product Tier
-             * @example Ab odit.
+             * @example Dolores magni id quaerat architecto.
              */
             productTierID: string;
             /**
@@ -41906,8 +42929,8 @@ export interface components {
          *       "eventCategory": "InstanceEvent",
          *       "eventID": "e-123456",
          *       "eventPayload": {
-         *         "Et qui et aut rerum.": "Hic illo ut.",
-         *         "Ullam fugit cupiditate id amet.": "Qui reprehenderit neque."
+         *         "Placeat voluptate et quos.": "Reprehenderit quo odio alias.",
+         *         "Quis illum.": "Saepe iusto fugit ullam iusto eos molestias."
          *       },
          *       "eventType": "UnhealthyInstance",
          *       "expiryTime": "2023-01-10T00:00:00Z",
@@ -41936,15 +42959,13 @@ export interface components {
             eventCategory: string;
             /**
              * @description ID of a Event
-             * @example Nulla quidem.
+             * @example Explicabo ratione fugiat illum voluptatem et.
              */
             eventID: string;
             /**
              * @description The event payload for a service provider
              * @example {
-             *       "Magnam delectus veritatis deleniti est.": "Voluptatem autem.",
-             *       "Quis error perferendis omnis vero.": "Occaecati ipsam hic adipisci.",
-             *       "Quos pariatur delectus mollitia necessitatibus.": "In voluptatibus."
+             *       "Quis eum debitis totam rerum.": "Ut optio harum."
              *     }
              */
             eventPayload: {
@@ -42036,18 +43057,18 @@ export interface components {
          *       "accountConfigId": "ac-12345678",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "js0"
+         *       "token": "t"
          *     }
          */
         SetActiveAccountConfigRequest: {
             /**
              * @description ID of an Account Config
-             * @example Quo hic.
+             * @example Debitis velit et qui et.
              */
             accountConfigId: string;
             /**
              * @description ID of a Service Model
-             * @example Autem id.
+             * @example Veritatis deleniti est sint voluptatem.
              */
             id: string;
             /**
@@ -42057,7 +43078,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example jfa
+             * @example b0
              */
             token: string;
         };
@@ -42071,7 +43092,7 @@ export interface components {
          *       ],
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "si"
+         *       "token": "6"
          *     }
          */
         SetEnvironmentVariablesRequest: {
@@ -42087,7 +43108,7 @@ export interface components {
             environmentVariables?: components["schemas"]["EnvironmentVariable"][];
             /**
              * @description ID of a resource
-             * @example Veniam nulla explicabo facere ab molestias.
+             * @example Ea assumenda molestias quod quos voluptatem.
              */
             id: string;
             /**
@@ -42097,7 +43118,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 6
+             * @example s
              */
             token: string;
         };
@@ -42127,7 +43148,7 @@ export interface components {
          * @example {
          *       "environmentType": "DEV",
          *       "name": "my-secret",
-         *       "token": "byt",
+         *       "token": "y",
          *       "value": "super-secret-value"
          *     }
          */
@@ -42144,7 +43165,7 @@ export interface components {
             name: string;
             /**
              * @description JWT token used to perform authorization
-             * @example zig
+             * @example 8e
              */
             token: string;
             /**
@@ -42248,7 +43269,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "s"
+         *       "token": "jd"
          *     }
          */
         StartResourceInstanceRequest: {
@@ -42289,7 +43310,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Necessitatibus facilis modi aut.
+             * @example Delectus saepe.
              */
             serviceProviderId: string;
             /**
@@ -42299,7 +43320,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example w
+             * @example iu
              */
             token: string;
         };
@@ -42314,7 +43335,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "5"
+         *       "token": "k"
          *     }
          */
         StopResourceInstanceRequest: {
@@ -42355,7 +43376,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Reiciendis nostrum.
+             * @example Ullam velit illo voluptates exercitationem in sapiente.
              */
             serviceProviderId: string;
             /**
@@ -42365,19 +43386,19 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example mfq
+             * @example s
              */
             token: string;
         };
         /**
          * @example {
-         *       "token": "pdp"
+         *       "token": "q"
          *     }
          */
         StripeAuthorizeURLRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 4cf
+             * @example v
              */
             token: string;
         };
@@ -42395,16 +43416,16 @@ export interface components {
         };
         /**
          * @example {
-         *       "certificateBase64": "Iusto voluptatum est sunt facilis.",
+         *       "certificateBase64": "Eveniet rerum repellat autem vero ut nisi.",
          *       "expirationDate": "2024-01-01T10:00:00Z",
-         *       "licenseBase64": "Saepe omnis laborum aliquid pariatur."
+         *       "licenseBase64": "Laudantium quis voluptatibus commodi."
          *     }
          */
         SubscriptionLicense: {
             /**
              * @description Public certificate used to sign the license in Base 64 format
              * @default
-             * @example Rerum quos hic molestiae.
+             * @example Iusto fugiat qui cum.
              */
             certificateBase64: string;
             /**
@@ -42415,7 +43436,7 @@ export interface components {
             /**
              * @description License file in Base 64 format
              * @default
-             * @example Alias ut.
+             * @example Dignissimos qui dolorem.
              */
             licenseBase64: string;
         };
@@ -42693,15 +43714,8 @@ export interface components {
          *       "baseVersion": "3.0",
          *       "createdAt": "2020-01-01T00:00:00Z",
          *       "createdBy": "John Doe",
-         *       "description": "Temporibus et et aut.",
+         *       "description": "Et sunt explicabo qui eaque est est.",
          *       "enabledFeatures": [
-         *         {
-         *           "configuration": {
-         *             "provider": "native"
-         *           },
-         *           "feature": "LOGS",
-         *           "scope": "INTERNAL"
-         *         },
          *         {
          *           "configuration": {
          *             "provider": "native"
@@ -42755,6 +43769,16 @@ export interface components {
          *           "managedResourceType": "PortsBasedProxy",
          *           "name": "MySQL multi-writer service",
          *           "urlKey": "myResource"
+         *         },
+         *         {
+         *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *           "id": "r-12345678",
+         *           "imageConfigId": "imgc-12345678",
+         *           "infraConfigId": "ic-12345678",
+         *           "isExternal": true,
+         *           "managedResourceType": "PortsBasedProxy",
+         *           "name": "MySQL multi-writer service",
+         *           "urlKey": "myResource"
          *         }
          *       ],
          *       "serviceId": "s-12345678",
@@ -42788,12 +43812,19 @@ export interface components {
             createdBy?: string;
             /**
              * @description A brief description of the product-tier version set.
-             * @example Animi molestias aut dignissimos numquam ea.
+             * @example Amet placeat nemo quos minima.
              */
             description?: string;
             /**
              * @description The features that are enabled for this product tier, including scope details and configuration
              * @example [
+             *       {
+             *         "configuration": {
+             *           "provider": "native"
+             *         },
+             *         "feature": "LOGS",
+             *         "scope": "INTERNAL"
+             *       },
              *       {
              *         "configuration": {
              *           "provider": "native"
@@ -42836,7 +43867,7 @@ export interface components {
             instanceCount?: number;
             /**
              * @description ID of an Upgrade Path
-             * @example Aliquid numquam illum.
+             * @example Est saepe aut culpa ad corporis.
              */
             latestUpgradePathId?: string;
             /**
@@ -42851,7 +43882,7 @@ export interface components {
             parentVersion?: string;
             /**
              * @description ID of a Product Tier
-             * @example Inventore est sunt.
+             * @example Qui asperiores reiciendis et.
              */
             productTierId: string;
             /**
@@ -42886,6 +43917,16 @@ export interface components {
              *         "managedResourceType": "PortsBasedProxy",
              *         "name": "MySQL multi-writer service",
              *         "urlKey": "myResource"
+             *       },
+             *       {
+             *         "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+             *         "id": "r-12345678",
+             *         "imageConfigId": "imgc-12345678",
+             *         "infraConfigId": "ic-12345678",
+             *         "isExternal": true,
+             *         "managedResourceType": "PortsBasedProxy",
+             *         "name": "MySQL multi-writer service",
+             *         "urlKey": "myResource"
              *       }
              *     ]
              */
@@ -42897,7 +43938,7 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Service Model
-             * @example Beatae rerum maiores deserunt placeat veritatis mollitia.
+             * @example Quia quod dolor perferendis perspiciatis.
              */
             serviceModelId: string;
             /**
@@ -42924,20 +43965,20 @@ export interface components {
         /**
          * @example {
          *       "productTierId": "Beatae beatae.",
-         *       "releaseNotes": "Itaque enim ex nulla at dolorem.",
+         *       "releaseNotes": "Fugiat et dolor dolorem animi et possimus.",
          *       "serviceId": "s-12345678",
-         *       "version": "Quod libero neque et."
+         *       "version": "Ex sed rerum eaque officia vero molestiae."
          *     }
          */
         TierVersionSetMetadata: {
             /**
              * @description ID of a Product Tier
-             * @example Ea dolore occaecati ipsam velit.
+             * @example Quisquam est placeat.
              */
             productTierId: string;
             /**
              * @description Release notes for the version set.
-             * @example Omnis repellendus accusantium nihil facere.
+             * @example Omnis fugiat possimus temporibus error.
              */
             releaseNotes?: string;
             /**
@@ -42947,18 +43988,18 @@ export interface components {
             serviceId: string;
             /**
              * @description The version number for the specific version set.
-             * @example Provident unde aut doloribus quas nihil unde.
+             * @example Ipsum voluptatibus adipisci ut ipsam quos.
              */
             version: string;
         };
         /**
          * @example {
-         *       "createdAt": "1987-06-30T04:57:31Z",
+         *       "createdAt": "1978-08-13T10:06:13Z",
          *       "hasSpecFile": true,
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
          *       "status": "Active",
-         *       "updatedAt": "1977-05-12T17:43:30Z",
+         *       "updatedAt": "1970-04-24T06:48:37Z",
          *       "version": "1.0"
          *     }
          */
@@ -42966,7 +44007,7 @@ export interface components {
             /**
              * Format: date-time
              * @description When the version was created
-             * @example 1977-05-09T09:21:34Z
+             * @example 1994-03-07T00:53:17Z
              */
             createdAt?: string;
             /**
@@ -42976,7 +44017,7 @@ export interface components {
             hasSpecFile: boolean;
             /**
              * @description ID of a Product Tier
-             * @example Aut quam voluptate doloremque quasi unde.
+             * @example Non aliquam ut.
              */
             productTierId: string;
             /**
@@ -42992,7 +44033,7 @@ export interface components {
             /**
              * Format: date-time
              * @description When the version was last updated
-             * @example 1991-04-20T08:17:16Z
+             * @example 1986-07-19T17:49:48Z
              */
             updatedAt?: string;
             /**
@@ -43005,13 +44046,13 @@ export interface components {
          * @example {
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "xl"
+         *       "token": "ii4"
          *     }
          */
         UndeprecateResourceRequest: {
             /**
              * @description ID of a resource
-             * @example Aut harum animi est.
+             * @example Accusantium cum est atque saepe consequatur incidunt.
              */
             id: string;
             /**
@@ -43021,7 +44062,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ioj
+             * @example z
              */
             token: string;
         };
@@ -43035,7 +44076,7 @@ export interface components {
          *       ],
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "6fk"
+         *       "token": "wm"
          *     }
          */
         UnsetEnvironmentVariablesRequest: {
@@ -43051,7 +44092,7 @@ export interface components {
             environmentVariables?: components["schemas"]["EnvironmentVariable"][];
             /**
              * @description ID of a resource
-             * @example Aut occaecati culpa vitae et.
+             * @example Blanditiis sit qui ut.
              */
             id: string;
             /**
@@ -43061,7 +44102,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example s
+             * @example 8
              */
             token: string;
         };
@@ -43093,7 +44134,7 @@ export interface components {
          *       "serviceId": "service-1234",
          *       "setConnection": true,
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "4cf"
+         *       "token": "2"
          *     }
          */
         UpdateAccountConfigResourceInstanceRequest: {
@@ -43119,7 +44160,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ed
+             * @example b
              */
             token: string;
         };
@@ -43170,7 +44211,7 @@ export interface components {
          *       },
          *       "rootVolumeSizeGi": 10,
          *       "serviceId": "s-12345678",
-         *       "token": "v",
+         *       "token": "bn",
          *       "warmPoolConfiguration": {
          *         "minimumNodesInPool": 1
          *       }
@@ -43190,7 +44231,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Compute Config
-             * @example Ad voluptas accusantium reiciendis doloremque blanditiis fugiat.
+             * @example Quibusdam quia eligendi sit nihil rerum error.
              */
             id: string;
             /**
@@ -43217,7 +44258,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example xnx
+             * @example j1
              */
             token: string;
             warmPoolConfiguration?: components["schemas"]["WarmPoolConfiguration"];
@@ -43283,13 +44324,13 @@ export interface components {
          * @example {
          *       "id": "n-12345678",
          *       "name": "Dev us-east-1",
-         *       "token": "1"
+         *       "token": "n"
          *     }
          */
         UpdateCustomNetworkRequest: {
             /**
              * @description ID of a custom network
-             * @example Sit dolorem.
+             * @example Eos non saepe non soluta.
              */
             id: string;
             /**
@@ -43299,7 +44340,7 @@ export interface components {
             name?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example la
+             * @example oy
              */
             token: string;
         };
@@ -43330,7 +44371,7 @@ export interface components {
          *         "region-abcd1234",
          *         "region-3c3c3c3c"
          *       ],
-         *       "token": "txo"
+         *       "token": "n4"
          *     }
          */
         UpdateDeploymentConfigRequest: {
@@ -43341,7 +44382,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Deployment Config
-             * @example Et nemo repellendus eos.
+             * @example Et laborum reiciendis et corporis.
              */
             id: string;
             infraRollConfiguration?: components["schemas"]["InfraRollConfiguration"];
@@ -43360,7 +44401,7 @@ export interface components {
             rolloutPriorityList?: string[];
             /**
              * @description JWT token used to perform authorization
-             * @example 3fo
+             * @example m06
              */
             token: string;
         };
@@ -43407,7 +44448,7 @@ export interface components {
          *       "fileId": "f-12345678",
          *       "id": "r-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "z94"
+         *       "token": "cd"
          *     }
          */
         UpdateFileContentRequest: {
@@ -43419,12 +44460,12 @@ export interface components {
             content_type: string;
             /**
              * @description ID of a File
-             * @example Non nisi voluptatum ab.
+             * @example Quas illo animi.
              */
             fileId: string;
             /**
              * @description ID of a resource
-             * @example Aliquid ullam explicabo vel.
+             * @example Sapiente officia eum magnam.
              */
             id: string;
             /**
@@ -43434,7 +44475,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 39
+             * @example if
              */
             token: string;
         };
@@ -43446,7 +44487,7 @@ export interface components {
          *       "mountPath": "/etc/config",
          *       "name": "file.txt",
          *       "serviceId": "s-12345678",
-         *       "token": "n"
+         *       "token": "xgq"
          *     }
          */
         UpdateFileMetadataRequest: {
@@ -43457,12 +44498,12 @@ export interface components {
             description?: string;
             /**
              * @description ID of a File
-             * @example Maiores expedita iusto quam magni.
+             * @example Aspernatur nihil.
              */
             fileId: string;
             /**
              * @description ID of a resource
-             * @example Distinctio culpa tenetur non asperiores.
+             * @example Autem et nesciunt nostrum.
              */
             id: string;
             /**
@@ -43482,7 +44523,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example gtr
+             * @example p
              */
             token: string;
         };
@@ -43523,7 +44564,7 @@ export interface components {
          *       "loginButtonText": "Login with Google",
          *       "name": "Google for my company",
          *       "scopes": "openid email profile",
-         *       "token": "0z",
+         *       "token": "ib",
          *       "tokenEndpoint": "https://oauth2.googleapis.com/token",
          *       "userInfoEndpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
          *     }
@@ -43561,7 +44602,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description ID of an Identity Provider
-             * @example Deleniti excepturi fugit voluptas eum ratione.
+             * @example Excepturi nostrum.
              */
             id: string;
             /**
@@ -43586,7 +44627,7 @@ export interface components {
             scopes?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example m
+             * @example s
              */
             token: string;
             /**
@@ -43698,7 +44739,7 @@ export interface components {
          *       "imageSignaturePublicKeyPEM": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "imageTag": "v1",
          *       "serviceId": "s-12345678",
-         *       "token": "6ve"
+         *       "token": "7a"
          *     }
          */
         UpdateImageConfigRequest: {
@@ -43710,7 +44751,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of an Image Config
-             * @example Nihil et qui laudantium.
+             * @example Aliquid iusto.
              */
             id: string;
             /**
@@ -43720,7 +44761,7 @@ export interface components {
             imageName?: string;
             /**
              * @description ID of an Image Registry
-             * @example Error alias repudiandae non sit reprehenderit.
+             * @example Incidunt esse quis quia ut sit.
              */
             imageRegistryId?: string;
             /**
@@ -43743,7 +44784,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example hi
              */
             token: string;
         };
@@ -43761,7 +44802,7 @@ export interface components {
          *       },
          *       "description": "An image configuration for my new entity",
          *       "imageName": "mysql",
-         *       "imageRegistryId": "Atque dolore corporis.",
+         *       "imageRegistryId": "Ratione aut et aliquam iusto qui dolorem.",
          *       "imageSignaturePublicKeyPEM": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "imageTag": "v1"
          *     }
@@ -43780,7 +44821,7 @@ export interface components {
             imageName?: string;
             /**
              * @description The image registry ID to use for the infra
-             * @example Quisquam debitis quas sed consequatur quo.
+             * @example Adipisci autem omnis culpa.
              */
             imageRegistryId?: string;
             /**
@@ -43805,7 +44846,7 @@ export interface components {
          *       "id": "ir-12345678",
          *       "name": "DockerHub",
          *       "password": "mypassword",
-         *       "token": "bn",
+         *       "token": "gz",
          *       "username": "myusername"
          *     }
          */
@@ -43822,7 +44863,7 @@ export interface components {
             host?: string;
             /**
              * @description ID of an Image Registry
-             * @example Quibusdam quia eligendi sit nihil rerum error.
+             * @example Consectetur debitis et voluptas labore.
              */
             id: string;
             /**
@@ -43837,7 +44878,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example j1
+             * @example n
              */
             token: string;
             /**
@@ -43896,13 +44937,13 @@ export interface components {
          *       "networkConfigId": "nc-12345678",
          *       "serviceId": "s-12345678",
          *       "storageConfigId": "sc-12345678",
-         *       "token": "st6"
+         *       "token": "cu"
          *     }
          */
         UpdateInfraConfigRequest: {
             /**
              * @description ID of a Compute Config
-             * @example Fugit architecto aut.
+             * @example Natus quae sequi praesentium.
              */
             computeConfigId?: string;
             customTag?: components["schemas"]["CustomTag"];
@@ -43913,7 +44954,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of an Infra Config
-             * @example Rerum sed cum sapiente tenetur tenetur ducimus.
+             * @example Dolore animi.
              */
             id: string;
             /**
@@ -43923,7 +44964,7 @@ export interface components {
             name?: string;
             /**
              * @description ID of a Network Config
-             * @example Necessitatibus ullam et tenetur vel laboriosam.
+             * @example Quaerat id repellat quia.
              */
             networkConfigId?: string;
             /**
@@ -43933,32 +44974,32 @@ export interface components {
             serviceId: string;
             /**
              * @description ID of a Storage Config
-             * @example Aut impedit hic.
+             * @example Sint est laborum commodi dolores quisquam nemo.
              */
             storageConfigId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example h8
+             * @example 35r
              */
             token: string;
         };
         /**
          * @example {
-         *       "computeConfigId": "Non reiciendis nisi dolorem voluptas saepe provident.",
+         *       "computeConfigId": "Ipsa consequuntur consequatur voluptate modi.",
          *       "customTag": {
          *         "key": "customKey",
          *         "value": "customValue"
          *       },
          *       "description": "Infra config used for the base tier MySQL service",
          *       "name": "MySQL Writer Infra Config",
-         *       "networkConfigId": "Aperiam repudiandae rerum.",
-         *       "storageConfigId": "Quidem et optio quisquam impedit nesciunt optio."
+         *       "networkConfigId": "Omnis in officia.",
+         *       "storageConfigId": "Amet temporibus."
          *     }
          */
         UpdateInfraConfigRequest2: {
             /**
              * @description The compute config ID
-             * @example Nemo vero ad blanditiis a quis fugiat.
+             * @example Culpa mollitia repellat libero minima sunt.
              */
             computeConfigId?: string;
             customTag?: components["schemas"]["CustomTag"];
@@ -43974,20 +45015,20 @@ export interface components {
             name?: string;
             /**
              * @description The network config ID
-             * @example Quae aut ea dolores odit officia.
+             * @example Delectus recusandae et debitis praesentium id aperiam.
              */
             networkConfigId?: string;
             /**
              * @description The storage config ID per compute node
-             * @example Atque inventore quo dolores consequatur.
+             * @example Molestiae ducimus rerum consequatur.
              */
             storageConfigId?: string;
         };
         /**
          * @example {
          *       "defaultValue": "[\"1\", \"2.8\", \"3\"]",
-         *       "description": "Quis quo ea.",
-         *       "hasOptions": false,
+         *       "description": "Voluptatem harum veniam nulla explicabo.",
+         *       "hasOptions": true,
          *       "id": "var-12345678",
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
@@ -44000,14 +45041,14 @@ export interface components {
          *         "min": "Rerum nisi beatae voluptas mollitia nostrum vel.",
          *         "minLength": "Eveniet architecto assumenda et voluptas perferendis enim."
          *       },
-         *       "modifiable": false,
-         *       "name": "gou",
+         *       "modifiable": true,
+         *       "name": "g",
          *       "options": [
          *         "[\"1\", \"2.8\", \"3\"]",
          *         "[\"3.4\", \"4.5\"]"
          *       ],
          *       "regex": "^[0-9]+$",
-         *       "required": true,
+         *       "required": false,
          *       "scope": {
          *         "cloudProviders": [
          *           "aws",
@@ -44017,7 +45058,7 @@ export interface components {
          *       },
          *       "serviceId": "s-12345678",
          *       "tabIndex": 1,
-         *       "token": "5"
+         *       "token": "owc"
          *     }
          */
         UpdateInputParameterRequest: {
@@ -44028,17 +45069,17 @@ export interface components {
             defaultValue?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Dolor aut tenetur voluptas cupiditate eos delectus.
+             * @example Commodi sequi.
              */
             description?: string;
             /**
              * @description Marks the input parameter to be selectable from a list of values
-             * @example true
+             * @example false
              */
             hasOptions?: boolean;
             /**
              * @description ID of an Input Parameter
-             * @example Molestias dolores consequatur maxime et.
+             * @example Sed id sed ea veritatis quam.
              */
             id: string;
             /**
@@ -44055,12 +45096,12 @@ export interface components {
             limits?: components["schemas"]["Limits"];
             /**
              * @description Marks the input parameter as immutable
-             * @example false
+             * @example true
              */
             modifiable?: boolean;
             /**
              * @description External name for the input parameter
-             * @example i
+             * @example e
              */
             name?: string;
             /**
@@ -44078,7 +45119,7 @@ export interface components {
             regex?: string;
             /**
              * @description Enforces the input parameter as a required parameter
-             * @example false
+             * @example true
              */
             required?: boolean;
             scope?: components["schemas"]["InputParameterScope"];
@@ -44096,15 +45137,15 @@ export interface components {
             tabIndex: number;
             /**
              * @description JWT token used to perform authorization
-             * @example ffy
+             * @example g0
              */
             token: string;
         };
         /**
          * @example {
          *       "defaultValue": "[\"1\", \"2.8\", \"3\"]",
-         *       "description": "Et autem dolores voluptatem.",
-         *       "hasOptions": false,
+         *       "description": "Enim veritatis molestias dolor et suscipit recusandae.",
+         *       "hasOptions": true,
          *       "labeledOptions": {
          *         "large": "t3.xlarge",
          *         "medium": "t3.large",
@@ -44116,8 +45157,8 @@ export interface components {
          *         "min": "Sed eligendi.",
          *         "minLength": "Ab sint."
          *       },
-         *       "modifiable": true,
-         *       "name": "3h2",
+         *       "modifiable": false,
+         *       "name": "vl",
          *       "options": [
          *         "[\"1\", \"2.8\", \"3\"]",
          *         "[\"3.4\", \"4.5\"]"
@@ -44142,7 +45183,7 @@ export interface components {
             defaultValue?: string;
             /**
              * @description A brief description of the input parameter
-             * @example Ab esse qui quos nihil.
+             * @example Voluptas nulla.
              */
             description?: string;
             /**
@@ -44164,12 +45205,12 @@ export interface components {
             limits?: components["schemas"]["Limits"];
             /**
              * @description Marks the input parameter as immutable
-             * @example true
+             * @example false
              */
             modifiable?: boolean;
             /**
              * @description External name for the input parameter
-             * @example 5
+             * @example y4
              */
             name?: string;
             /**
@@ -44206,13 +45247,13 @@ export interface components {
          *       "instanceStorageThroughputMiBps": "128",
          *       "instanceStorageType": "AWS::EBS_GP2",
          *       "serviceId": "s-12345678",
-         *       "token": "4d"
+         *       "token": "8"
          *     }
          */
         UpdateInstanceStorageVolumeConfigRequest: {
             /**
              * @description ID of a Storage Volume Config
-             * @example Nisi qui earum dolorum quidem et quia.
+             * @example Ipsum molestiae.
              */
             id: string;
             /**
@@ -44237,7 +45278,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k
+             * @example qp
              */
             token: string;
         };
@@ -44271,7 +45312,7 @@ export interface components {
          *       "family": "COMPUTE_INFRA",
          *       "key": "MAX_VIRTUAL_CORES_PER_RESOURCE",
          *       "name": "Premium Tier",
-         *       "token": "nl",
+         *       "token": "4sy",
          *       "value": 4
          *     }
          */
@@ -44298,7 +45339,7 @@ export interface components {
             name?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r3
+             * @example q50
              */
             token: string;
             /**
@@ -44373,7 +45414,7 @@ export interface components {
          *       "serviceId": "s-12345678",
          *       "stableEgressIP": true,
          *       "tlsTerminationPort": 443,
-         *       "token": "r3",
+         *       "token": "0c",
          *       "zoneConfiguration": "SINGLE_ZONE_OMNISTRATE_RECOMMENDED|SINGLE_ZONE_CUSTOMER_PROVIDED|MULTI_ZONE"
          *     }
          */
@@ -44390,7 +45431,7 @@ export interface components {
             endpointPerReplica?: boolean;
             /**
              * @description ID of a Network Config
-             * @example Alias molestiae fugiat consequuntur.
+             * @example Totam vitae mollitia corporis odit magni aut.
              */
             id: string;
             /**
@@ -44431,7 +45472,7 @@ export interface components {
             tlsTerminationPort?: number;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example cy
              */
             token: string;
             /**
@@ -44551,7 +45592,7 @@ export interface components {
          *       },
          *       "name": "Username",
          *       "serviceId": "s-12345678",
-         *       "token": "fn",
+         *       "token": "9uh",
          *       "value": "johndoe",
          *       "valueRef": "$var.username",
          *       "valueType": "Boolean|Float64|String|Secret|Password"
@@ -44566,7 +45607,7 @@ export interface components {
             genericCommandValueProvider?: components["schemas"]["GenericCommandValueProviderConfig"];
             /**
              * @description ID of an Output Parameter
-             * @example Sapiente facilis adipisci velit inventore reiciendis accusantium.
+             * @example Ut sit omnis suscipit voluptas consequatur.
              */
             id: string;
             kubectlValueProvider?: components["schemas"]["KubectlValueProviderConfig"];
@@ -44582,7 +45623,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example 0tu
              */
             token: string;
             /**
@@ -44665,7 +45706,7 @@ export interface components {
          *       "currentPassword": "currentPassword",
          *       "currentPasswordHash": "currentPasswordHash",
          *       "password": "password",
-         *       "token": "r6o"
+         *       "token": "cj"
          *     }
          */
         UpdatePasswordRequest: {
@@ -44677,7 +45718,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example dm6
              */
             token: string;
         };
@@ -44706,7 +45747,7 @@ export interface components {
          *         "se-23456789"
          *       ],
          *       "serviceId": "s-12345678",
-         *       "token": "vz"
+         *       "token": "dhd"
          *     }
          */
         UpdatePipelineRequest: {
@@ -44717,7 +45758,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Pipeline
-             * @example Quia voluptate id.
+             * @example Magni possimus eos.
              */
             id?: string;
             /**
@@ -44740,7 +45781,7 @@ export interface components {
             serviceId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example d
+             * @example to6
              */
             token: string;
         };
@@ -44825,7 +45866,7 @@ export interface components {
          *       "serviceId": "s-12345678",
          *       "support": "Any support",
          *       "tierType": "OMNISTRATE_DEDICATED_TENANCY",
-         *       "token": "5wd"
+         *       "token": "h"
          *     }
          */
         UpdateProductTierRequest: {
@@ -44912,7 +45953,7 @@ export interface components {
             gcpRegions?: string[];
             /**
              * @description ID of a Product Tier
-             * @example Molestiae rem.
+             * @example Distinctio facere ex dolor delectus.
              */
             id: string;
             /**
@@ -45006,7 +46047,7 @@ export interface components {
             tierType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 0c
+             * @example t
              */
             token: string;
         };
@@ -45284,7 +46325,7 @@ export interface components {
          *       "serviceModelKey": "hosted",
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "1"
+         *       "token": "k"
          *     }
          */
         UpdateResourceInstanceRequest: {
@@ -45352,7 +46393,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Animi odit nisi consequatur.
+             * @example Dolor laborum.
              */
             serviceProviderId: string;
             /**
@@ -45362,7 +46403,7 @@ export interface components {
             subscriptionId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8u
+             * @example w
              */
             token: string;
         };
@@ -45808,7 +46849,7 @@ export interface components {
          *           "terraformPath": "/project1/tf"
          *         }
          *       },
-         *       "token": "g"
+         *       "token": "80q"
          *     }
          */
         UpdateResourceRequest: {
@@ -45893,17 +46934,17 @@ export interface components {
             helmChartConfiguration?: components["schemas"]["HelmChartConfiguration"];
             /**
              * @description ID of a resource
-             * @example Ipsa repellendus vel.
+             * @example Debitis non quis.
              */
             id: string;
             /**
              * @description ID of an Image Config
-             * @example Enim quas.
+             * @example Architecto quis.
              */
             imageConfigId?: string;
             /**
              * @description ID of an Infra Config
-             * @example Et est.
+             * @example Perspiciatis sit pariatur.
              */
             infraConfigId?: string;
             jobConfig?: components["schemas"]["JobConfig"];
@@ -45925,7 +46966,7 @@ export interface components {
             terraformConfigurations?: components["schemas"]["TerraformConfigurations"];
             /**
              * @description JWT token used to perform authorization
-             * @example 0j5
+             * @example s
              */
             token: string;
         };
@@ -46159,8 +47200,8 @@ export interface components {
          *         },
          *         "username": "my-user"
          *       },
-         *       "imageConfigId": "Necessitatibus explicabo accusantium vitae eos eum ut.",
-         *       "infraConfigId": "Quo vel modi dolore quo.",
+         *       "imageConfigId": "Placeat nobis dolorem provident quia sed.",
+         *       "infraConfigId": "Excepturi et consequatur sit cum.",
          *       "jobConfig": {
          *         "activeDeadlineSeconds": 300,
          *         "backoffLimit": 5
@@ -46413,12 +47454,12 @@ export interface components {
             helmChartConfiguration?: components["schemas"]["HelmChartConfiguration"];
             /**
              * @description The ID of the image configuration that this resource refers to
-             * @example Occaecati id nihil quia laborum.
+             * @example Laboriosam dignissimos dolorem ratione.
              */
             imageConfigId?: string;
             /**
              * @description The ID of the infrastructure configuration that this resource refers to
-             * @example Voluptas numquam ipsa repellendus inventore.
+             * @example Ut voluptatibus dolorum eius fugiat et.
              */
             infraConfigId?: string;
             jobConfig?: components["schemas"]["JobConfig"];
@@ -46474,7 +47515,7 @@ export interface components {
          *       "description": "My custom domain description",
          *       "environmentType": "DEV",
          *       "name": "MyCustomDomain",
-         *       "token": "fbk"
+         *       "token": "on"
          *     }
          */
         UpdateSaaSPortalCustomDomainRequest: {
@@ -46500,7 +47541,7 @@ export interface components {
             name?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example sx8
+             * @example ss
              */
             token: string;
         };
@@ -46546,7 +47587,7 @@ export interface components {
          *         "imageRegistry": "ghcr.io",
          *         "imageTag": "latest"
          *       },
-         *       "token": "rou"
+         *       "token": "zp"
          *     }
          */
         UpdateSaaSPortalRequest: {
@@ -46574,7 +47615,7 @@ export interface components {
             imageConfig?: components["schemas"]["SaaSPortalImageConfig"];
             /**
              * @description JWT token used to perform authorization
-             * @example xwo
+             * @example 0
              */
             token: string;
         };
@@ -46621,7 +47662,7 @@ export interface components {
          *       "description": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
          *       "id": "sa-12345678",
          *       "serviceId": "s-12345678",
-         *       "token": "u1"
+         *       "token": "e"
          *     }
          */
         UpdateServiceAPIRequest: {
@@ -46632,7 +47673,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Service API
-             * @example Asperiores nesciunt dolore.
+             * @example Mollitia at est.
              */
             id: string;
             /**
@@ -46642,7 +47683,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example 0s
              */
             token: string;
         };
@@ -46668,7 +47709,7 @@ export interface components {
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
          *       "serviceId": "s-12345678",
          *       "sourceEnvironmentId": "se-12345678",
-         *       "token": "uix",
+         *       "token": "g",
          *       "visibility": "PUBLIC"
          *     }
          */
@@ -46680,7 +47721,7 @@ export interface components {
             autoApproveSubscription?: boolean;
             /**
              * @description ID of a Deployment Config
-             * @example Recusandae odit quis.
+             * @example Unde sint qui cupiditate laudantium.
              */
             deploymentConfigId?: string;
             /**
@@ -46718,7 +47759,7 @@ export interface components {
             sourceEnvironmentId?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example fe
+             * @example xn
              */
             token: string;
             /**
@@ -46730,7 +47771,7 @@ export interface components {
         /**
          * @example {
          *       "autoApproveSubscription": false,
-         *       "deploymentConfigId": "Rem quod sunt exercitationem quia voluptatum.",
+         *       "deploymentConfigId": "Non reiciendis nisi dolorem voluptas saepe provident.",
          *       "description": "The production environment for the MySQL multi-writer service",
          *       "name": "Production",
          *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
@@ -46746,7 +47787,7 @@ export interface components {
             autoApproveSubscription?: boolean;
             /**
              * @description The deployment configuration ID
-             * @example Eaque recusandae et.
+             * @example Quae aut ea dolores odit officia.
              */
             deploymentConfigId?: string;
             /**
@@ -46784,7 +47825,7 @@ export interface components {
          *       "id": "sm-12345678",
          *       "name": "MySQL multi-writer service hosted model",
          *       "serviceId": "s-12345678",
-         *       "token": "82m"
+         *       "token": "w"
          *     }
          */
         UpdateServiceModelRequest: {
@@ -46795,7 +47836,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Service Model
-             * @example Voluptatem in ipsam.
+             * @example Consequatur eligendi molestias dolore natus est autem.
              */
             id: string;
             /**
@@ -46810,7 +47851,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example tbg
+             * @example d
              */
             token: string;
         };
@@ -46837,8 +47878,8 @@ export interface components {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "id": "s-12345678",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "Aspernatur architecto molestiae velit tenetur adipisci.",
-         *       "token": "dj"
+         *       "serviceLogoURL": "Ut rerum repudiandae possimus.",
+         *       "token": "82m"
          *     }
          */
         UpdateServiceRequest: {
@@ -46859,12 +47900,12 @@ export interface components {
             name?: string;
             /**
              * @description The logo for the service
-             * @example Est ut ut.
+             * @example Voluptatem in ipsam.
              */
             serviceLogoURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 6yt
+             * @example tbg
              */
             token: string;
         };
@@ -46872,7 +47913,7 @@ export interface components {
          * @example {
          *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
          *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "Atque explicabo qui in neque et ipsum."
+         *       "serviceLogoURL": "Ut sit nam modi nihil magni."
          *     }
          */
         UpdateServiceRequest2: {
@@ -46888,7 +47929,7 @@ export interface components {
             name?: string;
             /**
              * @description The logo for the service
-             * @example Eveniet quibusdam perspiciatis nesciunt quisquam.
+             * @example Sit vel et.
              */
             serviceLogoURL?: string;
         };
@@ -46898,7 +47939,7 @@ export interface components {
          *       "id": "sc-12345678",
          *       "name": "my-storage-config",
          *       "serviceId": "s-12345678",
-         *       "token": "hpq"
+         *       "token": "y"
          *     }
          */
         UpdateStorageConfigRequest: {
@@ -46909,7 +47950,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of a Storage Config
-             * @example Nemo cupiditate et voluptatem exercitationem quo.
+             * @example Explicabo tenetur quidem consectetur quasi qui distinctio.
              */
             id: string;
             /**
@@ -46924,7 +47965,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example qu
+             * @example p1f
              */
             token: string;
         };
@@ -46953,7 +47994,7 @@ export interface components {
          *       "id": "svc-12345678",
          *       "name": "MySQL Data Volume",
          *       "serviceId": "s-12345678",
-         *       "token": "uc"
+         *       "token": "j"
          *     }
          */
         UpdateStorageVolumeConfigRequest: {
@@ -46969,7 +48010,7 @@ export interface components {
             disableBackup?: boolean;
             /**
              * @description ID of a Storage Volume Config
-             * @example In dolores dolor voluptatibus eligendi voluptas enim.
+             * @example Ut officia dolores harum dolorem voluptatem voluptatem.
              */
             id: string;
             /**
@@ -46984,7 +48025,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 5
+             * @example o
              */
             token: string;
         };
@@ -47017,13 +48058,13 @@ export interface components {
          *       "id": "svc-12345678",
          *       "instanceStorageSizeGi": "$var.storage_size",
          *       "serviceId": "s-12345678",
-         *       "token": "zi"
+         *       "token": "4"
          *     }
          */
         UpdateStorageVolumeSizeConfigRequest: {
             /**
              * @description ID of a Storage Volume Config
-             * @example Et voluptas labore qui.
+             * @example Est tempora officiis excepturi voluptate repellendus consequuntur.
              */
             id: string;
             /**
@@ -47038,7 +48079,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example v
+             * @example dxy
              */
             token: string;
         };
@@ -47057,21 +48098,21 @@ export interface components {
         /**
          * @example {
          *       "productTierId": "Beatae beatae.",
-         *       "releaseNotes": "Aut eveniet tempora quia sed.",
+         *       "releaseNotes": "Fuga aut.",
          *       "serviceId": "s-12345678",
-         *       "token": "0",
+         *       "token": "f",
          *       "version": "3.0"
          *     }
          */
         UpdateTierVersionSetMetadataRequest: {
             /**
              * @description ID of a Product Tier
-             * @example Aliquid ipsam quis voluptas deleniti autem est.
+             * @example Et laboriosam voluptas.
              */
             productTierId: string;
             /**
              * @description Release notes for the version set.
-             * @example Accusamus odit nisi qui.
+             * @example Consequuntur voluptatem vel.
              */
             releaseNotes?: string;
             /**
@@ -47081,7 +48122,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example szt
              */
             token: string;
             /**
@@ -47092,13 +48133,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "releaseNotes": "Quam voluptatem qui inventore."
+         *       "releaseNotes": "Totam laboriosam pariatur fugiat quaerat."
          *     }
          */
         UpdateTierVersionSetMetadataRequest2: {
             /**
              * @description Release notes for the version set.
-             * @example Doloribus accusantium.
+             * @example Reprehenderit aliquam voluptatem.
              */
             releaseNotes?: string;
         };
@@ -47107,7 +48148,7 @@ export interface components {
          *       "name": "Updated version set name",
          *       "productTierId": "Beatae beatae.",
          *       "serviceId": "s-12345678",
-         *       "token": "7cg",
+         *       "token": "q",
          *       "version": "3.0"
          *     }
          */
@@ -47119,7 +48160,7 @@ export interface components {
             name: string;
             /**
              * @description ID of a Product Tier
-             * @example Assumenda sint dolores autem autem.
+             * @example Quo rerum sint ex ut.
              */
             productTierId: string;
             /**
@@ -47129,7 +48170,7 @@ export interface components {
             serviceId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2vc
+             * @example y
              */
             token: string;
             /**
@@ -47158,7 +48199,7 @@ export interface components {
          *       "serviceId": "s-12345678",
          *       "sourceVersion": "567.0",
          *       "targetVersion": "589.0",
-         *       "token": "jb"
+         *       "token": "1"
          *     }
          */
         UpdateUpgradePathRequest: {
@@ -47169,7 +48210,7 @@ export interface components {
             description?: string;
             /**
              * @description ID of an Upgrade Path
-             * @example Modi amet cumque laudantium est ex.
+             * @example Delectus voluptatem delectus.
              */
             id?: string;
             /**
@@ -47194,7 +48235,7 @@ export interface components {
             targetVersion?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example u
+             * @example hb
              */
             token: string;
         };
@@ -47215,16 +48256,16 @@ export interface components {
          *       },
          *       "id": "user-abcd1234",
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Odit est soluta cumque vero et molestiae.",
+         *       "orgCookiePolicy": "Voluptatem et.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "http://cummerata.org/sigurd.senger",
-         *       "orgLogoURL": "http://spencer.com/ashleigh.schroeder",
+         *       "orgFavIconURL": "http://huel.info/craig",
+         *       "orgLogoURL": "http://farrell.info/emery_bernier",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Eum rerum et ad delectus eos labore.",
+         *       "orgPrivacyPolicy": "Ut optio et et.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Sint voluptas illum.",
+         *       "orgTermsOfUse": "Unde ducimus.",
          *       "orgURL": "something.acme",
-         *       "token": "w"
+         *       "token": "a2"
          *     }
          */
         UpdateUserRequest: {
@@ -47251,7 +48292,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns in an HTML format
-             * @example Rerum quas quam.
+             * @example Voluptatem recusandae optio qui eum.
              */
             orgCookiePolicy?: string;
             /**
@@ -47262,13 +48303,13 @@ export interface components {
             /**
              * Format: uri
              * @description The favicon of the org that this user owns
-             * @example http://boyle.name/turner
+             * @example http://ankundingbrekke.biz/sonia_corwin
              */
             orgFavIconURL?: string;
             /**
              * Format: uri
              * @description The logo of the org that this user owns
-             * @example http://christiansen.name/kristin_kertzmann
+             * @example http://mueller.com/carolanne
              */
             orgLogoURL?: string;
             /**
@@ -47278,7 +48319,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns in an HTML format
-             * @example Sed rem cumque nihil neque.
+             * @example Quas consequatur tempora illum animi dolore consequatur.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -47288,7 +48329,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns in an HTML format
-             * @example Suscipit sunt omnis et illum fuga vel.
+             * @example Ea itaque sint sed iste voluptatem.
              */
             orgTermsOfUse?: string;
             /**
@@ -47298,7 +48339,7 @@ export interface components {
             orgURL?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ss
+             * @example z
              */
             token: string;
         };
@@ -47318,14 +48359,14 @@ export interface components {
          *         "key2": "value2"
          *       },
          *       "name": "John Dae",
-         *       "orgCookiePolicy": "Esse veniam architecto vitae.",
+         *       "orgCookiePolicy": "Dolor officiis beatae atque.",
          *       "orgDescription": "ACME Inc.",
-         *       "orgFavIconURL": "http://williamson.info/emmanuel.schiller",
-         *       "orgLogoURL": "http://kessler.biz/clemmie.raynor",
+         *       "orgFavIconURL": "http://roweweber.name/cyril.stark",
+         *       "orgLogoURL": "http://balistreri.com/adrianna",
          *       "orgName": "ACME",
-         *       "orgPrivacyPolicy": "Consequatur ipsam consectetur labore maiores.",
+         *       "orgPrivacyPolicy": "Illo cum eveniet.",
          *       "orgSupportEmail": "support@example.com",
-         *       "orgTermsOfUse": "Repellendus quos dolorum commodi.",
+         *       "orgTermsOfUse": "Voluptas est optio eligendi quo praesentium.",
          *       "orgURL": "something.acme"
          *     }
          */
@@ -47348,7 +48389,7 @@ export interface components {
             name?: string;
             /**
              * @description The cookie policy for the org that this user owns in an HTML format
-             * @example Ea aut iure.
+             * @example Quis autem maiores velit.
              */
             orgCookiePolicy?: string;
             /**
@@ -47359,13 +48400,13 @@ export interface components {
             /**
              * Format: uri
              * @description The favicon of the org that this user owns
-             * @example http://kessler.info/meredith
+             * @example http://bradtkebahringer.org/golda
              */
             orgFavIconURL?: string;
             /**
              * Format: uri
              * @description The logo of the org that this user owns
-             * @example http://rodriguezmorar.info/gage_breitenberg
+             * @example http://baumbach.org/louie
              */
             orgLogoURL?: string;
             /**
@@ -47375,7 +48416,7 @@ export interface components {
             orgName?: string;
             /**
              * @description The privacy policy for the org that this user owns in an HTML format
-             * @example Omnis molestiae.
+             * @example Ipsum autem asperiores maiores animi placeat.
              */
             orgPrivacyPolicy?: string;
             /**
@@ -47385,7 +48426,7 @@ export interface components {
             orgSupportEmail?: string;
             /**
              * @description The terms of use for the org that this user owns in an HTML format
-             * @example Fugit voluptatem.
+             * @example Et officiis porro consectetur.
              */
             orgTermsOfUse?: string;
             /**
@@ -47406,7 +48447,7 @@ export interface components {
          *       "serviceProviderId": "omnistrate",
          *       "subscriptionId": "sub-abcd1234",
          *       "targetVersion": "2.0",
-         *       "token": "ce"
+         *       "token": "z"
          *     }
          */
         UpgradeResourceInstanceVersionRequest: {
@@ -47447,7 +48488,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description ID of a Service Provider
-             * @example Molestiae quasi iste dolorem occaecati aut esse.
+             * @example Modi unde.
              */
             serviceProviderId: string;
             /**
@@ -47462,7 +48503,7 @@ export interface components {
             targetVersion?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r
+             * @example m
              */
             token: string;
         };
@@ -47474,7 +48515,7 @@ export interface components {
          *       "serviceEnvironmentKey": "dev",
          *       "serviceKey": "service-orchestration",
          *       "serviceModelKey": "hosted",
-         *       "serviceProviderId": "Hic quia veritatis.",
+         *       "serviceProviderId": "Doloremque dolorem consectetur doloremque iusto officia minima.",
          *       "targetVersion": "2.0"
          *     }
          */
@@ -47511,7 +48552,7 @@ export interface components {
             serviceModelKey: string;
             /**
              * @description The service provider ID
-             * @example Exercitationem quisquam soluta alias.
+             * @example Ducimus et exercitationem perferendis.
              */
             serviceProviderId: string;
             /**
@@ -47611,54 +48652,54 @@ export interface components {
         /**
          * @example {
          *       "id": "ac-12345678",
-         *       "token": "y"
+         *       "token": "17"
          *     }
          */
         VerifyAccountConfigRequest: {
             /**
              * @description ID of an Account Config
-             * @example Pariatur quos eum.
+             * @example Aut magni id quaerat itaque sed.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example et9
+             * @example 33o
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "cd-12345678",
-         *       "token": "9"
+         *       "token": "u0"
          *     }
          */
         VerifyCustomDomainRequest: {
             /**
              * @description ID of an Custom Domain
-             * @example Natus harum labore assumenda nisi.
+             * @example Cupiditate quod.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example zx
+             * @example fx
              */
             token: string;
         };
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "gf"
+         *       "token": "um"
          *     }
          */
         VerifyIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Porro vitae quos possimus.
+             * @example Ea ullam eveniet aut.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example p
+             * @example are
              */
             token: string;
         };
@@ -47685,7 +48726,7 @@ export interface components {
             clientSecret?: string;
             /**
              * @description ID of an Identity Provider
-             * @example Eveniet provident.
+             * @example Officia id tenetur inventore voluptatem fugit.
              */
             id: string;
             /**
@@ -47765,19 +48806,19 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "awsAccessKey": "Provident officia nihil quo alias vel.",
+                 *       "awsAccessKey": "Debitis quisquam reiciendis.",
                  *       "awsAccountID": "123456789012",
                  *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-                 *       "awsSecretKey": "Eius temporibus ex eos tempore nostrum nesciunt.",
+                 *       "awsSecretKey": "Eligendi fugit ut et repellendus.",
                  *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
                  *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
                  *       "byoaInstanceID": "instance-12345678",
-                 *       "cloudProviderId": "Id repellat assumenda.",
+                 *       "cloudProviderId": "Exercitationem quas est.",
                  *       "description": "An AWS account hosting multiple dev environments",
                  *       "gcpProjectID": "my-project",
                  *       "gcpProjectNumber": "123456789012",
                  *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                 *       "gcpServiceAccountKey": "Animi ad.",
+                 *       "gcpServiceAccountKey": "Quaerat dolore.",
                  *       "name": "Dev AWS account",
                  *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                  *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -47793,7 +48834,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Assumenda ab quia est hic. */
+                    /** @example Nam illo alias est a distinctio. */
                     "application/json": string;
                 };
             };
@@ -47870,14 +48911,14 @@ export interface operations {
                      *         "instance-12345678",
                      *         "instance-abcdefgh"
                      *       ],
-                     *       "cloudProviderId": "Necessitatibus laudantium ipsa quo a perspiciatis ut.",
+                     *       "cloudProviderId": "Nostrum distinctio molestiae.",
                      *       "description": "An AWS account hosting multiple dev environments",
                      *       "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *       "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *       "gcpProjectID": "my-project",
                      *       "gcpProjectNumber": "123456789012",
                      *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *       "id": "Ut odio ad debitis voluptas culpa.",
+                     *       "id": "Sit repellat repudiandae labore sit voluptatibus.",
                      *       "name": "Dev AWS account",
                      *       "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *       "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
@@ -48037,9 +49078,9 @@ export interface operations {
                      *         "instance-12345678",
                      *         "instance-abcdefgh"
                      *       ],
-                     *       "cloudProviderId": "Cumque aut impedit ullam dicta illum nulla.",
+                     *       "cloudProviderId": "Quo officiis quas maxime porro accusamus praesentium.",
                      *       "description": "An AWS account hosting multiple dev environments",
-                     *       "id": "Ut ipsum.",
+                     *       "id": "Voluptatibus minus molestias maiores qui non.",
                      *       "name": "Dev AWS account",
                      *       "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
                      *       "statusMessage": "Account is ready"
@@ -48133,9 +49174,9 @@ export interface operations {
                      *         "instance-12345678",
                      *         "instance-abcdefgh"
                      *       ],
-                     *       "cloudProviderId": "Distinctio provident doloremque quis.",
+                     *       "cloudProviderId": "Consequatur qui delectus aliquid debitis.",
                      *       "description": "An AWS account hosting multiple dev environments",
-                     *       "id": "Aut id et reiciendis provident.",
+                     *       "id": "Id aliquid atque itaque.",
                      *       "name": "Dev AWS account",
                      *       "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
                      *       "statusMessage": "Account is ready"
@@ -48240,14 +49281,14 @@ export interface operations {
                      *             "instance-12345678",
                      *             "instance-abcdefgh"
                      *           ],
-                     *           "cloudProviderId": "Dolorem omnis eos dicta sit magnam.",
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
                      *           "description": "An AWS account hosting multiple dev environments",
                      *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
                      *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *           "id": "Praesentium dolorem aut perferendis possimus.",
+                     *           "id": "Iste neque est quos nemo repellendus.",
                      *           "name": "Dev AWS account",
                      *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
@@ -48269,14 +49310,72 @@ export interface operations {
                      *             "instance-12345678",
                      *             "instance-abcdefgh"
                      *           ],
-                     *           "cloudProviderId": "Dolorem omnis eos dicta sit magnam.",
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
                      *           "description": "An AWS account hosting multiple dev environments",
                      *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
                      *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *           "id": "Praesentium dolorem aut perferendis possimus.",
+                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "name": "Dev AWS account",
+                     *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
+                     *           "statusMessage": "Account is ready"
+                     *         },
+                     *         {
+                     *           "awsAccountID": "123456789012",
+                     *           "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
+                     *           "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
+                     *           "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
+                     *           "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+                     *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+                     *           "byoaInstanceIDs": [
+                     *             "instance-12345678",
+                     *             "instance-abcdefgh"
+                     *           ],
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
+                     *           "description": "An AWS account hosting multiple dev environments",
+                     *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpProjectID": "my-project",
+                     *           "gcpProjectNumber": "123456789012",
+                     *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
+                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "name": "Dev AWS account",
+                     *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
+                     *           "statusMessage": "Account is ready"
+                     *         },
+                     *         {
+                     *           "awsAccountID": "123456789012",
+                     *           "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
+                     *           "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
+                     *           "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
+                     *           "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+                     *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+                     *           "byoaInstanceIDs": [
+                     *             "instance-12345678",
+                     *             "instance-abcdefgh"
+                     *           ],
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
+                     *           "description": "An AWS account hosting multiple dev environments",
+                     *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpProjectID": "my-project",
+                     *           "gcpProjectNumber": "123456789012",
+                     *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
+                     *           "id": "Iste neque est quos nemo repellendus.",
                      *           "name": "Dev AWS account",
                      *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
@@ -48390,14 +49489,14 @@ export interface operations {
                      *             "instance-12345678",
                      *             "instance-abcdefgh"
                      *           ],
-                     *           "cloudProviderId": "Dolorem omnis eos dicta sit magnam.",
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
                      *           "description": "An AWS account hosting multiple dev environments",
                      *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
                      *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *           "id": "Praesentium dolorem aut perferendis possimus.",
+                     *           "id": "Iste neque est quos nemo repellendus.",
                      *           "name": "Dev AWS account",
                      *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
@@ -48419,14 +49518,43 @@ export interface operations {
                      *             "instance-12345678",
                      *             "instance-abcdefgh"
                      *           ],
-                     *           "cloudProviderId": "Dolorem omnis eos dicta sit magnam.",
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
                      *           "description": "An AWS account hosting multiple dev environments",
                      *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
                      *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *           "id": "Praesentium dolorem aut perferendis possimus.",
+                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "name": "Dev AWS account",
+                     *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
+                     *           "statusMessage": "Account is ready"
+                     *         },
+                     *         {
+                     *           "awsAccountID": "123456789012",
+                     *           "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
+                     *           "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
+                     *           "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
+                     *           "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+                     *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+                     *           "byoaInstanceIDs": [
+                     *             "instance-12345678",
+                     *             "instance-abcdefgh"
+                     *           ],
+                     *           "cloudProviderId": "Officia optio sint et saepe non.",
+                     *           "description": "An AWS account hosting multiple dev environments",
+                     *           "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+                     *           "gcpProjectID": "my-project",
+                     *           "gcpProjectNumber": "123456789012",
+                     *           "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
+                     *           "id": "Iste neque est quos nemo repellendus.",
                      *           "name": "Dev AWS account",
                      *           "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
                      *           "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
@@ -48530,12 +49658,12 @@ export interface operations {
                      *         "instance-12345678",
                      *         "instance-abcdefgh"
                      *       ],
-                     *       "cloudProviderId": "Eum debitis vero.",
+                     *       "cloudProviderId": "In aut voluptas adipisci laboriosam.",
                      *       "description": "An AWS account hosting multiple dev environments",
                      *       "gcpProjectID": "my-project",
                      *       "gcpProjectNumber": "123456789012",
                      *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-                     *       "id": "Non impedit.",
+                     *       "id": "Quo deserunt quia beatae exercitationem.",
                      *       "name": "Dev AWS account",
                      *       "status": "PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD",
                      *       "statusMessage": "Account is ready"
@@ -48617,7 +49745,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "id": "Consequatur eum at enim quisquam ut."
+                     *       "id": "Laborum cum enim minima praesentium dolorem aut."
                      *     }
                      */
                     "application/json": components["schemas"]["AccountConfigIdentityIDResult"];
@@ -48670,9 +49798,9 @@ export interface operations {
                      *         "instance-12345678",
                      *         "instance-abcdefgh"
                      *       ],
-                     *       "cloudProviderId": "Maiores aut qui quo rerum ratione rerum.",
+                     *       "cloudProviderId": "Aut ad ratione.",
                      *       "description": "An OCI account hosting multiple dev environments",
-                     *       "id": "Quaerat dolore.",
+                     *       "id": "Earum et iure quo qui reprehenderit.",
                      *       "name": "Dev OCI account",
                      *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -49009,7 +50137,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Perferendis reprehenderit voluptatem. */
+                    /** @example Beatae nostrum sapiente dolorem magni eum. */
                     "application/json": string;
                 };
             };
@@ -49450,7 +50578,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Corporis nam ipsam tempora velit rerum. */
+                    /** @example Eveniet porro officia molestiae ullam qui. */
                     "application/json": string;
                 };
             };
@@ -49548,8 +50676,8 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "errorMsg": "Explicabo voluptas quia ullam a ullam.",
-                     *       "imageAccessible": false
+                     *       "errorMsg": "Impedit nihil cum quaerat voluptatem.",
+                     *       "imageAccessible": true
                      *     }
                      */
                     "application/json": components["schemas"]["CheckIfContainerImageAccessibleResult"];
@@ -49646,7 +50774,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "fileContent": "Inventore nisi facere."
+                     *       "fileContent": "Voluptates dicta error ut voluptates."
                      *     }
                      */
                     "application/json": components["schemas"]["GenerateComposeSpecFromContainerImageResult"];
@@ -49813,7 +50941,7 @@ export interface operations {
                      *         {
                      *           "customDomain": "mydomain.dev",
                      *           "description": "Description of the domain",
-                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "id": "Aperiam cumque.",
                      *           "name": "Dev domain",
                      *           "route53Configuration": {
                      *             "awsAccountID": "123456789012",
@@ -49825,7 +50953,7 @@ export interface operations {
                      *         {
                      *           "customDomain": "mydomain.dev",
                      *           "description": "Description of the domain",
-                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "id": "Aperiam cumque.",
                      *           "name": "Dev domain",
                      *           "route53Configuration": {
                      *             "awsAccountID": "123456789012",
@@ -49837,7 +50965,7 @@ export interface operations {
                      *         {
                      *           "customDomain": "mydomain.dev",
                      *           "description": "Description of the domain",
-                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "id": "Aperiam cumque.",
                      *           "name": "Dev domain",
                      *           "route53Configuration": {
                      *             "awsAccountID": "123456789012",
@@ -49849,7 +50977,7 @@ export interface operations {
                      *         {
                      *           "customDomain": "mydomain.dev",
                      *           "description": "Description of the domain",
-                     *           "id": "Iste neque est quos nemo repellendus.",
+                     *           "id": "Aperiam cumque.",
                      *           "name": "Dev domain",
                      *           "route53Configuration": {
                      *             "awsAccountID": "123456789012",
@@ -49955,7 +51083,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Quia culpa odit rerum. */
+                    /** @example Repellendus sit pariatur ex et unde. */
                     "application/json": string;
                 };
             };
@@ -50022,7 +51150,7 @@ export interface operations {
                      * @example {
                      *       "customDomain": "mydomain.dev",
                      *       "description": "Description of the domain",
-                     *       "id": "Ad ratione.",
+                     *       "id": "Iure ut.",
                      *       "name": "Dev domain",
                      *       "route53Configuration": {
                      *         "awsAccountID": "123456789012",
@@ -50168,7 +51296,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "id": "Qui maiores eum vel consequuntur at alias."
+                     *       "id": "In vero minus inventore qui."
                      *     }
                      */
                     "application/json": components["schemas"]["CustomDomainIdentityIDResult"];
@@ -50977,7 +52105,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Error nihil velit facere placeat. */
+                    /** @example Debitis facere. */
                     "application/json": string;
                 };
             };
@@ -51571,11 +52699,6 @@ export interface operations {
                      *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
                      *           "name": "my-secret",
                      *           "value": "super-secret-value"
-                     *         },
-                     *         {
-                     *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                     *           "name": "my-secret",
-                     *           "value": "super-secret-value"
                      *         }
                      *       ]
                      *     }
@@ -51799,6 +52922,102 @@ export interface operations {
                      *                 },
                      *                 "path": "helm/values/production.yaml"
                      *               }
+                     *             }
+                     *           ],
+                     *           "namespace": "default",
+                     *           "password": "my-password",
+                     *           "username": "my-user"
+                     *         },
+                     *         {
+                     *           "chartName": "my-chart",
+                     *           "chartRepoName": "my-repo",
+                     *           "chartRepoUrl": "https://my-repo.com",
+                     *           "chartValues": {
+                     *             "key1": "value1",
+                     *             "key2": 3,
+                     *             "key3": {
+                     *               "key4": "value4"
+                     *             }
+                     *           },
+                     *           "chartVersion": "1.0.0",
+                     *           "layeredChartValues": [
+                     *             {
+                     *               "name": "my-layer",
+                     *               "scope": {
+                     *                 "{{ $sys.cloudProviderName }}": "aws"
+                     *               },
+                     *               "values": {
+                     *                 "global": {
+                     *                   "affinity": {
+                     *                     "nodeAffinity": {
+                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+                     *                         "nodeSelectorTerms": [
+                     *                           {
+                     *                             "matchExpressions": [
+                     *                               {
+                     *                                 "key": "omnistrate.com/managed-by",
+                     *                                 "operator": "In",
+                     *                                 "values": [
+                     *                                   "omnistrate"
+                     *                                 ]
+                     *                               }
+                     *                             ]
+                     *                           }
+                     *                         ]
+                     *                       }
+                     *                     }
+                     *                   }
+                     *                 }
+                     *               },
+                     *               "valuesFile": {
+                     *                 "gitConfiguration": {
+                     *                   "accessToken": "my-token",
+                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+                     *                   "referenceName": "tags/v1.0.0",
+                     *                   "repositoryUrl": "https://github.com/username/myrepo",
+                     *                   "userName": "my-user"
+                     *                 },
+                     *                 "path": "helm/values/production.yaml"
+                     *               }
+                     *             },
+                     *             {
+                     *               "name": "my-layer",
+                     *               "scope": {
+                     *                 "{{ $sys.cloudProviderName }}": "aws"
+                     *               },
+                     *               "values": {
+                     *                 "global": {
+                     *                   "affinity": {
+                     *                     "nodeAffinity": {
+                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
+                     *                         "nodeSelectorTerms": [
+                     *                           {
+                     *                             "matchExpressions": [
+                     *                               {
+                     *                                 "key": "omnistrate.com/managed-by",
+                     *                                 "operator": "In",
+                     *                                 "values": [
+                     *                                   "omnistrate"
+                     *                                 ]
+                     *                               }
+                     *                             ]
+                     *                           }
+                     *                         ]
+                     *                       }
+                     *                     }
+                     *                   }
+                     *                 }
+                     *               },
+                     *               "valuesFile": {
+                     *                 "gitConfiguration": {
+                     *                   "accessToken": "my-token",
+                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
+                     *                   "referenceName": "tags/v1.0.0",
+                     *                   "repositoryUrl": "https://github.com/username/myrepo",
+                     *                   "userName": "my-user"
+                     *                 },
+                     *                 "path": "helm/values/production.yaml"
+                     *               }
                      *             },
                      *             {
                      *               "name": "my-layer",
@@ -51973,45 +53192,6 @@ export interface operations {
                      *                 },
                      *                 "path": "helm/values/production.yaml"
                      *               }
-                     *             },
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
                      *             }
                      *           ],
                      *           "namespace": "default",
@@ -52031,219 +53211,6 @@ export interface operations {
                      *           },
                      *           "chartVersion": "1.0.0",
                      *           "layeredChartValues": [
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
-                     *             },
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
-                     *             },
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
-                     *             },
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
-                     *             }
-                     *           ],
-                     *           "namespace": "default",
-                     *           "password": "my-password",
-                     *           "username": "my-user"
-                     *         },
-                     *         {
-                     *           "chartName": "my-chart",
-                     *           "chartRepoName": "my-repo",
-                     *           "chartRepoUrl": "https://my-repo.com",
-                     *           "chartValues": {
-                     *             "key1": "value1",
-                     *             "key2": 3,
-                     *             "key3": {
-                     *               "key4": "value4"
-                     *             }
-                     *           },
-                     *           "chartVersion": "1.0.0",
-                     *           "layeredChartValues": [
-                     *             {
-                     *               "name": "my-layer",
-                     *               "scope": {
-                     *                 "{{ $sys.cloudProviderName }}": "aws"
-                     *               },
-                     *               "values": {
-                     *                 "global": {
-                     *                   "affinity": {
-                     *                     "nodeAffinity": {
-                     *                       "requiredDuringSchedulingIgnoredDuringExecution": {
-                     *                         "nodeSelectorTerms": [
-                     *                           {
-                     *                             "matchExpressions": [
-                     *                               {
-                     *                                 "key": "omnistrate.com/managed-by",
-                     *                                 "operator": "In",
-                     *                                 "values": [
-                     *                                   "omnistrate"
-                     *                                 ]
-                     *                               }
-                     *                             ]
-                     *                           }
-                     *                         ]
-                     *                       }
-                     *                     }
-                     *                   }
-                     *                 }
-                     *               },
-                     *               "valuesFile": {
-                     *                 "gitConfiguration": {
-                     *                   "accessToken": "my-token",
-                     *                   "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
-                     *                   "referenceName": "tags/v1.0.0",
-                     *                   "repositoryUrl": "https://github.com/username/myrepo",
-                     *                   "userName": "my-user"
-                     *                 },
-                     *                 "path": "helm/values/production.yaml"
-                     *               }
-                     *             },
                      *             {
                      *               "name": "my-layer",
                      *               "scope": {
@@ -52790,7 +53757,7 @@ export interface operations {
                      *           "disabled": false,
                      *           "emailIdentifiers": "company.com",
                      *           "environmentType": "production",
-                     *           "id": "Cumque aut neque autem sint deserunt.",
+                     *           "id": "Modi sint deserunt sed voluptatem quia.",
                      *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *           "loginButtonIconUrl": "https://example.com/icon.png",
                      *           "loginButtonText": "Login with Google",
@@ -52807,7 +53774,7 @@ export interface operations {
                      *           "disabled": false,
                      *           "emailIdentifiers": "company.com",
                      *           "environmentType": "production",
-                     *           "id": "Cumque aut neque autem sint deserunt.",
+                     *           "id": "Modi sint deserunt sed voluptatem quia.",
                      *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *           "loginButtonIconUrl": "https://example.com/icon.png",
                      *           "loginButtonText": "Login with Google",
@@ -52886,7 +53853,7 @@ export interface operations {
                  *       "clientSecret": "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",
                  *       "disabled": false,
                  *       "emailIdentifiers": "company.com",
-                 *       "environmentType": "Quibusdam est.",
+                 *       "environmentType": "Ex natus officia quia.",
                  *       "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                  *       "loginButtonIconUrl": "https://example.com/icon.png",
                  *       "loginButtonText": "Login with Google",
@@ -52906,7 +53873,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Veniam perspiciatis aut molestias. */
+                    /** @example Id voluptatem ex est voluptate. */
                     "application/json": string;
                 };
             };
@@ -53002,7 +53969,7 @@ export interface operations {
                      *       "identityProviders": [
                      *         {
                      *           "emailIdentifiers": "company.com",
-                     *           "id": "Quae dolores quis neque.",
+                     *           "id": "Rerum facilis ut voluptas reprehenderit reiciendis.",
                      *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *           "loginButtonIconUrl": "https://example.com/icon.png",
                      *           "loginButtonText": "Login with Google",
@@ -53012,7 +53979,17 @@ export interface operations {
                      *         },
                      *         {
                      *           "emailIdentifiers": "company.com",
-                     *           "id": "Quae dolores quis neque.",
+                     *           "id": "Rerum facilis ut voluptas reprehenderit reiciendis.",
+                     *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
+                     *           "loginButtonIconUrl": "https://example.com/icon.png",
+                     *           "loginButtonText": "Login with Google",
+                     *           "name": "Google for my company",
+                     *           "renderedAuthorizationEndpoint": "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com&redirect_uri=https://example.com/redirect&scope=openid email profile&state=idpName-guid",
+                     *           "state": "state"
+                     *         },
+                     *         {
+                     *           "emailIdentifiers": "company.com",
+                     *           "id": "Rerum facilis ut voluptas reprehenderit reiciendis.",
                      *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *           "loginButtonIconUrl": "https://example.com/icon.png",
                      *           "loginButtonText": "Login with Google",
@@ -53091,11 +54068,6 @@ export interface operations {
                     /**
                      * @example {
                      *       "identityProviderTypes": [
-                     *         {
-                     *           "SupportCustomEndpoints": true,
-                     *           "SupportCustomScopes": false,
-                     *           "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC"
-                     *         },
                      *         {
                      *           "SupportCustomEndpoints": true,
                      *           "SupportCustomScopes": false,
@@ -53193,7 +54165,7 @@ export interface operations {
                      *       "disabled": false,
                      *       "emailIdentifiers": "company.com",
                      *       "environmentType": "production",
-                     *       "id": "Aut similique earum odit non laborum.",
+                     *       "id": "Eligendi non aliquid.",
                      *       "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *       "loginButtonIconUrl": "https://example.com/icon.png",
                      *       "loginButtonText": "Login with Google",
@@ -53279,7 +54251,7 @@ export interface operations {
                      * @example {
                      *       "clientId": "205376496935-vtfpdnseqmjhsynlh0bsufl38k0test.apps.googleusercontent.com",
                      *       "clientSecret": "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",
-                     *       "id": "Ut quidem.",
+                     *       "id": "Ut rem earum in.",
                      *       "identityProviderName": "Google|GitHub|Microsoft Entra|Amazon Cognito|Okta|Auth0|Keycloak|OIDC",
                      *       "name": "Google for my company",
                      *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
@@ -53605,7 +54577,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Tempora nostrum maxime facere rerum. */
+                    /** @example Est cupiditate veniam quia fuga quasi magni. */
                     "application/json": string;
                 };
             };
@@ -53672,7 +54644,7 @@ export interface operations {
                      * @example {
                      *       "description": "DockerHub is a public Docker Image Registry",
                      *       "host": "docker.io",
-                     *       "id": "Repudiandae fugiat tempore nisi incidunt ea.",
+                     *       "id": "Qui distinctio in.",
                      *       "name": "DockerHub",
                      *       "password": "mypassword",
                      *       "username": "myusername"
@@ -54211,7 +55183,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Quia inventore dolores et. */
+                    /** @example Odit molestiae in qui soluta doloribus omnis. */
                     "application/json": unknown;
                 };
             };
@@ -55249,7 +56221,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Et sint eum labore molestias nihil. */
+                    /** @example Voluptas dolores. */
                     "application/json": string;
                 };
             };
@@ -55533,6 +56505,12 @@ export interface operations {
                      *           "maxReplicas": "1",
                      *           "minReplicas": "1",
                      *           "network_type": "PUBLIC|INTERNAL",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "onPremInstallerDetails": {
+                     *             "downloadURL": "https://example.com/installer/download",
+                     *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+                     *           },
+                     *           "onpremPlatform": "EKS|GKE|AKS|Generic",
                      *           "productTierFeatures": {
                      *             "LOGS": {
                      *               "auth": {
@@ -55687,6 +56665,12 @@ export interface operations {
                      *           "maxReplicas": "1",
                      *           "minReplicas": "1",
                      *           "network_type": "PUBLIC|INTERNAL",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "onPremInstallerDetails": {
+                     *             "downloadURL": "https://example.com/installer/download",
+                     *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+                     *           },
+                     *           "onpremPlatform": "EKS|GKE|AKS|Generic",
                      *           "productTierFeatures": {
                      *             "LOGS": {
                      *               "auth": {
@@ -55841,6 +56825,12 @@ export interface operations {
                      *           "maxReplicas": "1",
                      *           "minReplicas": "1",
                      *           "network_type": "PUBLIC|INTERNAL",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "onPremInstallerDetails": {
+                     *             "downloadURL": "https://example.com/installer/download",
+                     *             "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+                     *           },
+                     *           "onpremPlatform": "EKS|GKE|AKS|Generic",
                      *           "productTierFeatures": {
                      *             "LOGS": {
                      *               "auth": {
@@ -56164,15 +57154,15 @@ export interface operations {
                      *       "events": [
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56187,15 +57177,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56210,15 +57200,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56233,15 +57223,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56352,15 +57342,15 @@ export interface operations {
                      *       "events": [
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56375,15 +57365,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56398,38 +57388,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
-                     *           "userName": "John Doe",
-                     *           "workflowFailures": [
-                     *             {
-                     *               "eventTime": "2020-01-01T00:00:00Z",
-                     *               "message": "Bootstrap failed for reason X"
-                     *             },
-                     *             {
-                     *               "eventTime": "2020-01-01T00:01:00Z",
-                     *               "message": "Compute failed for reason Y"
-                     *             }
-                     *           ]
-                     *         },
-                     *         {
-                     *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
-                     *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
-                     *           "orgName": "Acme Corporation",
-                     *           "resourceInstanceId": "instance-abcd1234",
-                     *           "resourceName": "Galera",
-                     *           "subscriptionId": "sub-abcd1234",
-                     *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -56964,6 +57931,12 @@ export interface operations {
                      *       "maxReplicas": "1",
                      *       "minReplicas": "1",
                      *       "network_type": "PUBLIC|INTERNAL",
+                     *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *       "onPremInstallerDetails": {
+                     *         "downloadURL": "https://example.com/installer/download",
+                     *         "installerInstructions": "Please follow the steps outlined in the documentation to install the on-premise agent..."
+                     *       },
+                     *       "onpremPlatform": "EKS|GKE|AKS|Generic",
                      *       "productTierFeatures": {
                      *         "LOGS": {
                      *           "auth": {
@@ -58904,15 +59877,15 @@ export interface operations {
                      *       "events": [
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -58927,15 +59900,38 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
+                     *           "userName": "John Doe",
+                     *           "workflowFailures": [
+                     *             {
+                     *               "eventTime": "2020-01-01T00:00:00Z",
+                     *               "message": "Bootstrap failed for reason X"
+                     *             },
+                     *             {
+                     *               "eventTime": "2020-01-01T00:01:00Z",
+                     *               "message": "Compute failed for reason Y"
+                     *             }
+                     *           ]
+                     *         },
+                     *         {
+                     *           "eventSource": "Customer, Infra or Maintenance",
+                     *           "id": "Qui illo.",
+                     *           "message": "instance-abcd1234 created",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
+                     *           "orgName": "Acme Corporation",
+                     *           "resourceInstanceId": "instance-abcd1234",
+                     *           "resourceName": "Galera",
+                     *           "subscriptionId": "sub-abcd1234",
+                     *           "time": "2023-01-10T00:00:00Z",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59071,15 +60067,15 @@ export interface operations {
                      *       "events": [
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59094,15 +60090,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59117,15 +60113,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59414,8 +60410,10 @@ export interface operations {
                 /**
                  * @description The event types to filter by
                  * @example [
-                 *       "Odio aut.",
-                 *       "Ab necessitatibus sit quasi veniam tempora voluptatem."
+                 *       "Sed omnis.",
+                 *       "Iusto nisi quia porro deleniti quisquam quibusdam.",
+                 *       "Ut atque quas architecto tenetur.",
+                 *       "Aut debitis dolor dolorem eos."
                  *     ]
                  */
                 eventSourceTypes?: string[];
@@ -59452,15 +60450,15 @@ export interface operations {
                      *       "events": [
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59475,15 +60473,15 @@ export interface operations {
                      *         },
                      *         {
                      *           "eventSource": "Customer, Infra or Maintenance",
-                     *           "id": "Asperiores eaque omnis sed atque voluptas.",
+                     *           "id": "Qui illo.",
                      *           "message": "instance-abcd1234 created",
-                     *           "orgId": "Quae et quasi possimus sed.",
+                     *           "orgId": "Illo aut dolor et asperiores velit quibusdam.",
                      *           "orgName": "Acme Corporation",
                      *           "resourceInstanceId": "instance-abcd1234",
                      *           "resourceName": "Galera",
                      *           "subscriptionId": "sub-abcd1234",
                      *           "time": "2023-01-10T00:00:00Z",
-                     *           "userId": "Est voluptatem.",
+                     *           "userId": "Aliquid placeat officia.",
                      *           "userName": "John Doe",
                      *           "workflowFailures": [
                      *             {
@@ -59592,15 +60590,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "eventSource": "Customer, Infra or Maintenance",
-                     *       "id": "Eos impedit molestiae dolores.",
+                     *       "id": "Officiis qui corporis et quaerat.",
                      *       "message": "instance-abcd1234 created",
-                     *       "orgId": "Perspiciatis quia error.",
+                     *       "orgId": "Et et.",
                      *       "orgName": "Acme Corporation",
                      *       "resourceInstanceId": "instance-abcd1234",
                      *       "resourceName": "Galera",
                      *       "subscriptionId": "sub-abcd1234",
                      *       "time": "2023-01-10T00:00:00Z",
-                     *       "userId": "Aut tenetur.",
+                     *       "userId": "Modi ex hic.",
                      *       "userName": "John Doe",
                      *       "workflowFailures": [
                      *         {
@@ -59880,7 +60878,7 @@ export interface operations {
                      *           "cidr": "10.0.0.0/16",
                      *           "cloudProviderName": "aws|azure|gcp|all",
                      *           "cloudProviderRegion": "us-east-1",
-                     *           "id": "Quod ipsa tempore.",
+                     *           "id": "Eum velit molestiae.",
                      *           "name": "Prod us-east-1",
                      *           "networkDefinitionType": "Default|Custom|Imported",
                      *           "networkFeaturesConfiguration": {
@@ -59894,7 +60892,9 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             },
                      *             {
                      *               "awsAccountID": "123456789012",
@@ -59903,7 +60903,9 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             },
                      *             {
                      *               "awsAccountID": "123456789012",
@@ -59912,19 +60914,12 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             },
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             }
                      *           ],
-                     *           "owningUserId": "Nihil et.",
+                     *           "owningUserId": "Ea perferendis.",
                      *           "owningUserName": "John Doe",
                      *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *         },
@@ -59932,7 +60927,7 @@ export interface operations {
                      *           "cidr": "10.0.0.0/16",
                      *           "cloudProviderName": "aws|azure|gcp|all",
                      *           "cloudProviderRegion": "us-east-1",
-                     *           "id": "Quod ipsa tempore.",
+                     *           "id": "Eum velit molestiae.",
                      *           "name": "Prod us-east-1",
                      *           "networkDefinitionType": "Default|Custom|Imported",
                      *           "networkFeaturesConfiguration": {
@@ -59946,7 +60941,9 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             },
                      *             {
                      *               "awsAccountID": "123456789012",
@@ -59955,7 +60952,9 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             },
                      *             {
                      *               "awsAccountID": "123456789012",
@@ -59964,71 +60963,12 @@ export interface operations {
                      *               "cloudProviderNativeNetworkId": "vpc-12345678",
                      *               "gcpProjectID": "my-project",
                      *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             },
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
+                     *               "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *             }
                      *           ],
-                     *           "owningUserId": "Nihil et.",
-                     *           "owningUserName": "John Doe",
-                     *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-                     *         },
-                     *         {
-                     *           "cidr": "10.0.0.0/16",
-                     *           "cloudProviderName": "aws|azure|gcp|all",
-                     *           "cloudProviderRegion": "us-east-1",
-                     *           "id": "Quod ipsa tempore.",
-                     *           "name": "Prod us-east-1",
-                     *           "networkDefinitionType": "Default|Custom|Imported",
-                     *           "networkFeaturesConfiguration": {
-                     *             "isPrivateLinkEnabled": true
-                     *           },
-                     *           "networkInstances": [
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             },
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             },
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             },
-                     *             {
-                     *               "awsAccountID": "123456789012",
-                     *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-                     *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-                     *               "cloudProviderNativeNetworkId": "vpc-12345678",
-                     *               "gcpProjectID": "my-project",
-                     *               "gcpProjectNumber": "123456789012",
-                     *               "hostClusterID": "Et et."
-                     *             }
-                     *           ],
-                     *           "owningUserId": "Nihil et.",
+                     *           "owningUserId": "Ea perferendis.",
                      *           "owningUserName": "John Doe",
                      *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *         }
@@ -60076,7 +61016,7 @@ export interface operations {
                  *       "networkFeaturesConfiguration": {
                  *         "isPrivateLinkEnabled": true
                  *       },
-                 *       "orgId": "Quo culpa eligendi sunt."
+                 *       "orgId": "Temporibus laborum."
                  *     }
                  */
                 "application/json": components["schemas"]["CreateCustomNetworkRequest2"];
@@ -60094,7 +61034,7 @@ export interface operations {
                      *       "cidr": "10.0.0.0/16",
                      *       "cloudProviderName": "aws|azure|gcp|all",
                      *       "cloudProviderRegion": "us-east-1",
-                     *       "id": "Laborum sit corporis et provident fugiat.",
+                     *       "id": "Consequuntur corporis sunt commodi.",
                      *       "name": "Prod us-east-1",
                      *       "networkDefinitionType": "Default|Custom|Imported",
                      *       "networkFeaturesConfiguration": {
@@ -60108,7 +61048,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60117,7 +61059,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60126,7 +61070,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60135,10 +61081,12 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         }
                      *       ],
-                     *       "owningUserId": "Possimus aut sunt corrupti.",
+                     *       "owningUserId": "Maxime qui molestiae reiciendis recusandae officiis.",
                      *       "owningUserName": "John Doe",
                      *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *     }
@@ -60192,7 +61140,7 @@ export interface operations {
                      *       "cidr": "10.0.0.0/16",
                      *       "cloudProviderName": "aws|azure|gcp|all",
                      *       "cloudProviderRegion": "us-east-1",
-                     *       "id": "Explicabo reprehenderit quia.",
+                     *       "id": "Quas rerum omnis distinctio architecto.",
                      *       "name": "Prod us-east-1",
                      *       "networkDefinitionType": "Default|Custom|Imported",
                      *       "networkFeaturesConfiguration": {
@@ -60206,7 +61154,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60215,10 +61165,12 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         }
                      *       ],
-                     *       "owningUserId": "Molestias eum.",
+                     *       "owningUserId": "Qui dolores magnam accusamus.",
                      *       "owningUserName": "John Doe",
                      *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *     }
@@ -60341,7 +61293,7 @@ export interface operations {
                      *       "cidr": "10.0.0.0/16",
                      *       "cloudProviderName": "aws|azure|gcp|all",
                      *       "cloudProviderRegion": "us-east-1",
-                     *       "id": "Qui eos doloribus eius ea ducimus.",
+                     *       "id": "Rerum nemo optio.",
                      *       "name": "Prod us-east-1",
                      *       "networkDefinitionType": "Default|Custom|Imported",
                      *       "networkFeaturesConfiguration": {
@@ -60355,7 +61307,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60364,7 +61318,9 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         },
                      *         {
                      *           "awsAccountID": "123456789012",
@@ -60373,10 +61329,23 @@ export interface operations {
                      *           "cloudProviderNativeNetworkId": "vpc-12345678",
                      *           "gcpProjectID": "my-project",
                      *           "gcpProjectNumber": "123456789012",
-                     *           "hostClusterID": "Et et."
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         },
+                     *         {
+                     *           "awsAccountID": "123456789012",
+                     *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+                     *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+                     *           "cloudProviderNativeNetworkId": "vpc-12345678",
+                     *           "gcpProjectID": "my-project",
+                     *           "gcpProjectNumber": "123456789012",
+                     *           "hostClusterID": "Itaque non qui temporibus vitae animi.",
+                     *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                      *         }
                      *       ],
-                     *       "owningUserId": "At sint aut ratione.",
+                     *       "owningUserId": "Omnis in maxime mollitia voluptas hic quia.",
                      *       "owningUserName": "John Doe",
                      *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *     }
@@ -60443,15 +61412,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "eventSource": "Customer, Infra or Maintenance",
-                     *       "id": "Quae cumque ipsum voluptatem vel nam enim.",
+                     *       "id": "Et earum.",
                      *       "message": "instance-abcd1234 created",
-                     *       "orgId": "Veritatis quia architecto et omnis exercitationem.",
+                     *       "orgId": "Id atque necessitatibus omnis suscipit dolore.",
                      *       "orgName": "Acme Corporation",
                      *       "resourceInstanceId": "instance-abcd1234",
                      *       "resourceName": "Galera",
                      *       "subscriptionId": "sub-abcd1234",
                      *       "time": "2023-01-10T00:00:00Z",
-                     *       "userId": "Nisi ipsam quia vero.",
+                     *       "userId": "Excepturi velit.",
                      *       "userName": "John Doe",
                      *       "workflowFailures": [
                      *         {
@@ -60535,14 +61504,14 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "deploymentCellID": "In sed mollitia repudiandae cupiditate molestias.",
+                 *       "deploymentCellID": "Non similique quo quas sed corporis blanditiis.",
                  *       "expression": "{{ $sys.network.externalClusterEndpoint }}",
                  *       "expressionMap": {
                  *         "dbHost": "{{ $sys.database.host }}",
                  *         "dbPort": "{{ $var.port }}"
                  *       },
                  *       "instanceID": "instance-12345678",
-                 *       "productTierID": "Ut dolores saepe accusantium provident non aliquid.",
+                 *       "productTierID": "Ipsum suscipit alias doloribus ut delectus.",
                  *       "resourceKey": "mysql",
                  *       "serviceID": "s-123456"
                  *     }
@@ -61326,11 +62295,262 @@ export interface operations {
             };
         };
     };
-    "instance-snapshot-api/DeleteResourceInstanceSnapshot": {
+    "instance-snapshot-api/ListAllInstanceSnapshots": {
         parameters: {
             query?: {
                 /**
-                 * @description Subscription Id
+                 * @description The environment type to filter by
+                 * @example DEV
+                 */
+                environmentType?: string;
+                /**
+                 * @description The type of snapshot to list. Valid values are: 'ManualSnapshot' and 'AutomatedSnapshot'
+                 * @example AutomatedSnapshot|ManualSnapshot
+                 */
+                snapshotType?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "snapshots": [
+                     *         {
+                     *           "cloudProvider": "aws|azure|gcp|all",
+                     *           "completeTime": "2021-09-01T00:00:00Z",
+                     *           "createdTime": "2021-09-01T00:00:00Z",
+                     *           "encrypted": true,
+                     *           "outputParams": [
+                     *             {
+                     *               "displayName": "Server Name",
+                     *               "key": "serverName",
+                     *               "type": "string",
+                     *               "value": "server1"
+                     *             },
+                     *             {
+                     *               "displayName": "Server Type",
+                     *               "key": "serverType",
+                     *               "type": "string",
+                     *               "value": "db.t3.micro"
+                     *             }
+                     *           ],
+                     *           "productTierId": "Velit architecto.",
+                     *           "productTierName": "Premium",
+                     *           "productTierVersion": "1.0",
+                     *           "productTierVersionDescription": "Version 1.0",
+                     *           "progress": 99,
+                     *           "region": "us-west-2",
+                     *           "serviceId": "s-123456",
+                     *           "serviceName": "Postgres",
+                     *           "snapshotId": "Sequi ut totam quis aut.",
+                     *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+                     *           "sourceInstanceId": "instance-12345678",
+                     *           "status": "completed",
+                     *           "subscriptionId": "Qui repellat et architecto.",
+                     *           "subscriptionOwnerOrgId": "Dolor veritatis.",
+                     *           "subscriptionOwnerOrgName": "Example Inc.",
+                     *           "subscriptionOwnerUserId": "Reiciendis beatae rerum et.",
+                     *           "subscriptionOwnerUserName": "Admin"
+                     *         },
+                     *         {
+                     *           "cloudProvider": "aws|azure|gcp|all",
+                     *           "completeTime": "2021-09-01T00:00:00Z",
+                     *           "createdTime": "2021-09-01T00:00:00Z",
+                     *           "encrypted": true,
+                     *           "outputParams": [
+                     *             {
+                     *               "displayName": "Server Name",
+                     *               "key": "serverName",
+                     *               "type": "string",
+                     *               "value": "server1"
+                     *             },
+                     *             {
+                     *               "displayName": "Server Type",
+                     *               "key": "serverType",
+                     *               "type": "string",
+                     *               "value": "db.t3.micro"
+                     *             }
+                     *           ],
+                     *           "productTierId": "Velit architecto.",
+                     *           "productTierName": "Premium",
+                     *           "productTierVersion": "1.0",
+                     *           "productTierVersionDescription": "Version 1.0",
+                     *           "progress": 99,
+                     *           "region": "us-west-2",
+                     *           "serviceId": "s-123456",
+                     *           "serviceName": "Postgres",
+                     *           "snapshotId": "Sequi ut totam quis aut.",
+                     *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+                     *           "sourceInstanceId": "instance-12345678",
+                     *           "status": "completed",
+                     *           "subscriptionId": "Qui repellat et architecto.",
+                     *           "subscriptionOwnerOrgId": "Dolor veritatis.",
+                     *           "subscriptionOwnerOrgName": "Example Inc.",
+                     *           "subscriptionOwnerUserId": "Reiciendis beatae rerum et.",
+                     *           "subscriptionOwnerUserName": "Admin"
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ListInstanceSnapshotResult"];
+                };
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the requested resource is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to list snapshots of a resource instance */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "instance-snapshot-api/CreateInstanceSnapshot": {
+        parameters: {
+            query?: {
+                /**
+                 * @description The subscription ID
+                 * @example sub-abcd1234
+                 */
+                subscriptionId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "instanceId": "instance-abcd1234",
+                 *       "targetRegion": "us-west-2"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CreateInstanceSnapshotRequest2"];
+            };
+        };
+        responses: {
+            /** @description Accepted response. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "Rerum repellat."
+                     *     }
+                     */
+                    "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+                };
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the requested resource is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to copy a resource instance snapshot */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "instance-snapshot-api/DescribeInstanceSnapshot": {
+        parameters: {
+            query?: {
+                /**
+                 * @description The subscription ID
                  * @example sub-abcd1234
                  */
                 subscriptionId?: string;
@@ -61341,7 +62561,123 @@ export interface operations {
                  * @description The instance snapshot ID
                  * @example instance-ss-12345678
                  */
-                snapshotId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "cloudProvider": "aws|azure|gcp|all",
+                     *       "completeTime": "2021-09-01T00:00:00Z",
+                     *       "createdTime": "2021-09-01T00:00:00Z",
+                     *       "encrypted": true,
+                     *       "outputParams": [
+                     *         {
+                     *           "displayName": "Server Name",
+                     *           "key": "serverName",
+                     *           "type": "string",
+                     *           "value": "server1"
+                     *         },
+                     *         {
+                     *           "displayName": "Server Type",
+                     *           "key": "serverType",
+                     *           "type": "string",
+                     *           "value": "db.t3.micro"
+                     *         }
+                     *       ],
+                     *       "productTierId": "Officia nihil quo alias vel.",
+                     *       "productTierName": "Premium",
+                     *       "productTierVersion": "1.0",
+                     *       "productTierVersionDescription": "Version 1.0",
+                     *       "progress": 99,
+                     *       "region": "us-west-2",
+                     *       "serviceId": "s-123456",
+                     *       "serviceName": "Postgres",
+                     *       "snapshotId": "Et quia maxime animi veniam dolorem.",
+                     *       "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+                     *       "sourceInstanceId": "instance-12345678",
+                     *       "status": "completed",
+                     *       "subscriptionId": "Iure eos qui ipsam.",
+                     *       "subscriptionOwnerOrgId": "Aut id repellat assumenda libero.",
+                     *       "subscriptionOwnerOrgName": "Example Inc.",
+                     *       "subscriptionOwnerUserId": "Rerum ratione doloribus sed.",
+                     *       "subscriptionOwnerUserName": "Admin"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["DescribeInstanceSnapshotResult"];
+                };
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the requested resource is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to list snapshots of a resource instance */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "instance-snapshot-api/DeleteInstanceSnapshot": {
+        parameters: {
+            query?: {
+                /**
+                 * @description The subscription ID
+                 * @example sub-abcd1234
+                 */
+                subscriptionId?: string;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The instance snapshot ID
+                 * @example instance-ss-12345678
+                 */
+                id: string;
             };
             cookie?: never;
         };
@@ -61400,6 +62736,207 @@ export interface operations {
                 };
             };
             /** @description failed_request: Failed to delete a resource instance snapshot */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "instance-snapshot-api/RestoreResourceInstanceFromSnapshot": {
+        parameters: {
+            query?: {
+                /**
+                 * @description The subscription ID
+                 * @example sub-abcd1234
+                 */
+                subscriptionId?: string;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The snapshot ID
+                 * @example instance-ss-abcd1234
+                 */
+                snapshotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "custom_network_id": "n-1234567890",
+                 *       "network_type": "PUBLIC|INTERNAL"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RestoreFromInstanceSnapshotRequest2"];
+            };
+        };
+        responses: {
+            /** @description Accepted response. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "instanceId": "Consectetur sit dolore iure reprehenderit laudantium."
+                     *     }
+                     */
+                    "application/json": components["schemas"]["RestoreResourceInstanceFromSnapshotResponseBody"];
+                };
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the requested resource is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to create a resource instance */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "instance-snapshot-api/CopyInstanceSnapshot": {
+        parameters: {
+            query?: {
+                /**
+                 * @description The subscription ID
+                 * @example sub-abcd1234
+                 */
+                subscriptionId?: string;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The source snapshot ID
+                 * @example instance-ss-abcd1234
+                 */
+                sourceSnapshotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "targetRegion": "us-west-2"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CopyInstanceSnapshotRequest2"];
+            };
+        };
+        responses: {
+            /** @description Accepted response. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "Error vero officia voluptatibus incidunt."
+                     *     }
+                     */
+                    "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+                };
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the requested resource is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to copy a resource instance snapshot */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -62327,108 +63864,6 @@ export interface operations {
                      *             "imageTag": "latest"
                      *           },
                      *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-                     *         },
-                     *         {
-                     *           "customDomain": "mycustomdomain.com",
-                     *           "customDomainStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
-                     *           "detailedNetworkTopology": {
-                     *             "r-abcd1234": {
-                     *               "allowedIPRanges": [
-                     *                 "0.0.0.0/0"
-                     *               ],
-                     *               "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-                     *               "clusterPorts": [
-                     *                 3306
-                     *               ],
-                     *               "main": true,
-                     *               "networkingType": "PUBLIC",
-                     *               "nodes": [
-                     *                 {
-                     *                   "availabilityZone": "us-east-2a",
-                     *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-                     *                   "healthStatus": "healthy",
-                     *                   "id": "primary-0",
-                     *                   "ports": [
-                     *                     3306
-                     *                   ],
-                     *                   "status": "RUNNING"
-                     *                 }
-                     *               ],
-                     *               "privateNetworkCIDR": "10.0.0.2/24",
-                     *               "privateNetworkID": "n-1234abcd",
-                     *               "publiclyAccessible": true,
-                     *               "resourceKey": "saasportal",
-                     *               "resourceName": "SaaS Portal"
-                     *             }
-                     *           },
-                     *           "disablePasswordLogin": false,
-                     *           "emailConfig": {
-                     *             "smtpFromEmail": "example@gmail.com",
-                     *             "smtpHost": "smtp.gmail.com",
-                     *             "smtpPassword": "password",
-                     *             "smtpPort": 587,
-                     *             "smtpUsername": "username"
-                     *           },
-                     *           "endpoint": "https://saas-portal.example.com",
-                     *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                     *           "googleAnalyticsTagID": "G-123456789",
-                     *           "imageConfig": {
-                     *             "imageName": "myimage",
-                     *             "imageRegistry": "ghcr.io",
-                     *             "imageTag": "latest"
-                     *           },
-                     *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-                     *         },
-                     *         {
-                     *           "customDomain": "mycustomdomain.com",
-                     *           "customDomainStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
-                     *           "detailedNetworkTopology": {
-                     *             "r-abcd1234": {
-                     *               "allowedIPRanges": [
-                     *                 "0.0.0.0/0"
-                     *               ],
-                     *               "clusterEndpoint": "primary.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-                     *               "clusterPorts": [
-                     *                 3306
-                     *               ],
-                     *               "main": true,
-                     *               "networkingType": "PUBLIC",
-                     *               "nodes": [
-                     *                 {
-                     *                   "availabilityZone": "us-east-2a",
-                     *                   "endpoint": "primary-0.instance-abcd1234.us-east-2.aws.omnistrate.cloud",
-                     *                   "healthStatus": "healthy",
-                     *                   "id": "primary-0",
-                     *                   "ports": [
-                     *                     3306
-                     *                   ],
-                     *                   "status": "RUNNING"
-                     *                 }
-                     *               ],
-                     *               "privateNetworkCIDR": "10.0.0.2/24",
-                     *               "privateNetworkID": "n-1234abcd",
-                     *               "publiclyAccessible": true,
-                     *               "resourceKey": "saasportal",
-                     *               "resourceName": "SaaS Portal"
-                     *             }
-                     *           },
-                     *           "disablePasswordLogin": false,
-                     *           "emailConfig": {
-                     *             "smtpFromEmail": "example@gmail.com",
-                     *             "smtpHost": "smtp.gmail.com",
-                     *             "smtpPassword": "password",
-                     *             "smtpPort": 587,
-                     *             "smtpUsername": "username"
-                     *           },
-                     *           "endpoint": "https://saas-portal.example.com",
-                     *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                     *           "googleAnalyticsTagID": "G-123456789",
-                     *           "imageConfig": {
-                     *             "imageName": "myimage",
-                     *             "imageRegistry": "ghcr.io",
-                     *             "imageTag": "latest"
-                     *           },
-                     *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
                      *         }
                      *       ]
                      *     }
@@ -62501,6 +63936,14 @@ export interface operations {
                     /**
                      * @example {
                      *       "customDomains": [
+                     *         {
+                     *           "clusterEndpoint": "example.com",
+                     *           "customDomain": "mycustomdomain.com",
+                     *           "description": "My custom domain description",
+                     *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *           "name": "MyCustomDomain",
+                     *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+                     *         },
                      *         {
                      *           "clusterEndpoint": "example.com",
                      *           "customDomain": "mycustomdomain.com",
@@ -63345,7 +64788,7 @@ export interface operations {
                  * @example {
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
                  *       "name": "MySQL multi-writer service",
-                 *       "serviceLogoURL": "http://mohr.net/noe.aufderhar"
+                 *       "serviceLogoURL": "http://zieme.biz/nellie.baumbach"
                  *     }
                  */
                 "application/json": components["schemas"]["CreateServiceRequest2"];
@@ -63513,7 +64956,7 @@ export interface operations {
                      *           "serviceDescription": "MySQL is a relational database",
                      *           "serviceId": "s-123456",
                      *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "Sit minus voluptate reprehenderit placeat.",
+                     *           "serviceOrgId": "Sed excepturi.",
                      *           "serviceProviderId": "sp-9zrg9W8Are",
                      *           "serviceProviderName": "Omnistrate, Inc.",
                      *           "serviceURLKey": "mysql"
@@ -63574,7 +65017,7 @@ export interface operations {
                      *           "serviceDescription": "MySQL is a relational database",
                      *           "serviceId": "s-123456",
                      *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "Sit minus voluptate reprehenderit placeat.",
+                     *           "serviceOrgId": "Sed excepturi.",
                      *           "serviceProviderId": "sp-9zrg9W8Are",
                      *           "serviceProviderName": "Omnistrate, Inc.",
                      *           "serviceURLKey": "mysql"
@@ -63635,68 +65078,7 @@ export interface operations {
                      *           "serviceDescription": "MySQL is a relational database",
                      *           "serviceId": "s-123456",
                      *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "Sit minus voluptate reprehenderit placeat.",
-                     *           "serviceProviderId": "sp-9zrg9W8Are",
-                     *           "serviceProviderName": "Omnistrate, Inc.",
-                     *           "serviceURLKey": "mysql"
-                     *         },
-                     *         {
-                     *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "isDeprecated": false,
-                     *           "offerings": [
-                     *             {
-                     *               "allowCreatesWhenPaymentNotConfigured": true,
-                     *               "assets": {
-                     *                 "cloudFormationURL": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa",
-                     *                 "cloudFormationURLNoLB": "https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/omnistrate-cloudformation-dev/org-EUVvex3bVm/account-config-setup-template.yaml&stackName=AccountConfigSetup&param_AccountConfigIdentityId=org-EUVvex3bVm&param_OIDCIssuerURLWithoutPrefix=oidc.eks.us-east-2.amazonaws.com/id/C339DC3726AD36506FB7ABE55754784F&param_OIDCIssuerThumbprintList=9e99a48a9960b14926bb7f3b02e22da2b0ab7280&param_ServiceAccount=bootstrap-sa&param_CreateLoadBalancerPolicy=false"
-                     *               },
-                     *               "maxNumberOfInstances": 4,
-                     *               "productTierName": "Premium",
-                     *               "productTierURLKey": "premium",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-12345678",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PRIVATE",
-                     *               "serviceModelName": "Bring Your Own Account",
-                     *               "serviceModelURLKey": "byoa"
-                     *             },
-                     *             {
-                     *               "productTierName": "Basic",
-                     *               "productTierURLKey": "basic",
-                     *               "resourceParameters": [
-                     *                 {
-                     *                   "name": "MySQL",
-                     *                   "urlKey": "mysql"
-                     *                 },
-                     *                 {
-                     *                   "name": "Redis",
-                     *                   "urlKey": "redis"
-                     *                 }
-                     *               ],
-                     *               "serviceAPIID": "sa-abcdefgh",
-                     *               "serviceAPIVersion": "v1",
-                     *               "serviceEnvironmentName": "Production",
-                     *               "serviceEnvironmentURLKey": "prod",
-                     *               "serviceEnvironmentVisibility": "PUBLIC",
-                     *               "serviceModelName": "Hosted",
-                     *               "serviceModelURLKey": "hosted"
-                     *             }
-                     *           ],
-                     *           "serviceDescription": "MySQL is a relational database",
-                     *           "serviceId": "s-123456",
-                     *           "serviceName": "MySQL",
-                     *           "serviceOrgId": "Sit minus voluptate reprehenderit placeat.",
+                     *           "serviceOrgId": "Sed excepturi.",
                      *           "serviceProviderId": "sp-9zrg9W8Are",
                      *           "serviceProviderName": "Omnistrate, Inc.",
                      *           "serviceURLKey": "mysql"
@@ -63852,7 +65234,7 @@ export interface operations {
                      *       "serviceDescription": "MySQL is a relational database",
                      *       "serviceId": "s-123456",
                      *       "serviceName": "MySQL",
-                     *       "serviceOrgId": "In veritatis.",
+                     *       "serviceOrgId": "Hic enim ipsa.",
                      *       "serviceProviderId": "sp-9zrg9W8Are",
                      *       "serviceProviderName": "Omnistrate, Inc.",
                      *       "serviceURLKey": "mysql"
@@ -64714,7 +66096,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Consectetur nam ipsam excepturi fugit ea. */
+                    /** @example Aspernatur illo nesciunt quis ipsum sapiente veniam. */
                     "application/json": string;
                 };
             };
@@ -64779,7 +66161,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the compute config to describe. If not specified, the latest version is described.
-                 * @example Eius quisquam hic rerum.
+                 * @example Et iste porro sunt quidem.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -66406,7 +67788,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Hic qui. */
+                    /** @example Est dolore tempora natus voluptatem. */
                     "application/json": string;
                 };
             };
@@ -66471,7 +67853,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the image config to describe. If not specified, the latest version is described.
-                 * @example Delectus laudantium saepe aut iusto voluptatem ipsa.
+                 * @example Corporis error aut atque labore.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -67077,7 +68459,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Dolor modi. */
+                    /** @example Reiciendis eveniet. */
                     "application/json": string;
                 };
             };
@@ -67142,7 +68524,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the infra config to describe. If not specified, the latest version is described.
-                 * @example Velit facilis sit eius aliquam eos.
+                 * @example Eius ut deleniti distinctio commodi.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -68107,7 +69489,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Ut placeat recusandae. */
+                    /** @example Doloremque recusandae ipsum expedita sit sit. */
                     "application/json": string;
                 };
             };
@@ -68172,7 +69554,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Ut a.
+                 * @example Alias unde natus dolore sint aut.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -68559,7 +69941,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Aut necessitatibus aperiam. */
+                    /** @example Alias veritatis vero dicta vel. */
                     "application/json": string;
                 };
             };
@@ -69733,7 +71115,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Accusamus cumque est accusamus architecto fugit alias. */
+                    /** @example Aut voluptatum officia voluptatem. */
                     "application/json": string;
                 };
             };
@@ -69947,7 +71329,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Nam eum omnis et sit. */
+                    /** @example Alias voluptatum vel. */
                     "application/json": string;
                 };
             };
@@ -70012,7 +71394,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the network config to describe. If not specified, the latest version is described.
-                 * @example Et ea ullam tenetur animi autem.
+                 * @example Veritatis non veniam occaecati.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -70508,7 +71890,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Aut voluptatum officia voluptatem. */
+                    /** @example Nam quo. */
                     "application/json": string;
                 };
             };
@@ -70573,7 +71955,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Aut iste doloremque minima fuga assumenda numquam.
+                 * @example Eveniet quo.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -71011,7 +72393,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Sed qui qui. */
+                    /** @example Omnis expedita temporibus unde dolorem. */
                     "application/json": string;
                 };
             };
@@ -71986,7 +73368,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Id autem culpa ea sint ut esse. */
+                    /** @example Qui unde ad corrupti dignissimos neque voluptatem. */
                     "application/json": string;
                 };
             };
@@ -74477,7 +75859,7 @@ export interface operations {
                 managed?: boolean;
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Consequatur illo ut.
+                 * @example Ducimus dignissimos non est et.
                  */
                 ProductTierVersion?: string;
             };
@@ -76347,7 +77729,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Et dolorem qui iste molestias. */
+                    /** @example Ut itaque tenetur natus dolor. */
                     "application/json": string;
                 };
             };
@@ -76412,7 +77794,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Harum quia quia a.
+                 * @example Ipsam et excepturi.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -76980,7 +78362,13 @@ export interface operations {
     };
     "resource-api/DeleteResource": {
         parameters: {
-            query?: never;
+            query?: {
+                /**
+                 * @description If true, validates the deletion without actually deleting the resource
+                 * @example false
+                 */
+                dryRun?: boolean;
+            };
             header?: never;
             path: {
                 /**
@@ -77868,7 +79256,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Similique et fuga aut.
+                 * @example Delectus laudantium saepe aut iusto voluptatem ipsa.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -78783,7 +80171,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Unde repellendus. */
+                    /** @example Consectetur nam ipsam excepturi fugit ea. */
                     "application/json": string;
                 };
             };
@@ -79168,7 +80556,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Pariatur sit ut vitae officiis.
+                 * @example Modi quia earum.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -79717,7 +81105,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the instance to describe. If not specified, the latest version is described.
-                 * @example Vero dicta vel non quod.
+                 * @example Voluptas commodi voluptatum.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -79980,7 +81368,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the resource to describe. If not specified, the latest version is described.
-                 * @example Cum aut provident.
+                 * @example Rerum quisquam sunt.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -80182,7 +81570,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Sed et quaerat hic sunt sunt. */
+                    /** @example Accusantium tempora dolores. */
                     "application/json": string;
                 };
             };
@@ -81676,7 +83064,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Et sed ratione itaque doloribus commodi. */
+                    /** @example Quia inventore dolores et. */
                     "application/json": string;
                 };
             };
@@ -81741,7 +83129,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the storage config to describe. If not specified, the latest version is described.
-                 * @example Exercitationem rem quia voluptatem.
+                 * @example Culpa rerum vero eius sed provident perferendis.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -82355,7 +83743,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Quo eos nesciunt qui aut magnam. */
+                    /** @example Voluptatem odit rerum aspernatur mollitia quia exercitationem. */
                     "application/json": string;
                 };
             };
@@ -82420,7 +83808,7 @@ export interface operations {
             query?: {
                 /**
                  * @description Product tier version of the network config to describe. If not specified, the latest version is described.
-                 * @example Ad ut dolor officiis odio voluptatem.
+                 * @example Earum consectetur est.
                  */
                 ProductTierVersion?: string;
                 /**
@@ -83113,11 +84501,11 @@ export interface operations {
                 /**
                  * @example {
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-                 *       "fileContent": "Beatae placeat in et ea ut non.",
+                 *       "fileContent": "Ut non asperiores.",
                  *       "fileFormat": "text/plain",
                  *       "fileName": "mysql.yaml",
                  *       "name": "MySQL multi-writer service",
-                 *       "serviceLogoURL": "http://mueller.com/cristopher"
+                 *       "serviceLogoURL": "http://greenfelderhyatt.net/kolby"
                  *     }
                  */
                 "application/json": components["schemas"]["CreateServiceFromComposeSpecRequest2"];
@@ -83211,7 +84599,7 @@ export interface operations {
                  *       "release": true,
                  *       "releaseAsPreferred": true,
                  *       "releaseVersionName": "mysql",
-                 *       "serviceLogoURL": "http://hegmannokeefe.net/cristian"
+                 *       "serviceLogoURL": "http://witting.net/cristian"
                  *     }
                  */
                 "application/json": components["schemas"]["BuildServiceFromServicePlanSpecRequest2"];
@@ -83943,7 +85331,7 @@ export interface operations {
                      *       "nextPageToken": "next-token",
                      *       "subscriptions": [
                      *         {
-                     *           "accountConfigIdentityId": "Fugit omnis qui facilis vel et adipisci.",
+                     *           "accountConfigIdentityId": "Aut quas.",
                      *           "allowCreatesWhenPaymentNotConfigured": true,
                      *           "cloudProviderNames": [
                      *             "aws",
@@ -83951,26 +85339,26 @@ export interface operations {
                      *           ],
                      *           "createdAt": "2019-01-01T00:00:00Z",
                      *           "defaultSubscription": true,
-                     *           "id": "Cum et suscipit ea sint sunt.",
+                     *           "id": "Qui adipisci corrupti exercitationem omnis.",
                      *           "maxNumberOfInstances": 10,
                      *           "paymentMethodConfigured": true,
-                     *           "productTierId": "Voluptas quia cum.",
+                     *           "productTierId": "Vel eos ea.",
                      *           "productTierName": "Omnistrate Multi Tenancy",
                      *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
-                     *           "rootUserId": "Quod veniam et mollitia ipsam omnis.",
+                     *           "rootUserId": "Tempore doloremque quasi suscipit.",
                      *           "rootUserName": "John Doe",
-                     *           "rootUserOrgId": "Modi et.",
+                     *           "rootUserOrgId": "Sunt sint dolorem dolores.",
                      *           "rootUserOrgName": "Example Inc.",
                      *           "serviceId": "s-123456",
-                     *           "serviceLogoURL": "Et doloremque incidunt recusandae aut voluptatem a.",
+                     *           "serviceLogoURL": "Et est nobis sint mollitia.",
                      *           "serviceName": "MySQL multi-writer service",
-                     *           "serviceOrgId": "Nobis enim ducimus accusantium inventore dolorum dolor.",
+                     *           "serviceOrgId": "Quo nisi laboriosam.",
                      *           "serviceOrgName": "Omnistrate",
                      *           "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
                      *           "subscriptionOwnerName": "John Doe"
                      *         },
                      *         {
-                     *           "accountConfigIdentityId": "Fugit omnis qui facilis vel et adipisci.",
+                     *           "accountConfigIdentityId": "Aut quas.",
                      *           "allowCreatesWhenPaymentNotConfigured": true,
                      *           "cloudProviderNames": [
                      *             "aws",
@@ -83978,20 +85366,74 @@ export interface operations {
                      *           ],
                      *           "createdAt": "2019-01-01T00:00:00Z",
                      *           "defaultSubscription": true,
-                     *           "id": "Cum et suscipit ea sint sunt.",
+                     *           "id": "Qui adipisci corrupti exercitationem omnis.",
                      *           "maxNumberOfInstances": 10,
                      *           "paymentMethodConfigured": true,
-                     *           "productTierId": "Voluptas quia cum.",
+                     *           "productTierId": "Vel eos ea.",
                      *           "productTierName": "Omnistrate Multi Tenancy",
                      *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
-                     *           "rootUserId": "Quod veniam et mollitia ipsam omnis.",
+                     *           "rootUserId": "Tempore doloremque quasi suscipit.",
                      *           "rootUserName": "John Doe",
-                     *           "rootUserOrgId": "Modi et.",
+                     *           "rootUserOrgId": "Sunt sint dolorem dolores.",
                      *           "rootUserOrgName": "Example Inc.",
                      *           "serviceId": "s-123456",
-                     *           "serviceLogoURL": "Et doloremque incidunt recusandae aut voluptatem a.",
+                     *           "serviceLogoURL": "Et est nobis sint mollitia.",
                      *           "serviceName": "MySQL multi-writer service",
-                     *           "serviceOrgId": "Nobis enim ducimus accusantium inventore dolorum dolor.",
+                     *           "serviceOrgId": "Quo nisi laboriosam.",
+                     *           "serviceOrgName": "Omnistrate",
+                     *           "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
+                     *           "subscriptionOwnerName": "John Doe"
+                     *         },
+                     *         {
+                     *           "accountConfigIdentityId": "Aut quas.",
+                     *           "allowCreatesWhenPaymentNotConfigured": true,
+                     *           "cloudProviderNames": [
+                     *             "aws",
+                     *             "gcp"
+                     *           ],
+                     *           "createdAt": "2019-01-01T00:00:00Z",
+                     *           "defaultSubscription": true,
+                     *           "id": "Qui adipisci corrupti exercitationem omnis.",
+                     *           "maxNumberOfInstances": 10,
+                     *           "paymentMethodConfigured": true,
+                     *           "productTierId": "Vel eos ea.",
+                     *           "productTierName": "Omnistrate Multi Tenancy",
+                     *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
+                     *           "rootUserId": "Tempore doloremque quasi suscipit.",
+                     *           "rootUserName": "John Doe",
+                     *           "rootUserOrgId": "Sunt sint dolorem dolores.",
+                     *           "rootUserOrgName": "Example Inc.",
+                     *           "serviceId": "s-123456",
+                     *           "serviceLogoURL": "Et est nobis sint mollitia.",
+                     *           "serviceName": "MySQL multi-writer service",
+                     *           "serviceOrgId": "Quo nisi laboriosam.",
+                     *           "serviceOrgName": "Omnistrate",
+                     *           "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
+                     *           "subscriptionOwnerName": "John Doe"
+                     *         },
+                     *         {
+                     *           "accountConfigIdentityId": "Aut quas.",
+                     *           "allowCreatesWhenPaymentNotConfigured": true,
+                     *           "cloudProviderNames": [
+                     *             "aws",
+                     *             "gcp"
+                     *           ],
+                     *           "createdAt": "2019-01-01T00:00:00Z",
+                     *           "defaultSubscription": true,
+                     *           "id": "Qui adipisci corrupti exercitationem omnis.",
+                     *           "maxNumberOfInstances": 10,
+                     *           "paymentMethodConfigured": true,
+                     *           "productTierId": "Vel eos ea.",
+                     *           "productTierName": "Omnistrate Multi Tenancy",
+                     *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
+                     *           "rootUserId": "Tempore doloremque quasi suscipit.",
+                     *           "rootUserName": "John Doe",
+                     *           "rootUserOrgId": "Sunt sint dolorem dolores.",
+                     *           "rootUserOrgName": "Example Inc.",
+                     *           "serviceId": "s-123456",
+                     *           "serviceLogoURL": "Et est nobis sint mollitia.",
+                     *           "serviceName": "MySQL multi-writer service",
+                     *           "serviceOrgId": "Quo nisi laboriosam.",
                      *           "serviceOrgName": "Omnistrate",
                      *           "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
                      *           "subscriptionOwnerName": "John Doe"
@@ -84069,7 +85511,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "productTierId": "Aspernatur quibusdam qui sequi suscipit.",
+                 *       "productTierId": "Sed aliquid non dolores exercitationem a debitis.",
                  *       "serviceId": "s-123456"
                  *     }
                  */
@@ -84083,7 +85525,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Sed quod. */
+                    /** @example Expedita eos. */
                     "application/json": string;
                 };
             };
@@ -84166,7 +85608,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "accountConfigIdentityId": "Ut eum occaecati quis.",
+                     *       "accountConfigIdentityId": "Harum ut numquam at dolorum facere.",
                      *       "allowCreatesWhenPaymentNotConfigured": true,
                      *       "cloudProviderNames": [
                      *         "aws",
@@ -84174,20 +85616,20 @@ export interface operations {
                      *       ],
                      *       "createdAt": "2019-01-01T00:00:00Z",
                      *       "defaultSubscription": true,
-                     *       "id": "Rerum porro molestias qui recusandae vel.",
+                     *       "id": "Nihil et dolorem est aut.",
                      *       "maxNumberOfInstances": 10,
                      *       "paymentMethodConfigured": true,
-                     *       "productTierId": "Commodi sed et.",
+                     *       "productTierId": "Eum adipisci atque quod porro qui.",
                      *       "productTierName": "Omnistrate Multi Tenancy",
                      *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
-                     *       "rootUserId": "Quis ut dolores ad et quis.",
+                     *       "rootUserId": "Voluptatem quibusdam qui occaecati tempore dolor sint.",
                      *       "rootUserName": "John Doe",
-                     *       "rootUserOrgId": "Aspernatur nihil nam.",
+                     *       "rootUserOrgId": "Molestiae sequi architecto et.",
                      *       "rootUserOrgName": "Example Inc.",
                      *       "serviceId": "s-123456",
-                     *       "serviceLogoURL": "Ipsa quia accusamus.",
+                     *       "serviceLogoURL": "Qui consequatur occaecati sint perferendis fugiat.",
                      *       "serviceName": "MySQL multi-writer service",
-                     *       "serviceOrgId": "Porro rem dolores molestias eum.",
+                     *       "serviceOrgId": "Fugit doloribus.",
                      *       "serviceOrgName": "Omnistrate",
                      *       "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
                      *       "subscriptionOwnerName": "John Doe"
@@ -84362,50 +85804,66 @@ export interface operations {
                      *       "subscriptionRequests": [
                      *         {
                      *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "id": "Nemo illum.",
-                     *           "productTierId": "Corrupti exercitationem.",
+                     *           "id": "Voluptatum fugit et.",
+                     *           "productTierId": "Eaque officia aut consectetur nam.",
                      *           "productTierName": "Omnistrate Multi Tenancy",
                      *           "rootUserEmail": "abc@gmail.com",
-                     *           "rootUserId": "Explicabo tempore doloremque quasi suscipit sed sunt.",
+                     *           "rootUserId": "Et animi et laudantium.",
                      *           "rootUserName": "John Doe",
                      *           "serviceId": "s-123456",
-                     *           "serviceLogoURL": "Sint qui.",
+                     *           "serviceLogoURL": "Fuga nesciunt dicta accusamus.",
                      *           "serviceName": "MySQL multi-writer service",
                      *           "status": "PENDING|APPROVED|DENIED|CANCELLED",
                      *           "updatedAt": "2019-01-01T00:00:00Z",
-                     *           "updatedByUserId": "Dolorem dolores.",
+                     *           "updatedByUserId": "Vel eligendi sed sapiente qui necessitatibus minima.",
                      *           "updatedByUserName": "John Doe"
                      *         },
                      *         {
                      *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "id": "Nemo illum.",
-                     *           "productTierId": "Corrupti exercitationem.",
+                     *           "id": "Voluptatum fugit et.",
+                     *           "productTierId": "Eaque officia aut consectetur nam.",
                      *           "productTierName": "Omnistrate Multi Tenancy",
                      *           "rootUserEmail": "abc@gmail.com",
-                     *           "rootUserId": "Explicabo tempore doloremque quasi suscipit sed sunt.",
+                     *           "rootUserId": "Et animi et laudantium.",
                      *           "rootUserName": "John Doe",
                      *           "serviceId": "s-123456",
-                     *           "serviceLogoURL": "Sint qui.",
+                     *           "serviceLogoURL": "Fuga nesciunt dicta accusamus.",
                      *           "serviceName": "MySQL multi-writer service",
                      *           "status": "PENDING|APPROVED|DENIED|CANCELLED",
                      *           "updatedAt": "2019-01-01T00:00:00Z",
-                     *           "updatedByUserId": "Dolorem dolores.",
+                     *           "updatedByUserId": "Vel eligendi sed sapiente qui necessitatibus minima.",
                      *           "updatedByUserName": "John Doe"
                      *         },
                      *         {
                      *           "createdAt": "2019-01-01T00:00:00Z",
-                     *           "id": "Nemo illum.",
-                     *           "productTierId": "Corrupti exercitationem.",
+                     *           "id": "Voluptatum fugit et.",
+                     *           "productTierId": "Eaque officia aut consectetur nam.",
                      *           "productTierName": "Omnistrate Multi Tenancy",
                      *           "rootUserEmail": "abc@gmail.com",
-                     *           "rootUserId": "Explicabo tempore doloremque quasi suscipit sed sunt.",
+                     *           "rootUserId": "Et animi et laudantium.",
                      *           "rootUserName": "John Doe",
                      *           "serviceId": "s-123456",
-                     *           "serviceLogoURL": "Sint qui.",
+                     *           "serviceLogoURL": "Fuga nesciunt dicta accusamus.",
                      *           "serviceName": "MySQL multi-writer service",
                      *           "status": "PENDING|APPROVED|DENIED|CANCELLED",
                      *           "updatedAt": "2019-01-01T00:00:00Z",
-                     *           "updatedByUserId": "Dolorem dolores.",
+                     *           "updatedByUserId": "Vel eligendi sed sapiente qui necessitatibus minima.",
+                     *           "updatedByUserName": "John Doe"
+                     *         },
+                     *         {
+                     *           "createdAt": "2019-01-01T00:00:00Z",
+                     *           "id": "Voluptatum fugit et.",
+                     *           "productTierId": "Eaque officia aut consectetur nam.",
+                     *           "productTierName": "Omnistrate Multi Tenancy",
+                     *           "rootUserEmail": "abc@gmail.com",
+                     *           "rootUserId": "Et animi et laudantium.",
+                     *           "rootUserName": "John Doe",
+                     *           "serviceId": "s-123456",
+                     *           "serviceLogoURL": "Fuga nesciunt dicta accusamus.",
+                     *           "serviceName": "MySQL multi-writer service",
+                     *           "status": "PENDING|APPROVED|DENIED|CANCELLED",
+                     *           "updatedAt": "2019-01-01T00:00:00Z",
+                     *           "updatedByUserId": "Vel eligendi sed sapiente qui necessitatibus minima.",
                      *           "updatedByUserName": "John Doe"
                      *         }
                      *       ]
@@ -84481,7 +85939,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "productTierId": "Ullam voluptas iusto quo.",
+                 *       "productTierId": "Exercitationem quos.",
                  *       "serviceId": "s-123456"
                  *     }
                  */
@@ -84495,7 +85953,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /** @example Quidem harum ipsa et. */
+                    /** @example Laudantium laboriosam unde id culpa velit. */
                     "application/json": string;
                 };
             };
@@ -84579,18 +86037,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "createdAt": "2019-01-01T00:00:00Z",
-                     *       "id": "Et esse.",
-                     *       "productTierId": "Atque fugit doloribus omnis qui.",
+                     *       "id": "Sint qui esse repellat in.",
+                     *       "productTierId": "Fugit dolor est rem.",
                      *       "productTierName": "Omnistrate Multi Tenancy",
                      *       "rootUserEmail": "abc@gmail.com",
-                     *       "rootUserId": "Occaecati sint.",
+                     *       "rootUserId": "Sit vel sit et sint suscipit harum.",
                      *       "rootUserName": "John Doe",
                      *       "serviceId": "s-123456",
-                     *       "serviceLogoURL": "Adipisci atque quod porro.",
+                     *       "serviceLogoURL": "Non repudiandae ea.",
                      *       "serviceName": "MySQL multi-writer service",
                      *       "status": "PENDING|APPROVED|DENIED|CANCELLED",
                      *       "updatedAt": "2019-01-01T00:00:00Z",
-                     *       "updatedByUserId": "Fugiat amet.",
+                     *       "updatedByUserId": "Animi minima.",
                      *       "updatedByUserName": "John Doe"
                      *     }
                      */

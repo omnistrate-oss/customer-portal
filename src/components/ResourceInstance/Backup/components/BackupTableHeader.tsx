@@ -133,6 +133,21 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
           />
           <RefreshWithToolTip refetch={refetch} disabled={isRefetching} />
           <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
+
+          {tab === "snapshots" && (
+            <Button
+              variant="outlined"
+              sx={{
+                height: "40px !important",
+                padding: "10px 14px !important",
+              }}
+              onClick={handleDeleteSnapshotDialogOpen}
+              disabled={isRefetching || isDeleting || !selectedSnapshot}
+              disabledMessage={deleteSnapshotDisabledMessage}
+            >
+              Delete
+            </Button>
+          )}
           <Button
             variant="outlined"
             sx={{
@@ -148,7 +163,6 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             Restore
             {restoreMutation.isPending && <LoadingSpinnerSmall sx={{ color: "#7F56D9", marginLeft: "12px" }} />}
           </Button>
-
           <Button
             variant="outlined"
             sx={{
@@ -165,37 +179,8 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             }
             disabledMessage={copySnapshotDisabledMessage}
           >
-            {tab === "backups" ? "Create Snapshot" : "Copy Snapshot"}
+            {tab === "backups" ? "Create Snapshot" : "Copy"}
           </Button>
-
-          {/* {tab === "snapshots" && (
-            <Button
-              variant="outlined"
-              sx={{
-                height: "40px !important",
-                padding: "10px 14px !important",
-              }}
-              onClick={() => handleOpenCopySnapshotModal("createNew")}
-              disabled={isRefetching || copySnapshotMutation.isPending || cloudProvider !== CLOUD_PROVIDERS.gcp}
-              disabledMessage={createSnapshotDisabledMessage}
-            >
-              Create Snapshot
-            </Button>
-          )} */}
-          {tab === "snapshots" && (
-            <Button
-              variant="outlined"
-              sx={{
-                height: "40px !important",
-                padding: "10px 14px !important",
-              }}
-              onClick={handleDeleteSnapshotDialogOpen}
-              disabled={isRefetching || isDeleting || !selectedSnapshot}
-              disabledMessage={deleteSnapshotDisabledMessage}
-            >
-              Delete Snapshot
-            </Button>
-          )}
         </Stack>
       </Stack>
     </>

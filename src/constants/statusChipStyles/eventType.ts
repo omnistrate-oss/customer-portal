@@ -5,19 +5,19 @@ import { ColorObject } from "./index";
 const stylesMap: Record<EventType, ColorObject & { label: string }> = {
   Customer: {
     color: "#5925DC",
-    bgColor: "#F4F3FF",
+    backgroundColor: "#F4F3FF",
     borderColor: "#D9D6FE",
     label: "Customer",
   },
   Infra: {
     color: "#C11574",
-    bgColor: "#FDF2FA",
+    backgroundColor: "#FDF2FA",
     borderColor: "#FCCEEE",
     label: "Infra",
   },
   Maintenance: {
     color: "#026AA2",
-    bgColor: "#F0F9FF",
+    backgroundColor: "#F0F9FF",
     borderColor: "#B9E6FE",
     label: "Maintenance",
   },

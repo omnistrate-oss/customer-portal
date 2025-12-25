@@ -43,6 +43,7 @@ const SubscriptionsPage = () => {
 
   const serviceId = searchParams?.get("serviceId");
   const servicePlanId = searchParams?.get("servicePlanId");
+  const subscriptionId = searchParams?.get("subscriptionId");
 
   const [searchText, setSearchText] = useState<string>("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -66,6 +67,12 @@ const SubscriptionsPage = () => {
       setOverlayType("manage-subscriptions");
     }
   }, [serviceId, servicePlanId, isFetchingSubscriptions, isFetchingServiceOfferings]);
+
+  useEffect(() => {
+    if (subscriptionId && !isFetchingSubscriptions) {
+      setSearchText(subscriptionId);
+    }
+  }, [subscriptionId, isFetchingSubscriptions]);
 
   // Show only subscriptions that have service offerings associated with them
   const existingSubscriptions = useMemo(() => {
@@ -190,7 +197,10 @@ const SubscriptionsPage = () => {
 
   const filteredSubscriptions = useMemo(() => {
     return existingSubscriptions.filter((sub) => {
-      return sub.serviceName.toLowerCase().includes(searchText.toLowerCase());
+      return (
+        sub.serviceName.toLowerCase().includes(searchText.toLowerCase()) ||
+        sub.id.toLowerCase().includes(searchText.toLowerCase())
+      );
     });
   }, [searchText, existingSubscriptions]);
 
@@ -221,7 +231,7 @@ const SubscriptionsPage = () => {
                 setOverlayType("unsubscribe-dialog");
               },
               isUnsubscribing: unSubscribeMutation.isPending,
-              count: filteredSubscriptions?.length,
+              count: existingSubscriptions?.length,
               isFetchingSubscriptions,
               refetchSubscriptions,
               selectedSubscription,
