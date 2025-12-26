@@ -70,7 +70,7 @@ interface JsonDataType {
 }
 
 const Link = styled(NextLink)({
-  color: "#535862",
+  color: "#099250",
   fontWeight: 500,
   fontSize: "14px",
   lineHeight: "20px",

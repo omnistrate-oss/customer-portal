@@ -4,7 +4,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, Collapse, Stack } from "@mui/material";
 
 import Button from "../Button/Button";
-import DetailsTable, { DetailsTableColumn } from "../DetailsTable/DetailsTable";
+import DetailsTable from "../DetailsTable/DetailsTable";
 import { DisplayText, Text } from "../Typography/Typography";
 
 const Title = ({ title, description }: { title: string; description: string }) => {
@@ -24,7 +24,7 @@ const Title = ({ title, description }: { title: string; description: string }) =
 type SideDrawerHeaderProps = {
   title: string;
   description: string;
-  summaryTableColumns?: DetailsTableColumn[];
+  summaryTableColumns?: any[];
   showHideSummaryButton?: boolean;
 };
 

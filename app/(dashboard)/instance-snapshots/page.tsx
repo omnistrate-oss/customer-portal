@@ -330,7 +330,7 @@ const InstanceSnapshotsPage = () => {
             deleteDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
               : selectedSnapshot?.snapshotType === "AutomatedSnapshot"
-                ? "Only manual snapshots can be deleted"
+                ? "Automated Snapshots cannot be deleted"
                 : operationPending
                   ? "Operation in progress, please wait"
                   : "",
@@ -482,9 +482,8 @@ const InstanceSnapshotsPage = () => {
           if (overlayType === "copy-snapshot-dialog") {
             await copySnapshotMutation.mutateAsync({
               params: {
-                path: {
-                  sourceSnapshotId: selectedSnapshot.snapshotId,
-                },
+                path: { sourceSnapshotId: selectedSnapshot.snapshotId },
+                query: { subscriptionId: selectedSnapshot.subscriptionId },
               },
               body: {
                 targetRegion: formData.values.copySnapshotRegion,
@@ -493,9 +492,8 @@ const InstanceSnapshotsPage = () => {
           } else if (overlayType === "restore-snapshot-dialog") {
             await restoreSnapshotMutation.mutateAsync({
               params: {
-                path: {
-                  snapshotId: selectedSnapshot.snapshotId,
-                },
+                path: { snapshotId: selectedSnapshot.snapshotId },
+                query: { subscriptionId: selectedSnapshot.subscriptionId },
               },
               body: {
                 custom_network_id: formData.values.restoreSnapshotCustomNetworkId,

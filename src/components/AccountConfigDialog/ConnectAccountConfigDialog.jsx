@@ -274,8 +274,8 @@ const Check = ({ instance, fetchClickedInstanceDetails, setClickedInstance, serv
                   href={`${instance?.result_params?.connect_cloudformation_url}`}
                 >
                   this
-                </StyledLink>
-                 CloudFormation template to grant {`${serviceProviderName}`} the required permissions.
+                </StyledLink>{" "}
+                CloudFormation template to grant {`${serviceProviderName}`} the required permissions.
               </Text>
             ) : instance?.result_params?.azure_subscription_id ? (
               <Box>

@@ -88,7 +88,7 @@ const EndpointCard: FC<EndpointCardProps> = ({ isPrimary, isPublic, endpointName
             {endpointName}
           </Text>
           <StatusChip label={isPublic ? "Public" : "Private"} category={isPublic ? "success" : "unknown"} />
-          {isPrimary && <StatusChip label="Primary" color="#7F56D9" borderColor="#7F56D9" bgColor="#F9F5FF" />}
+          {isPrimary && <StatusChip label="Primary" color="#7F56D9" borderColor="#7F56D9" backgroundColor="#F9F5FF" />}
         </Stack>
 
         <EndpointLine endpointURL={endpointURL} isPrimary={isPrimary} openPort={openPorts?.[0]} mt="8px" />

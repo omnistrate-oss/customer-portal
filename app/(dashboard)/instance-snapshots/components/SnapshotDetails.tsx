@@ -111,7 +111,7 @@ const SnapshotDetails: React.FC<SnapshotDetailsProps> = ({ selectedSnapshot, ins
         value: <StatusChip status={encrypted ? "ENCRYPTED" : "NOT_ENCRYPTED"} />,
       },
     ];
-  }, [selectedSnapshot, instances]);
+  }, [selectedSnapshot, instances, subscriptionsObj]);
 
   const deploymentParamsRows: Row[] = useMemo(() => {
     const outputParams = selectedSnapshot?.outputParams;

@@ -170,7 +170,7 @@ const ResourceConnectivityEndpoint: FC<ResourceConnectivityEndpointProps> = (pro
                     category={publiclyAccessible ? "success" : "unknown"}
                   />
                   {isPrimaryResource && (
-                    <StatusChip label="Primary" color="#7F56D9" borderColor="#7F56D9" bgColor="#F9F5FF" />
+                    <StatusChip label="Primary" color="#7F56D9" borderColor="#7F56D9" backgroundColor="#F9F5FF" />
                   )}
                 </Stack>
 
