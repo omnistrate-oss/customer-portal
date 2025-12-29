@@ -594,7 +594,7 @@ export const getDeploymentConfigurationFields = (
           label: option,
           value: option,
         })),
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         isLoading: isFetchingResourceInstanceIds,
         emptyMenuText: "No dependent instances available",
         previewValue: values.requestParams[param.key],
@@ -621,7 +621,7 @@ export const getDeploymentConfigurationFields = (
             disabled: formMode !== "create" && param.custom && !param.modifiable,
           },
         ],
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         previewValue: values.requestParams[param.key] === "true" ? "true" : "false",
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
@@ -637,7 +637,7 @@ export const getDeploymentConfigurationFields = (
           label: option,
           value: option,
         })),
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         previewValue: values.requestParams[param.key]?.join(", "),
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
@@ -650,7 +650,7 @@ export const getDeploymentConfigurationFields = (
         value: values.requestParams[param.key] || "",
         type: "single-select-autocomplete",
         menuItems: param.options.map((option) => option),
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         previewValue: values.requestParams[param.key],
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
@@ -676,7 +676,7 @@ export const getDeploymentConfigurationFields = (
             label: config.label,
             value: config.id,
           })),
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         disabled: formMode !== "create",
         previewValue: cloudAccountInstances.find((config) => config.id === values.requestParams[param.key])?.label,
         emptyMenuText: "No cloud accounts available",
@@ -694,7 +694,7 @@ export const getDeploymentConfigurationFields = (
           name: `requestParams.${param.key}`,
           value: values.requestParams[param.key],
           type: "number",
-          required: formMode !== "modify" && param.required,
+          required: param.required,
           previewValue: values.requestParams[param.key],
         });
       } else {
@@ -706,7 +706,7 @@ export const getDeploymentConfigurationFields = (
           name: `requestParams.${param.key}`,
           value: values.requestParams[param.key] || "",
           type: "text-multiline",
-          required: formMode !== "modify" && param.required,
+          required: param.required,
           previewValue: values.requestParams[param.key],
         });
       }
