@@ -55,15 +55,13 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           placeholder: "Select instance", // TODO: Not showing Placeholder
           name: "createSnapshotInstanceId",
           type: "select",
-          menuItems: instances
-            .filter((instance) => instance.cloud_provider === "gcp")
-            .map((instance) => ({
-              value: instance.id,
-              label: instance.id,
-            })),
+          menuItems: instances.map((instance) => ({
+            value: instance.id,
+            label: instance.id,
+          })),
           required: true,
           isLoading: isFetchingInstances,
-          emptyMenuText: "No GCP instances found",
+          emptyMenuText: "No instances found",
         }}
         formData={formData}
       />
