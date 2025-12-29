@@ -96,6 +96,9 @@ const AxiosGlobalErrorHandler = () => {
               }
             }
           }
+        } else {
+          setSnackbarMsg("Something went wrong please try again later");
+          setIsOpen(true);
         }
 
         return Promise.reject(error);

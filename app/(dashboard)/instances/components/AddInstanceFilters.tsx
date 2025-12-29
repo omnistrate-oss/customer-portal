@@ -50,8 +50,6 @@ export const SelectedCategoryCustomTags = ({
   };
 
   const handleApply = () => {
-    //TODO: Handle Apply
-
     setSelectedFilters((prev) => {
       return {
         ...prev,

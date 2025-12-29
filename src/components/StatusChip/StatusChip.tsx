@@ -34,84 +34,37 @@ export const statuses = {
 };
 
 export const statusStyles = {
-  ACTIVE: {
-    backgroundColor: "#ECFDF3",
-    color: "#067647",
-    borderColor: "#ABEFC6",
-  },
-  Active: {
-    backgroundColor: "#F8F9FC",
-    color: "#669F2A",
-  },
-  CANCELLED: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
-  COMPLETE: {
-    backgroundColor: "#ECFDF3",
-    color: "#027A48",
-  },
-  COMPLETED: {
-    backgroundColor: "#ECFDF3",
-    color: "#027A48",
-  },
-  DELETING: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
-  DEPLOYING: {
-    backgroundColor: "#FFF4ED",
-    color: "#EAAA08",
-  },
-  DEPRECATED: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
-
+  ACTIVE: { ...chipCategoryColors.success },
+  Active: { ...chipCategoryColors.success },
+  CANCELLED: { ...chipCategoryColors.failed },
+  COMPLETE: { ...chipCategoryColors.success },
+  COMPLETED: { ...chipCategoryColors.success },
+  DELETING: { ...chipCategoryColors.failed },
+  DEPLOYING: { ...chipCategoryColors.pending },
+  DEPRECATED: { ...chipCategoryColors.failed },
   Draft: {
     backgroundColor: "#FCFCFC",
     color: "#6F6F6F",
   },
-  FAILED: {
-    backgroundColor: "#FEF3F2",
-    color: "#FA113D",
-  },
-  DELETED: {
-    backgroundColor: "#FEF3F2",
-    color: "#FA113D",
-  },
-  HEALTHY: {
-    backgroundColor: "#ECFDF3",
-    color: "#17B26A",
-  },
+  FAILED: { ...chipCategoryColors.failed },
+  DELETED: { ...chipCategoryColors.failed },
+  HEALTHY: { ...chipCategoryColors.success },
   IN_PROGRESS: {
     backgroundColor: "#F8F9FC",
     color: "#669F2A",
   },
-  NOT_ENABLED: {
-    backgroundColor: "#FEF3F2",
-    color: "#C83532",
-  },
+  NOT_ENABLED: { ...chipCategoryColors.failed },
   Open: {
     backgroundColor: "#EFF8FF",
     color: "#1942C6",
   },
-  PAID: {
-    backgroundColor: "#ECFDF3",
-    color: "#027A48",
-  },
-  Paid: {
-    backgroundColor: "#ECFDF3",
-    color: "#4F9F52",
-  },
+  PAID: { ...chipCategoryColors.success },
+  Paid: { ...chipCategoryColors.success },
   PAUSED: {
     backgroundColor: "#FEF3F2",
     color: "#C83532",
   },
-  PENDING: {
-    backgroundColor: "#EFF8FF",
-    color: "#06AED4",
-  },
+  PENDING: { ...chipCategoryColors.pending },
   PENDING_DEPENDENCY: {
     backgroundColor: "#EEF4FF",
     color: "#3538CD",
@@ -124,42 +77,15 @@ export const statusStyles = {
     color: "#175CD3",
     backgroundColor: "#EFF8FF",
   },
-  READY: {
-    backgroundColor: "#EDFCF2",
-    color: "#669F2A",
-  },
-  RELEASED: {
-    backgroundColor: "#ECFDF3",
-    color: "#4F9F52",
-  },
-  RUNNING: {
-    backgroundColor: "#ECFDF3",
-    color: "#027A48",
-  },
-  STOPPED: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
-  STOPPING: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
-  SUCCESS: {
-    backgroundColor: "#ECFDF3",
-    color: "#66C61C",
-  },
-  SUSPENDED: {
-    backgroundColor: "#F8EEEE",
-    color: "#B42318",
-  },
-  TERMINATED: {
-    backgroundColor: "#FEF3F2",
-    color: "#FA113D",
-  },
-  UNHEALTHY: {
-    backgroundColor: "#FEF3F2",
-    color: "#B42318",
-  },
+  READY: { ...chipCategoryColors.success },
+  RELEASED: { ...chipCategoryColors.success },
+  RUNNING: { ...chipCategoryColors.success },
+  STOPPED: { ...chipCategoryColors.failed },
+  STOPPING: { ...chipCategoryColors.failed },
+  SUCCESS: { ...chipCategoryColors.success },
+  SUSPENDED: { ...chipCategoryColors.failed },
+  TERMINATED: { ...chipCategoryColors.failed },
+  UNHEALTHY: { ...chipCategoryColors.failed },
   UNKNOWN: {
     color: "#363F72",
     borderColor: "#D5D9EB",
@@ -173,6 +99,8 @@ export const statusStyles = {
     backgroundColor: "#f2f4f7",
     color: "#667085",
   },
+  ENCRYPTED: { ...chipCategoryColors.unknown },
+  NOT_ENCRYPTED: { ...chipCategoryColors.failed },
 };
 
 type StatusChipProps = {
@@ -183,7 +111,7 @@ type StatusChipProps = {
   pulsateDot?: boolean;
   tick?: boolean;
   color?: string;
-  bgColor?: string;
+  backgroundColor?: string;
   capitalize?: boolean;
   label?: string;
   category?: Category;
@@ -203,7 +131,7 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
     pulsateDot,
     tick,
     color,
-    bgColor,
+    backgroundColor: bgColor,
     capitalize = true,
     label = statuses[status as keyof typeof statuses],
     category,
@@ -217,7 +145,7 @@ const StatusChip: FC<ChipProps & StatusChipProps> = (props) => {
   if (category) {
     chipStyles = {
       color: chipCategoryColors[category].color,
-      backgroundColor: chipCategoryColors[category].bgColor,
+      backgroundColor: chipCategoryColors[category].backgroundColor,
       borderColor: chipCategoryColors[category].borderColor,
     };
   }

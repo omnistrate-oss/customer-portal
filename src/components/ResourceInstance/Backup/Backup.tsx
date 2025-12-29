@@ -21,7 +21,6 @@ import CustomNetworkSelectionStep from "src/components/RestoreInstance/CustomNet
 import RestoreInstanceSuccessStep from "src/components/RestoreInstance/RestoreInstanceSuccessStep";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
-import { getResourceInstanceBackupStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceBackupStatus";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
@@ -283,7 +282,7 @@ const Backup: FC<{
     },
   });
 
-  const deleteSnapshotMutation = $api.useMutation("delete", "/2022-09-01-00/resource-instance/snapshot/{snapshotId}", {
+  const deleteSnapshotMutation = $api.useMutation("delete", "/2022-09-01-00/resource-instance/snapshot/{id}", {
     onSuccess: async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       snackbar.showSuccess(`Snapshot deletion initiated successfully`);
@@ -360,10 +359,9 @@ const Backup: FC<{
         field: "encrypted",
         headerName: "Encryption Status",
         flex: 0.7,
-        valueGetter: (params: { row: SnapshotBase }) => (params.row.encrypted ? "Encrypted" : "Not Encrypted"),
-        renderCell: (params: { row: SnapshotBase; value: "Encrypted" | "Not Encrypted" }) => {
-          const statusStylesAndMap = getResourceInstanceBackupStatusStylesAndLabel(params.value);
-          return <StatusChip status={params.value} {...statusStylesAndMap} />;
+        valueGetter: (params: { row: SnapshotBase }) => (params.row.encrypted ? "ENCRYPTED" : "NOT_ENCRYPTED"),
+        renderCell: (params: { row: SnapshotBase; value: "ENCRYPTED" | "NOT_ENCRYPTED" }) => {
+          return <StatusChip status={params.value} />;
         },
         minWidth: 150,
       },
@@ -466,7 +464,7 @@ const Backup: FC<{
           return await deleteSnapshotMutation.mutateAsync({
             params: {
               path: {
-                snapshotId: selectedSnapshot?.snapshotId || "",
+                id: selectedSnapshot?.snapshotId || "",
               },
               query: {
                 subscriptionId: accessQueryParams?.subscriptionId,

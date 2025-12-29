@@ -30,7 +30,7 @@ const Button = styled(
   },
   {
     shouldForwardProp: (prop) => {
-      return !["isLoading", "fontColor", "outlineColor", "outlineBg", "bgColor"].includes(prop);
+      return !["fontColor", "outlineColor", "outlineBg", "bgColor"].includes(prop);
     },
   }
 )(({ theme, outlineColor, fontColor, outlineBg, bgColor, size }) => {

@@ -64,7 +64,7 @@ const ServicePlanCard: React.FC<ServicePlanCardProps> = ({
         }}
         capitalize={false}
         color={isAutoApprove ? colors.lightBlue700 : rootSubscription ? colors.success700 : colors.error700}
-        bgColor={isAutoApprove ? colors.lightBlue50 : rootSubscription ? colors.success50 : colors.error50}
+        backgroundColor={isAutoApprove ? colors.lightBlue50 : rootSubscription ? colors.success50 : colors.error50}
         borderColor={isAutoApprove ? "#B2DDFF" : rootSubscription ? "#ABEFC6" : "#F9DBAF"}
         status={isAutoApprove ? "Auto Approval" : rootSubscription ? "Approved" : "Approval Required"}
       />
