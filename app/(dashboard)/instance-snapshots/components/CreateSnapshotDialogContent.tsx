@@ -26,9 +26,17 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
         const { serviceId, productTierId } = subscription || {};
         const instanceServiceOffering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
 
-        // NOTE: Instance Snapshots are only supported for GCP instances for now
+        const regions =
+          instance.cloud_provider === "gcp"
+            ? instanceServiceOffering?.gcpRegions
+            : instance.cloud_provider === "aws"
+              ? instanceServiceOffering?.awsRegions
+              : instance.cloud_provider === "azure"
+                ? instanceServiceOffering?.azureRegions
+                : [];
+
         return (
-          instanceServiceOffering?.gcpRegions?.map((region) => ({
+          regions?.map((region) => ({
             value: region,
             label: region,
           })) || []

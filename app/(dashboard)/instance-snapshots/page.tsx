@@ -267,14 +267,14 @@ const InstanceSnapshotsPage = () => {
   const createSnapshotMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/snapshot", {
     onSuccess: () => {
       snackbar.showSuccess("Snapshot creation initiated successfully");
-      refetchSnapshots();
+      setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
     },
   });
 
   const deleteSnapshotMutation = $api.useMutation("delete", "/2022-09-01-00/resource-instance/snapshot/{id}", {
     onSuccess: () => {
       snackbar.showSuccess("Snapshot deletion initiated successfully");
-      refetchSnapshots();
+      setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
       setSelectedRows([]);
     },
   });
@@ -285,7 +285,7 @@ const InstanceSnapshotsPage = () => {
     {
       onSuccess: () => {
         snackbar.showSuccess("Snapshot restore initiated successfully");
-        refetchSnapshots();
+        setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
       },
     }
   );
@@ -296,7 +296,7 @@ const InstanceSnapshotsPage = () => {
     {
       onSuccess: () => {
         snackbar.showSuccess("Snapshot copy initiated successfully");
-        refetchSnapshots();
+        setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
       },
     }
   );
@@ -361,17 +361,21 @@ const InstanceSnapshotsPage = () => {
             isRestoreLoading: restoreSnapshotMutation.isPending,
             restoreDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
-              : operationPending
-                ? "Operation in progress, please wait"
-                : "",
+              : selectedSnapshot?.status !== "COMPLETE"
+                ? "Only completed snapshots can be restored"
+                : operationPending
+                  ? "Operation in progress, please wait"
+                  : "",
             onCreateClick: () => openOverlay("create-snapshot-dialog"),
             createDisabledMessage: operationPending ? "Operation in progress, please wait" : "",
             onCopyClick: () => openOverlay("copy-snapshot-dialog"),
             copyDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
-              : operationPending
-                ? "Operation in progress, please wait"
-                : "",
+              : selectedSnapshot?.status !== "COMPLETE"
+                ? "Only completed snapshots can be copied"
+                : operationPending
+                  ? "Operation in progress, please wait"
+                  : "",
           }}
           selectionMode="single"
           selectedRows={selectedRows}
@@ -426,6 +430,7 @@ const InstanceSnapshotsPage = () => {
               ? () => (
                   <CopySnapshotDialogContent
                     formData={formData}
+                    selectedSnapshot={selectedSnapshot}
                     isFetchingServiceOfferings={isFetchingServiceOfferings}
                     serviceOffering={serviceOffering}
                   />
