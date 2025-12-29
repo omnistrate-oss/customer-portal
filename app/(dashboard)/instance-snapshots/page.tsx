@@ -422,6 +422,7 @@ const InstanceSnapshotsPage = () => {
             ? () => (
                 <RestoreSnapshotDialogContent
                   customNetworks={customNetworks}
+                  selectedSnapshot={selectedSnapshot}
                   isFetchingCustomNetworks={isFetchingCustomNetworks}
                   formData={formData}
                 />
