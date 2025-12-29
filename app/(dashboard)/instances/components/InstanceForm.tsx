@@ -216,9 +216,7 @@ const InstanceForm = ({
         });
 
         for (const key in data.requestParams) {
-          const value = data.requestParams[key];
-
-          if (value === undefined || (typeof value === "string" && !value.trim())) {
+          if (["cloud_provider", "region", "subscriptionId"].includes(key)) {
             delete data.requestParams[key];
           }
         }
@@ -260,7 +258,7 @@ const InstanceForm = ({
         }
 
         for (const field of requiredFields) {
-          if (data.requestParams[field.key] === undefined) {
+          if (data.requestParams[field.key] === undefined || (field.required && data.requestParams[field.key] === "")) {
             snackbar.showError(`${field.displayName || field.key} is required`);
             return;
           }
@@ -332,11 +330,20 @@ const InstanceForm = ({
             result?.required &&
             (data.requestParams[key] === undefined ||
               data.requestParams[key] === null ||
-              data.requestParams[key] === "")
+              data.requestParams[key] === "") &&
+            !(result?.type?.toLowerCase() === "password")
           ) {
             snackbar.showError(`${result.displayName || key} is required`);
             isTypeError = true;
             return;
+          }
+
+          if (
+            result?.required &&
+            result?.type?.toLowerCase() === "password" &&
+            (data.requestParams[key] === "" || data.requestParams[key] === null)
+          ) {
+            delete data.requestParams[key];
           }
 
           switch (result?.type?.toLowerCase()) {
@@ -363,9 +370,7 @@ const InstanceForm = ({
 
         // Remove Empty Fields from data.requestParams
         for (const key in data.requestParams) {
-          const value = data.requestParams[key];
-
-          if (value === undefined || (typeof value === "string" && !value.trim())) {
+          if (["cloud_provider", "region", "subscriptionId"].includes(key)) {
             delete data.requestParams[key];
           }
         }
