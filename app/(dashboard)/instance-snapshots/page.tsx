@@ -532,6 +532,10 @@ const InstanceSnapshotsPage = () => {
                 custom_network_id: formData.values.restoreSnapshotCustomNetworkId,
               },
             });
+
+            formData.resetForm();
+            // Return false to prevent auto-close; onSuccess callback handles showing the success view
+            return false;
           }
 
           formData.resetForm();
