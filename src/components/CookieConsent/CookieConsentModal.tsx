@@ -3,7 +3,6 @@ import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Stack, styled, Typography } from "@mui/material";
 
-// import CookiePreferenceModal from "./CookiePreferenceModal";
 import { useCookieConsentContext } from "src/context/cookieConsentContext";
 
 import Button from "../Button/Button";
@@ -34,7 +33,6 @@ function CookieConsentModal() {
 
   const closeConsentModal = () => setIsConsentModalOpen(false);
 
-  // const openPreferenceModal = () => setIsPreferenceModalOpen(true);
   const closePreferenceModal = () => setIsPreferenceModalOpen(false);
 
   const handleAllowAll = () => {
@@ -58,12 +56,6 @@ function CookieConsentModal() {
     closeConsentModal();
   };
 
-  // const handleSave = (userCategoryPreference) => {
-  //   updateConsent(userCategoryPreference);
-  //   closePreferenceModal();
-  //   closeConsentModal();
-  // };
-
   return (
     <>
       {isConsentModalOpen && !isPreferenceModalOpen && (
@@ -74,22 +66,15 @@ function CookieConsentModal() {
               <Typography
                 sx={{
                   fontSize: "16px",
-                  fontWeight: 600,
+                  fontWeight: 500,
                   lineHeight: "24px",
-                  color: "#ffffff",
+                  color: "#FFFFFF",
                 }}
               >
-                We use third-party cookies in order to personalise your experience.{" "}
-                <Box component={"span"} sx={{ fontWeight: 400 }}>
-                  Read our{" "}
-                  <Link
-                    href="/cookie-policy"
-                    target="_blank"
-                    style={{ textDecoration: "underline", cursor: "pointer" }}
-                  >
-                    Cookie Policy
-                  </Link>
-                </Box>
+                We use essential cookies. Analytics cookies are optional.{" "}
+                <Link href="/cookie-policy" target="_blank" style={{ textDecoration: "underline", cursor: "pointer" }}>
+                  Cookie Policy
+                </Link>
               </Typography>
             </Stack>
 
@@ -98,29 +83,19 @@ function CookieConsentModal() {
                 size="large"
                 variant="contained"
                 fontColor="#000000"
-                bgColor="#ffffff"
+                bgColor="#FFFFFF"
                 onClick={handleAllowNecessary}
               >
                 Allow necessary
               </Button>
-              <Button size="large" variant="contained" fontColor="#ffffff" bgColor="#000000" onClick={handleAllowAll}>
-                Allow all
+              <Button size="large" variant="contained" fontColor="#FFFFFF" bgColor="#000000" onClick={handleAllowAll}>
+                Allow analytics
               </Button>
-              <CloseIcon htmlColor="#ffffff" sx={{ cursor: "pointer" }} onClick={closeConsentModal} />
+              <CloseIcon htmlColor="#FFFFFF" sx={{ cursor: "pointer" }} onClick={closeConsentModal} />
             </Stack>
           </Stack>
         </StyledConsentContainer>
       )}
-
-      {/* {isPreferenceModalOpen && (
-        <CookiePreferenceModal
-          open={isPreferenceModalOpen}
-          handleClose={closePreferenceModal}
-          handleAllowAll={handleAllowAll}
-          handleAllowNecessary={handleAllowNecessary}
-          handleSave={handleSave}
-        />
-      )} */}
     </>
   );
 }
