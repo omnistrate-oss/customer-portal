@@ -30,7 +30,7 @@ setup("Authenticate User", async ({ page }) => {
     },
     { timeout: 60 * 1000 } // Wait for 60 seconds if needed
   );
-  const subscriptions = (await subscriptionsData.json()).subscriptions;
+  const subscriptions = (await subscriptionsData.json()).subscriptions || [];
 
   await page.waitForURL(PageURLs.instances);
   await page.context().storageState({ path: authFile });
