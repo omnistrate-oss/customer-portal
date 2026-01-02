@@ -17,7 +17,7 @@ import { TierVersionSet } from "src/types/tier-version-set";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
-import { requestParamsEmptyFields } from "../constants";
+import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import {
   filterSchemaByCloudProvider,
   getCustomNetworksMenuItems,
@@ -547,7 +547,7 @@ export const getDeploymentConfigurationFields = (
   if (!resourceSchema?.inputParameters) return fields;
 
   const filteredSchema = filterSchemaByCloudProvider(resourceSchema?.inputParameters || [], values.cloudProvider)
-    .filter((param) => !requestParamsEmptyFields.includes(param.key))
+    .filter((param) => !REQUEST_PARAMS_FIELDS_TO_FILTER.includes(param.key))
     .sort((a, b) => {
       if (a.tabIndex === undefined || b.tabIndex === undefined) {
         return 0;

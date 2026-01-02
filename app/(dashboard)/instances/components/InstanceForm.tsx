@@ -28,7 +28,7 @@ import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
-import { requestParamsEmptyFields } from "../constants";
+import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { filterSchemaByCloudProvider, getInitialValues } from "../utils";
@@ -214,7 +214,7 @@ const InstanceForm = ({
 
         for (const key in data.requestParams) {
           if (
-            requestParamsEmptyFields.includes(key) &&
+            REQUEST_PARAMS_FIELDS_TO_FILTER.includes(key) &&
             (data.requestParams[key] === "" || data.requestParams[key] === null)
           ) {
             delete data.requestParams[key];
@@ -371,7 +371,7 @@ const InstanceForm = ({
         // Remove Empty Fields from data.requestParams
         for (const key in data.requestParams) {
           if (
-            requestParamsEmptyFields.includes(key) &&
+            REQUEST_PARAMS_FIELDS_TO_FILTER.includes(key) &&
             (data.requestParams[key] === "" || data.requestParams[key] === null)
           ) {
             delete data.requestParams[key];
