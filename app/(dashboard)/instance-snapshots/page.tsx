@@ -11,6 +11,7 @@ import DataGridText from "src/components/DataGrid/DataGridText";
 import DataTable from "src/components/DataTable/DataTable";
 import ConfirmationDialog from "src/components/Dialog/ConfirmationDialog";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
+import SuccessIcon from "src/components/Icons/SuccessIcon/SuccessIcon";
 import LinearProgress from "src/components/LinearProgress/LinearProgress";
 import RegionIcon from "src/components/Region/RegionIcon";
 import SideDrawerRight from "src/components/SideDrawerRight/SideDrawerRight";
@@ -37,6 +38,7 @@ import CreateSnapshotDialogContent from "./components/CreateSnapshotDialogConten
 import { CopySnapshotIcon, CreateSnapshotIcon, RestoreSnapshotIcon } from "./components/Icons";
 import InstanceSnapshotsTableHeader from "./components/InstanceSnapshotsTableHeader";
 import RestoreSnapshotDialogContent from "./components/RestoreSnapshotDialogContent";
+import RestoreSnapshotSuccessContent from "./components/RestoreSnapshotSuccessContent";
 import SnapshotDetails from "./components/SnapshotDetails";
 import useInstanceSnapshots from "./hooks/useInstanceSnapshots";
 
@@ -45,6 +47,7 @@ type Overlay =
   | "delete-snapshot-dialog"
   | "snapshot-details-drawer"
   | "restore-snapshot-dialog"
+  | "restore-snapshot-success"
   | "copy-snapshot-dialog"
   | "create-snapshot-dialog";
 type FormValues = {
@@ -61,6 +64,7 @@ const InstanceSnapshotsPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-snapshot-dialog");
   const [clickedSnapshot, setClickedSnapshot] = useState<InstanceSnapshot>();
+  const [restoredInstanceId, setRestoredInstanceId] = useState<string>("");
 
   const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
@@ -267,14 +271,14 @@ const InstanceSnapshotsPage = () => {
   const createSnapshotMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/snapshot", {
     onSuccess: () => {
       snackbar.showSuccess("Snapshot creation initiated successfully");
-      setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
+      setTimeout(() => refetchSnapshots(), 2000); // Delay to allow backend to process
     },
   });
 
   const deleteSnapshotMutation = $api.useMutation("delete", "/2022-09-01-00/resource-instance/snapshot/{id}", {
     onSuccess: () => {
       snackbar.showSuccess("Snapshot deletion initiated successfully");
-      setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
+      setTimeout(() => refetchSnapshots(), 2000); // Delay to allow backend to process
       setSelectedRows([]);
     },
   });
@@ -283,9 +287,12 @@ const InstanceSnapshotsPage = () => {
     "post",
     "/2022-09-01-00/resource-instance/snapshot/{snapshotId}/restore",
     {
-      onSuccess: () => {
-        snackbar.showSuccess("Snapshot restore initiated successfully");
-        setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
+      onSuccess: (data) => {
+        const instanceId = data?.instanceId || "";
+        setRestoredInstanceId(instanceId);
+        setOverlayType("restore-snapshot-success");
+        setIsOverlayOpen(true);
+        setTimeout(() => refetchSnapshots(), 2000); // Delay to allow backend to process
       },
     }
   );
@@ -296,7 +303,7 @@ const InstanceSnapshotsPage = () => {
     {
       onSuccess: () => {
         snackbar.showSuccess("Snapshot copy initiated successfully");
-        setTimeout(() => refetchSnapshots(), 250); // Slight delay to allow backend to process
+        setTimeout(() => refetchSnapshots(), 2000); // Delay to allow backend to process
       },
     }
   );
@@ -371,11 +378,13 @@ const InstanceSnapshotsPage = () => {
             onCopyClick: () => openOverlay("copy-snapshot-dialog"),
             copyDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
-              : selectedSnapshot?.status !== "COMPLETE"
-                ? "Only completed snapshots can be copied"
-                : operationPending
-                  ? "Operation in progress, please wait"
-                  : "",
+              : selectedSnapshot?.cloudProvider !== "gcp"
+                ? "Snapshot copy is restricted to GCP deployments"
+                : selectedSnapshot?.status !== "COMPLETE"
+                  ? "Only completed snapshots can be copied"
+                  : operationPending
+                    ? "Operation in progress, please wait"
+                    : "",
           }}
           selectionMode="single"
           selectedRows={selectedRows}
@@ -407,15 +416,22 @@ const InstanceSnapshotsPage = () => {
       <ConfirmationDialog
         open={
           isOverlayOpen &&
-          ["restore-snapshot-dialog", "copy-snapshot-dialog", "create-snapshot-dialog"].includes(overlayType)
+          [
+            "restore-snapshot-dialog",
+            "restore-snapshot-success",
+            "copy-snapshot-dialog",
+            "create-snapshot-dialog",
+          ].includes(overlayType)
         }
         onClose={closeOverlay}
         title={
           overlayType === "restore-snapshot-dialog"
             ? "Restore Snapshot"
-            : overlayType === "copy-snapshot-dialog"
-              ? "Copy Snapshot"
-              : "Create Snapshot"
+            : overlayType === "restore-snapshot-success"
+              ? "Restoration Successful"
+              : overlayType === "copy-snapshot-dialog"
+                ? "Copy Snapshot"
+                : "Create Snapshot"
         }
         content={
           overlayType === "restore-snapshot-dialog"
@@ -427,29 +443,32 @@ const InstanceSnapshotsPage = () => {
                   formData={formData}
                 />
               )
-            : overlayType === "copy-snapshot-dialog"
-              ? () => (
-                  <CopySnapshotDialogContent
-                    formData={formData}
-                    selectedSnapshot={selectedSnapshot}
-                    isFetchingServiceOfferings={isFetchingServiceOfferings}
-                    serviceOffering={serviceOffering}
-                  />
-                )
-              : () => (
-                  <CreateSnapshotDialogContent
-                    formData={formData}
-                    instances={instances}
-                    isFetchingInstances={isFetchingInstances}
-                  />
-                )
+            : overlayType === "restore-snapshot-success"
+              ? () => <RestoreSnapshotSuccessContent restoredInstanceId={restoredInstanceId} />
+              : overlayType === "copy-snapshot-dialog"
+                ? () => (
+                    <CopySnapshotDialogContent
+                      formData={formData}
+                      isFetchingServiceOfferings={isFetchingServiceOfferings}
+                      serviceOffering={serviceOffering}
+                    />
+                  )
+                : () => (
+                    <CreateSnapshotDialogContent
+                      formData={formData}
+                      instances={instances}
+                      isFetchingInstances={isFetchingInstances}
+                    />
+                  )
         }
         icon={
           overlayType === "restore-snapshot-dialog"
             ? RestoreSnapshotIcon
-            : overlayType === "copy-snapshot-dialog"
-              ? CopySnapshotIcon
-              : CreateSnapshotIcon
+            : overlayType === "restore-snapshot-success"
+              ? SuccessIcon
+              : overlayType === "copy-snapshot-dialog"
+                ? CopySnapshotIcon
+                : CreateSnapshotIcon
         }
         isLoading={
           restoreSnapshotMutation.isPending || copySnapshotMutation.isPending || createSnapshotMutation.isPending
@@ -457,11 +476,19 @@ const InstanceSnapshotsPage = () => {
         confirmButtonLabel={
           overlayType === "restore-snapshot-dialog"
             ? "Restore"
-            : overlayType === "copy-snapshot-dialog"
-              ? "Copy Snapshot"
-              : "Create Snapshot"
+            : overlayType === "restore-snapshot-success"
+              ? "Close"
+              : overlayType === "copy-snapshot-dialog"
+                ? "Copy Snapshot"
+                : "Create Snapshot"
         }
+        hideCancelButton={overlayType === "restore-snapshot-success"}
         onConfirm={async () => {
+          // Close success dialog immediately
+          if (overlayType === "restore-snapshot-success") {
+            return true;
+          }
+
           const errors = await formData.validateForm();
           if (Object.keys(errors).length > 0) {
             // Mark fields with errors as touched so error messages are displayed
@@ -505,6 +532,10 @@ const InstanceSnapshotsPage = () => {
                 custom_network_id: formData.values.restoreSnapshotCustomNetworkId,
               },
             });
+
+            formData.resetForm();
+            // Return false to prevent auto-close; onSuccess callback handles showing the success view
+            return false;
           }
 
           formData.resetForm();
