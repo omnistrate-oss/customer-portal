@@ -41,7 +41,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
                       functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'
                     });
                     gtag('js', new Date());
-                    gtag('config', '${process.env.GOOGLE_ANALYTICS_TAG_ID}', { anonymize_ip: true });
+                    gtag('config', '${process.env.GOOGLE_ANALYTICS_TAG_ID}');
                     })();
                 `,
               }}
