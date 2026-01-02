@@ -90,12 +90,12 @@ test.describe("Signin Page", () => {
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toContainText(pageElements.cookieConsentText);
 
-    // Click on Allow All
+    // Click on Allow analytics
     await expect(page.getByRole("link", { name: pageElements.cookiePolicyText })).toHaveAttribute(
       "href",
       PageURLs.cookiePolicy
     );
-    await page.getByRole("button", { name: "Allow all" }).click();
+    await page.getByRole("button", { name: "Allow analytics" }).click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).not.toBeVisible();
 
     // Click on Cookie Settings Text
@@ -184,4 +184,3 @@ test.describe("Signin Page", () => {
     await expect(page).toHaveURL(PageURLs.instances, { timeout: 10000 });
   });
 });
-

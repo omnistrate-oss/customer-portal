@@ -131,6 +131,7 @@ async function globalTeardown() {
   });
 
   const uniqueServiceIds = Array.from(new Set(serviceOfferingsToDelete.map((offering) => offering.serviceId)));
+  console.log(`Deleting services: ${uniqueServiceIds}...`);
 
   for (const serviceId of uniqueServiceIds) {
     try {
