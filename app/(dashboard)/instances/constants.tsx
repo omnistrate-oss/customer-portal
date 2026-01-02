@@ -42,3 +42,13 @@ export const loadStatusLabel = {
 };
 
 export const customTagsInitializer = { key: "", value: "" };
+
+export const REQUEST_PARAMS_FIELDS_TO_FILTER = [
+  "cloud_provider",
+  "region",
+  "custom_network_id",
+  "custom_availability_zone",
+  "subscriptionId",
+  "cloud_provider_native_network_id",
+  "custom_dns_configuration",
+];
