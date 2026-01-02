@@ -28,6 +28,7 @@ import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
+import { requestParamsEmptyFields } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { filterSchemaByCloudProvider, getInitialValues } from "../utils";
@@ -127,11 +128,6 @@ const InstanceForm = ({
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: async (values) => {
-      // Clean up requestParams cloud_provider_native_network_id before submitting
-      if (values.requestParams?.cloud_provider_native_network_id === "") {
-        delete values.requestParams?.cloud_provider_native_network_id;
-      }
-
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
       // Determine if we should use version set resources or service offering resources
@@ -214,9 +210,13 @@ const InstanceForm = ({
               break;
           }
         });
+        // Remove Empty Fields from data.requestParams
 
         for (const key in data.requestParams) {
-          if (["cloud_provider", "region", "subscriptionId"].includes(key)) {
+          if (
+            requestParamsEmptyFields.includes(key) &&
+            (data.requestParams[key] === "" || data.requestParams[key] === null)
+          ) {
             delete data.requestParams[key];
           }
         }
@@ -370,7 +370,10 @@ const InstanceForm = ({
 
         // Remove Empty Fields from data.requestParams
         for (const key in data.requestParams) {
-          if (["cloud_provider", "region", "subscriptionId"].includes(key)) {
+          if (
+            requestParamsEmptyFields.includes(key) &&
+            (data.requestParams[key] === "" || data.requestParams[key] === null)
+          ) {
             delete data.requestParams[key];
           }
         }
