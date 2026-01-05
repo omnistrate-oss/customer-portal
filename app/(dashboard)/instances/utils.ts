@@ -147,7 +147,7 @@ export const getVersionSetResourceMenuItems = (versionSet?: TierVersionSet) => {
     }));
 };
 
-export const getRegionMenuItems = (offering: ServiceOffering, cloudProvider: CloudProvider) => {
+export const getRegionMenuItems = (offering?: ServiceOffering, cloudProvider?: CloudProvider) => {
   const menuItems: MenuItem[] = [];
 
   if (!offering || !cloudProvider) {

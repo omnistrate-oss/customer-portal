@@ -69,7 +69,10 @@ const InstanceSnapshotsPage = () => {
   const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
   const { data: snapshots = [], isFetching: isFetchingSnapshots, refetch: refetchSnapshots } = useInstanceSnapshots();
-  const { data: instances = [], isFetching: isFetchingInstances } = useInstances({ onlyInstances: true });
+  const { data: instances = [], isFetching: isFetchingInstances } = useInstances({
+    onlyInstances: true,
+    refetchInterval: isOverlayOpen ? false : 60000,
+  });
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks();
 
   const openOverlay = (type: Overlay) => {
@@ -378,13 +381,11 @@ const InstanceSnapshotsPage = () => {
             onCopyClick: () => openOverlay("copy-snapshot-dialog"),
             copyDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
-              : selectedSnapshot?.cloudProvider !== "gcp"
-                ? "Snapshot copy is restricted to GCP deployments"
-                : selectedSnapshot?.status !== "COMPLETE"
-                  ? "Only completed snapshots can be copied"
-                  : operationPending
-                    ? "Operation in progress, please wait"
-                    : "",
+              : selectedSnapshot?.status !== "COMPLETE"
+                ? "Only completed snapshots can be copied"
+                : operationPending
+                  ? "Operation in progress, please wait"
+                  : "",
           }}
           selectionMode="single"
           selectedRows={selectedRows}
@@ -451,6 +452,7 @@ const InstanceSnapshotsPage = () => {
                       formData={formData}
                       isFetchingServiceOfferings={isFetchingServiceOfferings}
                       serviceOffering={serviceOffering}
+                      cloudProvider={selectedSnapshot?.cloudProvider}
                     />
                   )
                 : () => (
@@ -504,6 +506,7 @@ const InstanceSnapshotsPage = () => {
                 targetRegion: formData.values.createSnapshotRegion,
               },
             });
+            formData.resetForm();
             return true;
           }
 
