@@ -18,7 +18,6 @@ import Button from "../Button/Button";
 import FieldError from "../FormElementsv2/FieldError/FieldError";
 import Radio from "../FormElementsv2/Radio/Radio";
 import TextField from "../FormElementsv2/TextField/TextField";
-import CalendarIcon from "../Icons/Calendar/Calendar";
 import { PopoverDynamicHeight } from "../Popover/Popover";
 import { Text } from "../Typography/Typography";
 
@@ -671,7 +670,6 @@ export const DateTimePickerPopover = (props: DateTimePickerPopoverProps) => {
     <>
       <Button
         variant="outlined"
-        startIcon={<CalendarIcon color="#414651" style={{ marginLeft: "4px" }} />}
         onClick={handleButtonClick}
         sx={{
           fontWeight: "500 !important",
@@ -679,7 +677,6 @@ export const DateTimePickerPopover = (props: DateTimePickerPopoverProps) => {
           height: "40px !important",
           padding: "10px 14px !important",
           borderColor: "#D5D7DA !important",
-          minWidth: "150px",
           flexShrink: 0,
         }}
       >

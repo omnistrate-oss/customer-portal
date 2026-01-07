@@ -39,7 +39,6 @@ import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
-import useInstances from "../instances/hooks/useInstances";
 
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
@@ -115,11 +114,16 @@ const CloudAccountsPage = () => {
   }, [clickedInstance]);
 
   const {
-    data: instances = [],
-    isPending: isInstancesPending,
-    isFetching: isFetchingInstances,
-    refetch: refetchInstances,
-  } = useInstances();
+    instances,
+    isInstancesPending,
+    isFetchingInstances,
+    refetchInstances,
+  } = useGlobalData();
+
+  // Refetch instances when landing on this page
+  useEffect(() => {
+    refetchInstances();
+  }, [refetchInstances]);
 
   const accountConfigIds = useMemo(() => {
     const ids = new Set<string>();

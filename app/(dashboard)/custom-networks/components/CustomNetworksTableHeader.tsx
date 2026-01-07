@@ -1,11 +1,6 @@
-import AddIcon from "@mui/icons-material/Add";
-import PeeringInfoIcon from "app/(dashboard)/components/Icons/PeeringInfoIcon";
-
 import Button from "src/components/Button/Button";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
-import DeleteIcon from "src/components/Icons/Delete/Delete";
-import EditIcon from "src/components/Icons/Edit/Edit";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 
 const CustomNetworksTableHeader = ({
@@ -40,7 +35,6 @@ const CustomNetworksTableHeader = ({
           variant={"outlined"}
           disabled={selectedRows.length !== 1}
           onClick={onModifyClick}
-          startIcon={<EditIcon disabled={selectedRows.length !== 1} />}
           disabledMessage="Please select a customer network"
         >
           Modify
@@ -50,7 +44,6 @@ const CustomNetworksTableHeader = ({
           variant="outlined"
           disabled={selectedRows.length !== 1}
           onClick={onDeleteClick}
-          startIcon={<DeleteIcon disabled={selectedRows.length !== 1} />}
           disabledMessage="Please select a customer network"
         >
           Delete
@@ -60,7 +53,6 @@ const CustomNetworksTableHeader = ({
           variant="outlined"
           disabled={selectedRows.length !== 1}
           onClick={onPeeringInfoClick}
-          startIcon={<PeeringInfoIcon disabled={selectedRows.length !== 1} />}
           disabledMessage="Please select a customer network"
         >
           Peering Info
@@ -69,7 +61,6 @@ const CustomNetworksTableHeader = ({
           data-testid="create-button"
           variant="contained"
           onClick={onCreateClick}
-          startIcon={<AddIcon />}
           disabled={isFetchingCustomNetworks}
         >
           Create

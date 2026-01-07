@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { styled } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 
 import { deleteUser } from "src/api/users";
 import Button from "src/components/Button/Button";
@@ -9,6 +8,7 @@ import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { Text } from "src/components/Typography/Typography";
 import useLogout from "src/hooks/useLogout";
 import useSnackbar from "src/hooks/useSnackbar";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 
 import DeleteAccountConfigConfirmationDialog from "./DeleteAccountConfirmationDialog";
@@ -33,7 +33,7 @@ function DeleteAccount() {
   const { handleLogout } = useLogout();
   const snackbar = useSnackbar();
 
-  const { data: instances = [], isPending: isInstancesPending } = useInstances();
+  const { instances, isInstancesPending } = useGlobalData();
 
   function handleDialogOpen() {
     setConfirmationDialogOpen(true);

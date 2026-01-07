@@ -33,7 +33,6 @@ import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
-import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
 import {
   FilterCategorySchema,
@@ -67,10 +66,20 @@ const InstancesPage = () => {
     isFetchingSubscriptions,
     isFetchingServiceOfferings,
     setShowGlobalProviderError,
+    instances,
+    isInstancesPending: isLoadingInstances,
+    isFetchingInstances,
+    refetchInstances,
+    isInstancesError,
   } = useGlobalData();
 
   const [selectedFilters, setSelectedFilters] =
     useState<Record<string, FilterCategorySchema>>(getIntialFiltersObject());
+
+  // Refetch instances when landing on this page
+  useEffect(() => {
+    refetchInstances();
+  }, [refetchInstances]);
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -338,14 +347,6 @@ const InstancesPage = () => {
       }),
     ];
   }, [subscriptionsObj, serviceOfferingsObj]);
-
-  const {
-    data: instances = [],
-    isPending: isLoadingInstances,
-    isFetching: isFetchingInstances,
-    refetch: refetchInstances,
-    isError: isInstancesError,
-  } = useInstances({ retry: 3 });
 
   useEffect(() => {
     if (isInstancesError) {

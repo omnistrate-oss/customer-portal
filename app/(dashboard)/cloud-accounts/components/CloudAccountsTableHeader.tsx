@@ -1,16 +1,11 @@
 import { FC } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import { CircularProgress } from "@mui/material";
 
-import ConnectIcon from "src/components/Icons/Connect/Connect";
-import DisconnectIcon from "src/components/Icons/Disconnect/Disconnect";
-import OffboardIcon from "src/components/Icons/Offboard/Offboard";
 import { AccountConfig } from "src/types/account-config";
 import { ResourceInstance } from "src/types/resourceInstance";
 import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
-import DeleteIcon from "components/Icons/Delete/Delete";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
 type CloudAccountTableHeaderProps = {
@@ -136,7 +131,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           variant="outlined"
           disabled={isDeleteDisabled}
           onClick={onDeleteClick}
-          startIcon={<DeleteIcon disabled={isDeleteDisabled} />}
           disabledMessage={isDeleteDisabledMessage}
         >
           Delete
@@ -147,7 +141,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           disabled={isOffboardDisabled}
           onClick={onOffboardClick}
           disabledMessage={offboardingDisabledMessage}
-          startIcon={<OffboardIcon disabled={isOffboardDisabled} />}
         >
           Offboard
         </Button>
@@ -156,7 +149,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           variant="outlined"
           disabled={isDisconnectDisabled}
           onClick={onDisconnectClick}
-          startIcon={<DisconnectIcon disabled={isDisconnectDisabled} />}
           disabledMessage={isDisconnectDisabledMessage}
         >
           Disconnect
@@ -166,12 +158,11 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           variant="outlined"
           disabled={isConnectDisabled}
           onClick={onConnectClick}
-          startIcon={<ConnectIcon disabled={isConnectDisabled} />}
           disabledMessage={isConnectDisabledMessage}
         >
           Connect
         </Button>
-        <Button data-testid="create-button" variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
+        <Button data-testid="create-button" variant="contained" onClick={onCreateClick}>
           Create
         </Button>
       </div>

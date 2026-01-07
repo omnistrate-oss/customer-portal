@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 
@@ -8,7 +10,6 @@ import EventsTable from "../components/EventsTable/EventsTable";
 import DashboardIcon from "../components/Icons/DashboardIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
-import useInstances from "../instances/hooks/useInstances";
 
 import DeploymentsByAgeChart from "./charts/DeploymentsByAgeChart";
 import DeploymentsByLoadChart from "./charts/DeploymentsByLoadChart";
@@ -19,12 +20,15 @@ import ClusterLocations from "./components/ClusterLocations";
 import DashboardLogsTableHeader from "./components/DashboardLogsTableHeader";
 
 const DashboardPage = () => {
-  const { data: allInstances = [], isPending: isInstancesPending } = useInstances();
+  const { isFetchingSubscriptions, instances: allInstances, isInstancesPending, refetchInstances } = useGlobalData();
+
+  // Refetch instances when landing on this page
+  useEffect(() => {
+    refetchInstances();
+  }, [refetchInstances]);
 
   // Filter out instances with resourceID starting with "r-injectedaccountconfig"
   const instances = allInstances.filter((instance) => !instance.resourceID?.startsWith("r-injectedaccountconfig"));
-
-  const { isFetchingSubscriptions } = useGlobalData();
 
   const { data: dashboardLogs, isFetching: isFetchingDashboardLogs } = useAuditLogs({
     pageSize: 5,

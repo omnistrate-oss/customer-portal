@@ -4,7 +4,6 @@ import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
-import FailoverIcon from "src/components/Icons/Failover/Failover";
 import GenerateTokenIcon from "src/components/Icons/GenerateToken/GenerateTokenIcon";
 
 type NodesTableHeaderProps = {
@@ -75,7 +74,6 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
                 height: "40px !important",
                 padding: "10px 14px !important",
               }}
-              startIcon={<FailoverIcon disabled={isFailoverDisabled} />}
               disabled={isFailoverDisabled}
               disabledMessage={failoverDisabledMessage}
               onClick={() => {

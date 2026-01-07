@@ -21,6 +21,7 @@ import {
   getInstancesRoute,
   getNotificationsRoute,
   getSettingsRoute,
+  getSnapshotDetailsRoute,
   getSubscriptionsRoute,
 } from "src/utils/routes";
 import APIDocsIcon from "components/Icons/SideNavbar/APIDocs/APIDocsIcon";
@@ -158,7 +159,8 @@ const Sidebar = () => {
         ...prev,
         Deployments:
           [getCustomNetworksRoute({}), getCloudAccountsRoute({}), getInstanceSnapshotsRoute()].includes(currentPath) ||
-          currentPath.startsWith("/instances"),
+          currentPath.startsWith("/instances") ||
+          currentPath.startsWith(getSnapshotDetailsRoute("")),
         "Governance Hub": [getAccessControlRoute(), getEventsRoute(), getNotificationsRoute()].includes(currentPath),
         "Account Management": [
           getSettingsRoute(),

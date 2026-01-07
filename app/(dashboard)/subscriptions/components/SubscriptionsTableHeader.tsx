@@ -1,5 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
-
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
@@ -62,7 +60,6 @@ const SubscriptionsTableHeader = ({
         <Button
           variant="contained"
           onClick={onManageSubscriptions}
-          startIcon={<AddIcon />}
           disabled={isUnsubscribing || isFetchingSubscriptions}
           disableRipple
         >
