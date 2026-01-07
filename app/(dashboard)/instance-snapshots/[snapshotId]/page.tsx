@@ -20,7 +20,7 @@ import useSnapshotDetail from "../hooks/useSnapshotDetail";
 
 export type CurrentTab = "Snapshot Details" | "Deployment Parameters";
 
-const tabs: Record<string, string> = {
+const tabs = {
   snapshotDetails: "Snapshot Details",
   deploymentParameters: "Deployment Parameters",
 };
@@ -38,7 +38,7 @@ const SnapshotDetailPage = ({
 
   // Set Page Title
   useEffect(() => {
-    document.title = `Instance Snapshot Details`;
+    document.title = "Instance Snapshot Details";
   }, [currentTab, snapshotId]);
 
   const { subscriptionsObj, isFetchingSubscriptions, instances: allInstances } = useGlobalData();
