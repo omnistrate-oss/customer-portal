@@ -75,6 +75,7 @@ const EventsPage = () => {
             "user",
             "subscriptionPlan",
             "subscriptionOwner",
+            "userAgent",
           ]}
           data={auditLogs}
           fetchNextPage={fetchNextPage}

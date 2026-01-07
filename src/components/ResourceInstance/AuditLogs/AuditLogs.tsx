@@ -18,6 +18,7 @@ import {
 } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import JSONView from "src/components/JSONView/JSONView";
+import MessageInput from "src/components/MessageInput/MessageInput";
 import useUserData from "src/hooks/usersData";
 import { AuditEvent } from "src/types/auditEvent";
 import { SetState } from "src/types/common/reactGenerics";
@@ -30,7 +31,6 @@ import EventTypeChip from "../../EventsTable/EventTypeChip";
 
 import AuditLogsEventFilterDropdown from "./components/AuditLogsEventFilterDropdown";
 import useAccessInstanceAuditLogs from "./hooks/useAccessInstanceAuditLogs";
-import MessageInput from "src/components/MessageInput/MessageInput";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -194,7 +194,6 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
           flex: 2,
         },
       }),
-
       columnHelper.accessor("userName", {
         id: "userName",
         header: "User",
@@ -220,6 +219,13 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
           }
 
           return <GridCellExpand href={pageLink} target="_blank" value={userDisplayLabel || "-"} />;
+        },
+      }),
+      columnHelper.accessor((row) => row.userAgent || "-", {
+        id: "userAgent",
+        header: "User Agent",
+        meta: {
+          width: 250,
         },
       }),
     ];
