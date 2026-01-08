@@ -532,7 +532,7 @@ const CloudAccountsPage = () => {
       setSelectedRows([]);
       setIsOverlayOpen(false);
       await refetchInstances();
-      snackbar.showError("Something went wrong try again");
+      snackbar.showError("Something went wrong. Please try again.");
     },
   });
 
