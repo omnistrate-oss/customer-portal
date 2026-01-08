@@ -533,6 +533,12 @@ const CloudAccountsPage = () => {
         }, 1700);
       }
     },
+    onError: async () => {
+      setSelectedRows([]);
+      setIsOverlayOpen(false);
+      await refetchInstances();
+      snackbar.showError("Something went wrong. Please try again.");
+    },
   });
 
   // const deleteAccountConfigMutation = $api.useMutation("delete", "/2022-09-01-00/accountconfig/{id}", {
@@ -656,8 +662,11 @@ const CloudAccountsPage = () => {
 
       <DeleteAccountConfigConfirmationDialog
         open={isOverlayOpen && overlayType === "delete-dialog"}
-        onClose={() => {
+        onClose={async () => {
           setIsOverlayOpen(false);
+          setSelectedRows([]);
+          setClickedInstance(undefined);
+          await refetchInstances();
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}

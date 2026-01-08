@@ -165,6 +165,10 @@ export const getInitialValues = (
 };
 
 export const getOffboardReadiness = (cloudAccountInstanceStatus?: string, accountConfigInstanceStatus?: string) => {
-  if (cloudAccountInstanceStatus === "DELETING" && accountConfigInstanceStatus === "READY_TO_OFFBOARD") return true;
+  if (
+    (cloudAccountInstanceStatus === "DELETING" || cloudAccountInstanceStatus === "FAILED") &&
+    accountConfigInstanceStatus === "READY_TO_OFFBOARD"
+  )
+    return true;
   else return false;
 };

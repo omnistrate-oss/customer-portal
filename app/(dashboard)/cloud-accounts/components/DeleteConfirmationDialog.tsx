@@ -127,6 +127,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const snackbar = useSnackbar();
   const stepChangedToOffboard = useRef(false);
+
   const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
 
   //show offboard step only if the instance is the last instance and the account config is found
@@ -153,7 +154,11 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   if (showStepper) {
     //if instance status is DELETING and if the account config status is READY_TO_OFFBOARD, then we show the offboard step else we show the delete step
-    if (instanceStatus === "DELETING" && accountConfig?.status === "READY_TO_OFFBOARD") {
+    //if instance status is FAILED and it's the last instance, go directly to offboard step
+    if (instanceStatus === "FAILED" && isLastInstance) {
+      step = "offboard";
+      buttonText = "Offboard";
+    } else if (instanceStatus === "DELETING" && accountConfig?.status === "READY_TO_OFFBOARD") {
       step = "offboard";
       buttonText = "Offboard";
     } else if (
