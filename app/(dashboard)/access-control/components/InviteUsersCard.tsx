@@ -165,7 +165,6 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
             <Button
               data-testid="send-invites-button"
               variant="contained"
-              startIcon={<EmailOutlinedIcon />}
               type="submit"
               disabled={createUserInvitesMutation.isPending || isFetchingUsers}
             >

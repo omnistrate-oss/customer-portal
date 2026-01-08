@@ -12,7 +12,6 @@ import APIDocumentation from "../APIDocumentation/APIDocumentation";
 import Button from "../Button/Button";
 import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
-import DownloadCLIIcon from "../Icons/DownloadCLI/DownloadCLIIcon";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
 
@@ -38,7 +37,6 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
   const actionButton = (
     <Button
       variant="outlined"
-      startIcon={<DownloadCLIIcon disabled={isDownloading} />}
       disabled={isDownloading}
       onClick={() => {
         downloadCLI(serviceOffering.serviceId, serviceOffering.serviceAPIID);

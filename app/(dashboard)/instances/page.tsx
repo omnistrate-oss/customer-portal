@@ -72,6 +72,14 @@ const InstancesPage = () => {
   const [selectedFilters, setSelectedFilters] =
     useState<Record<string, FilterCategorySchema>>(getIntialFiltersObject());
 
+  const {
+    data: instances = [],
+    isPending: isLoadingInstances,
+    isFetching: isFetchingInstances,
+    refetch: refetchInstances,
+    isError: isInstancesError,
+  } = useInstances();
+
   const dataTableColumns = useMemo(() => {
     return [
       columnHelper.accessor("id", {
@@ -338,14 +346,6 @@ const InstancesPage = () => {
       }),
     ];
   }, [subscriptionsObj, serviceOfferingsObj]);
-
-  const {
-    data: instances = [],
-    isPending: isLoadingInstances,
-    isFetching: isFetchingInstances,
-    refetch: refetchInstances,
-    isError: isInstancesError,
-  } = useInstances({ retry: 3 });
 
   useEffect(() => {
     if (isInstancesError) {

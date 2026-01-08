@@ -16,7 +16,6 @@ import Button from "components/Button/Button";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
-import { icons } from "../constants";
 import { getMainResourceFromInstance } from "../utils";
 
 import AddInstanceFilters from "./AddInstanceFilters";
@@ -274,7 +273,6 @@ const InstancesTableHeader = ({
           <RefreshWithToolTip refetch={refetchInstances} disabled={isFetchingInstances} />
 
           {mainActions.map((action, index) => {
-            const Icon = icons[action.label];
             return (
               <Button
                 data-testid={action.dataTestId || action.label}
@@ -282,7 +280,6 @@ const InstancesTableHeader = ({
                 variant={action.actionType === "primary" ? "contained" : "outlined"}
                 disabled={action.isDisabled || action.isLoading}
                 onClick={action.onClick}
-                startIcon={<Icon disabled={action.isDisabled || action.isLoading} />}
                 disabledMessage={action.disabledMessage}
               >
                 {action.label}

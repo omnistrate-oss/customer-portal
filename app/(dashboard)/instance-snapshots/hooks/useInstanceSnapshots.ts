@@ -4,7 +4,13 @@ const useInstanceSnapshots = (queryOptions = {}) => {
   const query = $api.useQuery(
     "get",
     "/2022-09-01-00/resource-instance/snapshot",
-    {},
+    {
+      params: {
+        query: {
+          snapshotType: "ManualSnapshot",
+        },
+      },
+    },
     {
       select: (data) =>
         data.snapshots?.sort((a, b) => {

@@ -1,13 +1,11 @@
+import { CircularProgress } from "@mui/material";
+
 import Button from "src/components/Button/Button";
-import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import { SetState } from "src/types/common/reactGenerics";
 
 type InstanceSnapshotsTableHeaderProps = {
   count: number;
-  searchText: string;
-  setSearchText: SetState<string>;
   refetchSnapshots: () => void;
   isFetchingSnapshots: boolean;
   onDeleteClick: () => void;
@@ -23,8 +21,6 @@ type InstanceSnapshotsTableHeaderProps = {
 
 const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> = ({
   count,
-  searchText,
-  setSearchText,
   refetchSnapshots,
   isFetchingSnapshots,
   onDeleteClick,
@@ -50,8 +46,10 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
       />
 
       <div className="flex items-center gap-4 flex-shrink-0">
-        <SearchInput placeholder="Search by ID" searchText={searchText} setSearchText={setSearchText} width="250px" />
-        <RefreshWithToolTip refetch={refetchSnapshots} disabled={isFetchingSnapshots} />
+        <div className="flex items-center gap-2">
+          {isFetchingSnapshots && <CircularProgress size={20} />}
+          <RefreshWithToolTip refetch={refetchSnapshots} disabled={isFetchingSnapshots} />
+        </div>
         <Button
           data-testid="delete-button"
           variant="outlined"
@@ -82,7 +80,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
         </Button>
         <Button
           data-testid="create-button"
-          variant="outlined"
+          variant="contained"
           onClick={onCreateClick}
           disabled={!!createDisabledMessage}
           disabledMessage={createDisabledMessage}

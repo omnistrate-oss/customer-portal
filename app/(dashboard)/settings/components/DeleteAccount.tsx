@@ -33,7 +33,7 @@ function DeleteAccount() {
   const { handleLogout } = useLogout();
   const snackbar = useSnackbar();
 
-  const { data: instances = [], isPending: isInstancesPending } = useInstances();
+  const { data: instances = [], isPending: isInstancesPending } = useInstances({ refetchOnMount: false });
 
   function handleDialogOpen() {
     setConfirmationDialogOpen(true);

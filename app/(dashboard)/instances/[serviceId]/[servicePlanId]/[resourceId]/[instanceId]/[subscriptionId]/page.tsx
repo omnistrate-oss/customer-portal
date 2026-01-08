@@ -105,7 +105,8 @@ const InstanceDetailsPage = ({
 
   const isCliManagedResource = useMemo(() => CLI_MANAGED_RESOURCES.includes(resourceType as string), [resourceType]);
 
-  const { data: instances = [] } = useInstances();
+  const { data: instances = [] } = useInstances({ refetchOnMount: false });
+
   const resourceInstanceQuery = useResourceInstance({
     serviceProviderId: offering?.serviceProviderId,
     serviceKey: offering?.serviceURLKey,
@@ -169,12 +170,9 @@ const InstanceDetailsPage = ({
   if (!resourceInstanceData) {
     return (
       <PageContainer>
-        <Stack p={3} pt="200px" alignItems="center" justifyContent="center">
-          <DisplayText
-            // @ts-ignore
-            size="xsmall"
-            sx={{ wordBreak: "break-word", textAlign: "center", maxWidth: 900 }}
-          >
+        <Stack p={3} pt="150px" alignItems="center" justifyContent="center">
+          {/* @ts-expect-error This is a valid prop */}
+          <DisplayText size="xsmall" sx={{ wordBreak: "break-word", textAlign: "center", maxWidth: 900 }}>
             Deployment Instance not found
           </DisplayText>
         </Stack>

@@ -8,7 +8,7 @@ type QueryOptions = {
 };
 
 const useInstances = (queryOptions: QueryOptions = {}) => {
-  const { onlyInstances } = queryOptions;
+  const { onlyInstances, ...options } = queryOptions;
 
   const query = $api.useQuery(
     "get",
@@ -31,7 +31,7 @@ const useInstances = (queryOptions: QueryOptions = {}) => {
         return res.sort((a, b) => new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime());
       },
       refetchInterval: 60000,
-      ...queryOptions,
+      ...options,
     }
   );
 

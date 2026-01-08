@@ -2,14 +2,6 @@ import { useMemo } from "react";
 
 import ActionMenu, { ActionMenuItem } from "@/components/ActionMenu";
 import { $api } from "src/api/query";
-import DeleteIcon from "src/components/Icons/Delete/Delete";
-import EditIcon from "src/components/Icons/Edit/Edit";
-import GenerateTokenIcon from "src/components/Icons/GenerateToken/GenerateTokenIcon";
-import PlayIcon from "src/components/Icons/Play/Play";
-import RebootIcon from "src/components/Icons/Reboot/Reboot";
-import RestoreInstanceIcon from "src/components/Icons/RestoreInstance/RestoreInstanceIcon";
-import StopIcon from "src/components/Icons/Stop/Stop";
-import UpgradeIcon from "src/components/Icons/Upgrade/UpgradeIcon";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
@@ -99,7 +91,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "stop-button",
         label: "Stop",
-        icon: StopIcon,
         isDisabled: !instance || status !== "RUNNING" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
@@ -120,7 +111,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "start-button",
         label: "Start",
-        icon: PlayIcon,
         isLoading: startInstanceMutation.isPending,
         isDisabled: !instance || status !== "STOPPED" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {
@@ -149,7 +139,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "modify-button",
         label: "Modify",
-        icon: EditIcon,
         isDisabled:
           !instance ||
           (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
@@ -174,7 +163,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "delete-button",
         label: "Delete",
-        icon: DeleteIcon,
         isDisabled:
           !instance || status === "DELETING" || status === "DISCONNECTED" || isProxyResource || !isDeleteAllowedByRBAC,
         onClick: () => {
@@ -200,7 +188,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "reboot-button",
         label: "Reboot",
-        icon: RebootIcon,
         isDisabled:
           !instance || (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") || !isUpdateAllowedByRBAC,
         onClick: () => {
@@ -221,7 +208,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         res.push({
           dataTestId: "restore-button",
           label: "Restore",
-          icon: RestoreInstanceIcon,
           isDisabled: !instance || !(instance.backupStatus as any)?.earliestRestoreTime || !isUpdateAllowedByRBAC,
           onClick: () => {
             if (!instance) return snackbar.showError("Please select an instance");
@@ -243,7 +229,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "upgrade-button",
         label: "Upgrade",
-        icon: UpgradeIcon,
         isDisabled: !instance || !["RUNNING", "STOPPED"].includes(status as string) || !isUpdateAllowedByRBAC,
         disabledMessage: !instance
           ? "Please select an instance"
@@ -264,7 +249,6 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "generate-token-button",
         label: "Generate Token",
-        icon: GenerateTokenIcon,
         isDisabled: !instance || status === "DISCONNECTED",
         disabledMessage: !instance
           ? "Please select an instance"

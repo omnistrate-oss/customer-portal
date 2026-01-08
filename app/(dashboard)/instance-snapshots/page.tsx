@@ -14,7 +14,6 @@ import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import SuccessIcon from "src/components/Icons/SuccessIcon/SuccessIcon";
 import LinearProgress from "src/components/LinearProgress/LinearProgress";
 import RegionIcon from "src/components/Region/RegionIcon";
-import SideDrawerRight from "src/components/SideDrawerRight/SideDrawerRight";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import Tooltip from "src/components/Tooltip/Tooltip";
@@ -24,7 +23,7 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
-import { getInstanceDetailsRoute } from "src/utils/routes";
+import { getInstanceDetailsRoute, getSnapshotDetailsRoute } from "src/utils/routes";
 import { isCustomNetworkEnabledOnServiceOffering } from "src/utils/serviceOffering";
 
 import InstanceSnapshotsIcon from "../components/Icons/InstanceSnapshotsIcon";
@@ -39,13 +38,11 @@ import { CopySnapshotIcon, CreateSnapshotIcon, RestoreSnapshotIcon } from "./com
 import InstanceSnapshotsTableHeader from "./components/InstanceSnapshotsTableHeader";
 import RestoreSnapshotDialogContent from "./components/RestoreSnapshotDialogContent";
 import RestoreSnapshotSuccessContent from "./components/RestoreSnapshotSuccessContent";
-import SnapshotDetails from "./components/SnapshotDetails";
 import useInstanceSnapshots from "./hooks/useInstanceSnapshots";
 
 const columnHelper = createColumnHelper<InstanceSnapshot>();
 type Overlay =
   | "delete-snapshot-dialog"
-  | "snapshot-details-drawer"
   | "restore-snapshot-dialog"
   | "restore-snapshot-success"
   | "copy-snapshot-dialog"
@@ -59,20 +56,25 @@ type FormValues = {
 
 const InstanceSnapshotsPage = () => {
   const snackbar = useSnackbar();
-  const [searchText, setSearchText] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-snapshot-dialog");
-  const [clickedSnapshot, setClickedSnapshot] = useState<InstanceSnapshot>();
   const [restoredInstanceId, setRestoredInstanceId] = useState<string>("");
 
   const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
-  const { data: snapshots = [], isFetching: isFetchingSnapshots, refetch: refetchSnapshots } = useInstanceSnapshots();
+  const {
+    data: snapshots = [],
+    isFetching: isFetchingSnapshots,
+    isPending: isPendingSnapshots,
+    refetch: refetchSnapshots,
+  } = useInstanceSnapshots();
+
   const { data: instances = [], isFetching: isFetchingInstances } = useInstances({
     onlyInstances: true,
     refetchInterval: isOverlayOpen ? false : 60000,
   });
+
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks();
 
   const openOverlay = (type: Overlay) => {
@@ -90,15 +92,10 @@ const InstanceSnapshotsPage = () => {
         id: "snapshotId",
         header: "Snapshot ID",
         cell: (data) => {
+          const snapshotId = data.row.original.snapshotId;
           return (
-            <DataGridText
-              color="primary"
-              onClick={() => {
-                setClickedSnapshot(data.row.original);
-                openOverlay("snapshot-details-drawer");
-              }}
-            >
-              {data.row.original.snapshotId}
+            <DataGridText color="primary" linkProps={{ href: snapshotId ? getSnapshotDetailsRoute(snapshotId) : "#" }}>
+              {snapshotId}
             </DataGridText>
           );
         },
@@ -221,13 +218,6 @@ const InstanceSnapshotsPage = () => {
     ];
   }, [instances, subscriptionsObj]);
 
-  const filteredSnapshots = useMemo(() => {
-    if (!searchText) return snapshots;
-    return snapshots.filter((snapshot) =>
-      [snapshot.snapshotId].filter(Boolean).some((field) => field!.toLowerCase().includes(searchText.toLowerCase()))
-    );
-  }, [searchText, snapshots]);
-
   const selectedSnapshot = useMemo(() => {
     if (!selectedRows.length) return undefined;
     return snapshots.find((snapshot) => snapshot.snapshotId === selectedRows[0]);
@@ -327,23 +317,19 @@ const InstanceSnapshotsPage = () => {
         {/* TODO: Solve the Problem of shifting DataTable height when paginating */}
         <DataTable
           columns={dataTableColumns}
-          rows={filteredSnapshots}
+          rows={snapshots}
           noRowsText="No instance snapshots"
           HeaderComponent={InstanceSnapshotsTableHeader}
           headerProps={{
             count: snapshots.length,
-            searchText,
-            setSearchText,
             refetchSnapshots,
             isFetchingSnapshots,
             onDeleteClick: () => openOverlay("delete-snapshot-dialog"),
             deleteDisabledMessage: !selectedSnapshot
               ? "Please select a snapshot"
-              : selectedSnapshot?.snapshotType === "AutomatedSnapshot"
-                ? "Automated Snapshots cannot be deleted"
-                : operationPending
-                  ? "Operation in progress, please wait"
-                  : "",
+              : operationPending
+                ? "Operation in progress, please wait"
+                : "",
             onRestoreClick: () => {
               if (!serviceOffering) {
                 snackbar.showError("Service offering not found for the selected snapshot");
@@ -390,7 +376,7 @@ const InstanceSnapshotsPage = () => {
           selectionMode="single"
           selectedRows={selectedRows}
           onRowSelectionChange={setSelectedRows}
-          isLoading={isFetchingSnapshots || isFetchingInstances}
+          isLoading={isPendingSnapshots}
           rowId="snapshotId"
         />
       </div>
@@ -544,12 +530,6 @@ const InstanceSnapshotsPage = () => {
           formData.resetForm();
           return true;
         }}
-      />
-      <SideDrawerRight
-        open={isOverlayOpen && overlayType === "snapshot-details-drawer"}
-        closeDrawer={closeOverlay}
-        size="xlarge"
-        RenderUI={<SnapshotDetails selectedSnapshot={clickedSnapshot} instances={instances} />}
       />
     </PageContainer>
   );
