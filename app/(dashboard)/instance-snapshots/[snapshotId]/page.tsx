@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CircularProgress, Stack } from "@mui/material";
+import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { RiArrowGoBackFill } from "react-icons/ri";
 
 import Button from "src/components/Button/Button";
@@ -11,7 +12,6 @@ import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToo
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
-import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
 import PageContainer from "../../components/Layout/PageContainer";
 import SnapshotDeploymentParametersTab from "../components/SnapshotDeploymentParametersTab";
@@ -41,12 +41,8 @@ const SnapshotDetailPage = ({
     document.title = "Instance Snapshot Details";
   }, [currentTab, snapshotId]);
 
-  const { subscriptionsObj, isFetchingSubscriptions, instances: allInstances } = useGlobalData();
-
-  // Filter to get only instances (not cloud accounts)
-  const instances = useMemo(() => {
-    return allInstances.filter((instance) => !isCloudAccountInstance(instance));
-  }, [allInstances]);
+  const { subscriptionsObj, isFetchingSubscriptions } = useGlobalData();
+  const { data: instances = [] } = useInstances({ onlyInstances: true });
 
   const snapshotQuery = useSnapshotDetail({ snapshotId });
 
