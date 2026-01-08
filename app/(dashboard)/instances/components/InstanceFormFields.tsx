@@ -315,7 +315,6 @@ export const getStandardInformationFields = (
     isHidden: resourceMenuItems.length <= 1,
   });
 
-  console.log(offering);
   if (cloudProviderFieldExists) {
     fields.push({
       label: "Cloud Provider",
