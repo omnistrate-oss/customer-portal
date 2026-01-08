@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { Stack } from "@mui/material";
+import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 
 type CreateSnapshotDialogContentProps = {
@@ -25,22 +27,9 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
         const subscription = subscriptionsObj[instance.subscriptionId as string];
         const { serviceId, productTierId } = subscription || {};
         const instanceServiceOffering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+        const cloudProvider = instance.cloud_provider;
 
-        const regions =
-          instance.cloud_provider === "gcp"
-            ? instanceServiceOffering?.gcpRegions
-            : instance.cloud_provider === "aws"
-              ? instanceServiceOffering?.awsRegions
-              : instance.cloud_provider === "azure"
-                ? instanceServiceOffering?.azureRegions
-                : [];
-
-        return (
-          regions?.map((region) => ({
-            value: region,
-            label: region,
-          })) || []
-        );
+        return getRegionMenuItems(instanceServiceOffering, cloudProvider as CloudProvider);
       }
     }
 
