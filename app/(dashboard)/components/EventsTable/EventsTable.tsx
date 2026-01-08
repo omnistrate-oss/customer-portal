@@ -196,6 +196,14 @@ const EventsTable = ({
           enableSorting: false,
         }
       ),
+      userAgent: columnHelper.accessor((row) => row.userAgent || "-", {
+        id: "userAgent",
+        header: "User Agent",
+        meta: {
+          width: 250,
+        },
+        enableSorting: false,
+      }),
     }),
     [subscriptionsObj]
   );

@@ -53,6 +53,7 @@ const DashboardPage = () => {
             "user",
             "subscriptionPlan",
             "subscriptionOwner",
+            "userAgent",
           ]}
           data={dashboardLogs}
           fetchNextPage={() => {}}
