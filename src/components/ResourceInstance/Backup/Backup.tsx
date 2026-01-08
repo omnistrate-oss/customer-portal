@@ -401,7 +401,6 @@ const Backup: FC<{
               selectedDateRange,
               setSelectedDateRange,
               handleOpenCopySnapshotModal,
-              cloudProvider,
               copySnapshotMutation,
               selectedSnapshot,
               tab,

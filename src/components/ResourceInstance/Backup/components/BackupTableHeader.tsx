@@ -8,7 +8,6 @@ import SearchInput from "src/components/DataGrid/SearchInput";
 import { DateRange, DateTimePickerPopover } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
 import { SetState } from "src/types/common/reactGenerics";
 
 import { SnapshotCreationType } from "../Backup";
@@ -25,7 +24,6 @@ type BackupsTableHeaderProps = {
   selectedDateRange: DateRange;
   setSelectedDateRange: SetState<DateRange>;
   handleOpenCopySnapshotModal: (creationType: SnapshotCreationType) => void;
-  cloudProvider: string | undefined;
   copySnapshotMutation: UseMutationResult<void, Error, { targetRegion: string }, unknown>;
   selectedSnapshot: SnapshotBase | null;
   tab: "backups" | "snapshots";
@@ -45,7 +43,6 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
   selectedDateRange,
   setSelectedDateRange,
   handleOpenCopySnapshotModal,
-  cloudProvider,
   copySnapshotMutation,
   selectedSnapshot,
   tab,
@@ -57,9 +54,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
     if (copySnapshotMutation.isPending) {
       return "Creating snapshot...";
     }
-    if (cloudProvider !== CLOUD_PROVIDERS.gcp) {
-      return "Snapshot creation is restricted to GCP deployments";
-    }
+
     if (!selectedSnapshot) {
       return `Select a ${tab === "snapshots" ? "snapshot" : "backup"} to create ${tab === "snapshots" ? "another snapshot" : "a snapshot"} from it`;
     }
@@ -67,17 +62,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
       return `Selected ${tab === "snapshots" ? "snapshot" : "backup"} must be 'Complete' to create a new snapshot from it`;
     }
     return "";
-  }, [cloudProvider, copySnapshotMutation.isPending, selectedSnapshot, tab]);
-
-  // const createSnapshotDisabledMessage = useMemo(() => {
-  //   if (copySnapshotMutation.isPending) {
-  //     return "Creating snapshot...";
-  //   }
-  //   if (cloudProvider !== CLOUD_PROVIDERS.gcp) {
-  //     return "Snapshot creation is restricted to GCP deployments";
-  //   }
-  //   return "";
-  // }, [cloudProvider, copySnapshotMutation.isPending]);
+  }, [copySnapshotMutation.isPending, selectedSnapshot, tab]);
 
   const restoreDisabledMessage = useMemo(() => {
     if (restoreMutation.isPending) {
@@ -173,7 +158,6 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             disabled={
               isRefetching ||
               copySnapshotMutation.isPending ||
-              cloudProvider !== CLOUD_PROVIDERS.gcp ||
               !selectedSnapshot ||
               selectedSnapshot?.status !== "COMPLETE"
             }
