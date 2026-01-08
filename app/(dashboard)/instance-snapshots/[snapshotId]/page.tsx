@@ -100,7 +100,7 @@ const SnapshotDetailPage = ({
         </Tabs>
 
         <Stack direction="row" alignItems="center" gap="16px">
-          <div className="flex items-center">{snapshotQuery.isFetching && <CircularProgress size={20} />}</div>
+          {snapshotQuery.isFetching && <CircularProgress size={20} />}
           <RefreshWithToolTip disabled={snapshotQuery.isFetching} refetch={refetchSnapshot} />
         </Stack>
       </Stack>
