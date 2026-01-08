@@ -72,7 +72,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
     isDeploying ||
     !isOnPremCopilot;
 
-  const isDeleteDisabled = !selectedInstance || isDeleting || isDisconnected;
+  const isDeleteDisabled = !selectedInstance || isDeleting || isDisconnected || isSelectedInstanceReadyToOffboard;
 
   const isOffboardDisabled = !isSelectedInstanceReadyToOffboard;
 
