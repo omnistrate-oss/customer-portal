@@ -75,6 +75,11 @@ const CloudAccountsPage = () => {
   const [isAccountCreation, setIsAccountCreation] = useState(false);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance>();
 
+  const awsCloudFormationTemplateUrl = useMemo(() => {
+    const result_params: any = clickedInstance?.result_params;
+    return result_params?.cloudformation_url;
+  }, [clickedInstance]);
+
   const gcpBootstrapShellCommand = useMemo(() => {
     const result_params: any = clickedInstance?.result_params;
     if (result_params?.gcp_bootstrap_shell_script) {
@@ -715,7 +720,7 @@ const CloudAccountsPage = () => {
         }}
         accountConfigId={clickedInstance?.id}
         selectedAccountConfig={clickedInstance}
-        cloudFormationTemplateUrl={clickedInstanceOffering?.assets?.cloudFormationURL}
+        cloudFormationTemplateUrl={awsCloudFormationTemplateUrl}
         isAccountCreation={isAccountCreation}
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}
         azureBootstrapShellCommand={azureBootstrapShellCommand}
