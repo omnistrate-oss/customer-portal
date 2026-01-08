@@ -3,13 +3,11 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import Navbar from "app/(dashboard)/components/Layout/Navbar";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
-import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 
 import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useOrgServiceOfferings from "src/hooks/useOrgServiceOfferings";
 import useSubscriptionRequests from "src/hooks/useSubscriptionRequests";
 import { SetState } from "src/types/common/reactGenerics";
-import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
@@ -31,12 +29,6 @@ type Context = {
   isServiceOfferingsPending: boolean;
   isFetchingServiceOfferings: boolean;
   refetchServiceOfferings: () => void; // TODO Later: Add a Proper Type
-
-  instances: ResourceInstance[];
-  isInstancesPending: boolean;
-  isFetchingInstances: boolean;
-  refetchInstances: () => void;
-  isInstancesError: boolean;
 
   subscriptionsObj: Record<string, Subscription>;
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>;
@@ -82,14 +74,6 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
     refetch: refetchServiceOfferings,
     isError: isServiceOfferingsError,
   } = useOrgServiceOfferings();
-
-  const {
-    data: instances = [],
-    isPending: isInstancesPending,
-    isFetching: isFetchingInstances,
-    refetch: refetchInstances,
-    isError: isInstancesError,
-  } = useInstances();
 
   const servicesObj = useMemo(() => {
     const servicesSet = new Set();
@@ -153,12 +137,6 @@ const GlobalDataProvider = ({ children }: { children: React.ReactNode }) => {
         isServiceOfferingsPending,
         isFetchingServiceOfferings,
         refetchServiceOfferings,
-
-        instances,
-        isInstancesPending,
-        isFetchingInstances,
-        refetchInstances,
-        isInstancesError,
 
         serviceOfferingsObj,
         subscriptionsObj,

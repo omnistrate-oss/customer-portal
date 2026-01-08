@@ -21,7 +21,6 @@ import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
-import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
 import { getInstanceDetailsRoute, getSnapshotDetailsRoute } from "src/utils/routes";
@@ -31,6 +30,7 @@ import InstanceSnapshotsIcon from "../components/Icons/InstanceSnapshotsIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 import useCustomNetworks from "../custom-networks/hooks/useCustomNetworks";
+import useInstances from "../instances/hooks/useInstances";
 
 import CopySnapshotDialogContent from "./components/CopySnapshotDialogContent";
 import CreateSnapshotDialogContent from "./components/CreateSnapshotDialogContent";
@@ -61,13 +61,7 @@ const InstanceSnapshotsPage = () => {
   const [overlayType, setOverlayType] = useState<Overlay>("delete-snapshot-dialog");
   const [restoredInstanceId, setRestoredInstanceId] = useState<string>("");
 
-  const {
-    serviceOfferings,
-    isFetchingServiceOfferings,
-    subscriptionsObj,
-    instances: allInstances,
-    isFetchingInstances,
-  } = useGlobalData();
+  const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
   const {
     data: snapshots = [],
@@ -76,12 +70,12 @@ const InstanceSnapshotsPage = () => {
     refetch: refetchSnapshots,
   } = useInstanceSnapshots();
 
-  const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks();
+  const { data: instances = [], isFetching: isFetchingInstances } = useInstances({
+    onlyInstances: true,
+    refetchInterval: isOverlayOpen ? false : 60000,
+  });
 
-  // Filter to get only instances (not cloud accounts)
-  const instances = useMemo(() => {
-    return allInstances.filter((instance) => !isCloudAccountInstance(instance));
-  }, [allInstances]);
+  const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks();
 
   const openOverlay = (type: Overlay) => {
     setOverlayType(type);

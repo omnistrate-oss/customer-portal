@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
+import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 
 import DataTable from "src/components/DataTable/DataTable";
 import EventTypeChip from "src/components/EventsTable/EventTypeChip";
@@ -29,14 +30,14 @@ const statusMap = {
 };
 
 const NotificationsTable = () => {
+  const { subscriptionsObj, serviceOfferingsObj } = useGlobalData();
+
   const {
-    subscriptionsObj,
-    serviceOfferingsObj,
-    instances,
-    isInstancesPending,
-    isFetchingInstances,
-    refetchInstances,
-  } = useGlobalData();
+    data: instances = [],
+    isPending: isInstancesPending,
+    isFetching: isFetchingInstances,
+    refetch: refetchInstances,
+  } = useInstances();
 
   const rows = useMemo(() => {
     return instances
