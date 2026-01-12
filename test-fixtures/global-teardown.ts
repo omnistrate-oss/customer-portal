@@ -3,42 +3,25 @@ import { ProviderAPIClient } from "test-utils/provider-api-client";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
-import { ServiceOffering } from "src/types/serviceOffering";
+import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-const deleteInstances = async (instances: ResourceInstance[], serviceOfferings: ServiceOffering[]) => {
-  const userAPIClient = new UserAPIClient();
+type Instance = ResourceInstance & { serviceId: string; environmentId: string };
 
+const deleteInstances = async (instances: Instance[]) => {
+  const providerAPIClient = new ProviderAPIClient();
   const deletingInstanceIds: string[] = [];
 
   for (const instance of instances) {
     try {
-      const subscription = await userAPIClient.describeSubscription(instance.subscriptionId);
-      const serviceOffering = serviceOfferings.find(
-        (offering) =>
-          offering.serviceId === subscription.serviceId && offering.productTierID === subscription.productTierId
-      );
-      const param: any = serviceOffering?.resourceParameters.find((param) => param.resourceId === instance.resourceID);
-
-      if (!serviceOffering) {
-        console.error(`Service Offering not found for Instance: ${instance.id}`);
-        continue;
-      }
-
       if (!instance.id || !instance.subscriptionId) {
         console.error(`Instance is missing required ID or subscription ID`);
         continue;
       }
 
-      const resourceInstance = await userAPIClient.describeResourceInstance(
-        serviceOffering.serviceProviderId,
-        serviceOffering.serviceURLKey,
-        serviceOffering.serviceAPIVersion,
-        serviceOffering.serviceEnvironmentURLKey,
-        serviceOffering.serviceModelURLKey,
-        serviceOffering.productTierURLKey,
-        instance.resourceID?.startsWith("r-injected") ? "omnistrateCloudAccountConfig" : param.urlKey,
-        instance.id,
-        instance.subscriptionId
+      const resourceInstance = await providerAPIClient.describeInstance(
+        instance.serviceId,
+        instance.environmentId,
+        instance.id
       );
 
       if (resourceInstance.status === "DELETING") {
@@ -46,16 +29,11 @@ const deleteInstances = async (instances: ResourceInstance[], serviceOfferings: 
         continue;
       }
 
-      await userAPIClient.deleteResourceInstance(
-        serviceOffering.serviceProviderId,
-        serviceOffering.serviceURLKey,
-        serviceOffering.serviceAPIVersion,
-        serviceOffering.serviceEnvironmentURLKey,
-        serviceOffering.serviceModelURLKey,
-        serviceOffering.productTierURLKey,
-        instance.resourceID?.startsWith("r-injected") ? "omnistrateCloudAccountConfig" : param.urlKey,
+      await providerAPIClient.deleteInstance(
+        instance.serviceId,
+        instance.environmentId,
         instance.id,
-        instance.subscriptionId
+        instance.resourceID!
       );
 
       console.log("Deleting Resource Instance: ", resourceInstance);
@@ -95,50 +73,60 @@ async function globalTeardown() {
   console.log("Running Global Teardown...");
 
   const userAPIClient = new UserAPIClient();
+  const providerAPIClient = new ProviderAPIClient();
 
+  // Login
   await userAPIClient.userLogin(process.env.USER_EMAIL!, process.env.USER_PASSWORD!);
-  const instances = await userAPIClient.listResourceInstances();
-  const serviceOfferings = await userAPIClient.listServiceOffering();
+  await providerAPIClient.providerLogin(process.env.PROVIDER_EMAIL!, process.env.PROVIDER_PASSWORD!);
+
+  const services = await providerAPIClient.listSaaSBuilderServices();
+  const instances: Instance[] = [];
+
+  for (const service of services) {
+    console.log(`Listing Instances for Service: ${service.name} (${service.id})`);
+    for (const environment of service.serviceEnvironments) {
+      console.log(`  Environment: ${environment.name} (${environment.id})`);
+      const arr = await providerAPIClient.listInstances(service.id, environment.id);
+      instances.push(
+        ...arr.map((instance) => ({
+          ...instance,
+          serviceId: service.id,
+          environmentId: environment.id,
+        }))
+      );
+    }
+  }
 
   // Delete Instances
-  const deletingInstanceIds = await deleteInstances(
-    instances.filter((el) => !el.resourceID?.startsWith("r-injected")),
-    serviceOfferings
-  );
+  const deletingInstanceIds = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
   await waitForDeletion("instance", deletingInstanceIds);
 
   // Delete Cloud Accounts
-  const deletingCloudAccountIds = await deleteInstances(
-    instances.filter((el) => el.resourceID?.startsWith("r-injected")),
-    serviceOfferings
-  );
+  const deletingCloudAccountIds = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));
   await waitForDeletion("cloudAccount", deletingCloudAccountIds);
 
-  // Delete Created Services and Services Older than 1 Days
-  const providerAPIClient = new ProviderAPIClient();
+  // Delete Services Created in This Test and Services Older than 2 Hours
   const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
   const date = GlobalStateManager.getDate();
 
-  const serviceOfferingsToDelete = serviceOfferings.filter((offering) => {
-    const isCreatedByCurrentTest = offering.serviceName.includes("SaaSBuilder") && offering.serviceName.includes(date);
+  const servicesToDelete = services.filter((service) => {
+    const isCreatedByCurrentTest = service.name.includes(date);
     if (isCreatedByCurrentTest) return true;
 
-    const createdAt = new Date(offering.createdAt).getTime();
-    if (date) {
-      return createdAt < twoHoursAgo || offering.serviceName.includes(date);
-    }
+    const createdAt = new Date(service.createdAt).getTime();
     return createdAt < twoHoursAgo;
   });
 
-  const uniqueServiceIds = Array.from(new Set(serviceOfferingsToDelete.map((offering) => offering.serviceId)));
-  console.log(`Deleting services: ${uniqueServiceIds}...`);
-
-  for (const serviceId of uniqueServiceIds) {
+  for (const service of servicesToDelete) {
     try {
-      await providerAPIClient.deleteService(serviceId);
-      console.log(`Deleted Service: ${serviceId}`);
+      for (const environment of service.serviceEnvironments) {
+        await providerAPIClient.deleteSubscriptions(service.id, environment.id);
+        console.log(`Deleted Subscriptions for Environment: ${environment.id}`);
+      }
+      await providerAPIClient.deleteService(service.id);
+      console.log(`Deleted Service: ${service.name}`);
     } catch (error) {
-      console.error(`Failed to delete service ${serviceId}:`, error);
+      console.error(`Failed to delete service ${service.name}:`, error);
     }
   }
 
