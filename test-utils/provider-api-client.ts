@@ -90,7 +90,11 @@ export class ProviderAPIClient {
 
   async deleteService(serviceId: string) {
     const context = await this.createProviderRequest();
-    return context.delete(`/${this.apiVersion}/service/${serviceId}`);
+    const response = await context.delete(`/${this.apiVersion}/service/${serviceId}`);
+
+    if (!response.ok()) {
+      console.error(await response.json());
+    }
   }
 
   async getIdentityProviders(): Promise<IdentityProvider[]> {
@@ -129,16 +133,17 @@ export class ProviderAPIClient {
 
   async deleteInstance(serviceId: string, environmentId: string, instanceId: string, resourceId: string) {
     const context = await this.createProviderRequest();
-    return context.delete(
+    const response = await context.delete(
       `/${this.apiVersion}/fleet/service/${serviceId}/environment/${environmentId}/instance/${instanceId}`,
       {
-        data: {
-          body: {
-            resourceId,
-          },
-        },
+        data: { resourceId },
       }
     );
+
+    if (!response.ok()) {
+      console.error(await response.json());
+      throw new Error("Failed to delete instance");
+    }
   }
 
   async describeInstance(serviceId: string, environmentId: string, instanceId: string) {
@@ -152,7 +157,7 @@ export class ProviderAPIClient {
       throw new Error("Failed to describe instance");
     }
 
-    const instance: ResourceInstance = (await response.json()).resourceInstance.consumptionResourceInstanceResult;
+    const instance: ResourceInstance = (await response.json()).consumptionResourceInstanceResult;
     return instance;
   }
 

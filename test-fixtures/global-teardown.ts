@@ -1,15 +1,15 @@
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
-import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
 type Instance = ResourceInstance & { serviceId: string; environmentId: string };
+type DeletingInstance = { serviceId: string; environmentId: string; instanceId: string };
 
 const deleteInstances = async (instances: Instance[]) => {
   const providerAPIClient = new ProviderAPIClient();
-  const deletingInstanceIds: string[] = [];
+  const deletingInstances: DeletingInstance[] = [];
 
   for (const instance of instances) {
     try {
@@ -37,32 +37,52 @@ const deleteInstances = async (instances: Instance[]) => {
       );
 
       console.log("Deleting Resource Instance: ", resourceInstance);
-      deletingInstanceIds.push(instance.id);
+      deletingInstances.push({
+        serviceId: instance.serviceId,
+        environmentId: instance.environmentId,
+        instanceId: instance.id,
+      });
     } catch (error) {
       console.error(`Failed to delete instance ${instance.id}:`, error);
     }
   }
 
-  return deletingInstanceIds;
+  return deletingInstances;
 };
 
-const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instanceIds: (string | undefined)[]) => {
-  const userAPIClient = new UserAPIClient(),
+const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instances: DeletingInstance[]) => {
+  const providerClient = new ProviderAPIClient(),
     startTime = Date.now(),
     timeout = 10 * 60 * 1000; // 10 minutes
 
-  while (Date.now() - startTime < timeout) {
-    const instances = await userAPIClient.listResourceInstances();
-    const deletingInstances = instances.filter(
-      (instance) => instance.status === "DELETING" && instanceIds.includes(instance.id)
-    );
+  // Get unique service/environment combinations
+  const deletingInstanceIds = instances.map((i) => i.instanceId);
+  const uniqueCombinations = Array.from(new Set(instances.map((i) => `${i.serviceId}:${i.environmentId}`))).map(
+    (combo) => {
+      const [serviceId, environmentId] = combo.split(":");
+      return { serviceId, environmentId };
+    }
+  );
 
-    if (deletingInstances.length === 0) {
+  while (Date.now() - startTime < timeout) {
+    let totalRemainingInstances = 0;
+
+    for (const { serviceId, environmentId } of uniqueCombinations) {
+      try {
+        const instancesList = await providerClient.listInstances(serviceId, environmentId);
+        const remainingInstances = instancesList.filter((inst) => deletingInstanceIds.includes(inst.id!));
+        totalRemainingInstances += remainingInstances.length;
+      } catch (error) {
+        console.error(`Failed to list instances for ${serviceId}/${environmentId}:`, error);
+      }
+    }
+
+    if (totalRemainingInstances === 0) {
       console.log(`All ${instanceType === "instance" ? "Instances" : "Cloud Accounts"} deleted successfully`);
       return;
     }
 
-    console.log(`Waiting for ${deletingInstances.length} instances to be deleted...`);
+    console.log(`Waiting for ${totalRemainingInstances} instances to be deleted...`);
     await new Promise((resolve) => setTimeout(resolve, 20000)); // Wait for 20 seconds
   }
 
@@ -72,11 +92,9 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 async function globalTeardown() {
   console.log("Running Global Teardown...");
 
-  const userAPIClient = new UserAPIClient();
   const providerAPIClient = new ProviderAPIClient();
 
   // Login
-  await userAPIClient.userLogin(process.env.USER_EMAIL!, process.env.USER_PASSWORD!);
   await providerAPIClient.providerLogin(process.env.PROVIDER_EMAIL!, process.env.PROVIDER_PASSWORD!);
 
   const services = await providerAPIClient.listSaaSBuilderServices();
@@ -97,13 +115,16 @@ async function globalTeardown() {
     }
   }
 
+  console.log(`Total Instances Found: ${instances.length}`);
+  console.log(instances);
+
   // Delete Instances
-  const deletingInstanceIds = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
-  await waitForDeletion("instance", deletingInstanceIds);
+  const deletingInstances = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
+  await waitForDeletion("instance", deletingInstances);
 
   // Delete Cloud Accounts
-  const deletingCloudAccountIds = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));
-  await waitForDeletion("cloudAccount", deletingCloudAccountIds);
+  const deletingCloudAccounts = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));
+  await waitForDeletion("cloudAccount", deletingCloudAccounts);
 
   // Delete Services Created in This Test using Date and Services Older than 2 Hours
   const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
