@@ -55,27 +55,34 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
     startTime = Date.now(),
     timeout = 10 * 60 * 1000; // 10 minutes
 
+  // Get unique service/environment combinations
+  const deletingInstanceIds = instances.map((i) => i.instanceId);
+  const uniqueCombinations = Array.from(new Set(instances.map((i) => `${i.serviceId}:${i.environmentId}`))).map(
+    (combo) => {
+      const [serviceId, environmentId] = combo.split(":");
+      return { serviceId, environmentId };
+    }
+  );
+
   while (Date.now() - startTime < timeout) {
-    const deletingInstances: ResourceInstance[] = [];
+    let totalRemainingInstances = 0;
 
-    for (const instance of instances) {
-      const instanceDetails = await providerClient.describeInstance(
-        instance.serviceId,
-        instance.environmentId,
-        instance.instanceId
-      );
-
-      if (instanceDetails.status === "DELETING") {
-        deletingInstances.push(instanceDetails);
+    for (const { serviceId, environmentId } of uniqueCombinations) {
+      try {
+        const instancesList = await providerClient.listInstances(serviceId, environmentId);
+        const remainingInstances = instancesList.filter((inst) => deletingInstanceIds.includes(inst.id!));
+        totalRemainingInstances += remainingInstances.length;
+      } catch (error) {
+        console.error(`Failed to list instances for ${serviceId}/${environmentId}:`, error);
       }
     }
 
-    if (deletingInstances.length === 0) {
+    if (totalRemainingInstances === 0) {
       console.log(`All ${instanceType === "instance" ? "Instances" : "Cloud Accounts"} deleted successfully`);
       return;
     }
 
-    console.log(`Waiting for ${deletingInstances.length} instances to be deleted...`);
+    console.log(`Waiting for ${totalRemainingInstances} instances to be deleted...`);
     await new Promise((resolve) => setTimeout(resolve, 20000)); // Wait for 20 seconds
   }
 
