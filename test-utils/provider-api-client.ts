@@ -133,16 +133,17 @@ export class ProviderAPIClient {
 
   async deleteInstance(serviceId: string, environmentId: string, instanceId: string, resourceId: string) {
     const context = await this.createProviderRequest();
-    return context.delete(
+    const response = await context.delete(
       `/${this.apiVersion}/fleet/service/${serviceId}/environment/${environmentId}/instance/${instanceId}`,
       {
-        data: {
-          body: {
-            resourceId,
-          },
-        },
+        data: { resourceId },
       }
     );
+
+    if (!response.ok()) {
+      console.error(await response.json());
+      throw new Error("Failed to delete instance");
+    }
   }
 
   async describeInstance(serviceId: string, environmentId: string, instanceId: string) {

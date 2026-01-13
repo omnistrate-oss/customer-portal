@@ -116,8 +116,8 @@ async function globalTeardown() {
   await waitForDeletion("instance", deletingInstances);
 
   // Delete Cloud Accounts
-  const deletingCloudAccountIds = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));
-  await waitForDeletion("cloudAccount", deletingCloudAccountIds);
+  const deletingCloudAccounts = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));
+  await waitForDeletion("cloudAccount", deletingCloudAccounts);
 
   // Delete Services Created in This Test using Date and Services Older than 2 Hours
   const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
