@@ -152,7 +152,7 @@ export class ProviderAPIClient {
       throw new Error("Failed to describe instance");
     }
 
-    const instance: ResourceInstance = (await response.json()).resourceInstance.consumptionResourceInstanceResult;
+    const instance: ResourceInstance = (await response.json()).consumptionResourceInstanceResult;
     return instance;
   }
 

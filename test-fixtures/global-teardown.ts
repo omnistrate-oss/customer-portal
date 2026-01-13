@@ -97,6 +97,9 @@ async function globalTeardown() {
     }
   }
 
+  console.log(`Total Instances Found: ${instances.length}`);
+  console.log(instances);
+
   // Delete Instances
   const deletingInstanceIds = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
   await waitForDeletion("instance", deletingInstanceIds);
