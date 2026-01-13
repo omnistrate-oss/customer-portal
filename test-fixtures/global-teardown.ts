@@ -1,15 +1,15 @@
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
-import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
 type Instance = ResourceInstance & { serviceId: string; environmentId: string };
+type DeletingInstance = { serviceId: string; environmentId: string; instanceId: string };
 
 const deleteInstances = async (instances: Instance[]) => {
   const providerAPIClient = new ProviderAPIClient();
-  const deletingInstanceIds: string[] = [];
+  const deletingInstances: DeletingInstance[] = [];
 
   for (const instance of instances) {
     try {
@@ -37,25 +37,38 @@ const deleteInstances = async (instances: Instance[]) => {
       );
 
       console.log("Deleting Resource Instance: ", resourceInstance);
-      deletingInstanceIds.push(instance.id);
+      deletingInstances.push({
+        serviceId: instance.serviceId,
+        environmentId: instance.environmentId,
+        instanceId: instance.id,
+      });
     } catch (error) {
       console.error(`Failed to delete instance ${instance.id}:`, error);
     }
   }
 
-  return deletingInstanceIds;
+  return deletingInstances;
 };
 
-const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instanceIds: (string | undefined)[]) => {
-  const userAPIClient = new UserAPIClient(),
+const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instances: DeletingInstance[]) => {
+  const providerClient = new ProviderAPIClient(),
     startTime = Date.now(),
     timeout = 10 * 60 * 1000; // 10 minutes
 
   while (Date.now() - startTime < timeout) {
-    const instances = await userAPIClient.listResourceInstances();
-    const deletingInstances = instances.filter(
-      (instance) => instance.status === "DELETING" && instanceIds.includes(instance.id)
-    );
+    const deletingInstances: ResourceInstance[] = [];
+
+    for (const instance of instances) {
+      const instanceDetails = await providerClient.describeInstance(
+        instance.serviceId,
+        instance.environmentId,
+        instance.instanceId
+      );
+
+      if (instanceDetails.status === "DELETING") {
+        deletingInstances.push(instanceDetails);
+      }
+    }
 
     if (deletingInstances.length === 0) {
       console.log(`All ${instanceType === "instance" ? "Instances" : "Cloud Accounts"} deleted successfully`);
@@ -72,11 +85,9 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 async function globalTeardown() {
   console.log("Running Global Teardown...");
 
-  const userAPIClient = new UserAPIClient();
   const providerAPIClient = new ProviderAPIClient();
 
   // Login
-  await userAPIClient.userLogin(process.env.USER_EMAIL!, process.env.USER_PASSWORD!);
   await providerAPIClient.providerLogin(process.env.PROVIDER_EMAIL!, process.env.PROVIDER_PASSWORD!);
 
   const services = await providerAPIClient.listSaaSBuilderServices();
@@ -101,8 +112,8 @@ async function globalTeardown() {
   console.log(instances);
 
   // Delete Instances
-  const deletingInstanceIds = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
-  await waitForDeletion("instance", deletingInstanceIds);
+  const deletingInstances = await deleteInstances(instances.filter((el) => !isCloudAccountInstance(el)));
+  await waitForDeletion("instance", deletingInstances);
 
   // Delete Cloud Accounts
   const deletingCloudAccountIds = await deleteInstances(instances.filter((el) => isCloudAccountInstance(el)));

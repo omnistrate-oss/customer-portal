@@ -90,7 +90,11 @@ export class ProviderAPIClient {
 
   async deleteService(serviceId: string) {
     const context = await this.createProviderRequest();
-    return context.delete(`/${this.apiVersion}/service/${serviceId}`);
+    const response = await context.delete(`/${this.apiVersion}/service/${serviceId}`);
+
+    if (!response.ok()) {
+      console.error(await response.json());
+    }
   }
 
   async getIdentityProviders(): Promise<IdentityProvider[]> {
