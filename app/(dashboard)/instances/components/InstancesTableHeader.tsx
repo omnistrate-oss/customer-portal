@@ -6,6 +6,8 @@ import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
+import { SetState } from "src/types/common/reactGenerics";
+import { ResourceInstance } from "src/types/resourceInstance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -18,9 +20,8 @@ import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip
 
 import { getMainResourceFromInstance } from "../utils";
 
-import AddInstanceFilters from "./AddInstanceFilters";
-import EditInstanceFilters from "./EditInstanceFilters";
 import InstanceActionMenu from "./InstanceActionMenu";
+import InstancesFilters from "./InstancesFilters";
 
 type Action = {
   dataTestId?: string;
@@ -32,7 +33,23 @@ type Action = {
   disabledMessage?: string;
 };
 
-const InstancesTableHeader = ({
+type InstancesTableHeaderProps = {
+  count: number;
+  selectedInstance: ResourceInstance | undefined;
+  setSelectedRows: any;
+  setOverlayType: any;
+  setIsOverlayOpen: SetState<boolean>;
+  selectedInstanceOffering: any;
+  selectedInstanceSubscription: any;
+  refetchInstances: () => void;
+  isFetchingInstances: boolean;
+  instances: ResourceInstance[];
+  setFilteredInstances: SetState<ResourceInstance[]>;
+  isLoadingInstances: boolean;
+  isLoadingPaymentConfiguration: boolean;
+};
+
+const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   count,
   selectedInstance,
   setSelectedRows,
@@ -42,10 +59,8 @@ const InstancesTableHeader = ({
   selectedInstanceSubscription,
   refetchInstances,
   isFetchingInstances,
-  filterOptionsMap,
-  selectedFilters,
-  setSelectedFilters,
-
+  instances,
+  setFilteredInstances,
   isLoadingInstances,
   isLoadingPaymentConfiguration,
 }) => {
@@ -303,18 +318,8 @@ const InstancesTableHeader = ({
         </div>
       </div>
 
-      <div className="px-6 py-4 border-b-[1px] flex justify-start items-center gap-4">
-        <div className="shrink-0">
-          <AddInstanceFilters
-            setSelectedFilters={setSelectedFilters}
-            filterOptionsMap={filterOptionsMap}
-            selectedFilters={selectedFilters}
-          />
-        </div>
-
-        <div className="flex-1">
-          <EditInstanceFilters selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-        </div>
+      <div className="px-6 py-4 border-b-[1px]">
+        <InstancesFilters instances={instances} setFilteredInstances={setFilteredInstances} />
       </div>
     </div>
   );
