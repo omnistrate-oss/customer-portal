@@ -117,7 +117,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       serviceModelKey: selectedInstanceOffering?.serviceModelURLKey,
       productTierKey: selectedInstanceOffering?.productTierURLKey,
       resourceKey: selectedResource?.urlKey as string,
-      id: selectedInstance?.id,
+      id: selectedInstance?.id as string,
     };
 
     actions.push({
@@ -126,12 +126,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isLoading: stopInstanceMutation.isPending,
       isDisabled:
-        !selectedInstance ||
-        status !== "RUNNING" ||
-        status === "DISCONNECTED" ||
-        isComplexResource ||
-        isProxyResource ||
-        !isUpdateAllowedByRBAC,
+        !selectedInstance || status !== "RUNNING" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         setOverlayType("stop-dialog");
@@ -139,10 +134,10 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status !== "RUNNING"
-          ? "Instance must be running to stop it"
-          : status === "DISCONNECTED"
-            ? "Instance is disconnected"
+        : status === "DISCONNECTED"
+          ? "Instance is disconnected"
+          : status !== "RUNNING"
+            ? "Instance must be running to stop it"
             : isComplexResource || isProxyResource
               ? "System manages instances cannot be stopped"
               : !isUpdateAllowedByRBAC
@@ -156,12 +151,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isLoading: startInstanceMutation.isPending,
       isDisabled:
-        !selectedInstance ||
-        status !== "STOPPED" ||
-        status === "DISCONNECTED" ||
-        isComplexResource ||
-        isProxyResource ||
-        !isUpdateAllowedByRBAC,
+        !selectedInstance || status !== "STOPPED" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         if (!selectedInstanceOffering) return snackbar.showError("Product not found");
@@ -176,10 +166,10 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status !== "STOPPED"
-          ? "Instances must be stopped before starting"
-          : status === "DISCONNECTED"
-            ? "Instance is disconnected"
+        : status === "DISCONNECTED"
+          ? "Instance is disconnected"
+          : status !== "STOPPED"
+            ? "Instances must be stopped before starting"
             : isComplexResource || isProxyResource
               ? "System managed instances cannot be started"
               : !isUpdateAllowedByRBAC
@@ -194,7 +184,6 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       isDisabled:
         !selectedInstance ||
         (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
-        status === "DISCONNECTED" ||
         isProxyResource ||
         !isUpdateAllowedByRBAC,
       onClick: () => {
@@ -204,10 +193,10 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status !== "RUNNING" && status !== "FAILED"
-          ? "Instance must be running or failed to modify"
-          : status === "DISCONNECTED"
-            ? "Instance is disconnected"
+        : status === "DISCONNECTED"
+          ? "Instance is disconnected"
+          : status !== "RUNNING" && status !== "FAILED"
+            ? "Instance must be running or failed to modify"
             : isProxyResource
               ? "System managed instances cannot be modified"
               : !isUpdateAllowedByRBAC
