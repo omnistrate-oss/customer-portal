@@ -1,5 +1,3 @@
-"use client";
-
 import GlobalDataProvider from "src/providers/GlobalDataProvider";
 
 import Footer from "./components/Layout/Footer";

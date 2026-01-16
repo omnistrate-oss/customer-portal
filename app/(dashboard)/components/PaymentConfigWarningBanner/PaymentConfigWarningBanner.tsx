@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
@@ -68,7 +68,7 @@ function PaymentConfigWarningBanner() {
               <>
                 Some subscriptions require a payment method to continue running instances.
                 <Link className="underline underline-offset-4" href="/billing">
-                  Go to Billing{" "}
+                  Go to Billing
                 </Link>
                 .
               </>
