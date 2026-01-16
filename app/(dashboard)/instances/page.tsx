@@ -36,10 +36,6 @@ import StatusCell from "./components/StatusCell";
 import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
 import {
-  FilterCategorySchema,
-  getFilteredInstances,
-  getInstanceFiltersObject,
-  getIntialFiltersObject,
   getMainResourceFromInstance,
   getRowBorderStyles,
 } from "./utils";
@@ -60,6 +56,7 @@ const InstancesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
+  const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
 
   const {
     subscriptionsObj,
@@ -68,9 +65,6 @@ const InstancesPage = () => {
     isFetchingServiceOfferings,
     setShowGlobalProviderError,
   } = useGlobalData();
-
-  const [selectedFilters, setSelectedFilters] =
-    useState<Record<string, FilterCategorySchema>>(getIntialFiltersObject());
 
   const {
     data: instances = [],
@@ -358,28 +352,19 @@ const InstancesPage = () => {
     return instances.filter((instance) => !isCloudAccountInstance(instance));
   }, [instances]);
 
-  const filterOptionsMap = useMemo(
-    () => getInstanceFiltersObject(nonBYOAInstances, subscriptionsObj),
-    [nonBYOAInstances, subscriptionsObj]
-  );
-
-  const filteredInstances = useMemo(
-    () => getFilteredInstances(nonBYOAInstances, selectedFilters, subscriptionsObj),
-    [nonBYOAInstances, selectedFilters, subscriptionsObj]
-  );
   const failedInstances = useMemo(() => {
-    return nonBYOAInstances?.filter((instance) => instance.status === "FAILED");
-  }, [nonBYOAInstances]);
+    return filteredInstances?.filter((instance) => instance.status === "FAILED");
+  }, [filteredInstances]);
 
   const overloadedInstances = useMemo(() => {
-    return nonBYOAInstances?.filter((instance) =>
+    return filteredInstances?.filter((instance) =>
       //@ts-ignore
       ["POD_OVERLOAD", "LOAD_OVERLOADED"].includes(instance.instanceLoadStatus)
     );
-  }, [nonBYOAInstances]);
+  }, [filteredInstances]);
 
   const unhealthyInstances = useMemo(() => {
-    return nonBYOAInstances?.filter((instance) => {
+    return filteredInstances?.filter((instance) => {
       const instanceHealthStatus = getInstanceHealthStatus(
         (instance?.detailedNetworkTopology ?? {}) as Record<string, ResourceInstanceNetworkTopology>,
 
@@ -389,11 +374,11 @@ const InstancesPage = () => {
 
       return false;
     });
-  }, [nonBYOAInstances]);
+  }, [filteredInstances]);
 
   const selectedInstance = useMemo(() => {
-    return nonBYOAInstances.find((instance) => instance.id === selectedRows[0]);
-  }, [selectedRows, nonBYOAInstances]);
+    return filteredInstances.find((instance) => instance.id === selectedRows[0]);
+  }, [selectedRows, filteredInstances]);
 
   // Subscription of the Selected Instance
   const selectedInstanceSubscription = useMemo(() => {
@@ -412,62 +397,21 @@ const InstancesPage = () => {
         title: "Failed Deployments",
         count: failedInstances?.length,
         handleClick: () => {
-          setSelectedFilters((prev) => {
-            return {
-              ...getIntialFiltersObject(),
-              lifecycleStatus: {
-                ...prev["lifecycleStatus"],
-                options: [
-                  {
-                    value: "FAILED",
-                    label: "Failed",
-                  },
-                ],
-              },
-            };
-          });
+          // TODO: Implement filter navigation
         },
       },
       {
         title: "Unhealthy Deployments",
         count: unhealthyInstances?.length,
-
         handleClick: () => {
-          setSelectedFilters((prev) => {
-            return {
-              ...getIntialFiltersObject(),
-              healthStatus: {
-                ...prev["healthStatus"],
-                options: [
-                  {
-                    value: "UNHEALTHY",
-                    label: "Unhealthy",
-                  },
-                ],
-              },
-            };
-          });
+          // TODO: Implement filter navigation
         },
       },
       {
         title: "Overload Deployments",
         count: overloadedInstances?.length,
-
         handleClick: () => {
-          setSelectedFilters((prev) => {
-            return {
-              ...getIntialFiltersObject(),
-              load: {
-                ...prev["load"],
-                options: [
-                  {
-                    value: "High",
-                    label: "High",
-                  },
-                ],
-              },
-            };
-          });
+          // TODO: Implement filter navigation
         },
       },
     ],
@@ -493,10 +437,10 @@ const InstancesPage = () => {
             selectedInstanceSubscription,
             refetchInstances,
             isFetchingInstances,
-            filterOptionsMap,
-            selectedFilters,
-            setSelectedFilters,
+            instances: nonBYOAInstances,
+            setFilteredInstances,
             isLoadingInstances,
+            isLoadingPaymentConfiguration: false,
           }}
           isLoading={isLoadingInstances || isFetchingSubscriptions || isFetchingServiceOfferings}
           selectedRows={selectedRows}

@@ -40,7 +40,7 @@ export const PopoverDynamicHeight = (props: PopoverProps) => {
   }, []);
 
   return (
-    <MuiPopover
+    <Popover
       slotProps={{
         paper: {
           ref: setPopoverRef, // Attach ref dynamically using callback

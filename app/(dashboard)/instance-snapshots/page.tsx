@@ -60,6 +60,7 @@ const InstanceSnapshotsPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-snapshot-dialog");
   const [restoredInstanceId, setRestoredInstanceId] = useState<string>("");
+  const [filteredSnapshots, setFilteredSnapshots] = useState<InstanceSnapshot[]>([]);
 
   const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
@@ -317,11 +318,13 @@ const InstanceSnapshotsPage = () => {
         {/* TODO: Solve the Problem of shifting DataTable height when paginating */}
         <DataTable
           columns={dataTableColumns}
-          rows={snapshots}
+          rows={filteredSnapshots}
           noRowsText="No instance snapshots"
           HeaderComponent={InstanceSnapshotsTableHeader}
           headerProps={{
-            count: snapshots.length,
+            count: filteredSnapshots.length,
+            snapshots,
+            setFilteredSnapshots,
             refetchSnapshots,
             isFetchingSnapshots,
             onDeleteClick: () => openOverlay("delete-snapshot-dialog"),
