@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Box } from "@mui/material";
 import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
 
 import { $api } from "src/api/query";
@@ -23,6 +24,7 @@ import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
 import InstanceForm from "./InstanceForm";
+import SnapshotBeforeDeletionConfirmation from "./SnapshotBeforeDeletionConfirmation";
 
 type InstanceDialogsProps = {
   variant: "instances-page" | "details-page";
@@ -86,6 +88,8 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     instanceId?: string;
     isCustomDNS?: boolean;
   }>({});
+  const [takeFinalSnapshot, setTakeFinalSnapshot] = useState(true);
+  const showSnapshotBeforeDeleteOption = Boolean(instance?.snapshotBeforeDeletionEnabled);
   const snackbar = useSnackbar();
 
   // Resource of the Selected Instance
@@ -186,6 +190,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       />
 
       <TextConfirmationDialog
+        maxWidth={overlayType === "delete-dialog" && showSnapshotBeforeDeleteOption ? "595px" : "521px"}
         open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
@@ -217,6 +222,8 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
               path: pathData,
               query: {
                 subscriptionId: subscription.id,
+                skipFinalSnapshot:
+                  overlayType === "delete-dialog" && showSnapshotBeforeDeleteOption ? !takeFinalSnapshot : undefined,
               },
             },
           };
@@ -233,7 +240,19 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         }}
         IconComponent={DIALOG_DATA[overlayType]?.icon}
         title={DIALOG_DATA[overlayType]?.title}
-        subtitle={`${DIALOG_DATA[overlayType]?.subtitle} - ${selectedInstanceData?.id}?`}
+        subtitle={
+          <>
+            {`${DIALOG_DATA[overlayType]?.subtitle} - ${selectedInstanceData?.id}?`}
+            {overlayType === "delete-dialog" && showSnapshotBeforeDeleteOption && (
+              <Box marginTop="16px">
+                <SnapshotBeforeDeletionConfirmation
+                  takeFinalSnapshot={takeFinalSnapshot}
+                  setTakeFinalSnapshot={setTakeFinalSnapshot}
+                />
+              </Box>
+            )}
+          </>
+        }
         confirmationText={DIALOG_DATA[overlayType]?.confirmationText}
         buttonLabel={DIALOG_DATA[overlayType]?.buttonLabel}
         buttonColor={DIALOG_DATA[overlayType]?.buttonColor}

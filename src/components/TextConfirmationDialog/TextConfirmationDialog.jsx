@@ -21,10 +21,10 @@ import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import DeleteCircleIcon from "../Icons/DeleteCircle/DeleteCircleIcon";
 import { Text } from "../Typography/Typography";
 
-const Dialog = styled(MuiDialog)(() => ({
+const Dialog = styled(MuiDialog)(({ maxWidth }) => ({
   [`& .MuiPaper-root `]: {
     width: "100%",
-    maxWidth: "521px",
+    maxWidth: maxWidth ? maxWidth : "521px",
     padding: "24px",
   },
 }));
@@ -35,6 +35,8 @@ const DialogTitle = styled(MuiDialogTitle)(() => ({
 
 const DialogContent = styled(MuiDialogContent)(() => ({
   padding: 0,
+  marginLeft: "12px",
+  marginRight: "12px",
 }));
 
 const DialogActions = styled(MuiDialogActions)(() => ({
@@ -54,6 +56,8 @@ const TextConfirmationDialog = (props) => {
     buttonColor = "#D92D20",
     isLoading,
     IconComponent = DeleteCircleIcon,
+    maxWidth = 521,
+    ...rest
   } = props;
 
   const message = props.message || `To confirm, please enter <b>${confirmationText}</b>, in the field below:`;
@@ -84,6 +88,8 @@ const TextConfirmationDialog = (props) => {
         handleClose();
         formData.resetForm();
       }}
+      maxWidth={maxWidth}
+      {...rest}
     >
       <Form onSubmit={formData.handleSubmit}>
         <DialogTitle>
