@@ -8,6 +8,8 @@ import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { ServiceOffering } from "src/types/serviceOffering";
+import { Subscription } from "src/types/subscription";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -40,8 +42,8 @@ type InstancesTableHeaderProps = {
   setSelectedRows: SetState<ResourceInstance[]>;
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
-  selectedInstanceOffering: any;
-  selectedInstanceSubscription: any;
+  selectedInstanceOffering: ServiceOffering;
+  selectedInstanceSubscription?: Subscription;
   refetchInstances: () => void;
   isFetchingInstances: boolean;
   instances: ResourceInstance[];
