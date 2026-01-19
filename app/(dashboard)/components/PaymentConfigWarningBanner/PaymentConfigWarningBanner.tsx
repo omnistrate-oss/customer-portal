@@ -56,7 +56,6 @@ function PaymentConfigWarningBanner() {
           Some subscriptions require a payment method to continue running instances. Go to Billing - multiple subscriptions
           */
 
-          console.log("subscriptionsRequiringPayment", subscriptionsRequiringPayment);
           const subscriptionNames = Array.from(subscriptionsRequiringPayment).map((sub) => sub.productTierName);
           if (subscriptionNames.length === 1) {
             setWarningMessage(
