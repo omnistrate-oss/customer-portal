@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { CircularProgress } from "@mui/material";
-import useBillingStatus from "app/(dashboard)/billing/hooks/useBillingStatus";
 
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
@@ -49,7 +48,6 @@ type InstancesTableHeaderProps = {
   instances: ResourceInstance[];
   setFilteredInstances: SetState<ResourceInstance[]>;
   isLoadingInstances: boolean;
-  isLoadingPaymentConfiguration: boolean;
 };
 
 const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
@@ -65,12 +63,8 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   instances,
   setFilteredInstances,
   isLoadingInstances,
-  isLoadingPaymentConfiguration,
 }) => {
   const snackbar = useSnackbar();
-  const billingStatusQuery = useBillingStatus();
-
-  const isBillingEnabled = Boolean(billingStatusQuery.data?.enabled);
 
   const stopInstanceMutation = $api.useMutation(
     "post",
@@ -239,7 +233,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       dataTestId: "create-button",
       label: "Create",
       actionType: "primary",
-      isDisabled: isLoadingInstances || (isBillingEnabled && isLoadingPaymentConfiguration),
+      isDisabled: isLoadingInstances,
       onClick: () => {
         setSelectedRows([]); // To make selectedInstance becomes undefined. See page.tsx
         setOverlayType("create-instance-form");

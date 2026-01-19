@@ -428,7 +428,6 @@ const InstancesPage = () => {
             instances: nonBYOAInstances,
             setFilteredInstances,
             isLoadingInstances,
-            isLoadingPaymentConfiguration: false,
           }}
           isLoading={isLoadingInstances || isFetchingSubscriptions || isFetchingServiceOfferings}
           selectedRows={selectedRows}
