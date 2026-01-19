@@ -35,10 +35,7 @@ import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
 import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
-import {
-  getMainResourceFromInstance,
-  getRowBorderStyles,
-} from "./utils";
+import { getMainResourceFromInstance, getRowBorderStyles } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 export type Overlay =
@@ -396,23 +393,14 @@ const InstancesPage = () => {
       {
         title: "Failed Deployments",
         count: failedInstances?.length,
-        handleClick: () => {
-          // TODO: Implement filter navigation
-        },
       },
       {
         title: "Unhealthy Deployments",
         count: unhealthyInstances?.length,
-        handleClick: () => {
-          // TODO: Implement filter navigation
-        },
       },
       {
         title: "Overload Deployments",
         count: overloadedInstances?.length,
-        handleClick: () => {
-          // TODO: Implement filter navigation
-        },
       },
     ],
     [failedInstances, overloadedInstances, unhealthyInstances]

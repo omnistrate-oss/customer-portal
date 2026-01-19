@@ -7,8 +7,6 @@ import _, { cloneDeep } from "lodash";
 import * as yup from "yup";
 import { StringSchema } from "yup";
 
-type ValidationSchema = StringSchema<string | undefined> | StringSchema<string | null | undefined>;
-
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
@@ -38,6 +36,8 @@ import {
   getNetworkConfigurationFields,
   getStandardInformationFields,
 } from "./InstanceFormFields";
+
+type ValidationSchema = StringSchema<string | undefined> | StringSchema<string | null | undefined>;
 
 const InstanceForm = ({
   formMode,

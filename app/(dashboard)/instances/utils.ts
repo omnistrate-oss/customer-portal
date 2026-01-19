@@ -776,3 +776,18 @@ export const getRowBorderStyles = () => {
   }
   return styles;
 };
+
+/**
+ * Converts a JSON value to a formatted string for display in form fields
+ * @param value - The value to convert (can be string, object, or any type)
+ * @returns Formatted JSON string or empty string if conversion fails
+ */
+export const getJsonValue = (value: any): string => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "";
+  }
+};
