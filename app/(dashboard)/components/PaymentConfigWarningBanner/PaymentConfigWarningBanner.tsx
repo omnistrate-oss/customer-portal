@@ -33,7 +33,7 @@ function PaymentConfigWarningBanner() {
     if (!isInstancesPending && !isSubscriptionsPending && !isBillingDetailsPending) {
       if (!isPaymentMethodConfigured && instances && instances.length > 0) {
         const subscriptionsRequiringPayment = new Set<Subscription>();
-        const hasInstancesRequiringPaymentMethod = instances.some((instance) => {
+        const instancesRequiringPaymentMethod = instances.filter((instance) => {
           const subscriptionId = instance.subscriptionId as string;
           const subscription = subscriptionsObj[subscriptionId];
 
@@ -47,12 +47,16 @@ function PaymentConfigWarningBanner() {
           return requiresPayment;
         });
 
+        const hasInstancesRequiringPaymentMethod = instancesRequiringPaymentMethod.length > 0;
+
         if (hasInstancesRequiringPaymentMethod) {
           /*
           show warning message in one of these formats
           {Subscription_Name} subsription requires a payment method to continue running instances. Go to Billing - single subscription
           Some subscriptions require a payment method to continue running instances. Go to Billing - multiple subscriptions
           */
+
+          console.log("subscriptionsRequiringPayment", subscriptionsRequiringPayment);
           const subscriptionNames = Array.from(subscriptionsRequiringPayment).map((sub) => sub.productTierName);
           if (subscriptionNames.length === 1) {
             setWarningMessage(
@@ -66,7 +70,7 @@ function PaymentConfigWarningBanner() {
           } else {
             setWarningMessage(
               <>
-                Some subscriptions require a payment method to continue running instances.
+                Some subscriptions require a payment method to continue running instances.{" "}
                 <Link className="underline underline-offset-4" href="/billing">
                   Go to Billing
                 </Link>
