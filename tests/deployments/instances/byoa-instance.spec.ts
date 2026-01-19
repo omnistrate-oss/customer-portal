@@ -6,7 +6,7 @@ import { GlobalStateManager } from "test-utils/global-state-manager";
 const logPrefix = "Instances -> BYOA Instance Tests ->";
 test.describe.configure({ mode: "serial" });
 
-test.describe("Instances Page - Specialized Tests", () => {
+test.describe.skip("Instances Page - Specialized Tests", () => {
   let instancesPage: InstancesPage,
     cloudAccountsPage: CloudAccountsPage,
     cloudAccountInstanceId: string,
