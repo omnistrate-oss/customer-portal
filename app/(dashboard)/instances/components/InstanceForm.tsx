@@ -330,20 +330,11 @@ const InstanceForm = ({
             result?.required &&
             (data.requestParams[key] === undefined ||
               data.requestParams[key] === null ||
-              data.requestParams[key] === "") &&
-            !(result?.type?.toLowerCase() === "password")
+              data.requestParams[key] === "")
           ) {
             snackbar.showError(`${result.displayName || key} is required`);
             isTypeError = true;
             return;
-          }
-
-          if (
-            result?.required &&
-            result?.type?.toLowerCase() === "password" &&
-            (data.requestParams[key] === "" || data.requestParams[key] === null)
-          ) {
-            delete data.requestParams[key];
           }
 
           switch (result?.type?.toLowerCase()) {
