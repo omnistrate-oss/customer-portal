@@ -18,6 +18,7 @@ import Button from "components/Button/Button";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
+import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
 import InstanceActionMenu from "./InstanceActionMenu";
@@ -36,8 +37,8 @@ type Action = {
 type InstancesTableHeaderProps = {
   count: number;
   selectedInstance: ResourceInstance | undefined;
-  setSelectedRows: any;
-  setOverlayType: any;
+  setSelectedRows: SetState<ResourceInstance[]>;
+  setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
   selectedInstanceOffering: any;
   selectedInstanceSubscription: any;
