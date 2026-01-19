@@ -138,10 +138,11 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
 
   const hasFilters = filterChips.length > 0;
   const hiddenChipCount = filterChips.length - visibleChipCount;
+  const filterChipsLength = filterChips.length;
 
   useLayoutEffect(() => {
-    if (!containerRef.current || filterChips.length === 0) {
-      setVisibleChipCount(filterChips.length);
+    if (!containerRef.current || filterChipsLength === 0) {
+      setVisibleChipCount(filterChipsLength);
       return;
     }
 
@@ -161,7 +162,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
         if (!chipEl) continue;
 
         const chipWidth = chipEl.offsetWidth;
-        const hasMoreChips = i < filterChips.length - 1;
+        const hasMoreChips = i < filterChipsLength - 1;
 
         const spaceNeeded = chipWidth + gap + (hasMoreChips ? moreChipWidth + gap : 0);
 
@@ -179,7 +180,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
     calculateVisibleChips();
     window.addEventListener("resize", calculateVisibleChips);
     return () => window.removeEventListener("resize", calculateVisibleChips);
-  }, [filterChips]);
+  }, [filterChipsLength]);
 
   const leftMenuOptions = useMemo(
     () =>

@@ -686,17 +686,6 @@ export const getDeploymentConfigurationFields = (
         type: "text-multiline",
         required: param.required,
         previewValue: getJsonValue(values.requestParams[param.key]),
-        // Add custom validation for JSON
-        onBlur: (formData: any) => {
-          const value = formData.values.requestParams[param.key];
-          if (value && value.trim()) {
-            try {
-              JSON.parse(value);
-            } catch {
-              formData.setFieldError(`requestParams.${param.key}`, "Invalid JSON format");
-            }
-          }
-        },
       });
     } else {
       if (param.key === "cloud_provider_account_config_id") {
