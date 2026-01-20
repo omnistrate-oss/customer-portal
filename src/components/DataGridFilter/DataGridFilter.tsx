@@ -298,7 +298,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
       >
         {!hasFilters ? (
           <Text size="medium" weight="regular" color="#717680" sx={{ flex: 1 }}>
-            Filter and search
+            Filter
           </Text>
         ) : (
           <Box ref={chipsContainerRef} display="flex" alignItems="center" gap="8px" flex={1} overflow="hidden">

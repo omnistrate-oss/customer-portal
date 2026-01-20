@@ -4,6 +4,7 @@ import DataGridFilter from "src/components/DataGridFilter/DataGridFilter";
 import { FilterConfig, KeyConfig } from "src/components/DataGridFilter/types";
 import { deriveOptionsFromData } from "src/components/DataGridFilter/utils";
 import { getInstanceHealthStatus } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
+import { cloudProviderLabelsShort } from "src/constants/cloudProviders";
 import { instaceHealthStatusMap } from "src/constants/statusChipStyles/resourceInstanceHealthStatus";
 import { resourceInstanceStatusMap } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -100,7 +101,16 @@ const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilte
         leftMenuLabel: "Region",
         filterType: "multi-select",
         accessor: (instance) => instance.region,
-        options: deriveOptionsFromData(instances, (instance) => instance.region || ""),
+        options: deriveOptionsFromData(
+          instances,
+          (instance) => instance.region || "",
+          (value) => {
+            // Append Cloud Provider to Region
+            const instance = instances.find((inst) => inst.region === value);
+            const cloudProvider = instance?.cloud_provider || "Unknown";
+            return `${cloudProviderLabelsShort[cloudProvider] || cloudProvider} - ${value}`;
+          }
+        ),
       },
       "subscription-owner": {
         leftMenuLabel: "Subscription Owner",

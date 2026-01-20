@@ -4,6 +4,7 @@ import DataGridFilter from "src/components/DataGridFilter/DataGridFilter";
 import { FilterConfig } from "src/components/DataGridFilter/types";
 import { deriveOptionsFromData } from "src/components/DataGridFilter/utils";
 import { statuses } from "src/components/StatusChip/StatusChip";
+import { cloudProviderLabelsShort } from "src/constants/cloudProviders";
 import { SetState } from "src/types/common/reactGenerics";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
 
@@ -48,7 +49,14 @@ const InstanceSnapshotsFilters: React.FC<InstanceSnapshotsFiltersProps> = ({ sna
         leftMenuLabel: "Region",
         filterType: "multi-select",
         accessor: "region",
-        options: deriveOptionsFromData(snapshots, "region"),
+        options: deriveOptionsFromData(snapshots, "region", (value) => {
+          // Append Cloud Provider to Region
+          const snapshot = snapshots.find((snap) => snap.region === value);
+          if (snapshot?.cloudProvider) {
+            return `${cloudProviderLabelsShort[snapshot.cloudProvider] || snapshot.cloudProvider} - ${value}`;
+          }
+          return value;
+        }),
       },
       "source-instance": {
         leftMenuLabel: "Source Instance",
