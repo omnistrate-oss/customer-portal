@@ -101,16 +101,32 @@ const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilte
         leftMenuLabel: "Region",
         filterType: "multi-select",
         accessor: (instance) => instance.region,
-        options: deriveOptionsFromData(
-          instances,
-          (instance) => instance.region || "",
-          (value) => {
-            // Append Cloud Provider to Region
-            const instance = instances.find((inst) => inst.region === value);
-            const cloudProvider = instance?.cloud_provider || "Unknown";
-            return `${cloudProviderLabelsShort[cloudProvider] || cloudProvider} - ${value}`;
-          }
-        ),
+        options: (() => {
+          const regionToCloudProvider = instances.reduce(
+            (acc, instance) => {
+              const region = instance.region;
+              if (!region) {
+                return acc;
+              }
+              // Only set the cloud provider for a region once
+              if (acc[region] === undefined) {
+                acc[region] = instance.cloud_provider;
+              }
+              return acc;
+            },
+            {} as Record<string, ResourceInstance["cloud_provider"] | undefined>
+          );
+
+          return deriveOptionsFromData(
+            instances,
+            (instance) => instance.region || "",
+            (value) => {
+              // Append Cloud Provider to Region
+              const cloudProvider = regionToCloudProvider[value] || "Unknown";
+              return `${cloudProviderLabelsShort[cloudProvider] || cloudProvider} - ${value}`;
+            }
+          );
+        })(),
       },
       "subscription-owner": {
         leftMenuLabel: "Subscription Owner",
