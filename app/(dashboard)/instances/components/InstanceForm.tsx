@@ -4,10 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
+import type { StringSchema } from "yup";
 import * as yup from "yup";
-import { StringSchema } from "yup";
-
-type ValidationSchema = StringSchema<string | undefined> | StringSchema<string | null | undefined>;
 
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
@@ -38,6 +36,11 @@ import {
   getNetworkConfigurationFields,
   getStandardInformationFields,
 } from "./InstanceFormFields";
+
+type ValidationSchema =
+  | StringSchema<string | undefined>
+  | StringSchema<string | null | undefined>
+  | ReturnType<typeof yup.mixed>;
 
 const InstanceForm = ({
   formMode,
@@ -208,6 +211,19 @@ const InstanceForm = ({
               if (data.requestParams[key] === "true") data.requestParams[key] = true;
               else data.requestParams[key] = false;
               break;
+            case "any":
+              // Ensure ANY type fields are always sent as strings
+              if (data.requestParams[key] !== undefined && data.requestParams[key] !== null) {
+                if (typeof data.requestParams[key] !== "string") {
+                  try {
+                    data.requestParams[key] = JSON.stringify(data.requestParams[key]);
+                  } catch {
+                    // If stringification fails, convert to empty string
+                    data.requestParams[key] = "";
+                  }
+                }
+              }
+              break;
           }
         });
         // Remove Empty Fields from data.requestParams
@@ -356,6 +372,19 @@ const InstanceForm = ({
               if (data.requestParams[key] === "true") data.requestParams[key] = true;
               else data.requestParams[key] = false;
               break;
+            case "any":
+              // Ensure ANY type fields are always sent as strings
+              if (data.requestParams[key] !== undefined && data.requestParams[key] !== null) {
+                if (typeof data.requestParams[key] !== "string") {
+                  try {
+                    data.requestParams[key] = JSON.stringify(data.requestParams[key]);
+                  } catch {
+                    // If stringification fails, convert to empty string
+                    data.requestParams[key] = "";
+                  }
+                }
+              }
+              break;
           }
         });
 
@@ -440,7 +469,29 @@ const InstanceForm = ({
     const requestParamsValidation: Record<string, ValidationSchema> = {};
 
     inputParams.forEach((param) => {
-      if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
+      if (param.custom === true && param.type?.toUpperCase() === "ANY") {
+        // Add JSON validation for ANY type fields
+        const fieldValidation = yup.mixed().test("json-validation", "Invalid JSON format", function (value) {
+          if (!value) return true; // Empty values handled by required validation
+
+          // If it's already an object or array (from API default), it's valid
+          if (typeof value === "object") return true;
+
+          // If it's a string, validate JSON syntax
+          if (typeof value === "string") {
+            if (value.trim() === "") return true;
+            try {
+              JSON.parse(value);
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          return true;
+        });
+        requestParamsValidation[param.key] = fieldValidation;
+      } else if (param.custom === true && ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())) {
         // Only add regex validation if regex is defined and not empty
         if (param.regex && param.regex.trim()) {
           // Test if the regex pattern is valid before adding validation
@@ -495,7 +546,29 @@ const InstanceForm = ({
     const requestParamsValidation: Record<string, ValidationSchema> = {};
 
     inputParams.forEach((param) => {
-      if (
+      if (param.custom === true && param.modifiable === true && param.type?.toUpperCase() === "ANY") {
+        // Add JSON validation for ANY type fields
+        const fieldValidation = yup.mixed().test("json-validation", "Invalid JSON format", function (value) {
+          if (!value) return true; // Empty values handled by required validation
+
+          // If it's already an object or array (from API default), it's valid
+          if (typeof value === "object") return true;
+
+          // If it's a string, validate JSON syntax
+          if (typeof value === "string") {
+            if (value.trim() === "") return true;
+            try {
+              JSON.parse(value);
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          return true;
+        });
+        requestParamsValidation[param.key] = fieldValidation;
+      } else if (
         param.custom === true &&
         param.modifiable === true &&
         ["STRING", "PASSWORD", "SECRET"].includes(param.type?.toUpperCase())

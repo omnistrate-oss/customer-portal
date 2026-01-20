@@ -60,8 +60,15 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
     column: 1,
   });
   const [decorationCollection, setDecorationCollection] = useState<any>(null);
-  const [completionDisposable, setCompletionDisposable] = useState<any>({});
-  useEffect(() => completionDisposable.dispose, [completionDisposable, language, isReadOnly, resourceType]);
+  const [completionDisposable, setCompletionDisposable] = useState<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (completionDisposable && typeof completionDisposable.dispose === "function") {
+        completionDisposable.dispose();
+      }
+    };
+  }, [completionDisposable]);
 
   useEffect(() => {
     const onFullscreenChange = () => {
