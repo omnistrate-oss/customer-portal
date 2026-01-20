@@ -565,7 +565,7 @@ export const getDeploymentConfigurationFields = (
         name: `requestParams.${param.key}`,
         value: values.requestParams[param.key] || "",
         type: "password",
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         showPasswordGenerator: true,
         previewValue: values.requestParams[param.key] ? "********" : "",
         disabled: formMode !== "create" && param.custom && !param.modifiable,

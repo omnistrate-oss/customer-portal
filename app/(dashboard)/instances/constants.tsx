@@ -21,6 +21,7 @@ export const loadStatusLabel = {
 export const customTagsInitializer = { key: "", value: "" };
 
 export const REQUEST_PARAMS_FIELDS_TO_FILTER = [
+  "id",
   "cloud_provider",
   "region",
   "custom_network_id",
