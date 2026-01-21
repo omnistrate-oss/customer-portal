@@ -16,13 +16,13 @@ const SnapshotBeforeDeletionConfirmation: FC<SnapshotBeforeDeletionConfirmationP
 }) => {
   return (
     <Box borderLeft="2px solid #F79009" padding="2px 8px" paddingRight="16px" marginBottom="20px">
-      <Stack direction="row" alignItems="center" gap="6 px">
+      <Stack direction="row" alignItems="center" gap="6px">
         <Checkbox checked={takeFinalSnapshot} onChange={(e) => setTakeFinalSnapshot(e.target.checked)} />
         <Text size="medium" weight="medium" color="#414651">
           Take final snapshot before deletion
         </Text>
       </Stack>
-      <Text size="small" weight="medium" sx={{ marginTop: "8px", color: " #414651" }}>
+      <Text size="small" weight="medium" sx={{ marginTop: "8px", color: "#414651" }}>
         This will create a final snapshot of all configured volumes before the instance is deleted.
         <br />
         <br />
