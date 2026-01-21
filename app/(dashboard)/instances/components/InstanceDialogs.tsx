@@ -119,6 +119,8 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         setSelectedRows([]);
         refetchData();
         setIsOverlayOpen(false);
+        setTakeFinalSnapshot(true);
+
         snackbar.showSuccess("Deleting deployment instance...");
 
         if (variant === "details-page") {
