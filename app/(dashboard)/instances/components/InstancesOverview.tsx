@@ -26,10 +26,10 @@ const SummaryHeaderColumn = ({ title }) => {
   );
 };
 
-const SummaryCell = ({ count, handleClick }) => {
+const SummaryCell = ({ count }) => {
   return (
     <div style={{ padding: "14px" }} className="flex items-center justify-center">
-      <Box {...(count > 0 && { onClick: handleClick, sx: { cursor: "pointer" } })}>
+      <Box>
         <Text size="small" weight="bold" color={count > 0 ? "#D92D20" : "#079455"}>
           {count || 0}
         </Text>
@@ -71,8 +71,8 @@ const InstancesOverview = (props) => {
           {summary?.map(({ title }, index) => {
             return <SummaryHeaderColumn title={title} key={index} />;
           })}
-          {summary?.map(({ count, handleClick }, index) => {
-            return <SummaryCell count={count} key={index} handleClick={handleClick} />;
+          {summary?.map(({ count }, index) => {
+            return <SummaryCell count={count} key={index} />;
           })}
         </div>
       </Collapse>

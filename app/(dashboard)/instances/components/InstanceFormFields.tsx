@@ -21,6 +21,7 @@ import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import {
   filterSchemaByCloudProvider,
   getCustomNetworksMenuItems,
+  getJsonValue,
   getRegionMenuItems,
   getResourceMenuItems,
   getServiceMenuItems,
@@ -564,7 +565,7 @@ export const getDeploymentConfigurationFields = (
         name: `requestParams.${param.key}`,
         value: values.requestParams[param.key] || "",
         type: "password",
-        required: formMode !== "modify" && param.required,
+        required: param.required,
         showPasswordGenerator: true,
         previewValue: values.requestParams[param.key] ? "********" : "",
         disabled: formMode !== "create" && param.custom && !param.modifiable,
@@ -672,6 +673,19 @@ export const getDeploymentConfigurationFields = (
         disabled: formMode !== "create",
         previewValue: cloudAccountInstances.find((config) => config.id === values.requestParams[param.key])?.label,
         emptyMenuText: "No cloud accounts available",
+      });
+    } else if (param.type?.toUpperCase() === "ANY") {
+      // Handle JSON type fields
+      fields.push({
+        dataTestId: `${param.key}-input`,
+        label: param.displayName || param.key,
+        subLabel: param.description,
+        disabled: formMode !== "create" && param.custom && !param.modifiable,
+        name: `requestParams.${param.key}`,
+        value: getJsonValue(values.requestParams[param.key]),
+        type: "text-multiline",
+        required: param.required,
+        previewValue: getJsonValue(values.requestParams[param.key]),
       });
     } else {
       if (param.key === "cloud_provider_account_config_id") {
