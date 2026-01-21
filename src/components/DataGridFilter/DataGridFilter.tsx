@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import { getISOStringfromDateAndTime } from "src/components/DateRangePicker/utils";
 
 import Button from "../Button/Button";
-import SearchLens from "../Icons/SearchLens/SearchLens";
+import FilterLinesIcon from "../Icons/FilterLines/FilterLines";
 import { PopoverDynamicHeight } from "../Popover/Popover";
 import { Text } from "../Typography/Typography";
 
@@ -314,7 +314,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
         )}
 
         <Box display="flex" alignItems="center" gap="4px" flexShrink={0}>
-          <SearchLens color="#717680" />
+          <FilterLinesIcon />
           {hasFilters && (
             <IconButton
               size="small"
