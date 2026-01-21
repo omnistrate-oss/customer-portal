@@ -16,7 +16,7 @@ const SnapshotBeforeDeletionConfirmation: FC<SnapshotBeforeDeletionConfirmationP
 }) => {
   return (
     <Box borderLeft="2px solid #F79009" padding="2px 8px" paddingRight="16px" marginBottom="20px">
-      <Stack direction="row" alignItems="center" gap="6px">
+      <Stack direction="row" alignItems="center" gap="2px">
         <Checkbox checked={takeFinalSnapshot} onChange={(e) => setTakeFinalSnapshot(e.target.checked)} />
         <Text size="medium" weight="medium" color="#414651">
           Take final snapshot before deletion
