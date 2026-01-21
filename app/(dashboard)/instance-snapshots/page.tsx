@@ -71,7 +71,11 @@ const InstanceSnapshotsPage = () => {
     refetch: refetchSnapshots,
   } = useInstanceSnapshots();
 
-  const { data: instances = [], isFetching: isFetchingInstances } = useInstances({
+  const {
+    data: instances = [],
+    isFetching: isFetchingInstances,
+    refetch: refetchInstances,
+  } = useInstances({
     onlyInstances: true,
     refetchInterval: isOverlayOpen ? false : 60000,
   });
@@ -85,6 +89,7 @@ const InstanceSnapshotsPage = () => {
 
   const closeOverlay = () => {
     setIsOverlayOpen(false);
+    formData.resetForm();
   };
 
   const dataTableColumns = useMemo(() => {
@@ -286,7 +291,10 @@ const InstanceSnapshotsPage = () => {
         setRestoredInstanceId(instanceId);
         setOverlayType("restore-snapshot-success");
         setIsOverlayOpen(true);
-        setTimeout(() => refetchSnapshots(), 2000); // Delay to allow backend to process
+        setTimeout(() => {
+          refetchSnapshots();
+          refetchInstances();
+        }, 2000); // Delay to allow backend to process
       },
     }
   );
@@ -332,7 +340,9 @@ const InstanceSnapshotsPage = () => {
               ? "Please select a snapshot"
               : operationPending
                 ? "Operation in progress, please wait"
-                : "",
+                : selectedSnapshot?.status === "DEPLOYING"
+                  ? "Deploying snapshots cannot be deleted"
+                  : "",
             onRestoreClick: () => {
               if (!serviceOffering) {
                 snackbar.showError("Service offering not found for the selected snapshot");

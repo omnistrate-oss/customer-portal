@@ -84,6 +84,10 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
     if (!selectedSnapshot) {
       return `Please select a snapshot to delete`;
     }
+    if (selectedSnapshot?.status === "DEPLOYING") {
+      return `Deploying snapshots cannot be deleted`;
+    }
+
     return "";
   }, [isDeleting, selectedSnapshot]);
 
@@ -127,7 +131,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
                 padding: "10px 14px !important",
               }}
               onClick={handleDeleteSnapshotDialogOpen}
-              disabled={isRefetching || isDeleting || !selectedSnapshot}
+              disabled={isRefetching || isDeleting || !selectedSnapshot || selectedSnapshot?.status === "DEPLOYING"}
               disabledMessage={deleteSnapshotDisabledMessage}
             >
               Delete

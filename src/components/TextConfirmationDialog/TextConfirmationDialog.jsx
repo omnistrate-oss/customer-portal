@@ -77,14 +77,13 @@ const TextConfirmationDialog = (props) => {
     validateOnChange: false,
   });
 
+  const onClose = () => {
+    handleClose();
+    formData.resetForm();
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        handleClose();
-        formData.resetForm();
-      }}
-    >
+    <Dialog open={open} onClose={onClose}>
       <Form onSubmit={formData.handleSubmit}>
         <DialogTitle>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -94,7 +93,7 @@ const TextConfirmationDialog = (props) => {
                 {title}
               </Text>
             </Stack>
-            <IconButton onClick={handleClose} sx={{ alignSelf: "flex-start" }}>
+            <IconButton onClick={onClose} sx={{ alignSelf: "flex-start" }}>
               <CloseIcon />
             </IconButton>
           </Stack>
@@ -119,7 +118,7 @@ const TextConfirmationDialog = (props) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" size="large" disabled={isLoading} onClick={handleClose}>
+          <Button variant="outlined" size="large" disabled={isLoading} onClick={onClose}>
             Cancel
           </Button>
           <Button

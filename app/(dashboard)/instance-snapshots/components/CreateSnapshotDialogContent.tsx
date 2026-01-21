@@ -3,6 +3,8 @@ import { Stack } from "@mui/material";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
+import StatusChip from "src/components/StatusChip/StatusChip";
+import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
@@ -44,10 +46,27 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           placeholder: "Select instance", // TODO: Not showing Placeholder
           name: "createSnapshotInstanceId",
           type: "select",
-          menuItems: instances.map((instance) => ({
-            value: instance.id,
-            label: instance.id,
-          })),
+          menuItems: instances.map((instance) => {
+            const status = instance.status ?? "";
+            const isDisabled = ["DELETING", "DEPLOYING"].includes(status);
+            const styles = getResourceInstanceStatusStylesAndLabel(status);
+            const data = {
+              value: instance.id,
+              label: (
+                <>
+                  {instance.id}
+                  {instance.cloud_provider ? " - " + instance.cloud_provider.toUpperCase() : ""}
+                  {instance.region ? " - " + instance.region : ""}
+                  &nbsp; &nbsp;
+                  <StatusChip status={status} {...styles} />
+                </>
+              ),
+              disabled: isDisabled,
+              disabledMessage: isDisabled ? "Can't create snapshots when the instance is deleting or deploying" : "",
+            };
+
+            return data;
+          }),
           required: true,
           isLoading: isFetchingInstances,
           emptyMenuText: "No instances found",
