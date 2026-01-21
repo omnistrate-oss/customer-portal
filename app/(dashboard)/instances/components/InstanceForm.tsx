@@ -336,6 +336,19 @@ const InstanceForm = ({
         }
 
         let isTypeError = false;
+
+        schema.forEach((schemaParam) => {
+          // Skip required validation for these fields as they are handled separately
+          if (REQUEST_PARAMS_FIELDS_TO_FILTER.includes(schemaParam.key)) {
+            return;
+          }
+          if (schemaParam?.required && !oldResultParams[schemaParam?.key] && !data.requestParams[schemaParam?.key]) {
+            snackbar.showError(`${schemaParam.displayName || schemaParam.key} is required`);
+            isTypeError = true;
+            return;
+          }
+        });
+
         Object.keys(data.requestParams).forEach((key) => {
           const result = schema.find((schemaParam) => {
             return schemaParam.key === key;
