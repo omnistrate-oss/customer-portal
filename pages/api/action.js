@@ -11,6 +11,9 @@ const apiClient = createFetchClient({
 
 const defaultErrorMessage = "";
 
+// Get app version from environment variable (set during Docker build) or fallback to "dev"
+const appVersion = process.env.APP_VERSION || "dev";
+
 export default async function handleAction(nextRequest, nextResponse) {
   if (nextRequest.method === "POST") {
     const { endpoint, method, data = {}, queryParams = {} } = nextRequest.body;
@@ -27,6 +30,17 @@ export default async function handleAction(nextRequest, nextResponse) {
           }
         }
 
+        // Extract client IP from X-Forwarded-For header
+        // xForwardedForHeader has multiple IPs in the format <client>, <proxy1>, <proxy2>
+        // Get the first IP (client IP)
+        const xForwardedForHeader = nextRequest.get("X-Forwarded-For") || "";
+        const clientIP = xForwardedForHeader.split(",").shift().trim();
+        const saasBuilderIP = process.env.POD_IP || "";
+
+        // Build custom User-Agent: customer-portal/<version> (<original-user-agent>)
+        const originalUserAgent = nextRequest.get("User-Agent") || "";
+        const customUserAgent = `customer-portal/${appVersion} (${originalUserAgent})`;
+
         // Prepare request options
         const requestOptions = {
           params: {
@@ -34,6 +48,9 @@ export default async function handleAction(nextRequest, nextResponse) {
           },
           headers: {
             Authorization: nextRequest.headers.authorization,
+            "Client-IP": clientIP,
+            "SaaSBuilder-IP": saasBuilderIP,
+            "User-Agent": customUserAgent,
           },
         };
 
