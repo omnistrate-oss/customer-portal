@@ -303,7 +303,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : isDeleteProtected
+          : !isDeleteProtected
             ? "Deletion protection is already disabled"
             : !isUpdateAllowedByRBAC
               ? "Unauthorized to disable deletion protection"
