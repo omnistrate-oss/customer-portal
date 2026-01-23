@@ -180,7 +180,11 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       onSuccess: async () => {
         refetchData();
         setSelectedRows([]);
-        snackbar.showSuccess("Instance metadata updated successfully");
+        if (overlayType === "enable-deletion-protection-dialog") {
+          snackbar.showSuccess("Delete protection enabled successfully");
+        } else {
+          snackbar.showSuccess("Delete protection disabled successfully");
+        }
       },
     }
   );
