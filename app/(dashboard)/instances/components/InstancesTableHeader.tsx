@@ -100,7 +100,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
-
+    const isDeleteProtected = selectedInstance?.resourceInstanceMetadata?.deletionProtection === true;
     // Check if the user has permission to perform the operation - Role from Subscription
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
@@ -210,7 +210,8 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
         status === "DELETING" ||
         status === "DISCONNECTED" ||
         isProxyResource ||
-        !isDeleteAllowedByRBAC,
+        !isDeleteAllowedByRBAC ||
+        isDeleteProtected,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         setOverlayType("delete-dialog");
@@ -224,9 +225,11 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
             ? "Instance is disconnected"
             : isProxyResource
               ? "System managed instances cannot be deleted"
-              : !isDeleteAllowedByRBAC
-                ? "Unauthorized to delete instances"
-                : "",
+              : isDeleteProtected
+                ? "Instance is delete protected"
+                : !isDeleteAllowedByRBAC
+                  ? "Unauthorized to delete instances"
+                  : "",
     });
 
     actions.push({

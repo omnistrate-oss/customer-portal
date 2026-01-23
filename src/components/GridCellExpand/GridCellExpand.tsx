@@ -66,9 +66,6 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
       {startIcon && (
         <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
           {startIcon}
-          {Boolean(copyButton && value) && (
-            <CopyToClipboardButton text={value} buttonStyles={{ marginLeft: "10px" }} disabled={disabled} />
-          )}
         </Box>
       )}
 
@@ -96,6 +93,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
           }}
         />
       )}
+      {Boolean(copyButton && value) && <CopyToClipboardButton text={value} disabled={disabled} />}
     </Box>
   );
 
@@ -132,6 +130,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
             width: "100%",
             color: disabled ? "#A4A7AE" : "inherit",
             pointerEvents: disabled ? "none" : "auto",
+            fontWeight: 600,
           }}
           href={href}
           target={target}
