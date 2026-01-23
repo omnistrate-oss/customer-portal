@@ -62,7 +62,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
                 </>
               ),
               disabled: isDisabled,
-              disabledMessage: isDisabled ? "Can't create snapshots when the instance is deleting or deploying" : "",
+              disabledMessage: isDisabled ? "Cannot create snapshot for Deleting or Deploying instances" : "",
             };
 
             return data;
