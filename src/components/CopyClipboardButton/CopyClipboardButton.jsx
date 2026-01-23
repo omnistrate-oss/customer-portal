@@ -9,7 +9,9 @@ const CopyToClipboardButton = (props) => {
   const { text = "", iconProps, buttonStyles = {} } = props;
   const [tooltipText, setTooltipText] = useState("Click to copy");
 
-  function handleClick() {
+  function handleClick(e) {
+    e.stopPropagation();
+    e.preventDefault();
     if (text) {
       clipboard
         .write(text)

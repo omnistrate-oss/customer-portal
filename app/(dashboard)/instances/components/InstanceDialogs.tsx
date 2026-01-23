@@ -6,8 +6,11 @@ import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullSc
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
 import DeleteCircleIcon from "src/components/Icons/DeleteCircle/DeleteCircleIcon";
+import LockIcon from "src/components/Icons/Lock/LockIcon";
 import RebootCircleIcon from "src/components/Icons/Reboot/RebootCircleIcon";
 import StopCircleIcon from "src/components/Icons/Stop/StopCircleIcon";
+import UnlockIcon from "src/components/Icons/Unlock/UnlockIcon";
+import OverlappingCirclesIconWrapper from "src/components/OverlappingCirclesIconWrapper/OverlappingCirclesIconWrapper";
 import CreateInstanceModal from "src/components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
 import AccessSideRestoreInstance from "src/components/RestoreInstance/AccessSideRestoreInstance";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
@@ -66,6 +69,22 @@ const DIALOG_DATA = {
     confirmationText: "stop",
     buttonLabel: "Stop",
     buttonColor: "#D92D20",
+  },
+  "enable-deletion-protection-dialog": {
+    icon: () => <OverlappingCirclesIconWrapper IconComponent={LockIcon} />,
+    title: "Enable Deletion Protection",
+    subtitle: "Are you sure you want to enable deletion protection for",
+    confirmationText: "enable",
+    buttonLabel: "Enable",
+    buttonColor: colors.success600,
+  },
+  "disable-deletion-protection-dialog": {
+    icon: () => <OverlappingCirclesIconWrapper IconComponent={UnlockIcon} />,
+    title: "Disable Deletion Protection",
+    subtitle: "Are you sure you want to disable deletion protection for",
+    confirmationText: "disable",
+    buttonLabel: "Disable",
+    buttonColor: colors.success600,
   },
 };
 
@@ -154,6 +173,18 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     }
   );
 
+  const updateInstanceMetadataMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata",
+    {
+      onSuccess: async () => {
+        refetchData();
+        setSelectedRows([]);
+        snackbar.showSuccess("Instance metadata updated successfully");
+      },
+    }
+  );
+
   return (
     <>
       <CreateInstanceModal
@@ -234,6 +265,16 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
             await deleteInstanceMutation.mutateAsync(body);
           } else if (overlayType === "reboot-dialog") {
             await restartInstanceMutation.mutateAsync(body);
+          } else if (
+            overlayType === "enable-deletion-protection-dialog" ||
+            overlayType === "disable-deletion-protection-dialog"
+          ) {
+            await updateInstanceMetadataMutation.mutateAsync({
+              ...body,
+              body: {
+                deletionProtection: overlayType === "enable-deletion-protection-dialog" ? true : false,
+              },
+            });
           } else {
             await stopInstanceMutation.mutateAsync(body);
           }
@@ -259,7 +300,10 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         buttonLabel={DIALOG_DATA[overlayType]?.buttonLabel}
         buttonColor={DIALOG_DATA[overlayType]?.buttonColor}
         isLoading={
-          deleteInstanceMutation.isPending || stopInstanceMutation.isPending || restartInstanceMutation.isPending
+          deleteInstanceMutation.isPending ||
+          stopInstanceMutation.isPending ||
+          restartInstanceMutation.isPending ||
+          updateInstanceMetadataMutation.isPending
         }
       />
 

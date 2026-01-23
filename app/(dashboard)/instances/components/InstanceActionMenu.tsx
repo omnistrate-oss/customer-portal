@@ -76,6 +76,9 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
     );
 
+    const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
+    const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
+
     const pathData = {
       serviceProviderId: serviceOffering?.serviceProviderId || "",
       serviceKey: serviceOffering?.serviceURLKey || "",
@@ -164,7 +167,12 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         dataTestId: "delete-button",
         label: "Delete",
         isDisabled:
-          !instance || status === "DELETING" || status === "DISCONNECTED" || isProxyResource || !isDeleteAllowedByRBAC,
+          !instance ||
+          status === "DELETING" ||
+          status === "DISCONNECTED" ||
+          isProxyResource ||
+          !isDeleteAllowedByRBAC ||
+          isDeleteProtected,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setOverlayType("delete-dialog");
@@ -178,9 +186,11 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
               ? "Instance is disconnected"
               : isProxyResource
                 ? "System managed instances cannot be deleted"
-                : !isDeleteAllowedByRBAC
-                  ? "Unauthorized to delete instances"
-                  : "",
+                : isDeleteProtected
+                  ? "Instance is delete protected"
+                  : !isDeleteAllowedByRBAC
+                    ? "Unauthorized to delete instances"
+                    : "",
       });
     }
 
@@ -262,6 +272,45 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
       });
     }
+
+    if (deletionProtectionFeatureEnabled) {
+      res.push({
+        dataTestId: "enable-deletion-protection-button",
+        label: "Enable Delete Protection",
+        isDisabled: isDeleteProtected || !isUpdateAllowedByRBAC,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setIsOverlayOpen(true);
+          setOverlayType("enable-deletion-protection-dialog");
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : isDeleteProtected
+            ? "Deletion protection is already enabled"
+            : !isUpdateAllowedByRBAC
+              ? "Unauthorized to enable deletion protection"
+              : "",
+      });
+
+      res.push({
+        dataTestId: "disable-deletion-protection-button",
+        label: "Disable Delete Protection",
+        isDisabled: !isDeleteProtected || !isUpdateAllowedByRBAC,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setIsOverlayOpen(true);
+          setOverlayType("disable-deletion-protection-dialog");
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : isDeleteProtected
+            ? "Deletion protection is already disabled"
+            : !isUpdateAllowedByRBAC
+              ? "Unauthorized to disable deletion protection"
+              : "",
+      });
+    }
+
     return res;
   }, [variant, instance, serviceOffering, selectedResource, subscription]);
 

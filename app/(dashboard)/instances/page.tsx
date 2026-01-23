@@ -19,7 +19,6 @@ import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/res
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
-import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
 import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
@@ -36,6 +35,7 @@ import StatusCell from "./components/StatusCell";
 import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
 import { getMainResourceFromInstance, getRowBorderStyles } from "./utils";
+import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 export type Overlay =
@@ -47,7 +47,9 @@ export type Overlay =
   | "generate-token-dialog"
   | "reboot-dialog"
   | "stop-dialog"
-  | "create-instance-dialog";
+  | "create-instance-dialog"
+  | "enable-deletion-protection-dialog"
+  | "disable-deletion-protection-dialog";
 
 const InstancesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -80,6 +82,10 @@ const InstancesPage = () => {
           const { id: instanceId, subscriptionId, resourceID } = data.row.original;
           const { serviceId, productTierId } = subscriptionsObj[subscriptionId as string] || {};
 
+          const deletionProtectionFeatureEnabled =
+            data.row.original?.resourceInstanceMetadata?.deletionProtection !== undefined;
+          const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
+
           const resourceInstanceUrlLink = getInstanceDetailsRoute({
             serviceId,
             servicePlanId: productTierId,
@@ -89,22 +95,26 @@ const InstancesPage = () => {
           });
 
           return (
-            <DataGridText
-              color="primary"
-              showCopyButton
-              linkProps={{
-                href: resourceInstanceUrlLink,
-              }}
-              style={{
-                fontWeight: 600,
-              }}
-            >
-              {instanceId}
-            </DataGridText>
+            <GridCellExpand
+              href={resourceInstanceUrlLink}
+              value={instanceId as string}
+              copyButton
+              endIcon={
+                deletionProtectionFeatureEnabled && (
+                  <Box sx={{ marginRight: "-2px", marginTop: "-7px" }}>
+                    <Tooltip title={isDeleteProtected ? "Delete Protection Enabled" : "Delete Protection Disabled"}>
+                      <span>
+                        <DeleteProtectionIcon disabled={!isDeleteProtected} />
+                      </span>
+                    </Tooltip>
+                  </Box>
+                )
+              }
+            />
           );
         },
         meta: {
-          minWidth: 240,
+          minWidth: 250,
         },
       }),
 
