@@ -27,6 +27,10 @@ RUN yarn run build
 # Final stage for app image
 FROM base
 
+# App version from GitHub release tag (passed as build arg)
+ARG APP_VERSION="dev"
+ENV APP_VERSION=$APP_VERSION
+
 ENV NODE_ENV="production"
 ENV NEXT_TELEMETRY_DISABLED=1
 
