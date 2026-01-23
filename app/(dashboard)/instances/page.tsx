@@ -102,7 +102,7 @@ const InstancesPage = () => {
               endIcon={
                 deletionProtectionFeatureEnabled && (
                   <Box sx={{ marginRight: "-2px", marginTop: "-7px" }}>
-                    <Tooltip title={isDeleteProtected ? "Delete Protection Enabled" : "Delete Protection Disabled"}>
+                    <Tooltip title={isDeleteProtected ? "Delete protection enabled" : "Delete protection disabled"}>
                       <span>
                         <DeleteProtectionIcon disabled={!isDeleteProtected} />
                       </span>

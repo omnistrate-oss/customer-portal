@@ -286,9 +286,9 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         disabledMessage: !instance
           ? "Please select an instance"
           : isDeleteProtected
-            ? "Deletion protection is already enabled"
+            ? "Delete protection is already enabled"
             : !isUpdateAllowedByRBAC
-              ? "Unauthorized to enable deletion protection"
+              ? "Unauthorized to enable delete protection"
               : "",
       });
 
@@ -304,9 +304,9 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         disabledMessage: !instance
           ? "Please select an instance"
           : !isDeleteProtected
-            ? "Deletion protection is already disabled"
+            ? "Delete protection is already disabled"
             : !isUpdateAllowedByRBAC
-              ? "Unauthorized to disable deletion protection"
+              ? "Unauthorized to disable delete protection"
               : "",
       });
     }

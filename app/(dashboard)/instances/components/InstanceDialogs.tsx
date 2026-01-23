@@ -72,16 +72,16 @@ const DIALOG_DATA = {
   },
   "enable-deletion-protection-dialog": {
     icon: () => <OverlappingCirclesIconWrapper IconComponent={LockIcon} />,
-    title: "Enable Deletion Protection",
-    subtitle: "Are you sure you want to enable deletion protection for",
+    title: "Enable Delete Protection",
+    subtitle: "Are you sure you want to enable delete protection for",
     confirmationText: "enable",
     buttonLabel: "Enable",
     buttonColor: colors.success600,
   },
   "disable-deletion-protection-dialog": {
     icon: () => <OverlappingCirclesIconWrapper IconComponent={UnlockIcon} />,
-    title: "Disable Deletion Protection",
-    subtitle: "Are you sure you want to disable deletion protection for",
+    title: "Disable Delete Protection",
+    subtitle: "Are you sure you want to disable delete protection for",
     confirmationText: "disable",
     buttonLabel: "Disable",
     buttonColor: colors.success600,
@@ -180,7 +180,11 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       onSuccess: async () => {
         refetchData();
         setSelectedRows([]);
-        snackbar.showSuccess("Instance metadata updated successfully");
+        if (overlayType === "enable-deletion-protection-dialog") {
+          snackbar.showSuccess("Delete protection enabled successfully");
+        } else {
+          snackbar.showSuccess("Delete protection disabled successfully");
+        }
       },
     }
   );
