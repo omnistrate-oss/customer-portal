@@ -1,12 +1,18 @@
+import { useEffect, useState } from "react";
+
 export function useLastLoginDetails() {
-  const email = localStorage ? localStorage.getItem("lastLoginEmail") : "";
-  const loginMethod: "Password" | string | null = localStorage ? localStorage.getItem("lastLoginMethod") : "";
+  const [email, setEmailState] = useState<string | null>("");
+  const [loginMethod, setLoginMethodState] = useState<string | null>("");
+
+  useEffect(() => {
+    setEmailState(localStorage.getItem("lastLoginEmail"));
+    setLoginMethodState(localStorage.getItem("lastLoginMethod"));
+  }, []);
 
   function setEmail(email: string) {
     try {
-      if (typeof window !== "undefined" && localStorage) {
-        localStorage.setItem("lastLoginEmail", email);
-      }
+      localStorage.setItem("lastLoginEmail", email);
+      setEmailState(email);
     } catch (error) {
       console.error("Error setting last login email in localStorage:", error);
     }
@@ -19,10 +25,9 @@ export function useLastLoginDetails() {
     idpName?: string;
   }) {
     try {
-      if (typeof window !== "undefined" && localStorage) {
-        const stringified = JSON.stringify(loginMethod);
-        localStorage.setItem("lastLoginMethod", stringified);
-      }
+      const stringified = JSON.stringify(loginMethod);
+      localStorage.setItem("lastLoginMethod", stringified);
+      setLoginMethodState(stringified);
     } catch (error) {
       console.error("Error setting last login method in localStorage:", error);
     }

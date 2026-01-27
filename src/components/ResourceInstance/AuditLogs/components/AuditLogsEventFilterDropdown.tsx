@@ -3,12 +3,12 @@ import { SelectChangeEvent, Stack, styled } from "@mui/material";
 import MuiMenuItem, { menuItemClasses } from "@mui/material/MenuItem";
 
 import Checkbox from "src/components/Checkbox/Checkbox";
+import Chip from "src/components/Chip/Chip";
 import EventTypeChip from "src/components/EventsTable/EventTypeChip";
 import Select from "src/components/FormElementsv2/Select/Select";
+import { Text } from "src/components/Typography/Typography";
 import { SetState } from "src/types/common/reactGenerics";
 import { EventType } from "src/types/event";
-import { Text } from "src/components/Typography/Typography";
-import Chip from "src/components/Chip/Chip";
 
 const MenuItem = styled(MuiMenuItem)({
   borderRadius: 6,

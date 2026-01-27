@@ -6,6 +6,8 @@ import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 import { IdentityProvider } from "src/types/identityProvider";
 
+import { getIdentityProviderButtonLabel } from "../signin/utils";
+
 import SignupPage from "./components/SignupPage";
 
 export const metadata: Metadata = {
@@ -20,6 +22,15 @@ const Page = async () => {
     redirectUrl: idpRedirectUri,
   });
   const identityProviders: IdentityProvider[] = identityProvidersResponse.data.identityProviders || [];
+
+  //sort identity providers by login button text
+  identityProviders.sort((a, b) => {
+    const loginButtonTextA = getIdentityProviderButtonLabel(a).toLowerCase();
+    const loginButtonTextB = getIdentityProviderButtonLabel(b).toLowerCase();
+
+    return loginButtonTextA.localeCompare(loginButtonTextB);
+  });
+
   const isPasswordLoginEnabled = process.env.DISABLE_PASSWORD_LOGIN?.toLowerCase() !== "true";
 
   return (

@@ -5,12 +5,11 @@ import MuiTextField from "@mui/material/TextField";
 import CopyButton from "src/components/Button/CopyButton";
 import { colors } from "src/themeConfig";
 
-const StyledTextField = styled(MuiTextField, {
+export const StyledTextField = styled(MuiTextField, {
   shouldForwardProp: (prop) => {
     return prop !== "marginTop";
   },
 })(({ theme, marginTop }) => {
-
   return {
     marginTop: marginTop,
 

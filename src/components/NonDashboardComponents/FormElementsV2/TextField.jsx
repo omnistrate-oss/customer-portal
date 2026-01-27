@@ -19,7 +19,6 @@ const TextField = ({ type, endAdornment, ...restProps }) => {
             backgroundColor: "#FFF",
             "&::placeholder": {
               fontSize: "14px",
-              // color: "#A0AEC0",
               color: "#9CA3AF",
             },
           },
@@ -27,7 +26,6 @@ const TextField = ({ type, endAdornment, ...restProps }) => {
         [`& .MuiOutlinedInput-input:disabled`]: {
           background: "#F9FAFB",
           color: "#667085",
-          // color: "#4a505d",
           WebkitTextFillColor: "#667085",
         },
         "& .MuiOutlinedInput-notchedOutline": {

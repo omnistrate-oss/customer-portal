@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Box, InputAdornment, TextField, Tooltip } from "@mui/material";
+import { Box, InputAdornment, Tooltip } from "@mui/material";
 import Generator from "generate-password";
 
+import { StyledTextField } from "src/components/FormElementsv2/TextField/TextField";
 import KeyIcon from "src/components/Icons/Key/KeyIcon";
 import { Text } from "src/components/Typography/Typography";
 
@@ -10,40 +11,12 @@ const PasswordField = (props) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   return (
-    <TextField
+    <StyledTextField
       data-cy={dataCy || "password-field"}
       type={isPasswordVisible ? "text" : "password"}
       value={value}
       disabled={disabled}
-      sx={{
-        ".MuiOutlinedInput-root": {
-          borderRadius: "6px",
-          fontSize: "14px",
-          color: "#111827",
-          fontWeight: "500",
-          boxShadow: "0px 1px 2px 0px #1018280D",
-          paddingRight: "0",
-          "& .MuiOutlinedInput-input": {
-            padding: "10px 12px",
-            backgroundColor: "#FFF",
-            "&::placeholder": {
-              fontSize: "14px",
-              color: "#9CA3AF",
-            },
-          },
-        },
-        [`& .MuiOutlinedInput-input:disabled`]: {
-          background: "#F9FAFB",
-          color: "#667085",
-          // color: "#4a505d",
-          WebkitTextFillColor: "#667085",
-        },
-        ".MuiInputAdornment-root": {
-          border: "none",
-          paddingRight: 0,
-        },
-        ...sx,
-      }}
+      sx={{ ...sx }}
       {...restProps}
       InputProps={{
         endAdornment: (
@@ -55,8 +28,7 @@ const PasswordField = (props) => {
                 color: "#7F56D9",
                 cursor: "pointer",
                 userSelect: "none",
-                paddingRight: "12px",
-                width: "46px",
+                width: "38px",
                 textAlign: "center",
               }}
               onClick={() => setIsPasswordVisible(!isPasswordVisible)}
@@ -71,7 +43,6 @@ const PasswordField = (props) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    px: "15px",
                     backgroundColor: "#F9F5FF",
                     height: "100%",
                     borderRadius: "0 8px 8px 0",

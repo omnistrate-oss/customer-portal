@@ -1,4 +1,5 @@
 import { FC } from "react";
+
 import { SVGIconProps } from "src/types/common/generalTypes";
 
 const DeleteProtectionIcon: FC<SVGIconProps> = (props) => {
