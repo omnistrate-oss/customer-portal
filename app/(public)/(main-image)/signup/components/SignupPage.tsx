@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Box, Collapse, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -25,9 +25,7 @@ import SuccessBox from "components/SuccessBox/SuccessBox";
 
 import { buildInvitationInfo } from "../../shared/idp-utils";
 import { useFilteredIdentityProviders } from "../../shared/useFilteredIdentityProviders";
-import { useLastLoginDetails } from "../../signin/hooks/useLastLoginDetails";
 
-import AlertIcon from "./AlertIcon";
 import SignupForm from "./SignupForm";
 
 const signupValidationSchema = Yup.object({
@@ -54,7 +52,7 @@ const SignupPage = (props) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [hasCaptchaErrored, setHasCaptchaErrored] = useState(false);
-  const [formStep, setFormStep] = useState<"email-input" | "complete-form">("email-input");
+  const [formStep, setFormStep] = useState<"email-input" | "complete-form">(email ? "complete-form" : "email-input");
 
   const snackbar = useSnackbar();
   const reCaptchaRef = useRef<any>(null);
@@ -122,10 +120,13 @@ const SignupPage = (props) => {
 
   const { values, errors, touched, handleChange, handleBlur } = formik;
 
-  const { emailDomain, hasIDPWithMatchingDomain, domainFilteredIdentityProviders } = useFilteredIdentityProviders(
+  const { hasIDPWithMatchingDomain, domainFilteredIdentityProviders } = useFilteredIdentityProviders(
     identityProviders || [],
     values.email || ""
   );
+
+  const hasNoLoginMethods = !isPasswordLoginEnabled && identityProviders.length === 0;
+  const hasNoLoginMethodsForEmail = !isPasswordLoginEnabled && domainFilteredIdentityProviders.length === 0;
 
   useEffect(() => {
     const updatedValues: any = {};
@@ -164,8 +165,6 @@ const SignupPage = (props) => {
     }
     /*eslint-disable-next-line react-hooks/exhaustive-deps*/
   }, [org, orgUrl, email, userSource]);
-
-  const policyAgreementText = `By creating your account, you agree to our`;
 
   const invitationInfo = buildInvitationInfo({ email, org, orgUrl });
 
@@ -218,7 +217,7 @@ const SignupPage = (props) => {
               error={touched.email && errors.email}
               disabled={Boolean(email)}
             />
-            <FieldError>{touched.email && errors.email}</FieldError>
+            <FieldError sx={{ marginTop: "6px" }}>{touched.email && errors.email}</FieldError>
           </FieldContainer>
         ) : (
           <SignupForm
@@ -240,6 +239,8 @@ const SignupPage = (props) => {
               hasIDPWithMatchingDomain
             }
             isSubmitLoading={signupMutation.isPending}
+            hasNoLoginMethods={hasNoLoginMethods}
+            hasNoLoginMethodsForEmail={hasNoLoginMethodsForEmail}
           />
         )}
 
@@ -292,18 +293,7 @@ const SignupPage = (props) => {
           />
         )}
       </Box>
-      {formStep === "complete-form" && (
-        <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", marginTop: "32px" }}>
-          {policyAgreementText}{" "}
-          <Link target="_blank" href="/terms-of-use" style={{ color: "#364152", fontWeight: 600 }}>
-            Terms & Conditions
-          </Link>{" "}
-          and{" "}
-          <Link target="_blank" href="/privacy-policy" style={{ color: "#364152", fontWeight: 600 }}>
-            Privacy Policy
-          </Link>
-        </Text>
-      )}
+
       {/* Signup Link */}
       <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", marginTop: "24px" }}>
         Already have an account?{" "}

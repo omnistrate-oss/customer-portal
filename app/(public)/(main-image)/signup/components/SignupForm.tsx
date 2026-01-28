@@ -15,9 +15,12 @@ import FieldContainer from "components/NonDashboardComponents/FormElementsV2/Fie
 import FieldLabel from "components/NonDashboardComponents/FormElementsV2/FieldLabel";
 import PasswordField from "components/NonDashboardComponents/FormElementsV2/PasswordField";
 import SubmitButton from "components/NonDashboardComponents/FormElementsV2/SubmitButton";
+import Link from "next/link";
 
 import { handleIDPButtonClick } from "../../shared/idp-utils";
 import IDPButton from "../../shared/IDPButton";
+
+const policyAgreementText = `By creating your account, you agree to our`;
 
 const FormGrid = styled(Box)(() => ({
   display: "grid",
@@ -48,6 +51,8 @@ type SignupFormProps = {
   isSubmitDisabled: boolean;
   isSubmitLoading: boolean;
   hasIDPWithMatchingDomain: boolean;
+  hasNoLoginMethodsForEmail: boolean;
+  hasNoLoginMethods: boolean;
 };
 
 const SignupForm: React.FC<SignupFormProps> = ({
@@ -64,6 +69,8 @@ const SignupForm: React.FC<SignupFormProps> = ({
   isSubmitDisabled,
   isSubmitLoading,
   hasIDPWithMatchingDomain,
+  hasNoLoginMethodsForEmail,
+  hasNoLoginMethods,
 }) => {
   const { values, errors, touched, handleChange, handleBlur } = formData;
   const [areOtherSigninOptionsExpanded, setAreOtherSigninOptionsExpanded] = useState(
@@ -85,7 +92,6 @@ const SignupForm: React.FC<SignupFormProps> = ({
   const otherIdps = identityProviders.slice(1);
 
   const passwordSignupAllowed = isPasswordLoginEnabled && !hasIDPWithMatchingDomain;
-
 
   const emailField = (
     <FieldContainer>
@@ -118,7 +124,11 @@ const SignupForm: React.FC<SignupFormProps> = ({
                   userSelect: "none",
                   textAlign: "center",
                 }}
-                onClick={() => setFormStep("email-input")}
+                onClick={() => {
+                  router.replace("signup");
+                  setFormStep("email-input");
+                  formData.setFieldValue("email", "");
+                }}
               >
                 Change
               </Text>
@@ -294,6 +304,26 @@ const SignupForm: React.FC<SignupFormProps> = ({
           </SubmitButton>
         </Stack>
       </Collapse>
+      {hasNoLoginMethods ? (
+        <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+          No signup methods available. Please contact support
+        </Text>
+      ) : hasNoLoginMethodsForEmail ? (
+        <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+          No signup methods available for this email. Try another email or contact support
+        </Text>
+      ) : (
+        <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", marginTop: "32px" }}>
+          {policyAgreementText}{" "}
+          <Link target="_blank" href="/terms-of-use" style={{ color: "#364152", fontWeight: 600 }}>
+            Terms & Conditions
+          </Link>{" "}
+          and{" "}
+          <Link target="_blank" href="/privacy-policy" style={{ color: "#364152", fontWeight: 600 }}>
+            Privacy Policy
+          </Link>
+        </Text>
+      )}
     </>
   );
 };
