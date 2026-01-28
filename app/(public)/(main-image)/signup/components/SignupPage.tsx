@@ -43,7 +43,6 @@ const signupValidationSchema = Yup.object({
 const SignupPage = (props) => {
   const { googleReCaptchaSiteKey, isReCaptchaSetup, isPasswordLoginEnabled, identityProviders } = props;
   const { orgName, orgLogoURL } = useProviderOrgDetails();
-  const { email: loginStepOneEmail } = useLastLoginDetails();
 
   const searchParams = useSearchParams();
   const org = searchParams?.get("org");
@@ -108,7 +107,7 @@ const SignupPage = (props) => {
   const formik = useFormik({
     initialValues: {
       name: "",
-      email: loginStepOneEmail || "",
+      email: "",
       password: "",
       confirmPassword: "",
       legalcompanyname: "",
@@ -192,7 +191,19 @@ const SignupPage = (props) => {
       </Box>
       <DisplayHeading mt="24px">Get Started Today</DisplayHeading>
 
-      <Box component="form" mt="44px" autoComplete="off">
+      <Box
+        component="form"
+        mt="44px"
+        autoComplete="off"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (formStep === "email-input" && !errors.email) {
+            setFormStep("complete-form");
+          } else if (formStep === "complete-form") {
+            formik.handleSubmit();
+          }
+        }}
+      >
         {formStep === "email-input" ? (
           <FieldContainer sx={{ maxWidth: "360px", mx: "auto" }}>
             <FieldLabel required>Email</FieldLabel>
@@ -215,6 +226,7 @@ const SignupPage = (props) => {
             setFormStep={setFormStep}
             isSSOEnabled={domainFilteredIdentityProviders.length > 0}
             isPasswordLoginEnabled={isPasswordLoginEnabled}
+            hasIDPWithMatchingDomain={hasIDPWithMatchingDomain}
             identityProviders={domainFilteredIdentityProviders}
             invitationInfo={invitationInfo}
             affiliateCode={affiliateCode}
@@ -232,7 +244,7 @@ const SignupPage = (props) => {
         )}
 
         {/* Signup Restriction Message */}
-        <Collapse in={hasIDPWithMatchingDomain} timeout={300}>
+        {/* <Collapse in={hasIDPWithMatchingDomain} timeout={300}>
           <Box
             mt="32px"
             display="flex"
@@ -251,7 +263,7 @@ const SignupPage = (props) => {
               </span>
             </Text>
           </Box>
-        </Collapse>
+        </Collapse> */}
 
         {formStep === "email-input" && (
           <Stack mt="32px" maxWidth="360px" mx="auto">

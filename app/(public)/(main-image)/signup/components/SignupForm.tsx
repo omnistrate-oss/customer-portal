@@ -47,6 +47,7 @@ type SignupFormProps = {
   onSubmit: () => void;
   isSubmitDisabled: boolean;
   isSubmitLoading: boolean;
+  hasIDPWithMatchingDomain: boolean;
 };
 
 const SignupForm: React.FC<SignupFormProps> = ({
@@ -62,6 +63,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   onSubmit,
   isSubmitDisabled,
   isSubmitLoading,
+  hasIDPWithMatchingDomain,
 }) => {
   const { values, errors, touched, handleChange, handleBlur } = formData;
   const [areOtherSigninOptionsExpanded, setAreOtherSigninOptionsExpanded] = useState(
@@ -82,9 +84,12 @@ const SignupForm: React.FC<SignupFormProps> = ({
   const primaryIdp = identityProviders.length > 0 ? identityProviders[0] : null;
   const otherIdps = identityProviders.slice(1);
 
+  const passwordSignupAllowed = isPasswordLoginEnabled && !hasIDPWithMatchingDomain;
+
+
   const emailField = (
     <FieldContainer>
-      {isPasswordLoginEnabled && <FieldLabel required>Email</FieldLabel>}
+      {passwordSignupAllowed && <FieldLabel required>Email</FieldLabel>}
       {/* @ts-ignore */}
       <TextField
         name="email"
@@ -127,13 +132,18 @@ const SignupForm: React.FC<SignupFormProps> = ({
 
   return (
     <>
-      {!isPasswordLoginEnabled && (
+      {!passwordSignupAllowed && (
         <Box maxWidth="390px" mx="auto">
           {emailField}
         </Box>
       )}
       {isSSOEnabled && (
-        <Stack maxWidth="390px" mx="auto" mb={isPasswordLoginEnabled ? 0 : "8px"} mt={!isPasswordLoginEnabled ? "24px" : 0}>
+        <Stack
+          maxWidth="390px"
+          mx="auto"
+          mb={passwordSignupAllowed ? 0 : "8px"}
+          mt={!passwordSignupAllowed ? "24px" : 0}
+        >
           {primaryIdp && (
             <IDPButton
               idp={primaryIdp}
@@ -153,7 +163,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
               ))}
             </Stack>
           </Collapse>
-          {otherIdps.length > 0 && isPasswordLoginEnabled && (
+          {otherIdps.length > 0 && passwordSignupAllowed && (
             <Button
               variant="text"
               disableRipple
@@ -174,8 +184,8 @@ const SignupForm: React.FC<SignupFormProps> = ({
           )}
         </Stack>
       )}
-      <Collapse in={isPasswordLoginEnabled && !areOtherSigninOptionsExpanded}>
-        {isPasswordLoginEnabled && isSSOEnabled && (
+      <Collapse in={passwordSignupAllowed && !areOtherSigninOptionsExpanded}>
+        {passwordSignupAllowed && isSSOEnabled && (
           <div className="max-w-[390px] mx-auto mb-8">
             <div className="relative flex items-center mt-4">
               <div className="flex-grow border-t border-[#E9EAEB]" />
