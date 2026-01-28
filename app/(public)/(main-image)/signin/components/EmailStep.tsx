@@ -26,8 +26,6 @@ type EmailStepProps = {
 const EmailStep: FC<EmailStepProps> = (props) => {
   const { setCurrentStep, formData, setShouldRememberLoginDetails, shouldRememberLoginDetails } = props;
   const { setEmail } = useLastLoginDetails();
-  const envType = useEnvironmentType();
-  const isProduction = envType === "PROD";
 
   function handleNextClick() {
     formData.validateForm().then((errors) => {
@@ -53,7 +51,7 @@ const EmailStep: FC<EmailStepProps> = (props) => {
   return (
     <>
       <DisplayHeading sx={{ fontSize: "26px !important" }} mt="48px">
-        Enter your email to log in{isProduction && " or sign up"}
+        Enter your email to log in
       </DisplayHeading>
       <Stack gap="30px" mt="24px">
         <FieldContainer>
