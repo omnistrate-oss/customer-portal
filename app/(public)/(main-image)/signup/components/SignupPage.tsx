@@ -55,7 +55,7 @@ const SignupPage = (props) => {
   const [formStep, setFormStep] = useState<"email-input" | "complete-form">(email ? "complete-form" : "email-input");
 
   const snackbar = useSnackbar();
-  const reCaptchaRef = useRef<any>(null);
+  const reCaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   const signupMutation = useMutation({
     mutationFn: (payload) => {
