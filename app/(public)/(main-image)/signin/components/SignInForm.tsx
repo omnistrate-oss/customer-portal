@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import Cookies from "js-cookie";
 import ReCAPTCHA from "react-google-recaptcha";
+import Link from "next/link";
 
 import { customerUserSignin } from "src/api/customer-user";
 import axios from "src/axios";
@@ -19,6 +20,9 @@ import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
 
 import EmailStep from "./EmailStep";
 import LoginMethodStep from "./LoginMethodStep";
+import { Text } from "src/components/Typography/Typography";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 
 type SignInFormProps = {
   isPasswordLoginEnabled: boolean;
@@ -45,6 +49,9 @@ const SignInForm: FC<SignInFormProps> = ({
   const redirect_reason = searchParams?.get("redirect_reason");
   const destination = searchParams?.get("destination");
   const snackbar = useSnackbar();
+
+  const { orgName } = useProviderOrgDetails();
+  const environmentType = useEnvironmentType();
 
   const reCaptchaRef = useRef<ReCAPTCHA | null>(null);
 
@@ -167,6 +174,15 @@ const SignInForm: FC<SignInFormProps> = ({
           />
         )}
       </Stack>
+
+      {environmentType === "PROD" && (
+        <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", fontSize: "15px" }}>
+          New {orgName ? `to ${orgName}` : "here"}?{" "}
+          <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
+            Sign up
+          </Link>
+        </Text>
+      )}
     </>
   );
 };

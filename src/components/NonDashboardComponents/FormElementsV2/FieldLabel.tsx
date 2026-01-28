@@ -1,6 +1,11 @@
 import { Box } from "@mui/material";
 
-const FieldLabel = ({ required, children }) => {
+type FieldLabelProps = {
+  required?: boolean;
+  children: React.ReactNode;
+};
+
+const FieldLabel: React.FC<FieldLabelProps> = ({ required, children }) => {
   return (
     <Box
       component="label"

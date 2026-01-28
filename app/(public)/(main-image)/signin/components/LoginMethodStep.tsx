@@ -1,9 +1,8 @@
-import { FC, ReactNode, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, InputAdornment, Stack, styled } from "@mui/material";
+import { Box, InputAdornment, Stack } from "@mui/material";
 import { FormikProps } from "formik";
 
 import Button from "src/components/Button/Button";
@@ -12,24 +11,16 @@ import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldCo
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import { Text } from "src/components/Typography/Typography";
-import extractQueryParam from "src/constants/extractQueryParam";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
-import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
 
-import { IDENTITY_PROVIDER_ICON_MAP } from "../constants";
+import { buildInvitationInfo, handleIDPButtonClick } from "../../shared/idp-utils";
+import IDPButton from "../../shared/IDPButton";
+import { useFilteredIdentityProviders } from "../../shared/useFilteredIdentityProviders";
 import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
-import { getIdentityProviderButtonLabel } from "../utils";
 
 import PasswordLoginFields from "./PasswordLoginFields";
-
-const LogoImg = styled("img")({
-  height: "24px",
-  width: "24px",
-  display: "inline-block",
-});
 
 type LoginMethodStepProps = {
   setCurrentStep: SetState<number>;
@@ -54,7 +45,6 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     isReCaptchaSetup,
     isRecaptchaScriptLoaded,
   } = props;
-  const { orgName } = useProviderOrgDetails();
   const searchParams = useSearchParams();
   const org = searchParams?.get("org");
   const orgUrl = searchParams?.get("orgUrl");
@@ -66,65 +56,19 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
   const router = useRouter();
   const { loginMethod: loginMethodStringified } = useLastLoginDetails();
   const userEmail = formData.values.email;
-  const emailDomain = userEmail.split("@")[1] || "";
   const [preferredLoginMethod, setPreferredLoginMethod] = useState<{
     type: string;
     name?: string;
   } | null>(null);
   const [viewType, setViewType] = useState<"password-login" | "login-options">("login-options");
-  const environmentType = useEnvironmentType();
-  const hasIDPWithMatchingDomain = useMemo(() => {
-    return (
-      identityProviders.length > 0 &&
-      identityProviders.some((idp) => {
-        if (idp.emailIdentifiers === undefined || idp.emailIdentifiers === "") return false;
 
-        const emailIdentifiersList = idp.emailIdentifiers.split(",").map((identifier) => identifier.trim());
-        return emailIdentifiersList.includes(emailDomain);
-      })
-    );
-  }, [identityProviders, emailDomain]);
+  const { hasIDPWithMatchingDomain, domainFilteredIdentityProviders } = useFilteredIdentityProviders(
+    identityProviders,
+    userEmail
+  );
 
   //hide password login if there is some IDP with email identifiers matching the email domain
   const allowPasswordLogin = isPasswordLoginEnabled && !hasIDPWithMatchingDomain;
-
-  const domainFilteredIdentityProviders = useMemo(() => {
-    //if some IDP has a configured domain and the domain matches the email domain, show only those IDPs with matching domains and hide the ones without configured domains
-
-    const filteredProviders = identityProviders.filter((idp) => {
-      if ((idp.emailIdentifiers === undefined || idp.emailIdentifiers === "") && !hasIDPWithMatchingDomain) return true;
-
-      const emailIdentifiersList = idp.emailIdentifiers.split(",").map((identifier) => identifier.trim());
-
-      return emailIdentifiersList.some((identifier) => {
-        return identifier === emailDomain;
-      });
-    });
-
-    // Sort providers: exact domain matches first, then others in original order
-    return filteredProviders.sort((a, b) => {
-      const aHasExactMatch =
-        a.emailIdentifiers &&
-        a.emailIdentifiers
-          .split(",")
-          .map((id) => id.trim())
-          .includes(emailDomain);
-      const bHasExactMatch =
-        b.emailIdentifiers &&
-        b.emailIdentifiers
-          .split(",")
-          .map((id) => id.trim())
-          .includes(emailDomain);
-
-      // If 'a' has exact match and 'b' doesn't, 'a' comes first
-      if (aHasExactMatch && !bHasExactMatch) return -1;
-      // If 'b' has exact match and 'a' doesn't, 'b' comes first
-      if (bHasExactMatch && !aHasExactMatch) return 1;
-
-      // For all other cases (both match or both don't match), maintain original order
-      return 0;
-    });
-  }, [identityProviders, emailDomain, hasIDPWithMatchingDomain]);
 
   //set default sign in method using data from last login stored in localStorage
   useEffect(() => {
@@ -198,24 +142,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
 
   let defaultLoginMethodButton: ReactNode | null = null;
 
-  const invitationInfo: {
-    invitedEmail?: string;
-    legalCompanyName?: string;
-    companyUrl?: string;
-    affiliateCode?: string;
-  } = {};
-
-  if (email || org || orgUrl) {
-    if (email) {
-      invitationInfo.invitedEmail = decodeURIComponent(email).trim();
-    }
-    if (org) {
-      invitationInfo.legalCompanyName = decodeURIComponent(org).trim();
-    }
-    if (orgUrl) {
-      invitationInfo.companyUrl = decodeURIComponent(orgUrl).trim();
-    }
-  }
+  const invitationInfo = buildInvitationInfo({ email, org, orgUrl });
 
   const otherIdpSignInOptions = domainFilteredIdentityProviders.filter((idp) => {
     const match = idp.name === preferredLoginMethod?.name && idp.identityProviderName === preferredLoginMethod?.type;
@@ -226,46 +153,16 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     otherIdpSignInOptions.length +
     (allowPasswordLogin && preferredLoginMethod?.type?.toLowerCase() !== "password" ? 1 : 0);
 
-  function handleIDPButtonClick(idp: IdentityProvider) {
-    //check if state query param is present in the renderdAuthorizationEndpoint
-    const stateFromURL = extractQueryParam(idp.renderedAuthorizationEndpoint, "state");
-
-    const state = idp.state;
-    let redirectURL = idp.renderedAuthorizationEndpoint;
-
-    if (!stateFromURL && state) {
-      // If state is not present in the URL, append it
-      redirectURL += (redirectURL.includes("?") ? "&" : "?") + `state=${state}`;
-    }
-    redirectURL += (redirectURL.includes("?") ? "&" : "?") + `login_hint=${encodeURIComponent(userEmail)}`;
-
-    const localAuthState: {
-      destination: string | undefined | null;
-      identityProvider: string;
-      invitationInfo: any;
-      nonce?: string;
-      affiliateCode?: string;
-    } = {
-      destination: destination,
-      identityProvider: idp.name || idp.identityProviderName,
+  function onIDPButtonClick(idp: IdentityProvider) {
+    handleIDPButtonClick({
+      idp,
+      userEmail,
+      destination,
       invitationInfo,
-    };
-
-    if (stateFromURL || state) {
-      localAuthState.nonce = stateFromURL || state;
-    }
-    if (affiliateCode) {
-      localAuthState.affiliateCode = decodeURIComponent(affiliateCode).trim();
-    }
-
-    const encodedLocalAuthState = Buffer.from(JSON.stringify(localAuthState), "utf8").toString("base64");
-
-    sessionStorage.setItem("authState", encodedLocalAuthState);
-    setLoginMethod({
-      methodType: idp.identityProviderName,
-      idpName: idp.name,
+      affiliateCode,
+      onRedirect: (url) => router.push(url),
+      onSetLoginMethod: (method) => setLoginMethod(method),
     });
-    router.push(redirectURL);
   }
 
   const passwordLoginButton = (
@@ -281,7 +178,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
       data-testid="password-login-button"
     >
       <Box display="inline-flex" flexGrow={1} justifyContent="center">
-        Sign In With Password
+        Sign In with Password
       </Box>
     </Button>
   );
@@ -297,33 +194,12 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
       );
 
       if (matchingIdp) {
-        const loginButtonIconUrl = matchingIdp.loginButtonIconUrl;
-
-        let LoginButtonIcon: ReactNode;
-        if (loginButtonIconUrl) {
-          LoginButtonIcon = <LogoImg src={loginButtonIconUrl} alt={matchingIdp.name} />;
-        } else if (IDENTITY_PROVIDER_ICON_MAP[matchingIdp.identityProviderName]) {
-          const IconComponent: FC = IDENTITY_PROVIDER_ICON_MAP[matchingIdp.identityProviderName];
-          LoginButtonIcon = <IconComponent />;
-        } else {
-          LoginButtonIcon = <Box width="24px" height="24px" />;
-        }
-
         defaultLoginMethodButton = (
-          <Button
-            variant="outlined"
-            size="xlarge"
-            startIcon={LoginButtonIcon}
-            sx={{ justifyContent: "flex-start" }}
-            onClick={() => {
-              handleIDPButtonClick(matchingIdp);
-            }}
+          <IDPButton
+            idp={matchingIdp}
+            onClick={onIDPButtonClick}
             data-testid={`idp-login-button-${matchingIdp.name}`}
-          >
-            <Box display="inline-flex" flexGrow={1} justifyContent="center">
-              {getIdentityProviderButtonLabel(matchingIdp)}
-            </Box>
-          </Button>
+          />
         );
       }
     }
@@ -408,37 +284,14 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                 {defaultLoginMethodButton}
 
                 {idpOptionsExpanded &&
-                  otherIdpSignInOptions.map((idp) => {
-                    const loginButtonIconUrl = idp.loginButtonIconUrl;
-
-                    let LoginButtonIcon: ReactNode;
-                    if (loginButtonIconUrl) {
-                      LoginButtonIcon = <LogoImg src={loginButtonIconUrl} alt={idp.name} />;
-                    } else if (IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName]) {
-                      const IconComponent: FC = IDENTITY_PROVIDER_ICON_MAP[idp.identityProviderName];
-                      LoginButtonIcon = <IconComponent />;
-                    } else {
-                      LoginButtonIcon = <Box width="24px" height="24px" />;
-                    }
-
-                    return (
-                      <Button
-                        variant="outlined"
-                        key={idp.name}
-                        size="xlarge"
-                        startIcon={LoginButtonIcon}
-                        sx={{ justifyContent: "flex-start" }}
-                        onClick={() => {
-                          handleIDPButtonClick(idp);
-                        }}
-                        data-testid={`idp-login-button-${idp.name}`}
-                      >
-                        <Box display="inline-flex" flexGrow={1} justifyContent="center">
-                          {getIdentityProviderButtonLabel(idp)}
-                        </Box>
-                      </Button>
-                    );
-                  })}
+                  otherIdpSignInOptions.map((idp) => (
+                    <IDPButton
+                      key={idp.name}
+                      idp={idp}
+                      onClick={onIDPButtonClick}
+                      data-testid={`idp-login-button-${idp.name}`}
+                    />
+                  ))}
                 {preferredLoginMethod?.type?.toLowerCase() !== "password" &&
                   allowPasswordLogin &&
                   idpOptionsExpanded &&
@@ -476,19 +329,6 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                   {idpOptionsExpanded ? "View less options" : "Other sign in options"}
                 </Text>
               </Button>
-            )}
-            {environmentType === "PROD" && allowPasswordLogin && (
-              <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", fontSize: "15px" }}>
-                New {orgName ? `to ${orgName}` : "here"}?{" "}
-                <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
-                  Sign up with a password
-                </Link>
-                {domainFilteredIdentityProviders.length > 0 && (
-                  <>
-                    <br /> — or use the other sign-in options above
-                  </>
-                )}
-              </Text>
             )}
           </>
         )}

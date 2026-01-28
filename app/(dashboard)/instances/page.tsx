@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
 import LoadIndicatorNormal from "src/components/Icons/LoadIndicator/LoadIndicatorNormal";
@@ -35,7 +36,6 @@ import StatusCell from "./components/StatusCell";
 import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
 import { getMainResourceFromInstance, getRowBorderStyles } from "./utils";
-import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 export type Overlay =
