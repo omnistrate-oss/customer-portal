@@ -1,5 +1,4 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -48,7 +47,6 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     isReCaptchaSetup,
     isRecaptchaScriptLoaded,
   } = props;
-  const { orgName } = useProviderOrgDetails();
   const searchParams = useSearchParams();
   const org = searchParams?.get("org");
   const orgUrl = searchParams?.get("orgUrl");
@@ -65,7 +63,6 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     name?: string;
   } | null>(null);
   const [viewType, setViewType] = useState<"password-login" | "login-options">("login-options");
-  const environmentType = useEnvironmentType();
 
   const { hasIDPWithMatchingDomain, domainFilteredIdentityProviders } = useFilteredIdentityProviders(
     identityProviders,
@@ -335,19 +332,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                 </Text>
               </Button>
             )}
-            {environmentType === "PROD" && allowPasswordLogin && (
-              <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", fontSize: "15px" }}>
-                New {orgName ? `to ${orgName}` : "here"}?{" "}
-                <Link href="/signup" style={{ color: "#364152", fontWeight: 600 }}>
-                  Sign up with a password
-                </Link>
-                {domainFilteredIdentityProviders.length > 0 && (
-                  <>
-                    <br /> — or use the other sign-in options above
-                  </>
-                )}
-              </Text>
-            )}
+
           </>
         )}
       </Stack>
