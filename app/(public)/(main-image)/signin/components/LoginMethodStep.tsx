@@ -178,7 +178,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
       data-testid="password-login-button"
     >
       <Box display="inline-flex" flexGrow={1} justifyContent="center">
-        Sign In With Password
+        Sign In with Password
       </Box>
     </Button>
   );

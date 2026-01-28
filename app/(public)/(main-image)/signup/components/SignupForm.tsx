@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -76,7 +76,14 @@ const SignupForm: React.FC<SignupFormProps> = ({
   const [areOtherSigninOptionsExpanded, setAreOtherSigninOptionsExpanded] = useState(
     isPasswordLoginEnabled ? false : true
   );
+  const [hasLoadedParams, setHasLoadedParams] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Mark params as loaded after initial render
+    setHasLoadedParams(true);
+  }, []);
+  
 
   function onIDPButtonClick(idp: IdentityProvider) {
     handleIDPButtonClick({
@@ -194,116 +201,121 @@ const SignupForm: React.FC<SignupFormProps> = ({
           )}
         </Stack>
       )}
-      <Collapse in={passwordSignupAllowed && !areOtherSigninOptionsExpanded}>
-        {passwordSignupAllowed && isSSOEnabled && (
-          <div className="max-w-[390px] mx-auto mb-8">
-            <div className="relative flex items-center mt-4">
-              <div className="flex-grow border-t border-[#E9EAEB]" />
-              <Text size="small" weight="medium" color="#535862" sx={{ mx: "8px", background: "white" }}>
-                OR
-              </Text>
-              <div className="flex-grow border-t border-[#E9EAEB]" />
+      {hasLoadedParams && passwordSignupAllowed && !areOtherSigninOptionsExpanded && (
+        <Collapse in={passwordSignupAllowed && !areOtherSigninOptionsExpanded}>
+          {passwordSignupAllowed && isSSOEnabled && (
+            <div className="max-w-[390px] mx-auto mb-8">
+              <div className="relative flex items-center mt-4">
+                <div className="flex-grow border-t border-[#E9EAEB]" />
+                <Text size="small" weight="medium" color="#535862" sx={{ mx: "8px", background: "white" }}>
+                  OR
+                </Text>
+                <div className="flex-grow border-t border-[#E9EAEB]" />
+              </div>
             </div>
-          </div>
-        )}
-        <FormGrid>
-          <FieldContainer>
-            <FieldLabel required>Name</FieldLabel>
-            {/* @ts-ignore */}
-            <TextField
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              value={values.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.name && errors.name}
-            />
-            <FieldError sx={{ paddingLeft: "13px" }}>{touched.name && errors.name}</FieldError>
-          </FieldContainer>
+          )}
+          <FormGrid>
+            <FieldContainer>
+              <FieldLabel required>Name</FieldLabel>
+              {/* @ts-ignore */}
+              <TextField
+                id="name"
+                name="name"
+                placeholder="Enter your full name"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.name && errors.name}
+              />
+              <FieldError sx={{ paddingLeft: "13px" }}>{touched.name && errors.name}</FieldError>
+            </FieldContainer>
 
-          {emailField}
+            {emailField}
 
-          <FieldContainer>
-            <FieldLabel required>Company Name</FieldLabel>
-            {/* @ts-ignore */}
-            <TextField
-              id="legalcompanyname"
-              name="legalcompanyname"
-              placeholder="Enter your company's name"
-              value={values.legalcompanyname}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={Boolean(org)}
-              error={touched.legalcompanyname && errors.legalcompanyname}
-            />
-            <FieldError sx={{ paddingLeft: "13px" }}>{touched.legalcompanyname && errors.legalcompanyname}</FieldError>
-          </FieldContainer>
+            <FieldContainer>
+              <FieldLabel required>Company Name</FieldLabel>
+              {/* @ts-ignore */}
+              <TextField
+                id="legalcompanyname"
+                name="legalcompanyname"
+                placeholder="Enter your company's name"
+                value={values.legalcompanyname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={Boolean(org)}
+                error={touched.legalcompanyname && errors.legalcompanyname}
+              />
+              <FieldError sx={{ paddingLeft: "13px" }}>
+                {touched.legalcompanyname && errors.legalcompanyname}
+              </FieldError>
+            </FieldContainer>
 
-          <FieldContainer>
-            <FieldLabel>Company URL</FieldLabel>
-            {/* @ts-ignore */}
-            <TextField
-              id="companyurl"
-              name="companyurl"
-              placeholder="https://companyurl.com"
-              value={values.companyurl}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.companyurl && errors.companyurl}
-              disabled={Boolean(orgUrl)}
-            />
-            <FieldError sx={{ paddingLeft: "13px" }}>{touched.companyurl && errors.companyurl}</FieldError>
-          </FieldContainer>
+            <FieldContainer>
+              <FieldLabel>Company URL</FieldLabel>
+              {/* @ts-ignore */}
+              <TextField
+                id="companyurl"
+                name="companyurl"
+                placeholder="https://companyurl.com"
+                value={values.companyurl}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.companyurl && errors.companyurl}
+                disabled={Boolean(orgUrl)}
+              />
+              <FieldError sx={{ paddingLeft: "13px" }}>{touched.companyurl && errors.companyurl}</FieldError>
+            </FieldContainer>
 
-          <FieldContainer>
-            <FieldLabel required>Password</FieldLabel>
-            <PasswordField
-              name="password"
-              id="password"
-              autoComplete="new-password"
-              placeholder="Enter your password"
-              value={values.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.password && errors.password}
-            />
-            <FieldError sx={{ paddingLeft: "13px" }}>{touched.password && errors.password}</FieldError>
-          </FieldContainer>
+            <FieldContainer>
+              <FieldLabel required>Password</FieldLabel>
+              <PasswordField
+                name="password"
+                id="password"
+                autoComplete="new-password"
+                placeholder="Enter your password"
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && errors.password}
+              />
+              <FieldError sx={{ paddingLeft: "13px" }}>{touched.password && errors.password}</FieldError>
+            </FieldContainer>
 
-          <FieldContainer>
-            <FieldLabel required>Confirm Password</FieldLabel>
-            <PasswordField
-              name="confirmPassword"
-              id="confirmPassword"
-              placeholder="Confirm your password"
-              value={values.confirmPassword}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.confirmPassword && errors.confirmPassword}
-            />
-            <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
-          </FieldContainer>
-          <FieldContainer>
-            <FieldLabel>Affiliation Code</FieldLabel>
-            {/* @ts-ignore */}
-            <TextField
-              id="affiliateCode"
-              name="affiliateCode"
-              placeholder="Affiliation Code"
-              value={values.affiliateCode}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.affiliateCode && errors.affiliateCode}
-            />
-          </FieldContainer>
-        </FormGrid>
-        <Stack mt="32px" maxWidth="360px" mx="auto">
-          <SubmitButton type="submit" onClick={onSubmit} disabled={isSubmitDisabled} loading={isSubmitLoading}>
-            Create Account
-          </SubmitButton>
-        </Stack>
-      </Collapse>
+            <FieldContainer>
+              <FieldLabel required>Confirm Password</FieldLabel>
+              <PasswordField
+                name="confirmPassword"
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                value={values.confirmPassword}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.confirmPassword && errors.confirmPassword}
+              />
+              <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
+            </FieldContainer>
+            <FieldContainer>
+              <FieldLabel>Affiliation Code</FieldLabel>
+              {/* @ts-ignore */}
+              <TextField
+                id="affiliateCode"
+                name="affiliateCode"
+                placeholder="Affiliation Code"
+                value={values.affiliateCode}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.affiliateCode && errors.affiliateCode}
+              />
+            </FieldContainer>
+          </FormGrid>
+          <Stack mt="32px" maxWidth="360px" mx="auto">
+            <SubmitButton type="submit" onClick={onSubmit} disabled={isSubmitDisabled} loading={isSubmitLoading}>
+              Create Account
+            </SubmitButton>
+          </Stack>
+        </Collapse>
+      )}
+
       {hasNoLoginMethods ? (
         <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
           No signup methods available. Please contact support
