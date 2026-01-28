@@ -11,8 +11,6 @@ import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldCo
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import { Text } from "src/components/Typography/Typography";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
-import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
@@ -332,7 +330,6 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                 </Text>
               </Button>
             )}
-
           </>
         )}
       </Stack>

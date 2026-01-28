@@ -8,7 +8,6 @@ import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldCo
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import SubmitButton from "src/components/NonDashboardComponents/FormElementsV2/SubmitButton";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { SetState } from "src/types/common/reactGenerics";
 
 import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
