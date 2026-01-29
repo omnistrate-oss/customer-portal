@@ -43,6 +43,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
     onSuccess: () => {
       snackbar.showSuccess("Instance upgrade initiated successfully");
       refetchInstances();
+      setSelectedVersion("");
     },
   });
 
@@ -141,7 +142,10 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
       icon={UpgradeDialogIcon}
       title="Version Upgrade"
       content={Content}
-      onClose={onClose}
+      onClose={() => {
+        onClose();
+        setSelectedVersion("");
+      }}
       open={open}
       confirmButtonLabel="Upgrade"
       isLoading={upgradeInstanceMutation.isPending}
