@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -15,7 +16,6 @@ import FieldContainer from "components/NonDashboardComponents/FormElementsV2/Fie
 import FieldLabel from "components/NonDashboardComponents/FormElementsV2/FieldLabel";
 import PasswordField from "components/NonDashboardComponents/FormElementsV2/PasswordField";
 import SubmitButton from "components/NonDashboardComponents/FormElementsV2/SubmitButton";
-import Link from "next/link";
 
 import { handleIDPButtonClick } from "../../shared/idp-utils";
 import IDPButton from "../../shared/IDPButton";
@@ -83,7 +83,6 @@ const SignupForm: React.FC<SignupFormProps> = ({
     // Mark params as loaded after initial render
     setHasLoadedParams(true);
   }, []);
-  
 
   function onIDPButtonClick(idp: IdentityProvider) {
     handleIDPButtonClick({

@@ -19,11 +19,7 @@ import { selectUserrootData } from "src/slices/userDataSlice";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
-import {
-  ACCOUNT_CREATION_METHOD_LABELS,
-  CLOUD_ACCOUNT_CREATION_METHOD_OPTIONS,
-  CLOUD_PROVIDER_DEFAULT_CREATION_METHOD,
-} from "src/utils/constants/accountConfig";
+import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
 import { FormConfiguration } from "components/DynamicForm/types";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -272,7 +268,7 @@ const CloudAccountForm = ({
     const serviceMenuItems = getServiceMenuItems(byoaServiceOfferings);
     const subscriptionMenuItems = byoaSubscriptions.filter((sub) => sub.productTierId === servicePlanId);
 
-    const accountConfigurationMethods = CLOUD_ACCOUNT_CREATION_METHOD_OPTIONS[values.cloudProvider] ?? [];
+    // const accountConfigurationMethods = CLOUD_ACCOUNT_CREATION_METHOD_OPTIONS[values.cloudProvider] ?? [];
     return {
       footer: {
         submitButton: {
@@ -423,21 +419,21 @@ const CloudAccountForm = ({
                     return cloudProviderLongLogoMap[cloudProvider];
                   },
             },
-            {
-              dataTestId: "account-configuration-method-select",
-              label: "Account Configuration Method",
-              subLabel: "Choose a method from among the options to configure your cloud provider account",
-              name: "accountConfigurationMethod",
-              type: "select",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: !cloudProvider,
-              menuItems: accountConfigurationMethods.map((option) => ({
-                value: option,
-                label: ACCOUNT_CREATION_METHOD_LABELS[option],
-              })),
-              previewValue: ACCOUNT_CREATION_METHOD_LABELS[values.accountConfigurationMethod],
-            },
+            // {
+            //   dataTestId: "account-configuration-method-select",
+            //   label: "Account Configuration Method",
+            //   subLabel: "Choose a method from among the options to configure your cloud provider account",
+            //   name: "accountConfigurationMethod",
+            //   type: "select",
+            //   required: true,
+            //   disabled: formMode !== "create",
+            //   isHidden: !cloudProvider,
+            //   menuItems: accountConfigurationMethods.map((option) => ({
+            //     value: option,
+            //     label: ACCOUNT_CREATION_METHOD_LABELS[option],
+            //   })),
+            //   previewValue: ACCOUNT_CREATION_METHOD_LABELS[values.accountConfigurationMethod],
+            // },
             {
               dataTestId: "aws-account-id-input",
               label: "AWS Account ID",
