@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -57,15 +57,15 @@ const isResourceBYOA = false;
 const InstanceDetailsPage = ({
   params,
 }: {
-  params: {
+  params: Promise<{
     serviceId: string;
     servicePlanId: string;
     resourceId: string;
     instanceId: string;
     subscriptionId: string;
-  };
+  }>;
 }) => {
-  const { serviceId, servicePlanId, resourceId, instanceId, subscriptionId } = params;
+  const { serviceId, servicePlanId, resourceId, instanceId, subscriptionId } = use(params);
   const searchParams = useSearchParams();
   const view = searchParams?.get("view");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);

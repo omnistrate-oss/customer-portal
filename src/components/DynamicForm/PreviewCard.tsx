@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 import { colors } from "src/themeConfig";
 
@@ -21,7 +21,7 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
     return null;
   }
 
-  const renderPreviewValue = () => {
+  const renderPreviewValue = (): ReactNode => {
     if (typeof previewValue === "string" || typeof previewValue === "number") {
       return (
         <Text
@@ -46,7 +46,7 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
     return null;
   };
 
-  const renderValue = () => {
+  const renderValue = (): ReactNode => {
     if (value) {
       return (
         <Text

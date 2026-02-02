@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { CircularProgress, Stack } from "@mui/material";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
@@ -28,11 +28,11 @@ const tabs = {
 const SnapshotDetailPage = ({
   params,
 }: {
-  params: {
+  params: Promise<{
     snapshotId: string;
-  };
+  }>;
 }) => {
-  const { snapshotId } = params;
+  const { snapshotId } = use(params);
 
   const [currentTab, setCurrentTab] = useState<CurrentTab>("Snapshot Details");
 

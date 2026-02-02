@@ -359,7 +359,6 @@ const AbsoluteRange = (props: AbsoluteRangeProps) => {
 
   return (
     <Box>
-      {/*@ts-ignore */}
       <ReactDateRange
         onChange={(item) => {
           handleChangeDateRange(item.selection);
