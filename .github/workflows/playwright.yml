@@ -62,7 +62,7 @@ jobs:
           PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
           PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
