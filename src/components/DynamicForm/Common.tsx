@@ -30,7 +30,7 @@ const updateCursorPosition = (element, position) => {
 
 export const MultilinePasswordInput = ({ field, formData }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const textAreaRef = useRef();
+  const textAreaRef = useRef(null);
   const compositionRef = useRef(false);
 
   const currentValue = field.value ?? formData.values[field.name] ?? "";

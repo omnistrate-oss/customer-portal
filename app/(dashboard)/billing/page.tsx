@@ -35,7 +35,7 @@ const BillingPage = () => {
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
   const selectUser = useSelector(selectUserrootData);
   // Track previous paymentConfigured state to detect changes
-  const previousPaymentConfiguredRef = useRef<boolean | undefined>();
+  const previousPaymentConfiguredRef = useRef<boolean | undefined>(undefined);
 
   const billingStatusQuery = useBillingStatus();
 

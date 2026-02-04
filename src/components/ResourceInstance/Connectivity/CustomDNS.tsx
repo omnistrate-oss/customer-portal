@@ -71,7 +71,7 @@ const CustomDNS: FC<EndpointProps> = (props) => {
   const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [isTextfieldDisabled, setIsTextFieldDisabled] = useState(false);
-  const textfieldRef = useRef<HTMLInputElement>();
+  const textfieldRef = useRef<HTMLInputElement>(null);
   const timeoutID = useRef<any>(null);
   const pollCount = useRef(0);
 

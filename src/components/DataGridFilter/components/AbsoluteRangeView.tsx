@@ -102,7 +102,6 @@ const AbsoluteRangeView: React.FC<AbsoluteRangeViewProps> = ({
   return (
     <>
       <Box display="flex" justifyContent="center">
-        {/*@ts-expect-error This is a valid JSX component */}
         <ReactDateRange
           onChange={(item) => handleChangeDateRange(item.selection)}
           showSelectionPreview={true}

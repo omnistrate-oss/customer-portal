@@ -78,7 +78,7 @@ const ResourceConnectivityCustomDNS: FC<ResourceConnectivityEndpointProps> = (pr
   const [shouldShowConfigDialog, setShouldShowConfigDialog] = useState(false);
   const [isVerifyingDNSRemoval, setIsVerifyingDNSRemoval] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const textfieldRef = useRef<HTMLInputElement>();
+  const textfieldRef = useRef<HTMLInputElement>(null);
   const timeoutID = useRef<any>(null);
   const pollCount = useRef(0);
 
