@@ -4,6 +4,8 @@ import { Box, Stack } from "@mui/material";
 
 import InfoFilledIcon from "src/components/Icons/InfoFilled/InfoFilled";
 import { Text } from "src/components/Typography/Typography";
+import Link from "next/link";
+import { omnistratePortalUrl } from "src/utils/constants";
 
 const InsructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemContent }) => {
   return (
@@ -18,12 +20,25 @@ const InsructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemConten
 
 const instructionsList = [
   <>
-    Use your existing Omnistrate username/password to access your non-production customer portal. Sign-ups are
-    restricted to your domain for security.{" "}
+    Use your existing Omnistrate username/password to access your{" "}
+    <Box component="span" fontWeight={600}>
+      non-production
+    </Box>{" "}
+    customer portal. Sign-ups are restricted to your domain for security.{" "}
   </>,
   <>You can also configure your Identity provider to authenticate against the customer portal.</>,
   <>Note that Omnistrate Single Sign-On is not currently supported.</>,
-  <>Don’t have an Omnistrate username/password? Refer to this documentation.</>,
+  <>
+    Used Google or GitHub to sign into the Omnistrate Portal? This Customer Portal requires a password.{" "}
+    <Link
+      href={`${omnistratePortalUrl}/settings?view=Password`}
+      style={{ fontWeight: 600, textDecoration: "underline" }}
+      target="_blank"
+    >
+      Set your password
+    </Link>{" "}
+    first and then sign in with your email/password.
+  </>,
 ];
 
 function NonProdLoginInstructions() {
