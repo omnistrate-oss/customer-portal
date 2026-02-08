@@ -50,6 +50,9 @@ export type OffboardInstructionDetails = {
   azureSubscriptionID?: string;
   azureTenantID?: string;
   azureOffboardCommand?: string;
+  ociTenancyID?: string;
+  ociDomainID?: string;
+  ociOffboardCommand?: string;
 };
 
 export const OffboardingInstructions: FC<{ offboardingInstructionDetails: OffboardInstructionDetails }> = ({
@@ -96,6 +99,23 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               Azure Tenant ID
             </Text>
             <TextContainerToCopy text={offboardingInstructionDetails?.azureTenantID} marginTop="6px" />
+          </Box>
+        </Stack>
+      )}
+
+      {offboardingInstructionDetails?.ociTenancyID && (
+        <Stack direction={"row"} alignItems={"flex-start"} gap="12px" marginBottom={"20px"}>
+          <Box flex={1} maxWidth={"50%"}>
+            <Text size="small" weight="semibold" color="#374151">
+              OCI Tenancy OCID
+            </Text>
+            <TextContainerToCopy text={offboardingInstructionDetails?.ociTenancyID} marginTop="6px" />
+          </Box>
+          <Box flex={1} maxWidth={"50%"}>
+            <Text size="small" weight="semibold" color="#374151">
+              OCI Domain OCID
+            </Text>
+            <TextContainerToCopy text={offboardingInstructionDetails?.ociDomainID} marginTop="6px" />
           </Box>
         </Stack>
       )}
@@ -175,6 +195,32 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               {offboardingInstructionDetails?.azureOffboardCommand && (
                 <TextContainerToCopy
                   text={addQuotesToShellCommand(offboardingInstructionDetails?.azureOffboardCommand)}
+                  marginTop="12px"
+                />
+              )}
+            </Box>
+          </ListItem>
+        )}
+
+        {offboardingInstructionDetails?.ociTenancyID && (
+          <ListItem>
+            <ListItemIcon>
+              <ArrowBullet />
+            </ListItemIcon>
+
+            <Box overflow={"hidden"} flex={1}>
+              <Text size="small" weight="regular" color="#414651">
+                Open the OCI Cloud Shell environment using the following link{" "}
+                <StyledLink target="_blank" rel="noopener noreferrer" href="https://cloud.oracle.com/?cloudshell=true">
+                  OCI Cloud Shell
+                </StyledLink>
+                . Once the terminal is open, execute the following command to complete the off-boarding process and
+                revoke our access.
+              </Text>
+
+              {offboardingInstructionDetails?.ociOffboardCommand && (
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(offboardingInstructionDetails?.ociOffboardCommand)}
                   marginTop="12px"
                 />
               )}

@@ -739,6 +739,8 @@ const InstanceForm = ({
             return values.cloudProvider === "aws";
           } else if (instance.result_params?.azure_subscription_id) {
             return values.cloudProvider === "azure";
+          } else if (instance.result_params?.oci_tenancy_id) {
+            return values.cloudProvider === "oci";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
@@ -748,7 +750,9 @@ const InstanceForm = ({
             ? `${instance.id} (Project ID - ${instance.result_params?.gcp_project_id})`
             : instance.result_params?.aws_account_id
               ? `${instance.id} (Account ID - ${instance.result_params?.aws_account_id})`
-              : `${instance.id} (Subscription ID - ${instance.result_params?.azure_subscription_id})`,
+              : instance.result_params?.oci_tenancy_id
+                ? `${instance.id} (Tenancy ID - ${instance.result_params?.oci_tenancy_id})`
+                : `${instance.id} (Subscription ID - ${instance.result_params?.azure_subscription_id})`,
         })),
     [instances, values.cloudProvider]
   );

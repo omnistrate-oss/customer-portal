@@ -131,6 +131,23 @@ const DeleteInstructions = ({ accountInstructionDetails }) => {
         </Stack>
       )}
 
+      {accountInstructionDetails?.ociTenancyID && (
+        <Stack direction={"row"} alignItems={"flex-start"} gap="12px" marginBottom={"20px"}>
+          <Box flex={1} maxWidth={"50%"}>
+            <Text size="small" weight="semibold" color="#374151">
+              OCI Tenancy OCID
+            </Text>
+            <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
+          </Box>
+          <Box flex={1} maxWidth={"50%"}>
+            <Text size="small" weight="semibold" color="#374151">
+              OCI Domain OCID
+            </Text>
+            <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
+          </Box>
+        </Stack>
+      )}
+
       <Text size="medium" weight="semibold" color="#374151">
         To off-board your account:
       </Text>
@@ -222,28 +239,33 @@ const DeleteInstructions = ({ accountInstructionDetails }) => {
             </Box>
           </ListItem>
         )}
+
+        {accountInstructionDetails?.ociTenancyID && (
+          <ListItem>
+            <ListItemIcon>
+              <ArrowBullet />
+            </ListItemIcon>
+
+            <Box overflow={"hidden"} flex={1}>
+              <Text size="medium" weight="regular" color="#374151">
+                Open the OCI Cloud Shell environment using the following link{" "}
+                <StyledLink target="_blank" rel="noopener noreferrer" href="https://cloud.oracle.com/?cloudshell=true">
+                  OCI Cloud Shell
+                </StyledLink>
+                . Once the terminal is open, execute the following command to complete the off-boarding process and
+                revoke our access.
+              </Text>
+
+              {accountInstructionDetails?.ociDisconnectShellCommand && (
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(accountInstructionDetails?.ociDisconnectShellCommand)}
+                  marginTop="12px"
+                />
+              )}
+            </Box>
+          </ListItem>
+        )}
       </List>
-
-      {/* <List sx={{ marginTop: "12px" }}>
-        <ListItem>
-          <ListItemIcon>
-            <ArrowBullet />
-          </ListItemIcon>
-
-          <Text size="medium" weight="regular" color="#374151">
-            <b>Using Terraform:</b> Execute terraform destroy to revoke our
-            access. For more details, refer to the documentation{" "}
-            <StyledLink
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://docs.omnistrate.com/getting-started/account-offboarding/"
-            >
-              here
-            </StyledLink>
-            .
-          </Text>
-        </ListItem>
-      </List> */}
     </Box>
   );
 };

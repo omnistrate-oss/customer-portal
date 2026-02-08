@@ -149,18 +149,27 @@ const CustomNetworksPage = () => {
         title: "Project Number",
         value: networkInstance.gcpProjectNumber,
       });
-      //@ts-ignore
     } else if (networkInstance.azureSubscriptionID) {
       res.push({
         title: "Subscription ID",
-        //@ts-ignore
+
         value: networkInstance.azureSubscriptionID,
         icon: cloudProviderLogoMap.azure,
       });
       res.push({
         title: "Tenant ID",
-        //@ts-ignore
+
         value: networkInstance.azureTenantID,
+      });
+    } else if (networkInstance.ociTenancyID) {
+      res.push({
+        title: "Tenancy ID",
+        value: networkInstance.ociTenancyID,
+        icon: cloudProviderLogoMap.oci,
+      });
+      res.push({
+        title: "Domain ID",
+        value: networkInstance.ociDomainID,
       });
     }
 

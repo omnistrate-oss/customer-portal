@@ -17,6 +17,7 @@ export class CustomNetworksPage {
     awsCard: "aws-card",
     gcpCard: "gcp-card",
     azureCard: "azure-card",
+    ociCard: "oci-card",
     regionSelect: "region-select",
     cidrInput: "cidr-input",
   };

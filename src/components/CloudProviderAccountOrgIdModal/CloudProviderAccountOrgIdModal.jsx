@@ -143,6 +143,8 @@ const CreationTimeInstructions = (props) => {
     azureCloudShellLink,
     azureShellScriptGuide,
     azureBootstrapShellCommand,
+    ociCloudShellLink,
+    ociShellScriptGuide,
     accountInstructionDetails,
     fetchClickedInstanceDetails,
     setClickedInstance,
@@ -223,7 +225,8 @@ const CreationTimeInstructions = (props) => {
     if (
       (accountInstructionDetails?.gcpProjectID && !gcpBootstrapShellCommand) ||
       (accountInstructionDetails?.azureSubscriptionID && !azureBootstrapShellCommand) ||
-      (accountInstructionDetails?.awsAccountID && !cloudFormationTemplateUrl)
+      (accountInstructionDetails?.awsAccountID && !cloudFormationTemplateUrl) ||
+      (accountInstructionDetails?.ociTenancyID && !accountInstructionDetails?.ociBootstrapShellCommand)
     ) {
       startPolling();
     } else {
@@ -356,6 +359,42 @@ const CreationTimeInstructions = (props) => {
         </>
       </>
     );
+  } else if (accountInstructionDetails?.ociTenancyID) {
+    return (
+      <>
+        <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
+          <Box flex={1} maxWidth={"50%"}>
+            <BodyText weight="medium">OCI Tenancy OCID</BodyText>
+            <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
+          </Box>
+          <Box flex={1} maxWidth={"50%"}>
+            <BodyText weight="medium">OCI Domain OCID</BodyText>
+            <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
+          </Box>
+        </Stack>
+
+        <>
+          {accountInstructionDetails?.ociBootstrapShellCommand ? (
+            <>
+              <BodyText sx={{ marginTop: "20px" }}>
+                Please open the OCI Cloud Shell environment using the following link {ociCloudShellLink} and execute the
+                below command.
+              </BodyText>
+              <TextContainerToCopy
+                text={addQuotesToShellCommand(accountInstructionDetails?.ociBootstrapShellCommand)}
+              />
+              <BodyText sx={{ marginTop: "20px" }}>
+                For guidance, our instructional video is available {ociShellScriptGuide}.
+              </BodyText>
+            </>
+          ) : (
+            <BodyText sx={{ marginTop: "20px" }}>
+              Your OCI shell script is being configured. Please check back shortly for detailed setup instructions.
+            </BodyText>
+          )}
+        </>
+      </>
+    );
   } else {
     return (
       <BodyText>
@@ -377,13 +416,16 @@ const NonCreationTimeInstructions = (props) => {
     azureCloudShellLink,
     azureBootstrapShellCommand,
     azureShellScriptGuide,
+    ociCloudShellLink,
+    ociShellScriptGuide,
     accountInstructionDetails,
   } = props;
 
   if (
     !accountInstructionDetails?.awsAccountID &&
     !accountInstructionDetails?.gcpProjectID &&
-    !accountInstructionDetails?.azureSubscriptionID
+    !accountInstructionDetails?.azureSubscriptionID &&
+    !accountInstructionDetails?.ociTenancyID
   ) {
     return (
       <BodyText>
@@ -428,14 +470,23 @@ const NonCreationTimeInstructions = (props) => {
           </Stack>
         )}
 
+        {accountInstructionDetails?.ociTenancyID && (
+          <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
+            <Box flex={1} maxWidth={"50%"}>
+              <BodyText weight="medium">OCI Tenancy OCID</BodyText>
+              <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
+            </Box>
+            <Box flex={1} maxWidth={"50%"}>
+              <BodyText weight="medium">OCI Domain OCID</BodyText>
+              <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
+            </Box>
+          </Stack>
+        )}
+
         <BodyText sx={{ marginTop: "20px", fontWeight: 600 }}>
           {getAccountConfigStatusBasedHeader(
             selectedAccountConfig?.status,
             selectedAccountConfig?.result_params?.cloud_provider_account_config_id
-            // accountConfigMethod,
-            // accountInstructionDetails?.gcpProjectID
-            //   ? CLOUD_PROVIDERS.gcp
-            //   : CLOUD_PROVIDERS.aws
           )}
         </BodyText>
 
@@ -546,6 +597,44 @@ const NonCreationTimeInstructions = (props) => {
                 )}
               </ListItem>
             )}
+
+            {accountInstructionDetails?.ociTenancyID && (
+              <ListItem>
+                <ListItemIcon>
+                  <ArrowBulletSmall />
+                </ListItemIcon>
+
+                {accountInstructionDetails?.ociBootstrapShellCommand ? (
+                  <Box flex={1} overflow={"hidden"}>
+                    <BodyText>
+                      Please open the OCI Cloud Shell environment using the following link {ociCloudShellLink} and
+                      execute the command below.
+                    </BodyText>
+
+                    <TextContainerToCopy
+                      text={addQuotesToShellCommand(accountInstructionDetails?.ociBootstrapShellCommand)}
+                      marginTop="12px"
+                    />
+                    <BodyText sx={{ marginTop: "20px" }}>
+                      For guidance, our instructional video is available {ociShellScriptGuide}.
+                    </BodyText>
+                  </Box>
+                ) : selectedAccountConfig?.status === "FAILED" ? (
+                  <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
+                    <BodyText>
+                      You may delete this failed configuration and retry adding it after carefully verifying the OCI
+                      Tenancy OCID and Domain OCID.
+                    </BodyText>
+                    <BodyText>If the issue persists, please contact Support for assistance.</BodyText>
+                  </Box>
+                ) : (
+                  <BodyText flex={1} overflow={"hidden"}>
+                    Your account details are being configured. Please check back shortly for detailed setup
+                    instructions.
+                  </BodyText>
+                )}
+              </ListItem>
+            )}
           </>
         </List>
       </Box>
@@ -592,6 +681,12 @@ function CloudProviderAccountOrgIdModal(props) {
     </StyledLink>
   );
 
+  const ociCloudShellLink = (
+    <StyledLink href="https://cloud.oracle.com/?cloudshell=true" target="_blank" rel="noopener noreferrer">
+      OCI Cloud Shell
+    </StyledLink>
+  );
+
   // links pointing to guides for different methods
   const azureShellScriptGuide = isAccessPage ? (
     <StyledLink href="https://youtu.be/7A9WbZjuXgQ?si=y-AvMmtdFIycqzOS" target="_blank" rel="noopener noreferrer">
@@ -599,6 +694,13 @@ function CloudProviderAccountOrgIdModal(props) {
     </StyledLink>
   ) : (
     <StyledLink href="https://youtu.be/7A9WbZjuXgQ?si=y-AvMmtdFIycqzOS" target="_blank" rel="noopener noreferrer">
+      here
+    </StyledLink>
+  );
+
+  // TODO: Update once video is ready
+  const ociShellScriptGuide = (
+    <StyledLink href="#" target="_blank" rel="noopener noreferrer">
       here
     </StyledLink>
   );
@@ -622,24 +724,6 @@ function CloudProviderAccountOrgIdModal(props) {
       {isAccountCreation ? "here" : "guide"}
     </StyledLink>
   );
-
-  // const terraformGuide = isAccessPage ? (
-  //   <StyledLink
-  //     href="https://youtu.be/l6lMEZdMMxs"
-  //     target="_blank"
-  //     rel="noopener noreferrer"
-  //   >
-  //     here
-  //   </StyledLink>
-  // ) : (
-  //   <StyledLink
-  //     href="https://youtu.be/eKktc4QKgaA"
-  //     target="_blank"
-  //     rel="noopener noreferrer"
-  //   >
-  //     here
-  //   </StyledLink>
-  // );
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth={"tablet"}>
@@ -673,7 +757,6 @@ function CloudProviderAccountOrgIdModal(props) {
         <Content>
           {isAccountCreation ? (
             <CreationTimeInstructions
-              // orgId={orgId}
               cloudformationlink={cloudformationlink}
               cloudFormationGuide={cloudFormationGuide}
               accountConfigStatus={selectedAccountConfig?.status}
@@ -685,16 +768,15 @@ function CloudProviderAccountOrgIdModal(props) {
               azureCloudShellLink={azureCloudShellLink}
               azureShellScriptGuide={azureShellScriptGuide}
               azureBootstrapShellCommand={azureBootstrapShellCommand}
+              ociCloudShellLink={ociCloudShellLink}
+              ociShellScriptGuide={ociShellScriptGuide}
               accountInstructionDetails={accountInstructionDetails}
               accountConfigMethod={accountConfigMethod}
-              // terraformlink={terraformlink}
-              // terraformGuide={terraformGuide}
               fetchClickedInstanceDetails={fetchClickedInstanceDetails}
               setClickedInstance={setClickedInstance}
             />
           ) : (
             <NonCreationTimeInstructions
-              // orgId={orgId}
               selectedAccountConfig={selectedAccountConfig}
               cloudformationlink={cloudformationlink}
               cloudFormationGuide={cloudFormationGuide}
@@ -704,11 +786,11 @@ function CloudProviderAccountOrgIdModal(props) {
               gcpShellScriptGuide={gcpShellScriptGuide}
               accountInstructionDetails={accountInstructionDetails}
               accountConfigMethod={accountConfigMethod}
-              // terraformlink={terraformlink}
-              // terraformGuide={terraformGuide}
               azureCloudShellLink={azureCloudShellLink}
               azureShellScriptGuide={azureShellScriptGuide}
               azureBootstrapShellCommand={azureBootstrapShellCommand}
+              ociCloudShellLink={ociCloudShellLink}
+              ociShellScriptGuide={ociShellScriptGuide}
             />
           )}
         </Content>

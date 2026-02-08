@@ -53,7 +53,7 @@ type SchemaParameter = {
 /**
  * Filters schema parameters based on the selected cloud provider and scope
  * @param schemaParameters - Array of schema parameters to filter
- * @param selectedCloudProvider - The currently selected cloud provider (e.g., "aws", "gcp", "azure")
+ * @param selectedCloudProvider - The currently selected cloud provider (e.g., "aws", "gcp", "azure", "oci")
  * @returns Filtered array of schema parameters that match the cloud provider scope
  */
 export const filterSchemaByCloudProvider = (
@@ -171,6 +171,13 @@ export const getRegionMenuItems = (offering?: ServiceOffering, cloudProvider?: C
   } else if (cloudProvider === "azure") {
     // @ts-ignore
     offering.azureRegions?.forEach((region: string) => {
+      menuItems.push({
+        label: region,
+        value: region,
+      });
+    });
+  } else if (cloudProvider === "oci") {
+    offering.ociRegions?.forEach((region: string) => {
       menuItems.push({
         label: region,
         value: region,
@@ -355,8 +362,9 @@ export const getInitialValues = (
   } else if (cloudProvider === "gcp") {
     region = offering.gcpRegions?.[0];
   } else if (cloudProvider === "azure") {
-    // @ts-ignore
     region = offering.azureRegions?.[0];
+  } else if (cloudProvider === "oci") {
+    region = offering.ociRegions?.[0];
   }
 
   const resources = getResourceMenuItems(offering);

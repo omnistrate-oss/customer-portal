@@ -93,7 +93,10 @@ export const getInitialValues = (
         : //@ts-ignore
           selectedInstance.result_params?.azure_subscription_id
           ? "azure"
-          : "aws",
+          : // @ts-ignore
+            selectedInstance.result_params?.aws_account_id
+            ? "aws"
+            : "oci",
       accountConfigurationMethod:
         // @ts-ignore
         selectedInstance.result_params?.account_configuration_method,
@@ -108,6 +111,11 @@ export const getInitialValues = (
         selectedInstance.result_params?.azure_subscription_id,
       //@ts-ignore
       azureTenantId: selectedInstance.result_params?.azure_tenant_id,
+      ociTenancyId:
+        // @ts-ignore
+        selectedInstance.result_params?.oci_tenancy_id,
+      // @ts-ignore
+      ociDomainId: selectedInstance.result_params?.oci_domain_id,
     };
   }
 
@@ -161,6 +169,8 @@ export const getInitialValues = (
     awsAccountId: "",
     gcpProjectId: "",
     gcpProjectNumber: "",
+    ociTenancyId: "",
+    ociDomainId: "",
   };
 };
 
