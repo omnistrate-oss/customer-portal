@@ -7,6 +7,9 @@ import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
+import CloudAccountsActionMenu from "./CloudAccountsActionsMenu";
+import { Overlay } from "../page";
+import { Subscription } from "src/types/subscription";
 
 type CloudAccountTableHeaderProps = {
   count: number;
@@ -24,6 +27,9 @@ type CloudAccountTableHeaderProps = {
   accountConfig: AccountConfig;
   isSelectedInstanceReadyToOffboard: boolean;
   isFetchingAccountConfigs: boolean;
+  setOverlayType: (overlay: Overlay) => void;
+  setIsOverlayOpen: (isOpen: boolean) => void;
+  selectedInstanceSubscription?: Subscription;
 };
 
 const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
@@ -41,6 +47,9 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   serviceModelType,
   onOffboardClick,
   isSelectedInstanceReadyToOffboard,
+  setOverlayType,
+  setIsOverlayOpen,
+  selectedInstanceSubscription,
 }) => {
   const isDeploying = selectedInstance?.status === "DEPLOYING";
   const isAttaching = selectedInstance?.status === "ATTACHING";
@@ -165,6 +174,21 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
         <Button data-testid="create-button" variant="contained" onClick={onCreateClick}>
           Create
         </Button>
+
+        <CloudAccountsActionMenu
+          setOverlayType={setOverlayType}
+          setIsOverlayOpen={setIsOverlayOpen}
+          disabled={!selectedInstance}
+          disabledMessage="Please select an instance"
+          instance={selectedInstance}
+          subscription={selectedInstanceSubscription}
+          onConnectClick={onConnectClick}
+          onDisconnectClick={onDisconnectClick}
+          onDeleteClick={onDeleteClick}
+          onOffboardClick={() => onOffboardClick?.()}
+          serviceModelType={serviceModelType}
+          isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
+        />
       </div>
     </div>
   );

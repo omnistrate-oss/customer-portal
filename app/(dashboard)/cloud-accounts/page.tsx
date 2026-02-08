@@ -9,6 +9,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
+import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { chipCategoryColors } from "src/constants/statusChipStyles";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
@@ -28,8 +29,8 @@ import {
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
 import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
@@ -46,17 +47,22 @@ import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { getOffboardReadiness } from "./utils";
+import { $api } from "src/api/query";
+import { DIALOG_DATA } from "./constants";
+import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
-type Overlay =
+export type Overlay =
   | "delete-dialog"
   | "create-instance-form"
   | "view-instance-form"
   | "view-instructions-dialog"
   | "connect-dialog"
   | "disconnect-dialog"
-  | "offboard-dialog";
+  | "offboard-dialog"
+  | "enable-deletion-protection-dialog"
+  | "disable-deletion-protection-dialog";
 
 const CloudAccountsPage = () => {
   const snackbar = useSnackbar();
@@ -200,15 +206,26 @@ const CloudAccountsPage = () => {
               data.row.original.result_params?.azure_subscription_id ||
               "-";
 
+            const deletionProtectionFeatureEnabled =
+              data.row.original?.resourceInstanceMetadata?.deletionProtection !== undefined;
+            const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
+
             return (
-              <DataGridText
-                showCopyButton={value !== "-"}
-                style={{
-                  fontWeight: 600,
-                }}
-              >
-                {value}
-              </DataGridText>
+              <GridCellExpand
+                value={value}
+                copyButton={value !== "-"}
+                endIcon={
+                  deletionProtectionFeatureEnabled && (
+                    <Box sx={{ marginRight: "-2px", marginTop: "-7px" }}>
+                      <Tooltip title={isDeleteProtected ? "Delete protection enabled" : "Delete protection disabled"}>
+                        <span>
+                          <DeleteProtectionIcon disabled={!isDeleteProtected} />
+                        </span>
+                      </Tooltip>
+                    </Box>
+                  )
+                }
+              />
             );
           },
           meta: {
@@ -541,6 +558,22 @@ const CloudAccountsPage = () => {
     },
   });
 
+  const updateInstanceMetadataMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata",
+    {
+      onSuccess: async () => {
+        refetchInstances();
+        setSelectedRows([]);
+        if (overlayType === "enable-deletion-protection-dialog") {
+          snackbar.showSuccess("Delete protection enabled successfully");
+        } else {
+          snackbar.showSuccess("Delete protection disabled successfully");
+        }
+      },
+    }
+  );
+
   // const deleteAccountConfigMutation = $api.useMutation("delete", "/2022-09-01-00/accountconfig/{id}", {
   //   onSuccess: () => {
   //     //refetch cloud account instances
@@ -579,6 +612,20 @@ const CloudAccountsPage = () => {
       setOverlayType("view-instructions-dialog");
     }
   }, [isAccountCreation]);
+
+  const selectedInstanceData = useMemo(() => {
+    return {
+      id: selectedInstance?.id || "",
+      serviceProviderId: selectedInstanceOffering?.serviceProviderId || "",
+      serviceKey: selectedInstanceOffering?.serviceURLKey || "",
+      serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion || "",
+      serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey || "",
+      serviceModelKey: selectedInstanceOffering?.serviceModelURLKey || "",
+      productTierKey: selectedInstanceOffering?.productTierURLKey || "",
+      resourceKey: selectedResource?.urlKey as string,
+      subscriptionId: selectedInstanceSubscription?.id,
+    };
+  }, [selectedInstance, selectedInstanceOffering, selectedInstanceSubscription, selectedResource]);
 
   return (
     <PageContainer>
@@ -628,6 +675,9 @@ const CloudAccountsPage = () => {
             isFetchingAccountConfigs: isFetchingAccountConfigs,
             serviceModelType: selectedInstanceOffering?.serviceModelType,
             isSelectedInstanceReadyToOffboard: isSelectedInstanceReadyToOffboard,
+            setOverlayType: setOverlayType,
+            setIsOverlayOpen: setIsOverlayOpen,
+            selectedInstanceSubscription,
           }}
           isLoading={isInstancesPending || isAccountConfigsPending}
           selectionMode="single"
@@ -742,6 +792,65 @@ const CloudAccountsPage = () => {
         }
         fetchClickedInstanceDetails={fetchClickedInstanceDetails}
         setClickedInstance={setClickedInstance}
+      />
+
+      <TextConfirmationDialog
+        open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
+        handleClose={() => setIsOverlayOpen(false)}
+        onConfirm={async () => {
+          if (!selectedInstance) snackbar.showError("No instance selected");
+          if (!selectedInstanceOffering) {
+            snackbar.showError("Offering not found");
+          }
+          if (!selectedInstanceSubscription) {
+            snackbar.showError("Subscription not found");
+          }
+          if (!selectedResource) {
+            snackbar.showError("Resource not found");
+          }
+          if (!selectedInstance || !selectedInstanceOffering || !selectedInstanceSubscription || !selectedResource)
+            return false;
+
+          const pathData = {
+            serviceProviderId: selectedInstanceData.serviceProviderId,
+            serviceKey: selectedInstanceData.serviceKey,
+            serviceAPIVersion: selectedInstanceData.serviceAPIVersion,
+            serviceEnvironmentKey: selectedInstanceData.serviceEnvironmentKey,
+            serviceModelKey: selectedInstanceData.serviceModelKey,
+            productTierKey: selectedInstanceData.productTierKey,
+            resourceKey: selectedInstanceData.resourceKey,
+            id: selectedInstanceData.id,
+          };
+
+          const body = {
+            params: {
+              path: pathData,
+              query: {
+                subscriptionId: selectedInstanceSubscription?.id,
+              }, 
+            },
+          };
+
+          if (
+            overlayType === "enable-deletion-protection-dialog" ||
+            overlayType === "disable-deletion-protection-dialog"
+          ) {
+            await updateInstanceMetadataMutation.mutateAsync({
+              ...body,
+              body: {
+                deletionProtection: overlayType === "enable-deletion-protection-dialog" ? true : false,
+              },
+            });
+          }
+          return true;
+        }}
+        IconComponent={DIALOG_DATA[overlayType]?.icon}
+        title={DIALOG_DATA[overlayType]?.title}
+        subtitle={<>{`${DIALOG_DATA[overlayType]?.subtitle} - ${selectedInstanceData?.id}?`}</>}
+        confirmationText={DIALOG_DATA[overlayType]?.confirmationText}
+        buttonLabel={DIALOG_DATA[overlayType]?.buttonLabel}
+        buttonColor={DIALOG_DATA[overlayType]?.buttonColor}
+        isLoading={updateInstanceMetadataMutation.isPending}
       />
     </PageContainer>
   );
