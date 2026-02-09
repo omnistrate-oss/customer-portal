@@ -2,6 +2,7 @@ const withYaml = require("next-plugin-yaml");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {},
   async redirects() {
     return [
       {
