@@ -184,10 +184,12 @@ const CloudAccountForm = ({
                       azure_subscription_id: values.azureSubscriptionId,
                       azure_tenant_id: values.azureTenantId,
                     }
-                  : {
-                      oci_tenancy_id: values.ociTenancyId,
-                      oci_domain_id: values.ociDomainId,
-                    }),
+                  : values.cloudProvider === CLOUD_PROVIDERS.oci
+                    ? {
+                        oci_tenancy_id: values.ociTenancyId,
+                        oci_domain_id: values.ociDomainId,
+                      }
+                    : {}),
           },
         });
         setOverlayType("view-instructions-dialog");
@@ -211,7 +213,7 @@ const CloudAccountForm = ({
       const { serviceId, servicePlanId } = values;
       const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
 
-      let requestParams: Record<string, any>;
+      let requestParams: Record<string, any> = {};
       if (values.cloudProvider === "aws") {
         requestParams = {
           cloud_provider: values.cloudProvider,
@@ -234,7 +236,7 @@ const CloudAccountForm = ({
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
         };
-      } else {
+      } else if (values.cloudProvider === "oci") {
         requestParams = {
           cloud_provider: values.cloudProvider,
           oci_tenancy_id: values.ociTenancyId,

@@ -96,7 +96,10 @@ export const getInitialValues = (
           : // @ts-ignore
             selectedInstance.result_params?.aws_account_id
             ? "aws"
-            : "oci",
+            : // @ts-ignore
+              selectedInstance.result_params?.oci_tenancy_id
+              ? "oci"
+              : "",
       accountConfigurationMethod:
         // @ts-ignore
         selectedInstance.result_params?.account_configuration_method,

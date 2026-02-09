@@ -144,7 +144,7 @@ const CreationTimeInstructions = (props) => {
     azureShellScriptGuide,
     azureBootstrapShellCommand,
     ociCloudShellLink,
-    ociShellScriptGuide,
+    // ociShellScriptGuide,
     accountInstructionDetails,
     fetchClickedInstanceDetails,
     setClickedInstance,
@@ -383,9 +383,9 @@ const CreationTimeInstructions = (props) => {
               <TextContainerToCopy
                 text={addQuotesToShellCommand(accountInstructionDetails?.ociBootstrapShellCommand)}
               />
-              <BodyText sx={{ marginTop: "20px" }}>
+              {/* <BodyText sx={{ marginTop: "20px" }}>
                 For guidance, our instructional video is available {ociShellScriptGuide}.
-              </BodyText>
+              </BodyText> */}
             </>
           ) : (
             <BodyText sx={{ marginTop: "20px" }}>
@@ -417,7 +417,7 @@ const NonCreationTimeInstructions = (props) => {
     azureBootstrapShellCommand,
     azureShellScriptGuide,
     ociCloudShellLink,
-    ociShellScriptGuide,
+    // ociShellScriptGuide,
     accountInstructionDetails,
   } = props;
 
@@ -615,9 +615,9 @@ const NonCreationTimeInstructions = (props) => {
                       text={addQuotesToShellCommand(accountInstructionDetails?.ociBootstrapShellCommand)}
                       marginTop="12px"
                     />
-                    <BodyText sx={{ marginTop: "20px" }}>
+                    {/* <BodyText sx={{ marginTop: "20px" }}>
                       For guidance, our instructional video is available {ociShellScriptGuide}.
-                    </BodyText>
+                    </BodyText> */}
                   </Box>
                 ) : selectedAccountConfig?.status === "FAILED" ? (
                   <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
@@ -699,11 +699,11 @@ function CloudProviderAccountOrgIdModal(props) {
   );
 
   // TODO: Update once video is ready
-  const ociShellScriptGuide = (
-    <StyledLink href="#" target="_blank" rel="noopener noreferrer">
-      here
-    </StyledLink>
-  );
+  // const ociShellScriptGuide = (
+  //   <StyledLink href="#" target="_blank" rel="noopener noreferrer">
+  //     here
+  //   </StyledLink>
+  // );
 
   const gcpShellScriptGuide = isAccessPage ? (
     <StyledLink href="https://youtu.be/isTGi8tQA2w?si=a12mJXnlA-y2ipVC" target="_blank" rel="noopener noreferrer">
@@ -769,7 +769,7 @@ function CloudProviderAccountOrgIdModal(props) {
               azureShellScriptGuide={azureShellScriptGuide}
               azureBootstrapShellCommand={azureBootstrapShellCommand}
               ociCloudShellLink={ociCloudShellLink}
-              ociShellScriptGuide={ociShellScriptGuide}
+              // ociShellScriptGuide={ociShellScriptGuide}
               accountInstructionDetails={accountInstructionDetails}
               accountConfigMethod={accountConfigMethod}
               fetchClickedInstanceDetails={fetchClickedInstanceDetails}
@@ -790,7 +790,7 @@ function CloudProviderAccountOrgIdModal(props) {
               azureShellScriptGuide={azureShellScriptGuide}
               azureBootstrapShellCommand={azureBootstrapShellCommand}
               ociCloudShellLink={ociCloudShellLink}
-              ociShellScriptGuide={ociShellScriptGuide}
+              // ociShellScriptGuide={ociShellScriptGuide}
             />
           )}
         </Content>
