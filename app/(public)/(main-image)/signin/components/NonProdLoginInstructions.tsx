@@ -1,13 +1,13 @@
 import { FC, ReactNode } from "react";
+import Link from "next/link";
 import { ArrowForward } from "@mui/icons-material";
 import { Box, Stack } from "@mui/material";
 
 import InfoFilledIcon from "src/components/Icons/InfoFilled/InfoFilled";
 import { Text } from "src/components/Typography/Typography";
-import Link from "next/link";
 import { omnistratePortalUrl } from "src/utils/constants";
 
-const InsructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemContent }) => {
+const InstructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemContent }) => {
   return (
     <Stack direction="row" gap="8px" alignItems="flex-start" marginTop="8px">
       <ArrowForward style={{ flexShrink: 0 }} />
@@ -45,14 +45,14 @@ function NonProdLoginInstructions() {
   return (
     <Box border="1px solid #E9EAEB" bgcolor="#FAFAFA" borderRadius="8px" p="20px">
       <Stack direction="row" gap="8px" alignItems="center">
-        <InfoFilledIcon style={{ alignSelf: "start" }} />
+        <InfoFilledIcon style={{ alignSelf: "flex-start" }} />
         <Text size="large" weight="semibold" color="#181D27">
           How to sign in:
         </Text>
       </Stack>
       <Stack marginTop="8px">
         {instructionsList.map((instruction, index) => (
-          <InsructionListItem key={index} listItemContent={instruction} />
+          <InstructionListItem key={index} listItemContent={instruction} />
         ))}
       </Stack>
     </Box>
