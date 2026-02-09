@@ -39,8 +39,6 @@ function ResourceInstanceDetails(props) {
     customTags,
   } = props;
 
-  const isResourceBYOA = resultParameters.gcp_project_id || resultParameters.aws_account_id;
-
   // Show Version If The Service Offering Allows Upgrades
   const showVersion = serviceOffering?.productTierFeatures?.some(
     (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
@@ -65,18 +63,6 @@ function ResourceInstanceDetails(props) {
           "private_network_id",
         ];
 
-        if (isResourceBYOA) {
-          if (resultParameters.cloud_provider === "aws") {
-            filterArr.push(...["gcp_project_id", "gcp_project_number", "gcp_service_account_email"]);
-          } else if (resultParameters.cloud_provider === "gcp") {
-            filterArr.push(...["aws_account_id", "aws_bootstrap_role_arn"]);
-          }
-
-          if (resultParameters.account_configuration_method === "Terraform") {
-            filterArr.push("cloudformation_url");
-          }
-        }
-
         return !filterArr.includes(param.key);
       })
       .sort((a, b) => {
@@ -88,7 +74,7 @@ function ResourceInstanceDetails(props) {
         return 0; // If tabIndex is not available, maintain original order
       });
     return result;
-  }, [isResourceBYOA, resultParameters, resultParametersSchema]);
+  }, [resultParameters, resultParametersSchema]);
 
   const instanceInfoData = useMemo(() => {
     const res = [

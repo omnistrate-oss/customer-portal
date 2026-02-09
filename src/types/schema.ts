@@ -2635,7 +2635,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** CopyServiceModel service-model-api */
+        /**
+         * CopyServiceModel service-model-api
+         * @description DEPRECATED: Create a new service model from spec instead
+         */
         post: operations["service-model-api/CopyServiceModel"];
         delete?: never;
         options?: never;
@@ -8888,7 +8891,7 @@ export interface components {
          *       "name": "Multi-zone",
          *       "namedOpenPorts": {
          *         "grpc-range": {
-         *           "portRange": {
+         *           "portsRange": {
          *             "end": 9010,
          *             "start": 9000
          *           }
@@ -8994,7 +8997,7 @@ export interface components {
          *       "name": "Multi-zone",
          *       "namedOpenPorts": {
          *         "grpc-range": {
-         *           "portRange": {
+         *           "portsRange": {
          *             "end": 9010,
          *             "start": 9000
          *           }
@@ -9056,7 +9059,7 @@ export interface components {
              * @description Named ports to map to the generated DNS endpoint
              * @example {
              *       "grpc-range": {
-             *         "portRange": {
+             *         "portsRange": {
              *           "end": 9010,
              *           "start": 9000
              *         }
@@ -10181,7 +10184,7 @@ export interface components {
          *         "autoDiscoverImagesTag": "omnistrate/images",
          *         "chartAffinityControl": {
          *           "enableInjection": true,
-         *           "enableMultitenancy": true
+         *           "enableSharedHost": true
          *         },
          *         "chartName": "my-chart",
          *         "chartRepoName": "my-repo",
@@ -10738,7 +10741,7 @@ export interface components {
          *         "autoDiscoverImagesTag": "omnistrate/images",
          *         "chartAffinityControl": {
          *           "enableInjection": true,
-         *           "enableMultitenancy": true
+         *           "enableSharedHost": true
          *         },
          *         "chartName": "my-chart",
          *         "chartRepoName": "my-repo",
@@ -17464,7 +17467,7 @@ export interface components {
          *       "name": "Multi-zone",
          *       "namedOpenPorts": {
          *         "grpc-range": {
-         *           "portRange": {
+         *           "portsRange": {
          *             "end": 9010,
          *             "start": 9000
          *           }
@@ -19283,7 +19286,7 @@ export interface components {
          *         "autoDiscoverImagesTag": "omnistrate/images",
          *         "chartAffinityControl": {
          *           "enableInjection": true,
-         *           "enableMultitenancy": true
+         *           "enableSharedHost": true
          *         },
          *         "chartName": "my-chart",
          *         "chartRepoName": "my-repo",
@@ -24447,7 +24450,7 @@ export interface components {
         /**
          * @example {
          *       "enableInjection": true,
-         *       "enableMultitenancy": true
+         *       "enableSharedHost": true
          *     }
          */
         HelmChartAffinityControl: {
@@ -24457,17 +24460,17 @@ export interface components {
              */
             enableInjection?: boolean;
             /**
-             * @description Enable multitenancy support for the resource
+             * @description Enable shared host support for the resource
              * @example true
              */
-            enableMultitenancy?: boolean;
+            enableSharedHost?: boolean;
         };
         /**
          * @example {
          *       "autoDiscoverImagesTag": "omnistrate/images",
          *       "chartAffinityControl": {
          *         "enableInjection": true,
-         *         "enableMultitenancy": true
+         *         "enableSharedHost": true
          *       },
          *       "chartName": "my-chart",
          *       "chartRepoName": "my-repo",
@@ -31653,7 +31656,7 @@ export interface components {
          *             "autoDiscoverImagesTag": "omnistrate/images",
          *             "chartAffinityControl": {
          *               "enableInjection": true,
-         *               "enableMultitenancy": true
+         *               "enableSharedHost": true
          *             },
          *             "chartName": "my-chart",
          *             "chartRepoName": "my-repo",
@@ -32112,7 +32115,7 @@ export interface components {
          *             "autoDiscoverImagesTag": "omnistrate/images",
          *             "chartAffinityControl": {
          *               "enableInjection": true,
-         *               "enableMultitenancy": true
+         *               "enableSharedHost": true
          *             },
          *             "chartName": "my-chart",
          *             "chartRepoName": "my-repo",
@@ -32571,7 +32574,7 @@ export interface components {
          *             "autoDiscoverImagesTag": "omnistrate/images",
          *             "chartAffinityControl": {
          *               "enableInjection": true,
-         *               "enableMultitenancy": true
+         *               "enableSharedHost": true
          *             },
          *             "chartName": "my-chart",
          *             "chartRepoName": "my-repo",
@@ -33030,7 +33033,7 @@ export interface components {
          *             "autoDiscoverImagesTag": "omnistrate/images",
          *             "chartAffinityControl": {
          *               "enableInjection": true,
-         *               "enableMultitenancy": true
+         *               "enableSharedHost": true
          *             },
          *             "chartName": "my-chart",
          *             "chartRepoName": "my-repo",
@@ -33510,7 +33513,7 @@ export interface components {
              *           "autoDiscoverImagesTag": "omnistrate/images",
              *           "chartAffinityControl": {
              *             "enableInjection": true,
-             *             "enableMultitenancy": true
+             *             "enableSharedHost": true
              *           },
              *           "chartName": "my-chart",
              *           "chartRepoName": "my-repo",
@@ -33969,7 +33972,7 @@ export interface components {
              *           "autoDiscoverImagesTag": "omnistrate/images",
              *           "chartAffinityControl": {
              *             "enableInjection": true,
-             *             "enableMultitenancy": true
+             *             "enableSharedHost": true
              *           },
              *           "chartName": "my-chart",
              *           "chartRepoName": "my-repo",
@@ -34428,7 +34431,7 @@ export interface components {
              *           "autoDiscoverImagesTag": "omnistrate/images",
              *           "chartAffinityControl": {
              *             "enableInjection": true,
-             *             "enableMultitenancy": true
+             *             "enableSharedHost": true
              *           },
              *           "chartName": "my-chart",
              *           "chartRepoName": "my-repo",
@@ -38755,7 +38758,7 @@ export interface components {
          * @description Map of port names to port specifications
          * @example {
          *       "grpc-range": {
-         *         "portRange": {
+         *         "portsRange": {
          *           "end": 9010,
          *           "start": 9000
          *         }
@@ -44292,6 +44295,7 @@ export interface components {
         };
         /**
          * @example {
+         *       "artifactsLocalPath": "/local/path/to/artifacts",
          *       "gitConfiguration": {
          *         "accessToken": "my-token",
          *         "commitSHA": "1e386b5f54de9150d336ccfe2e14782b94faf67c",
@@ -44367,6 +44371,11 @@ export interface components {
          *     }
          */
         TerraformConfiguration: {
+            /**
+             * @description The local path to store artifacts generated during Terraform execution
+             * @example /local/path/to/artifacts
+             */
+            artifactsLocalPath?: string;
             gitConfiguration?: components["schemas"]["GitConfiguration"];
             /**
              * @description The git access tokens for private modules
@@ -46161,7 +46170,7 @@ export interface components {
          *       "name": "Multi-zone",
          *       "namedOpenPorts": {
          *         "grpc-range": {
-         *           "portRange": {
+         *           "portsRange": {
          *             "end": 9010,
          *             "start": 9000
          *           }
@@ -46271,7 +46280,7 @@ export interface components {
          *       "name": "Multi-zone",
          *       "namedOpenPorts": {
          *         "grpc-range": {
-         *           "portRange": {
+         *           "portsRange": {
          *             "end": 9010,
          *             "start": 9000
          *           }
@@ -46332,7 +46341,7 @@ export interface components {
              * @description Named ports to map to the generated DNS endpoint
              * @example {
              *       "grpc-range": {
-             *         "portRange": {
+             *         "portsRange": {
              *           "end": 9010,
              *           "start": 9000
              *         }
@@ -47553,7 +47562,7 @@ export interface components {
          *         "autoDiscoverImagesTag": "omnistrate/images",
          *         "chartAffinityControl": {
          *           "enableInjection": true,
-         *           "enableMultitenancy": true
+         *           "enableSharedHost": true
          *         },
          *         "chartName": "my-chart",
          *         "chartRepoName": "my-repo",
@@ -48072,7 +48081,7 @@ export interface components {
          *         "autoDiscoverImagesTag": "omnistrate/images",
          *         "chartAffinityControl": {
          *           "enableInjection": true,
-         *           "enableMultitenancy": true
+         *           "enableSharedHost": true
          *         },
          *         "chartName": "my-chart",
          *         "chartRepoName": "my-repo",
@@ -72827,7 +72836,7 @@ export interface operations {
                  *       "name": "Multi-zone",
                  *       "namedOpenPorts": {
                  *         "grpc-range": {
-                 *           "portRange": {
+                 *           "portsRange": {
                  *             "end": 9010,
                  *             "start": 9000
                  *           }
@@ -72983,7 +72992,7 @@ export interface operations {
                      *       "name": "Multi-zone",
                      *       "namedOpenPorts": {
                      *         "grpc-range": {
-                     *           "portRange": {
+                     *           "portsRange": {
                      *             "end": 9010,
                      *             "start": 9000
                      *           }
@@ -73190,7 +73199,7 @@ export interface operations {
                  *       "name": "Multi-zone",
                  *       "namedOpenPorts": {
                  *         "grpc-range": {
-                 *           "portRange": {
+                 *           "portsRange": {
                  *             "end": 9010,
                  *             "start": 9000
                  *           }
@@ -77489,7 +77498,7 @@ export interface operations {
                      *             "autoDiscoverImagesTag": "omnistrate/images",
                      *             "chartAffinityControl": {
                      *               "enableInjection": true,
-                     *               "enableMultitenancy": true
+                     *               "enableSharedHost": true
                      *             },
                      *             "chartName": "my-chart",
                      *             "chartRepoName": "my-repo",
@@ -77938,7 +77947,7 @@ export interface operations {
                      *             "autoDiscoverImagesTag": "omnistrate/images",
                      *             "chartAffinityControl": {
                      *               "enableInjection": true,
-                     *               "enableMultitenancy": true
+                     *               "enableSharedHost": true
                      *             },
                      *             "chartName": "my-chart",
                      *             "chartRepoName": "my-repo",
@@ -78387,7 +78396,7 @@ export interface operations {
                      *             "autoDiscoverImagesTag": "omnistrate/images",
                      *             "chartAffinityControl": {
                      *               "enableInjection": true,
-                     *               "enableMultitenancy": true
+                     *               "enableSharedHost": true
                      *             },
                      *             "chartName": "my-chart",
                      *             "chartRepoName": "my-repo",
@@ -78857,7 +78866,7 @@ export interface operations {
                  *         "autoDiscoverImagesTag": "omnistrate/images",
                  *         "chartAffinityControl": {
                  *           "enableInjection": true,
-                 *           "enableMultitenancy": true
+                 *           "enableSharedHost": true
                  *         },
                  *         "chartName": "my-chart",
                  *         "chartRepoName": "my-repo",
@@ -79457,7 +79466,7 @@ export interface operations {
                      *         "autoDiscoverImagesTag": "omnistrate/images",
                      *         "chartAffinityControl": {
                      *           "enableInjection": true,
-                     *           "enableMultitenancy": true
+                     *           "enableSharedHost": true
                      *         },
                      *         "chartName": "my-chart",
                      *         "chartRepoName": "my-repo",
@@ -80031,7 +80040,7 @@ export interface operations {
                  *         "autoDiscoverImagesTag": "omnistrate/images",
                  *         "chartAffinityControl": {
                  *           "enableInjection": true,
-                 *           "enableMultitenancy": true
+                 *           "enableSharedHost": true
                  *         },
                  *         "chartName": "my-chart",
                  *         "chartRepoName": "my-repo",

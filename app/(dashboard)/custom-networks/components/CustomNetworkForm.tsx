@@ -91,7 +91,7 @@ const CustomNetworkForm = ({
           return acc;
         }, [])
         .filter((provider) => Object.values(CLOUD_PROVIDERS).includes(provider))
-        // Sort as ['aws', 'azure', 'gcp']
+        // Sort as ['aws', 'azure', 'gcp', 'oci']
         .sort((a, b) => a.localeCompare(b))
     );
   }, [regions]);
