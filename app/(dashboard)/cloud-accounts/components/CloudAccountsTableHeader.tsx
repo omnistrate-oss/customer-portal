@@ -47,6 +47,9 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   const isConnecting = selectedInstance?.status === "CONNECTING";
   const isDisconnected = selectedInstance?.status === "DISCONNECTED";
 
+  const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
+  const isAzureOrOci = !!(resultParams?.azure_subscription_id || resultParams?.oci_tenancy_id);
+
   const isOnPremCopilot = serviceModelType === "ON_PREM_COPILOT";
   const isReady = selectedInstance?.status === "READY";
   const isDisconnecting = selectedInstance?.status === "DISCONNECTING";
@@ -56,7 +59,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   const isDeleting = selectedInstance?.status === "DELETING";
 
   const isDisconnectDisabled =
-    !selectedInstance || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
+    !selectedInstance || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot || isAzureOrOci;
 
   const isConnectDisabled =
     !selectedInstance ||
@@ -65,7 +68,8 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
     isDetaching ||
     isPendingDetaching ||
     isDeploying ||
-    !isOnPremCopilot;
+    !isOnPremCopilot ||
+    isAzureOrOci;
 
   const isDeleteDisabled = !selectedInstance || isDeleting || isDisconnected || isSelectedInstanceReadyToOffboard;
 
@@ -73,26 +77,30 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
 
   const isDisconnectDisabledMessage = !selectedInstance
     ? "Please select a cloud account"
-    : isAttaching || isConnecting
-      ? "Cloud account is connecting"
-      : isDisconnected
-        ? "Cloud account is disconnected"
-        : isDeploying
-          ? "Please wait for the instance to get to Ready state"
-          : !isOnPremCopilot
-            ? "This feature is not supported for this plan"
-            : "";
+    : isAzureOrOci
+      ? "This feature is not supported for this cloud provider"
+      : isAttaching || isConnecting
+        ? "Cloud account is connecting"
+        : isDisconnected
+          ? "Cloud account is disconnected"
+          : isDeploying
+            ? "Please wait for the instance to get to Ready state"
+            : !isOnPremCopilot
+              ? "This feature is not supported for this plan"
+              : "";
   const isConnectDisabledMessage = !selectedInstance
     ? "Please select a cloud account"
-    : isReady
-      ? "Cloud account is already connected"
-      : isDisconnecting || isDetaching || isPendingDetaching
-        ? "Cloud account is disconnecting"
-        : isDeploying
-          ? "Please wait for the instance to get to Ready state"
-          : !isOnPremCopilot
-            ? "This feature is not supported for this plan"
-            : "";
+    : isAzureOrOci
+      ? "This feature is not supported for this cloud provider"
+      : isReady
+        ? "Cloud account is already connected"
+        : isDisconnecting || isDetaching || isPendingDetaching
+          ? "Cloud account is disconnecting"
+          : isDeploying
+            ? "Please wait for the instance to get to Ready state"
+            : !isOnPremCopilot
+              ? "This feature is not supported for this plan"
+              : "";
 
   const isDeleteDisabledMessage = !selectedInstance
     ? "Please select a cloud account"
