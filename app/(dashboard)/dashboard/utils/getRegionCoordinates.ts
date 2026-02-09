@@ -148,8 +148,6 @@ const AWS_REGION_COORDINATES = {
     latitude: -23.5558,
     longitude: -46.6396,
   },
-  // "cn-north-1": { name: "China (Beijing)", latitude: "", longitude: "" },
-  // "cn-northwest-1": { name: "China (Ningxia)", latitude: "", longitude: "" },
 };
 
 export const GCP_REGION_COORDINATES = {
@@ -508,10 +506,239 @@ export const AZURE_REGION_COORDINATES = {
   },
 };
 
+export const OCI_REGION_COORDINATES = {
+  // US
+  "us-ashburn-1": {
+    name: "US East (Ashburn)",
+    latitude: 39.0438,
+    longitude: -77.4874,
+  },
+  "us-chicago-1": {
+    name: "US Midwest (Chicago)",
+    latitude: 41.8781,
+    longitude: -87.6298,
+  },
+  "us-phoenix-1": {
+    name: "US West (Phoenix)",
+    latitude: 33.4484,
+    longitude: -112.074,
+  },
+  "us-sanjose-1": {
+    name: "US West (San Jose)",
+    latitude: 37.3382,
+    longitude: -121.8863,
+  },
+  // Americas
+  "sa-saopaulo-1": {
+    name: "Brazil East (São Paulo)",
+    latitude: -23.5505,
+    longitude: -46.6333,
+  },
+  "sa-vinhedo-1": {
+    name: "Brazil Southeast (Vinhedo)",
+    latitude: -23.0296,
+    longitude: -46.9756,
+  },
+  "ca-montreal-1": {
+    name: "Canada Southeast (Montreal)",
+    latitude: 45.5017,
+    longitude: -73.5673,
+  },
+  "ca-toronto-1": {
+    name: "Canada Southeast (Toronto)",
+    latitude: 43.6532,
+    longitude: -79.3832,
+  },
+  "sa-santiago-1": {
+    name: "Chile Central (Santiago)",
+    latitude: -33.4489,
+    longitude: -70.6693,
+  },
+  "sa-valparaiso-1": {
+    name: "Chile West (Valparaíso)",
+    latitude: -33.0472,
+    longitude: -71.6127,
+  },
+  "sa-bogota-1": {
+    name: "Colombia Central (Bogotá)",
+    latitude: 4.711,
+    longitude: -74.0721,
+  },
+  "mx-queretaro-1": {
+    name: "Mexico Central (Querétaro)",
+    latitude: 20.5888,
+    longitude: -100.3899,
+  },
+  "mx-monterrey-1": {
+    name: "Mexico Northeast (Monterrey)",
+    latitude: 25.6866,
+    longitude: -100.3161,
+  },
+  // Europe
+  "eu-paris-1": {
+    name: "France Central (Paris)",
+    latitude: 48.8566,
+    longitude: 2.3522,
+  },
+  "eu-marseille-1": {
+    name: "France South (Marseille)",
+    latitude: 43.2965,
+    longitude: 5.3698,
+  },
+  "eu-frankfurt-1": {
+    name: "Germany Central (Frankfurt)",
+    latitude: 50.1109,
+    longitude: 8.6821,
+  },
+  "eu-milan-1": {
+    name: "Italy Northwest (Milan)",
+    latitude: 45.4642,
+    longitude: 9.19,
+  },
+  "eu-turin-1": {
+    name: "Italy North (Turin)",
+    latitude: 45.0703,
+    longitude: 7.6869,
+  },
+  "eu-amsterdam-1": {
+    name: "Netherlands Northwest (Amsterdam)",
+    latitude: 52.3676,
+    longitude: 4.9041,
+  },
+  "eu-jovanovac-1": {
+    name: "Serbia Central (Jovanovac)",
+    latitude: 43.97,
+    longitude: 21.24,
+  },
+  "eu-madrid-1": {
+    name: "Spain Central (Madrid)",
+    latitude: 40.4168,
+    longitude: -3.7038,
+  },
+  "eu-madrid-3": {
+    name: "Spain Central (Madrid 3)",
+    latitude: 40.4168,
+    longitude: -3.7038,
+  },
+  "eu-stockholm-1": {
+    name: "Sweden Central (Stockholm)",
+    latitude: 59.3293,
+    longitude: 18.0686,
+  },
+  "eu-zurich-1": {
+    name: "Switzerland North (Zurich)",
+    latitude: 47.3769,
+    longitude: 8.5417,
+  },
+  "uk-london-1": {
+    name: "UK South (London)",
+    latitude: 51.5074,
+    longitude: -0.1278,
+  },
+  "uk-cardiff-1": {
+    name: "UK West (Newport)",
+    latitude: 51.5842,
+    longitude: -2.9977,
+  },
+  // Asia Pacific
+  "ap-sydney-1": {
+    name: "Australia East (Sydney)",
+    latitude: -33.8688,
+    longitude: 151.2093,
+  },
+  "ap-melbourne-1": {
+    name: "Australia Southeast (Melbourne)",
+    latitude: -37.8136,
+    longitude: 144.9631,
+  },
+  "ap-hyderabad-1": {
+    name: "India South (Hyderabad)",
+    latitude: 17.385,
+    longitude: 78.4867,
+  },
+  "ap-mumbai-1": {
+    name: "India West (Mumbai)",
+    latitude: 19.076,
+    longitude: 72.8777,
+  },
+  "ap-batam-1": {
+    name: "Indonesia (Batam)",
+    latitude: 1.0456,
+    longitude: 104.0305,
+  },
+  "ap-osaka-1": {
+    name: "Japan Central (Osaka)",
+    latitude: 34.6937,
+    longitude: 135.5023,
+  },
+  "ap-tokyo-1": {
+    name: "Japan East (Tokyo)",
+    latitude: 35.6762,
+    longitude: 139.6503,
+  },
+  "ap-kulai-2": {
+    name: "Malaysia (Kulai)",
+    latitude: 1.6577,
+    longitude: 103.6041,
+  },
+  "ap-singapore-1": {
+    name: "Singapore",
+    latitude: 1.3521,
+    longitude: 103.8198,
+  },
+  "ap-singapore-2": {
+    name: "Singapore 2",
+    latitude: 1.3521,
+    longitude: 103.8198,
+  },
+  "ap-seoul-1": {
+    name: "South Korea Central (Seoul)",
+    latitude: 37.5665,
+    longitude: 126.978,
+  },
+  "ap-chuncheon-1": {
+    name: "South Korea North (Chuncheon)",
+    latitude: 37.8813,
+    longitude: 127.7298,
+  },
+  "af-johannesburg-1": {
+    name: "South Africa Central (Johannesburg)",
+    latitude: -26.2041,
+    longitude: 28.0473,
+  },
+  // Middle East
+  "il-jerusalem-1": {
+    name: "Israel Central (Jerusalem)",
+    latitude: 31.7683,
+    longitude: 35.2137,
+  },
+  "me-jeddah-1": {
+    name: "Saudi Arabia West (Jeddah)",
+    latitude: 21.4858,
+    longitude: 39.1925,
+  },
+  "me-riyadh-1": {
+    name: "Saudi Arabia Central (Riyadh)",
+    latitude: 24.7136,
+    longitude: 46.6753,
+  },
+  "me-abudhabi-1": {
+    name: "UAE Central (Abu Dhabi)",
+    latitude: 24.4539,
+    longitude: 54.3773,
+  },
+  "me-dubai-1": {
+    name: "UAE East (Dubai)",
+    latitude: 25.2048,
+    longitude: 55.2708,
+  },
+};
+
 export const REGION_COORDINATES = {
   aws: AWS_REGION_COORDINATES,
   gcp: GCP_REGION_COORDINATES,
   azure: AZURE_REGION_COORDINATES,
+  oci: OCI_REGION_COORDINATES,
 };
 
 export function getRegionCoordinates(
