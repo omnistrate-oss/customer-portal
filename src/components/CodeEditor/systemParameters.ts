@@ -33,7 +33,7 @@ export const baseSystermParameters: Record<string, BaseSystemParameter> = {
     type: "integer",
   },
   "compute.node.region": {
-    description: "AWS region where the current node is deployed.",
+    description: "Region where the current node is deployed.",
     type: "string",
   },
   "compute.nodes[i].poolName": {
@@ -61,7 +61,7 @@ export const baseSystermParameters: Record<string, BaseSystemParameter> = {
     type: "integer",
   },
   "compute.nodes[i].region": {
-    description: "AWS region where a specific node (node i) is deployed.",
+    description: "Region where a specific node (node i) is deployed.",
     type: "string",
   },
   "compute.numNodes": {

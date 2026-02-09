@@ -65,7 +65,9 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
         ? offering.awsRegions || []
         : cloudProvider === "gcp"
           ? offering.gcpRegions || []
-          : offering.azureRegions || [],
+          : cloudProvider === "azure"
+            ? offering.azureRegions || []
+            : offering.ociRegions || [],
       region
     );
   }, [customNetworks, cloudProvider, region, offering]);
