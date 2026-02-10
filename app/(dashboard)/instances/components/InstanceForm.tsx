@@ -116,12 +116,13 @@ const InstanceForm = ({
                   const isBYOAInstance = checkBYOADeploymentInstance(instance);
                   if (!isBYOAInstance) return false;
                   const instanceAccountId =
-                    instance?.awsAccountID || instance?.gcpProjectID || instance?.azureSubscriptionID;
+                    instance?.awsAccountID || instance?.gcpProjectID || instance?.azureSubscriptionID || instance?.ociTenancyID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
-                    createdInstance?.azureSubscriptionID;
-
+                    createdInstance?.azureSubscriptionID ||
+                    createdInstance?.ociTenancyID;
+                    
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
                   const isFromSameRegion = instance.region === createdInstance.region;
