@@ -101,8 +101,8 @@ function CreateInstanceModal(props: CreateInstanceModalProps) {
               :
             </Text>
             <Stack direction="row" alignItems="center" gap="4px">
-              <Text size="small" weight="regular" color="#535862" data-test-id="instance-id">
-                {instanceId}{" "}
+              <Text size="small" weight="regular" color="#535862" data-testid="instance-id">
+                {instanceId}
               </Text>
               {instanceId && (
                 <CopyToClipboardButton
