@@ -12,8 +12,8 @@ dotenv.config({ path: path.resolve(__dirname, ".env.local") });
  */
 
 export default defineConfig({
-  globalSetup: require.resolve("./test-fixtures/global-setup"),
-  globalTeardown: require.resolve("./test-fixtures/global-teardown"),
+  // globalSetup: require.resolve("./test-fixtures/global-setup"),
+  // globalTeardown: require.resolve("./test-fixtures/global-teardown"),
 
   testDir: "./tests",
   testMatch: /(?!)/, // Skip all tests temporarily (backend issues)
