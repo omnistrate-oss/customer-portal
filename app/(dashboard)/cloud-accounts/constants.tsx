@@ -55,6 +55,28 @@ export const CloudAccountValidationSchema = yup.object({
       ),
     otherwise: yup.string(),
   }),
+  ociTenancyId: yup.string().when("cloudProvider", {
+    is: "oci",
+    then: yup
+      .string()
+      .required("OCI Tenancy OCID is required")
+      .matches(
+        /^ocid1\.tenancy\.oc1\.[a-z0-9.-]+$/,
+        "OCI Tenancy OCID must start with 'ocid1.tenancy.oc1.' followed by alphanumeric characters"
+      ),
+    otherwise: yup.string(),
+  }),
+  ociDomainId: yup.string().when("cloudProvider", {
+    is: "oci",
+    then: yup
+      .string()
+      .required("OCI Domain OCID is required")
+      .matches(
+        /^ocid1\.(domain|user)\.oc1\.[a-z0-9.-]+$/,
+        "OCI Domain OCID must start with 'ocid1.domain.oc1.' or 'ocid1.user.oc1.' followed by alphanumeric characters"
+      ),
+    otherwise: yup.string(),
+  }),
 });
 
 export const cloudAccountOffboardingSteps = [

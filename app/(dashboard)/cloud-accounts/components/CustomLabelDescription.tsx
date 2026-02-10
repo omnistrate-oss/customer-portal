@@ -41,7 +41,7 @@ export const StyledListItem: FC<StyledListItemProps> = (props) => {
 
 const CustomLabelDescription: FC<{
   hideLinks?: boolean;
-  variant: "aws" | "gcpProjectNumber" | "gcpProjectId" | "azureSubscriptionId" | "azureTenantId";
+  variant: "aws" | "gcpProjectNumber" | "gcpProjectId" | "azureSubscriptionId" | "azureTenantId" | "ociTenancyId" | "ociDomainId";
 }> = ({ hideLinks, variant }) => {
   return (
     <Box mt="8px">
@@ -74,7 +74,7 @@ const CustomLabelDescription: FC<{
         ) : variant === "azureSubscriptionId" ? (
           <>
             <StyledListItem
-              text="Can’t find Subscription ID?"
+              text="Can't find Subscription ID?"
               link={
                 "https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id#find-your-azure-active-directory-tenant-id"
               }
@@ -82,15 +82,26 @@ const CustomLabelDescription: FC<{
 
             <StyledListItem text="Don't have Azure Account?" link={"https://signup.azure.com/"} />
           </>
-        ) : (
+        ) : variant === "ociTenancyId" ? (
           <>
             <StyledListItem
-              text="Can't find Azure Tenant ID?"
-              link={
-                "https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id#find-your-azure-active-directory-tenant-id"
-              }
+              text="Can't find Tenancy OCID?"
+              link="https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm#tenancy_ocid"
             />
+            <StyledListItem text="Don't have OCI account?" link="https://www.oracle.com/cloud/free/" />
           </>
+        ) : variant === "ociDomainId" ? (
+          <StyledListItem
+            text="Can't find Domain OCID?"
+            link="https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm"
+          />
+        ) : (
+          <StyledListItem
+            text="Can't find Azure Tenant ID?"
+            link={
+              "https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id#find-your-azure-active-directory-tenant-id"
+            }
+          />
         ))}
     </Box>
   );

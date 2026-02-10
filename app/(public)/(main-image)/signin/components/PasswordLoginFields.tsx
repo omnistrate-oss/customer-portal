@@ -1,12 +1,14 @@
 import { FC, useState } from "react";
 import Link from "next/link";
-import { InputAdornment, Stack } from "@mui/material";
+import { InputAdornment } from "@mui/material";
 import { FormikProps } from "formik";
 
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import SubmitButton from "src/components/NonDashboardComponents/FormElementsV2/SubmitButton";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+
+import NonProdLoginInstructions from "./NonProdLoginInstructions";
 
 type PasswordLoginFieldsProps = {
   formData: FormikProps<{
@@ -84,6 +86,7 @@ const PasswordLoginFields: FC<PasswordLoginFieldsProps> = ({
           Forgot Password
         </Link>
       )}
+      {environmentType !== "PROD" && <NonProdLoginInstructions />}
 
       <SubmitButton
         data-testid="login-button"
@@ -94,11 +97,6 @@ const PasswordLoginFields: FC<PasswordLoginFieldsProps> = ({
       >
         Sign In
       </SubmitButton>
-      {environmentType !== "PROD" && (
-        <Stack display="flex" justifyContent="center" alignItems="center" mt="22px">
-          <Text>Log in with your Omnistrate account credentials</Text>
-        </Stack>
-      )}
     </>
   );
 };

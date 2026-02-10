@@ -28,6 +28,7 @@ export class InstancesPage {
     awsCard: "aws-card",
     gcpCard: "gcp-card",
     azureCard: "azure-card",
+    ociCard: "oci-card",
     cloudAccountSelect: "cloud_provider_account_config_id-select",
     submitButton: "submit-button",
 
