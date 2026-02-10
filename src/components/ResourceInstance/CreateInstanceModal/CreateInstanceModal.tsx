@@ -100,17 +100,17 @@ function CreateInstanceModal(props: CreateInstanceModalProps) {
             <Text size="small" weight="semibold" color="#344054">
               :
             </Text>
-            <Stack direction="row" alignItems="center" gap="8px">
+            <Stack direction="row" alignItems="center" gap="4px">
               <Text size="small" weight="regular" color="#535862">
                 {instanceId}{" "}
-                {instanceId && (
-                  <CopyToClipboardButton
-                    text={instanceId}
-                    iconProps={{ color: "#067647" }}
-                    tooltipText="Copy Instance ID"
-                  />
-                )}
               </Text>
+              {instanceId && (
+                <CopyToClipboardButton
+                  text={instanceId}
+                  iconProps={{ color: "#067647" }}
+                  tooltipText="Copy Instance ID"
+                />
+              )}
             </Stack>
             <Text size="small" weight="semibold" color="#344054">
               Lifecycle Status
@@ -119,9 +119,7 @@ function CreateInstanceModal(props: CreateInstanceModalProps) {
               :
             </Text>
             <Stack direction="row" alignItems="center" gap="8px">
-              <Text size="small" weight="regular" color="#535862">
-                <StatusChip status={lifecycleStatus} {...statusStylesAndLabel} showOverflowTitle />
-              </Text>
+              <StatusChip status={lifecycleStatus} {...statusStylesAndLabel} showOverflowTitle />
             </Stack>
           </Box>
 
