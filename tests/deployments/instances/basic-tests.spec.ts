@@ -61,7 +61,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
     await page.waitForTimeout(5000); // Wait 5 seconds
     await page.getByTestId(dataTestIds.submitButton).click();
-
+    // Wait for the instance ID element to be visible
+    await page.getByTestId(dataTestIds.instanceId).waitFor({ state: "visible" });
     instanceId = (await page.getByTestId(dataTestIds.instanceId).textContent()) || "";
     console.log(logPrefix, "Instance ID:", instanceId);
 
