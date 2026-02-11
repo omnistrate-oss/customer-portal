@@ -67,7 +67,7 @@ const ChangePasswordPage = () => {
 
   return (
     <>
-      <Box textAlign="center">
+      <Box display="flex" justifyContent="center">
         {orgLogoURL ? (
           <Logo src={orgLogoURL} alt={orgName} style={{ width: "120px", height: "auto", maxHeight: "unset" }} />
         ) : (
