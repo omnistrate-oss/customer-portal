@@ -46,7 +46,6 @@ function startMailServiceCron() {
       //Fetch all events
       const eventsResponse = await getEventsList(environmentType);
       const events = eventsResponse.data.events || [];
-      console.log("Events", events);
       const orgDetailsResponse = await getProviderOrgDetails();
       const orgLogoURL = orgDetailsResponse.data.orgLogoURL;
       const orgSupportEmail = orgDetailsResponse.data.orgSupportEmail;
@@ -188,13 +187,12 @@ function startMailServiceCron() {
               .then(async () => {
                 //call backend api
                 await acknowledgeEvent(event.eventID);
-                console.log("Event acknowledged", event);
               });
 
             mailPromises.push(mailPromise);
           }
-        } catch (error) {
-          console.error("Mail error", error);
+        } catch {
+          console.error("Mail error");
         }
       }
 
@@ -206,9 +204,9 @@ function startMailServiceCron() {
         .finally(() => {
           isRunning = false;
         });
-    } catch (error) {
+    } catch {
       isRunning = false;
-      console.error(error?.response?.data);
+      console.error("Mail cron error");
     }
   }
   //run cron job after every 30 seconds

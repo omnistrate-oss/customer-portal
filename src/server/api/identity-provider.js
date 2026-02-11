@@ -8,7 +8,7 @@ function getRenderIdentityProvidersList(queryParams) {
       params: queryParams,
     })
     .catch((error) => {
-      console.log("list identity provider error", error);
+      console.log("list identity provider error");
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {

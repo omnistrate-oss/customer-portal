@@ -57,8 +57,7 @@ export async function middleware(request) {
       response.headers.set(`x-middleware-cache`, `no-cache`);
       return response;
     }
-  } catch (error) {
-    console.log("Middleware Error", error?.response?.data);
+  } catch {
     redirectToSignIn();
   }
 

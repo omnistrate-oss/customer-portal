@@ -172,8 +172,8 @@ test.describe("Signin Page", () => {
             jwtToken: userToken,
           }),
         });
-      } catch (error) {
-        console.log("Error in route handler:", error);
+      } catch {
+        console.log("Error in route handler");
       }
     });
     await page.waitForTimeout(2000);

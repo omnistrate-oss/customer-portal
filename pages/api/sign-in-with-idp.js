@@ -27,7 +27,7 @@ export default async function handleSignIn(nextRequest, nextResponse) {
 
       nextResponse.status(200).send({ ...response.data });
     } catch (error) {
-      console.log("IDP Error", error);
+      console.log("IDP Sign In Error");
       const defaultErrorMessage = "Someting went wrong. Please retry";
 
       if (error.name === "ProviderAuthError" || error?.response?.status === undefined) {

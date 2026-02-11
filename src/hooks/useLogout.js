@@ -38,8 +38,8 @@ function useLogout() {
   function logout() {
     axios
       .post("/logout")
-      .catch((error) => {
-        console.log("Logout request failed", error);
+      .catch(() => {
+        console.log("Logout request failed");
       })
       .finally(() => {
         handleLogout();
@@ -47,8 +47,8 @@ function useLogout() {
         if (logoutBroadcastChannel) {
           try {
             logoutBroadcastChannel.postMessage("logout");
-          } catch (error) {
-            console.error("Failed to post message on broadcast channel:", error);
+          } catch {
+            console.error("Failed to post message on broadcast channel:");
           }
         }
       });

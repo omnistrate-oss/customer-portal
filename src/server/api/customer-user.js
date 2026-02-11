@@ -12,7 +12,6 @@ function customerUserSignUp(payload, ipHeaders = {}) {
       headers: ipHeaders,
     })
     .catch((error) => {
-      console.log("Sign up error", error);
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {
@@ -27,7 +26,6 @@ function customerUserSignIn(payload, ipHeaders = {}) {
       headers: ipHeaders,
     })
     .catch((error) => {
-      console.log("Sign in error", error);
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {
@@ -42,7 +40,6 @@ function customerSignInWithIdentityProvider(payload, ipHeaders = {}) {
       headers: ipHeaders,
     })
     .catch((error) => {
-      console.log("IDP Sign in error", error);
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {
@@ -68,7 +65,7 @@ function customerUserResetPassword(payload, ipHeaders = {}) {
 
 function getProviderOrgDetails() {
   return axios.get("/user").catch((error) => {
-    console.log("getProviderOrgDetails error", error);
+    console.log("getProviderOrgDetails error");
     if (error.response && error.response.status === 401) {
       throw new ProviderAuthError();
     } else {

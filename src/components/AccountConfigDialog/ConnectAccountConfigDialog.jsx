@@ -103,7 +103,7 @@ const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusS
       const resourceInstanceResponse = await fetchClickedInstanceDetails();
       resourceInstance = resourceInstanceResponse.data;
     } catch {
-      console.log("check error in polling ");
+      console.log("Error in polling for resource instance details");
     }
 
     if (resourceInstance?.status) {

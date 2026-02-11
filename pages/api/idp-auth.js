@@ -30,8 +30,8 @@ export default async function handleAuth(nextRequest, nextResponse) {
         nextResponse.setHeader("Set-Cookie", `token=${jwtToken}; Path=/`);
         nextResponse.setHeader("Access-Control-Expose-Headers", "Set-Cookie");
         nextResponse.redirect(307, "/signin");
-      } catch (err) {
-        console.log("IDP AUTH err", err);
+      } catch {
+        console.log("IDP auth error");
       }
     }
   }
