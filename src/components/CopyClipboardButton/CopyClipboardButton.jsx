@@ -33,7 +33,7 @@ const CopyToClipboardButton = (props) => {
         setTooltipText("Click to copy");
       }}
     >
-      <IconButton onClick={handleClick} sx={buttonStyles}>
+      <IconButton onClick={handleClick} sx={{ flexShrink: 0, ...buttonStyles }}>
         <DataGridCopyIcon color="#7F56D9" {...iconProps} />
       </IconButton>
     </Tooltip>
