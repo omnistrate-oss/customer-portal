@@ -70,6 +70,7 @@ function Connectivity(props) {
     if (primaryResourceName && primaryResourceEndpoint) {
       res.push(
         <ResourceConnectivityEndpoint
+          key="primary"
           isPrimaryResource={true}
           endpointURL={primaryResourceEndpoint}
           resourceName={primaryResourceName}

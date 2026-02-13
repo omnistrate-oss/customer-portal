@@ -48,7 +48,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
             />
           </>
         )}
-        <link rel="icon" href="" id="provider-favicon" />
+        <link rel="icon" href={undefined} id="provider-favicon" />
         <meta httpEquiv="cache-control" content="no-cache" />
         <meta httpEquiv="expires" content="0" />
         <meta httpEquiv="pragma" content="no-cache" />

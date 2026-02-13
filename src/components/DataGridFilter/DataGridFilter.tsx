@@ -89,10 +89,18 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
     },
   });
 
+  const filterConfigRef = useRef(filterConfig);
+  filterConfigRef.current = filterConfig;
+
   useEffect(() => {
-    const filtered = filterData(data, appliedFilters, filterConfig);
-    setFilteredData(filtered);
-  }, [data, appliedFilters, filterConfig, setFilteredData]);
+    const filtered = filterData(data, appliedFilters, filterConfigRef.current);
+    setFilteredData((prev) => {
+      if (prev.length === filtered.length && prev.every((item, i) => item === filtered[i])) {
+        return prev;
+      }
+      return filtered;
+    });
+  }, [data, appliedFilters, setFilteredData]);
 
   useEffect(() => {
     const currentConfig = filterConfig[activeFilterView];

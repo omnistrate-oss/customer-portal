@@ -256,9 +256,9 @@ const DeleteInstructions = ({ accountInstructionDetails }) => {
                 revoke our access.
               </Text>
 
-              {accountInstructionDetails?.ociDisconnectShellCommand && (
+              {accountInstructionDetails?.ociOffboardShellCommand && (
                 <TextContainerToCopy
-                  text={addQuotesToShellCommand(accountInstructionDetails?.ociDisconnectShellCommand)}
+                  text={addQuotesToShellCommand(accountInstructionDetails?.ociOffboardShellCommand)}
                   marginTop="12px"
                 />
               )}

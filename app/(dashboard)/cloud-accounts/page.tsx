@@ -24,6 +24,7 @@ import {
   getAzureShellScriptOffboardCommand,
   getGcpBootstrapShellCommand,
   getGcpShellScriptOffboardCommand,
+  getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
@@ -485,7 +486,9 @@ const CloudAccountsPage = () => {
         gcpProjectNumber: result_params?.gcp_project_number,
       };
       if (result_params?.cloud_provider_account_config_id) {
-        details.gcpOffboardCommand = getGcpShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+        details.gcpOffboardCommand =
+          selectedAccountConfig?.gcpOffboardShellCommand ||
+          getGcpShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
       }
     } else if (result_params?.azure_subscription_id) {
       details = {
@@ -493,17 +496,19 @@ const CloudAccountsPage = () => {
         azureTenantID: result_params?.azure_tenant_id,
       };
       if (result_params?.cloud_provider_account_config_id) {
-        details.azureOffboardCommand = getAzureShellScriptOffboardCommand(
-          result_params?.cloud_provider_account_config_id
-        );
+        details.azureOffboardCommand =
+          selectedAccountConfig?.azureOffboardShellCommand ||
+          getAzureShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
       }
     } else if (result_params?.oci_tenancy_id) {
       details = {
         ociTenancyID: result_params?.oci_tenancy_id,
         ociDomainID: result_params?.oci_domain_id,
       };
-      if (selectedAccountConfig?.ociDisconnectShellCommand) {
-        details.ociOffboardCommand = selectedAccountConfig.ociDisconnectShellCommand;
+      if (result_params?.cloud_provider_account_config_id) {
+        details.ociOffboardCommand =
+          selectedAccountConfig?.ociOffboardShellCommand ||
+          getOciShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
       }
     }
     return details;
