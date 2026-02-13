@@ -37,6 +37,13 @@ export const getAzureShellScriptOffboardCommand = (accountId) => {
   return AZURE_SHELL_SCRIPT_OFFBOARD_COMMAND.replace("<BASE_URL>", baseURL).replace("<ACCOUNT_CONFIG_ID>", accountId);
 };
 
+//oci utilities
+export const OCI_SHELL_SCRIPT_OFFBOARD_COMMAND = `bash -c "$(curl -fsSL '<BASE_URL>/account-setup/oci-offboard.sh?account_config_id=<ACCOUNT_CONFIG_ID>')"`;
+
+export const getOciShellScriptOffboardCommand = (accountId) => {
+  return OCI_SHELL_SCRIPT_OFFBOARD_COMMAND.replace("<BASE_URL>", baseURL).replace("<ACCOUNT_CONFIG_ID>", accountId);
+};
+
 export const addQuotesToShellCommand = (command) => {
   if (!command) return command;
 
