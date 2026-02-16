@@ -160,16 +160,18 @@ const SignupForm: React.FC<SignupFormProps> = ({
           mb={passwordSignupAllowed ? 0 : "8px"}
           mt={!passwordSignupAllowed ? "24px" : 0}
         >
-          <Stack gap="12px" mt="12px">
-            {topTwoIDPOptions.map((idp) => (
-              <IDPButton
-                key={idp.name}
-                idp={idp}
-                onClick={onIDPButtonClick}
-                data-testid={`idp-signup-button-${idp.name}`}
-              />
-            ))}
-          </Stack>
+          {topTwoIDPOptions.length > 0 && (
+            <Stack gap="12px" mt="12px">
+              {topTwoIDPOptions.map((idp) => (
+                <IDPButton
+                  key={idp.name}
+                  idp={idp}
+                  onClick={onIDPButtonClick}
+                  data-testid={`idp-signup-button-${idp.name}`}
+                />
+              ))}
+            </Stack>
+          )}
           <Collapse in={areOtherSigninOptionsExpanded} timeout={300}>
             <Stack gap="12px" mt="12px">
               {otherIDPOptions.map((idp) => (
