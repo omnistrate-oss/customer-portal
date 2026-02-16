@@ -94,8 +94,8 @@ const SignupForm: React.FC<SignupFormProps> = ({
     });
   }
 
-  const primaryIdp = identityProviders.length > 0 ? identityProviders[0] : null;
-  const otherIdps = identityProviders.slice(1);
+  const topTwoIDPOptions = identityProviders.slice(0, 2);
+  const otherIDPOptions = identityProviders.slice(2);
 
   const passwordSignupAllowed = isPasswordLoginEnabled && !hasIDPWithMatchingDomain;
 
@@ -160,16 +160,19 @@ const SignupForm: React.FC<SignupFormProps> = ({
           mb={passwordSignupAllowed ? 0 : "8px"}
           mt={!passwordSignupAllowed ? "24px" : 0}
         >
-          {primaryIdp && (
-            <IDPButton
-              idp={primaryIdp}
-              onClick={onIDPButtonClick}
-              data-testid={`idp-signup-button-${primaryIdp.name}`}
-            />
-          )}
+          <Stack gap="12px" mt="12px">
+            {topTwoIDPOptions.map((idp) => (
+              <IDPButton
+                key={idp.name}
+                idp={idp}
+                onClick={onIDPButtonClick}
+                data-testid={`idp-signup-button-${idp.name}`}
+              />
+            ))}
+          </Stack>
           <Collapse in={areOtherSigninOptionsExpanded} timeout={300}>
             <Stack gap="12px" mt="12px">
-              {otherIdps.map((idp) => (
+              {otherIDPOptions.map((idp) => (
                 <IDPButton
                   key={idp.name}
                   idp={idp}
@@ -179,7 +182,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
               ))}
             </Stack>
           </Collapse>
-          {otherIdps.length > 0 && passwordSignupAllowed && (
+          {otherIDPOptions.length > 0 && passwordSignupAllowed && (
             <Button
               variant="text"
               disableRipple
