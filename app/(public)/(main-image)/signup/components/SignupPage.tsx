@@ -192,7 +192,7 @@ const SignupPage = (props) => {
 
       <Box
         component="form"
-        mt="44px"
+        mt="32px"
         autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
