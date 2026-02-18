@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Box } from "@mui/material";
 import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
@@ -25,6 +25,7 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { getInstancesRoute } from "src/utils/routes";
 
+import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
@@ -129,6 +130,11 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     };
   }, [instance, serviceOffering, subscription, selectedResource]);
 
+  const { data: selectedInstance } = useInstancesDescribe({
+    ...selectedInstanceData,
+    enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
+  });
+
   const deleteInstanceMutation = $api.useMutation(
     "delete",
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
@@ -207,7 +213,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
           <InstanceForm
             instances={instances}
             formMode={overlayType === "create-instance-form" ? "create" : "modify"}
-            selectedInstance={instance}
+            selectedInstance={selectedInstance}
             refetchInstances={refetchData}
             setCreateInstanceModalData={setCreateInstanceModalData}
             setIsOverlayOpen={setIsOverlayOpen}
@@ -220,7 +226,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         open={isOverlayOpen && overlayType === "upgrade-dialog"}
         onClose={() => setIsOverlayOpen(false)}
         refetchInstances={refetchData}
-        instance={instance}
+        instance={selectedInstance}
         subscription={subscription}
         serviceOffering={serviceOffering}
       />
