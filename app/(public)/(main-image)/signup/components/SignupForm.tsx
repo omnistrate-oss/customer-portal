@@ -26,7 +26,7 @@ const FormGrid = styled(Box)(() => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
   columnGap: "22px",
-  rowGap: "27px",
+  rowGap: "22px",
   "@media (max-width: 1280px)": {
     gridTemplateColumns: "1fr",
     rowGap: "22px",
@@ -77,6 +77,9 @@ const SignupForm: React.FC<SignupFormProps> = ({
     isPasswordLoginEnabled ? false : true
   );
   const [hasLoadedParams, setHasLoadedParams] = useState(false);
+  const [affiliateCodeFieldVisible, setAffiliateCodeFieldVisible] = useState(
+    formData.values.affiliateCode || affiliateCode ? true : false
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -161,7 +164,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           mt={!passwordSignupAllowed ? "24px" : 0}
         >
           {topTwoIDPOptions.length > 0 && (
-            <Stack gap="12px" mt="12px">
+            <Stack gap="12px">
               {topTwoIDPOptions.map((idp) => (
                 <IDPButton
                   key={idp.name}
@@ -208,8 +211,8 @@ const SignupForm: React.FC<SignupFormProps> = ({
       {hasLoadedParams && passwordSignupAllowed && !areOtherSigninOptionsExpanded && (
         <Collapse in={passwordSignupAllowed && !areOtherSigninOptionsExpanded}>
           {passwordSignupAllowed && isSSOEnabled && (
-            <div className="max-w-[390px] mx-auto mb-8">
-              <div className="relative flex items-center mt-4">
+            <div className="max-w-[390px] mx-auto mb-4">
+              <div className="relative flex items-center mt-3">
                 <div className="flex-grow border-t border-[#E9EAEB]" />
                 <Text size="small" weight="medium" color="#535862" sx={{ mx: "8px", background: "white" }}>
                   OR
@@ -218,6 +221,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
               </div>
             </div>
           )}
+
           <FormGrid>
             <FieldContainer>
               <FieldLabel required>Name</FieldLabel>
@@ -298,19 +302,31 @@ const SignupForm: React.FC<SignupFormProps> = ({
               />
               <FieldError sx={{ paddingLeft: "13px" }}>{touched.confirmPassword && errors.confirmPassword}</FieldError>
             </FieldContainer>
-            <FieldContainer>
-              <FieldLabel>Affiliation Code</FieldLabel>
-              {/* @ts-ignore */}
-              <TextField
-                id="affiliateCode"
-                name="affiliateCode"
-                placeholder="Affiliation Code"
-                value={values.affiliateCode}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.affiliateCode && errors.affiliateCode}
-              />
-            </FieldContainer>
+            <Box>
+              <Box
+                onClick={() => {
+                  setAffiliateCodeFieldVisible((prev) => !prev);
+                }}
+              >
+                <FieldLabel>Have Affiliation Code?</FieldLabel>{" "}
+                {affiliateCodeFieldVisible ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </Box>
+
+              <Collapse in={affiliateCodeFieldVisible}>
+                <FieldContainer>
+                  {/* @ts-ignore */}
+                  <TextField
+                    id="affiliateCode"
+                    name="affiliateCode"
+                    placeholder="Enter your affiliation code"
+                    value={values.affiliateCode}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.affiliateCode && errors.affiliateCode}
+                  />
+                </FieldContainer>
+              </Collapse>
+            </Box>
           </FormGrid>
           <Stack mt="32px" maxWidth="360px" mx="auto">
             <SubmitButton type="submit" onClick={onSubmit} disabled={isSubmitDisabled} loading={isSubmitLoading}>
