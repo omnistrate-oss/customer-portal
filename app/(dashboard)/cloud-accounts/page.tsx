@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataGridText from "components/DataGrid/DataGridText";
+import DataTable from "components/DataTable/DataTable";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
@@ -28,13 +35,6 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataGridText from "components/DataGrid/DataGridText";
-import DataTable from "components/DataTable/DataTable";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -635,16 +635,7 @@ const CloudAccountsPage = () => {
               setIsOverlayOpen(true);
               setOverlayType("delete-dialog");
             },
-            onConnectClick: () => {
-              setClickedInstance(selectedInstance);
-              setIsOverlayOpen(true);
-              setOverlayType("connect-dialog");
-            },
-            onDisconnectClick: () => {
-              setClickedInstance(selectedInstance);
-              setIsOverlayOpen(true);
-              setOverlayType("disconnect-dialog");
-            },
+
             onOffboardClick: () => {
               setClickedInstance(selectedInstance);
               setIsOverlayOpen(true);
@@ -655,7 +646,6 @@ const CloudAccountsPage = () => {
             isFetchingInstances: isFetchingInstances,
             refetchAccountConfigs: refetchAccountConfigs,
             isFetchingAccountConfigs: isFetchingAccountConfigs,
-            serviceModelType: selectedInstanceOffering?.serviceModelType,
             isSelectedInstanceReadyToOffboard: isSelectedInstanceReadyToOffboard,
           }}
           isLoading={isInstancesPending || isAccountConfigsPending}
