@@ -48,7 +48,7 @@ const SigninPage: FC<SignInPageProps> = (props) => {
 
   return (
     <Box minHeight="451px">
-      <Box textAlign="center">
+      <Box display="flex" justifyContent="center">
         {orgLogoURL ? (
           <Logo src={orgLogoURL} alt={orgName} style={{ maxWidth: "300px", maxHeight: "120px", height: "auto" }} />
         ) : (

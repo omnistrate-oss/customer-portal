@@ -132,8 +132,9 @@ export const getStandardInformationFields = (
         } else if (cloudProvider === "gcp") {
           setFieldValue("region", offering.gcpRegions?.[0] || "");
         } else if (cloudProvider === "azure") {
-          // @ts-ignore
           setFieldValue("region", offering.azureRegions?.[0] || "");
+        } else if (cloudProvider === "oci") {
+          setFieldValue("region", offering.ociRegions?.[0] || "");
         }
 
         const resources = getResourceMenuItems(offering);
@@ -174,8 +175,9 @@ export const getStandardInformationFields = (
             } else if (cloudProvider === "gcp") {
               setFieldValue("region", offering.gcpRegions?.[0] || "");
             } else if (cloudProvider === "azure") {
-              // @ts-ignore
               setFieldValue("region", offering.azureRegions?.[0] || "");
+            } else if (cloudProvider === "oci") {
+              setFieldValue("region", offering.ociRegions?.[0] || "");
             }
 
             const resources = getResourceMenuItems(offering);
@@ -334,8 +336,9 @@ export const getStandardInformationFields = (
             } else if (newCloudProvider === "gcp") {
               setFieldValue("region", offering.gcpRegions?.[0] || "");
             } else if (newCloudProvider === "azure") {
-              // @ts-ignore
               setFieldValue("region", offering.azureRegions?.[0] || "");
+            } else if (newCloudProvider === "oci") {
+              setFieldValue("region", offering.ociRegions?.[0] || "");
             }
           }}
           disabled={formMode !== "create"}
@@ -472,7 +475,9 @@ export const getNetworkConfigurationFields = (
           ? offering.awsRegions || []
           : values.cloudProvider === "gcp"
             ? offering.gcpRegions || []
-            : offering.azureRegions || [],
+            : values.cloudProvider === "azure"
+              ? offering.azureRegions || []
+              : offering.ociRegions || [],
         values.region
       ),
       emptyMenuText: "No customer networks available",

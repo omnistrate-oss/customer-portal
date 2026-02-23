@@ -181,7 +181,7 @@ const SignupPage = (props) => {
 
   return (
     <>
-      <Box textAlign="center">
+      <Box display="flex" justifyContent="center">
         {orgLogoURL ? (
           <Logo src={orgLogoURL} alt={orgName} style={{ maxWidth: "300px", maxHeight: "120px", height: "auto" }} />
         ) : (
@@ -192,7 +192,7 @@ const SignupPage = (props) => {
 
       <Box
         component="form"
-        mt="44px"
+        mt="32px"
         autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();

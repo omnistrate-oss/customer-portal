@@ -176,7 +176,8 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
     },
     getSubRows: getSubRows,
     paginateExpandedRows: false,
-    getRowId: (row) => String(row[rowId]),
+    autoResetPageIndex: false,
+    getRowId: (row, index) => (row[rowId] != null ? String(row[rowId]) : String(index)), // Use the specified rowId property or fallback to index if not available
   });
 
   const rowData = table.getRowModel().rows;

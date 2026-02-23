@@ -6,10 +6,12 @@ import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
+import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { chipCategoryColors } from "src/constants/statusChipStyles";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
@@ -25,6 +27,7 @@ import {
   getAzureShellScriptOffboardCommand,
   getGcpBootstrapShellCommand,
   getGcpShellScriptOffboardCommand,
+  getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
@@ -46,10 +49,8 @@ import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
-import { getOffboardReadiness } from "./utils";
-import { $api } from "src/api/query";
 import { DIALOG_DATA } from "./constants";
-import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
+import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -121,6 +122,12 @@ const CloudAccountsPage = () => {
         azureSubscriptionID: result_params?.azure_subscription_id,
         azureTenantID: result_params?.azure_tenant_id,
       };
+    } else if (result_params?.oci_tenancy_id) {
+      details = {
+        ociTenancyID: result_params?.oci_tenancy_id,
+        ociDomainID: result_params?.oci_domain_id,
+        ociBootstrapShellCommand: result_params?.oci_bootstrap_shell_script,
+      };
     }
     return details;
   }, [clickedInstance]);
@@ -175,7 +182,9 @@ const CloudAccountsPage = () => {
           // @ts-ignore
           instance.result_params?.aws_account_id?.toLowerCase().includes(searchText.toLowerCase()) ||
           // @ts-ignore
-          instance.result_params?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase())
+          instance.result_params?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase()) ||
+          // @ts-ignore
+          instance.result_params?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
@@ -192,6 +201,8 @@ const CloudAccountsPage = () => {
           row.result_params?.aws_account_id ||
           // @ts-ignore
           row.result_params?.azure_subscription_id ||
+          // @ts-ignore
+          row.result_params?.oci_tenancy_id ||
           "-",
         {
           id: "account_id",
@@ -204,6 +215,8 @@ const CloudAccountsPage = () => {
               data.row.original.result_params?.aws_account_id ||
               // @ts-ignore
               data.row.original.result_params?.azure_subscription_id ||
+              // @ts-ignore
+              data.row.original.result_params?.oci_tenancy_id ||
               "-";
 
             const deletionProtectionFeatureEnabled =
@@ -405,6 +418,8 @@ const CloudAccountsPage = () => {
           else if (result_params?.gcp_project_id) cloudProvider = "gcp";
           // @ts-ignore
           else if (result_params?.azure_subscription_id) cloudProvider = "azure";
+          // @ts-ignore
+          else if (result_params?.oci_tenancy_id) cloudProvider = "oci";
           return cloudProvider;
         },
         {
@@ -419,6 +434,8 @@ const CloudAccountsPage = () => {
             else if (result_params?.gcp_project_id) cloudProvider = "gcp";
             // @ts-ignore
             else if (result_params?.azure_subscription_id) cloudProvider = "azure";
+            // @ts-ignore
+            else if (result_params?.oci_tenancy_id) cloudProvider = "oci";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
           },
@@ -486,7 +503,9 @@ const CloudAccountsPage = () => {
         gcpProjectNumber: result_params?.gcp_project_number,
       };
       if (result_params?.cloud_provider_account_config_id) {
-        details.gcpOffboardCommand = getGcpShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+        details.gcpOffboardCommand =
+          selectedAccountConfig?.gcpOffboardShellCommand ||
+          getGcpShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
       }
     } else if (result_params?.azure_subscription_id) {
       details = {
@@ -494,13 +513,23 @@ const CloudAccountsPage = () => {
         azureTenantID: result_params?.azure_tenant_id,
       };
       if (result_params?.cloud_provider_account_config_id) {
-        details.azureOffboardCommand = getAzureShellScriptOffboardCommand(
-          result_params?.cloud_provider_account_config_id
-        );
+        details.azureOffboardCommand =
+          selectedAccountConfig?.azureOffboardShellCommand ||
+          getAzureShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+      }
+    } else if (result_params?.oci_tenancy_id) {
+      details = {
+        ociTenancyID: result_params?.oci_tenancy_id,
+        ociDomainID: result_params?.oci_domain_id,
+      };
+      if (result_params?.cloud_provider_account_config_id) {
+        details.ociOffboardCommand =
+          selectedAccountConfig?.ociOffboardShellCommand ||
+          getOciShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
       }
     }
     return details;
-  }, [selectedInstance]);
+  }, [selectedInstance, selectedAccountConfig]);
 
   // Subscription of the Selected Instance
   const selectedInstanceSubscription = useMemo(() => {
@@ -653,16 +682,7 @@ const CloudAccountsPage = () => {
               setIsOverlayOpen(true);
               setOverlayType("delete-dialog");
             },
-            onConnectClick: () => {
-              setClickedInstance(selectedInstance);
-              setIsOverlayOpen(true);
-              setOverlayType("connect-dialog");
-            },
-            onDisconnectClick: () => {
-              setClickedInstance(selectedInstance);
-              setIsOverlayOpen(true);
-              setOverlayType("disconnect-dialog");
-            },
+
             onOffboardClick: () => {
               setClickedInstance(selectedInstance);
               setIsOverlayOpen(true);
@@ -673,7 +693,6 @@ const CloudAccountsPage = () => {
             isFetchingInstances: isFetchingInstances,
             refetchAccountConfigs: refetchAccountConfigs,
             isFetchingAccountConfigs: isFetchingAccountConfigs,
-            serviceModelType: selectedInstanceOffering?.serviceModelType,
             isSelectedInstanceReadyToOffboard: isSelectedInstanceReadyToOffboard,
             setOverlayType: setOverlayType,
             setIsOverlayOpen: setIsOverlayOpen,
@@ -784,8 +803,6 @@ const CloudAccountsPage = () => {
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}
         azureBootstrapShellCommand={azureBootstrapShellCommand}
         accountInstructionDetails={accountInstructionDetails}
-        // downloadTerraformKitMutation={downloadTerraformKitMutation}
-        // orgId={clickedInstanceSubscription?.accountConfigIdentityId}
         accountConfigMethod={
           // @ts-ignore
           clickedInstance?.result_params?.account_configuration_method
@@ -827,7 +844,7 @@ const CloudAccountsPage = () => {
               path: pathData,
               query: {
                 subscriptionId: selectedInstanceSubscription?.id,
-              }, 
+              },
             },
           };
 

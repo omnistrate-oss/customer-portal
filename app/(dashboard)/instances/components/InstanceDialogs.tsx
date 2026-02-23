@@ -11,7 +11,9 @@ import RebootCircleIcon from "src/components/Icons/Reboot/RebootCircleIcon";
 import StopCircleIcon from "src/components/Icons/Stop/StopCircleIcon";
 import UnlockIcon from "src/components/Icons/Unlock/UnlockIcon";
 import OverlappingCirclesIconWrapper from "src/components/OverlappingCirclesIconWrapper/OverlappingCirclesIconWrapper";
-import CreateInstanceModal from "src/components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
+import CreateInstanceModal, {
+  CreateInstanceModalData,
+} from "src/components/ResourceInstance/CreateInstanceModal/CreateInstanceModal";
 import AccessSideRestoreInstance from "src/components/RestoreInstance/AccessSideRestoreInstance";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import UpgradeDialog from "src/components/Upgrade/UpgradeDialog";
@@ -103,10 +105,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   refetchData,
 }) => {
   const router = useRouter();
-  const [createInstanceModalData, setCreateInstanceModalData] = useState<{
-    instanceId?: string;
-    isCustomDNS?: boolean;
-  }>({});
+  const [createInstanceModalData, setCreateInstanceModalData] = useState<CreateInstanceModalData | null>(null);
   const [takeFinalSnapshot, setTakeFinalSnapshot] = useState(true);
   const showSnapshotBeforeDeleteOption = Boolean(instance?.snapshotBeforeDeletionEnabled);
   const snackbar = useSnackbar();

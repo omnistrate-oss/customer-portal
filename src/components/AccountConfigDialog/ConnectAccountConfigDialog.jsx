@@ -294,6 +294,26 @@ const Check = ({ instance, fetchClickedInstanceDetails, setClickedInstance, serv
                   />
                 )}
               </Box>
+            ) : instance?.result_params?.oci_tenancy_id ? (
+              <Box>
+                <Text size="medium" weight="regular" color="#374151">
+                  Please open the OCI Cloud Shell environment using the following link:{" "}
+                  <StyledLink
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://cloud.oracle.com/?cloudshell=true"
+                  >
+                    OCI Cloud Shell
+                  </StyledLink>
+                  . Once the terminal is open, execute the following command:
+                </Text>
+                {instance?.result_params?.oci_bootstrap_shell_script && (
+                  <TextContainerToCopy
+                    text={addQuotesToShellCommand(instance?.result_params?.oci_bootstrap_shell_script)}
+                    marginTop="12px"
+                  />
+                )}
+              </Box>
             ) : (
               <Box>
                 <Text size="medium" weight="regular" color="#374151">

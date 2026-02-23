@@ -1,4 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import { Stack } from "@mui/material";
@@ -6,11 +7,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import Cookies from "js-cookie";
 import ReCAPTCHA from "react-google-recaptcha";
-import Link from "next/link";
 
 import { customerUserSignin } from "src/api/customer-user";
 import axios from "src/axios";
+import { Text } from "src/components/Typography/Typography";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { IdentityProvider } from "src/types/identityProvider";
 import checkRouteValidity from "src/utils/route/checkRouteValidity";
 import { getInstancesRoute } from "src/utils/routes";
@@ -20,9 +23,6 @@ import { useLastLoginDetails } from "../hooks/useLastLoginDetails";
 
 import EmailStep from "./EmailStep";
 import LoginMethodStep from "./LoginMethodStep";
-import { Text } from "src/components/Typography/Typography";
-import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
 
 type SignInFormProps = {
   isPasswordLoginEnabled: boolean;
@@ -147,7 +147,7 @@ const SignInForm: FC<SignInFormProps> = ({
           shouldRememberLoginDetails={shouldRememberLoginDetails}
         />
       )}
-      <Stack component="form" gap="32px" mt="44px">
+      <Stack component="form" gap="24px" mt="32px">
         {currentStep === 1 && (
           <LoginMethodStep
             formData={formik}

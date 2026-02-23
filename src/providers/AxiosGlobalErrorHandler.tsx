@@ -71,34 +71,37 @@ const AxiosGlobalErrorHandler = () => {
         return response;
       },
       async function (error) {
-        const ignoreGlobalErrorSnack = error.config.ignoreGlobalErrorSnack; //state passed with each request to suppress the global snackbar errors if true the errors are ignore
+        const ignoreGlobalErrorSnack = error.config?.ignoreGlobalErrorSnack;
+
         if (error.response && error.response.status === 401) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
             handleLogout();
           }
-        } else if (error.response && error.response.data && !ignoreGlobalErrorSnack) {
-          const status = String(error.response.status);
-          if (status.startsWith("4") || status.startsWith("5")) {
-            const message = error.response.data.message;
-            const ignoredMessages = [
-              "You have not been subscribed to a service yet.",
-              "Your provider has not enabled billing for the user.",
-              "You have not been enrolled in a service plan with a billing plan yet.",
-              "Your provider has not enabled billing for the services.",
-            ];
-            if (!ignoredMessages.includes(message)) {
-              if (message) {
-                setSnackbarMsg(message);
-                setIsOpen(true);
-              } else {
-                setSnackbarMsg("Something went wrong please try again later");
-                setIsOpen(true);
+        } else if (!ignoreGlobalErrorSnack) {
+          if (error.response && error.response.data) {
+            const status = String(error.response.status);
+            if (status.startsWith("4") || status.startsWith("5")) {
+              const message = error.response.data.message;
+              const ignoredMessages = [
+                "You have not been subscribed to a service yet.",
+                "Your provider has not enabled billing for the user.",
+                "You have not been enrolled in a service plan with a billing plan yet.",
+                "Your provider has not enabled billing for the services.",
+              ];
+              if (!ignoredMessages.includes(message)) {
+                if (message) {
+                  setSnackbarMsg(message);
+                  setIsOpen(true);
+                } else {
+                  setSnackbarMsg("Something went wrong please try again later");
+                  setIsOpen(true);
+                }
               }
             }
+          } else {
+            setSnackbarMsg("Something went wrong please try again later");
+            setIsOpen(true);
           }
-        } else {
-          setSnackbarMsg("Something went wrong please try again later");
-          setIsOpen(true);
         }
 
         return Promise.reject(error);

@@ -1,4 +1,5 @@
 import { $api } from "src/api/query";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 
 const useInstanceSnapshots = (queryOptions = {}) => {
   const query = $api.useQuery(
@@ -8,6 +9,7 @@ const useInstanceSnapshots = (queryOptions = {}) => {
       params: {
         query: {
           snapshotType: "ManualSnapshot",
+          environmentType: useEnvironmentType(),
         },
       },
     },

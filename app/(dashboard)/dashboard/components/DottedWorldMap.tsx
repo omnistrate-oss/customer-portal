@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Fragment } from "react";
 import { Box, Stack } from "@mui/material";
 import DottedMap from "dotted-map/without-countries";
 
@@ -57,11 +57,10 @@ const DottedWorldMap: FC<DottedWorldMapProps> = (props) => {
               const colorRGBNumbers = getRegionHexColor(location.cloudProvider, location.region, inUseProviderRegions);
 
               return (
-                <>
+                <Fragment key={index}>
                   <foreignObject
                     x={pin.x}
                     y={pin.y}
-                    key={index}
                     height="6px"
                     width="6px"
                     style={{
@@ -83,7 +82,7 @@ const DottedWorldMap: FC<DottedWorldMapProps> = (props) => {
                       </Box>
                     </RegionTootlip>
                   </foreignObject>
-                </>
+                </Fragment>
               );
             } else {
               return "";

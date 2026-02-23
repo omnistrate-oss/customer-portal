@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { isOCIEnabled } from "src/constants/globalConstants";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -146,6 +147,9 @@ const CloudAccountForm = ({
             } else if (values.cloudProvider === "azure") {
               result_params.azure_subscription_id = values.azureSubscriptionId;
               result_params.azure_tenant_id = values.azureTenantId;
+            } else if (values.cloudProvider === "oci") {
+              result_params.oci_tenancy_id = values.ociTenancyId;
+              result_params.oci_domain_id = values.ociDomainId;
             }
 
             return {
@@ -176,10 +180,17 @@ const CloudAccountForm = ({
                     gcp_project_id: values.gcpProjectId,
                     gcp_project_number: values.gcpProjectNumber,
                   }
-                : {
-                    azure_subscription_id: values.azureSubscriptionId,
-                    azure_tenant_id: values.azureTenantId,
-                  }),
+                : values.cloudProvider === CLOUD_PROVIDERS.azure
+                  ? {
+                      azure_subscription_id: values.azureSubscriptionId,
+                      azure_tenant_id: values.azureTenantId,
+                    }
+                  : values.cloudProvider === CLOUD_PROVIDERS.oci
+                    ? {
+                        oci_tenancy_id: values.ociTenancyId,
+                        oci_domain_id: values.ociDomainId,
+                      }
+                    : {}),
           },
         });
         setOverlayType("view-instructions-dialog");
@@ -203,7 +214,7 @@ const CloudAccountForm = ({
       const { serviceId, servicePlanId } = values;
       const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
 
-      let requestParams: Record<string, any>;
+      let requestParams: Record<string, any> = {};
       if (values.cloudProvider === "aws") {
         requestParams = {
           cloud_provider: values.cloudProvider,
@@ -219,11 +230,18 @@ const CloudAccountForm = ({
           account_configuration_method: values.accountConfigurationMethod,
           gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
         };
-      } else {
+      } else if (values.cloudProvider === "azure") {
         requestParams = {
           cloud_provider: values.cloudProvider,
           azure_subscription_id: values.azureSubscriptionId,
           azure_tenant_id: values.azureTenantId,
+          account_configuration_method: values.accountConfigurationMethod,
+        };
+      } else if (values.cloudProvider === "oci") {
+        requestParams = {
+          cloud_provider: values.cloudProvider,
+          oci_tenancy_id: values.ociTenancyId,
+          oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
         };
       }
@@ -402,7 +420,7 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
+                  cloudProviders={(serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []).filter((p) => isOCIEnabled || p !== "oci")}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
@@ -419,21 +437,6 @@ const CloudAccountForm = ({
                     return cloudProviderLongLogoMap[cloudProvider];
                   },
             },
-            // {
-            //   dataTestId: "account-configuration-method-select",
-            //   label: "Account Configuration Method",
-            //   subLabel: "Choose a method from among the options to configure your cloud provider account",
-            //   name: "accountConfigurationMethod",
-            //   type: "select",
-            //   required: true,
-            //   disabled: formMode !== "create",
-            //   isHidden: !cloudProvider,
-            //   menuItems: accountConfigurationMethods.map((option) => ({
-            //     value: option,
-            //     label: ACCOUNT_CREATION_METHOD_LABELS[option],
-            //   })),
-            //   previewValue: ACCOUNT_CREATION_METHOD_LABELS[values.accountConfigurationMethod],
-            // },
             {
               dataTestId: "aws-account-id-input",
               label: "AWS Account ID",
@@ -470,7 +473,6 @@ const CloudAccountForm = ({
               isHidden: values.cloudProvider !== "gcp",
               previewValue: cloudProvider === "gcp" ? values.gcpProjectNumber : null,
             },
-
             {
               dataTestId: "azure-subscription-id-input",
               label: "Azure Subscription ID",
@@ -494,6 +496,30 @@ const CloudAccountForm = ({
               disabled: formMode !== "create",
               isHidden: values.cloudProvider !== "azure",
               previewValue: cloudProvider === "azure" ? values.azureTenantId : null,
+            },
+            {
+              dataTestId: "oci-tenancy-id-input",
+              label: "Tenancy OCID",
+              subLabel: "OCI Tenancy OCID to use for the account",
+              description: <CustomLabelDescription variant="ociTenancyId" />,
+              name: "ociTenancyId",
+              type: "text",
+              required: true,
+              disabled: formMode !== "create",
+              isHidden: values.cloudProvider !== "oci",
+              previewValue: cloudProvider === "oci" ? values.ociTenancyId : null,
+            },
+            {
+              dataTestId: "oci-domain-id-input",
+              label: "Domain OCID",
+              subLabel: "OCI Domain OCID to use for the account",
+              description: <CustomLabelDescription variant="ociDomainId" />,
+              name: "ociDomainId",
+              type: "text",
+              required: true,
+              disabled: formMode !== "create",
+              isHidden: values.cloudProvider !== "oci",
+              previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
             },
           ],
         },

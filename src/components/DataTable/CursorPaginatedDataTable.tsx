@@ -117,6 +117,7 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
     manualPagination: true,
     pageCount: Math.ceil(rows.length / pageSize),
     paginateExpandedRows: false,
+    autoResetPageIndex: false,
     getRowId: (row) => String(row[rowId]),
   });
 

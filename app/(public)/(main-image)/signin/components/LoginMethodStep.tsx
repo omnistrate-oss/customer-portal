@@ -6,11 +6,11 @@ import { Box, InputAdornment, Stack } from "@mui/material";
 import { FormikProps } from "formik";
 
 import Button from "src/components/Button/Button";
-import FieldLabel from "src/components/FormElements/FieldLabel/FieldLabel";
 import FieldContainer from "src/components/FormElementsv2/FieldContainer/FieldContainer";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import DisplayHeading from "src/components/NonDashboardComponents/DisplayHeading";
 import { Text } from "src/components/Typography/Typography";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
@@ -61,14 +61,15 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
     name?: string;
   } | null>(null);
   const [viewType, setViewType] = useState<"password-login" | "login-options">("login-options");
-
+  const environmentType = useEnvironmentType();
   const { hasIDPWithMatchingDomain, domainFilteredIdentityProviders } = useFilteredIdentityProviders(
     identityProviders,
     userEmail
   );
 
   //hide password login if there is some IDP with email identifiers matching the email domain
-  const allowPasswordLogin = isPasswordLoginEnabled && !hasIDPWithMatchingDomain;
+  //always show password login in non-prod environments for testing purposes
+  const allowPasswordLogin = environmentType !== "PROD" || (isPasswordLoginEnabled && !hasIDPWithMatchingDomain);
 
   //set default sign in method using data from last login stored in localStorage
   useEffect(() => {
@@ -210,10 +211,9 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
 
   return (
     <>
-      <DisplayHeading mt="24px">Login to your account</DisplayHeading>
+      <DisplayHeading>Login to your account</DisplayHeading>
       <Stack gap="24px">
-        <FieldContainer>
-          <FieldLabel>Welcome</FieldLabel>
+        <FieldContainer marginTop={0}>
           <TextField
             inputProps={{
               "data-testid": "email-input",
@@ -278,6 +278,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
                 isReCaptchaSetup={isReCaptchaSetup}
                 isRecaptchaScriptLoaded={isRecaptchaScriptLoaded}
                 isPasswordSignInLoading={isPasswordSignInLoading}
+                identityProviders={identityProviders}
               />
             ) : (
               <Stack gap="12px">
@@ -324,6 +325,7 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
 
                   setIdpOptionsExpanded((prev) => !prev);
                 }}
+                sx={{ marginTop: "-8px" }}
               >
                 <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center" }}>
                   {idpOptionsExpanded ? "View less options" : "Other sign in options"}
