@@ -8,7 +8,7 @@ import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance
 import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
-  describeOfInstances?: boolean;
+  describeInstances?: boolean;
   [key: string]: any;
 };
 
@@ -16,7 +16,7 @@ const sortByCreatedAtDesc = (a: { created_at?: string }, b: { created_at?: strin
   new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime();
 
 const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
-  const { onlyInstances, describeOfInstances, ...restOptions } = queryOptions;
+  const { onlyInstances, describeInstances, ...restOptions } = queryOptions;
 
   const { serviceOfferings } = useGlobalData();
   // Standard list query for all instances
@@ -47,7 +47,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
 
   const describeQuery = useQuery({
     queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt, serviceOfferings],
-    enabled: Boolean(describeOfInstances && listQuery.data),
+    enabled: Boolean(describeInstances && listQuery.data),
     queryFn: async () => {
       const res = listQuery.data || [];
 
@@ -93,7 +93,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
-  if (describeOfInstances) {
+  if (describeInstances) {
     return {
       ...listQuery,
       data: describeQuery.data || [],

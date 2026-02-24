@@ -131,7 +131,7 @@ const CloudAccountsPage = () => {
     isPending: isInstancesPending,
     isFetching: isFetchingInstances,
     refetch: refetchInstances,
-  } = useInstancesListWithDescribe({ describeOfInstances: true });
+  } = useInstancesListWithDescribe({ describeInstances: true });
 
   const accountConfigIds = useMemo(() => {
     const ids = new Set<string>();
@@ -448,7 +448,7 @@ const CloudAccountsPage = () => {
   }, [subscriptionsObj, accountConfigsHash]);
 
   const selectedInstance = useMemo(() => {
-    return instances.find((instance) => instance && instance.id === selectedRows[0]);
+    return instances.find((instance) => instance.id === selectedRows[0]);
   }, [selectedRows, instances]);
 
   const selectedAccountConfig: AccountConfig | undefined = useMemo(() => {

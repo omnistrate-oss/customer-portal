@@ -1,12 +1,29 @@
 import { $api } from "src/api/query";
 
 type QueryOptions = {
-  onlyInstances?: boolean;
+  serviceProviderId: string;
+  serviceKey: string;
+  serviceAPIVersion: string;
+  serviceEnvironmentKey: string;
+  serviceModelKey: string;
+  productTierKey: string;
+  resourceKey: string;
+  id: string;
   [key: string]: any;
 };
 
-const useInstancesDescribe = (queryOptions: QueryOptions = {}) => {
-  const { ...options } = queryOptions;
+const useInstancesDescribe = (queryOptions: QueryOptions) => {
+  const {
+    serviceProviderId,
+    serviceKey,
+    serviceAPIVersion,
+    serviceEnvironmentKey,
+    serviceModelKey,
+    productTierKey,
+    resourceKey,
+    id,
+    ...options
+  } = queryOptions;
 
   const query = $api.useQuery(
     "get",
@@ -14,22 +31,18 @@ const useInstancesDescribe = (queryOptions: QueryOptions = {}) => {
     {
       params: {
         path: {
-          serviceProviderId: queryOptions.serviceProviderId,
-          serviceKey: queryOptions.serviceKey,
-          serviceAPIVersion: queryOptions.serviceAPIVersion,
-          serviceEnvironmentKey: queryOptions.serviceEnvironmentKey,
-          serviceModelKey: queryOptions.serviceModelKey,
-          productTierKey: queryOptions.productTierKey,
-          resourceKey: queryOptions.resourceKey,
-          id: queryOptions.id,
+          serviceProviderId,
+          serviceKey,
+          serviceAPIVersion,
+          serviceEnvironmentKey,
+          serviceModelKey,
+          productTierKey,
+          resourceKey,
+          id,
         },
       },
     },
     {
-      select: (data) => {
-        // If the API returns the instance directly, just return data
-        return data;
-      },
       ...options,
     }
   );
