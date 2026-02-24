@@ -193,6 +193,43 @@ const CloudAccountsPage = () => {
 
   const dataTableColumns = useMemo(() => {
     return [
+      columnHelper.display({
+        id: "delete_protection",
+        header: "",
+        cell: (data) => {
+          const isDeleteProtectionSupported =
+            data.row.original.resourceInstanceMetadata?.deletionProtection !== undefined;
+          const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
+
+          return (
+            <Tooltip
+              title={
+                !isDeleteProtectionSupported
+                  ? "Delete protection not supported"
+                  : isDeleteProtected
+                    ? "Delete protection enabled"
+                    : "Delete protection disabled"
+              }
+            >
+              <span>
+                <DeleteProtectionIcon disabled={!isDeleteProtected} />
+              </span>
+            </Tooltip>
+          );
+        },
+        meta: {
+          width: 25,
+          minWidth: 25,
+          headerStyles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+          styles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+        },
+      }),
       columnHelper.accessor(
         (row) =>
           // @ts-ignore
@@ -219,27 +256,7 @@ const CloudAccountsPage = () => {
               data.row.original.result_params?.oci_tenancy_id ||
               "-";
 
-            const deletionProtectionFeatureEnabled =
-              data.row.original?.resourceInstanceMetadata?.deletionProtection !== undefined;
-            const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
-
-            return (
-              <GridCellExpand
-                value={value}
-                copyButton={value !== "-"}
-                endIcon={
-                  deletionProtectionFeatureEnabled && (
-                    <Box sx={{ marginRight: "-2px", marginTop: "-7px" }}>
-                      <Tooltip title={isDeleteProtected ? "Delete protection enabled" : "Delete protection disabled"}>
-                        <span>
-                          <DeleteProtectionIcon disabled={!isDeleteProtected} />
-                        </span>
-                      </Tooltip>
-                    </Box>
-                  )
-                }
-              />
-            );
+            return <GridCellExpand value={value} copyButton={value !== "-"} />;
           },
           meta: {
             minWidth: 200,

@@ -21,11 +21,8 @@ type CloudAccountsActionMenuProps = {
   disabledMessage?: string;
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
-  onConnectClick: () => void;
-  onDisconnectClick: () => void;
   onDeleteClick: () => void;
   onOffboardClick: () => void;
-  serviceModelType?: string;
   isSelectedInstanceReadyToOffboard: boolean;
 };
 
@@ -36,11 +33,8 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
   disabledMessage = "",
   setOverlayType,
   setIsOverlayOpen,
-  onConnectClick,
-  onDisconnectClick,
   onDeleteClick,
   onOffboardClick,
-  serviceModelType,
   isSelectedInstanceReadyToOffboard,
 }) => {
   const snackbar = useSnackbar();
@@ -51,64 +45,9 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const role = getEnumFromUserRoleString(subscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
 
-    const isDeploying = instance?.status === "DEPLOYING";
-    const isAttaching = instance?.status === "ATTACHING";
-    const isConnecting = instance?.status === "CONNECTING";
     const isDisconnected = instance?.status === "DISCONNECTED";
-    const isOnPremCopilot = serviceModelType === "ON_PREM_COPILOT";
-    const isReady = instance?.status === "READY";
-    const isDisconnecting = instance?.status === "DISCONNECTING";
-    const isDetaching = instance?.status === "DETACHING";
-    const isPendingDetaching = instance?.status === "PENDING_DETACHING";
+
     const isDeleting = instance?.status === "DELETING";
-
-    // Connect action
-    const isConnectDisabled =
-      !instance || isReady || isDisconnecting || isDetaching || isPendingDetaching || isDeploying || !isOnPremCopilot;
-
-    const isConnectDisabledMessage = !instance
-      ? "Please select a cloud account"
-      : isReady
-        ? "Cloud account is already connected"
-        : isDisconnecting || isDetaching || isPendingDetaching
-          ? "Cloud account is disconnecting"
-          : isDeploying
-            ? "Please wait for the instance to get to Ready state"
-            : !isOnPremCopilot
-              ? "This feature is not supported for this plan"
-              : "";
-
-    res.push({
-      dataTestId: "connect-action-button",
-      label: "Connect",
-      isDisabled: isConnectDisabled,
-      onClick: onConnectClick,
-      disabledMessage: isConnectDisabledMessage,
-    });
-
-    // Disconnect action
-    const isDisconnectDisabled =
-      !instance || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
-
-    const isDisconnectDisabledMessage = !instance
-      ? "Please select a cloud account"
-      : isAttaching || isConnecting
-        ? "Cloud account is connecting"
-        : isDisconnected
-          ? "Cloud account is disconnected"
-          : isDeploying
-            ? "Please wait for the instance to get to Ready state"
-            : !isOnPremCopilot
-              ? "This feature is not supported for this plan"
-              : "";
-
-    res.push({
-      dataTestId: "disconnect-action-button",
-      label: "Disconnect",
-      isDisabled: isDisconnectDisabled,
-      onClick: onDisconnectClick,
-      disabledMessage: isDisconnectDisabledMessage,
-    });
 
     // Delete action
     const isDeleteDisabled = !instance || isDeleting || isDisconnected || isSelectedInstanceReadyToOffboard;
@@ -191,10 +130,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
   }, [
     instance,
     subscription,
-    serviceModelType,
     isSelectedInstanceReadyToOffboard,
-    onConnectClick,
-    onDisconnectClick,
     onDeleteClick,
     onOffboardClick,
     setIsOverlayOpen,
