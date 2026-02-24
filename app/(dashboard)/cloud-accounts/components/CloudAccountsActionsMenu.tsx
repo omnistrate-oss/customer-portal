@@ -45,20 +45,16 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const role = getEnumFromUserRoleString(subscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
 
-    const isDisconnected = instance?.status === "DISCONNECTED";
-
     const isDeleting = instance?.status === "DELETING";
 
     // Delete action
-    const isDeleteDisabled = !instance || isDeleting || isDisconnected || isSelectedInstanceReadyToOffboard;
+    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard;
 
     const isDeleteDisabledMessage = !instance
       ? "Please select a cloud account"
       : isDeleting
         ? "Cloud account deletion is already in progress"
-        : isDisconnected
-          ? "Cloud account is disconnected"
-          : "";
+        : "";
 
     res.push({
       dataTestId: "delete-action-button",
@@ -92,7 +88,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
       res.push({
         dataTestId: "enable-deletion-protection-button",
         label: "Enable Delete Protection",
-        isDisabled: isDeleteProtected || !isUpdateAllowedByRBAC,
+        isDisabled: isDeleteProtected || !isUpdateAllowedByRBAC || isDeleting,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setIsOverlayOpen(true);
@@ -100,17 +96,19 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : isDeleteProtected
-            ? "Delete protection is already enabled"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to enable delete protection"
-              : "",
+          : isDeleting
+            ? "Cloud account is being deleted"
+            : isDeleteProtected
+              ? "Delete protection is already enabled"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to enable delete protection"
+                : "",
       });
 
       res.push({
         dataTestId: "disable-deletion-protection-button",
         label: "Disable Delete Protection",
-        isDisabled: !isDeleteProtected || !isUpdateAllowedByRBAC,
+        isDisabled: !isDeleteProtected || !isUpdateAllowedByRBAC || isDeleting,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setIsOverlayOpen(true);
@@ -118,11 +116,13 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : !isDeleteProtected
-            ? "Delete protection is already disabled"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to disable delete protection"
-              : "",
+          : isDeleting
+            ? "Cloud account is being deleted"
+            : !isDeleteProtected
+              ? "Delete protection is already disabled"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to disable delete protection"
+                : "",
       });
     }
 
