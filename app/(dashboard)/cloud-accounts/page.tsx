@@ -832,15 +832,15 @@ const CloudAccountsPage = () => {
         open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
-          if (!selectedInstance) snackbar.showError("No instance selected");
+          if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedInstanceOffering) {
-            snackbar.showError("Offering not found");
+            return snackbar.showError("Offering not found");
           }
           if (!selectedInstanceSubscription) {
-            snackbar.showError("Subscription not found");
+            return snackbar.showError("Subscription not found");
           }
           if (!selectedResource) {
-            snackbar.showError("Resource not found");
+            return snackbar.showError("Resource not found");
           }
           if (!selectedInstance || !selectedInstanceOffering || !selectedInstanceSubscription || !selectedResource)
             return false;
