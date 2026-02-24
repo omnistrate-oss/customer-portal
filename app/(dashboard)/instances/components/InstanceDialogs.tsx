@@ -133,7 +133,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   const { data: selectedInstance } = useInstancesDescribe({
     ...selectedInstanceData,
     enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
-  });
+  }) as { data?: DescribeResourceInstanceResponse };
 
   const deleteInstanceMutation = $api.useMutation(
     "delete",
