@@ -1,21 +1,17 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataGridText from "components/DataGrid/DataGridText";
-import DataTable from "components/DataTable/DataTable";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
+import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
+import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
+import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { chipCategoryColors } from "src/constants/statusChipStyles";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
@@ -35,6 +31,13 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -46,18 +49,21 @@ import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
+import { DIALOG_DATA } from "./constants";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
-type Overlay =
+export type Overlay =
   | "delete-dialog"
   | "create-instance-form"
   | "view-instance-form"
   | "view-instructions-dialog"
   | "connect-dialog"
   | "disconnect-dialog"
-  | "offboard-dialog";
+  | "offboard-dialog"
+  | "enable-deletion-protection-dialog"
+  | "disable-deletion-protection-dialog";
 
 const CloudAccountsPage = () => {
   const snackbar = useSnackbar();
@@ -187,6 +193,43 @@ const CloudAccountsPage = () => {
 
   const dataTableColumns = useMemo(() => {
     return [
+      columnHelper.display({
+        id: "delete_protection",
+        header: "",
+        cell: (data) => {
+          const isDeleteProtectionSupported =
+            data.row.original.resourceInstanceMetadata?.deletionProtection !== undefined;
+          const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
+
+          return (
+            <Tooltip
+              title={
+                !isDeleteProtectionSupported
+                  ? "Delete protection not supported"
+                  : isDeleteProtected
+                    ? "Delete protection enabled"
+                    : "Delete protection disabled"
+              }
+            >
+              <span>
+                <DeleteProtectionIcon disabled={!isDeleteProtected} />
+              </span>
+            </Tooltip>
+          );
+        },
+        meta: {
+          width: 25,
+          minWidth: 25,
+          headerStyles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+          styles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+        },
+      }),
       columnHelper.accessor(
         (row) =>
           // @ts-ignore
@@ -213,16 +256,7 @@ const CloudAccountsPage = () => {
               data.row.original.result_params?.oci_tenancy_id ||
               "-";
 
-            return (
-              <DataGridText
-                showCopyButton={value !== "-"}
-                style={{
-                  fontWeight: 600,
-                }}
-              >
-                {value}
-              </DataGridText>
-            );
+            return <GridCellExpand value={value} copyButton={value !== "-"} />;
           },
           meta: {
             minWidth: 200,
@@ -570,6 +604,22 @@ const CloudAccountsPage = () => {
     },
   });
 
+  const updateInstanceMetadataMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata",
+    {
+      onSuccess: async () => {
+        refetchInstances();
+        setSelectedRows([]);
+        if (overlayType === "enable-deletion-protection-dialog") {
+          snackbar.showSuccess("Delete protection enabled successfully");
+        } else {
+          snackbar.showSuccess("Delete protection disabled successfully");
+        }
+      },
+    }
+  );
+
   // const deleteAccountConfigMutation = $api.useMutation("delete", "/2022-09-01-00/accountconfig/{id}", {
   //   onSuccess: () => {
   //     //refetch cloud account instances
@@ -609,6 +659,20 @@ const CloudAccountsPage = () => {
     }
   }, [isAccountCreation]);
 
+  const selectedInstanceData = useMemo(() => {
+    return {
+      id: selectedInstance?.id || "",
+      serviceProviderId: selectedInstanceOffering?.serviceProviderId || "",
+      serviceKey: selectedInstanceOffering?.serviceURLKey || "",
+      serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion || "",
+      serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey || "",
+      serviceModelKey: selectedInstanceOffering?.serviceModelURLKey || "",
+      productTierKey: selectedInstanceOffering?.productTierURLKey || "",
+      resourceKey: selectedResource?.urlKey as string,
+      subscriptionId: selectedInstanceSubscription?.id,
+    };
+  }, [selectedInstance, selectedInstanceOffering, selectedInstanceSubscription, selectedResource]);
+
   return (
     <PageContainer>
       <PageTitle icon={CloudAccountsIcon} className="mb-6">
@@ -647,6 +711,9 @@ const CloudAccountsPage = () => {
             refetchAccountConfigs: refetchAccountConfigs,
             isFetchingAccountConfigs: isFetchingAccountConfigs,
             isSelectedInstanceReadyToOffboard: isSelectedInstanceReadyToOffboard,
+            setOverlayType: setOverlayType,
+            setIsOverlayOpen: setIsOverlayOpen,
+            selectedInstanceSubscription,
           }}
           isLoading={isInstancesPending || isAccountConfigsPending}
           selectionMode="single"
@@ -759,6 +826,65 @@ const CloudAccountsPage = () => {
         }
         fetchClickedInstanceDetails={fetchClickedInstanceDetails}
         setClickedInstance={setClickedInstance}
+      />
+
+      <TextConfirmationDialog
+        open={isOverlayOpen && Object.keys(DIALOG_DATA).includes(overlayType)}
+        handleClose={() => setIsOverlayOpen(false)}
+        onConfirm={async () => {
+          if (!selectedInstance) return snackbar.showError("No instance selected");
+          if (!selectedInstanceOffering) {
+            return snackbar.showError("Offering not found");
+          }
+          if (!selectedInstanceSubscription) {
+            return snackbar.showError("Subscription not found");
+          }
+          if (!selectedResource) {
+            return snackbar.showError("Resource not found");
+          }
+          if (!selectedInstance || !selectedInstanceOffering || !selectedInstanceSubscription || !selectedResource)
+            return false;
+
+          const pathData = {
+            serviceProviderId: selectedInstanceData.serviceProviderId,
+            serviceKey: selectedInstanceData.serviceKey,
+            serviceAPIVersion: selectedInstanceData.serviceAPIVersion,
+            serviceEnvironmentKey: selectedInstanceData.serviceEnvironmentKey,
+            serviceModelKey: selectedInstanceData.serviceModelKey,
+            productTierKey: selectedInstanceData.productTierKey,
+            resourceKey: selectedInstanceData.resourceKey,
+            id: selectedInstanceData.id,
+          };
+
+          const body = {
+            params: {
+              path: pathData,
+              query: {
+                subscriptionId: selectedInstanceSubscription?.id,
+              },
+            },
+          };
+
+          if (
+            overlayType === "enable-deletion-protection-dialog" ||
+            overlayType === "disable-deletion-protection-dialog"
+          ) {
+            await updateInstanceMetadataMutation.mutateAsync({
+              ...body,
+              body: {
+                deletionProtection: overlayType === "enable-deletion-protection-dialog" ? true : false,
+              },
+            });
+          }
+          return true;
+        }}
+        IconComponent={DIALOG_DATA[overlayType]?.icon}
+        title={DIALOG_DATA[overlayType]?.title}
+        subtitle={<>{`${DIALOG_DATA[overlayType]?.subtitle} - ${selectedInstanceData?.id}?`}</>}
+        confirmationText={DIALOG_DATA[overlayType]?.confirmationText}
+        buttonLabel={DIALOG_DATA[overlayType]?.buttonLabel}
+        buttonColor={DIALOG_DATA[overlayType]?.buttonColor}
+        isLoading={updateInstanceMetadataMutation.isPending}
       />
     </PageContainer>
   );

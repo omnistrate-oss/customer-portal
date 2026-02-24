@@ -83,6 +83,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
       >
         {value}
       </Box>
+      {Boolean(copyButton && value) && <CopyToClipboardButton text={value} disabled={disabled} />}
 
       {endIcon}
       {!endIcon && externalLinkArrow && (
@@ -93,7 +94,6 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
           }}
         />
       )}
-      {Boolean(copyButton && value) && <CopyToClipboardButton text={value} disabled={disabled} />}
     </Box>
   );
 

@@ -1,3 +1,7 @@
+import LockIcon from "src/components/Icons/Lock/LockIcon";
+import UnlockIcon from "src/components/Icons/Unlock/UnlockIcon";
+import OverlappingCirclesIconWrapper from "src/components/OverlappingCirclesIconWrapper/OverlappingCirclesIconWrapper";
+import { colors } from "src/themeConfig";
 import * as yup from "yup";
 
 export const CloudAccountValidationSchema = yup.object({
@@ -89,3 +93,22 @@ export const cloudAccountOffboardingSteps = [
     description: "Confirm Offboarding",
   },
 ];
+
+export const DIALOG_DATA = {
+  "enable-deletion-protection-dialog": {
+    icon: () => <OverlappingCirclesIconWrapper IconComponent={LockIcon} />,
+    title: "Enable Delete Protection",
+    subtitle: "Are you sure you want to enable delete protection for",
+    confirmationText: "enable",
+    buttonLabel: "Enable",
+    buttonColor: colors.success600,
+  },
+  "disable-deletion-protection-dialog": {
+    icon: () => <OverlappingCirclesIconWrapper IconComponent={UnlockIcon} />,
+    title: "Disable Delete Protection",
+    subtitle: "Are you sure you want to disable delete protection for",
+    confirmationText: "disable",
+    buttonLabel: "Disable",
+    buttonColor: colors.success600,
+  },
+};

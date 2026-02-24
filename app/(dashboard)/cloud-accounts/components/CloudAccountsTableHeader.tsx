@@ -1,12 +1,17 @@
-import { CircularProgress } from "@mui/material";
 import { FC } from "react";
+import { CircularProgress } from "@mui/material";
 
+import { AccountConfig } from "src/types/account-config";
+import { ResourceInstance } from "src/types/resourceInstance";
+import { Subscription } from "src/types/subscription";
 import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
-import { AccountConfig } from "src/types/account-config";
-import { ResourceInstance } from "src/types/resourceInstance";
+
+import { Overlay } from "../page";
+
+import CloudAccountsActionMenu from "./CloudAccountsActionsMenu";
 
 type CloudAccountTableHeaderProps = {
   count: number;
@@ -21,6 +26,9 @@ type CloudAccountTableHeaderProps = {
   accountConfig: AccountConfig;
   isSelectedInstanceReadyToOffboard: boolean;
   isFetchingAccountConfigs: boolean;
+  setOverlayType: (overlay: Overlay) => void;
+  setIsOverlayOpen: (isOpen: boolean) => void;
+  selectedInstanceSubscription?: Subscription;
 };
 
 const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
@@ -35,25 +43,10 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   isFetchingAccountConfigs,
   onOffboardClick,
   isSelectedInstanceReadyToOffboard,
+  setOverlayType,
+  setIsOverlayOpen,
+  selectedInstanceSubscription,
 }) => {
-  const isDeleting = selectedInstance?.status === "DELETING";
-
-  const isDeleteDisabled = !selectedInstance || isDeleting || isSelectedInstanceReadyToOffboard;
-
-  const isOffboardDisabled = !isSelectedInstanceReadyToOffboard;
-
-  const isDeleteDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-    : isDeleting
-      ? "Cloud account deletion is already in progress"
-      : "";
-
-  const offboardingDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-    : isOffboardDisabled
-      ? "Cloud account is not ready to offboard"
-      : "";
-
   return (
     <div className="py-5 px-6 flex items-center justify-between gap-4">
       <DataGridHeaderTitle
@@ -71,28 +64,21 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
 
         <SearchInput placeholder="Search by ID" searchText={searchText} setSearchText={setSearchText} />
         <RefreshWithToolTip refetch={refetchInstances} disabled={isFetchingInstances || isFetchingAccountConfigs} />
-
-        <Button
-          data-testid="delete-button"
-          variant="outlined"
-          disabled={isDeleteDisabled}
-          onClick={onDeleteClick}
-          disabledMessage={isDeleteDisabledMessage}
-        >
-          Delete
-        </Button>
-        <Button
-          data-testid="offboard-button"
-          variant="outlined"
-          disabled={isOffboardDisabled}
-          onClick={onOffboardClick}
-          disabledMessage={offboardingDisabledMessage}
-        >
-          Offboard
-        </Button>
         <Button data-testid="create-button" variant="contained" onClick={onCreateClick}>
           Create
         </Button>
+
+        <CloudAccountsActionMenu
+          setOverlayType={setOverlayType}
+          setIsOverlayOpen={setIsOverlayOpen}
+          disabled={!selectedInstance}
+          disabledMessage="Please select an instance"
+          instance={selectedInstance}
+          subscription={selectedInstanceSubscription}
+          onDeleteClick={onDeleteClick}
+          onOffboardClick={() => onOffboardClick?.()}
+          isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
+        />
       </div>
     </div>
   );
