@@ -1,18 +1,11 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataGridText from "components/DataGrid/DataGridText";
-import DataTable from "components/DataTable/DataTable";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
@@ -35,6 +28,13 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataGridText from "components/DataGrid/DataGridText";
+import DataTable from "components/DataTable/DataTable";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -163,7 +163,7 @@ const CloudAccountsPage = () => {
       });
       router.replace(getCloudAccountsRoute({}));
     }
-  }, [serviceId, servicePlanId, subscriptionId]);
+  }, [serviceId, servicePlanId, subscriptionId, router]);
 
   const byoaInstances = useMemo(() => {
     const res = instances.filter((instance) => isCloudAccountInstance(instance));
@@ -695,6 +695,10 @@ const CloudAccountsPage = () => {
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
+          // Reset mutation state if dialog is closed before backend responds
+          if (deleteCloudAccountInstanceMutation.isPending) {
+            deleteCloudAccountInstanceMutation.reset();
+          }
           await refetchInstances();
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
@@ -704,7 +708,6 @@ const CloudAccountsPage = () => {
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
-
           await deleteCloudAccountInstanceMutation.mutateAsync();
         }}
         onOffboardClick={async () => {
@@ -712,13 +715,13 @@ const CloudAccountsPage = () => {
           if (selectedInstance && selectedInstance?.status === "DELETING" && !selectedAccountConfig)
             return snackbar.showError("Offboarding is in progress");
           if (!selectedResource) return snackbar.showError("Resource not found");
-
           await deleteCloudAccountInstanceMutation.mutateAsync();
           setSelectedRows([]);
         }}
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
+        refetchInstanceStatus={refetchInstances}
       />
 
       <ConnectAccountConfigDialog
