@@ -18,12 +18,19 @@ import SubmitButton from "components/NonDashboardComponents/FormElementsV2/Submi
 import Logo from "components/NonDashboardComponents/Logo";
 import PageDescription from "components/NonDashboardComponents/PageDescription";
 
-const changePasswordValidationSchema = Yup.object({
-  password: Yup.string().required("Password is required").matches(passwordRegex, passwordText),
-  confirmPassword: Yup.string()
-    .required("Password is required")
-    .oneOf([Yup.ref("password"), null], "Passwords must match"),
-});
+const getChangePasswordValidationSchema = (email: string) =>
+  Yup.object({
+    password: Yup.string()
+      .required("Password is required")
+      .matches(passwordRegex, passwordText)
+      .test("password-not-email", "Email cannot be used as password", (value) => {
+        if (!value || !email) return true;
+        return value.toLowerCase() !== email.toLowerCase();
+      }),
+    confirmPassword: Yup.string()
+      .required("Password is required")
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
+  });
 
 const ChangePasswordPage = () => {
   const router = useRouter();
@@ -60,7 +67,7 @@ const ChangePasswordPage = () => {
         console.error("Password change failed:", error);
       }
     },
-    validationSchema: changePasswordValidationSchema,
+    validationSchema: getChangePasswordValidationSchema(decodeURIComponent(email ?? "")),
   });
 
   const { values, handleChange, handleBlur, touched, errors } = formik;

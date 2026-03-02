@@ -31,7 +31,18 @@ import SignupForm from "./SignupForm";
 const signupValidationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email address").required("Email is required"),
-  password: Yup.string().required("Password is required").matches(passwordRegex, passwordText),
+  password: Yup.string()
+    .required("Password is required")
+    .matches(passwordRegex, passwordText)
+    .test(
+      "password-not-email",
+      "Email cannot be used as password",
+      function (value) {
+        const { email } = this.parent;
+        if (!value || !email) return true;
+        return value.toLowerCase() !== email.toLowerCase();
+      }
+    ),
   confirmPassword: Yup.string()
     .required("Re-enter your password")
     .oneOf([Yup.ref("password"), null], "Passwords must match"),
