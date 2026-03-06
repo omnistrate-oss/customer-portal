@@ -1,12 +1,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Stack, styled, Typography } from "@mui/material";
+import { Box, Stack, styled } from "@mui/material";
 
 import { useCookieConsentContext } from "src/context/cookieConsentContext";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 
 import Button from "../Button/Button";
 import FlagWithBackground from "../Icons/Flag/FlagWithBackground";
+import { Text } from "../Typography/Typography";
 
 const StyledConsentContainer = styled(Box)<{ maxWidth?: string }>(({ maxWidth }) => ({
   position: "fixed",
@@ -26,10 +28,22 @@ const StyledConsentContainer = styled(Box)<{ maxWidth?: string }>(({ maxWidth })
   zIndex: 1300,
 }));
 
+const FlexContainer = styled(Box)(() => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: "16px",
+  justifyContent: "space-between",
+  alignItems: "center",
+  "@media (min-width: 768px)": {
+    flexDirection: "row",
+  },
+}));
+
 function CookieConsentModal() {
   const [isPreferenceModalOpen, setIsPreferenceModalOpen] = useState(false);
 
   const { consentState, updateConsent, isConsentModalOpen, setIsConsentModalOpen } = useCookieConsentContext();
+  const { orgName } = useProviderOrgDetails();
 
   const closeConsentModal = () => setIsConsentModalOpen(false);
 
@@ -59,41 +73,76 @@ function CookieConsentModal() {
   return (
     <>
       {isConsentModalOpen && !isPreferenceModalOpen && (
-        <StyledConsentContainer data-testid="cookie-consent-banner" maxWidth={"1216px"}>
-          <Stack direction="row" justifyContent="space-between">
-            <Stack direction="row" alignItems="center" gap="16px">
-              <FlagWithBackground />
-              <Typography
-                sx={{
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  lineHeight: "24px",
-                  color: "#FFFFFF",
-                }}
-              >
-                We use essential cookies. Analytics cookies are optional.{" "}
-                <Link href="/cookie-policy" target="_blank" style={{ textDecoration: "underline", cursor: "pointer" }}>
-                  Cookie Policy
-                </Link>
-              </Typography>
-            </Stack>
+        <StyledConsentContainer data-testid="cookie-consent-banner" maxWidth={"1440px"}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: "16px", alignItems: "center" }}>
+            <FlexContainer>
+              <Stack direction="row" alignItems="center" gap="16px">
+                <FlagWithBackground style={{ flexShrink: 0 }} />
+                <Box
+                  sx={{
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Text size="medium" weight="semibold" color="#FFFFFF">
+                    We care about your privacy
+                  </Text>
+                  <Text
+                    size="small"
+                    weight="regular"
+                    color="#FFFFFF"
+                    sx={{
+                      marginTop: "2px",
+                      "@media (min-width: 768px)": {
+                        fontSize: "16px",
+                        lineHeight: "24px",
+                      },
+                    }}
+                  >
+                    We use necessary cookies to keep the {orgName} platform secure and reliable. Optional analytics
+                    cookies help us improve the platform experience. Accept All enables analytics cookies. Reject All
+                    uses only necessary cookies. Learn more in our{" "}
+                    <Link
+                      href="/cookie-policy"
+                      target="_blank"
+                      style={{ textDecoration: "underline", cursor: "pointer", fontWeight: 600, color: "#FFFFFF" }}
+                    >
+                      Cookie Policy
+                    </Link>
+                    .
+                  </Text>
+                </Box>
+              </Stack>
 
-            <Stack direction="row" gap="16px" alignItems="center">
-              <Button
-                size="large"
-                variant="contained"
-                fontColor="#000000"
-                bgColor="#FFFFFF"
-                onClick={handleAllowNecessary}
-              >
-                Allow necessary
-              </Button>
-              <Button size="large" variant="contained" fontColor="#FFFFFF" bgColor="#000000" onClick={handleAllowAll}>
-                Allow analytics
-              </Button>
-              <CloseIcon htmlColor="#FFFFFF" sx={{ cursor: "pointer" }} onClick={closeConsentModal} />
-            </Stack>
-          </Stack>
+              <Stack direction="row" gap="16px" alignItems="center" flexShrink={0}>
+                <Button
+                  size="large"
+                  variant="contained"
+                  fontColor="#FFFFFF"
+                  bgColor="#000000"
+                  onClick={handleAllowNecessary}
+                >
+                  Reject All
+                </Button>
+                <Button size="large" variant="contained" fontColor="#FFFFFF" bgColor="#000000" onClick={handleAllowAll}>
+                  Accept All
+                </Button>
+              </Stack>
+            </FlexContainer>
+            <CloseIcon
+              htmlColor="#FFFFFF"
+              sx={{
+                cursor: "pointer",
+                flexShrink: 0,
+                alignSelf: "flex-start",
+                marginTop: "32px",
+                "@media (min-width: 768px)": {
+                  alignSelf: "center",
+                  marginTop: 0,
+                },
+              }}
+              onClick={closeConsentModal}
+            />
+          </Box>
         </StyledConsentContainer>
       )}
     </>
