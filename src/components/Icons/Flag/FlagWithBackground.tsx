@@ -1,5 +1,9 @@
-const FlagWithBackground = () => (
-  <svg width={52} height={53} viewBox="0 0 52 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+import { FC } from "react";
+
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const FlagWithBackground: FC<SVGIconProps> = (props) => (
+  <svg width={52} height={53} viewBox="0 0 52 53" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g filter="url(#filter0_dii_10108_1692)">
       <path
         d="M2 11.5439C2 6.0211 6.47715 1.54395 12 1.54395H40C45.5229 1.54395 50 6.0211 50 11.5439V39.5439C50 45.0668 45.5228 49.5439 40 49.5439H12C6.47715 49.5439 2 45.0668 2 39.5439V11.5439Z"
