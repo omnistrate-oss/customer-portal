@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataGridText from "components/DataGrid/DataGridText";
+import DataTable from "components/DataTable/DataTable";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
@@ -28,13 +35,6 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataGridText from "components/DataGrid/DataGridText";
-import DataTable from "components/DataTable/DataTable";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -45,6 +45,7 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
+import { shouldResetDeleteMutationOnClose } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { getOffboardReadiness } from "./utils";
 
@@ -696,7 +697,7 @@ const CloudAccountsPage = () => {
           setSelectedRows([]);
           setClickedInstance(undefined);
           // Reset mutation state if dialog is closed before backend responds
-          if (deleteCloudAccountInstanceMutation.isPending) {
+          if (shouldResetDeleteMutationOnClose(deleteCloudAccountInstanceMutation.isPending)) {
             deleteCloudAccountInstanceMutation.reset();
           }
           await refetchInstances();

@@ -4,18 +4,23 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useFormik } from "formik";
 
+import Button from "components/Button/Button";
+import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
+import DeleteCircleIcon from "components/Icons/DeleteCircle/DeleteCircleIcon";
+import { Text } from "components/Typography/Typography";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import OffboardConfirmationIcon from "src/components/Icons/OffboardConfirmatiion/OffboardConfirmation";
 import { Step, StepLabel, Stepper } from "src/components/Stepper/Stepper";
 import useSnackbar from "src/hooks/useSnackbar";
 import { AccountConfig } from "src/types/account-config";
-import Button from "components/Button/Button";
-import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
-import DeleteCircleIcon from "components/Icons/DeleteCircle/DeleteCircleIcon";
-import { Text } from "components/Typography/Typography";
 
 import { cloudAccountOffboardingSteps } from "../constants";
 
+import {
+  deriveDeleteDialogState,
+  INSTANCE_STATUS_POLL_INTERVAL_MS,
+  shouldPollInstanceStatus,
+} from "./deleteDialogState";
 import { OffboardingInstructions, OffboardInstructionDetails } from "./OffboardingInstructions";
 
 const StyledForm = styled(Box)({
@@ -129,10 +134,16 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   // Polling for status every 10 seconds if dialog is open and instance is deleting
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
-    if (open && instanceStatus === "DELETING" && typeof refetchInstanceStatus === "function") {
+    if (
+      shouldPollInstanceStatus({
+        open,
+        instanceStatus,
+        hasRefetchInstanceStatus: typeof refetchInstanceStatus === "function",
+      })
+    ) {
       interval = setInterval(() => {
-        refetchInstanceStatus();
-      }, 10000);
+        refetchInstanceStatus?.();
+      }, INSTANCE_STATUS_POLL_INTERVAL_MS);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -155,7 +166,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   const [hasRequestedDeletion, setHasRequestedDeletion] = useState(false);
 
   // Spinner should persist if dialog is reopened for same instance in deleting state
-  let isDeletingInstance = false;
   const showStepper = isMultiStepDialog;
   let step: "delete" | "offboard" = "delete";
 
@@ -168,30 +178,17 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     title = "Delete and Offboard Account";
   }
 
-  if (showStepper) {
-    //if instance status is DELETING and if the account config status is READY_TO_OFFBOARD, then we show the offboard step else we show the delete step
-    //if instance status is FAILED and it's the last instance, go directly to offboard step
-    if (instanceStatus === "FAILED" && isLastInstance) {
-      step = "offboard";
-      buttonText = "Offboard";
-    } else if (instanceStatus === "DELETING" && accountConfig?.status === "READY_TO_OFFBOARD") {
-      step = "offboard";
-      buttonText = "Offboard";
-    } else if (
-      (instanceStatus === "DELETING" && accountConfig?.status !== "READY_TO_OFFBOARD") ||
-      isDeleteInstanceMutationPending ||
-      hasRequestedDeletion
-    ) {
-      step = "delete";
-      buttonText = "Deleting";
-      isDeletingInstance = true;
-    }
-  }
-  // Always show spinner if instance is in DELETING state (even if dialog is reopened)
-  if (instanceStatus === "DELETING" && step === "delete") {
-    isDeletingInstance = true;
-    buttonText = "Deleting";
-  }
+  const deleteDialogState = deriveDeleteDialogState({
+    isMultiStepDialog: showStepper,
+    isLastInstance,
+    accountConfigStatus: accountConfig?.status,
+    instanceStatus,
+    isDeleteInstanceMutationPending,
+    hasRequestedDeletion,
+  });
+
+  step = deleteDialogState.step as "delete" | "offboard";
+  buttonText = deleteDialogState.buttonText;
 
   useEffect(() => {
     if (step === "offboard" && hasRequestedDeletion) {
@@ -211,7 +208,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading = isDeleteInstanceMutationPending || isDeletingInstance || hasRequestedDeletion;
+  const isLoading = deleteDialogState.isLoading;
 
   const formData = useFormik({
     initialValues: {
