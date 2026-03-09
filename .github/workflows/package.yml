@@ -55,7 +55,7 @@ jobs:
 
       - name: Build on linux/amd64 only
         timeout-minutes: 20
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -101,7 +101,7 @@ jobs:
 
       - name: Build on linux/arm64 only
         timeout-minutes: 20
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -174,7 +174,7 @@ jobs:
       - name: Build and push ${{ matrix.platform }} by digest
         id: build
         timeout-minutes: 30
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
