@@ -46,7 +46,7 @@ function useResources(queryParams: QueryParams, queryOptions = {}) {
         productTierVersion,
         isInjectedAccountConfig,
       }),
-    enabled: Boolean(serviceId && productTierId && productTierVersion),
+    enabled: Boolean(serviceId && productTierId),
     ...queryOptions,
   });
 
