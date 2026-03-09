@@ -9,7 +9,6 @@ import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyle
 import { AvailabilityZone } from "src/types/availabilityZone";
 import { CloudProvider, FormMode } from "src/types/common/enums";
 import { CustomNetwork } from "src/types/customNetwork";
-import { Resource } from "src/types/resource";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
@@ -18,6 +17,7 @@ import { TierVersionSet } from "src/types/tier-version-set";
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
+import { ResourceSummary } from "../hooks/useResources";
 import {
   filterSchemaByCloudProvider,
   getCustomNetworksMenuItems,
@@ -414,7 +414,7 @@ export const getNetworkConfigurationFields = (
   values,
   resourceSchema: APIEntity,
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
-  resources: Resource[],
+  resources: ResourceSummary[],
   customNetworks: CustomNetwork[],
   isFetchingCustomNetworks: boolean
 ) => {
@@ -584,9 +584,7 @@ export const getNetworkConfigurationFields = (
 
   if (customDNSFieldExists) {
     const param = inputParametersObj["custom_dns_configuration"];
-    const customDnsResources = (resources || []).filter((resource) =>
-      resource?.capabilities?.some((capability) => capability?.capability === "CUSTOM_DNS")
-    );
+    const customDnsResources = (resources || []).filter((resource) => resource?.customDNS === true);
 
     if (customDnsResources.length) {
       customDnsResources.forEach((resource) => {
@@ -616,18 +614,6 @@ export const getNetworkConfigurationFields = (
             });
           },
         });
-      });
-    } else {
-      fields.push({
-        dataTestId: `${param.key}-input`,
-        label: param.displayName || param.key,
-        subLabel: param.description,
-        disabled: formMode !== "create",
-        name: `requestParams.${param.key}`,
-        value: values.requestParams[param.key] || "",
-        type: "text-multiline",
-        required: formMode !== "modify" && param.required,
-        previewValue: values.requestParams[param.key],
       });
     }
   }

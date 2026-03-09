@@ -1,78 +1,54 @@
-import { $api } from "src/api/query";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-import { Resource } from "../../../../src/types/resource";
+type QueryParams = {
+  serviceId?: string;
+  productTierId?: string;
+  productTierVersion?: string;
+  isInjectedAccountConfig?: boolean;
+};
 
-function useResources(queryParams, queryOptions = {}) {
+export type ResourceSummary = {
+  customDNS: boolean;
+  id: string;
+  key?: string;
+  name: string;
+};
+
+type ResourcesResponse = {
+  resources: ResourceSummary[];
+};
+
+async function fetchResources(params: QueryParams): Promise<ResourceSummary[]> {
+  const { serviceId, productTierId, productTierVersion, isInjectedAccountConfig } = params;
+
+  const response = await axios.get("/api/resources", {
+    params: {
+      serviceId,
+      productTierId,
+      productTierVersion: productTierVersion || "",
+      isInjectedAccountConfig: isInjectedAccountConfig ? "true" : "false",
+    },
+  });
+
+  return (response.data as ResourcesResponse).resources || [];
+}
+
+function useResources(queryParams: QueryParams, queryOptions = {}) {
   const { serviceId, productTierId, productTierVersion, isInjectedAccountConfig = false } = queryParams;
 
-  const query = $api.useQuery(
-    "get",
-    "/2022-09-01-00/service/{serviceId}/producttier/{productTierId}/resource",
-    {
-      params: {
-        path: {
-          serviceId,
-          productTierId,
-        },
-        query: {
-          ProductTierVersion: productTierVersion,
-        },
-      },
-    },
-    {
-      enabled: Boolean(serviceId && productTierId),
-      select: (data) => {
-        let resourceIds: string[] = [];
-        let resources: Resource[] = [];
-
-        if (data.resources) {
-          resources = data.resources;
-          resourceIds = data.ids;
-        }
-
-        if (isInjectedAccountConfig) {
-          //filter out observability resource
-          return {
-            resources: resources
-              .filter((resource) => !resource?.id?.includes("r-obsrv"))
-              .map((resource) => {
-                return {
-                  ...resource,
-                  dependencies: (resource.dependencies || []).filter(
-                    (dependency) => !dependency?.resourceId?.includes("r-obsrv")
-                  ),
-                };
-              }),
-            resourceIds: resourceIds.filter((resourceId) => !resourceId?.includes("r-obsrv")),
-          };
-        } else {
-          //filter out observability, cloud provider account resource
-          return {
-            resources: resources
-              .filter(
-                (resource) => !(resource?.id?.includes("r-obsrv") || resource?.id?.includes("r-injectedaccountconfig"))
-              )
-              .map((resource) => {
-                return {
-                  ...resource,
-                  dependencies: (resource.dependencies || []).filter(
-                    (dependency) =>
-                      !(
-                        dependency?.resourceId?.includes("r-obsrv") ||
-                        dependency?.resourceId?.includes("r-injectedaccountconfig")
-                      )
-                  ),
-                };
-              }),
-            resourceIds: resourceIds.filter(
-              (resourceId) => !(resourceId?.includes("r-obsrv") || resourceId?.includes("r-injectedaccountconfig"))
-            ),
-          };
-        }
-      },
-      ...queryOptions,
-    }
-  );
+  const query = useQuery({
+    queryKey: ["resources", serviceId, productTierId, productTierVersion, isInjectedAccountConfig],
+    queryFn: () =>
+      fetchResources({
+        serviceId,
+        productTierId,
+        productTierVersion,
+        isInjectedAccountConfig,
+      }),
+    enabled: Boolean(serviceId && productTierId && productTierVersion),
+    ...queryOptions,
+  });
 
   return query;
 }

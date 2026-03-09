@@ -601,18 +601,11 @@ const InstanceForm = ({
     productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
   });
 
-  const { data: resourcesData } = useResources(
-    {
-      serviceId: values.serviceId,
-      productTierId: values.servicePlanId,
-      productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
-    },
-    {
-      enabled: Boolean(values.serviceId && values.servicePlanId),
-    }
-  );
-
-  const resources = resourcesData?.resources || [];
+  const { data: resources = [] } = useResources({
+    serviceId: values.serviceId,
+    productTierId: values.servicePlanId,
+    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
+  });
 
   const resourceCreateSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
   const resourceModifySchema = resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE") as APIEntity;
