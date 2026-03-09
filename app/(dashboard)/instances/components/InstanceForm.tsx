@@ -30,6 +30,7 @@ import { checkBYOADeploymentInstance } from "src/utils/instance";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
+import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { filterSchemaByCloudProvider, getInitialValues } from "../utils";
 
@@ -600,6 +601,19 @@ const InstanceForm = ({
     productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
   });
 
+  const { data: resourcesData } = useResources(
+    {
+      serviceId: values.serviceId,
+      productTierId: values.servicePlanId,
+      productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
+    },
+    {
+      enabled: Boolean(values.serviceId && values.servicePlanId),
+    }
+  );
+
+  const resources = resourcesData?.resources || [];
+
   const resourceCreateSchema = resourceSchemaData?.apis?.find((api) => api.verb === "CREATE") as APIEntity;
   const resourceModifySchema = resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE") as APIEntity;
 
@@ -936,10 +950,19 @@ const InstanceForm = ({
       formData.values,
       resourceCreateSchema,
       serviceOfferingsObj,
+      resources,
       customNetworks,
       isFetchingCustomNetworks
     );
-  }, [formMode, formData.values, resourceCreateSchema, serviceOfferingsObj, customNetworks, isFetchingCustomNetworks]);
+  }, [
+    formMode,
+    formData.values,
+    resourceCreateSchema,
+    serviceOfferingsObj,
+    resources,
+    customNetworks,
+    isFetchingCustomNetworks,
+  ]);
 
   const deploymentConfigurationFields = useMemo(() => {
     return getDeploymentConfigurationFields(

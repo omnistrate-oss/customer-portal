@@ -9,6 +9,7 @@ import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyle
 import { AvailabilityZone } from "src/types/availabilityZone";
 import { CloudProvider, FormMode } from "src/types/common/enums";
 import { CustomNetwork } from "src/types/customNetwork";
+import { Resource } from "src/types/resource";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
@@ -413,6 +414,7 @@ export const getNetworkConfigurationFields = (
   values,
   resourceSchema: APIEntity,
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
+  resources: Resource[],
   customNetworks: CustomNetwork[],
   isFetchingCustomNetworks: boolean
 ) => {
@@ -582,13 +584,13 @@ export const getNetworkConfigurationFields = (
 
   if (customDNSFieldExists) {
     const param = inputParametersObj["custom_dns_configuration"];
-    const customDnsResources = (offering?.resourceParameters || []).filter((resource) =>
+    const customDnsResources = (resources || []).filter((resource) =>
       resource?.capabilities?.some((capability) => capability?.capability === "CUSTOM_DNS")
     );
 
     if (customDnsResources.length) {
       customDnsResources.forEach((resource) => {
-        const resourceKey = resource?.urlKey;
+        const resourceKey = resource?.key || resource?.id;
         if (!resourceKey) {
           return;
         }
