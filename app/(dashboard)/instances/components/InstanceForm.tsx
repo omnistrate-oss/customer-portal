@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
+import { useEffect, useMemo, useState } from "react";
 import type { StringSchema } from "yup";
 import * as yup from "yup";
 
+import Button from "components/Button/Button";
+import CardWithTitle from "components/Card/CardWithTitle";
+import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
+import GridDynamicField from "components/DynamicForm/GridDynamicField";
+import PreviewCard from "components/DynamicForm/PreviewCard";
+import Form from "components/FormElementsv2/Form/Form";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import { Text } from "components/Typography/Typography";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
@@ -19,14 +27,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import { checkBYOADeploymentInstance } from "src/utils/instance";
-import Button from "components/Button/Button";
-import CardWithTitle from "components/Card/CardWithTitle";
-import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
-import GridDynamicField from "components/DynamicForm/GridDynamicField";
-import PreviewCard from "components/DynamicForm/PreviewCard";
-import Form from "components/FormElementsv2/Form/Form";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import { Text } from "components/Typography/Typography";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
@@ -43,6 +43,55 @@ type ValidationSchema =
   | StringSchema<string | undefined>
   | StringSchema<string | null | undefined>
   | ReturnType<typeof yup.mixed>;
+
+const normalizeCustomDnsValue = (key: string, value: unknown): string => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  const valueAsString = typeof value === "string" ? value : String(value);
+
+  try {
+    const parsedValue = JSON.parse(valueAsString);
+    if (
+      parsedValue &&
+      typeof parsedValue === "object" &&
+      !Array.isArray(parsedValue) &&
+      typeof (parsedValue as Record<string, unknown>)[key] === "string"
+    ) {
+      return (parsedValue as Record<string, string>)[key];
+    }
+  } catch {
+    // Plain string, keep as-is.
+  }
+
+  return valueAsString;
+};
+
+const normalizeCustomDnsConfiguration = (
+  customDnsConfiguration: unknown,
+  resourceKey: string
+): Record<string, string> => {
+  if (typeof customDnsConfiguration === "string") {
+    const normalizedValue = normalizeCustomDnsValue(resourceKey, customDnsConfiguration);
+    return normalizedValue ? { [resourceKey]: normalizedValue } : {};
+  }
+
+  if (customDnsConfiguration && typeof customDnsConfiguration === "object" && !Array.isArray(customDnsConfiguration)) {
+    const normalizedCustomDnsConfiguration: Record<string, string> = {};
+
+    Object.entries(customDnsConfiguration as Record<string, unknown>).forEach(([key, value]) => {
+      const normalizedValue = normalizeCustomDnsValue(key, value);
+      if (normalizedValue) {
+        normalizedCustomDnsConfiguration[key] = normalizedValue;
+      }
+    });
+
+    return normalizedCustomDnsConfiguration;
+  }
+
+  return {};
+};
 
 const InstanceForm = ({
   formMode,
@@ -116,13 +165,16 @@ const InstanceForm = ({
                   const isBYOAInstance = checkBYOADeploymentInstance(instance);
                   if (!isBYOAInstance) return false;
                   const instanceAccountId =
-                    instance?.awsAccountID || instance?.gcpProjectID || instance?.azureSubscriptionID || instance?.ociTenancyID;
+                    instance?.awsAccountID ||
+                    instance?.gcpProjectID ||
+                    instance?.azureSubscriptionID ||
+                    instance?.ociTenancyID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
                     createdInstance?.azureSubscriptionID ||
                     createdInstance?.ociTenancyID;
-                    
+
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
                   const isFromSameRegion = instance.region === createdInstance.region;
@@ -310,13 +362,36 @@ const InstanceForm = ({
           return snackbar.showError("Network Type is required");
         }
 
-        if (inputParametersObj["custom_dns_configuration"] && data.requestParams["custom_dns_configuration"]) {
-          data.requestParams.custom_dns_configuration = {
-            [resourceKey]: data.requestParams.custom_dns_configuration,
-          };
+        if (inputParametersObj["custom_dns_configuration"]) {
+          const normalizedCustomDnsConfiguration = normalizeCustomDnsConfiguration(
+            data.requestParams.custom_dns_configuration,
+            resourceKey
+          );
+
+          if (Object.keys(normalizedCustomDnsConfiguration).length) {
+            data.requestParams.custom_dns_configuration = normalizedCustomDnsConfiguration;
+          } else {
+            delete data.requestParams.custom_dns_configuration;
+          }
         }
 
         for (const field of requiredFields) {
+          if (field.key === "custom_dns_configuration") {
+            const customDnsConfiguration = data.requestParams.custom_dns_configuration;
+            const hasCustomDnsValue =
+              customDnsConfiguration &&
+              typeof customDnsConfiguration === "object" &&
+              !Array.isArray(customDnsConfiguration) &&
+              Object.values(customDnsConfiguration).some((value) => typeof value === "string" && value.trim());
+
+            if (field.required && !hasCustomDnsValue) {
+              snackbar.showError(`${field.displayName || field.key} is required`);
+              return;
+            }
+
+            continue;
+          }
+
           if (data.requestParams[field.key] === undefined || (field.required && data.requestParams[field.key] === "")) {
             snackbar.showError(`${field.displayName || field.key} is required`);
             return;
@@ -454,6 +529,19 @@ const InstanceForm = ({
           }
         }
 
+        if (inputParametersObj["custom_dns_configuration"]) {
+          const normalizedCustomDnsConfiguration = normalizeCustomDnsConfiguration(
+            data.requestParams.custom_dns_configuration,
+            resourceKey
+          );
+
+          if (Object.keys(normalizedCustomDnsConfiguration).length) {
+            data.requestParams.custom_dns_configuration = normalizedCustomDnsConfiguration;
+          } else {
+            delete data.requestParams.custom_dns_configuration;
+          }
+        }
+
         if (!isTypeError) {
           updateInstanceMutation.mutate({
             params: {
@@ -574,6 +662,12 @@ const InstanceForm = ({
                   return value.every((item) => !item || regex.test(item));
                 }
 
+                if (value && typeof value === "object") {
+                  return Object.values(value as Record<string, unknown>).every(
+                    (item) => !item || regex.test(String(item))
+                  );
+                }
+
                 // Handle single values
                 return regex.test(value);
               });
@@ -653,6 +747,12 @@ const InstanceForm = ({
                 if (Array.isArray(value)) {
                   if (value.length === 0) return true;
                   return value.every((item) => !item || regex.test(item));
+                }
+
+                if (value && typeof value === "object") {
+                  return Object.values(value as Record<string, unknown>).every(
+                    (item) => !item || regex.test(String(item))
+                  );
                 }
 
                 // Handle single values
@@ -832,6 +932,7 @@ const InstanceForm = ({
   const networkConfigurationFields = useMemo(() => {
     return getNetworkConfigurationFields(
       formMode,
+      formData,
       formData.values,
       resourceCreateSchema,
       serviceOfferingsObj,

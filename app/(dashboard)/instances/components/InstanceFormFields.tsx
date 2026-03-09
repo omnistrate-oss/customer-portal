@@ -1,6 +1,5 @@
-import React from "react";
-import Link from "next/link";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
+import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -410,6 +409,7 @@ export const getStandardInformationFields = (
 
 export const getNetworkConfigurationFields = (
   formMode: FormMode,
+  formData,
   values,
   resourceSchema: APIEntity,
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
@@ -430,6 +430,63 @@ export const getNetworkConfigurationFields = (
   const customNetworkFieldExists = inputParametersObj["custom_network_id"];
   const cloudProviderNativeNetworkIdFieldExists = inputParametersObj["cloud_provider_native_network_id"];
   const customDNSFieldExists = inputParametersObj["custom_dns_configuration"];
+
+  const normalizeCustomDnsValue = (key: string, value: unknown): string => {
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    const valueAsString = typeof value === "string" ? value : String(value);
+
+    try {
+      const parsedValue = JSON.parse(valueAsString);
+      if (
+        parsedValue &&
+        typeof parsedValue === "object" &&
+        !Array.isArray(parsedValue) &&
+        typeof (parsedValue as Record<string, unknown>)[key] === "string"
+      ) {
+        return (parsedValue as Record<string, string>)[key];
+      }
+    } catch {
+      // Plain string, keep as-is.
+    }
+
+    return valueAsString;
+  };
+
+  const getCustomDnsInputValue = (resourceKey: string): string => {
+    const customDnsConfiguration = values?.requestParams?.custom_dns_configuration;
+
+    if (!resourceKey) {
+      return "";
+    }
+
+    if (
+      customDnsConfiguration &&
+      typeof customDnsConfiguration === "object" &&
+      !Array.isArray(customDnsConfiguration)
+    ) {
+      const configuredValue = customDnsConfiguration[resourceKey];
+
+      if (typeof configuredValue !== "string") {
+        return "";
+      }
+
+      try {
+        const parsedValue = JSON.parse(configuredValue);
+        return parsedValue?.[resourceKey] ?? configuredValue;
+      } catch {
+        return configuredValue;
+      }
+    }
+
+    if (typeof customDnsConfiguration === "string") {
+      return normalizeCustomDnsValue(resourceKey, customDnsConfiguration);
+    }
+
+    return "";
+  };
 
   const networkTypeFieldExists = cloudProviderFieldExists && !isMultiTenancy && offering?.supportsPublicNetwork;
 
@@ -525,17 +582,52 @@ export const getNetworkConfigurationFields = (
 
   if (customDNSFieldExists) {
     const param = inputParametersObj["custom_dns_configuration"];
-    fields.push({
-      dataTestId: `${param.key}-input`,
-      label: param.displayName || param.key,
-      subLabel: param.description,
-      disabled: formMode !== "create",
-      name: `requestParams.${param.key}`,
-      value: values.requestParams[param.key] || "",
-      type: "text-multiline",
-      required: formMode !== "modify" && param.required,
-      previewValue: values.requestParams[param.key],
-    });
+    const customDnsResources = (offering?.resourceParameters || []).filter((resource) =>
+      resource?.capabilities?.some((capability) => capability?.capability === "CUSTOM_DNS")
+    );
+
+    if (customDnsResources.length) {
+      customDnsResources.forEach((resource) => {
+        const resourceKey = resource?.urlKey;
+        if (!resourceKey) {
+          return;
+        }
+
+        fields.push({
+          dataTestId: `${param.key}.${resourceKey}`,
+          label: `${resource?.name || resourceKey} Custom DNS`,
+          subLabel: `Enter custom DNS value for ${resource?.name || resourceKey}`,
+          disabled: formMode !== "create",
+          name: `requestParams.${param.key}.${resourceKey}`,
+          value: getCustomDnsInputValue(resourceKey),
+          type: "text-multiline",
+          required: formMode !== "modify" && param.required,
+          previewValue: getCustomDnsInputValue(resourceKey),
+          onChange: (event) => {
+            const currentConfig = values?.requestParams?.custom_dns_configuration;
+            const normalizedConfig =
+              currentConfig && typeof currentConfig === "object" && !Array.isArray(currentConfig) ? currentConfig : {};
+
+            formData.setFieldValue("requestParams.custom_dns_configuration", {
+              ...normalizedConfig,
+              [resourceKey]: event.target.value,
+            });
+          },
+        });
+      });
+    } else {
+      fields.push({
+        dataTestId: `${param.key}-input`,
+        label: param.displayName || param.key,
+        subLabel: param.description,
+        disabled: formMode !== "create",
+        name: `requestParams.${param.key}`,
+        value: values.requestParams[param.key] || "",
+        type: "text-multiline",
+        required: formMode !== "modify" && param.required,
+        previewValue: values.requestParams[param.key],
+      });
+    }
   }
 
   return fields;
