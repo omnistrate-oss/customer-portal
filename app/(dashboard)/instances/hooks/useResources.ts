@@ -5,8 +5,6 @@ import { Resource } from "../../../../src/types/resource";
 function useResources(queryParams, queryOptions = {}) {
   const { serviceId, productTierId, productTierVersion, isInjectedAccountConfig = false } = queryParams;
 
-  console.log("useResources queryParams", queryParams);
-
   const query = $api.useQuery(
     "get",
     "/2022-09-01-00/service/{serviceId}/producttier/{productTierId}/resource",
