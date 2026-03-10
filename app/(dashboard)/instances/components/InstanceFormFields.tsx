@@ -603,7 +603,6 @@ export const getNetworkConfigurationFields = (
           type: "text-multiline",
           required: formMode !== "modify" && param.required,
           previewValue: getCustomDnsInputValue(resourceKey),
-          skipFormikHandleChange: true,
           onChange: (event) => {
             const currentConfig = values?.requestParams?.custom_dns_configuration;
             const normalizedConfig =

@@ -45,7 +45,7 @@ function ResourceCustomDNS(props) {
 
     if (primaryResourceName || primaryResourceEndpoint) {
       const customDNSEndpointName = globalEndpoints?.primary?.customDNSEndpoint?.name ?? "";
-      if (globalEndpoints?.primary?.resourceHasCompute && globalEndpoints?.primary?.customDNSEndpoint?.enabled) {
+      if (globalEndpoints?.primary?.customDNSEndpoint?.enabled) {
         res.push({
           label: primaryResourceName,
           description: `The global endpoint of the ${sectionLabel.toLowerCase()}`,
