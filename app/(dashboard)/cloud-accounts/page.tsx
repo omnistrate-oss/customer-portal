@@ -138,7 +138,7 @@ const CloudAccountsPage = () => {
     isPending: isInstancesPending,
     isFetching: isFetchingInstances,
     refetch: refetchInstances,
-  } = useInstancesListWithDescribe({ describeInstances: true });
+  } = useInstancesListWithDescribe({ describeInstances: true, onlyCloudAccounts: true });
 
   const accountConfigIds = useMemo(() => {
     const ids = new Set<string>();
