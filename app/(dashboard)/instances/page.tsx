@@ -75,16 +75,53 @@ const InstancesPage = () => {
 
   const dataTableColumns = useMemo(() => {
     return [
+      columnHelper.display({
+        id: "icons",
+        header: "",
+        cell: (data) => {
+          const isDeleteProtectionSupported =
+            data.row.original.resourceInstanceMetadata?.deletionProtection !== undefined;
+          const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
+          const upcomingUpgrade = data.row.original.maintenanceTasks?.upgrade_paths?.[0];
+
+          return (
+            <Stack direction="row" alignItems="center" gap="6px">
+              <StatusCell upcomingUpgrade={upcomingUpgrade} />
+              <Tooltip
+                title={
+                  !isDeleteProtectionSupported
+                    ? "Delete protection not supported"
+                    : isDeleteProtected
+                      ? "Delete protection enabled"
+                      : "Delete protection disabled"
+                }
+              >
+                <span>
+                  <DeleteProtectionIcon disabled={!isDeleteProtected} />
+                </span>
+              </Tooltip>
+            </Stack>
+          );
+        },
+        meta: {
+          width: 50,
+          minWidth: 50,
+          headerStyles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+          styles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+        },
+      }),
       columnHelper.accessor("id", {
         id: "id",
         header: "Instance ID",
         cell: (data) => {
           const { id: instanceId, subscriptionId, resourceID } = data.row.original;
           const { serviceId, productTierId } = subscriptionsObj[subscriptionId as string] || {};
-
-          const deletionProtectionFeatureEnabled =
-            data.row.original?.resourceInstanceMetadata?.deletionProtection !== undefined;
-          const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
 
           const resourceInstanceUrlLink = getInstanceDetailsRoute({
             serviceId,
@@ -94,24 +131,7 @@ const InstancesPage = () => {
             subscriptionId: subscriptionId as string,
           });
 
-          return (
-            <GridCellExpand
-              href={resourceInstanceUrlLink}
-              value={instanceId as string}
-              copyButton
-              endIcon={
-                deletionProtectionFeatureEnabled && (
-                  <Box sx={{ marginRight: "-2px", marginTop: "-7px" }}>
-                    <Tooltip title={isDeleteProtected ? "Delete protection enabled" : "Delete protection disabled"}>
-                      <span>
-                        <DeleteProtectionIcon disabled={!isDeleteProtected} />
-                      </span>
-                    </Tooltip>
-                  </Box>
-                )
-              }
-            />
-          );
+          return <GridCellExpand href={resourceInstanceUrlLink} value={instanceId as string} copyButton />;
         },
         meta: {
           minWidth: 250,
@@ -450,26 +470,9 @@ const InstancesPage = () => {
             );
             return healthStatus;
           }}
+          checkboxContainerStyles={{ marginLeft: "8px" }}
+          checkboxColumnMeta={{ minWidth: 44 }}
           tableStyles={{ ...getRowBorderStyles() }}
-          statusColumn={{
-            id: "instance-status",
-            header: "",
-            cell: ({ row }) => {
-              const upcomingUpgrade = row.original.maintenanceTasks?.upgrade_paths?.[0];
-              return (
-                <div className="flex items-center justify-center">
-                  <StatusCell upcomingUpgrade={upcomingUpgrade} />
-                </div>
-              );
-            },
-            meta: {
-              width: 50,
-              styles: {
-                padding: "0px",
-                paddingLeft: "4px",
-              },
-            },
-          }}
         />
       </div>
 

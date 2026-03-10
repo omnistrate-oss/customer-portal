@@ -5,6 +5,7 @@ import { Box, Stack } from "@mui/material";
 
 import InfoFilledIcon from "src/components/Icons/InfoFilled/InfoFilled";
 import { Text } from "src/components/Typography/Typography";
+import { IdentityProvider } from "src/types/identityProvider";
 import { omnistratePortalUrl } from "src/utils/constants";
 
 const InstructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemContent }) => {
@@ -18,30 +19,36 @@ const InstructionListItem: FC<{ listItemContent: ReactNode }> = ({ listItemConte
   );
 };
 
-const instructionsList = [
-  <>
-    Use your existing Omnistrate username/password to access your{" "}
-    <Box component="span" fontWeight={600}>
-      non-production
-    </Box>{" "}
-    customer portal. Sign-ups are restricted to your domain for security.{" "}
-  </>,
-  <>You can also configure your Identity provider to authenticate against the customer portal.</>,
-  <>Note that Omnistrate Single Sign-On is not currently supported.</>,
-  <>
-    Used Google or GitHub to sign into the Omnistrate Portal? This Customer Portal requires a password.{" "}
-    <Link
-      href={`${omnistratePortalUrl}/settings?view=Password`}
-      style={{ fontWeight: 600, textDecoration: "underline" }}
-      target="_blank"
-    >
-      Set your password
-    </Link>{" "}
-    first and then sign in with your email/password.
-  </>,
-];
+const NonProdLoginInstructions: FC<{ identityProviders: IdentityProvider[] }> = ({ identityProviders }) => {
+  const instructionsList = [
+    <>
+      Use your existing Omnistrate username/password to access your{" "}
+      <Box component="span" fontWeight={600}>
+        non-production
+      </Box>{" "}
+      customer portal. Sign-ups are restricted to your domain for security.{" "}
+    </>,
+    <>
+      Used Google or GitHub to sign into the Omnistrate Portal? This Customer Portal requires a password.{" "}
+      <Link
+        href={`${omnistratePortalUrl}/settings?view=Password`}
+        style={{ fontWeight: 600, textDecoration: "underline" }}
+        target="_blank"
+      >
+        Set your password
+      </Link>{" "}
+      first and then sign in with your email/password.
+    </>,
+  ];
 
-function NonProdLoginInstructions() {
+  if (identityProviders.length === 0) {
+    instructionsList.push(
+      <>You can also configure your Identity provider to authenticate against the customer portal.</>
+    );
+  }
+
+  instructionsList.push(<>Note that Omnistrate Single Sign-On is not currently supported.</>);
+
   return (
     <Box border="1px solid #E9EAEB" bgcolor="#FAFAFA" borderRadius="8px" p="20px">
       <Stack direction="row" gap="8px" alignItems="center">
@@ -57,6 +64,6 @@ function NonProdLoginInstructions() {
       </Stack>
     </Box>
   );
-}
+};
 
 export default NonProdLoginInstructions;
