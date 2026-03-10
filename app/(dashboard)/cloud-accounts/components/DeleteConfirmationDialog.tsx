@@ -71,7 +71,7 @@ const LastInstanceConfirmationMessage: FC<{
           You are about to delete the last cloud account instance linked to this cloud account. This will begin the
           deletion process and mark the account for offboarding.
         </Text>
-        <Box marginLeft="10px" marginTop="20px" borderLeft="2px solid #F79009" paddingLeft="10px">
+        <Box marginLeft="10px" marginTop="20px" borderLeft="3px solid #f91202" paddingLeft="10px">
           <Text size="small" weight="medium" color="#414651">
             <b>Note:</b> Deletion may take a few minutes and will run in the background. You can safely close this popup
             and return later to complete the off-boarding step.
