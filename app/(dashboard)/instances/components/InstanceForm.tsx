@@ -71,20 +71,42 @@ const normalizeCustomDnsValue = (key: string, value: unknown): string => {
 
 const normalizeCustomDnsConfiguration = (
   customDnsConfiguration: unknown,
-  resourceKey: string
+  fallbackResourceKey: string
 ): Record<string, string> => {
+  // Handle string value.
+  // If it is a JSON object string (e.g. '{"outlineWiki":"...","postgres":"..."}')
+  // preserve all keys instead of collapsing to fallbackResourceKey.
   if (typeof customDnsConfiguration === "string") {
-    const normalizedValue = normalizeCustomDnsValue(resourceKey, customDnsConfiguration);
-    return normalizedValue ? { [resourceKey]: normalizedValue } : {};
+    try {
+      const parsedConfiguration = JSON.parse(customDnsConfiguration);
+      if (parsedConfiguration && typeof parsedConfiguration === "object" && !Array.isArray(parsedConfiguration)) {
+        const normalizedCustomDnsConfiguration: Record<string, string> = {};
+
+        Object.entries(parsedConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
+          const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
+          if (normalizedValue) {
+            normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
+          }
+        });
+
+        return normalizedCustomDnsConfiguration;
+      }
+    } catch {
+      // Plain string, fallback to legacy single-resource behavior.
+    }
+
+    const normalizedValue = normalizeCustomDnsValue(fallbackResourceKey, customDnsConfiguration);
+    return normalizedValue ? { [fallbackResourceKey]: normalizedValue } : {};
   }
 
+  // Handle object value - normalize each resource's custom DNS value
   if (customDnsConfiguration && typeof customDnsConfiguration === "object" && !Array.isArray(customDnsConfiguration)) {
     const normalizedCustomDnsConfiguration: Record<string, string> = {};
 
-    Object.entries(customDnsConfiguration as Record<string, unknown>).forEach(([key, value]) => {
-      const normalizedValue = normalizeCustomDnsValue(key, value);
+    Object.entries(customDnsConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
+      const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
       if (normalizedValue) {
-        normalizedCustomDnsConfiguration[key] = normalizedValue;
+        normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
       }
     });
 
