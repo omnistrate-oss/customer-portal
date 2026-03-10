@@ -42,7 +42,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.11",
-    "dompurify": "3.2.4",
+    "dompurify": "3.3.2",
     "dotenv": "^16.4.5",
     "dotted-map": "^2.2.3",
     "ejs": "^3.1.10",
@@ -115,8 +115,10 @@
     "qs": "6.14.2",
     "lodash": "4.17.23",
     "lodash-es": "4.17.23",
-    "minimatch": "5.1.7",
+    "minimatch": "5.1.8",
     "ajv": "^6.14.0",
-    "basic-ftp": "5.2.0"
+    "basic-ftp": "5.2.0",
+    "**/sass/immutable": "5.1.5",
+    "**/swagger-ui-react/**/immutable": "3.8.3"
   }
 }
