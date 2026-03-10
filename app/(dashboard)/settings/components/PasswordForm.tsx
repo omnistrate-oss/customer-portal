@@ -18,7 +18,7 @@ import Form from "components/FormElementsv2/Form/Form";
 import { PasswordField } from "components/FormElementsv2/PasswordField/PasswordField";
 import { Text } from "components/Typography/Typography";
 
-import { FieldCell, FieldTitleCell, PasswordValidationSchema } from "./Common";
+import { FieldCell, FieldTitleCell, getPasswordValidationSchema } from "./Common";
 import FormHeader from "./FormHeader";
 type PasswordFormProps = {
   email: string;
@@ -58,7 +58,7 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ email }) => {
         },
       });
     },
-    validationSchema: PasswordValidationSchema,
+    validationSchema: getPasswordValidationSchema(email),
   });
 
   const { values, handleChange, handleBlur, touched, errors } = formData;
@@ -109,7 +109,7 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ email }) => {
                 onBlur={handleBlur}
                 sx={{ mt: 0 }}
               />
-              <FieldError>{touched.currentPassword && errors.currentPassword}</FieldError>
+              <FieldError mt="4px">{touched.currentPassword && errors.currentPassword}</FieldError>
             </FieldCell>
 
             <FieldTitleCell>
@@ -128,7 +128,7 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ email }) => {
                 onBlur={handleBlur}
                 sx={{ mt: 0 }}
               />
-              <FieldError>{touched.newPassword && errors.newPassword}</FieldError>
+              <FieldError mt="4px">{touched.newPassword && errors.newPassword}</FieldError>
             </FieldCell>
 
             <FieldTitleCell>
@@ -144,7 +144,7 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ email }) => {
                 onBlur={handleBlur}
                 sx={{ mt: 0 }}
               />
-              <FieldError>{touched.confirmPassword && errors.confirmPassword}</FieldError>
+              <FieldError mt="4px">{touched.confirmPassword && errors.confirmPassword}</FieldError>
             </FieldCell>
           </div>
 

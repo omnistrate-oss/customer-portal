@@ -75,7 +75,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const allowUpgrades = serviceOffering?.productTierFeatures?.some(
       (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
     );
-
+    const isDeleting = instance?.status === "DELETING";
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
 
@@ -167,12 +167,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         dataTestId: "delete-button",
         label: "Delete",
         isDisabled:
-          !instance ||
-          status === "DELETING" ||
-          status === "DISCONNECTED" ||
-          isProxyResource ||
-          !isDeleteAllowedByRBAC ||
-          isDeleteProtected,
+          !instance || status === "DELETING" || isProxyResource || !isDeleteAllowedByRBAC || isDeleteProtected,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setOverlayType("delete-dialog");
@@ -182,15 +177,13 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           ? "Please select an instance"
           : status === "DELETING"
             ? "Instance deletion is already in progress"
-            : status === "DISCONNECTED"
-              ? "Instance is disconnected"
-              : isProxyResource
-                ? "System managed instances cannot be deleted"
-                : isDeleteProtected
-                  ? "Instance is delete protected"
-                  : !isDeleteAllowedByRBAC
-                    ? "Unauthorized to delete instances"
-                    : "",
+            : isProxyResource
+              ? "System managed instances cannot be deleted"
+              : isDeleteProtected
+                ? "Instance is delete protected"
+                : !isDeleteAllowedByRBAC
+                  ? "Unauthorized to delete instances"
+                  : "",
       });
     }
 
@@ -259,12 +252,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "generate-token-button",
         label: "Generate Token",
-        isDisabled: !instance || status === "DISCONNECTED",
-        disabledMessage: !instance
-          ? "Please select an instance"
-          : status === "DISCONNECTED"
-            ? "Cloud account is disconnected"
-            : "",
+        isDisabled: !instance,
+        disabledMessage: !instance ? "Please select an instance" : "",
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setOverlayType("generate-token-dialog");
@@ -277,7 +266,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "enable-deletion-protection-button",
         label: "Enable Delete Protection",
-        isDisabled: isDeleteProtected || !isUpdateAllowedByRBAC,
+        isDisabled: isDeleteProtected || !isUpdateAllowedByRBAC || isDeleting,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setIsOverlayOpen(true);
@@ -285,17 +274,19 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : isDeleteProtected
-            ? "Delete protection is already enabled"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to enable delete protection"
-              : "",
+          : isDeleting
+            ? "Instance is being deleted"
+            : isDeleteProtected
+              ? "Delete protection is already enabled"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to enable delete protection"
+                : "",
       });
 
       res.push({
         dataTestId: "disable-deletion-protection-button",
         label: "Disable Delete Protection",
-        isDisabled: !isDeleteProtected || !isUpdateAllowedByRBAC,
+        isDisabled: !isDeleteProtected || !isUpdateAllowedByRBAC || isDeleting,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
           setIsOverlayOpen(true);
@@ -303,11 +294,13 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : !isDeleteProtected
-            ? "Delete protection is already disabled"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to disable delete protection"
-              : "",
+          : isDeleting
+            ? "Instance is being deleted"
+            : !isDeleteProtected
+              ? "Delete protection is already disabled"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to disable delete protection"
+                : "",
       });
     }
 

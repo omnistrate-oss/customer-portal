@@ -32,11 +32,19 @@ export const BillingAddressValidationSchema = yup.object({
   }),
 });
 
-export const PasswordValidationSchema = yup.object({
-  currentPassword: yup.string().required("Current Password is required"),
-  newPassword: yup.string().required("New Password is required").matches(passwordRegex, passwordText),
-  confirmPassword: yup
-    .string()
-    .required("Confirm Password is required")
-    .oneOf([yup.ref("newPassword"), null], "Passwords must match"),
-});
+export const getPasswordValidationSchema = (email: string) =>
+  yup.object({
+    currentPassword: yup.string().required("Current Password is required"),
+    newPassword: yup
+      .string()
+      .required("New Password is required")
+      .matches(passwordRegex, passwordText)
+      .test("password-not-email", "Email cannot be used as password", (value) => {
+        if (!value || !email) return true;
+        return value.toLowerCase() !== email.toLowerCase();
+      }),
+    confirmPassword: yup
+      .string()
+      .required("Confirm Password is required")
+      .oneOf([yup.ref("newPassword"), null], "Passwords must match"),
+  });

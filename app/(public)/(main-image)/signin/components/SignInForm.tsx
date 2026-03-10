@@ -147,7 +147,7 @@ const SignInForm: FC<SignInFormProps> = ({
           shouldRememberLoginDetails={shouldRememberLoginDetails}
         />
       )}
-      <Stack component="form" gap="32px" mt="44px">
+      <Stack component="form" gap="24px" mt="32px">
         {currentStep === 1 && (
           <LoginMethodStep
             formData={formik}
