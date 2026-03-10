@@ -30,8 +30,8 @@ function Connectivity(props) {
     const otherResourceFilteredEndpoints = [];
 
     otherEndpoints?.forEach((endpointData) => {
-      const { resourceName, endpoint } = endpointData;
-      if (resourceName && endpoint) {
+      const { resourceName } = endpointData;
+      if (resourceName) {
         const matchingResourcePort = otherResourcePorts.find(
           (port) => port.resourceName === resourceName && port.ports
         );
@@ -67,7 +67,7 @@ function Connectivity(props) {
   const rows = useMemo(() => {
     const res = [];
 
-    if (primaryResourceName && primaryResourceEndpoint) {
+    if (primaryResourceName) {
       res.push(
         <ResourceConnectivityEndpoint
           key="primary"
@@ -86,7 +86,7 @@ function Connectivity(props) {
     if (otherResourceFilteredEndpoints?.length > 0) {
       otherResourceFilteredEndpoints.forEach(
         ({ resourceName, endpoint, resourceId, customDNSEndpoint, publiclyAccessible }) => {
-          if (resourceName && endpoint && otherResourceFilteredPorts) {
+          if (resourceName && otherResourceFilteredPorts) {
             res.push(
               <ResourceConnectivityEndpoint
                 key={resourceId}
