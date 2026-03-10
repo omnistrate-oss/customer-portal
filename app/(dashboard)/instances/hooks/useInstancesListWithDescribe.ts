@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
@@ -101,6 +102,12 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
+  // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
+  const refetch = useCallback(async () => {
+    await listQuery.refetch();
+    return describeQuery.refetch();
+  }, [listQuery.refetch, describeQuery.refetch]);
+
   if (describeInstances) {
     return {
       ...listQuery,
@@ -108,10 +115,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
       isPending: listQuery.isPending || describeQuery.isPending,
       isFetching: listQuery.isFetching || describeQuery.isFetching,
       error: listQuery.error || describeQuery.error,
-      refetch: async () => {
-        await listQuery.refetch();
-        return describeQuery.refetch();
-      },
+      refetch,
     };
   }
 
