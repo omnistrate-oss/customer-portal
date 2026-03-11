@@ -43,6 +43,16 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
       open: true,
       instanceStatus: "READY",
       hasRefetchInstanceStatus: true,
+      hasRequestedDeletion: true,
+    }),
+    true
+  );
+
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "READY",
+      hasRefetchInstanceStatus: true,
     }),
     false
   );

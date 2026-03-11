@@ -1,7 +1,7 @@
 export const INSTANCE_STATUS_POLL_INTERVAL_MS = 10_000;
 
-export const shouldPollInstanceStatus = ({ open, instanceStatus, hasRefetchInstanceStatus }) => {
-  return Boolean(open && instanceStatus === "DELETING" && hasRefetchInstanceStatus);
+export const shouldPollInstanceStatus = ({ open, instanceStatus, hasRefetchInstanceStatus, hasRequestedDeletion }) => {
+  return Boolean(open && hasRefetchInstanceStatus && (instanceStatus === "DELETING" || hasRequestedDeletion));
 };
 
 export const shouldResetDeleteMutationOnClose = (isMutationPending) => {

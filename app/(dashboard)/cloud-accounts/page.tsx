@@ -48,7 +48,11 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
-import { shouldResetDeleteMutationOnClose } from "./components/deleteDialogState";
+import {
+  INSTANCE_STATUS_POLL_INTERVAL_MS,
+  shouldPollInstanceStatus,
+  shouldResetDeleteMutationOnClose,
+} from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { DIALOG_DATA } from "./constants";
 import { getOffboardReadiness } from "./utils";
@@ -605,6 +609,35 @@ const CloudAccountsPage = () => {
     },
   });
 
+  const showDeleteDialog = isOverlayOpen && overlayType === "delete-dialog";
+  const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
+    open: showDeleteDialog,
+    instanceStatus: selectedInstance?.status,
+    hasRefetchInstanceStatus: true,
+    hasRequestedDeletion: deleteCloudAccountInstanceMutation.isPending,
+  });
+
+  useEffect(() => {
+    // Poll only while the delete dialog is open and deletion is in-progress.
+    // Updated data flows back through `selectedInstance` and `selectedAccountConfig`
+    // to transition the dialog from Delete -> Offboard without a manual refresh.
+    if (!showDeleteDialog || !shouldPollDeleteDialogStatus) {
+      return;
+    }
+
+    refetchInstances();
+    refetchAccountConfigs();
+
+    const pollingInterval = window.setInterval(() => {
+      refetchInstances();
+      refetchAccountConfigs();
+    }, INSTANCE_STATUS_POLL_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(pollingInterval);
+    };
+  }, [showDeleteDialog, shouldPollDeleteDialogStatus, refetchInstances, refetchAccountConfigs]);
+
   const updateInstanceMetadataMutation = $api.useMutation(
     "patch",
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata",
@@ -779,7 +812,6 @@ const CloudAccountsPage = () => {
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
-        refetchInstanceStatus={refetchInstances}
       />
 
       <ConnectAccountConfigDialog
