@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
@@ -8,6 +9,7 @@ import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance
 import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
+  onlyCloudAccounts?: boolean;
   describeInstances?: boolean;
   [key: string]: any;
 };
@@ -16,7 +18,7 @@ const sortByCreatedAtDesc = (a: { created_at?: string }, b: { created_at?: strin
   new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime();
 
 const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
-  const { onlyInstances, describeInstances, ...restOptions } = queryOptions;
+  const { onlyInstances, onlyCloudAccounts, describeInstances, ...restOptions } = queryOptions;
 
   const { serviceOfferings } = useGlobalData();
   // Standard list query for all instances
@@ -34,10 +36,13 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
       select: (data) => {
         let res = data.resourceInstances;
         if (onlyInstances) {
+          // Exclude cloud account instances
           res = res.filter((instance: any) => !isCloudAccountInstance(instance));
-        } else {
+        } else if (onlyCloudAccounts) {
+          // Only cloud account instances
           res = res.filter((instance: any) => isCloudAccountInstance(instance));
         }
+        // When neither option is set, return all instances (matches useInstances behavior)
         return res;
       },
       refetchInterval: 60000,
@@ -46,7 +51,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
   );
 
   const describeQuery = useQuery({
-    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt, serviceOfferings],
+    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt],
     enabled: Boolean(describeInstances && listQuery.data),
     queryFn: async () => {
       const res = listQuery.data || [];
@@ -57,6 +62,10 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
           mainResource = Object.values(instance?.detailedNetworkTopology).find(
             (topologyDetails: any) => topologyDetails.main === true
           );
+        }
+
+        if (!mainResource?.urlKey) {
+          return null;
         }
 
         const serviceOffering = serviceOfferings?.find((so: any) =>
@@ -75,7 +84,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
             serviceOffering?.serviceEnvironmentURLKey as string,
             serviceOffering?.serviceModelURLKey as string,
             serviceOffering?.productTierURLKey as string,
-            mainResource?.urlKey,
+            mainResource.urlKey,
             instance.id,
             instance.subscriptionId
           );
@@ -93,6 +102,12 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
+  // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
+  const refetch = useCallback(async () => {
+    await listQuery.refetch();
+    return describeQuery.refetch();
+  }, [listQuery.refetch, describeQuery.refetch]);
+
   if (describeInstances) {
     return {
       ...listQuery,
@@ -100,10 +115,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
       isPending: listQuery.isPending || describeQuery.isPending,
       isFetching: listQuery.isFetching || describeQuery.isFetching,
       error: listQuery.error || describeQuery.error,
-      refetch: async () => {
-        await listQuery.refetch();
-        return describeQuery.refetch();
-      },
+      refetch,
     };
   }
 

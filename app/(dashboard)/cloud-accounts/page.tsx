@@ -48,6 +48,7 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
+import { shouldResetDeleteMutationOnClose } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { DIALOG_DATA } from "./constants";
 import { getOffboardReadiness } from "./utils";
@@ -137,7 +138,7 @@ const CloudAccountsPage = () => {
     isPending: isInstancesPending,
     isFetching: isFetchingInstances,
     refetch: refetchInstances,
-  } = useInstancesListWithDescribe({ describeInstances: true });
+  } = useInstancesListWithDescribe({ describeInstances: true, onlyCloudAccounts: true });
 
   const accountConfigIds = useMemo(() => {
     const ids = new Set<string>();
@@ -752,6 +753,10 @@ const CloudAccountsPage = () => {
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
+          // Reset mutation state if dialog is closed before backend responds
+          if (shouldResetDeleteMutationOnClose(deleteCloudAccountInstanceMutation.isPending)) {
+            deleteCloudAccountInstanceMutation.reset();
+          }
           await refetchInstances();
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
@@ -761,7 +766,6 @@ const CloudAccountsPage = () => {
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
-
           await deleteCloudAccountInstanceMutation.mutateAsync();
         }}
         onOffboardClick={async () => {
@@ -769,13 +773,13 @@ const CloudAccountsPage = () => {
           if (selectedInstance && selectedInstance?.status === "DELETING" && !selectedAccountConfig)
             return snackbar.showError("Offboarding is in progress");
           if (!selectedResource) return snackbar.showError("Resource not found");
-
           await deleteCloudAccountInstanceMutation.mutateAsync();
           setSelectedRows([]);
         }}
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
+        refetchInstanceStatus={refetchInstances}
       />
 
       <ConnectAccountConfigDialog
