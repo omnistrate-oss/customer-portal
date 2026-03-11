@@ -170,7 +170,7 @@ const CloudAccountsPage = () => {
       });
       router.replace(getCloudAccountsRoute({}));
     }
-  }, [serviceId, servicePlanId, subscriptionId, router]);
+  }, [serviceId, servicePlanId, subscriptionId]);
 
   const byoaInstances = useMemo(() => {
     const res = instances.filter((instance) => isCloudAccountInstance(instance));
