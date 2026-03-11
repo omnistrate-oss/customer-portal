@@ -67,7 +67,7 @@ function Connectivity(props) {
   const rows = useMemo(() => {
     const res = [];
 
-    if (primaryResourceName) {
+    if (primaryResourceName && primaryResourceEndpoint) {
       res.push(
         <ResourceConnectivityEndpoint
           key="primary"
