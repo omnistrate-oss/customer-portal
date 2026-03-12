@@ -8,8 +8,13 @@ export const shouldPollInstanceStatus = ({
   hasRequestedDeletion,
 }) => {
   const isWaitingForOffboardTransition = instanceStatus === "DELETING" && accountConfigStatus !== "READY_TO_OFFBOARD";
+  const isWaitingForDeletionToStart =
+    hasRequestedDeletion &&
+    instanceStatus !== "DELETING" &&
+    instanceStatus !== "FAILED" &&
+    accountConfigStatus !== "READY_TO_OFFBOARD";
 
-  return Boolean(open && hasRefetchInstanceStatus && (isWaitingForOffboardTransition || hasRequestedDeletion));
+  return Boolean(open && hasRefetchInstanceStatus && (isWaitingForOffboardTransition || isWaitingForDeletionToStart));
 };
 
 export const shouldResetDeleteMutationOnClose = (isMutationPending) => {

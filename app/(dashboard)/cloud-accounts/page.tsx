@@ -86,6 +86,7 @@ const CloudAccountsPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isAccountCreation, setIsAccountCreation] = useState(false);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance>();
+  const [hasRequestedDeleteForPolling, setHasRequestedDeleteForPolling] = useState(false);
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
     const result_params: any = clickedInstance?.result_params;
@@ -615,8 +616,29 @@ const CloudAccountsPage = () => {
     instanceStatus: selectedInstance?.status,
     accountConfigStatus: selectedAccountConfig?.status,
     hasRefetchInstanceStatus: true,
-    hasRequestedDeletion: deleteCloudAccountInstanceMutation.isPending,
+    hasRequestedDeletion: hasRequestedDeleteForPolling,
   });
+
+  useEffect(() => {
+    if (!showDeleteDialog && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+      return;
+    }
+
+    if (selectedAccountConfig?.status === "READY_TO_OFFBOARD" && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+      return;
+    }
+
+    if (selectedInstance?.status === "FAILED" && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+    }
+  }, [
+    hasRequestedDeleteForPolling,
+    selectedAccountConfig?.status,
+    selectedInstance?.status,
+    showDeleteDialog,
+  ]);
 
   useEffect(() => {
     // Poll only while the delete dialog is open and deletion is in-progress.
@@ -784,6 +806,7 @@ const CloudAccountsPage = () => {
       <DeleteAccountConfigConfirmationDialog
         open={isOverlayOpen && overlayType === "delete-dialog"}
         onClose={async () => {
+          setHasRequestedDeleteForPolling(false);
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
@@ -800,6 +823,7 @@ const CloudAccountsPage = () => {
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
+          setHasRequestedDeleteForPolling(true);
           await deleteCloudAccountInstanceMutation.mutateAsync();
         }}
         onOffboardClick={async () => {
