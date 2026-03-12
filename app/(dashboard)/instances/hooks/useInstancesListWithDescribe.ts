@@ -51,6 +51,12 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
       }
 
       const describePromises = res.map(async (instance: any) => {
+        let mainResource;
+        if (instance?.detailedNetworkTopology) {
+          mainResource = Object.values(instance?.detailedNetworkTopology).find(
+            (topologyDetails: any) => topologyDetails.main === true
+          );
+        }
         const serviceOffering = serviceOfferings?.find((so: any) =>
           so?.resourceParameters?.some((resourceParam: any) => resourceParam?.resourceId === instance?.resourceID)
         );
@@ -63,7 +69,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
             serviceOffering.serviceEnvironmentURLKey as string,
             serviceOffering.serviceModelURLKey as string,
             serviceOffering.productTierURLKey as string,
-            "omnistrateCloudAccountConfig",
+            mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig",
             instance.id,
             instance.subscriptionId
           );
