@@ -613,6 +613,7 @@ const CloudAccountsPage = () => {
   const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
     open: showDeleteDialog,
     instanceStatus: selectedInstance?.status,
+    accountConfigStatus: selectedAccountConfig?.status,
     hasRefetchInstanceStatus: true,
     hasRequestedDeletion: deleteCloudAccountInstanceMutation.isPending,
   });
