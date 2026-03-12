@@ -32,7 +32,7 @@ import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
-import { filterSchemaByCloudProvider, getInitialValues } from "../utils";
+import { applyCustomDnsNormalization, filterSchemaByCloudProvider, getInitialValues } from "../utils";
 
 import {
   getDeploymentConfigurationFields,
@@ -44,77 +44,6 @@ type ValidationSchema =
   | StringSchema<string | undefined>
   | StringSchema<string | null | undefined>
   | ReturnType<typeof yup.mixed>;
-
-const normalizeCustomDnsValue = (key: string, value: unknown): string => {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  const valueAsString = typeof value === "string" ? value : String(value);
-
-  try {
-    const parsedValue = JSON.parse(valueAsString);
-    if (
-      parsedValue &&
-      typeof parsedValue === "object" &&
-      !Array.isArray(parsedValue) &&
-      typeof (parsedValue as Record<string, unknown>)[key] === "string"
-    ) {
-      return (parsedValue as Record<string, string>)[key];
-    }
-  } catch {
-    // Plain string, keep as-is.
-  }
-
-  return valueAsString;
-};
-
-const normalizeCustomDnsConfiguration = (
-  customDnsConfiguration: unknown,
-  fallbackResourceKey: string
-): Record<string, string> => {
-  // Handle string value.
-  // If it is a JSON object string (e.g. '{"outlineWiki":"...","postgres":"..."}')
-  // preserve all keys instead of collapsing to fallbackResourceKey.
-  if (typeof customDnsConfiguration === "string") {
-    try {
-      const parsedConfiguration = JSON.parse(customDnsConfiguration);
-      if (parsedConfiguration && typeof parsedConfiguration === "object" && !Array.isArray(parsedConfiguration)) {
-        const normalizedCustomDnsConfiguration: Record<string, string> = {};
-
-        Object.entries(parsedConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
-          const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
-          if (normalizedValue) {
-            normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
-          }
-        });
-
-        return normalizedCustomDnsConfiguration;
-      }
-    } catch {
-      // Plain string, fallback to legacy single-resource behavior.
-    }
-
-    const normalizedValue = normalizeCustomDnsValue(fallbackResourceKey, customDnsConfiguration);
-    return normalizedValue ? { [fallbackResourceKey]: normalizedValue } : {};
-  }
-
-  // Handle object value - normalize each resource's custom DNS value
-  if (customDnsConfiguration && typeof customDnsConfiguration === "object" && !Array.isArray(customDnsConfiguration)) {
-    const normalizedCustomDnsConfiguration: Record<string, string> = {};
-
-    Object.entries(customDnsConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
-      const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
-      if (normalizedValue) {
-        normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
-      }
-    });
-
-    return normalizedCustomDnsConfiguration;
-  }
-
-  return {};
-};
 
 const InstanceForm = ({
   formMode,
@@ -386,16 +315,7 @@ const InstanceForm = ({
         }
 
         if (inputParametersObj["custom_dns_configuration"]) {
-          const normalizedCustomDnsConfiguration = normalizeCustomDnsConfiguration(
-            data.requestParams.custom_dns_configuration,
-            resourceKey
-          );
-
-          if (Object.keys(normalizedCustomDnsConfiguration).length) {
-            data.requestParams.custom_dns_configuration = normalizedCustomDnsConfiguration;
-          } else {
-            delete data.requestParams.custom_dns_configuration;
-          }
+          applyCustomDnsNormalization(data.requestParams, resourceKey);
         }
 
         for (const field of requiredFields) {
@@ -553,16 +473,7 @@ const InstanceForm = ({
         }
 
         if (inputParametersObj["custom_dns_configuration"]) {
-          const normalizedCustomDnsConfiguration = normalizeCustomDnsConfiguration(
-            data.requestParams.custom_dns_configuration,
-            resourceKey
-          );
-
-          if (Object.keys(normalizedCustomDnsConfiguration).length) {
-            data.requestParams.custom_dns_configuration = normalizedCustomDnsConfiguration;
-          } else {
-            delete data.requestParams.custom_dns_configuration;
-          }
+          applyCustomDnsNormalization(data.requestParams, resourceKey);
         }
 
         if (!isTypeError) {

@@ -27,6 +27,7 @@ import {
   getServiceMenuItems,
   getValidSubscriptionForInstanceCreation,
   getVersionSetResourceMenuItems,
+  normalizeCustomDnsValue,
 } from "../utils";
 
 import AccountConfigDescription from "./AccountConfigDescription";
@@ -433,30 +434,6 @@ export const getNetworkConfigurationFields = (
   const cloudProviderNativeNetworkIdFieldExists = inputParametersObj["cloud_provider_native_network_id"];
   const customDNSFieldExists = inputParametersObj["custom_dns_configuration"];
 
-  const normalizeCustomDnsValue = (key: string, value: unknown): string => {
-    if (value === null || value === undefined) {
-      return "";
-    }
-
-    const valueAsString = typeof value === "string" ? value : String(value);
-
-    try {
-      const parsedValue = JSON.parse(valueAsString);
-      if (
-        parsedValue &&
-        typeof parsedValue === "object" &&
-        !Array.isArray(parsedValue) &&
-        typeof (parsedValue as Record<string, unknown>)[key] === "string"
-      ) {
-        return (parsedValue as Record<string, string>)[key];
-      }
-    } catch {
-      // Plain string, keep as-is.
-    }
-
-    return valueAsString;
-  };
-
   const getCustomDnsInputValue = (resourceKey: string): string => {
     const customDnsConfiguration = values?.requestParams?.custom_dns_configuration;
 
@@ -603,6 +580,7 @@ export const getNetworkConfigurationFields = (
           type: "text-multiline",
           required: formMode !== "modify" && param.required,
           previewValue: getCustomDnsInputValue(resourceKey),
+          skipFormikHandleChange: true,
           onChange: (event) => {
             const currentConfig = values?.requestParams?.custom_dns_configuration;
             const normalizedConfig =

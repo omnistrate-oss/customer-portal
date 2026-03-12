@@ -5,20 +5,6 @@ const withProviderTokenExpirationHanding = require("../utils/withProviderTokenEx
 const OBSERVABILITY_RESOURCE_ID = "r-obsrv";
 const INJECTED_ACCOUNT_CONFIG_RESOURCE_ID = "r-injectedaccountconfig";
 
-function filterResourceDependencies(resource, shouldFilterInjectedAccountConfig) {
-  return {
-    ...resource,
-    dependencies: (resource.dependencies || []).filter((dependency) => {
-      const dependencyResourceId = dependency?.resourceId;
-      const shouldFilterObservability = dependencyResourceId?.includes(OBSERVABILITY_RESOURCE_ID);
-      const shouldFilterInjectedAccountConfigDependency =
-        shouldFilterInjectedAccountConfig && dependencyResourceId?.includes(INJECTED_ACCOUNT_CONFIG_RESOURCE_ID);
-
-      return !(shouldFilterObservability || shouldFilterInjectedAccountConfigDependency);
-    }),
-  };
-}
-
 function shouldIncludeResource(resource, shouldFilterInjectedAccountConfig) {
   const resourceId = resource?.id;
   const isObservabilityResource = resourceId?.includes(OBSERVABILITY_RESOURCE_ID);
@@ -61,11 +47,10 @@ function getResources(params = {}) {
 
       return resources
         .filter((resource) => shouldIncludeResource(resource, shouldFilterInjectedAccountConfig))
-        .map((resource) => filterResourceDependencies(resource, shouldFilterInjectedAccountConfig))
         .map((resource) => mapResourceSummary(resource));
     })
     .catch((error) => {
-      console.log("getResources error", error);
+      console.error("getResources error", error);
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {
