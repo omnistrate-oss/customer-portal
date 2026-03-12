@@ -1,12 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  deriveDeleteDialogState,
-  INSTANCE_STATUS_POLL_INTERVAL_MS,
-  shouldPollInstanceStatus,
-  shouldResetDeleteMutationOnClose,
-} from "./deleteDialogState.js";
+import { deriveDeleteDialogState, shouldResetDeleteMutationOnClose } from "./deleteDialogState.js";
 
 test("1) close dialog before delete response -> mutation reset and no stale loading for another instance", () => {
   assert.equal(shouldResetDeleteMutationOnClose(true), true);
@@ -26,63 +21,7 @@ test("1) close dialog before delete response -> mutation reset and no stale load
   assert.equal(accountBState.step, "delete");
 });
 
-test("2) poll status every 10 seconds while dialog is open and instance is deleting", () => {
-  assert.equal(INSTANCE_STATUS_POLL_INTERVAL_MS, 10_000);
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "DELETING",
-      accountConfigStatus: "PENDING",
-      hasRefetchInstanceStatus: true,
-    }),
-    true
-  );
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "DELETING",
-      accountConfigStatus: "READY_TO_OFFBOARD",
-      hasRefetchInstanceStatus: true,
-    }),
-    false
-  );
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "READY",
-      accountConfigStatus: "READY_TO_OFFBOARD",
-      hasRefetchInstanceStatus: true,
-      hasRequestedDeletion: true,
-    }),
-    false
-  );
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "READY",
-      accountConfigStatus: "PENDING",
-      hasRefetchInstanceStatus: true,
-      hasRequestedDeletion: true,
-    }),
-    true
-  );
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "READY",
-      accountConfigStatus: "PENDING",
-      hasRefetchInstanceStatus: true,
-    }),
-    false
-  );
-});
-
-test("3) close and reopen same deleting instance keeps in-progress state", () => {
+test("2) close and reopen same deleting instance keeps in-progress state", () => {
   const reopenedState = deriveDeleteDialogState({
     isMultiStepDialog: true,
     isLastInstance: true,
@@ -98,7 +37,7 @@ test("3) close and reopen same deleting instance keeps in-progress state", () =>
   assert.equal(reopenedState.step, "delete");
 });
 
-test("4) opening a different non-deleting instance does not force spinner", () => {
+test("3) opening a different non-deleting instance does not force spinner", () => {
   const state = deriveDeleteDialogState({
     isMultiStepDialog: true,
     isLastInstance: false,
@@ -113,19 +52,7 @@ test("4) opening a different non-deleting instance does not force spinner", () =
   assert.equal(state.buttonText, "Delete");
 });
 
-test("5) polling stops on dialog close", () => {
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: false,
-      instanceStatus: "DELETING",
-      accountConfigStatus: "PENDING",
-      hasRefetchInstanceStatus: true,
-    }),
-    false
-  );
-});
-
-test("6) failure path stops spinner and supports retry behavior for non-last instances", () => {
+test("4) failure path stops spinner and supports retry behavior for non-last instances", () => {
   const failedNonLastInstanceState = deriveDeleteDialogState({
     isMultiStepDialog: false,
     isLastInstance: false,

@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
 
-import { $api } from "src/api/query";
+import { apiClient } from "src/api/client";
+import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance";
-import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
   onlyCloudAccounts?: boolean;
@@ -18,111 +17,73 @@ const sortByCreatedAtDesc = (a: { created_at?: string }, b: { created_at?: strin
   new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime();
 
 const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
-  const { onlyInstances, onlyCloudAccounts, describeInstances, ...restOptions } = queryOptions;
+  const { onlyInstances, onlyCloudAccounts, ...restOptions } = queryOptions;
 
-  const { serviceOfferings } = useGlobalData();
-  // Standard list query for all instances
-  const listQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/resource-instance",
-    {
-      params: {
-        query: {
-          environmentType: useEnvironmentType(),
-        },
-      },
-    },
-    {
-      select: (data) => {
-        let res = data.resourceInstances;
-        if (onlyInstances) {
-          // Exclude cloud account instances
-          res = res.filter((instance: any) => !isCloudAccountInstance(instance));
-        } else if (onlyCloudAccounts) {
-          // Only cloud account instances
-          res = res.filter((instance: any) => isCloudAccountInstance(instance));
-        }
-        // When neither option is set, return all instances (matches useInstances behavior)
-        return res;
-      },
-      refetchInterval: 60000,
-      ...restOptions,
-    }
-  );
+  const { serviceOfferings, isServiceOfferingsPending } = useGlobalData();
+  const environmentType = useEnvironmentType();
 
-  const describeQuery = useQuery({
-    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt],
-    enabled: Boolean(describeInstances && listQuery.data),
+  // Derive a stable key from serviceOfferings so the query re-runs when they load
+  const serviceOfferingIds = serviceOfferings?.map((so: any) => so?.serviceId).join(",") ?? "";
+
+  const listQuery = useQuery({
+    queryKey: [
+      "get",
+      "/2022-09-01-00/resource-instance",
+      { params: { query: { environmentType } } },
+      { onlyInstances, onlyCloudAccounts },
+      serviceOfferingIds,
+    ],
     queryFn: async () => {
-      const res = listQuery.data || [];
+      const { data } = await apiClient.GET("/2022-09-01-00/resource-instance", {
+        params: {
+          query: {
+            environmentType,
+          },
+        },
+      });
+
+      let res = data?.resourceInstances ?? [];
+
+      if (onlyInstances) {
+        res = res.filter((instance: any) => !isCloudAccountInstance(instance));
+      } else if (onlyCloudAccounts) {
+        res = res.filter((instance: any) => isCloudAccountInstance(instance));
+      }
 
       const describePromises = res.map(async (instance: any) => {
-        let mainResource;
-        if (instance?.detailedNetworkTopology) {
-          mainResource = Object.values(instance?.detailedNetworkTopology).find(
-            (topologyDetails: any) => topologyDetails.main === true
-          );
-        }
-
-        if (!mainResource?.urlKey) {
-          return null;
-        }
-
         const serviceOffering = serviceOfferings?.find((so: any) =>
           so?.resourceParameters?.some((resourceParam: any) => resourceParam?.resourceId === instance?.resourceID)
         );
 
-        if (!serviceOffering) {
-          return [];
-        }
-
-        try {
+        if (serviceOffering) {
           const describeResponse = await getResourceInstanceDetails(
-            serviceOffering?.serviceProviderId as string,
-            serviceOffering?.serviceURLKey as string,
-            serviceOffering?.serviceAPIVersion as string,
-            serviceOffering?.serviceEnvironmentURLKey as string,
-            serviceOffering?.serviceModelURLKey as string,
-            serviceOffering?.productTierURLKey as string,
-            mainResource.urlKey,
+            serviceOffering.serviceProviderId as string,
+            serviceOffering.serviceURLKey as string,
+            serviceOffering.serviceAPIVersion as string,
+            serviceOffering.serviceEnvironmentURLKey as string,
+            serviceOffering.serviceModelURLKey as string,
+            serviceOffering.productTierURLKey as string,
+            "omnistrateCloudAccountConfig",
             instance.id,
             instance.subscriptionId
           );
 
           return describeResponse?.data ?? null;
-        } catch {
-          return [] as any; // Return empty array on error to be filtered out later
         }
+
+        return null;
       });
 
-      const describedInstances = (await Promise.all(describePromises)).filter(Boolean);
-      const listToReturn = describedInstances.length > 0 ? describedInstances : res;
-
-      return listToReturn.sort(sortByCreatedAtDesc);
+      const results = await Promise.all(describePromises);
+      return results.filter((item): item is Record<string, any> => item !== null).sort(sortByCreatedAtDesc);
     },
+    // Wait until serviceOfferings are loaded before running the query
+    enabled: !isServiceOfferingsPending && serviceOfferings.length > 0,
+    refetchInterval: 60000,
+    ...restOptions,
   });
 
-  // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
-  const refetch = useCallback(async () => {
-    await listQuery.refetch();
-    return describeQuery.refetch();
-  }, [listQuery.refetch, describeQuery.refetch]);
-
-  if (describeInstances) {
-    return {
-      ...listQuery,
-      data: describeQuery.data || [],
-      isPending: listQuery.isPending || describeQuery.isPending,
-      isFetching: listQuery.isFetching || describeQuery.isFetching,
-      error: listQuery.error || describeQuery.error,
-      refetch,
-    };
-  }
-
-  return {
-    ...listQuery,
-    data: (listQuery.data || []).sort(sortByCreatedAtDesc),
-  };
+  return listQuery;
 };
 
 export default useInstancesListWithDescribe;

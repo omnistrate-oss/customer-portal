@@ -1,8 +1,7 @@
-import { FC, useEffect, useRef, useState } from "react";
-// import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useFormik } from "formik";
+import { FC, useEffect, useState } from "react";
 
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
@@ -119,6 +118,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     isDeleteInstanceMutationPending,
     // isDeletingAccountConfig,
     accountConfig,
+    linkedInstanceCount,
     instanceStatus,
     offboardingInstructionDetails,
     onClose,
@@ -128,9 +128,11 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   } = props;
 
   const snackbar = useSnackbar();
-  const stepChangedToOffboard = useRef(false);
 
-  const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
+  const isLastInstance =
+    typeof linkedInstanceCount === "number"
+      ? linkedInstanceCount <= 1
+      : !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
 
   //show offboard step only if the instance is the last instance and the account config is found
   const isMultiStepDialog = Boolean(isLastInstance && accountConfig);
@@ -166,22 +168,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   step = deleteDialogState.step as "delete" | "offboard";
   buttonText = deleteDialogState.buttonText;
 
-  useEffect(() => {
-    if (step === "offboard" && hasRequestedDeletion) {
-      // If we are in the offboard step and a deletion request was made, reset the deletion request state
-      setHasRequestedDeletion(false);
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
-
-  //reset hasRequestedDeletion state to false when instanceId changes
-  useEffect(() => {
-    if (instanceId) {
-      // If instanceId changes, reset the deletion request state
-      setHasRequestedDeletion(false);
-    }
-  }, [instanceId]);
-
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
   const isLoading = deleteDialogState.isLoading;
@@ -194,13 +180,16 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
       if (activeStepIndex === 0) {
         if (values.confirmationText === "deleteme") {
           try {
+            if (isMultiStepDialog) {
+              setHasRequestedDeletion(true);
+            }
             await onInstanceDeleteClick();
             if (!isMultiStepDialog) {
               handleClose();
-            } else {
-              setHasRequestedDeletion(true); // Mark deletion request as made
             }
-          } catch {}
+          } catch {
+            setHasRequestedDeletion(false);
+          }
         } else {
           snackbar.showError(`Please enter deleteme to confirm`);
         }
@@ -218,25 +207,28 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   });
 
   function handleClose() {
-    onClose();
     formData.resetForm();
+    setHasRequestedDeletion(false);
+    onClose();
   }
 
   useEffect(() => {
-    if (open) {
-      formData.resetForm();
-      stepChangedToOffboard.current = false;
+    if (!open) {
+      return;
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+
+    formData.resetForm();
+    setHasRequestedDeletion(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, instanceId]);
 
   useEffect(() => {
-    if (step === "offboard" && !stepChangedToOffboard.current) {
-      stepChangedToOffboard.current = true;
+    if (step === "offboard") {
       formData.resetForm();
+      setHasRequestedDeletion(false);
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   return (
     <Dialog open={open} onClose={handleClose}>
