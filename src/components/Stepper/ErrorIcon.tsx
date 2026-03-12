@@ -1,6 +1,6 @@
-import { useId } from "react";
+import { type SVGProps, useId } from "react";
 
-const ErrorIcon = (props: any) => {
+const ErrorIcon = (props: SVGProps<SVGSVGElement>) => {
   const filterId = useId();
   const clipPathId = useId();
 
