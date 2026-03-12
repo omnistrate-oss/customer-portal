@@ -74,10 +74,10 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
             instance.subscriptionId
           );
 
-          return describeResponse?.data ?? null;
+          return describeResponse?.data ?? instance;
         }
 
-        return null;
+        return instance;
       });
 
       const results = await Promise.all(describePromises);
