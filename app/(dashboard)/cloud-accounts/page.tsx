@@ -500,6 +500,20 @@ const CloudAccountsPage = () => {
     }
   }, [selectedInstance, accountConfigsHash]);
 
+  const selectedAccountConfigId = useMemo(() => {
+    const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
+    return resultParams?.cloud_provider_account_config_id;
+  }, [selectedInstance]);
+
+  const linkedCloudAccountInstanceCount = useMemo(() => {
+    if (!selectedAccountConfigId) return 0;
+
+    return instances.filter((instance) => {
+      const resultParams = instance?.result_params as Record<string, any> | undefined;
+      return resultParams?.cloud_provider_account_config_id === selectedAccountConfigId;
+    }).length;
+  }, [instances, selectedAccountConfigId]);
+
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
     selectedAccountConfig?.status
@@ -819,6 +833,7 @@ const CloudAccountsPage = () => {
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={selectedAccountConfig}
+        linkedInstanceCount={linkedCloudAccountInstanceCount}
         isLoadingAccountConfig={isFetchingAccountConfigs}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
