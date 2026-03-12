@@ -16,11 +16,7 @@ import { AccountConfig } from "src/types/account-config";
 
 import { cloudAccountOffboardingSteps } from "../constants";
 
-import {
-  deriveDeleteDialogState,
-  INSTANCE_STATUS_POLL_INTERVAL_MS,
-  shouldPollInstanceStatus,
-} from "./deleteDialogState";
+import { deriveDeleteDialogState } from "./deleteDialogState";
 import { OffboardingInstructions, OffboardInstructionDetails } from "./OffboardingInstructions";
 
 const StyledForm = styled(Box)({
@@ -104,6 +100,7 @@ const ConfirmationMessage = () => {
 
 type DeleteAccountConfigConfirmationDialogProps = {
   accountConfig: AccountConfig | undefined;
+  linkedInstanceCount?: number;
   instanceStatus: string | undefined;
   isLoadingAccountConfig: boolean;
   open: boolean;
@@ -114,7 +111,6 @@ type DeleteAccountConfigConfirmationDialogProps = {
   onOffboardClick: () => Promise<void>;
   offboardingInstructionDetails: OffboardInstructionDetails;
   instanceId?: string;
-  refetchInstanceStatus?: () => Promise<any>;
 };
 
 const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationDialogProps> = (props) => {
@@ -129,27 +125,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     onInstanceDeleteClick,
     onOffboardClick,
     instanceId,
-    refetchInstanceStatus,
   } = props;
-  // Polling for status every 10 seconds if dialog is open and instance is deleting
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | undefined;
-    if (
-      shouldPollInstanceStatus({
-        open,
-        instanceStatus,
-        hasRefetchInstanceStatus: typeof refetchInstanceStatus === "function",
-      })
-    ) {
-      interval = setInterval(() => {
-        refetchInstanceStatus?.();
-      }, INSTANCE_STATUS_POLL_INTERVAL_MS);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-    // Only rerun if open, instanceStatus, or refetchInstanceStatus changes
-  }, [open, instanceStatus, refetchInstanceStatus]);
 
   const snackbar = useSnackbar();
   const stepChangedToOffboard = useRef(false);

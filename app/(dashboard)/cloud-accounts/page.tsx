@@ -48,7 +48,11 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
-import { shouldResetDeleteMutationOnClose } from "./components/deleteDialogState";
+import {
+  INSTANCE_STATUS_POLL_INTERVAL_MS,
+  shouldPollInstanceStatus,
+  shouldResetDeleteMutationOnClose,
+} from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { DIALOG_DATA } from "./constants";
 import { getOffboardReadiness } from "./utils";
@@ -82,6 +86,7 @@ const CloudAccountsPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isAccountCreation, setIsAccountCreation] = useState(false);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance>();
+  const [hasRequestedDeleteForPolling, setHasRequestedDeleteForPolling] = useState(false);
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
     const result_params: any = clickedInstance?.result_params;
@@ -495,6 +500,20 @@ const CloudAccountsPage = () => {
     }
   }, [selectedInstance, accountConfigsHash]);
 
+  const selectedAccountConfigId = useMemo(() => {
+    const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
+    return resultParams?.cloud_provider_account_config_id;
+  }, [selectedInstance]);
+
+  const linkedCloudAccountInstanceCount = useMemo(() => {
+    if (!selectedAccountConfigId) return 0;
+
+    return instances.filter((instance) => {
+      const resultParams = instance?.result_params as Record<string, any> | undefined;
+      return resultParams?.cloud_provider_account_config_id === selectedAccountConfigId;
+    }).length;
+  }, [instances, selectedAccountConfigId]);
+
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
     selectedAccountConfig?.status
@@ -604,6 +623,52 @@ const CloudAccountsPage = () => {
       snackbar.showError("Something went wrong. Please try again.");
     },
   });
+
+  const showDeleteDialog = isOverlayOpen && overlayType === "delete-dialog";
+  const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
+    open: showDeleteDialog,
+    instanceStatus: selectedInstance?.status,
+    accountConfigStatus: selectedAccountConfig?.status,
+    hasRefetchInstanceStatus: true,
+    hasRequestedDeletion: hasRequestedDeleteForPolling,
+  });
+
+  useEffect(() => {
+    if (!showDeleteDialog && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+      return;
+    }
+
+    if (selectedAccountConfig?.status === "READY_TO_OFFBOARD" && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+      return;
+    }
+
+    if (selectedInstance?.status === "FAILED" && hasRequestedDeleteForPolling) {
+      setHasRequestedDeleteForPolling(false);
+    }
+  }, [hasRequestedDeleteForPolling, selectedAccountConfig?.status, selectedInstance?.status, showDeleteDialog]);
+
+  useEffect(() => {
+    // Poll only while the delete dialog is open and deletion is in-progress.
+    // Updated data flows back through `selectedInstance` and `selectedAccountConfig`
+    // to transition the dialog from Delete -> Offboard without a manual refresh.
+    if (!showDeleteDialog || !shouldPollDeleteDialogStatus) {
+      return;
+    }
+
+    refetchInstances();
+    refetchAccountConfigs();
+
+    const pollingInterval = window.setInterval(() => {
+      refetchInstances();
+      refetchAccountConfigs();
+    }, INSTANCE_STATUS_POLL_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(pollingInterval);
+    };
+  }, [showDeleteDialog, shouldPollDeleteDialogStatus, refetchInstances, refetchAccountConfigs]);
 
   const updateInstanceMetadataMutation = $api.useMutation(
     "patch",
@@ -750,6 +815,7 @@ const CloudAccountsPage = () => {
       <DeleteAccountConfigConfirmationDialog
         open={isOverlayOpen && overlayType === "delete-dialog"}
         onClose={async () => {
+          setHasRequestedDeleteForPolling(false);
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
@@ -762,10 +828,12 @@ const CloudAccountsPage = () => {
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={selectedAccountConfig}
+        linkedInstanceCount={linkedCloudAccountInstanceCount}
         isLoadingAccountConfig={isFetchingAccountConfigs}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
+          setHasRequestedDeleteForPolling(true);
           await deleteCloudAccountInstanceMutation.mutateAsync();
         }}
         onOffboardClick={async () => {
@@ -779,7 +847,6 @@ const CloudAccountsPage = () => {
         instanceStatus={selectedInstance?.status}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
-        refetchInstanceStatus={refetchInstances}
       />
 
       <ConnectAccountConfigDialog

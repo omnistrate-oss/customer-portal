@@ -1,6 +1,9 @@
 import { Stack } from "@mui/material";
+import { useId } from "react";
 
 const BaseIcon = (props) => {
+  const clipPathId = useId();
+
   return (
     <Stack justifyContent="center" alignItems="center" width={32} height={32}>
       <svg
@@ -12,7 +15,7 @@ const BaseIcon = (props) => {
         style={{ zIndex: 99 }}
         {...props}
       >
-        <g clipPath="url(#a)">
+        <g clipPath={`url(#${clipPathId})`}>
           <path fill="#FAFAFA" d="M.5 12c0-6.627 5.373-12 12-12s12 5.373 12 12-5.373 12-12 12-12-5.373-12-12Z" />
           <path
             stroke="#E9EAEB"
@@ -22,7 +25,7 @@ const BaseIcon = (props) => {
           <circle cx={12.5} cy={12} r={4} fill="#D5D7DA" />
         </g>
         <defs>
-          <clipPath id="a">
+          <clipPath id={clipPathId}>
             <path fill="#fff" d="M.5 12c0-6.627 5.373-12 12-12s12 5.373 12 12-5.373 12-12 12-12-5.373-12-12Z" />
           </clipPath>
         </defs>

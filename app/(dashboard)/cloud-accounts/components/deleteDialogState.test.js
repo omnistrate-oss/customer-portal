@@ -33,6 +33,7 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
     shouldPollInstanceStatus({
       open: true,
       instanceStatus: "DELETING",
+      accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
     }),
     true
@@ -41,7 +42,40 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      hasRefetchInstanceStatus: true,
+    }),
+    false
+  );
+
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
       instanceStatus: "READY",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      hasRefetchInstanceStatus: true,
+      hasRequestedDeletion: true,
+    }),
+    false
+  );
+
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "READY",
+      accountConfigStatus: "PENDING",
+      hasRefetchInstanceStatus: true,
+      hasRequestedDeletion: true,
+    }),
+    true
+  );
+
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "READY",
+      accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
     }),
     false
@@ -84,6 +118,7 @@ test("5) polling stops on dialog close", () => {
     shouldPollInstanceStatus({
       open: false,
       instanceStatus: "DELETING",
+      accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
     }),
     false
