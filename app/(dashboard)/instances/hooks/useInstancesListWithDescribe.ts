@@ -17,7 +17,7 @@ const sortByCreatedAtDesc = (a: { created_at?: string }, b: { created_at?: strin
   new Date(b.created_at || "").getTime() - new Date(a.created_at || "").getTime();
 
 const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
-  const { onlyInstances, onlyCloudAccounts, ...restOptions } = queryOptions;
+  const { onlyCloudAccounts = true, ...restOptions } = queryOptions;
 
   const { serviceOfferings, isServiceOfferingsPending } = useGlobalData();
   const environmentType = useEnvironmentType();
@@ -30,7 +30,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
       "get",
       "/2022-09-01-00/resource-instance",
       { params: { query: { environmentType } } },
-      { onlyInstances, onlyCloudAccounts },
+      onlyCloudAccounts,
       serviceOfferingIds,
     ],
     queryFn: async () => {
@@ -44,10 +44,10 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
 
       let res = data?.resourceInstances ?? [];
 
-      if (onlyInstances) {
-        res = res.filter((instance: any) => !isCloudAccountInstance(instance));
-      } else if (onlyCloudAccounts) {
+      if (onlyCloudAccounts) {
         res = res.filter((instance: any) => isCloudAccountInstance(instance));
+      } else {
+        res = res.filter((instance: any) => !isCloudAccountInstance(instance));
       }
 
       const describePromises = res.map(async (instance: any) => {

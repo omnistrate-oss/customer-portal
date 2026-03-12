@@ -139,8 +139,6 @@ const CloudAccountsPage = () => {
     isFetching: isFetchingInstances,
     refetch: refetchInstances,
   } = useInstancesListWithDescribe({
-    describeInstances: true,
-    onlyCloudAccounts: true,
     refetchInterval: false,
     refetchOnWindowFocus: false,
   });
@@ -756,6 +754,7 @@ const CloudAccountsPage = () => {
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            refetchInstances={refetchInstances}
           />
         }
       />
