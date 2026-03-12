@@ -99,7 +99,6 @@ const ConfirmationMessage = () => {
 
 type DeleteAccountConfigConfirmationDialogProps = {
   accountConfig: AccountConfig | undefined;
-  linkedInstanceCount?: number;
   instanceStatus: string | undefined;
   isLoadingAccountConfig: boolean;
   open: boolean;
@@ -118,7 +117,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     isDeleteInstanceMutationPending,
     // isDeletingAccountConfig,
     accountConfig,
-    linkedInstanceCount,
     instanceStatus,
     offboardingInstructionDetails,
     onClose,
@@ -129,10 +127,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const snackbar = useSnackbar();
 
-  const isLastInstance =
-    typeof linkedInstanceCount === "number"
-      ? linkedInstanceCount <= 1
-      : !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
+  const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
 
   //show offboard step only if the instance is the last instance and the account config is found
   const isMultiStepDialog = Boolean(isLastInstance && accountConfig);
