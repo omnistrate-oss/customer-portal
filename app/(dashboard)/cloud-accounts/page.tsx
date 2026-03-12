@@ -647,12 +647,7 @@ const CloudAccountsPage = () => {
     if (selectedInstance?.status === "FAILED" && hasRequestedDeleteForPolling) {
       setHasRequestedDeleteForPolling(false);
     }
-  }, [
-    hasRequestedDeleteForPolling,
-    selectedAccountConfig?.status,
-    selectedInstance?.status,
-    showDeleteDialog,
-  ]);
+  }, [hasRequestedDeleteForPolling, selectedAccountConfig?.status, selectedInstance?.status, showDeleteDialog]);
 
   useEffect(() => {
     // Poll only while the delete dialog is open and deletion is in-progress.
