@@ -12,7 +12,6 @@ import { useSelector } from "react-redux";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import { isOCIEnabled } from "src/constants/globalConstants";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -420,7 +419,7 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={(serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []).filter((p) => isOCIEnabled || p !== "oci")}
+                  cloudProviders={serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
