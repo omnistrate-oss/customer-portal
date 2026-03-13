@@ -22,6 +22,7 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
     productTierKey,
     resourceKey,
     id,
+    subscriptionId,
     ...options
   } = queryOptions;
 
@@ -39,6 +40,9 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
           productTierKey,
           resourceKey,
           id,
+        },
+        query: {
+          subscriptionId,
         },
       },
     },
