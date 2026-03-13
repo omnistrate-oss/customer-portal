@@ -1,9 +1,12 @@
+import { useId } from "react";
+
 import { colors } from "src/themeConfig";
 
 const CloudAccountsIcon = () => {
+  const clipPathId = useId();
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g clipPath="url(#clip0_6139_43520)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -126,7 +129,7 @@ const CloudAccountsIcon = () => {
         />
       </g>
       <defs>
-        <clipPath id="clip0_6139_43520">
+        <clipPath id={clipPathId}>
           <rect width="32" height="32" fill="white" />
         </clipPath>
       </defs>

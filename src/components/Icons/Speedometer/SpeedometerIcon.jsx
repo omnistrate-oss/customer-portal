@@ -1,7 +1,10 @@
+import { useId } from "react";
+
 const SpeedometerIcon = (props) => {
+  const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} fill="none" {...props}>
-      <g clipPath="url(#a)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           stroke="#fff"
           strokeLinecap="round"
@@ -11,7 +14,7 @@ const SpeedometerIcon = (props) => {
         />
       </g>
       <defs>
-        <clipPath id="a">
+        <clipPath id={clipPathId}>
           <path fill="#fff" d="M0 0h20v20H0z" />
         </clipPath>
       </defs>
