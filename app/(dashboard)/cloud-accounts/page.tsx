@@ -619,7 +619,7 @@ const CloudAccountsPage = () => {
     onError: async () => {
       setSelectedRows([]);
       setIsOverlayOpen(false);
-      await refetchInstances();
+
       snackbar.showError("Something went wrong. Please try again.");
     },
   });
@@ -629,23 +629,16 @@ const CloudAccountsPage = () => {
     open: showDeleteDialog,
     instanceStatus: selectedInstance?.status,
     accountConfigStatus: selectedAccountConfig?.status,
-    hasRefetchInstanceStatus: true,
-    hasRequestedDeletion: hasRequestedDeleteForPolling,
   });
 
   useEffect(() => {
-    if (!showDeleteDialog && hasRequestedDeleteForPolling) {
+    if (
+      !showDeleteDialog &&
+      hasRequestedDeleteForPolling &&
+      (selectedAccountConfig?.status === "READY_TO_OFFBOARD" || selectedInstance?.status === "FAILED")
+    ) {
       setHasRequestedDeleteForPolling(false);
       return;
-    }
-
-    if (selectedAccountConfig?.status === "READY_TO_OFFBOARD" && hasRequestedDeleteForPolling) {
-      setHasRequestedDeleteForPolling(false);
-      return;
-    }
-
-    if (selectedInstance?.status === "FAILED" && hasRequestedDeleteForPolling) {
-      setHasRequestedDeleteForPolling(false);
     }
   }, [hasRequestedDeleteForPolling, selectedAccountConfig?.status, selectedInstance?.status, showDeleteDialog]);
 
@@ -657,12 +650,12 @@ const CloudAccountsPage = () => {
       return;
     }
 
-    refetchInstances();
-    refetchAccountConfigs();
-
     const pollingInterval = window.setInterval(() => {
       refetchInstances();
       refetchAccountConfigs();
+      console.log("Starting polling for instance and account config status...");
+      console.log("Selected Instance Status:", selectedInstance?.status);
+      console.log("Selected Account Config Status:", selectedAccountConfig?.status);
     }, INSTANCE_STATUS_POLL_INTERVAL_MS);
 
     return () => {
@@ -808,6 +801,7 @@ const CloudAccountsPage = () => {
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            refetchInstances={refetchInstances}
           />
         }
       />

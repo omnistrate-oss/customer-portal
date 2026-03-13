@@ -1,18 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -20,9 +21,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -38,9 +36,8 @@ const CloudAccountForm = ({
   setOverlayType,
   setClickedInstance,
   instances,
+  refetchInstances,
 }) => {
-  const environmentType = useEnvironmentType();
-  const queryClient = useQueryClient();
   const snackbar = useSnackbar();
   const selectUser = useSelector(selectUserrootData);
   const {
@@ -111,89 +108,13 @@ const CloudAccountForm = ({
 
         const resourceInstance = resourceInstanceResponse.data;
 
-        // Sometimes, we don't get the result_params in the response
-        // So, we need to update the query data manually
-        queryClient.setQueryData(
-          [
-            "get",
-            "/2022-09-01-00/resource-instance",
-            {
-              params: {
-                query: {
-                  environmentType,
-                },
-              },
-            },
-          ],
-          (oldData: any) => {
-            const result_params = {
-              // @ts-ignore
-              ...resourceInstance.result_params,
-              cloud_provider: values.cloudProvider,
-              account_configuration_method: values.accountConfigurationMethod,
-            };
-
-            if (values.cloudProvider === "aws") {
-              result_params.aws_account_id = values.awsAccountId;
-              result_params.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
-            } else if (values.cloudProvider === "gcp") {
-              result_params.gcp_project_id = values.gcpProjectId;
-              result_params.gcp_project_number = values.gcpProjectNumber;
-              result_params.gcp_service_account_email = getGcpServiceEmail(
-                values.gcpProjectId,
-                selectUser?.orgId.toLowerCase()
-              );
-            } else if (values.cloudProvider === "azure") {
-              result_params.azure_subscription_id = values.azureSubscriptionId;
-              result_params.azure_tenant_id = values.azureTenantId;
-            } else if (values.cloudProvider === "oci") {
-              result_params.oci_tenancy_id = values.ociTenancyId;
-              result_params.oci_domain_id = values.ociDomainId;
-            }
-
-            return {
-              resourceInstances: [
-                ...(oldData?.resourceInstances || []),
-                {
-                  ...(resourceInstance || {}),
-                  result_params: result_params,
-                },
-              ],
-            };
-          }
-        );
-
         setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
-          result_params: {
-            ...(resourceInstance.result_params || {}),
-            account_configuration_method: values.accountConfigurationMethod,
-            cloud_provider: values.cloudProvider,
-            ...(values.cloudProvider === CLOUD_PROVIDERS.aws
-              ? {
-                  aws_account_id: values.awsAccountId,
-                }
-              : values.cloudProvider === CLOUD_PROVIDERS.gcp
-                ? {
-                    gcp_project_id: values.gcpProjectId,
-                    gcp_project_number: values.gcpProjectNumber,
-                  }
-                : values.cloudProvider === CLOUD_PROVIDERS.azure
-                  ? {
-                      azure_subscription_id: values.azureSubscriptionId,
-                      azure_tenant_id: values.azureTenantId,
-                    }
-                  : values.cloudProvider === CLOUD_PROVIDERS.oci
-                    ? {
-                        oci_tenancy_id: values.ociTenancyId,
-                        oci_domain_id: values.ociDomainId,
-                      }
-                    : {}),
-          },
         });
         setOverlayType("view-instructions-dialog");
         snackbar.showSuccess("Cloud Account created successfully");
+        refetchInstances();
       },
     }
   );
