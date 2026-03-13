@@ -44,7 +44,8 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
 
     const role = getEnumFromUserRoleString(subscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
-
+    const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
+    const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
 
     // Delete action
@@ -59,7 +60,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     res.push({
       dataTestId: "delete-action-button",
       label: "Delete",
-      isDisabled: isDeleteDisabled,
+      isDisabled: isDeleteDisabled || isDeleteProtected || !isUpdateAllowedByRBAC,
       onClick: onDeleteClick,
       disabledMessage: isDeleteDisabledMessage,
     });
@@ -80,9 +81,6 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
       onClick: onOffboardClick,
       disabledMessage: offboardingDisabledMessage,
     });
-
-    const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
-    const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
 
     if (deletionProtectionFeatureEnabled) {
       res.push({
