@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     console.error("Error fetching resources:", error);
 
     if (error.name === "ProviderAuthError") {
-      return res.status(401).json({ message: "Provider authentication failed" });
+      return res.status(500).json({ message: "Provider authentication failed" });
     }
 
     return res.status(500).json({ message: error.message || "Failed to fetch resources" });
