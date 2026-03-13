@@ -55,7 +55,11 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
       ? "Please select a cloud account"
       : isDeleting
         ? "Cloud account deletion is already in progress"
-        : "";
+        : isDeleteProtected && deletionProtectionFeatureEnabled
+          ? "Cloud account has delete protection enabled"
+          : !isUpdateAllowedByRBAC
+            ? "You don't have permission to delete this cloud account"
+            : "";
 
     res.push({
       dataTestId: "delete-action-button",
