@@ -52,7 +52,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
 
   const describeQuery = useQuery({
     queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt],
-    enabled: Boolean(describeInstances && listQuery.data),
+    enabled: Boolean(describeInstances && listQuery.data && !listQuery.isFetching),
     queryFn: async () => {
       const res = listQuery.data || [];
 
