@@ -9,6 +9,7 @@ type QueryOptions = {
   productTierKey: string;
   resourceKey: string;
   id: string;
+  subscriptionId?: string;
   [key: string]: any;
 };
 
