@@ -64,10 +64,6 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
           );
         }
 
-        if (!mainResource?.urlKey) {
-          return null;
-        }
-
         const serviceOffering = serviceOfferings?.find((so: any) =>
           so?.resourceParameters?.some((resourceParam: any) => resourceParam?.resourceId === instance?.resourceID)
         );
@@ -84,7 +80,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
             serviceOffering?.serviceEnvironmentURLKey as string,
             serviceOffering?.serviceModelURLKey as string,
             serviceOffering?.productTierURLKey as string,
-            mainResource.urlKey,
+            mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig",
             instance.id,
             instance.subscriptionId
           );
@@ -102,11 +98,15 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
+  const { refetch: refetchList } = listQuery;
+
   // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
+  // Only refetch the list query — the describe query auto-fires because its
+  // queryKey includes listQuery.dataUpdatedAt, so an explicit describeQuery.refetch()
+  // would cause a redundant second describe fetch.
   const refetch = useCallback(async () => {
-    await listQuery.refetch();
-    return describeQuery.refetch();
-  }, [listQuery.refetch, describeQuery.refetch]);
+    return refetchList();
+  }, [refetchList]);
 
   if (describeInstances) {
     return {
