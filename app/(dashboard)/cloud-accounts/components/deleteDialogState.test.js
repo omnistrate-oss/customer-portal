@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   deriveDeleteDialogState,
   INSTANCE_STATUS_POLL_INTERVAL_MS,
+  MAX_POLL_COUNT,
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./deleteDialogState.js";
@@ -26,25 +27,71 @@ test("1) close dialog before delete response -> mutation reset and no stale load
   assert.equal(accountBState.step, "delete");
 });
 
-test("2) poll status every 10 seconds while dialog is open and instance is deleting", () => {
+test("2) poll status every 10 seconds while dialog is open and instance is deleting (max 12 polls)", () => {
   assert.equal(INSTANCE_STATUS_POLL_INTERVAL_MS, 10_000);
+  assert.equal(MAX_POLL_COUNT, 12);
 
+  // Multi-step dialog with delete requested and DELETING status -> should poll
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
       instanceStatus: "DELETING",
       accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
+      isMultiStepDialog: true,
+      hasRequestedDeletion: true,
     }),
     true
   );
 
+  // Non-multi-step dialog -> should NOT poll even with DELETING status
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "PENDING",
+      hasRefetchInstanceStatus: true,
+      isMultiStepDialog: false,
+      hasRequestedDeletion: true,
+    }),
+    false
+  );
+
+  // Multi-step but delete not yet requested -> should NOT poll
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "PENDING",
+      hasRefetchInstanceStatus: true,
+      isMultiStepDialog: true,
+      hasRequestedDeletion: false,
+    }),
+    false
+  );
+
+  // Already READY_TO_OFFBOARD -> should NOT poll
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
       instanceStatus: "DELETING",
       accountConfigStatus: "READY_TO_OFFBOARD",
       hasRefetchInstanceStatus: true,
+      isMultiStepDialog: true,
+      hasRequestedDeletion: true,
+    }),
+    false
+  );
+
+  // Waiting for deletion to start (status still READY, delete requested)
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "READY",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      hasRefetchInstanceStatus: true,
+      hasRequestedDeletion: true,
+      isMultiStepDialog: true,
     }),
     false
   );
@@ -53,30 +100,22 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
     shouldPollInstanceStatus({
       open: true,
       instanceStatus: "READY",
-      accountConfigStatus: "READY_TO_OFFBOARD",
-      hasRefetchInstanceStatus: true,
-      hasRequestedDeletion: true,
-    }),
-    false
-  );
-
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "READY",
       accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
       hasRequestedDeletion: true,
+      isMultiStepDialog: true,
     }),
     true
   );
 
+  // No hasRequestedDeletion -> should NOT poll
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
       instanceStatus: "READY",
       accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
+      isMultiStepDialog: true,
     }),
     false
   );
@@ -120,6 +159,8 @@ test("5) polling stops on dialog close", () => {
       instanceStatus: "DELETING",
       accountConfigStatus: "PENDING",
       hasRefetchInstanceStatus: true,
+      isMultiStepDialog: true,
+      hasRequestedDeletion: true,
     }),
     false
   );

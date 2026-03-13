@@ -4,7 +4,7 @@ import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import DataTable from "components/DataTable/DataTable";
@@ -13,6 +13,7 @@ import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcution
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 import Tooltip from "components/Tooltip/Tooltip";
+import { apiClient } from "src/api/client";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -642,26 +643,71 @@ const CloudAccountsPage = () => {
     }
   }, [hasRequestedDeleteForPolling, selectedAccountConfig?.status, selectedInstance?.status, showDeleteDialog]);
 
+  // Standalone fetch for polling: describe the selected instance
+  const fetchInstanceForPolling = useCallback(async () => {
+    if (!selectedInstanceOffering || !selectedResource || !selectedInstance) return;
+    await getResourceInstanceDetails(
+      selectedInstanceOffering.serviceProviderId,
+      selectedInstanceOffering.serviceURLKey,
+      selectedInstanceOffering.serviceAPIVersion,
+      selectedInstanceOffering.serviceEnvironmentURLKey,
+      selectedInstanceOffering.serviceModelURLKey,
+      selectedInstanceOffering.productTierURLKey,
+      selectedResource.urlKey,
+      selectedInstance.id,
+      selectedInstance.subscriptionId
+    );
+  }, [selectedInstanceOffering, selectedResource, selectedInstance]);
+
+  // Standalone fetch for polling: get the selected account config
+  const fetchAccountConfigForPolling = useCallback(async () => {
+    if (!selectedAccountConfigId) return;
+    await apiClient.GET("/2022-09-01-00/accountconfig/{id}", {
+      params: { path: { id: selectedAccountConfigId } },
+    });
+  }, [selectedAccountConfigId]);
+
+  const pollingErrorRef = useRef(false);
+
+  // Reset polling error flag when the delete dialog opens
+  useEffect(() => {
+    if (showDeleteDialog) {
+      pollingErrorRef.current = false;
+    }
+  }, [showDeleteDialog]);
+
   useEffect(() => {
     // Poll only while the delete dialog is open and deletion is in-progress.
-    // Updated data flows back through `selectedInstance` and `selectedAccountConfig`
-    // to transition the dialog from Delete -> Offboard without a manual refresh.
+    // Uses standalone fetch functions so the main hooks remain unchanged.
+    // Stops polling on API errors to avoid unnecessary requests.
     if (!showDeleteDialog || !shouldPollDeleteDialogStatus) {
       return;
     }
 
-    const pollingInterval = window.setInterval(() => {
-      refetchInstances();
-      refetchAccountConfigs();
-      console.log("Starting polling for instance and account config status...");
-      console.log("Selected Instance Status:", selectedInstance?.status);
-      console.log("Selected Account Config Status:", selectedAccountConfig?.status);
+    const pollingInterval = window.setInterval(async () => {
+      if (pollingErrorRef.current) return;
+
+      try {
+        await Promise.all([fetchInstanceForPolling(), fetchAccountConfigForPolling()]);
+        // After successful fetch, refetch instances to update UI state, then stop polling
+        await refetchInstances();
+        pollingErrorRef.current = true;
+      } catch {
+        // Stop polling on error
+        pollingErrorRef.current = true;
+      }
     }, INSTANCE_STATUS_POLL_INTERVAL_MS);
 
     return () => {
       window.clearInterval(pollingInterval);
     };
-  }, [showDeleteDialog, shouldPollDeleteDialogStatus, refetchInstances, refetchAccountConfigs]);
+  }, [
+    showDeleteDialog,
+    shouldPollDeleteDialogStatus,
+    fetchInstanceForPolling,
+    fetchAccountConfigForPolling,
+    refetchInstances,
+  ]);
 
   const updateInstanceMetadataMutation = $api.useMutation(
     "patch",
