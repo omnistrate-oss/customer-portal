@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { Box, InputAdornment, Stack } from "@mui/material";
 import Generator from "generate-password";
+import { useRef, useState } from "react";
 
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
 import Select from "components/FormElementsv2/Select/Select";
@@ -268,7 +268,9 @@ export const TextInput = ({ field, formData }: { field: Field; formData: any }) 
       value={field.value ?? values[field.name] ?? ""}
       onChange={(e) => {
         field.onChange?.(e);
-        handleChange(e);
+        if (!field.skipFormikHandleChange) {
+          handleChange(e);
+        }
       }}
       error={Boolean(touched[field.name] && errors[field.name])}
       onBlur={(e) => {
