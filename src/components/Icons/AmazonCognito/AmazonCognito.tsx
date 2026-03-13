@@ -1,13 +1,14 @@
-import { FC } from "react";
+import { FC, useId } from "react";
 
 import { SVGIconProps } from "src/types/common/generalTypes";
 
 const AmazonCognitoIcon: FC<SVGIconProps> = (props) => {
   const { width = 24, height = 24 } = props;
+  const clipPathId = useId();
 
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g clipPath="url(#a)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           fill="#7A3E65"
           d="m17.124 4.662 2.114-.533.016.023.053 12.488-.069.067-.436.019-1.653-.252-.025-.064V4.662ZM4.897 17.575h.008l5.58 1.587.015.01.024.02-.008 4.753-.016.02-5.603-2.663v-3.727Z"
@@ -30,7 +31,7 @@ const AmazonCognitoIcon: FC<SVGIconProps> = (props) => {
         <path fill="#C17B9E" d="M19.238 4.13v12.577L10.5 19.172v4.793L21 19.006V4.961l-1.762-.832Z" />
       </g>
       <defs>
-        <clipPath id="a">
+        <clipPath id={clipPathId}>
           <path fill="#fff" d="M0 0h21v24H0z" />
         </clipPath>
       </defs>

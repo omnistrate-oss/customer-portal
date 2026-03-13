@@ -1,7 +1,10 @@
+import { useId } from "react";
+
 const AccordionErrorIcon = (props) => {
+  const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={16} height={17} fill="none" {...props}>
-      <g clipPath="url(#a)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           stroke="#D92D20"
           strokeLinecap="round"
@@ -11,7 +14,7 @@ const AccordionErrorIcon = (props) => {
         />
       </g>
       <defs>
-        <clipPath id="a">
+        <clipPath id={clipPathId}>
           <path fill="#fff" d="M0 .627h16v16H0z" />
         </clipPath>
       </defs>

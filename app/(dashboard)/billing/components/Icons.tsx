@@ -1,7 +1,10 @@
+import { useId } from "react";
+
 export const StripeIcon = (props) => {
+  const clipPathId = useId();
   return (
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g clipPath="url(#clip0_254_9537)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M31.0218 0H8.97818C4.01967 0 0 4.01967 0 8.97818V31.0218C0 35.9803 4.01967 40 8.97818 40H31.0218C35.9803 40 40 35.9803 40 31.0218V8.97818C40 4.01967 35.9803 0 31.0218 0Z"
           fill="#6772E5"
@@ -14,7 +17,7 @@ export const StripeIcon = (props) => {
         />
       </g>
       <defs>
-        <clipPath id="clip0_254_9537">
+        <clipPath id={clipPathId}>
           <rect width="40" height="40" fill="white" />
         </clipPath>
       </defs>
