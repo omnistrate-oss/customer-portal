@@ -597,6 +597,8 @@ const CloudAccountsPage = () => {
         setSelectedRows([]);
         setIsOverlayOpen(false);
         snackbar.showSuccess("Deleting cloud account...");
+        // Wait 5 seconds before fetching instance details to allow backend processing
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         await refetchInstances();
         // refetchAccountConfigs();
       } else {
@@ -604,6 +606,9 @@ const CloudAccountsPage = () => {
         if (isOffboardReady) {
           // Offboard action was triggered from step 2 — start polling to track completion.
           setHasRequestedOffboardForPolling(true);
+          await refetchInstances();
+          setSelectedRows([]);
+          setIsOverlayOpen(false);
         } else {
           // Instance is transitioning to DELETING — start polling to track progress
           // and keep the dialog in loading state until offboard is ready.
