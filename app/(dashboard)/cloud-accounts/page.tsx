@@ -613,9 +613,6 @@ const CloudAccountsPage = () => {
   });
 
   const showDeleteDialog = isOverlayOpen && overlayType === "delete-dialog";
-  const isLastInstance =
-    !selectedAccountConfig?.byoaInstanceIDs || selectedAccountConfig?.byoaInstanceIDs?.length === 1;
-  const isMultiStepDialog = Boolean(isLastInstance && selectedAccountConfig);
 
   // Derive the account config ID for the selected instance
   const selectedAccountConfigId = useMemo(() => {
@@ -623,10 +620,24 @@ const CloudAccountsPage = () => {
     return resultParams?.cloud_provider_account_config_id;
   }, [selectedInstance]);
 
+  // Local state for polled data used only by the delete dialog
+  const [polledInstanceStatus, setPolledInstanceStatus] = useState<string | undefined>();
+  const [polledAccountConfig, setPolledAccountConfig] = useState<AccountConfig | undefined>();
+  const pollCountRef = useRef(0);
+
+  // Use polled data when available, otherwise fall back to the original data.
+  // These merged values drive both the dialog display and the polling stop condition.
+  const deleteDialogInstanceStatus = polledInstanceStatus ?? selectedInstance?.status;
+  const deleteDialogAccountConfig = polledAccountConfig ?? selectedAccountConfig;
+
+  const isLastInstance =
+    !deleteDialogAccountConfig?.byoaInstanceIDs || deleteDialogAccountConfig?.byoaInstanceIDs?.length === 1;
+  const isMultiStepDialog = Boolean(isLastInstance && deleteDialogAccountConfig);
+
   const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
     open: showDeleteDialog,
-    instanceStatus: selectedInstance?.status,
-    accountConfigStatus: selectedAccountConfig?.status,
+    instanceStatus: deleteDialogInstanceStatus,
+    accountConfigStatus: deleteDialogAccountConfig?.status,
     isMultiStepDialog,
     hasRequestedDeletion: hasRequestedDeleteForPolling,
   });
@@ -646,11 +657,6 @@ const CloudAccountsPage = () => {
     },
     selectedAccountConfigId
   );
-
-  // Local state for polled data used only by the delete dialog
-  const [polledInstanceStatus, setPolledInstanceStatus] = useState<string | undefined>();
-  const [polledAccountConfig, setPolledAccountConfig] = useState<AccountConfig | undefined>();
-  const pollCountRef = useRef(0);
 
   // Reset polled state when dialog opens/closes
   useEffect(() => {
@@ -725,10 +731,6 @@ const CloudAccountsPage = () => {
     };
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldPollDeleteDialogStatus]);
-
-  // Use polled data when available, otherwise fall back to the original data
-  const deleteDialogInstanceStatus = polledInstanceStatus ?? selectedInstance?.status;
-  const deleteDialogAccountConfig = polledAccountConfig ?? selectedAccountConfig;
 
   const updateInstanceMetadataMutation = $api.useMutation(
     "patch",
