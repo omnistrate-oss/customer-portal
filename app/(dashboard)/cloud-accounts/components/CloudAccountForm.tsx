@@ -94,6 +94,9 @@ const CloudAccountForm = ({
           resource.resourceId.startsWith("r-injectedaccountconfig")
         );
 
+        // Wait 5 seconds before fetching instance details to allow backend processing
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
         const resourceInstanceResponse = await getResourceInstanceDetails(
           offering?.serviceProviderId,
           offering?.serviceURLKey,
@@ -107,6 +110,8 @@ const CloudAccountForm = ({
         );
 
         const resourceInstance = resourceInstanceResponse.data;
+
+        console.log("Created Cloud Account Resource Instance:", resourceInstance);
 
         setIsAccountCreation(true);
         setClickedInstance({
