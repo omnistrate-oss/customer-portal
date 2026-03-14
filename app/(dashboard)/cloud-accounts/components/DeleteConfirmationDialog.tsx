@@ -229,8 +229,8 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
         if (values.confirmationText === "offboard") {
           await onOffboardClick();
           formData.resetForm();
-          // Don't call handleClose() here — polling (hasRequestedOffboard) keeps the dialog
-          // open in loading state and closes it automatically when offboarding completes (404).
+          // Don't call handleClose() here — the parent component's polling 404 handler
+          // will automatically close the dialog when offboarding completes.
         } else {
           snackbar.showError(`Please enter offboard to confirm`);
         }

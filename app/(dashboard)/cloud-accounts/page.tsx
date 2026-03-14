@@ -681,6 +681,17 @@ const CloudAccountsPage = () => {
     }
   }, [showDeleteDialog, hasRequestedDeleteForPolling, hasRequestedOffboardForPolling]);
 
+  // Reset the step-1 deletion polling flag when the dialog naturally transitions to the
+  // offboard step (offboard-ready condition met), so the spinner doesn't persist on step 2.
+  useEffect(() => {
+    if (!hasRequestedDeleteForPolling) return;
+    const isOffboardReady =
+      deleteDialogAccountConfig?.status === "READY_TO_OFFBOARD" || deleteDialogInstanceStatus === "FAILED";
+    if (isOffboardReady) {
+      setHasRequestedDeleteForPolling(false);
+    }
+  }, [hasRequestedDeleteForPolling, deleteDialogAccountConfig?.status, deleteDialogInstanceStatus]);
+
   // Polling: fetch instance describe + account config to track deletion progress.
   // Only runs for 2-step dialogs after deletion has been requested.
   // Stops when: offboard step ready (shouldPoll becomes false), max retries, 404, or error.
@@ -923,7 +934,9 @@ const CloudAccountsPage = () => {
             return snackbar.showError("Offboarding is in progress");
           if (!selectedResource) return snackbar.showError("Resource not found");
           await deleteCloudAccountInstanceMutation.mutateAsync();
-          setSelectedRows([]);
+          // Do NOT clear selectedRows here — polling needs selectedInstance to stay defined
+          // so fetchInstanceDetails can detect the 404 when offboarding completes.
+          // setSelectedRows([]) is called by the polling 404 handler and the onClose handler.
         }}
         instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
