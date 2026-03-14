@@ -603,7 +603,7 @@ const CloudAccountsPage = () => {
         // refetchAccountConfigs();
       } else {
         const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
-        if (isOffboardReady) {
+        if (isOffboardReady || selectedInstance?.status === "FAILED") {
           // Offboard step 2 completed — close dialog immediately and refresh the list.
           // The offboard API call is the final action; no polling is needed.
           setIsOverlayOpen(false);
@@ -936,7 +936,6 @@ const CloudAccountsPage = () => {
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={deleteDialogAccountConfig}
-        isLoadingAccountConfig={isFetchingAccountConfigs}
         isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");

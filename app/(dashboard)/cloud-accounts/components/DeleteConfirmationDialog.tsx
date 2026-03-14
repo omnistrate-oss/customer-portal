@@ -102,7 +102,6 @@ type DeleteAccountConfigConfirmationDialogProps = {
   accountConfig: AccountConfig | undefined;
 
   instanceStatus: string | undefined;
-  isLoadingAccountConfig: boolean;
   isPollingActive?: boolean;
   open: boolean;
   onClose: () => void;
@@ -121,7 +120,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     // isDeletingAccountConfig,
     accountConfig,
     instanceStatus,
-    isLoadingAccountConfig,
     isPollingActive = false,
     offboardingInstructionDetails,
     onClose,
@@ -203,9 +201,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading =
-    deleteDialogState.isLoading ||
-    (step === "offboard" && (isLoadingAccountConfig || isPollingActive));
+  const isLoading = deleteDialogState.isLoading || (step === "offboard" && isPollingActive);
 
   const formData = useFormik({
     initialValues: {
