@@ -599,9 +599,16 @@ const CloudAccountsPage = () => {
         await refetchInstances();
         // refetchAccountConfigs();
       } else {
-        setTimeout(async () => {
-          await refetchInstances();
-        }, 1700);
+        const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
+        if (isOffboardReady) {
+          setTimeout(async () => {
+            await refetchInstances();
+          }, 1700);
+        } else {
+          // Instance is transitioning to DELETING — start polling to track progress
+          // and keep the dialog in loading state until offboard is ready.
+          setHasRequestedDeleteForPolling(true);
+        }
       }
     },
     onError: async () => {
@@ -895,7 +902,6 @@ const CloudAccountsPage = () => {
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
-          setHasRequestedDeleteForPolling(true);
           await deleteCloudAccountInstanceMutation.mutateAsync();
         }}
         onOffboardClick={async () => {
