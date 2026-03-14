@@ -5,7 +5,7 @@ import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance";
+import axios from "../../../../src/axios";
 import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
@@ -75,16 +75,18 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
         }
 
         try {
-          const describeResponse = await getResourceInstanceDetails(
-            serviceOffering?.serviceProviderId as string,
-            serviceOffering?.serviceURLKey as string,
-            serviceOffering?.serviceAPIVersion as string,
-            serviceOffering?.serviceEnvironmentURLKey as string,
-            serviceOffering?.serviceModelURLKey as string,
-            serviceOffering?.productTierURLKey as string,
-            mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig",
-            instance.id,
-            instance.subscriptionId
+          const queryParams: Record<string, string> = {};
+          if (instance.subscriptionId) {
+            queryParams.subscriptionId = instance.subscriptionId;
+          }
+          const resourceKey = mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig";
+
+          const describeResponse = await axios.get(
+            `/resource-instance/${serviceOffering?.serviceProviderId}/${serviceOffering?.serviceURLKey}/${serviceOffering?.serviceAPIVersion}/${serviceOffering?.serviceEnvironmentURLKey}/${serviceOffering?.serviceModelURLKey}/${serviceOffering?.productTierURLKey}/${resourceKey}/${instance.id}`,
+            {
+              params: queryParams,
+              ignoreGlobalErrorSnack: true,
+            }
           );
 
           return describeResponse?.data ?? null;

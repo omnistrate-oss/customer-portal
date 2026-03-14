@@ -719,10 +719,7 @@ const CloudAccountsPage = () => {
       try {
         // Use the instances list to detect deletion instead of a direct describe call.
         // This avoids spurious 404 errors from instance describe during deletion tracking.
-        const [listResult, accountConfigResult] = await Promise.allSettled([
-          refetchInstances(),
-          fetchAccountConfig(),
-        ]);
+        const [listResult, accountConfigResult] = await Promise.allSettled([refetchInstances(), fetchAccountConfig()]);
 
         // Determine instance existence from the refreshed list
         const listInstances: ResourceInstance[] | null =
