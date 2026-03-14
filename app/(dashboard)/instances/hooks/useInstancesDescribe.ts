@@ -9,6 +9,7 @@ type QueryOptions = {
   productTierKey: string;
   resourceKey: string;
   id: string;
+  subscriptionId?: string;
   [key: string]: any;
 };
 
@@ -22,6 +23,7 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
     productTierKey,
     resourceKey,
     id,
+    subscriptionId,
     ...options
   } = queryOptions;
 
@@ -39,6 +41,9 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
           productTierKey,
           resourceKey,
           id,
+        },
+        query: {
+          subscriptionId,
         },
       },
     },
