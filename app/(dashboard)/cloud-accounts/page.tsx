@@ -516,7 +516,10 @@ const CloudAccountsPage = () => {
   }, [instances, isFetchingInstances]);
 
   const offboardingInstructionDetails: OffboardInstructionDetails = useMemo(() => {
-    const result_params: any = selectedInstance?.result_params;
+    // Use clickedInstance as a stable fallback: the describe-query refetch that runs
+    // during polling briefly sets instances=[] (new query key), making selectedInstance
+    // undefined. clickedInstance holds a snapshot captured when the dialog opened.
+    const result_params: any = (selectedInstance || clickedInstance)?.result_params;
     let details: any = {};
     if (result_params?.aws_account_id) {
       details = {
@@ -554,7 +557,7 @@ const CloudAccountsPage = () => {
       }
     }
     return details;
-  }, [selectedInstance, selectedAccountConfig]);
+  }, [selectedInstance, clickedInstance, selectedAccountConfig]);
 
   // Subscription of the Selected Instance
   const selectedInstanceSubscription = useMemo(() => {
@@ -865,6 +868,7 @@ const CloudAccountsPage = () => {
               setOverlayType("create-instance-form");
             },
             onDeleteClick: () => {
+              setClickedInstance(selectedInstance);
               setIsOverlayOpen(true);
               setOverlayType("delete-dialog");
             },
