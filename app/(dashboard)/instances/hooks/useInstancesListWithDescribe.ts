@@ -5,7 +5,7 @@ import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance";
+import axios from "../../../../src/axios";
 import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
@@ -51,8 +51,10 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
   );
 
   const describeQuery = useQuery({
-    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt],
-    enabled: Boolean(describeInstances && listQuery.data),
+    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt, serviceOfferings?.length],
+    enabled: Boolean(
+      describeInstances && listQuery.data && !listQuery.isFetching && !listQuery.isPending && serviceOfferings?.length
+    ),
     queryFn: async () => {
       const res = listQuery.data || [];
 
@@ -64,10 +66,6 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
           );
         }
 
-        if (!mainResource?.urlKey) {
-          return null;
-        }
-
         const serviceOffering = serviceOfferings?.find((so: any) =>
           so?.resourceParameters?.some((resourceParam: any) => resourceParam?.resourceId === instance?.resourceID)
         );
@@ -77,16 +75,18 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
         }
 
         try {
-          const describeResponse = await getResourceInstanceDetails(
-            serviceOffering?.serviceProviderId as string,
-            serviceOffering?.serviceURLKey as string,
-            serviceOffering?.serviceAPIVersion as string,
-            serviceOffering?.serviceEnvironmentURLKey as string,
-            serviceOffering?.serviceModelURLKey as string,
-            serviceOffering?.productTierURLKey as string,
-            mainResource.urlKey,
-            instance.id,
-            instance.subscriptionId
+          const queryParams: Record<string, string> = {};
+          if (instance.subscriptionId) {
+            queryParams.subscriptionId = instance.subscriptionId;
+          }
+          const resourceKey = mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig";
+
+          const describeResponse = await axios.get(
+            `/resource-instance/${serviceOffering?.serviceProviderId}/${serviceOffering?.serviceURLKey}/${serviceOffering?.serviceAPIVersion}/${serviceOffering?.serviceEnvironmentURLKey}/${serviceOffering?.serviceModelURLKey}/${serviceOffering?.productTierURLKey}/${resourceKey}/${instance.id}`,
+            {
+              params: queryParams,
+              ignoreGlobalErrorSnack: true,
+            }
           );
 
           return describeResponse?.data ?? null;
@@ -102,11 +102,15 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
+  const { refetch: refetchList } = listQuery;
+
   // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
+  // Only refetch the list query — the describe query auto-fires because its
+  // queryKey includes listQuery.dataUpdatedAt, so an explicit describeQuery.refetch()
+  // would cause a redundant second describe fetch.
   const refetch = useCallback(async () => {
-    await listQuery.refetch();
-    return describeQuery.refetch();
-  }, [listQuery.refetch, describeQuery.refetch]);
+    return refetchList();
+  }, [refetchList]);
 
   if (describeInstances) {
     return {
