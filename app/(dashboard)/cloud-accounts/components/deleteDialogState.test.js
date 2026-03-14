@@ -193,3 +193,53 @@ test("6) failure path stops spinner and supports retry behavior for non-last ins
   assert.equal(failedLastInstanceState.buttonText, "Offboard");
   assert.equal(failedLastInstanceState.isLoading, false);
 });
+
+test("7) offboard step (step 2) never requires polling — dialog closes synchronously on success", () => {
+  // DELETING + READY_TO_OFFBOARD: offboard is the next action, not a poll trigger
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      isMultiStepDialog: true,
+      hasRequestedDeletion: false,
+    }),
+    false
+  );
+
+  // FAILED + READY_TO_OFFBOARD: same — no polling for offboard step
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "FAILED",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      isMultiStepDialog: true,
+      hasRequestedDeletion: false,
+    }),
+    false
+  );
+
+  // hasRequestedDeletion with READY_TO_OFFBOARD -> should NOT poll (offboard step reached)
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: true,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      isMultiStepDialog: true,
+      hasRequestedDeletion: true,
+    }),
+    false
+  );
+
+  // Dialog closed -> should NOT poll
+  assert.equal(
+    shouldPollInstanceStatus({
+      open: false,
+      instanceStatus: "DELETING",
+      accountConfigStatus: "READY_TO_OFFBOARD",
+      isMultiStepDialog: true,
+      hasRequestedDeletion: false,
+    }),
+    false
+  );
+});

@@ -87,7 +87,9 @@ const useDeleteDialogPolling = (
     });
 
     if (response.error) {
-      throw response.error;
+      // Throw an error with the HTTP status so callers can detect 404 etc.
+      const err = Object.assign(new Error("Failed to fetch account config"), { status: response.response.status });
+      throw err;
     }
     return response.data as AccountConfig;
   }, [canFetchAccountConfig, accountConfigId]);
