@@ -57,7 +57,7 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
     false
   );
 
-  // Multi-step but delete not yet requested -> should NOT poll
+  // Multi-step with DELETING status but delete not yet requested (e.g. dialog reopened) -> should poll
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
@@ -67,7 +67,7 @@ test("2) poll status every 10 seconds while dialog is open and instance is delet
       isMultiStepDialog: true,
       hasRequestedDeletion: false,
     }),
-    false
+    true
   );
 
   // Already READY_TO_OFFBOARD -> should NOT poll

@@ -4,7 +4,7 @@ import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import DataTable from "components/DataTable/DataTable";
@@ -13,7 +13,6 @@ import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcution
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 import Tooltip from "components/Tooltip/Tooltip";
-import { apiClient } from "src/api/client";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -51,11 +50,13 @@ import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
+  MAX_POLL_COUNT,
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { DIALOG_DATA } from "./constants";
+import useDeleteDialogPolling from "./hooks/useDeleteDialogPolling";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -501,20 +502,6 @@ const CloudAccountsPage = () => {
     }
   }, [selectedInstance, accountConfigsHash]);
 
-  const selectedAccountConfigId = useMemo(() => {
-    const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
-    return resultParams?.cloud_provider_account_config_id;
-  }, [selectedInstance]);
-
-  const linkedCloudAccountInstanceCount = useMemo(() => {
-    if (!selectedAccountConfigId) return 0;
-
-    return instances.filter((instance) => {
-      const resultParams = instance?.result_params as Record<string, any> | undefined;
-      return resultParams?.cloud_provider_account_config_id === selectedAccountConfigId;
-    }).length;
-  }, [instances, selectedAccountConfigId]);
-
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
     selectedAccountConfig?.status
@@ -626,88 +613,122 @@ const CloudAccountsPage = () => {
   });
 
   const showDeleteDialog = isOverlayOpen && overlayType === "delete-dialog";
+  const isLastInstance =
+    !selectedAccountConfig?.byoaInstanceIDs || selectedAccountConfig?.byoaInstanceIDs?.length === 1;
+  const isMultiStepDialog = Boolean(isLastInstance && selectedAccountConfig);
+
+  // Derive the account config ID for the selected instance
+  const selectedAccountConfigId = useMemo(() => {
+    const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
+    return resultParams?.cloud_provider_account_config_id;
+  }, [selectedInstance]);
+
   const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
     open: showDeleteDialog,
     instanceStatus: selectedInstance?.status,
     accountConfigStatus: selectedAccountConfig?.status,
+    isMultiStepDialog,
+    hasRequestedDeletion: hasRequestedDeleteForPolling,
   });
 
+  // Hook provides fetch functions for instance describe + account config (with global error suppressed)
+  const { fetchInstanceDetails, fetchAccountConfig } = useDeleteDialogPolling(
+    {
+      serviceProviderId: selectedInstanceOffering?.serviceProviderId,
+      serviceURLKey: selectedInstanceOffering?.serviceURLKey,
+      serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion,
+      serviceEnvironmentURLKey: selectedInstanceOffering?.serviceEnvironmentURLKey,
+      serviceModelURLKey: selectedInstanceOffering?.serviceModelURLKey,
+      productTierURLKey: selectedInstanceOffering?.productTierURLKey,
+      resourceUrlKey: selectedResource?.urlKey,
+      instanceId: selectedInstance?.id,
+      subscriptionId: selectedInstance?.subscriptionId,
+    },
+    selectedAccountConfigId
+  );
+
+  // Local state for polled data used only by the delete dialog
+  const [polledInstanceStatus, setPolledInstanceStatus] = useState<string | undefined>();
+  const [polledAccountConfig, setPolledAccountConfig] = useState<AccountConfig | undefined>();
+  const pollCountRef = useRef(0);
+
+  // Reset polled state when dialog opens/closes
   useEffect(() => {
-    if (
-      !showDeleteDialog &&
-      hasRequestedDeleteForPolling &&
-      (selectedAccountConfig?.status === "READY_TO_OFFBOARD" || selectedInstance?.status === "FAILED")
-    ) {
-      setHasRequestedDeleteForPolling(false);
+    if (!showDeleteDialog) {
+      setPolledInstanceStatus(undefined);
+      setPolledAccountConfig(undefined);
+      pollCountRef.current = 0;
+      if (hasRequestedDeleteForPolling) {
+        setHasRequestedDeleteForPolling(false);
+      }
+    }
+  }, [showDeleteDialog, hasRequestedDeleteForPolling]);
+
+  // Polling: fetch instance describe + account config to track deletion progress.
+  // Only runs for 2-step dialogs after deletion has been requested.
+  // Stops when: offboard step ready (shouldPoll becomes false), max retries, 404, or error.
+  useEffect(() => {
+    if (!shouldPollDeleteDialogStatus) {
       return;
     }
-  }, [hasRequestedDeleteForPolling, selectedAccountConfig?.status, selectedInstance?.status, showDeleteDialog]);
 
-  // Standalone fetch for polling: describe the selected instance
-  const fetchInstanceForPolling = useCallback(async () => {
-    if (!selectedInstanceOffering || !selectedResource || !selectedInstance) return;
-    await getResourceInstanceDetails(
-      selectedInstanceOffering.serviceProviderId,
-      selectedInstanceOffering.serviceURLKey,
-      selectedInstanceOffering.serviceAPIVersion,
-      selectedInstanceOffering.serviceEnvironmentURLKey,
-      selectedInstanceOffering.serviceModelURLKey,
-      selectedInstanceOffering.productTierURLKey,
-      selectedResource.urlKey,
-      selectedInstance.id,
-      selectedInstance.subscriptionId
-    );
-  }, [selectedInstanceOffering, selectedResource, selectedInstance]);
-
-  // Standalone fetch for polling: get the selected account config
-  const fetchAccountConfigForPolling = useCallback(async () => {
-    if (!selectedAccountConfigId) return;
-    await apiClient.GET("/2022-09-01-00/accountconfig/{id}", {
-      params: { path: { id: selectedAccountConfigId } },
-    });
-  }, [selectedAccountConfigId]);
-
-  const pollingErrorRef = useRef(false);
-
-  // Reset polling error flag when the delete dialog opens
-  useEffect(() => {
-    if (showDeleteDialog) {
-      pollingErrorRef.current = false;
-    }
-  }, [showDeleteDialog]);
-
-  useEffect(() => {
-    // Poll only while the delete dialog is open and deletion is in-progress.
-    // Uses standalone fetch functions so the main hooks remain unchanged.
-    // Stops polling on API errors to avoid unnecessary requests.
-    if (!showDeleteDialog || !shouldPollDeleteDialogStatus) {
-      return;
-    }
+    pollCountRef.current = 0;
 
     const pollingInterval = window.setInterval(async () => {
-      if (pollingErrorRef.current) return;
+      pollCountRef.current += 1;
+
+      if (pollCountRef.current >= MAX_POLL_COUNT) {
+        window.clearInterval(pollingInterval);
+        setHasRequestedDeleteForPolling(false);
+        return;
+      }
 
       try {
-        await Promise.all([fetchInstanceForPolling(), fetchAccountConfigForPolling()]);
-        // After successful fetch, refetch instances to update UI state, then stop polling
-        await refetchInstances();
-        pollingErrorRef.current = true;
+        const results = await Promise.allSettled([fetchInstanceDetails(), fetchAccountConfig()]);
+
+        // Check for 404 — instance or account config deleted
+        const has404 = results.some(
+          (r) => r.status === "rejected" && (r.reason?.response?.status === 404 || r.reason?.status === 404)
+        );
+
+        if (has404) {
+          window.clearInterval(pollingInterval);
+          setHasRequestedDeleteForPolling(false);
+          setIsOverlayOpen(false);
+          return;
+        }
+
+        // Any other error — stop polling, keep dialog open
+        const hasError = results.some((r) => r.status === "rejected");
+        if (hasError) {
+          window.clearInterval(pollingInterval);
+          setHasRequestedDeleteForPolling(false);
+          return;
+        }
+
+        // Update polled data from successful responses
+        const [instanceResult, accountConfigResult] = results;
+        if (instanceResult.status === "fulfilled" && instanceResult.value) {
+          setPolledInstanceStatus(instanceResult.value.status);
+        }
+        if (accountConfigResult.status === "fulfilled" && accountConfigResult.value) {
+          setPolledAccountConfig(accountConfigResult.value);
+        }
       } catch {
-        // Stop polling on error
-        pollingErrorRef.current = true;
+        window.clearInterval(pollingInterval);
+        setHasRequestedDeleteForPolling(false);
       }
     }, INSTANCE_STATUS_POLL_INTERVAL_MS);
 
     return () => {
       window.clearInterval(pollingInterval);
     };
-  }, [
-    showDeleteDialog,
-    shouldPollDeleteDialogStatus,
-    fetchInstanceForPolling,
-    fetchAccountConfigForPolling,
-    refetchInstances,
-  ]);
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldPollDeleteDialogStatus]);
+
+  // Use polled data when available, otherwise fall back to the original data
+  const deleteDialogInstanceStatus = polledInstanceStatus ?? selectedInstance?.status;
+  const deleteDialogAccountConfig = polledAccountConfig ?? selectedAccountConfig;
 
   const updateInstanceMetadataMutation = $api.useMutation(
     "patch",
@@ -867,8 +888,7 @@ const CloudAccountsPage = () => {
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
-        accountConfig={selectedAccountConfig}
-        linkedInstanceCount={linkedCloudAccountInstanceCount}
+        accountConfig={deleteDialogAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
@@ -884,7 +904,7 @@ const CloudAccountsPage = () => {
           await deleteCloudAccountInstanceMutation.mutateAsync();
           setSelectedRows([]);
         }}
-        instanceStatus={selectedInstance?.status}
+        instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
       />
