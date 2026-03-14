@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import { Box, Stack } from "@mui/material";
+import { useMemo } from "react";
 
 import Card from "src/components/Card/Card";
 import { Text } from "src/components/Typography/Typography";
@@ -26,8 +26,8 @@ function ResourceCustomDNS(props) {
     const otherResourceFilteredEndpoints: any[] = [];
 
     otherEndpoints?.forEach((endpointData) => {
-      const { resourceName, endpoint } = endpointData;
-      if (resourceName && endpoint) {
+      const { resourceName } = endpointData;
+      if (resourceName) {
         // filter out omnistrate observability
         if (resourceName === "Omnistrate Observability") {
           return;
@@ -45,7 +45,7 @@ function ResourceCustomDNS(props) {
 
     if (primaryResourceName || primaryResourceEndpoint) {
       const customDNSEndpointName = globalEndpoints?.primary?.customDNSEndpoint?.name ?? "";
-      if (globalEndpoints?.primary?.resourceHasCompute && globalEndpoints?.primary?.customDNSEndpoint?.enabled) {
+      if (globalEndpoints?.primary?.customDNSEndpoint?.enabled) {
         res.push({
           label: primaryResourceName,
           description: `The global endpoint of the ${sectionLabel.toLowerCase()}`,
@@ -60,7 +60,6 @@ function ResourceCustomDNS(props) {
                   resourceKey={globalEndpoints?.primary?.resourceKey}
                   resourceId={globalEndpoints?.primary?.resourceId}
                   refetchInstance={refetchInstance}
-                  resourceHasCompute={globalEndpoints?.primary?.resourceHasCompute}
                 />
               )}
             </>
@@ -70,29 +69,26 @@ function ResourceCustomDNS(props) {
     }
 
     if (otherResourceFilteredEndpoints?.length > 0) {
-      otherResourceFilteredEndpoints.forEach(
-        ({ resourceName, resourceKey, resourceId, resourceHasCompute, customDNSEndpoint }) => {
-          const customDNSEndpointName = customDNSEndpoint?.name ?? "";
-          if (resourceHasCompute && customDNSEndpoint?.enabled) {
-            res.push({
-              label: resourceName,
-              description: `The global endpoint of the ${sectionLabel.toLowerCase()}`,
-              valueType: "custom",
-              value: (
-                <CustomDNS
-                  resourceName={`${resourceName} ${customDNSEndpointName}`}
-                  customDNSData={customDNSEndpoint}
-                  accessQueryParams={accessQueryParams}
-                  resourceKey={resourceKey}
-                  resourceId={resourceId}
-                  refetchInstance={refetchInstance}
-                  resourceHasCompute={resourceHasCompute}
-                />
-              ),
-            });
-          }
+      otherResourceFilteredEndpoints.forEach(({ resourceName, resourceKey, resourceId, customDNSEndpoint }) => {
+        const customDNSEndpointName = customDNSEndpoint?.name ?? "";
+        if (customDNSEndpoint?.enabled) {
+          res.push({
+            label: resourceName,
+            description: `The global endpoint of the ${sectionLabel.toLowerCase()}`,
+            valueType: "custom",
+            value: (
+              <CustomDNS
+                resourceName={`${resourceName} ${customDNSEndpointName}`}
+                customDNSData={customDNSEndpoint}
+                accessQueryParams={accessQueryParams}
+                resourceKey={resourceKey}
+                resourceId={resourceId}
+                refetchInstance={refetchInstance}
+              />
+            ),
+          });
         }
-      );
+      });
     }
 
     return res;
