@@ -111,8 +111,6 @@ const CloudAccountForm = ({
 
         const resourceInstance = resourceInstanceResponse.data;
 
-        console.log("Created Cloud Account Resource Instance:", resourceInstance);
-
         setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
