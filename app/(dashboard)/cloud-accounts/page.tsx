@@ -597,18 +597,14 @@ const CloudAccountsPage = () => {
         setSelectedRows([]);
         setIsOverlayOpen(false);
         snackbar.showSuccess("Deleting cloud account...");
-        // Wait 5 seconds before fetching instance details to allow backend processing
-        await new Promise((resolve) => setTimeout(resolve, 5000));
         await refetchInstances();
         // refetchAccountConfigs();
       } else {
         const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
         if (isOffboardReady) {
           // Offboard action was triggered from step 2 — start polling to track completion.
+          // Do NOT close the dialog here; the polling 404 handler will close it automatically.
           setHasRequestedOffboardForPolling(true);
-          await refetchInstances();
-          setSelectedRows([]);
-          setIsOverlayOpen(false);
         } else {
           // Instance is transitioning to DELETING — start polling to track progress
           // and keep the dialog in loading state until offboard is ready.
@@ -655,8 +651,8 @@ const CloudAccountsPage = () => {
     hasRequestedOffboard: hasRequestedOffboardForPolling,
   });
 
-  // Hook provides fetch functions for instance describe + account config (with global error suppressed)
-  const { fetchInstanceDetails, fetchAccountConfig } = useDeleteDialogPolling(
+  // Hook provides the account config fetch function (with global error suppressed) used during polling.
+  const { fetchAccountConfig } = useDeleteDialogPolling(
     {
       serviceProviderId: selectedInstanceOffering?.serviceProviderId,
       serviceURLKey: selectedInstanceOffering?.serviceURLKey,
@@ -699,7 +695,7 @@ const CloudAccountsPage = () => {
 
   // Polling: fetch instance describe + account config to track deletion progress.
   // Only runs for 2-step dialogs after deletion has been requested.
-  // Stops when: offboard step ready (shouldPoll becomes false), max retries, 404, or error.
+  // Stops when: offboard step ready (shouldPoll becomes false), max retries, instance gone from list, or error.
   useEffect(() => {
     if (!shouldPollDeleteDialogStatus) {
       return;
@@ -712,6 +708,9 @@ const CloudAccountsPage = () => {
       setHasRequestedOffboardForPolling(false);
     };
 
+    // Capture the instance ID at poll-start time (stable for the polling lifetime).
+    const pollingInstanceId = selectedInstance?.id;
+
     const pollingInterval = window.setInterval(async () => {
       pollCountRef.current += 1;
 
@@ -722,24 +721,40 @@ const CloudAccountsPage = () => {
       }
 
       try {
-        const results = await Promise.allSettled([fetchInstanceDetails(), fetchAccountConfig()]);
+        // Use the instances list to detect deletion instead of a direct describe call.
+        // This avoids spurious 404 errors from instance describe during deletion tracking.
+        const [listResult, accountConfigResult] = await Promise.allSettled([
+          refetchInstances(),
+          fetchAccountConfig(),
+        ]);
 
-        // Check for 404 — instance or account config deleted (deletion/offboard complete)
-        const has404 = results.some(
-          (r) => r.status === "rejected" && (r.reason?.response?.status === 404 || r.reason?.status === 404)
-        );
+        // Determine instance existence from the refreshed list
+        const listInstances: ResourceInstance[] | null =
+          listResult.status === "fulfilled" ? ((listResult.value as any)?.data ?? []) : null;
+        const instanceInList =
+          pollingInstanceId && listInstances !== null
+            ? listInstances.find((i: ResourceInstance) => i.id === pollingInstanceId)
+            : undefined;
 
-        if (has404) {
+        // Instance no longer in the list → deletion/offboard complete (equivalent to 404)
+        const instanceGone = listInstances !== null && Boolean(pollingInstanceId) && !instanceInList;
+
+        // Account config 404 → offboarding completed
+        const has404 =
+          accountConfigResult.status === "rejected" &&
+          (accountConfigResult.reason?.response?.status === 404 || accountConfigResult.reason?.status === 404);
+
+        if (instanceGone || has404) {
           window.clearInterval(pollingInterval);
           stopPolling();
           setIsOverlayOpen(false);
           setSelectedRows([]);
-          await refetchInstances();
+          // Instances list was already refreshed by refetchInstances() above
           return;
         }
 
         // Any other error — stop polling, keep dialog open
-        const hasError = results.some((r) => r.status === "rejected");
+        const hasError = listResult.status === "rejected" || accountConfigResult.status === "rejected";
         if (hasError) {
           window.clearInterval(pollingInterval);
           stopPolling();
@@ -747,9 +762,8 @@ const CloudAccountsPage = () => {
         }
 
         // Update polled data from successful responses
-        const [instanceResult, accountConfigResult] = results;
-        if (instanceResult.status === "fulfilled" && instanceResult.value) {
-          setPolledInstanceStatus(instanceResult.value.status);
+        if (instanceInList) {
+          setPolledInstanceStatus(instanceInList.status);
         }
         if (accountConfigResult.status === "fulfilled" && accountConfigResult.value) {
           setPolledAccountConfig(accountConfigResult.value);
@@ -940,8 +954,8 @@ const CloudAccountsPage = () => {
           if (!selectedResource) return snackbar.showError("Resource not found");
           await deleteCloudAccountInstanceMutation.mutateAsync();
           // Do NOT clear selectedRows here — polling needs selectedInstance to stay defined
-          // so fetchInstanceDetails can detect the 404 when offboarding completes.
-          // setSelectedRows([]) is called by the polling 404 handler and the onClose handler.
+          // so the list-check in the polling loop can detect when the instance has been removed.
+          // setSelectedRows([]) is called by the polling completion handler and the onClose handler.
         }}
         instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
