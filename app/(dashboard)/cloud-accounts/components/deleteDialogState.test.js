@@ -194,8 +194,8 @@ test("6) failure path stops spinner and supports retry behavior for non-last ins
   assert.equal(failedLastInstanceState.isLoading, false);
 });
 
-test("7) offboard step polling starts when offboard is explicitly requested", () => {
-  // DELETING + READY_TO_OFFBOARD + offboard requested -> should poll (step 2 in progress)
+test("7) offboard step (step 2) never requires polling — dialog closes synchronously on success", () => {
+  // DELETING + READY_TO_OFFBOARD: offboard is the next action, not a poll trigger
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
@@ -203,12 +203,11 @@ test("7) offboard step polling starts when offboard is explicitly requested", ()
       accountConfigStatus: "READY_TO_OFFBOARD",
       isMultiStepDialog: true,
       hasRequestedDeletion: false,
-      hasRequestedOffboard: true,
     }),
-    true
+    false
   );
 
-  // FAILED + READY_TO_OFFBOARD + offboard requested -> should poll
+  // FAILED + READY_TO_OFFBOARD: same — no polling for offboard step
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
@@ -216,25 +215,11 @@ test("7) offboard step polling starts when offboard is explicitly requested", ()
       accountConfigStatus: "READY_TO_OFFBOARD",
       isMultiStepDialog: true,
       hasRequestedDeletion: false,
-      hasRequestedOffboard: true,
-    }),
-    true
-  );
-
-  // DELETING + READY_TO_OFFBOARD + offboard NOT requested -> should NOT poll
-  assert.equal(
-    shouldPollInstanceStatus({
-      open: true,
-      instanceStatus: "DELETING",
-      accountConfigStatus: "READY_TO_OFFBOARD",
-      isMultiStepDialog: true,
-      hasRequestedDeletion: false,
-      hasRequestedOffboard: false,
     }),
     false
   );
 
-  // hasRequestedDeletion alone with READY_TO_OFFBOARD -> should NOT poll (offboard not yet requested)
+  // hasRequestedDeletion with READY_TO_OFFBOARD -> should NOT poll (offboard step reached)
   assert.equal(
     shouldPollInstanceStatus({
       open: true,
@@ -242,12 +227,11 @@ test("7) offboard step polling starts when offboard is explicitly requested", ()
       accountConfigStatus: "READY_TO_OFFBOARD",
       isMultiStepDialog: true,
       hasRequestedDeletion: true,
-      hasRequestedOffboard: false,
     }),
     false
   );
 
-  // Dialog closed -> should NOT poll even with offboard requested
+  // Dialog closed -> should NOT poll
   assert.equal(
     shouldPollInstanceStatus({
       open: false,
@@ -255,7 +239,6 @@ test("7) offboard step polling starts when offboard is explicitly requested", ()
       accountConfigStatus: "READY_TO_OFFBOARD",
       isMultiStepDialog: true,
       hasRequestedDeletion: false,
-      hasRequestedOffboard: true,
     }),
     false
   );

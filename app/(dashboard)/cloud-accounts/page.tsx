@@ -89,7 +89,6 @@ const CloudAccountsPage = () => {
   const [isAccountCreation, setIsAccountCreation] = useState(false);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance>();
   const [hasRequestedDeleteForPolling, setHasRequestedDeleteForPolling] = useState(false);
-  const [hasRequestedOffboardForPolling, setHasRequestedOffboardForPolling] = useState(false);
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
     const result_params: any = clickedInstance?.result_params;
@@ -602,9 +601,11 @@ const CloudAccountsPage = () => {
       } else {
         const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
         if (isOffboardReady) {
-          // Offboard action was triggered from step 2 — start polling to track completion.
-          // Do NOT close the dialog here; the polling 404 handler will close it automatically.
-          setHasRequestedOffboardForPolling(true);
+          // Offboard step 2 completed — close dialog immediately and refresh the list.
+          // The offboard API call is the final action; no polling is needed.
+          setIsOverlayOpen(false);
+          setSelectedRows([]);
+          await refetchInstances();
         } else {
           // Instance is transitioning to DELETING — start polling to track progress
           // and keep the dialog in loading state until offboard is ready.
@@ -648,7 +649,6 @@ const CloudAccountsPage = () => {
     accountConfigStatus: deleteDialogAccountConfig?.status,
     isMultiStepDialog,
     hasRequestedDeletion: hasRequestedDeleteForPolling,
-    hasRequestedOffboard: hasRequestedOffboardForPolling,
   });
 
   // Hook provides the account config fetch function (with global error suppressed) used during polling.
@@ -676,11 +676,8 @@ const CloudAccountsPage = () => {
       if (hasRequestedDeleteForPolling) {
         setHasRequestedDeleteForPolling(false);
       }
-      if (hasRequestedOffboardForPolling) {
-        setHasRequestedOffboardForPolling(false);
-      }
     }
-  }, [showDeleteDialog, hasRequestedDeleteForPolling, hasRequestedOffboardForPolling]);
+  }, [showDeleteDialog, hasRequestedDeleteForPolling]);
 
   // Reset the step-1 deletion polling flag when the dialog naturally transitions to the
   // offboard step (offboard-ready condition met), so the spinner doesn't persist on step 2.
@@ -705,7 +702,6 @@ const CloudAccountsPage = () => {
 
     const stopPolling = () => {
       setHasRequestedDeleteForPolling(false);
-      setHasRequestedOffboardForPolling(false);
     };
 
     // Capture the instance ID at poll-start time (stable for the polling lifetime).
@@ -927,7 +923,6 @@ const CloudAccountsPage = () => {
         open={isOverlayOpen && overlayType === "delete-dialog"}
         onClose={async () => {
           setHasRequestedDeleteForPolling(false);
-          setHasRequestedOffboardForPolling(false);
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
@@ -941,7 +936,7 @@ const CloudAccountsPage = () => {
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={deleteDialogAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
-        isPollingActive={hasRequestedDeleteForPolling || hasRequestedOffboardForPolling}
+        isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
@@ -953,9 +948,7 @@ const CloudAccountsPage = () => {
             return snackbar.showError("Offboarding is in progress");
           if (!selectedResource) return snackbar.showError("Resource not found");
           await deleteCloudAccountInstanceMutation.mutateAsync();
-          // Do NOT clear selectedRows here — polling needs selectedInstance to stay defined
-          // so the list-check in the polling loop can detect when the instance has been removed.
-          // setSelectedRows([]) is called by the polling completion handler and the onClose handler.
+          // onSuccess closes the dialog and refetches — no extra cleanup needed here.
         }}
         instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
