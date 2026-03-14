@@ -103,6 +103,7 @@ type DeleteAccountConfigConfirmationDialogProps = {
 
   instanceStatus: string | undefined;
   isLoadingAccountConfig: boolean;
+  isPollingActive?: boolean;
   open: boolean;
   onClose: () => void;
   isDeleteInstanceMutationPending: boolean;
@@ -120,6 +121,8 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     // isDeletingAccountConfig,
     accountConfig,
     instanceStatus,
+    isLoadingAccountConfig,
+    isPollingActive = false,
     offboardingInstructionDetails,
     onClose,
     onInstanceDeleteClick,
@@ -177,15 +180,18 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   useEffect(() => {
     // If delete API has already returned but status hasn't moved to DELETING yet,
     // stop forcing the loading state so user can retry instead of getting stuck.
+    // Do not clear while polling is active — the spinner must stay on until the
+    // first poll result arrives (which updates instanceStatus to DELETING).
     if (
       hasRequestedDeletion &&
       !isDeleteInstanceMutationPending &&
+      !isPollingActive &&
       instanceStatus !== "DELETING" &&
       step !== "offboard"
     ) {
       setHasRequestedDeletion(false);
     }
-  }, [hasRequestedDeletion, isDeleteInstanceMutationPending, instanceStatus, step]);
+  }, [hasRequestedDeletion, isDeleteInstanceMutationPending, isPollingActive, instanceStatus, step]);
 
   //reset hasRequestedDeletion state to false when instanceId changes
   useEffect(() => {
@@ -197,7 +203,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading = deleteDialogState.isLoading;
+  const isLoading = deleteDialogState.isLoading || (step === "offboard" && isLoadingAccountConfig);
 
   const formData = useFormik({
     initialValues: {

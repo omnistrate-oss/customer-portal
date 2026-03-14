@@ -899,6 +899,7 @@ const CloudAccountsPage = () => {
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={deleteDialogAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
+        isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");
