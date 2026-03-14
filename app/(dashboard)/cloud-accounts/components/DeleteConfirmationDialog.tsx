@@ -203,7 +203,9 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading = deleteDialogState.isLoading || (step === "offboard" && isLoadingAccountConfig);
+  const isLoading =
+    deleteDialogState.isLoading ||
+    (step === "offboard" && (isLoadingAccountConfig || isPollingActive));
 
   const formData = useFormik({
     initialValues: {
@@ -227,7 +229,8 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
         if (values.confirmationText === "offboard") {
           await onOffboardClick();
           formData.resetForm();
-          handleClose();
+          // Don't call handleClose() here — polling (hasRequestedOffboard) keeps the dialog
+          // open in loading state and closes it automatically when offboarding completes (404).
         } else {
           snackbar.showError(`Please enter offboard to confirm`);
         }

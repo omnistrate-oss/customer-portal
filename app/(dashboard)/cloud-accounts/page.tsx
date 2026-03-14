@@ -89,6 +89,7 @@ const CloudAccountsPage = () => {
   const [isAccountCreation, setIsAccountCreation] = useState(false);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance>();
   const [hasRequestedDeleteForPolling, setHasRequestedDeleteForPolling] = useState(false);
+  const [hasRequestedOffboardForPolling, setHasRequestedOffboardForPolling] = useState(false);
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
     const result_params: any = clickedInstance?.result_params;
@@ -601,9 +602,8 @@ const CloudAccountsPage = () => {
       } else {
         const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
         if (isOffboardReady) {
-          setTimeout(async () => {
-            await refetchInstances();
-          }, 1700);
+          // Offboard action was triggered from step 2 — start polling to track completion.
+          setHasRequestedOffboardForPolling(true);
         } else {
           // Instance is transitioning to DELETING — start polling to track progress
           // and keep the dialog in loading state until offboard is ready.
@@ -647,6 +647,7 @@ const CloudAccountsPage = () => {
     accountConfigStatus: deleteDialogAccountConfig?.status,
     isMultiStepDialog,
     hasRequestedDeletion: hasRequestedDeleteForPolling,
+    hasRequestedOffboard: hasRequestedOffboardForPolling,
   });
 
   // Hook provides fetch functions for instance describe + account config (with global error suppressed)
@@ -674,8 +675,11 @@ const CloudAccountsPage = () => {
       if (hasRequestedDeleteForPolling) {
         setHasRequestedDeleteForPolling(false);
       }
+      if (hasRequestedOffboardForPolling) {
+        setHasRequestedOffboardForPolling(false);
+      }
     }
-  }, [showDeleteDialog, hasRequestedDeleteForPolling]);
+  }, [showDeleteDialog, hasRequestedDeleteForPolling, hasRequestedOffboardForPolling]);
 
   // Polling: fetch instance describe + account config to track deletion progress.
   // Only runs for 2-step dialogs after deletion has been requested.
@@ -687,27 +691,34 @@ const CloudAccountsPage = () => {
 
     pollCountRef.current = 0;
 
+    const stopPolling = () => {
+      setHasRequestedDeleteForPolling(false);
+      setHasRequestedOffboardForPolling(false);
+    };
+
     const pollingInterval = window.setInterval(async () => {
       pollCountRef.current += 1;
 
       if (pollCountRef.current >= MAX_POLL_COUNT) {
         window.clearInterval(pollingInterval);
-        setHasRequestedDeleteForPolling(false);
+        stopPolling();
         return;
       }
 
       try {
         const results = await Promise.allSettled([fetchInstanceDetails(), fetchAccountConfig()]);
 
-        // Check for 404 — instance or account config deleted
+        // Check for 404 — instance or account config deleted (deletion/offboard complete)
         const has404 = results.some(
           (r) => r.status === "rejected" && (r.reason?.response?.status === 404 || r.reason?.status === 404)
         );
 
         if (has404) {
           window.clearInterval(pollingInterval);
-          setHasRequestedDeleteForPolling(false);
+          stopPolling();
           setIsOverlayOpen(false);
+          setSelectedRows([]);
+          await refetchInstances();
           return;
         }
 
@@ -715,7 +726,7 @@ const CloudAccountsPage = () => {
         const hasError = results.some((r) => r.status === "rejected");
         if (hasError) {
           window.clearInterval(pollingInterval);
-          setHasRequestedDeleteForPolling(false);
+          stopPolling();
           return;
         }
 
@@ -729,7 +740,7 @@ const CloudAccountsPage = () => {
         }
       } catch {
         window.clearInterval(pollingInterval);
-        setHasRequestedDeleteForPolling(false);
+        stopPolling();
       }
     }, INSTANCE_STATUS_POLL_INTERVAL_MS);
 
@@ -886,6 +897,7 @@ const CloudAccountsPage = () => {
         open={isOverlayOpen && overlayType === "delete-dialog"}
         onClose={async () => {
           setHasRequestedDeleteForPolling(false);
+          setHasRequestedOffboardForPolling(false);
           setIsOverlayOpen(false);
           setSelectedRows([]);
           setClickedInstance(undefined);
@@ -899,7 +911,7 @@ const CloudAccountsPage = () => {
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
         accountConfig={deleteDialogAccountConfig}
         isLoadingAccountConfig={isFetchingAccountConfigs}
-        isPollingActive={hasRequestedDeleteForPolling}
+        isPollingActive={hasRequestedDeleteForPolling || hasRequestedOffboardForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
           if (!selectedResource) return snackbar.showError("Resource not found");

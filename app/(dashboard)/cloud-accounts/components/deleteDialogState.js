@@ -7,13 +7,19 @@ export const shouldPollInstanceStatus = ({
   accountConfigStatus,
   isMultiStepDialog,
   hasRequestedDeletion,
+  hasRequestedOffboard,
 }) => {
   // Offboard is ready when account config is READY_TO_OFFBOARD or instance has FAILED
   const isOffboardReady = accountConfigStatus === "READY_TO_OFFBOARD" || instanceStatus === "FAILED";
 
-  return Boolean(
-    open && isMultiStepDialog && (hasRequestedDeletion || instanceStatus === "DELETING") && !isOffboardReady
-  );
+  // Poll during step 1: waiting for instance to transition to DELETING / READY_TO_OFFBOARD
+  const isWaitingForOffboardTransition =
+    (hasRequestedDeletion || instanceStatus === "DELETING") && !isOffboardReady;
+
+  // Poll during step 2: offboard was explicitly requested, track until completion (404)
+  const isWaitingForOffboardCompletion = hasRequestedOffboard && isOffboardReady;
+
+  return Boolean(open && isMultiStepDialog && (isWaitingForOffboardTransition || isWaitingForOffboardCompletion));
 };
 
 export const shouldResetDeleteMutationOnClose = (isMutationPending) => {
