@@ -2,6 +2,7 @@ import { $api } from "src/api/query";
 
 type QueryOptions = {
   accountConfigId: string;
+  [key: string]: any;
 };
 
 const useAccountConfig = (queryOptions: QueryOptions) => {

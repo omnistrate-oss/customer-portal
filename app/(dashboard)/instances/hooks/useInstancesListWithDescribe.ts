@@ -72,7 +72,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
         );
 
         if (!serviceOffering) {
-          return [];
+          return null;
         }
 
         try {
@@ -80,7 +80,16 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
           if (instance.subscriptionId) {
             queryParams.subscriptionId = instance.subscriptionId;
           }
-          const resourceKey = mainResource?.urlKey ? mainResource.urlKey : "omnistrateCloudAccountConfig";
+          let resourceKey: string | null = null;
+          if (mainResource?.urlKey) {
+            resourceKey = mainResource.urlKey;
+          } else if (isCloudAccountInstance(instance)) {
+            resourceKey = "omnistrateCloudAccountConfig";
+          }
+          // If we don't have a valid resource key, skip the describe call for this instance.
+          if (!resourceKey) {
+            return null;
+          }
 
           const describeResponse = await axios.get(
             `/resource-instance/${serviceOffering?.serviceProviderId}/${serviceOffering?.serviceURLKey}/${serviceOffering?.serviceAPIVersion}/${serviceOffering?.serviceEnvironmentURLKey}/${serviceOffering?.serviceModelURLKey}/${serviceOffering?.productTierURLKey}/${resourceKey}/${instance.id}`,
