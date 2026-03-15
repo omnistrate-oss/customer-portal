@@ -43,6 +43,7 @@ import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
+import useInstancesDescribe from "../instances/hooks/useInstancesDescribe";
 import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWithDescribe";
 
 import CloudAccountForm from "./components/CloudAccountForm";
@@ -56,7 +57,7 @@ import {
 } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import { DIALOG_DATA } from "./constants";
-import useDeleteDialogPolling from "./hooks/useDeleteDialogPolling";
+import useAccountConfig from "./hooks/useAccountConfig";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -654,21 +655,38 @@ const CloudAccountsPage = () => {
     hasRequestedDeletion: hasRequestedDeleteForPolling,
   });
 
-  // Hook provides the account config fetch function (with global error suppressed) used during polling.
-  const { fetchAccountConfig } = useDeleteDialogPolling(
-    {
-      serviceProviderId: selectedInstanceOffering?.serviceProviderId,
-      serviceURLKey: selectedInstanceOffering?.serviceURLKey,
-      serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion,
-      serviceEnvironmentURLKey: selectedInstanceOffering?.serviceEnvironmentURLKey,
-      serviceModelURLKey: selectedInstanceOffering?.serviceModelURLKey,
-      productTierURLKey: selectedInstanceOffering?.productTierURLKey,
-      resourceUrlKey: selectedResource?.urlKey,
-      instanceId: selectedInstance?.id,
-      subscriptionId: selectedInstance?.subscriptionId,
-    },
-    selectedAccountConfigId
-  );
+  // Instance describe query — disabled by default, refetched manually during polling.
+  const describeQuery = useInstancesDescribe({
+    serviceProviderId: selectedInstanceOffering?.serviceProviderId ?? "",
+    serviceKey: selectedInstanceOffering?.serviceURLKey ?? "",
+    serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion ?? "",
+    serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey ?? "",
+    serviceModelKey: selectedInstanceOffering?.serviceModelURLKey ?? "",
+    productTierKey: selectedInstanceOffering?.productTierURLKey ?? "",
+    resourceKey: selectedResource?.urlKey ?? "",
+    id: selectedInstance?.id ?? "",
+    subscriptionId: selectedInstance?.subscriptionId,
+    ignoreGlobalError: true,
+    enabled: Boolean(showDeleteDialog && selectedInstance?.id),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: false,
+  });
+
+  // Derive account config ID from describe query data (polled) or fall back to selected instance
+  const describeResultParams = (describeQuery.data as any)?.result_params;
+  const polledAccountConfigId = describeResultParams?.cloud_provider_account_config_id as string | undefined;
+
+  // Account config query — disabled by default, refetched manually during polling.
+  const accountConfigQuery = useAccountConfig({
+    accountConfigId: polledAccountConfigId ?? selectedAccountConfigId ?? "",
+    enabled: Boolean(showDeleteDialog && (polledAccountConfigId || selectedAccountConfigId)),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: false,
+  });
 
   // Reset polled state when dialog opens/closes
   useEffect(() => {
@@ -707,9 +725,6 @@ const CloudAccountsPage = () => {
       setHasRequestedDeleteForPolling(false);
     };
 
-    // Capture the instance ID at poll-start time (stable for the polling lifetime).
-    const pollingInstanceId = selectedInstance?.id;
-
     const pollingInterval = window.setInterval(async () => {
       pollCountRef.current += 1;
 
@@ -720,49 +735,50 @@ const CloudAccountsPage = () => {
       }
 
       try {
-        // Use the instances list to detect deletion instead of a direct describe call.
-        // This avoids spurious 404 errors from instance describe during deletion tracking.
-        const [listResult, accountConfigResult] = await Promise.allSettled([refetchInstances(), fetchAccountConfig()]);
+        const [instanceResult, accountConfigResult] = await Promise.allSettled([
+          describeQuery.refetch(),
+          accountConfigQuery.refetch(),
+        ]);
 
-        // Determine instance existence from the refreshed list
-        const listInstances: ResourceInstance[] | null =
-          listResult.status === "fulfilled" ? ((listResult.value as any)?.data ?? []) : null;
-        const instanceInList =
-          pollingInstanceId && listInstances !== null
-            ? listInstances.find((i: ResourceInstance) => i.id === pollingInstanceId)
-            : undefined;
-
-        // Instance no longer in the list → deletion/offboard complete (equivalent to 404)
-        const instanceGone = listInstances !== null && Boolean(pollingInstanceId) && !instanceInList;
+        // Instance describe returned 404 → instance deleted
+        const instanceError =
+          instanceResult.status === "fulfilled" ? instanceResult.value.error : instanceResult.reason;
+        const instanceGone = instanceError?.response?.status === 404 || instanceError?.status === 404;
 
         // Account config 404 → offboarding completed
-        const has404 =
-          accountConfigResult.status === "rejected" &&
-          (accountConfigResult.reason?.response?.status === 404 || accountConfigResult.reason?.status === 404);
+        const accountConfigError =
+          accountConfigResult.status === "fulfilled" ? accountConfigResult.value.error : accountConfigResult.reason;
+        const accountConfigGone = accountConfigError?.response?.status === 404 || accountConfigError?.status === 404;
 
-        if (instanceGone || has404) {
+        if (instanceGone || accountConfigGone) {
           window.clearInterval(pollingInterval);
           stopPolling();
           setIsOverlayOpen(false);
           setSelectedRows([]);
-          // Instances list was already refreshed by refetchInstances() above
+          await refetchInstances();
           return;
         }
 
         // Any other error — stop polling, keep dialog open
-        const hasError = listResult.status === "rejected" || accountConfigResult.status === "rejected";
-        if (hasError) {
+        const hasInstanceError =
+          instanceResult.status === "rejected" ||
+          (instanceResult.status === "fulfilled" && instanceResult.value.isError);
+        const hasAccountConfigError =
+          accountConfigResult.status === "rejected" ||
+          (accountConfigResult.status === "fulfilled" && accountConfigResult.value.isError);
+        if (hasInstanceError || hasAccountConfigError) {
           window.clearInterval(pollingInterval);
           stopPolling();
           return;
         }
 
         // Update polled data from successful responses
-        if (instanceInList) {
-          setPolledInstanceStatus(instanceInList.status);
+        if (instanceResult.status === "fulfilled" && instanceResult.value.data) {
+          const instanceData = instanceResult.value.data as ResourceInstance;
+          setPolledInstanceStatus(instanceData.status);
         }
-        if (accountConfigResult.status === "fulfilled" && accountConfigResult.value) {
-          setPolledAccountConfig(accountConfigResult.value);
+        if (accountConfigResult.status === "fulfilled" && accountConfigResult.value.data) {
+          setPolledAccountConfig(accountConfigResult.value.data as AccountConfig);
         }
       } catch {
         window.clearInterval(pollingInterval);
