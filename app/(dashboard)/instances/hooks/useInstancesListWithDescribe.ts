@@ -5,8 +5,9 @@ import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-import axios from "../../../../src/axios";
-import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
+import axios from "src/axios";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
+
 type QueryOptions = {
   onlyInstances?: boolean;
   onlyCloudAccounts?: boolean;
