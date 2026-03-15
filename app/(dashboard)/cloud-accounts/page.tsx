@@ -754,8 +754,7 @@ const CloudAccountsPage = () => {
         // Check for 404 (resource gone) — statusCode is injected by the API client middleware
         const instanceError =
           instanceResult.status === "fulfilled" ? instanceResult.value.error : instanceResult.reason;
-        const accountConfigError =
-          accountConfigResult.status === "fulfilled" ? accountConfigResult.value.error : accountConfigResult.reason;
+
         const instanceGone = hasInstanceError && instanceError?.statusCode === 404;
 
         // Instance  deleted (404) — stop polling, refresh list, close dialog
