@@ -578,6 +578,11 @@ const CloudAccountsPage = () => {
     );
   }, [selectedInstanceOffering?.resourceParameters]);
 
+  // Local state for polled data used only by the delete dialog
+  const [polledInstanceStatus, setPolledInstanceStatus] = useState<string | undefined>();
+  const [polledAccountConfig, setPolledAccountConfig] = useState<AccountConfig | undefined>();
+  const pollCountRef = useRef(0);
+
   const deleteCloudAccountInstanceMutation = useMutation({
     mutationFn: () => {
       const requestPayload = {
@@ -603,8 +608,13 @@ const CloudAccountsPage = () => {
         await refetchInstances();
         // refetchAccountConfigs();
       } else {
-        const isOffboardReady = getOffboardReadiness(selectedInstance?.status, selectedAccountConfig?.status);
-        if (isOffboardReady || selectedInstance?.status === "FAILED") {
+        // Use polled data (if available) for offboard readiness check — selectedAccountConfig
+        // may be stale (e.g. already deleted by the offboard API call before onSuccess runs).
+        const currentInstanceStatus = polledInstanceStatus ?? selectedInstance?.status;
+        const currentAccountConfigStatus = polledAccountConfig?.status ?? selectedAccountConfig?.status;
+        const isOffboardReady = getOffboardReadiness(currentInstanceStatus, currentAccountConfigStatus);
+
+        if (isOffboardReady || currentInstanceStatus === "FAILED") {
           // Offboard step 2 completed — close dialog immediately and refresh the list.
           // The offboard API call is the final action; no polling is needed.
           setIsOverlayOpen(false);
@@ -632,11 +642,6 @@ const CloudAccountsPage = () => {
     const resultParams = selectedInstance?.result_params as Record<string, any> | undefined;
     return resultParams?.cloud_provider_account_config_id;
   }, [selectedInstance]);
-
-  // Local state for polled data used only by the delete dialog
-  const [polledInstanceStatus, setPolledInstanceStatus] = useState<string | undefined>();
-  const [polledAccountConfig, setPolledAccountConfig] = useState<AccountConfig | undefined>();
-  const pollCountRef = useRef(0);
 
   // Use polled data when available, otherwise fall back to the original data.
   // These merged values drive both the dialog display and the polling stop condition.
