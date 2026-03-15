@@ -94,8 +94,8 @@ const CloudAccountForm = ({
           resource.resourceId.startsWith("r-injectedaccountconfig")
         );
 
-        // Wait 5 seconds before fetching instance details to allow backend processing
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        // Wait 3 seconds before fetching instance details to allow backend processing
+        await new Promise((resolve) => setTimeout(resolve, 3000));
 
         const resourceInstanceResponse = await getResourceInstanceDetails(
           offering?.serviceProviderId,
