@@ -740,22 +740,26 @@ const CloudAccountsPage = () => {
       }
 
       try {
-        const [instanceResult, accountConfigResult] = await Promise.allSettled([
-          describeQuery.refetch(),
-          accountConfigQuery.refetch(),
-        ]);
+        const [instanceResult] = await Promise.allSettled([describeQuery.refetch()]);
+        const [accountConfigResult] = await Promise.allSettled([accountConfigQuery.refetch()]);
 
-        // Instance describe returned 404 → instance deleted
+        // Detect errors from refetch results
+        const hasInstanceError =
+          instanceResult.status === "rejected" ||
+          (instanceResult.status === "fulfilled" && instanceResult.value.isError);
+        const hasAccountConfigError =
+          accountConfigResult.status === "rejected" ||
+          (accountConfigResult.status === "fulfilled" && accountConfigResult.value.isError);
+
+        // Check for 404 (resource gone) — statusCode is injected by the API client middleware
         const instanceError =
           instanceResult.status === "fulfilled" ? instanceResult.value.error : instanceResult.reason;
-        const instanceGone = instanceError?.response?.status === 404 || instanceError?.status === 404;
-
-        // Account config 404 → offboarding completed
         const accountConfigError =
           accountConfigResult.status === "fulfilled" ? accountConfigResult.value.error : accountConfigResult.reason;
-        const accountConfigGone = accountConfigError?.response?.status === 404 || accountConfigError?.status === 404;
+        const instanceGone = hasInstanceError && instanceError?.statusCode === 404;
 
-        if (instanceGone || accountConfigGone) {
+        // Instance  deleted (404) — stop polling, refresh list, close dialog
+        if (instanceGone) {
           window.clearInterval(pollingInterval);
           stopPolling();
           setIsOverlayOpen(false);
@@ -764,13 +768,7 @@ const CloudAccountsPage = () => {
           return;
         }
 
-        // Any other error — stop polling, keep dialog open
-        const hasInstanceError =
-          instanceResult.status === "rejected" ||
-          (instanceResult.status === "fulfilled" && instanceResult.value.isError);
-        const hasAccountConfigError =
-          accountConfigResult.status === "rejected" ||
-          (accountConfigResult.status === "fulfilled" && accountConfigResult.value.isError);
+        // Non-404 errors — stop polling, keep dialog open
         if (hasInstanceError || hasAccountConfigError) {
           window.clearInterval(pollingInterval);
           stopPolling();
@@ -788,6 +786,8 @@ const CloudAccountsPage = () => {
       } catch {
         window.clearInterval(pollingInterval);
         stopPolling();
+        setIsOverlayOpen(false);
+        setSelectedRows([]);
       }
     }, INSTANCE_STATUS_POLL_INTERVAL_MS);
 

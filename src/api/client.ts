@@ -171,7 +171,9 @@ apiClient.use({
     const text = await clonedResponse.text();
     if (text.trim() === "") {
       console.warn("Received empty response for:", request.url);
-      return new Response("{}", {
+      // For non-OK responses, inject statusCode so consumers can detect specific HTTP errors (e.g. 404)
+      const body = !response.ok ? JSON.stringify({ statusCode: response.status }) : "{}";
+      return new Response(body, {
         status: response.status,
         statusText: response.statusText,
         headers: {
@@ -184,7 +186,11 @@ apiClient.use({
     // Handle non-JSON responses
     if (!response.headers.get("Content-Type")?.includes("application/json")) {
       console.warn("Non-JSON response received:", text);
-      return new Response(JSON.stringify({ data: text }), {
+      const body: Record<string, any> = { data: text };
+      if (!response.ok) {
+        body.statusCode = response.status;
+      }
+      return new Response(JSON.stringify(body), {
         status: response.status,
         statusText: response.statusText,
         headers: {
@@ -192,6 +198,27 @@ apiClient.use({
           "Content-Type": "application/json",
         },
       });
+    }
+
+    // For non-OK JSON responses, inject the HTTP status code into the body
+    // so that error consumers (like openapi-react-query) can detect specific HTTP statuses (e.g. 404)
+    if (!response.ok) {
+      try {
+        const errorBody = JSON.parse(text);
+        if (typeof errorBody === "object" && errorBody !== null) {
+          errorBody.statusCode = response.status;
+          return new Response(JSON.stringify(errorBody), {
+            status: response.status,
+            statusText: response.statusText,
+            headers: {
+              ...Object.fromEntries(response.headers.entries()),
+              "Content-Type": "application/json",
+            },
+          });
+        }
+      } catch {
+        // If JSON parsing fails, return original response
+      }
     }
 
     return response;
