@@ -10,6 +10,7 @@ type QueryOptions = {
   resourceKey: string;
   id: string;
   ignoreGlobalError?: boolean;
+  subscriptionId?: string;
   [key: string]: any;
 };
 
