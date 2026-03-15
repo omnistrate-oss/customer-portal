@@ -11,6 +11,11 @@ export function setGlobalErrorHandler(handler: ((error: Error) => void) | null) 
   globalErrorHandler = handler;
 }
 
+interface NonJsonResponseBody {
+  data: string;
+  statusCode?: number;
+}
+
 export const apiClient = createFetchClient<paths>();
 
 apiClient.use({
@@ -186,7 +191,7 @@ apiClient.use({
     // Handle non-JSON responses
     if (!response.headers.get("Content-Type")?.includes("application/json")) {
       console.warn("Non-JSON response received:", text);
-      const body: Record<string, any> = { data: text };
+      const body: NonJsonResponseBody = { data: text };
       if (!response.ok) {
         body.statusCode = response.status;
       }
