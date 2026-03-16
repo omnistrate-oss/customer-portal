@@ -175,22 +175,6 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  useEffect(() => {
-    // If delete API has already returned but status hasn't moved to DELETING yet,
-    // stop forcing the loading state so user can retry instead of getting stuck.
-    // Do not clear while polling is active — the spinner must stay on until the
-    // first poll result arrives (which updates instanceStatus to DELETING).
-    if (
-      hasRequestedDeletion &&
-      !isDeleteInstanceMutationPending &&
-      !isPollingActive &&
-      instanceStatus !== "DELETING" &&
-      step !== "offboard"
-    ) {
-      setHasRequestedDeletion(false);
-    }
-  }, [hasRequestedDeletion, isDeleteInstanceMutationPending, isPollingActive, instanceStatus, step]);
-
   //reset hasRequestedDeletion state to false when instanceId changes
   useEffect(() => {
     if (instanceId) {
