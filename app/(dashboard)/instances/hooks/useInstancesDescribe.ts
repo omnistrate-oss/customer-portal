@@ -9,6 +9,7 @@ type QueryOptions = {
   productTierKey: string;
   resourceKey: string;
   id: string;
+  ignoreGlobalError?: boolean;
   subscriptionId?: string;
   [key: string]: any;
 };
@@ -24,6 +25,7 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
     resourceKey,
     id,
     subscriptionId,
+    ignoreGlobalError = false,
     ...options
   } = queryOptions;
 
@@ -45,6 +47,9 @@ const useInstancesDescribe = (queryOptions: QueryOptions) => {
         query: {
           subscriptionId,
         },
+      },
+      headers: {
+        "x-ignore-global-error": ignoreGlobalError,
       },
     },
     {

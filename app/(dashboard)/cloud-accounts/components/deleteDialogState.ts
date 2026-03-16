@@ -1,20 +1,22 @@
+import { getOffboardReadiness } from "../utils";
+
 export const INSTANCE_STATUS_POLL_INTERVAL_MS = 10_000;
+export const MAX_POLL_COUNT = 12;
 
 export const shouldPollInstanceStatus = ({
   open,
   instanceStatus,
   accountConfigStatus,
-  hasRefetchInstanceStatus,
+  isMultiStepDialog,
   hasRequestedDeletion,
 }) => {
-  const isWaitingForOffboardTransition = instanceStatus === "DELETING" && accountConfigStatus !== "READY_TO_OFFBOARD";
-  const isWaitingForDeletionToStart =
-    hasRequestedDeletion &&
-    instanceStatus !== "DELETING" &&
-    instanceStatus !== "FAILED" &&
-    accountConfigStatus !== "READY_TO_OFFBOARD";
+  // Offboard is ready when account config is READY_TO_OFFBOARD and instance has FAILED or instance is DELETING. In both cases, we can skip polling and show the offboard step immediately.
 
-  return Boolean(open && hasRefetchInstanceStatus && (isWaitingForOffboardTransition || isWaitingForDeletionToStart));
+  const isOffboardReady = getOffboardReadiness(accountConfigStatus, instanceStatus);
+
+  const isWaitingForOffboardTransition = hasRequestedDeletion && !isOffboardReady;
+
+  return Boolean(open && isMultiStepDialog && isWaitingForOffboardTransition);
 };
 
 export const shouldResetDeleteMutationOnClose = (isMutationPending) => {
