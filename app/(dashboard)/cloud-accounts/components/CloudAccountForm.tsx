@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
@@ -15,7 +15,6 @@ import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -38,9 +37,8 @@ const CloudAccountForm = ({
   setOverlayType,
   setClickedInstance,
   instances,
+  refetchInstances,
 }) => {
-  const queryClient = useQueryClient();
-  const environmentType = useEnvironmentType();
   const snackbar = useSnackbar();
   const selectUser = useSelector(selectUserrootData);
   const {
@@ -111,16 +109,18 @@ const CloudAccountForm = ({
 
         const resourceInstance = resourceInstanceResponse.data;
 
+        const environmentType = offering?.serviceEnvironmentURLKey;
+
         // Sometimes, we don't get the result_params in the response
         // So, we need to update the query data manually
-        queryClient.setQueryData(
+        QueryClient.setQueryData(
           [
             "get",
             "/2022-09-01-00/resource-instance",
             {
               params: {
                 query: {
-                  environmentType,
+                  environmentType: environmentType,
                 },
               },
             },
@@ -163,8 +163,6 @@ const CloudAccountForm = ({
           }
         );
 
-        await queryClient.invalidateQueries({ queryKey: ["resource-instances-describe"] });
-
         setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
@@ -196,6 +194,7 @@ const CloudAccountForm = ({
         });
         setOverlayType("view-instructions-dialog");
         snackbar.showSuccess("Cloud Account created successfully");
+        refetchInstances();
       },
     }
   );

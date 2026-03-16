@@ -922,6 +922,7 @@ const CloudAccountsPage = () => {
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            refetchInstances={refetchInstances}
           />
         }
       />
