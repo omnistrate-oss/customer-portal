@@ -751,14 +751,8 @@ const CloudAccountsPage = () => {
           accountConfigResult.status === "rejected" ||
           (accountConfigResult.status === "fulfilled" && accountConfigResult.value.isError);
 
-        // Check for 404 (resource gone) — statusCode is injected by the API client middleware
-        const instanceError =
-          instanceResult.status === "fulfilled" ? instanceResult.value.error : instanceResult.reason;
-
-        const instanceGone = hasInstanceError && instanceError?.statusCode === 404;
-
-        // Instance  deleted (404) — stop polling, refresh list, close dialog
-        if (instanceGone) {
+        // Non-404 errors — stop polling, keep dialog open
+        if (hasInstanceError) {
           window.clearInterval(pollingInterval);
           stopPolling();
           setIsOverlayOpen(false);
@@ -767,19 +761,12 @@ const CloudAccountsPage = () => {
           return;
         }
 
-        // Non-404 errors — stop polling, keep dialog open
-        if (hasInstanceError || hasAccountConfigError) {
-          window.clearInterval(pollingInterval);
-          stopPolling();
-          return;
-        }
-
         // Update polled data from successful responses
         if (instanceResult.status === "fulfilled" && instanceResult.value.data) {
           const instanceData = instanceResult.value.data as ResourceInstance;
           setPolledInstanceStatus(instanceData.status);
         }
-        if (accountConfigResult.status === "fulfilled" && accountConfigResult.value.data) {
+        if (accountConfigResult.status === "fulfilled" && accountConfigResult.value.data && !hasAccountConfigError) {
           setPolledAccountConfig(accountConfigResult.value.data as AccountConfig);
         }
       } catch {
