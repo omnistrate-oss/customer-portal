@@ -13,7 +13,7 @@ import { FormConfiguration } from "components/DynamicForm/types";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -114,6 +114,31 @@ const CloudAccountForm = ({
         setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
+          result_params: {
+            ...(resourceInstance.result_params || {}),
+            account_configuration_method: values.accountConfigurationMethod,
+            cloud_provider: values.cloudProvider,
+            ...(values.cloudProvider === CLOUD_PROVIDERS.aws
+              ? {
+                  aws_account_id: values.awsAccountId,
+                }
+              : values.cloudProvider === CLOUD_PROVIDERS.gcp
+                ? {
+                    gcp_project_id: values.gcpProjectId,
+                    gcp_project_number: values.gcpProjectNumber,
+                  }
+                : values.cloudProvider === CLOUD_PROVIDERS.azure
+                  ? {
+                      azure_subscription_id: values.azureSubscriptionId,
+                      azure_tenant_id: values.azureTenantId,
+                    }
+                  : values.cloudProvider === CLOUD_PROVIDERS.oci
+                    ? {
+                        oci_tenancy_id: values.ociTenancyId,
+                        oci_domain_id: values.ociDomainId,
+                      }
+                    : {}),
+          },
         });
         setOverlayType("view-instructions-dialog");
         snackbar.showSuccess("Cloud Account created successfully");
