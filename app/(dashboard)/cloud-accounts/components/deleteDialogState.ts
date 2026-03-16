@@ -14,8 +14,6 @@ export const shouldPollInstanceStatus = ({
 
   const isOffboardReady = getOffboardReadiness(accountConfigStatus, instanceStatus);
 
-  // Poll during step 1 only: waiting for instance to transition to DELETING / READY_TO_OFFBOARD.
-  // Step 2 (offboard) is handled synchronously — the API call is the final action, no polling needed.
   const isWaitingForOffboardTransition = hasRequestedDeletion && !isOffboardReady;
 
   return Boolean(open && isMultiStepDialog && isWaitingForOffboardTransition);
