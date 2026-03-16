@@ -175,6 +175,7 @@ apiClient.use({
         status: response.status,
         statusText: response.statusText,
         headers: {
+          ...Object.fromEntries(response.headers.entries()),
           "Content-Type": "application/json",
         },
       });
@@ -192,5 +193,6 @@ apiClient.use({
         },
       });
     }
+    return response;
   },
 });
