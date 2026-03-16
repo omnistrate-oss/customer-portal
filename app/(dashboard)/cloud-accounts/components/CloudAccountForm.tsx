@@ -152,7 +152,8 @@ const CloudAccountForm = ({
 
             return {
               resourceInstances: [
-                ...(oldData?.resourceInstances || []),
+                // Filter out existing entry with same ID to prevent duplicates
+                ...(oldData?.resourceInstances || []).filter((inst: any) => inst.id !== resourceInstance?.id),
                 {
                   ...(resourceInstance || {}),
                   result_params: result_params,
