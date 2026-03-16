@@ -751,7 +751,7 @@ const CloudAccountsPage = () => {
           accountConfigResult.status === "rejected" ||
           (accountConfigResult.status === "fulfilled" && accountConfigResult.value.isError);
 
-        // Non-404 errors — stop polling, keep dialog open
+        //errors — stop polling, keep dialog open
         if (hasInstanceError) {
           window.clearInterval(pollingInterval);
           stopPolling();
