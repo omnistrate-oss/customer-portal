@@ -193,7 +193,6 @@ const CloudAccountForm = ({
         });
         setOverlayType("view-instructions-dialog");
         snackbar.showSuccess("Cloud Account created successfully");
-        // refetchInstances();
       },
     }
   );
