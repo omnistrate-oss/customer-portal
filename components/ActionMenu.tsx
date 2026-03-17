@@ -24,6 +24,10 @@ type ActionMenuProps = {
 };
 
 const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMessage, isLoading, sx }) => {
+  const isEmptyMenu = menuItems.length === 0;
+  const isDisabled = disabled || isEmptyMenu;
+  const tooltipMessage = isEmptyMenu ? "No actions available" : disabledMessage;
+
   const select = (
     <Select
       data-testid="actions-select"
@@ -37,7 +41,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
         );
       }}
       displayEmpty
-      disabled={disabled || isLoading}
+      disabled={isDisabled || isLoading}
       MenuProps={{
         anchorOrigin: { vertical: "bottom", horizontal: "right" },
         transformOrigin: { vertical: "top", horizontal: "right" },
@@ -112,9 +116,9 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ menuItems, disabled, disabledMe
     </Select>
   );
 
-  if (disabled && disabledMessage) {
+  if (isDisabled && tooltipMessage) {
     return (
-      <Tooltip title={disabledMessage}>
+      <Tooltip title={tooltipMessage}>
         <span>{select}</span>
       </Tooltip>
     );
