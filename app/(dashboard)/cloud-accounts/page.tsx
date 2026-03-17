@@ -619,6 +619,7 @@ const CloudAccountsPage = () => {
           // The offboard API call is the final action; no polling is needed.
           setIsOverlayOpen(false);
           setSelectedRows([]);
+          snackbar.showSuccess("Deleting cloud account...");
           await refetchInstances();
         } else {
           // Instance is transitioning to DELETING — start polling to track progress
