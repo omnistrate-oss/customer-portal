@@ -7,7 +7,7 @@ import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
 
-export async function middleware(request) {
+export async function proxy(request) {
   const authToken = request.cookies.get("token");
   const path = request.nextUrl.pathname;
 
