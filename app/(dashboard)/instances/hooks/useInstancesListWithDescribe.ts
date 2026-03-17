@@ -1,12 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { $api } from "src/api/query";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
-import { isCloudAccountInstance } from "src/utils/access/byoaResource";
-
 import axios from "src/axios";
+import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
 type QueryOptions = {
   onlyInstances?: boolean;
@@ -56,6 +55,7 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     enabled: Boolean(
       describeInstances && listQuery.data && !listQuery.isFetching && !listQuery.isPending && serviceOfferings?.length
     ),
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const res = listQuery.data || [];
 
