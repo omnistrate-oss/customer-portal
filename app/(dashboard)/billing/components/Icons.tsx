@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-export const StripeIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+export const StripeIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>

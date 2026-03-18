@@ -1,8 +1,9 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
+import { SVGIconProps } from "src/types/common/generalTypes";
 import { colors } from "src/themeConfig";
 
-const QuestionIcon = (props) => {
+const QuestionIcon: FC<SVGIconProps> = (props) => {
   const { color = "#D0D1D3", disabled, ...restProps } = props;
   const clipPathIdA = useId();
   const clipPathIdB = useId();

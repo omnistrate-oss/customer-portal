@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const AWSLogo = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const AWSLogo: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg width="68" height="40" viewBox="0 0 68 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>

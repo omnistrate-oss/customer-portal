@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const PublicIcon = (props: any) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const PublicIcon: FC<SVGIconProps> = (props) => {
   const filterId = useId();
   const gradientId = useId();
   const clipPathId = useId();
