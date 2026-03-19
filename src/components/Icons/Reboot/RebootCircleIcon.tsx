@@ -1,7 +1,10 @@
+import { useId } from "react";
+
 const RebootCircleIcon = () => {
+  const clipPathId = useId();
   return (
     <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g clipPath="url(#clip0_2163_52115)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M52 28C52 14.7452 41.2548 4 28 4C14.7452 4 4 14.7452 4 28C4 41.2548 14.7452 52 28 52C41.2548 52 52 41.2548 52 28Z"
           fill="#D3F8DF"
@@ -20,7 +23,7 @@ const RebootCircleIcon = () => {
         />
       </g>
       <defs>
-        <clipPath id="clip0_2163_52115">
+        <clipPath id={clipPathId}>
           <rect width="56" height="56" fill="white" />
         </clipPath>
       </defs>

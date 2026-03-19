@@ -1,7 +1,10 @@
+import { useId } from "react";
+
 const StepperSuccessIcon = () => {
+  const clipPathId = useId();
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g clipPath="url(#clip0_229_4972)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
           fill="#F9F5FF"
@@ -18,7 +21,7 @@ const StepperSuccessIcon = () => {
         />
       </g>
       <defs>
-        <clipPath id="clip0_229_4972">
+        <clipPath id={clipPathId}>
           <path
             d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
             fill="white"

@@ -1,9 +1,10 @@
-import { FC } from "react";
+import { FC, useId } from "react";
 
 import { SVGIconProps } from "src/types/common/generalTypes";
 
 const GithubLoginIcon: FC<SVGIconProps> = (props) => {
   const { disabled, width = 24, height = 24, ...restProps } = props;
+  const clipPathId = useId();
   return (
     <svg
       width={width}
@@ -13,7 +14,7 @@ const GithubLoginIcon: FC<SVGIconProps> = (props) => {
       xmlns="http://www.w3.org/2000/svg"
       {...restProps}
     >
-      <g clipPath="url(#clip-github-login)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -22,7 +23,7 @@ const GithubLoginIcon: FC<SVGIconProps> = (props) => {
         />
       </g>
       <defs>
-        <clipPath id="clip-github-login">
+        <clipPath id={clipPathId}>
           <rect width="32" height="31.3469" fill="white" transform="translate(0 0.659393)" />
         </clipPath>
       </defs>

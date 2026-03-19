@@ -1,13 +1,14 @@
-import { FC } from "react";
+import { FC, useId } from "react";
 
 import { SVGIconProps } from "src/types/common/generalTypes";
 
 const ArrowRightCircleBrokenIcon: FC<SVGIconProps> = (props) => {
   const { disabled, color = "#7F56D9", ...restProps } = props;
+  const clipPathId = useId();
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="none" {...restProps}>
-      <g clipPath="url(#a)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           stroke={disabled ? "#a3a6ac" : color}
           strokeLinecap="round"
@@ -17,7 +18,7 @@ const ArrowRightCircleBrokenIcon: FC<SVGIconProps> = (props) => {
         />
       </g>
       <defs>
-        <clipPath id="a">
+        <clipPath id={clipPathId}>
           <path fill="#fff" d="M16 0H0v16h16z" />
         </clipPath>
       </defs>

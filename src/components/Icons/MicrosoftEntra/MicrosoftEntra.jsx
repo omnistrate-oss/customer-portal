@@ -1,8 +1,11 @@
+import { useId } from "react";
+
 function MicrosoftEntraIcon(props) {
   const { width = 24, height = 24 } = props;
+  const clipPathId = useId();
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g clipPath="url(#clip0_8229_30892)">
+      <g clipPath={`url(#${clipPathId})`}>
         <path
           d="M5.06934 18.7094C5.58667 19.0321 6.44667 19.3908 7.356 19.3908C8.184 19.3908 8.95334 19.1508 9.59067 18.7414C9.59067 18.7414 9.592 18.7414 9.59334 18.7401L12 17.2361V22.6668C11.6187 22.6668 11.2347 22.5628 10.9013 22.3548L5.06934 18.7094Z"
           fill="#225086"
@@ -26,7 +29,7 @@ function MicrosoftEntraIcon(props) {
         <path d="M17.8201 13.5987L12.0015 7.03467V17.2347L17.8201 13.5987Z" fill="#96BCC2" />
       </g>
       <defs>
-        <clipPath id="clip0_8229_30892">
+        <clipPath id={clipPathId}>
           <rect width="24" height="24" fill="white" />
         </clipPath>
       </defs>
