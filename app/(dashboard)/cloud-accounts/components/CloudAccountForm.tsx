@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -20,9 +23,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -39,8 +39,8 @@ const CloudAccountForm = ({
   setClickedInstance,
   instances,
 }) => {
-  const environmentType = useEnvironmentType();
   const queryClient = useQueryClient();
+  const environmentType = useEnvironmentType();
   const snackbar = useSnackbar();
   const selectUser = useSelector(selectUserrootData);
   const {
@@ -110,7 +110,6 @@ const CloudAccountForm = ({
         );
 
         const resourceInstance = resourceInstanceResponse.data;
-
         // Sometimes, we don't get the result_params in the response
         // So, we need to update the query data manually
         queryClient.setQueryData(
@@ -153,7 +152,8 @@ const CloudAccountForm = ({
 
             return {
               resourceInstances: [
-                ...(oldData?.resourceInstances || []),
+                // Filter out existing entry with same ID to prevent duplicates
+                ...(oldData?.resourceInstances || []).filter((inst: any) => inst.id !== resourceInstance?.id),
                 {
                   ...(resourceInstance || {}),
                   result_params: result_params,

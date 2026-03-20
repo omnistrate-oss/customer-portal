@@ -1,12 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { $api } from "src/api/query";
+import axios from "src/axios";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 
-import { getResourceInstanceDetails } from "../../../../src/api/resourceInstance";
-import { useGlobalData } from "../../../../src/providers/GlobalDataProvider";
 type QueryOptions = {
   onlyInstances?: boolean;
   onlyCloudAccounts?: boolean;
@@ -51,8 +51,11 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
   );
 
   const describeQuery = useQuery({
-    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt],
-    enabled: Boolean(describeInstances && listQuery.data),
+    queryKey: ["resource-instances-describe", listQuery.dataUpdatedAt, serviceOfferings?.length],
+    enabled: Boolean(
+      describeInstances && listQuery.data && !listQuery.isFetching && !listQuery.isPending && serviceOfferings?.length
+    ),
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const res = listQuery.data || [];
 
@@ -64,29 +67,36 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
           );
         }
 
-        if (!mainResource?.urlKey) {
-          return null;
-        }
-
         const serviceOffering = serviceOfferings?.find((so: any) =>
           so?.resourceParameters?.some((resourceParam: any) => resourceParam?.resourceId === instance?.resourceID)
         );
 
         if (!serviceOffering) {
-          return [];
+          return null;
         }
 
         try {
-          const describeResponse = await getResourceInstanceDetails(
-            serviceOffering?.serviceProviderId as string,
-            serviceOffering?.serviceURLKey as string,
-            serviceOffering?.serviceAPIVersion as string,
-            serviceOffering?.serviceEnvironmentURLKey as string,
-            serviceOffering?.serviceModelURLKey as string,
-            serviceOffering?.productTierURLKey as string,
-            mainResource.urlKey,
-            instance.id,
-            instance.subscriptionId
+          const queryParams: Record<string, string> = {};
+          if (instance.subscriptionId) {
+            queryParams.subscriptionId = instance.subscriptionId;
+          }
+          let resourceKey: string | null = null;
+          if (mainResource?.urlKey) {
+            resourceKey = mainResource.urlKey;
+          } else if (isCloudAccountInstance(instance)) {
+            resourceKey = "omnistrateCloudAccountConfig";
+          }
+          // If we don't have a valid resource key, skip the describe call for this instance.
+          if (!resourceKey) {
+            return null;
+          }
+
+          const describeResponse = await axios.get(
+            `/resource-instance/${serviceOffering?.serviceProviderId}/${serviceOffering?.serviceURLKey}/${serviceOffering?.serviceAPIVersion}/${serviceOffering?.serviceEnvironmentURLKey}/${serviceOffering?.serviceModelURLKey}/${serviceOffering?.productTierURLKey}/${resourceKey}/${instance.id}`,
+            {
+              params: queryParams,
+              ignoreGlobalErrorSnack: true,
+            }
           );
 
           return describeResponse?.data ?? null;
@@ -102,11 +112,15 @@ const useInstancesListWithDescribe = (queryOptions: QueryOptions = {}) => {
     },
   });
 
+  const { refetch: refetchList } = listQuery;
+
   // Memoize refetch to prevent useEffect re-runs in consumers using this as a dependency
+  // Only refetch the list query — the describe query auto-fires because its
+  // queryKey includes listQuery.dataUpdatedAt, so an explicit describeQuery.refetch()
+  // would cause a redundant second describe fetch.
   const refetch = useCallback(async () => {
-    await listQuery.refetch();
-    return describeQuery.refetch();
-  }, [listQuery.refetch, describeQuery.refetch]);
+    return refetchList();
+  }, [refetchList]);
 
   if (describeInstances) {
     return {

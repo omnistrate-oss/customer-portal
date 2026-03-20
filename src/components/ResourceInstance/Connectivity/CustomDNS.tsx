@@ -1,7 +1,7 @@
-import { FC, useEffect, useRef, useState } from "react";
 import { Box, Stack, SxProps, Theme } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { FC, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import {
@@ -35,7 +35,6 @@ type EndpointProps = {
   containerStyles?: SxProps<Theme>;
   resourceKey: string;
   resourceId: string;
-  resourceHasCompute: boolean;
   customDNSData?: {
     enabled: boolean;
     dnsName?: string;
@@ -65,7 +64,6 @@ const CustomDNS: FC<EndpointProps> = (props) => {
     resourceKey,
     resourceId,
     refetchInstance,
-    resourceHasCompute,
   } = props;
 
   const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = useState(false);
@@ -205,7 +203,7 @@ const CustomDNS: FC<EndpointProps> = (props) => {
 
   return (
     <>
-      {resourceHasCompute && customDNSData?.enabled && (
+      {customDNSData?.enabled && (
         <Card
           sx={{
             p: 0,

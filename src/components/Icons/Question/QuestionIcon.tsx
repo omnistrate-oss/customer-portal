@@ -1,7 +1,7 @@
 import { FC, useId } from "react";
 
-import { SVGIconProps } from "src/types/common/generalTypes";
 import { colors } from "src/themeConfig";
+import { SVGIconProps } from "src/types/common/generalTypes";
 
 const QuestionIcon: FC<SVGIconProps> = (props) => {
   const { color = "#D0D1D3", disabled, ...restProps } = props;

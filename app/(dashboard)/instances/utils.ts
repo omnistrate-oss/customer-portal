@@ -1,3 +1,4 @@
+import { SxProps } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -9,7 +10,6 @@ import { CustomNetwork } from "src/types/customNetwork";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 dayjs.extend(utc);
-import { SxProps } from "@mui/material";
 
 import { getInstanceHealthStatus } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
 import { instaceHealthStatusMap } from "src/constants/statusChipStyles/resourceInstanceHealthStatus";
@@ -799,3 +799,89 @@ export const getJsonValue = (value: any): string => {
     return "";
   }
 };
+
+export const normalizeCustomDnsValue = (key: string, value: unknown): string => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  const valueAsString = typeof value === "string" ? value : String(value);
+
+  try {
+    const parsedValue = JSON.parse(valueAsString);
+    if (
+      parsedValue &&
+      typeof parsedValue === "object" &&
+      !Array.isArray(parsedValue) &&
+      typeof (parsedValue as Record<string, unknown>)[key] === "string"
+    ) {
+      return (parsedValue as Record<string, string>)[key];
+    }
+  } catch {
+    // Plain string, keep as-is.
+  }
+
+  return valueAsString;
+};
+
+export const normalizeCustomDnsConfiguration = (
+  customDnsConfiguration: unknown,
+  fallbackResourceKey: string
+): Record<string, string> => {
+  // Handle string value.
+  // If it is a JSON object string (e.g. '{"outlineWiki":"...","postgres":"..."}')
+  // preserve all keys instead of collapsing to fallbackResourceKey.
+  if (typeof customDnsConfiguration === "string") {
+    try {
+      const parsedConfiguration = JSON.parse(customDnsConfiguration);
+      if (parsedConfiguration && typeof parsedConfiguration === "object" && !Array.isArray(parsedConfiguration)) {
+        const normalizedCustomDnsConfiguration: Record<string, string> = {};
+
+        Object.entries(parsedConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
+          const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
+          if (normalizedValue) {
+            normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
+          }
+        });
+
+        return normalizedCustomDnsConfiguration;
+      }
+    } catch {
+      // Plain string, fallback to legacy single-resource behavior.
+    }
+
+    const normalizedValue = normalizeCustomDnsValue(fallbackResourceKey, customDnsConfiguration);
+    return normalizedValue ? { [fallbackResourceKey]: normalizedValue } : {};
+  }
+
+  // Handle object value - normalize each resource's custom DNS value
+  if (customDnsConfiguration && typeof customDnsConfiguration === "object" && !Array.isArray(customDnsConfiguration)) {
+    const normalizedCustomDnsConfiguration: Record<string, string> = {};
+
+    Object.entries(customDnsConfiguration as Record<string, unknown>).forEach(([resourceKey, value]) => {
+      const normalizedValue = normalizeCustomDnsValue(resourceKey, value);
+      if (normalizedValue) {
+        normalizedCustomDnsConfiguration[resourceKey] = normalizedValue;
+      }
+    });
+
+    return normalizedCustomDnsConfiguration;
+  }
+
+  return {};
+};
+
+/**
+ * Normalizes custom_dns_configuration in requestParams.
+ * If the normalized result is non-empty, it replaces the original value;
+ * otherwise, the field is removed from requestParams.
+ */
+export function applyCustomDnsNormalization(requestParams: any, resourceKey: string) {
+  const normalized = normalizeCustomDnsConfiguration(requestParams.custom_dns_configuration, resourceKey);
+
+  if (Object.keys(normalized).length) {
+    requestParams.custom_dns_configuration = normalized;
+  } else {
+    delete requestParams.custom_dns_configuration;
+  }
+}

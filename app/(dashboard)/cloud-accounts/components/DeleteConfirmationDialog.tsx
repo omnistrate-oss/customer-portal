@@ -100,9 +100,9 @@ const ConfirmationMessage = () => {
 
 type DeleteAccountConfigConfirmationDialogProps = {
   accountConfig: AccountConfig | undefined;
-  linkedInstanceCount?: number;
+
   instanceStatus: string | undefined;
-  isLoadingAccountConfig: boolean;
+  isPollingActive?: boolean;
   open: boolean;
   onClose: () => void;
   isDeleteInstanceMutationPending: boolean;
@@ -120,6 +120,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
     // isDeletingAccountConfig,
     accountConfig,
     instanceStatus,
+    isPollingActive = false,
     offboardingInstructionDetails,
     onClose,
     onInstanceDeleteClick,
@@ -184,7 +185,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
 
   const activeStepIndex = step === "offboard" ? 1 : 0;
 
-  const isLoading = deleteDialogState.isLoading;
+  const isLoading = deleteDialogState.isLoading || (step === "offboard" && isPollingActive);
 
   const formData = useFormik({
     initialValues: {
@@ -208,7 +209,8 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
         if (values.confirmationText === "offboard") {
           await onOffboardClick();
           formData.resetForm();
-          handleClose();
+          // Don't call handleClose() here — the parent's onSuccess handler closes the dialog
+          // synchronously after the offboard API call succeeds.
         } else {
           snackbar.showError(`Please enter offboard to confirm`);
         }

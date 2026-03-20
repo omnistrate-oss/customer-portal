@@ -33,6 +33,7 @@ export type Field = {
   customComponent?: React.ReactNode;
   onChange?: (e: any) => void;
   onBlur?: (e: any) => void;
+  skipFormikHandleChange?: boolean;
 };
 
 export type Section = {
