@@ -7,7 +7,7 @@ import TextField from "src/components/FormElementsv2/TextField/TextField";
 import SearchLens from "src/components/Icons/SearchLens/SearchLens";
 import { Text } from "src/components/Typography/Typography";
 
-const ROW_HEIGHT = 38;
+const ROW_HEIGHT = 34;
 
 type Option = { label: string; value: string };
 
