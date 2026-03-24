@@ -1,13 +1,58 @@
-import { useState } from "react";
-import { Box, InputAdornment, Stack } from "@mui/material";
+import { CSSProperties, ReactElement, useCallback, useMemo, useState } from "react";
+import { Box, InputAdornment } from "@mui/material";
+import { List } from "react-window";
 
 import CustomCheckbox from "src/components/Checkbox/Checkbox";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import SearchLens from "src/components/Icons/SearchLens/SearchLens";
 import { Text } from "src/components/Typography/Typography";
 
+const ROW_HEIGHT = 34;
+
+type Option = { label: string; value: string };
+
+type RowData = {
+  filteredOptions: Option[];
+  selectedSet: Set<string>;
+  onToggle: (value: string) => void;
+};
+
+const Row = ({
+  index,
+  style,
+  ariaAttributes,
+  filteredOptions,
+  selectedSet,
+  onToggle,
+}: {
+  index: number;
+  style: CSSProperties;
+  ariaAttributes: {
+    "aria-posinset": number;
+    "aria-setsize": number;
+    role: "listitem";
+  };
+} & RowData): ReactElement => {
+  const option = filteredOptions[index];
+  return (
+    <Box
+      style={style}
+      display="flex"
+      alignItems="center"
+      sx={{ cursor: "pointer" }}
+      onClick={() => onToggle(option.value)}
+      {...ariaAttributes}
+    >
+      <CustomCheckbox checked={selectedSet.has(option.value)} />
+      <Text size="small" weight="medium" color="#414651" ellipsis>
+        {option.label}
+      </Text>
+    </Box>
+  );
+};
+
 type FilterOptionsMultiSelectProps = {
-  options: { label: string; value: string }[];
+  options: Option[];
   selectedValues: string[];
   onChange: (selectedValues: string[]) => void;
 };
@@ -15,19 +60,32 @@ type FilterOptionsMultiSelectProps = {
 const FilterOptionsMultiSelect: React.FC<FilterOptionsMultiSelectProps> = ({ options, selectedValues, onChange }) => {
   const [searchText, setSearchText] = useState("");
 
-  const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(searchText.toLowerCase()));
+  const filteredOptions = useMemo(() => {
+    if (!searchText) return options;
+    const lower = searchText.toLowerCase();
+    return options.filter((option) => option.label.toLowerCase().includes(lower));
+  }, [options, searchText]);
 
-  const handleToggle = (value: string) => {
-    const isSelected = selectedValues.includes(value);
-    if (isSelected) {
-      onChange(selectedValues.filter((v) => v !== value));
-    } else {
-      onChange([...selectedValues, value]);
-    }
-  };
+  const selectedSet = useMemo(() => new Set(selectedValues), [selectedValues]);
+
+  const handleToggle = useCallback(
+    (value: string) => {
+      if (selectedSet.has(value)) {
+        onChange(selectedValues.filter((v) => v !== value));
+      } else {
+        onChange([...selectedValues, value]);
+      }
+    },
+    [selectedSet, selectedValues, onChange]
+  );
+
+  const rowProps = useMemo<RowData>(
+    () => ({ filteredOptions, selectedSet, onToggle: handleToggle }),
+    [filteredOptions, selectedSet, handleToggle]
+  );
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
       <TextField
         InputProps={{
           startAdornment: (
@@ -40,29 +98,24 @@ const FilterOptionsMultiSelect: React.FC<FilterOptionsMultiSelectProps> = ({ opt
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         fullWidth
-        sx={{ mb: "12px" }}
+        sx={{ mb: "12px", flexShrink: 0 }}
       />
-      <Stack>
-        {filteredOptions.map((option) => (
-          <Box
-            key={option.value}
-            display="flex"
-            alignItems="center"
-            sx={{ cursor: "pointer" }}
-            onClick={() => handleToggle(option.value)}
-          >
-            <CustomCheckbox checked={selectedValues.includes(option.value)} />
-            <Text size="small" weight="medium" color="#414651" ellipsis>
-              {option.label}
-            </Text>
-          </Box>
-        ))}
-        {filteredOptions.length === 0 && (
-          <Text size="small" weight="medium" color="#717680">
-            No options found
-          </Text>
-        )}
-      </Stack>
+      {filteredOptions.length === 0 ? (
+        <Text size="small" weight="medium" color="#717680">
+          No options found
+        </Text>
+      ) : (
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <List
+            rowComponent={Row}
+            rowCount={filteredOptions.length}
+            rowHeight={ROW_HEIGHT}
+            rowProps={rowProps}
+            style={{ height: "100%" }}
+            overscanCount={5}
+          />
+        </div>
+      )}
     </div>
   );
 };
