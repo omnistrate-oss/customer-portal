@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const UsageDimensionIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const UsageDimensionIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} fill="none" {...props}>

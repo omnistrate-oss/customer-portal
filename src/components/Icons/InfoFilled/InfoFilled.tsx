@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const InfoFilledIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const InfoFilledIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 28" width={20} height={28} fill="none" {...props}>

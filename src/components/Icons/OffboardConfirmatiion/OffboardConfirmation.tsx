@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const OffboardConfirmationIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const OffboardConfirmationIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={56} height={56} fill="none" {...props}>

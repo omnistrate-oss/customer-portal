@@ -147,7 +147,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   let step: "delete" | "offboard" = "delete";
 
   let buttonText = "Delete";
-  let IconComponent = DeleteCircleIcon;
+  let IconComponent: FC<any> = DeleteCircleIcon;
   let title = "Delete Confirmation";
 
   if (isMultiStepDialog) {

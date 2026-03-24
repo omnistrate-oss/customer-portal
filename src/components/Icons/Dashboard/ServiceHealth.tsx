@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const ServiceHealthIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const ServiceHealthIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={65} height={64} fill="none" {...props}>
