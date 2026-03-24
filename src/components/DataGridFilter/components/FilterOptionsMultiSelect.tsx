@@ -20,6 +20,7 @@ type RowData = {
 const Row = ({
   index,
   style,
+  ariaAttributes,
   filteredOptions,
   selectedSet,
   onToggle,
@@ -40,6 +41,7 @@ const Row = ({
       alignItems="center"
       sx={{ cursor: "pointer" }}
       onClick={() => onToggle(option.value)}
+      {...ariaAttributes}
     >
       <CustomCheckbox checked={selectedSet.has(option.value)} />
       <Text size="small" weight="medium" color="#414651" ellipsis>
