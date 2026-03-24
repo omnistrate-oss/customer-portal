@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const BrokenCircleCheckIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const BrokenCircleCheckIcon: FC<SVGIconProps> = (props) => {
   const { color = "#039855", disabled, ...restProps } = props;
   const clipPathId = useId();
 

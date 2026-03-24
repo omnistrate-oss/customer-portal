@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const PublicIcon = (props: any) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const PublicIcon: FC<SVGIconProps> = (props) => {
   const filterId = useId();
   const gradientId = useId();
   const clipPathId = useId();
@@ -93,7 +95,7 @@ const PublicIcon = (props: any) => {
           filterUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"

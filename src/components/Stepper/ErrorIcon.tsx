@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const ErrorIcon = (props: any) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const ErrorIcon: FC<SVGIconProps> = (props) => {
   const filterId = useId();
   const clipPathId = useId();
   return (

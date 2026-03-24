@@ -1,6 +1,8 @@
-import { useId } from "react";
+import { FC, useId } from "react";
 
-const InstructionsCircledIcon = (props) => {
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const InstructionsCircledIcon: FC<SVGIconProps> = (props) => {
   const clipPathId = useId();
   return (
     <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>

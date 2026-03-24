@@ -13,6 +13,7 @@ import OffboardConfirmationIcon from "src/components/Icons/OffboardConfirmatiion
 import { Step, StepLabel, Stepper } from "src/components/Stepper/Stepper";
 import useSnackbar from "src/hooks/useSnackbar";
 import { AccountConfig } from "src/types/account-config";
+import { SVGIconProps } from "src/types/common/generalTypes";
 
 import { cloudAccountOffboardingSteps } from "../constants";
 
@@ -147,7 +148,7 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   let step: "delete" | "offboard" = "delete";
 
   let buttonText = "Delete";
-  let IconComponent = DeleteCircleIcon;
+  let IconComponent: FC<SVGIconProps> = DeleteCircleIcon;
   let title = "Delete Confirmation";
 
   if (isMultiStepDialog) {
