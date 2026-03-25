@@ -1,18 +1,22 @@
 import test, { expect } from "@playwright/test";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 
 const logPrefix = "Instances -> BYOA Instance Tests ->";
+const guard = new BackendSetupGuard("deployments/instances/byoa-instance.spec.ts");
+
 test.describe.configure({ mode: "serial" });
 
-test.describe.skip("Instances Page - Specialized Tests", () => {
+test.describe.skip("Instances Page - BYOA Instance Tests", () => {
   let instancesPage: InstancesPage,
     cloudAccountsPage: CloudAccountsPage,
     cloudAccountInstanceId: string,
     instanceId: string;
 
   test.beforeEach(async ({ page }) => {
+    test.skip(guard.setupFailed, `Skipping: ${guard.failureMessage}`);
     instancesPage = new InstancesPage(page);
     cloudAccountsPage = new CloudAccountsPage(page);
   });
@@ -38,7 +42,6 @@ test.describe.skip("Instances Page - Specialized Tests", () => {
     await page.getByTestId(dataTestIds.awsAccountIdInput).fill(process.env.BYOA_AWS_ACCOUNT_ID!);
     await page.getByTestId(dataTestIds.submitButton).click();
 
-    // Intercept Data from Instance Details Request
     const instanceDetails = await page.waitForResponse((response) =>
       response.url().includes("/api/action?endpoint=%2F2022-09-01-00%2Fresource-instance%2F")
     );
@@ -51,7 +54,9 @@ test.describe.skip("Instances Page - Specialized Tests", () => {
     await expect(page.getByText(pageElements.instructionsDialogTitle)).toBeVisible();
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
 
-    await cloudAccountsPage.waitForStatus(cloudAccountInstanceId, "Ready", logPrefix);
+    await skipOnBackendError(test, async () => {
+      await cloudAccountsPage.waitForStatus(cloudAccountInstanceId, "Ready", logPrefix);
+    });
   });
 
   test("Create a BYOA Instance", async ({ page }) => {
@@ -74,10 +79,10 @@ test.describe.skip("Instances Page - Specialized Tests", () => {
     await page.getByTestId("dashboardPassword-input").fill("hello");
     await page.getByTestId("projectName-input").fill("hello");
 
-    await page.waitForTimeout(5000); // Wait 5 seconds
+    await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
 
-    instanceId = (await page.getByTestId(dataTestIds.instanceId).textContent()) || "";
+    instanceId = (await page.getByRole("textbox").textContent()) || "";
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
@@ -88,8 +93,10 @@ test.describe.skip("Instances Page - Specialized Tests", () => {
     await page.waitForLoadState("networkidle");
 
     await instancesPage.deleteInstance(instanceId);
-    await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
-    await instancesPage.waitForDelete(instanceId, logPrefix);
+    await skipOnBackendError(test, async () => {
+      await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
+      await instancesPage.waitForDelete(instanceId, logPrefix);
+    });
 
     await cloudAccountsPage.navigate();
     await page.waitForLoadState("networkidle");

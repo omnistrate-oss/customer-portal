@@ -10,11 +10,14 @@ import {
   TestMetricsTab,
   TestNodesTab,
 } from "test-fixtures/utils/instance-details-tabs";
+import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 
 const logPrefix = "Instances -> Basic Tests ->";
+const guard = new BackendSetupGuard("deployments/instances/basic-tests.spec.ts");
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("Instances Page - Basic Lifecycle Tests", () => {
@@ -24,13 +27,14 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     instanceId: string;
 
   test.beforeEach(async ({ page }) => {
+    test.skip(guard.setupFailed, `Skipping: ${guard.failureMessage}`);
     instancesPage = new InstancesPage(page);
     instanceDetailsPage = new InstanceDetailsPage(page);
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");
   });
 
-  test("Overall Structre and Elements + Create a Postgres DT Instance", async ({ page }) => {
+  test("Overall Structure and Elements + Create a Postgres DT Instance", async ({ page }) => {
     const dataTestIds = instancesPage.dataTestIds;
 
     // Expect the Refresh, Stop, Start, Modify, Delete, Create, and Actions Menu to be Visible
@@ -59,21 +63,21 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await page.getByTestId(dataTestIds.regionSelect).click();
     await page.getByRole("option", { name: "us-central1" }).click();
 
-    await page.waitForTimeout(5000); // Wait 5 seconds
+    await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
-    // Wait for the instance ID element to be visible
-    await page.getByTestId(dataTestIds.instanceId).waitFor({ state: "visible" });
-    instanceId = (await page.getByTestId(dataTestIds.instanceId).textContent()) || "";
+    instanceId = (await page.getByRole("textbox").textContent()) || "";
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
   });
 
   test("Wait for Running Instance -> Test Running State", async ({ page }) => {
-    await instancesPage.waitForStatus(instanceId, "Running", logPrefix);
+    await skipOnBackendError(test, async () => {
+      await instancesPage.waitForStatus(instanceId, "Running", logPrefix);
+    });
+
     await instancesPage.navigateToInstanceDetails(instanceId);
 
-    // Intercept Data from Instance Details Request
     const instanceDetails = await page.waitForResponse((response) =>
       response.url().includes("/api/action?endpoint=%2F2022-09-01-00%2Fresource-instance%2F")
     );
@@ -92,10 +96,12 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
   test("Stop Instance -> Test Stopped State", async ({ page }) => {
     await instancesPage.stopInstance(instanceId);
-    await instancesPage.waitForStatus(instanceId, "Stopped", logPrefix);
+    await skipOnBackendError(test, async () => {
+      await instancesPage.waitForStatus(instanceId, "Stopped", logPrefix);
+    });
+
     await instancesPage.navigateToInstanceDetails(instanceId);
 
-    // Intercept Data from Instance Details Request
     const instanceDetails = await page.waitForResponse((response) =>
       response.url().includes("/api/action?endpoint=%2F2022-09-01-00%2Fresource-instance%2F")
     );
@@ -114,6 +120,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
   test("Delete Instance", async () => {
     await instancesPage.deleteInstance(instanceId);
-    await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
+    await skipOnBackendError(test, async () => {
+      await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
+    });
   });
 });

@@ -1,5 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
+import { dataTestIds } from "page-objects/constants/instances-page";
 
 import Button from "src/components/Button/Button";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
@@ -103,7 +104,12 @@ function CreateInstanceModal(props: CreateInstanceModalProps) {
             </Text>
 
             <Stack direction="row" alignItems="center" gap="4px">
-              <TextField disabled value={instanceId} sx={{ maxHeight: "40px", marginTop: "0px", flexGrow: 1 }} />
+              <TextField
+                data-testid={dataTestIds.instanceId}
+                disabled
+                value={instanceId}
+                sx={{ maxHeight: "40px", marginTop: "0px", flexGrow: 1 }}
+              />
               {instanceId && <CopyToClipboardButton text={instanceId} tooltipText="Copy Instance ID" />}
             </Stack>
             <Text size="small" weight="medium" color="#414651">

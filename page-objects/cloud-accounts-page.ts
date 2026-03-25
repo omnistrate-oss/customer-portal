@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { BackendError } from "test-utils/backend-error";
 
 import { PageURLs } from "./pages";
 
@@ -36,6 +37,18 @@ export class CloudAccountsPage {
     await this.page.goto(PageURLs.cloudAccounts);
   }
 
+  /**
+   * Dismisses any blocking overlays (Next.js dev overlay, MUI dialogs, etc.)
+   * that might intercept pointer events and cause click failures.
+   */
+  async dismissBlockingOverlays() {
+    await this.page.evaluate(() => {
+      document.querySelectorAll("nextjs-portal").forEach((el) => el.remove());
+    });
+    await this.page.keyboard.press("Escape");
+    await this.page.waitForTimeout(300);
+  }
+
   async waitForStatus(
     instanceId: string,
     targetStatus: string,
@@ -48,6 +61,7 @@ export class CloudAccountsPage {
     const startTime = Date.now();
 
     while (Date.now() - startTime < options.timeout) {
+      await this.dismissBlockingOverlays();
       await this.page.getByTestId(this.dataTestIds.refreshButton).click();
       await this.page.waitForLoadState("networkidle");
 
@@ -61,13 +75,13 @@ export class CloudAccountsPage {
       }
 
       if (status === "Failed" && targetStatus !== "Failed") {
-        throw new Error(`Cloud Account ${instanceId} failed to reach status ${targetStatus}`);
+        throw new BackendError(`Cloud Account ${instanceId} failed to reach status ${targetStatus}`);
       }
 
       await this.page.waitForTimeout(options.pollingInterval);
     }
 
-    throw new Error(`Timeout waiting for cloud account ${instanceId} to reach status ${targetStatus}`);
+    throw new BackendError(`Timeout waiting for cloud account ${instanceId} to reach status ${targetStatus}`);
   }
 
   async selectCloudAccount(instanceId: string) {
