@@ -130,7 +130,7 @@ const StatusCell: React.FC<StatusCellProps> = ({ upcomingUpgrade }) => {
     );
   }
 
-  return <Tooltip title="No notifications">{icon}</Tooltip>;
+  return <Tooltip title="No alerts">{icon}</Tooltip>;
 };
 
 export default StatusCell;
