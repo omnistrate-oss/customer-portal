@@ -46,7 +46,6 @@ function startMailServiceCron() {
       //Fetch all events
       const eventsResponse = await getEventsList(environmentType);
       const events = eventsResponse.data.events || [];
-      console.log("Events", events);
       const orgDetailsResponse = await getProviderOrgDetails();
       const orgLogoURL = orgDetailsResponse.data.orgLogoURL;
       const orgSupportEmail = orgDetailsResponse.data.orgSupportEmail;
