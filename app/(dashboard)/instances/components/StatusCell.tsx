@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { styled, Tooltip, tooltipClasses } from "@mui/material";
+import { styled, Tooltip as MuiTooltip, tooltipClasses } from "@mui/material";
 
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
 import { UpgradeStatus } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
@@ -20,8 +21,8 @@ const statusMap: Record<UpgradeStatus, string> = {
   SCHEDULED: "Scheduled",
 };
 
-const StyledTooltip = styled(({ className, ...props }: any) => (
-  <Tooltip placement="top" classes={{ popper: className }} {...props} />
+const StyledNotificationsTooltip = styled(({ className, ...props }: any) => (
+  <MuiTooltip placement="top" classes={{ popper: className }} {...props} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: "374px",
@@ -35,7 +36,6 @@ const StyledTooltip = styled(({ className, ...props }: any) => (
     color: "#FFFFFF",
   },
 });
-
 
 const CalendarIcon = () => {
   return (
@@ -124,13 +124,13 @@ const StatusCell: React.FC<StatusCellProps> = ({ upcomingUpgrade }) => {
 
   if (notifications.length > 0) {
     return (
-      <StyledTooltip title={<TooltipContent notifications={notifications} />}>
+      <StyledNotificationsTooltip title={<TooltipContent notifications={notifications} />}>
         <span>{icon}</span>
-      </StyledTooltip>
+      </StyledNotificationsTooltip>
     );
   }
 
-  return icon;
+  return <Tooltip title="No notifications">{icon}</Tooltip>;
 };
 
 export default StatusCell;
