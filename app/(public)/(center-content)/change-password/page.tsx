@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import { $api } from "src/api/query";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
-import { passwordRegex, passwordText } from "src/utils/passwordRegex";
+import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText } from "src/utils/passwordRegex";
 import FieldError from "components/FormElementsv2/FieldError/FieldError";
 import DisplayHeading from "components/NonDashboardComponents/DisplayHeading";
 import FieldContainer from "components/NonDashboardComponents/FormElementsV2/FieldContainer";
@@ -23,9 +23,8 @@ const getChangePasswordValidationSchema = (email: string) =>
     password: Yup.string()
       .required("Password is required")
       .matches(passwordRegex, passwordText)
-      .test("password-not-email", "Email cannot be used as password", (value) => {
-        if (!value || !email) return true;
-        return value.toLowerCase() !== email.toLowerCase();
+      .test("password-not-email", passwordMatchesEmailText, (value) => {
+        return !isPasswordSameAsEmail(value, email);
       }),
     confirmPassword: Yup.string()
       .required("Password is required")
