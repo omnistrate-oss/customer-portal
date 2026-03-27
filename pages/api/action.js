@@ -1,7 +1,7 @@
 import createFetchClient from "openapi-fetch";
 
 import { baseDomain } from "src/api/client";
-import { isAllowedRoute } from "src/server/utils/allowedRoutes";
+import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
 import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
 
@@ -27,7 +27,8 @@ export default async function handleAction(nextRequest, nextResponse) {
 
       try {
         // Password validation for change-password and update-password endpoints
-        if (endpoint === "/2022-09-01-00/change-password" || endpoint === "/2022-09-01-00/update-password") {
+        const normalizedEndpoint = normalizeEndpoint(endpoint);
+        if (normalizedEndpoint === "/2022-09-01-00/change-password" || normalizedEndpoint === "/2022-09-01-00/update-password") {
           const password = data.password;
           if (password && typeof password === "string") {
             if (!password.match(passwordRegex)) {

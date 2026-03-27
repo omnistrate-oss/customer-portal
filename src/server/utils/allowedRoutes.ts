@@ -337,16 +337,33 @@ function escapeRegex(str: string): string {
  * e.g. "/2022-09-01-00/resource-instance" — it may include a query string
  * which is stripped before matching.
  */
-export function isAllowedRoute(method: string, endpoint: string): boolean {
-  const upperMethod = method.toUpperCase();
-
+export function normalizeEndpoint(endpoint: string): string {
   // Strip query string if present (some axios calls embed query params in the URL)
   const pathOnly = endpoint.split("?")[0];
 
   // Remove trailing slash for consistency
-  const normalizedPath = pathOnly.endsWith("/") && pathOnly.length > 1
+  const normalized = pathOnly.endsWith("/") && pathOnly.length > 1
     ? pathOnly.slice(0, -1)
     : pathOnly;
+
+  return normalized;
+}
+
+export function isAllowedRoute(method: string, endpoint: string): boolean {
+  const upperMethod = method.toUpperCase();
+
+  const normalizedPath = normalizeEndpoint(endpoint);
+
+  // Reject percent-encoded path separators to prevent allowlist bypass
+  if (/%2f|%5c/i.test(normalizedPath)) {
+    return false;
+  }
+
+  // Reject dot-segments that could be used for path traversal
+  const segments = normalizedPath.split("/");
+  if (segments.some((s) => s === "." || s === "..")) {
+    return false;
+  }
 
   for (const route of allowedRoutes) {
     if (route.method !== upperMethod) continue;
