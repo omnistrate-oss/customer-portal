@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { passwordRegex, passwordText } from "src/utils/passwordRegex";
+import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText } from "src/utils/passwordRegex";
 
 export const FieldCell = ({ children }) => (
   <div className="col-span-3 pb-5 border-b border-[#E9EAEB] lg:pl-8">
@@ -39,9 +39,8 @@ export const getPasswordValidationSchema = (email: string) =>
       .string()
       .required("New Password is required")
       .matches(passwordRegex, passwordText)
-      .test("password-not-email", "Email cannot be used as password", (value) => {
-        if (!value || !email) return true;
-        return value.toLowerCase() !== email.toLowerCase();
+      .test("password-not-email", passwordMatchesEmailText, (value) => {
+        return !isPasswordSameAsEmail(value, email);
       }),
     confirmPassword: yup
       .string()
