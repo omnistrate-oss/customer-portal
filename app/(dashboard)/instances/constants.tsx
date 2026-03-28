@@ -29,4 +29,5 @@ export const REQUEST_PARAMS_FIELDS_TO_FILTER = [
   "subscriptionId",
   "cloud_provider_native_network_id",
   "custom_dns_configuration",
+  "onprem_platform",
 ];

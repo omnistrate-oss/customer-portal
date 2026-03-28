@@ -15,6 +15,7 @@ import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
+import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistributionsMultiSelect/KubernetesDistributionsMultiSelect";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import { ResourceSummary } from "../hooks/useResources";
@@ -97,6 +98,54 @@ export const getStandardInformationFields = (
   const cloudProviderFieldExists = inputParametersObj["cloud_provider"];
   const regionFieldExists = inputParametersObj["region"];
   const customAvailabilityZoneFieldExists = inputParametersObj["custom_availability_zone"];
+
+  const isOnPrem =
+    offering?.serviceModelType === "ON_PREM" &&
+    resourceSchema?.inputParameters.find((field) => field.key === "onprem_platform");
+
+  const cloudProviderOptions: string[] = (() => {
+    const options: string[] = [];
+    if (isOnPrem) {
+      const onPremPlatforms = offering?.onPremPlatforms || [];
+      if (onPremPlatforms.includes("EKS")) {
+        options.push("aws");
+      }
+      if (onPremPlatforms.includes("GKE")) {
+        options.push("gcp");
+      }
+      if (onPremPlatforms.includes("AKS")) {
+        options.push("azure");
+      }
+      if (onPremPlatforms.includes("OKE")) {
+        options.push("oci");
+      }
+      if (onPremPlatforms.includes("Generic")) {
+        options.push("private");
+      }
+    }
+    return options;
+  })();
+
+  const cloudProviderToPlatformMap: Record<string, string> = {
+    aws: "EKS",
+    gcp: "GKE",
+    azure: "AKS",
+    oci: "OKE",
+    private: "Generic",
+  };
+
+  const onPremPlatformOptions: string[] = (() => {
+    const options: string[] = [];
+    const currentCloudProvider = formData.values.cloudProvider;
+    const mappedPlatform = cloudProviderToPlatformMap[currentCloudProvider];
+    if (mappedPlatform) {
+      options.push(mappedPlatform);
+    }
+    if (!options.includes("Generic")) {
+      options.push("Generic");
+    }
+    return options;
+  })();
 
   const fields: Field[] = [
     {
@@ -369,6 +418,52 @@ export const getStandardInformationFields = (
           : "No regions available",
       menuItems: getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider),
       disabled: formMode !== "create",
+    });
+  }
+
+  if (isOnPrem) {
+    fields.push({
+      label: "Kubernetes Platform",
+      subLabel: "Select the Kubernetes platform",
+      name: "kubernetesPlatform",
+      required: true,
+      customComponent: (
+        <CloudProviderRadio
+          cloudProviders={cloudProviderOptions.length > 0 ? cloudProviderOptions : offering?.cloudProviders || []}
+          name="cloudProvider"
+          formData={formData}
+          // @ts-ignore
+          onChange={(newCloudProvider: CloudProvider) => {
+            const platform = cloudProviderToPlatformMap[newCloudProvider] || "Generic";
+            setFieldValue("onprem_platform", platform);
+            setFieldValue("cloudProvider", newCloudProvider);
+          }}
+          disabled={formMode !== "create"}
+        />
+      ),
+      previewValue: values.cloudProvider
+        ? () => {
+            const cloudProvider = values.cloudProvider;
+            return cloudProviderLongLogoMap[cloudProvider];
+          }
+        : null,
+    });
+  }
+
+  if (isOnPrem) {
+    fields.push({
+      label: "Kubernetes Distribution",
+      subLabel: "Choose the Kubernetes distribution supported by the selected platform",
+      name: "kubernetesDistribution",
+      required: true,
+      customComponent: (
+        <KubernetesDistributionsMultiSelect
+          onPremPlatforms={formData.values.onprem_platform}
+          setFieldValue={formData.setFieldValue}
+          onPremPlatformOptions={onPremPlatformOptions as ("EKS" | "GKE" | "AKS" | "Generic")[]}
+        />
+      ),
+      previewValue: values.onprem_platform || null,
     });
   }
 

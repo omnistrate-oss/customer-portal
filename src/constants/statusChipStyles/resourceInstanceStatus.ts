@@ -29,6 +29,9 @@ export const resourceInstanceStatusMap: Record<string, { category: Category; lab
   ATTACHING: { category: "pending", label: "Attaching" },
   COPYING_SNAPSHOT: { category: "inProgress", label: "Copying Snapshot" },
   BACKING_UP: { category: "inProgress", label: "Backing Up" },
+  CREATING_INSTALLER: { category: "pending", label: "Creating Installer" },
+  UPDATING_INSTALLER: { category: "pending", label: "Updating Installer" },
+  INSTALLER_READY: { category: "success", label: "Installer Ready" },
 };
 
 export const getResourceInstanceStatusStylesAndLabel = (status: string): ColorObject & { label?: string } => {

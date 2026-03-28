@@ -2,20 +2,22 @@
 
 import { cn } from "lib/utils";
 
+import { Text } from "components/Typography/Typography";
 import { cloudProviderLabels } from "src/constants/cloudProviders";
 import { colors } from "src/themeConfig";
-import { Text } from "components/Typography/Typography";
 
 import AWSIcon from "./AWSIcon";
 import AzureIcon from "./AzureIcon";
 import GcpIcon from "./GCPIcon";
 import OCIIcon from "./OCIIcon";
+import PrivateIcon from "./PrivateIcon";
 
 const cloudIcons = {
   aws: <AWSIcon style={{ height: "32px", width: "auto" }} />,
   gcp: <GcpIcon style={{ height: "32px", width: "auto" }} />,
   azure: <AzureIcon style={{ height: "32px", width: "auto" }} />,
   oci: <OCIIcon style={{ height: "32px", width: "auto" }} />,
+  private: <PrivateIcon style={{ height: "32px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
