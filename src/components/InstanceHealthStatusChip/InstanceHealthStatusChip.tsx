@@ -1,8 +1,8 @@
-import { FC, ReactNode } from "react";
-import Link from "next/link";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Box, Stack, styled } from "@mui/material";
 import _ from "lodash";
+import Link from "next/link";
+import { FC, ReactNode } from "react";
 
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import { chipCategoryColors } from "src/constants/statusChipStyles";
@@ -207,6 +207,7 @@ type InstanceHealthStatusChipProps = {
   viewNodesLink?: string;
   computedHealthStatus: InstanceComputedHealthStatus;
   openLinkInSameTab?: boolean;
+  serviceModelType?: string;
 };
 
 const InstanceHealthStatusChip: FC<InstanceHealthStatusChipProps> = (props) => {
@@ -216,7 +217,12 @@ const InstanceHealthStatusChip: FC<InstanceHealthStatusChipProps> = (props) => {
     viewNodesLink,
     computedHealthStatus,
     openLinkInSameTab = false,
+    serviceModelType,
   } = props;
+
+  if (serviceModelType === "ON_PREM") {
+    return "-";
+  }
 
   const nodes = getInstanceNodes(detailedNetworkTopology);
 

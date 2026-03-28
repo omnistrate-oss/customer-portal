@@ -134,6 +134,14 @@ export const getStandardInformationFields = (
     private: "Generic",
   };
 
+  const platformToCloudProviderMap: Record<string, string> = {
+    EKS: "aws",
+    GKE: "gcp",
+    AKS: "azure",
+    OKE: "oci",
+    Generic: "private",
+  };
+
   const onPremPlatformOptions: string[] = (() => {
     const options: string[] = [];
     const currentCloudProvider = formData.values.cloudProvider;
@@ -175,7 +183,11 @@ export const getStandardInformationFields = (
         setFieldValue("subscriptionId", subscriptionId);
 
         const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
-        const cloudProvider = offering?.cloudProviders?.[0] || "";
+        const isOfferingOnPrem = offering?.serviceModelType === "ON_PREM";
+        const cloudProvider = isOfferingOnPrem
+          ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
+          : offering?.cloudProviders?.[0] || "";
+
         setFieldValue("cloudProvider", cloudProvider);
         if (cloudProvider === "aws") {
           setFieldValue("region", offering.awsRegions?.[0] || "");
@@ -185,6 +197,13 @@ export const getStandardInformationFields = (
           setFieldValue("region", offering.azureRegions?.[0] || "");
         } else if (cloudProvider === "oci") {
           setFieldValue("region", offering.ociRegions?.[0] || "");
+        }
+
+        // Set default onprem_platform for on-prem offerings
+        if (isOfferingOnPrem) {
+          setFieldValue("onprem_platform", cloudProviderToPlatformMap[cloudProvider] || "");
+        } else {
+          setFieldValue("onprem_platform", "");
         }
 
         const resources = getResourceMenuItems(offering);
@@ -217,7 +236,10 @@ export const getStandardInformationFields = (
             subscriptionId?: string // This is very specific to when we subscribe to the plan for the first time
           ) => {
             const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
-            const cloudProvider = offering?.cloudProviders?.[0] || "";
+            const isOfferingOnPrem = offering?.serviceModelType === "ON_PREM";
+            const cloudProvider = isOfferingOnPrem
+              ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
+              : offering?.cloudProviders?.[0] || "";
 
             setFieldValue("cloudProvider", cloudProvider);
             if (cloudProvider === "aws") {
@@ -228,6 +250,13 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.azureRegions?.[0] || "");
             } else if (cloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
+            }
+
+            // Set default onprem_platform for on-prem offerings
+            if (isOfferingOnPrem) {
+              setFieldValue("onprem_platform", cloudProviderToPlatformMap[cloudProvider] || "");
+            } else {
+              setFieldValue("onprem_platform", "");
             }
 
             const resources = getResourceMenuItems(offering);

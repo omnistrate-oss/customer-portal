@@ -1,14 +1,17 @@
 import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
-import { FC, useMemo, useState } from "react";
+import axios from "axios";
+import { FC, useCallback, useMemo, useState } from "react";
 
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import SideDrawerRight from "src/components/SideDrawerRight/SideDrawerRight";
 import Tooltip from "src/components/Tooltip/Tooltip";
+import useSnackbar from "src/hooks/useSnackbar";
 import formatDateUTC from "src/utils/formatDateUTC";
+import { saveBlob } from "src/utils/saveBlob";
 
-import URLCopyIcon from "../../../../../src/components/Icons/CopyIcon/URLCopyIcon";
+import LoadingSpinnerSmall from "../../../../../src/components/CircularProgress/CircularProgress";
 
 import DataGridHeader from "./DataGridHeader";
 import InstallerUpgraderInstructions from "./InstallerUpgraderInstructions";
@@ -31,6 +34,54 @@ const columnHelper = createColumnHelper<InstallerRow>();
 const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const snackbar = useSnackbar();
+
+  const handleDownload = useCallback(
+    async (downloadURL: string) => {
+      if (!downloadURL || isDownloading) return;
+
+      setIsDownloading(true);
+      try {
+        // Strip the host/domain and only pass the path to the server
+        let downloadPath: string;
+        try {
+          const url = new URL(downloadURL);
+          downloadPath = url.pathname + url.search;
+        } catch {
+          // If it's already a relative path, use as-is
+          downloadPath = downloadURL;
+        }
+
+        const response = await axios.post(
+          "/api/download-installer",
+          { downloadPath },
+          {
+            responseType: "blob",
+          }
+        );
+
+        // Extract filename from Content-Disposition or fallback
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = "installer";
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
+          if (match?.[2]) {
+            filename = match[2];
+          }
+        }
+
+        saveBlob(response.data, filename);
+        snackbar.showSuccess("Installer download successfully");
+      } catch (error) {
+        console.error("Failed to download installer:", error);
+        snackbar.showError("Failed to download installer. Please try again.");
+      } finally {
+        setIsDownloading(false);
+      }
+    },
+    [isDownloading, snackbar]
+  );
 
   const rows: InstallerRow[] = useMemo(() => {
     return [
@@ -89,10 +140,10 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                 <span>
                   <IconButton
                     disableRipple
-                    disabled={!isInstallerReady}
+                    disabled={!isInstallerReady || isDownloading}
                     onClick={() => {
                       if (downloadURL) {
-                        window.open(downloadURL, "_self");
+                        handleDownload(downloadURL);
                       }
                     }}
                     sx={{
@@ -101,28 +152,9 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                       gap: "4px",
                     }}
                   >
-                    <DownloadCLIIcon color={isInstallerReady ? "#6941C6" : "#A0A0A0"} />
+                    <DownloadCLIIcon color={isInstallerReady && !isDownloading ? "#6941C6" : "#A0A0A0"} />
                   </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title={!isInstallerReady ? "Installer is not ready for copy URL" : "Copy Installer URL"}>
-                <span>
-                  <IconButton
-                    disableRipple
-                    disabled={!isInstallerReady}
-                    onClick={() => {
-                      if (downloadURL) {
-                        navigator.clipboard.writeText(downloadURL);
-                      }
-                    }}
-                    sx={{
-                      cursor: "pointer",
-                      padding: 0,
-                      gap: "4px",
-                    }}
-                  >
-                    <URLCopyIcon color={isInstallerReady ? "#6941C6" : "#A0A0A0"} />
-                  </IconButton>
+                  {isDownloading && <LoadingSpinnerSmall />}
                 </span>
               </Tooltip>
             </Stack>
@@ -133,7 +165,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
         },
       }),
     ];
-  }, []);
+  }, [isDownloading, handleDownload]);
 
   return (
     <Box>

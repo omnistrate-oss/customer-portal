@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
+import axios from "axios";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import RegionIcon from "components/Region/RegionIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
@@ -20,12 +26,11 @@ import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/res
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import RegionIcon from "components/Region/RegionIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
 
+import LoadingSpinnerSmall from "../../../src/components/CircularProgress/CircularProgress";
+import DownloadCLIIcon from "../../../src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import useSnackbar from "../../../src/hooks/useSnackbar";
+import { saveBlob } from "../../../src/utils/saveBlob";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
@@ -33,8 +38,8 @@ import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
-import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
+import useInstances from "./hooks/useInstances";
 import { getMainResourceFromInstance, getRowBorderStyles } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -52,11 +57,14 @@ export type Overlay =
   | "disable-deletion-protection-dialog";
 
 const InstancesPage = () => {
+  const snackbar = useSnackbar();
+
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
-
+  const [instanceId, setInstanceId] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
   const {
     subscriptionsObj,
     serviceOfferingsObj,
@@ -72,6 +80,53 @@ const InstancesPage = () => {
     refetch: refetchInstances,
     isError: isInstancesError,
   } = useInstances();
+
+  const handleDownload = useCallback(
+    async (id: string, downloadURL: string) => {
+      if (!downloadURL || isDownloading) return;
+
+      setInstanceId(id);
+      setIsDownloading(true);
+      try {
+        // Strip the host/domain and only pass the path to the server
+        let downloadPath: string;
+        try {
+          const url = new URL(downloadURL);
+          downloadPath = url.pathname + url.search;
+        } catch {
+          // If it's already a relative path, use as-is
+          downloadPath = downloadURL;
+        }
+
+        const response = await axios.post(
+          "/api/download-installer",
+          { downloadPath },
+          {
+            responseType: "blob",
+          }
+        );
+
+        // Extract filename from Content-Disposition or fallback
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = "installer";
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
+          if (match?.[2]) {
+            filename = match[2];
+          }
+        }
+
+        saveBlob(response.data, filename);
+        snackbar.showSuccess("Installer download successfully");
+      } catch (error) {
+        console.error("Failed to download installer:", error);
+        snackbar.showError("Failed to download installer. Please try again.");
+      } finally {
+        setIsDownloading(false);
+      }
+    },
+    [isDownloading, snackbar]
+  );
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -197,13 +252,39 @@ const InstancesPage = () => {
         id: "status",
         header: "Lifecycle Status",
         cell: (data) => {
-          const status = data.row.original.status;
+          const { status, id, onPremInstallerDetails } = data.row.original;
           const statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
+          const downloadURL = onPremInstallerDetails?.downloadURL;
+          const isInstallerReady = status === "INSTALLER_READY" && !!downloadURL;
+          const isPending = id === instanceId;
 
-          return <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />;
+          return (
+            <Stack direction="row" alignItems="center" gap="8px">
+              <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
+              {isInstallerReady && (
+                <>
+                  <IconButton
+                    disableRipple
+                    disabled={isPending && isDownloading}
+                    onClick={() => {
+                      if (downloadURL) {
+                        handleDownload(id || "", downloadURL);
+                      }
+                    }}
+                    sx={{
+                      padding: 0,
+                    }}
+                  >
+                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : "#6941C6"} />
+                    {isPending && isDownloading && <LoadingSpinnerSmall />}
+                  </IconButton>
+                </>
+              )}
+            </Stack>
+          );
         },
         meta: {
-          minWidth: 170,
+          minWidth: 200,
           disableBrowserTooltip: true,
         },
       }),
@@ -234,12 +315,15 @@ const InstancesPage = () => {
               viewType: "Nodes",
             });
 
+            const offering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+
             return (
               <InstanceHealthStatusChip
                 computedHealthStatus={value}
                 detailedNetworkTopology={
                   (data.row.original?.detailedNetworkTopology ?? {}) as Record<string, ResourceInstanceNetworkTopology>
                 }
+                serviceModelType={offering?.serviceModelType} // Pass the service model type to conditionally render the health status
                 viewNodesLink={resourceInstanceUrlLink}
               />
             );
@@ -366,7 +450,7 @@ const InstancesPage = () => {
         },
       }),
     ];
-  }, [subscriptionsObj, serviceOfferingsObj]);
+  }, [subscriptionsObj, serviceOfferingsObj, isDownloading, handleDownload, instanceId]);
 
   useEffect(() => {
     if (isInstancesError) {
