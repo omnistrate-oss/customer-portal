@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Customer Portal project, provided by Omnistrate, is an open-source platform designed for service providers to deliver customizable SaaS solutions to end customers. It supports direct use for quick deployment or extensive customization through forking, catering to diverse provider needs. This adaptability saves significant time and costs in developing and launching SaaS offerings. Additionally, its open-source nature encourages community engagement, leading to continuous improvement, innovation, and security enhancements, benefiting from the collective expertise of developers worldwide.
+The Customer Portal project, provided by Omnistrate, is an open-source platform designed for service providers to deliver customizable SaaS solutions to end customers. It supports direct use for quick deployment or extensive customization through forking, catering to diverse provider needs. This adaptability saves significant time and costs in developing and launching SaaS offerings. Additionally, its open-source nature encourages community engagement, leading to continuous improvement, innovation, and security enhancements, benefiting from the collective expertise of developers.
 
 ## Getting Started
 
