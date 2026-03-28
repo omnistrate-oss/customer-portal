@@ -1,38 +1,36 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 import useSnackbar from "src/hooks/useSnackbar";
-import { saveBlob } from "src/utils/saveBlob";
 
 type DownloadState = {
   /** Whether a download is currently in progress */
   isDownloading: boolean;
-  /** Download progress from 0 to 100, or null if content-length is unknown */
-  progress: number | null;
   /** The instance ID currently being downloaded (for multi-row UIs) */
   activeInstanceId: string | null;
 };
 
 /**
- * Fast installer download hook using the native `fetch()` API with streaming.
+ * Installer download hook that delegates to the **browser's native download manager**.
  *
- * Why this is faster than axios:
- * - fetch() streams the response natively — no transform pipeline overhead
- * - ReadableStream lets us read chunks directly into an ArrayBuffer
- * - AbortController allows cancelling stuck downloads instantly
- * - Progress tracking gives the user real-time feedback
+ * How it works:
+ * 1. Builds a GET URL: `/api/download-installer?downloadPath=...`
+ * 2. Opens it via a hidden `<a>` tag click — this triggers the browser download bar
+ * 3. The browser handles progress, pause/resume, and file saving automatically
+ *
+ * Auth is read from the "token" cookie on the server side, so no
+ * Authorization header is needed — the cookie is sent automatically
+ * with the browser navigation request.
  */
 export default function useInstallerDownload() {
   const [state, setState] = useState<DownloadState>({
     isDownloading: false,
-    progress: null,
     activeInstanceId: null,
   });
 
-  const abortRef = useRef<AbortController | null>(null);
   const snackbar = useSnackbar();
 
   const download = useCallback(
-    async (downloadURL: string, instanceId?: string) => {
+    (downloadURL: string, instanceId?: string) => {
       if (!downloadURL || state.isDownloading) return;
 
       // Parse the URL to extract just the path (don't send full URL to server)
@@ -44,99 +42,50 @@ export default function useInstallerDownload() {
         downloadPath = downloadURL;
       }
 
-      // Allow cancellation
-      abortRef.current = new AbortController();
-
       setState({
         isDownloading: true,
-        progress: 0,
         activeInstanceId: instanceId ?? null,
       });
 
       try {
-        const response = await fetch("/api/download-installer", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ downloadPath }),
-          signal: abortRef.current.signal,
-        });
+        // Build a GET URL that the browser navigates to directly
+        const params = new URLSearchParams({ downloadPath });
+        const href = `/api/download-installer?${params.toString()}`;
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.message || `Download failed (${response.status})`);
-        }
+        // Use a hidden <a> tag to trigger the browser's native download manager.
+        // The server responds with Content-Disposition: attachment, so the browser
+        // shows the download in its download bar/panel with progress, pause, resume.
+        const anchor = document.createElement("a");
+        anchor.href = href;
+        anchor.style.display = "none";
+        document.body.appendChild(anchor);
+        anchor.click();
 
-        // --- Stream the body with progress tracking ---
-        const contentLength = Number(response.headers.get("Content-Length"));
-        const hasLength = contentLength > 0;
-        const reader = response.body?.getReader();
+        // Clean up the temporary anchor element
+        setTimeout(() => {
+          document.body.removeChild(anchor);
+        }, 100);
 
-        if (!reader) {
-          throw new Error("ReadableStream not supported in this browser");
-        }
-
-        const chunks: ArrayBuffer[] = [];
-        let receivedBytes = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          chunks.push(value.buffer as ArrayBuffer);
-          receivedBytes += value.length;
-
-          if (hasLength) {
-            setState((prev) => ({
-              ...prev,
-              progress: Math.round((receivedBytes / contentLength) * 100),
-            }));
-          }
-        }
-
-        // Build the blob from chunks (one allocation, no intermediate buffers)
-        const contentType = response.headers.get("Content-Type") || "application/octet-stream";
-        const blob = new Blob(chunks, { type: contentType });
-
-        // Extract filename from Content-Disposition header
-        const contentDisposition = response.headers.get("Content-Disposition");
-        let filename = "installer";
-        if (contentDisposition) {
-          const match = contentDisposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
-          if (match?.[2]) {
-            filename = match[2];
-          }
-        }
-
-        saveBlob(blob, filename);
-        snackbar.showSuccess("Installer downloaded successfully");
+        snackbar.showSuccess("Installer download started");
       } catch (error: unknown) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          snackbar.showError("Download cancelled");
-          return;
-        }
         const message = error instanceof Error ? error.message : "An unknown error occurred";
-        console.error("Failed to download installer:", message);
+        console.error("Failed to start installer download:", message);
         snackbar.showError("Failed to download installer. Please try again.");
       } finally {
-        abortRef.current = null;
-        setState({
-          isDownloading: false,
-          progress: null,
-          activeInstanceId: null,
-        });
+        // Reset state after a short delay (the browser takes over from here)
+        setTimeout(() => {
+          setState({
+            isDownloading: false,
+            activeInstanceId: null,
+          });
+        }, 1500);
       }
     },
     [state.isDownloading, snackbar]
   );
 
-  /** Cancel an in-progress download */
-  const cancelDownload = useCallback(() => {
-    abortRef.current?.abort();
-  }, []);
-
   return {
     ...state,
     download,
-    cancelDownload,
   };
 }

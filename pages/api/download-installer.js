@@ -3,11 +3,16 @@ import { getInstallerDownload } from "src/server/api/installer-download";
 const BACKEND_BASE_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.dev";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  // Support both GET (browser-managed download) and POST (legacy)
+  const isGet = req.method === "GET";
+  const isPost = req.method === "POST";
+
+  if (!isGet && !isPost) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { downloadPath } = req.body;
+  // GET: downloadPath from query string; POST: from body
+  const downloadPath = isGet ? req.query.downloadPath : req.body?.downloadPath;
 
   if (!downloadPath || typeof downloadPath !== "string") {
     return res.status(400).json({ message: "downloadPath is required" });
@@ -18,12 +23,15 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: "Invalid download path" });
   }
 
+  // Auth: prefer Authorization header, fall back to "token" cookie
+  const authToken = req.headers.authorization || (req.cookies?.token ? `Bearer ${req.cookies.token}` : "");
+
   const downloadURL = BACKEND_BASE_DOMAIN + downloadPath;
 
   try {
     const response = await getInstallerDownload({
       downloadURL,
-      authToken: req.headers.authorization || "",
+      authToken,
     });
 
     // Forward content headers for binary download
