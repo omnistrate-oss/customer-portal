@@ -41,20 +41,38 @@ export default async function handler(req, res) {
       res.setHeader("Content-Length", contentLength);
     }
 
-    return res.status(response.status || 200).send(Buffer.from(response.data));
+    res.status(response.status || 200);
+
+    // Stream the response directly to the client — no buffering
+    await new Promise((resolve, reject) => {
+      response.stream.pipe(res);
+      response.stream.on("end", resolve);
+      response.stream.on("error", reject);
+    });
   } catch (error) {
+    // If headers already sent (partial stream), we can only destroy the connection
+    if (res.headersSent) {
+      console.error("Stream error after headers sent:", error?.message);
+      return res.end();
+    }
+
     console.error("Error downloading installer:", error?.message);
     const statusCode = error?.response?.status || 500;
-    const errorMessage = error?.response?.data
-      ? Buffer.from(error.response.data).toString()
-      : error.message || "Failed to download installer";
+
+    let errorMessage = error.message || "Failed to download installer";
+    if (error?.response?.data) {
+      // In stream mode, error response data is a stream — read it
+      try {
+        const chunks = [];
+        for await (const chunk of error.response.data) {
+          chunks.push(chunk);
+        }
+        errorMessage = Buffer.concat(chunks).toString();
+      } catch {
+        // Fall back to the default error message
+      }
+    }
 
     return res.status(statusCode).json({ message: errorMessage });
   }
 }
-
-export const config = {
-  api: {
-    responseLimit: false,
-  },
-};
