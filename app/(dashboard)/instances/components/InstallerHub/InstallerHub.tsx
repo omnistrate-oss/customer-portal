@@ -1,15 +1,13 @@
 import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
-import axios from "axios";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import SideDrawerRight from "src/components/SideDrawerRight/SideDrawerRight";
 import Tooltip from "src/components/Tooltip/Tooltip";
-import useSnackbar from "src/hooks/useSnackbar";
+import useInstallerDownload from "src/hooks/useInstallerDownload";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { saveBlob } from "src/utils/saveBlob";
 
 import LoadingSpinnerSmall from "../../../../../src/components/CircularProgress/CircularProgress";
 
@@ -34,54 +32,7 @@ const columnHelper = createColumnHelper<InstallerRow>();
 const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const snackbar = useSnackbar();
-
-  const handleDownload = useCallback(
-    async (downloadURL: string) => {
-      if (!downloadURL || isDownloading) return;
-
-      setIsDownloading(true);
-      try {
-        // Strip the host/domain and only pass the path to the server
-        let downloadPath: string;
-        try {
-          const url = new URL(downloadURL);
-          downloadPath = url.pathname + url.search;
-        } catch {
-          // If it's already a relative path, use as-is
-          downloadPath = downloadURL;
-        }
-
-        const response = await axios.post(
-          "/api/download-installer",
-          { downloadPath },
-          {
-            responseType: "blob",
-          }
-        );
-
-        // Extract filename from Content-Disposition or fallback
-        const contentDisposition = response.headers["content-disposition"];
-        let filename = "installer";
-        if (contentDisposition) {
-          const match = contentDisposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
-          if (match?.[2]) {
-            filename = match[2];
-          }
-        }
-
-        saveBlob(response.data, filename);
-        snackbar.showSuccess("Installer download successfully");
-      } catch (error) {
-        console.error("Failed to download installer:", error);
-        snackbar.showError("Failed to download installer. Please try again.");
-      } finally {
-        setIsDownloading(false);
-      }
-    },
-    [isDownloading, snackbar]
-  );
+  const { isDownloading, download: handleDownload } = useInstallerDownload();
 
   const rows: InstallerRow[] = useMemo(() => {
     return [

@@ -2,7 +2,6 @@
 
 import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
-import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import DataTable from "components/DataTable/DataTable";
@@ -29,8 +28,7 @@ import { getInstanceDetailsRoute } from "src/utils/routes";
 
 import LoadingSpinnerSmall from "../../../src/components/CircularProgress/CircularProgress";
 import DownloadCLIIcon from "../../../src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import useSnackbar from "../../../src/hooks/useSnackbar";
-import { saveBlob } from "../../../src/utils/saveBlob";
+import useInstallerDownload from "../../../src/hooks/useInstallerDownload";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
@@ -57,14 +55,12 @@ export type Overlay =
   | "disable-deletion-protection-dialog";
 
 const InstancesPage = () => {
-  const snackbar = useSnackbar();
-
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
   const [instanceId, setInstanceId] = useState("");
-  const [isDownloading, setIsDownloading] = useState(false);
+  const { isDownloading, download: downloadInstaller } = useInstallerDownload();
   const {
     subscriptionsObj,
     serviceOfferingsObj,
@@ -82,50 +78,11 @@ const InstancesPage = () => {
   } = useInstances();
 
   const handleDownload = useCallback(
-    async (id: string, downloadURL: string) => {
-      if (!downloadURL || isDownloading) return;
-
+    (id: string, downloadURL: string) => {
       setInstanceId(id);
-      setIsDownloading(true);
-      try {
-        // Strip the host/domain and only pass the path to the server
-        let downloadPath: string;
-        try {
-          const url = new URL(downloadURL);
-          downloadPath = url.pathname + url.search;
-        } catch {
-          // If it's already a relative path, use as-is
-          downloadPath = downloadURL;
-        }
-
-        const response = await axios.post(
-          "/api/download-installer",
-          { downloadPath },
-          {
-            responseType: "blob",
-          }
-        );
-
-        // Extract filename from Content-Disposition or fallback
-        const contentDisposition = response.headers["content-disposition"];
-        let filename = "installer";
-        if (contentDisposition) {
-          const match = contentDisposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
-          if (match?.[2]) {
-            filename = match[2];
-          }
-        }
-
-        saveBlob(response.data, filename);
-        snackbar.showSuccess("Installer download successfully");
-      } catch (error) {
-        console.error("Failed to download installer:", error);
-        snackbar.showError("Failed to download installer. Please try again.");
-      } finally {
-        setIsDownloading(false);
-      }
+      downloadInstaller(downloadURL, id);
     },
-    [isDownloading, snackbar]
+    [downloadInstaller]
   );
 
   const dataTableColumns = useMemo(() => {
