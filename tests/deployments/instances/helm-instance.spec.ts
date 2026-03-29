@@ -1,4 +1,4 @@
-import test from "@playwright/test";
+import test, { expect } from "@playwright/test";
 import { InstancesPage } from "page-objects/instances-page";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
@@ -40,7 +40,9 @@ test.describe("Instances Page - Helm Instance Tests", () => {
     await page.getByLabel("Password Generator").click();
     await page.getByTestId(dataTestIds.submitButton).click();
 
-    instanceId = (await page.getByRole("textbox").textContent()) || "";
+    const instanceIdInput = page.getByTestId(dataTestIds.instanceId).locator("input");
+    await expect(instanceIdInput).not.toHaveValue("", { timeout: 30000 });
+    instanceId = await instanceIdInput.inputValue();
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();

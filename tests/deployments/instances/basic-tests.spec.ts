@@ -65,7 +65,9 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
     await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
-    instanceId = (await page.getByRole("textbox").textContent()) || "";
+    const instanceIdInput = page.getByTestId(dataTestIds.instanceId).locator("input");
+    await expect(instanceIdInput).not.toHaveValue("", { timeout: 30000 });
+    instanceId = await instanceIdInput.inputValue();
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();

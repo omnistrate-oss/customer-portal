@@ -16,7 +16,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 3,
-  reporter: [["html"], ...(process.env.CI ? [["github" as const]] : [])],
+  reporter: process.env.CI ? [["html"], ["github"]] : [["html"]],
 
   timeout: 12 * 60 * 1000, // 12 minutes per test
 

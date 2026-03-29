@@ -1,5 +1,6 @@
 import test, { expect } from "@playwright/test";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
+import { dataTestIds as instanceDataTestIds } from "page-objects/constants/instances-page";
 import { InstancesPage } from "page-objects/instances-page";
 import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
@@ -9,7 +10,7 @@ const guard = new BackendSetupGuard("deployments/instances/byoa-instance.spec.ts
 
 test.describe.configure({ mode: "serial" });
 
-test.describe.skip("Instances Page - BYOA Instance Tests", () => {
+test.describe("Instances Page - BYOA Instance Tests", () => {
   let instancesPage: InstancesPage,
     cloudAccountsPage: CloudAccountsPage,
     cloudAccountInstanceId: string,
@@ -82,7 +83,9 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
 
-    instanceId = (await page.getByRole("textbox").textContent()) || "";
+    const instanceIdInput = page.getByTestId(instanceDataTestIds.instanceId).locator("input");
+    await expect(instanceIdInput).not.toHaveValue("", { timeout: 30000 });
+    instanceId = await instanceIdInput.inputValue();
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();

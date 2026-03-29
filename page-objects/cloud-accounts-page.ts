@@ -10,9 +10,8 @@ export class CloudAccountsPage {
     serviceNameSelect: "service-name-select",
 
     refreshButton: "refresh-button",
-    deleteButton: "delete-button",
-    disconnectButton: "disconnect-button",
-    connectButton: "connect-button",
+    deleteActionButton: "delete-action-button",
+    actionsMenu: "actions-select",
     createButton: "create-button",
 
     // Form Elements
@@ -91,7 +90,8 @@ export class CloudAccountsPage {
 
   async deleteCloudAccount(instanceId: string) {
     await this.selectCloudAccount(instanceId);
-    await this.page.getByTestId(this.dataTestIds.deleteButton).click();
+    await this.page.getByTestId(this.dataTestIds.actionsMenu).click();
+    await this.page.getByTestId(this.dataTestIds.deleteActionButton).click();
 
     await this.page.locator("#confirmationText").fill("deleteme");
     await this.page.getByTestId("delete-submit-button").click();
