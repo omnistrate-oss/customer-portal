@@ -26,7 +26,24 @@ export default async function handler(req, res) {
   // Auth: prefer Authorization header, fall back to "token" cookie
   const authToken = req.headers.authorization || (req.cookies?.token ? `Bearer ${req.cookies.token}` : "");
 
-  const downloadURL = BACKEND_BASE_DOMAIN + downloadPath;
+  // Read filename from top-level query/body param
+  const reqFilename = isGet ? req.query.filename : req.body?.filename;
+
+  // Also extract and remove "filename" from inside downloadPath if present
+  let cleanPath = downloadPath;
+  let extractedFilename = "";
+  const qIndex = downloadPath.indexOf("?");
+  if (qIndex !== -1) {
+    const params = new URLSearchParams(downloadPath.slice(qIndex + 1));
+    if (params.has("filename")) {
+      extractedFilename = params.get("filename");
+      params.delete("filename");
+      const remaining = params.toString();
+      cleanPath = downloadPath.slice(0, qIndex) + (remaining ? `?${remaining}` : "");
+    }
+  }
+
+  const downloadURL = BACKEND_BASE_DOMAIN + cleanPath;
 
   try {
     const response = await getInstallerDownload({
@@ -39,11 +56,14 @@ export default async function handler(req, res) {
     const contentDisposition = response.headers["content-disposition"];
     const contentLength = response.headers["content-length"];
 
+    // Priority: top-level query param > extracted from downloadPath > fallback
+    const filename = reqFilename || extractedFilename || "installer.tar.gz";
+
     res.setHeader("Content-Type", contentType);
     if (contentDisposition) {
       res.setHeader("Content-Disposition", contentDisposition);
     } else {
-      res.setHeader("Content-Disposition", 'attachment; filename="installer"');
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     }
     if (contentLength) {
       res.setHeader("Content-Length", contentLength);

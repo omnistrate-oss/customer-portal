@@ -1,6 +1,6 @@
-import { FC, useMemo, useState } from "react";
 import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
+import { FC, useMemo, useState } from "react";
 
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
@@ -32,7 +32,7 @@ const columnHelper = createColumnHelper<InstallerRow>();
 const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const { isDownloading, download: handleDownload } = useInstallerDownload();
+  const { isDownloading, download } = useInstallerDownload();
 
   const rows: InstallerRow[] = useMemo(() => {
     return [
@@ -94,7 +94,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                     disabled={!isInstallerReady || isDownloading}
                     onClick={() => {
                       if (downloadURL) {
-                        handleDownload(downloadURL);
+                        download(downloadURL, instanceDetails?.id);
                       }
                     }}
                     sx={{
@@ -116,7 +116,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
         },
       }),
     ];
-  }, [isDownloading, handleDownload]);
+  }, [isDownloading, download, instanceDetails?.id]);
 
   return (
     <Box>

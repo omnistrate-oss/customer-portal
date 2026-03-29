@@ -48,23 +48,20 @@ export default function useInstallerDownload() {
       });
 
       try {
+        // Use instanceId as the download filename (e.g. "instance-abc123.tar.gz")
+        const filename = instanceId ? `${instanceId}.tar.gz` : "installer.tar.gz";
+
         // Build a GET URL that the browser navigates to directly
-        const params = new URLSearchParams({ downloadPath });
+        const params = new URLSearchParams({ downloadPath, filename });
         const href = `/api/download-installer?${params.toString()}`;
 
         // Use a hidden <a> tag to trigger the browser's native download manager.
         // The server responds with Content-Disposition: attachment, so the browser
         // shows the download in its download bar/panel with progress, pause, resume.
-        const anchor = document.createElement("a");
-        anchor.href = href;
-        anchor.style.display = "none";
-        document.body.appendChild(anchor);
-        anchor.click();
-
-        // Clean up the temporary anchor element
-        setTimeout(() => {
-          document.body.removeChild(anchor);
-        }, 100);
+        // Open the URL directly — the server responds with
+        // Content-Disposition: attachment; filename="..."
+        // which the browser's download manager respects for the filename.
+        window.location.href = href;
 
         snackbar.showSuccess("Installer download started");
       } catch (error: unknown) {
