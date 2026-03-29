@@ -354,7 +354,27 @@ export const getInitialValues = (
   const servicePlanId = selectedSubscription?.productTierId || "";
 
   const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
-  const cloudProvider = offering?.cloudProviders?.[0] || "";
+  const isOnPrem = offering?.serviceModelType === "ON_PREM";
+
+  const platformToCloudProviderMap: Record<string, string> = {
+    EKS: "aws",
+    GKE: "gcp",
+    AKS: "azure",
+    OKE: "oci",
+    Generic: "private",
+  };
+  const cloudProviderToPlatformMap: Record<string, string> = {
+    aws: "EKS",
+    gcp: "GKE",
+    azure: "AKS",
+    oci: "OKE",
+    private: "Generic",
+  };
+
+  // For on-prem, derive cloudProvider from the first onPremPlatform
+  const cloudProvider = isOnPrem
+    ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
+    : offering?.cloudProviders?.[0] || "";
 
   let region;
   if (cloudProvider === "aws") {
@@ -373,6 +393,9 @@ export const getInitialValues = (
   const preferredVersion = versionSets?.find((v) => v.status === "Preferred");
   const defaultProductTierVersion = preferredVersion?.version || "";
 
+  // For on-prem offerings, derive the default onprem_platform from the cloudProvider
+  const onpremPlatform = isOnPrem ? cloudProviderToPlatformMap[cloudProvider] || "" : "";
+
   return {
     serviceId,
     servicePlanId,
@@ -383,6 +406,7 @@ export const getInitialValues = (
     productTierVersion: defaultProductTierVersion,
     requestParams: {},
     customTags: [],
+    ...(isOnPrem && { onprem_platform: onpremPlatform }),
   };
 };
 
@@ -885,3 +909,20 @@ export function applyCustomDnsNormalization(requestParams: any, resourceKey: str
     delete requestParams.custom_dns_configuration;
   }
 }
+
+/**
+ * Returns result_params if non-empty, otherwise falls back to launch_input_params.
+ * result_params can be an empty object `{}` which is truthy,
+ * so a simple `||` check doesn't work.
+ */
+type InstanceParams = Record<string, string>;
+
+export const getResultParams = (
+  resultParams: InstanceParams | undefined,
+  launchInputParams: InstanceParams | undefined
+): InstanceParams | undefined => {
+  if (resultParams && Object.keys(resultParams).length > 0) {
+    return resultParams;
+  }
+  return launchInputParams;
+};

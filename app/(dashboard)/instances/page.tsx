@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Box, Stack } from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
@@ -26,6 +26,9 @@ import RegionIcon from "components/Region/RegionIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 
+import LoadingSpinnerSmall from "../../../src/components/CircularProgress/CircularProgress";
+import DownloadCLIIcon from "../../../src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import useInstallerDownload from "../../../src/hooks/useInstallerDownload";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
@@ -56,7 +59,8 @@ const InstancesPage = () => {
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
-
+  const [instanceId, setInstanceId] = useState("");
+  const { isDownloading, download: downloadInstaller } = useInstallerDownload();
   const {
     subscriptionsObj,
     serviceOfferingsObj,
@@ -72,6 +76,14 @@ const InstancesPage = () => {
     refetch: refetchInstances,
     isError: isInstancesError,
   } = useInstances();
+
+  const handleDownload = useCallback(
+    (id: string, downloadURL: string) => {
+      setInstanceId(id);
+      downloadInstaller(downloadURL, id);
+    },
+    [downloadInstaller]
+  );
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -197,13 +209,39 @@ const InstancesPage = () => {
         id: "status",
         header: "Lifecycle Status",
         cell: (data) => {
-          const status = data.row.original.status;
+          const { status, id, onPremInstallerDetails } = data.row.original;
           const statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
+          const downloadURL = onPremInstallerDetails?.downloadURL;
+          const isInstallerReady = status === "INSTALLER_READY" && !!downloadURL;
+          const isPending = id === instanceId;
 
-          return <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />;
+          return (
+            <Stack direction="row" alignItems="center" gap="8px">
+              <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
+              {isInstallerReady && (
+                <>
+                  <IconButton
+                    disableRipple
+                    disabled={isPending && isDownloading}
+                    onClick={() => {
+                      if (downloadURL) {
+                        handleDownload(id || "", downloadURL);
+                      }
+                    }}
+                    sx={{
+                      padding: 0,
+                    }}
+                  >
+                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : "#6941C6"} />
+                    {isPending && isDownloading && <LoadingSpinnerSmall />}
+                  </IconButton>
+                </>
+              )}
+            </Stack>
+          );
         },
         meta: {
-          minWidth: 170,
+          minWidth: 200,
           disableBrowserTooltip: true,
         },
       }),
@@ -234,12 +272,15 @@ const InstancesPage = () => {
               viewType: "Nodes",
             });
 
+            const offering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+
             return (
               <InstanceHealthStatusChip
                 computedHealthStatus={value}
                 detailedNetworkTopology={
                   (data.row.original?.detailedNetworkTopology ?? {}) as Record<string, ResourceInstanceNetworkTopology>
                 }
+                serviceModelType={offering?.serviceModelType} // Pass the service model type to conditionally render the health status
                 viewNodesLink={resourceInstanceUrlLink}
               />
             );
@@ -366,7 +407,7 @@ const InstancesPage = () => {
         },
       }),
     ];
-  }, [subscriptionsObj, serviceOfferingsObj]);
+  }, [subscriptionsObj, serviceOfferingsObj, isDownloading, handleDownload, instanceId]);
 
   useEffect(() => {
     if (isInstancesError) {

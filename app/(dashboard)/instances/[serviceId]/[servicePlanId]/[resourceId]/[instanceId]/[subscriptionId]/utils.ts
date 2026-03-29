@@ -8,7 +8,8 @@ export const getTabs = (
   isCliManagedResource,
   resourceType,
   isBackup,
-  isCustomDNS
+  isCustomDNS,
+  serviceModelType
 ) => {
   const tabs: Record<string, string | undefined> = {
     resourceInstanceDetails: "Instance Details",
@@ -21,6 +22,9 @@ export const getTabs = (
   if (!isActive || resourceType === RESOURCE_TYPES.Terraform) {
     delete tabs.connectivity;
     delete tabs.nodes;
+  }
+  if (serviceModelType === "ON_PREM") {
+    tabs["installerHub"] = "Installer Hub";
   }
 
   tabs["auditLogs"] = "Audit Logs";
