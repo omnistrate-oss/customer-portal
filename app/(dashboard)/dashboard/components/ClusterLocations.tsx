@@ -6,8 +6,7 @@ import ClusterLocationsIcon from "src/components/Icons/Dashboard/ClusterLocation
 import { Text } from "src/components/Typography/Typography";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
-
-import { getResultParams } from "../../../../src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 const DottedWorldMap = dynamic(() => import("./DottedWorldMap"), {
   ssr: false,
 });
