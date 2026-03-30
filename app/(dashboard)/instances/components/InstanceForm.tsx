@@ -26,7 +26,7 @@ import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
-import { checkBYOADeploymentInstance } from "src/utils/instance";
+import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
@@ -364,7 +364,7 @@ const InstanceForm = ({
       } else {
         // Only send the fields that have changed
         const requestParams = {},
-          oldResultParams = selectedInstance?.result_params || selectedInstance?.launch_input_params;
+          oldResultParams = getResultParams(selectedInstance);
 
         for (const key in data.requestParams) {
           const value = data.requestParams[key];
@@ -816,7 +816,7 @@ const InstanceForm = ({
       instances
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
-          const result_params = instance?.result_params || instance?.launch_input_params;
+          const result_params = getResultParams(instance);
           if (result_params?.gcp_project_id) {
             return values.cloudProvider === "gcp";
           } else if (result_params?.aws_account_id) {
@@ -829,7 +829,7 @@ const InstanceForm = ({
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
         .map((instance) => {
-          const result_params = instance?.result_params || instance?.launch_input_params;
+          const result_params = getResultParams(instance);
           return {
             ...instance,
             label: result_params?.gcp_project_id

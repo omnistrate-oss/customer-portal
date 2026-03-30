@@ -176,7 +176,7 @@ const CreationTimeInstructions = (props) => {
     if (result_params?.cloud_provider_account_config_id) {
       setClickedInstance((prev) => ({
         ...prev,
-        result_params: { ...(prev?.result_params || prev?.launch_input_params), ...result_params },
+        result_params: { ...getResultParams(prev), ...result_params },
       }));
 
       queryClient.setQueryData(
@@ -192,8 +192,8 @@ const CreationTimeInstructions = (props) => {
         (oldData) => {
           const result_params = {
             // @ts-ignore
-            ...(oldData?.resourceInstances?.result_params || oldData?.resourceInstance?.launch_input_params),
-            ...(resourceInstance.result_params || resourceInstance.launch_input_params),
+            ...getResultParams(oldData?.resourceInstances),
+            ...getResultParams(resourceInstance),
           };
 
           return {
@@ -487,9 +487,7 @@ const NonCreationTimeInstructions = (props) => {
         <BodyText sx={{ marginTop: "20px", fontWeight: 600 }}>
           {getAccountConfigStatusBasedHeader(
             selectedAccountConfig?.status,
-
-            selectedAccountConfig?.result_params?.cloud_provider_account_config_id ||
-              selectedAccountConfig?.launch_input_params?.cloud_provider_account_config_id
+            getResultParams(selectedAccountConfig)?.cloud_provider_account_config_id
           )}
         </BodyText>
 
