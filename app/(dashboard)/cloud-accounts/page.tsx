@@ -1013,10 +1013,7 @@ const CloudAccountsPage = () => {
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}
         azureBootstrapShellCommand={azureBootstrapShellCommand}
         accountInstructionDetails={accountInstructionDetails}
-        accountConfigMethod={
-          (clickedInstance?.result_params as Record<string, string>)?.account_configuration_method ||
-          (clickedInstance?.launch_input_params as Record<string, string>)?.account_configuration_method
-        }
+        accountConfigMethod={getResultParams(clickedInstance)?.account_configuration_method}
         fetchClickedInstanceDetails={fetchClickedInstanceDetails}
         setClickedInstance={setClickedInstance}
       />
