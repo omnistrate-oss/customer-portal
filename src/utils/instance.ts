@@ -16,7 +16,7 @@ export { checkBYOADeploymentInstance };
  */
 
 export const getResultParams = (instance) => {
-  const resultParams = instance.result_params;
+  const resultParams = instance?.result_params;
   if (resultParams && Object.keys(resultParams).length > 0) {
     return resultParams;
   }
