@@ -3,6 +3,8 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 
+import { getResultParams } from "../../../src/utils/instance";
+
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   subscriptions: Subscription[],
@@ -83,42 +85,44 @@ export const getInitialValues = (
 ) => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
+    const result_params = getResultParams(selectedInstance);
     return {
       serviceId: subscription?.serviceId || "",
       servicePlanId: subscription?.productTierId || "",
       subscriptionId: subscription?.id || "",
+
       // @ts-ignore
-      cloudProvider: selectedInstance.result_params?.gcp_project_id
+      cloudProvider: result_params?.gcp_project_id
         ? "gcp"
         : //@ts-ignore
-          selectedInstance.result_params?.azure_subscription_id
+          result_params?.azure_subscription_id
           ? "azure"
           : // @ts-ignore
-            selectedInstance.result_params?.aws_account_id
+            result_params?.aws_account_id
             ? "aws"
             : // @ts-ignore
-              selectedInstance.result_params?.oci_tenancy_id
+              result_params?.oci_tenancy_id
               ? "oci"
               : "",
       accountConfigurationMethod:
         // @ts-ignore
-        selectedInstance.result_params?.account_configuration_method,
+        result_params?.account_configuration_method,
       // @ts-ignore
-      awsAccountId: selectedInstance.result_params?.aws_account_id,
+      awsAccountId: result_params?.aws_account_id,
       // @ts-ignore
-      gcpProjectId: selectedInstance.result_params?.gcp_project_id,
+      gcpProjectId: result_params?.gcp_project_id,
       // @ts-ignore
-      gcpProjectNumber: selectedInstance.result_params?.gcp_project_number,
+      gcpProjectNumber: result_params?.gcp_project_number,
       azureSubscriptionId:
         // @ts-ignore
-        selectedInstance.result_params?.azure_subscription_id,
+        result_params?.azure_subscription_id,
       //@ts-ignore
-      azureTenantId: selectedInstance.result_params?.azure_tenant_id,
+      azureTenantId: result_params?.azure_tenant_id,
       ociTenancyId:
         // @ts-ignore
-        selectedInstance.result_params?.oci_tenancy_id,
+        result_params?.oci_tenancy_id,
       // @ts-ignore
-      ociDomainId: selectedInstance.result_params?.oci_domain_id,
+      ociDomainId: result_params?.oci_domain_id,
     };
   }
 

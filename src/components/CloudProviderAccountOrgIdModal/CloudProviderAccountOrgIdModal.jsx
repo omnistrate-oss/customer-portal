@@ -1,9 +1,9 @@
 // import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
@@ -13,6 +13,7 @@ import {
   // ACCOUNT_CREATION_METHODS,
   getAccountConfigStatusBasedHeader,
 } from "src/utils/constants/accountConfig";
+import { getResultParams } from "src/utils/instance";
 
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import CopyToClipboardButton from "../CopyClipboardButton/CopyClipboardButton";
@@ -171,11 +172,11 @@ const CreationTimeInstructions = (props) => {
 
     if (!isMounted.current) return;
 
-    const result_params = resourceInstance?.result_params;
+    const result_params = getResultParams(resourceInstance);
     if (result_params?.cloud_provider_account_config_id) {
       setClickedInstance((prev) => ({
         ...prev,
-        result_params: { ...prev?.result_params, ...result_params },
+        result_params: { ...(prev?.result_params || prev?.launch_input_params), ...result_params },
       }));
 
       queryClient.setQueryData(
@@ -191,8 +192,8 @@ const CreationTimeInstructions = (props) => {
         (oldData) => {
           const result_params = {
             // @ts-ignore
-            ...oldData?.resourceInstances?.result_params,
-            ...resourceInstance.result_params,
+            ...(oldData?.resourceInstances?.result_params || oldData?.resourceInstance?.launch_input_params),
+            ...(resourceInstance.result_params || resourceInstance.launch_input_params),
           };
 
           return {
@@ -486,7 +487,9 @@ const NonCreationTimeInstructions = (props) => {
         <BodyText sx={{ marginTop: "20px", fontWeight: 600 }}>
           {getAccountConfigStatusBasedHeader(
             selectedAccountConfig?.status,
-            selectedAccountConfig?.result_params?.cloud_provider_account_config_id
+
+            selectedAccountConfig?.result_params?.cloud_provider_account_config_id ||
+              selectedAccountConfig?.launch_input_params?.cloud_provider_account_config_id
           )}
         </BodyText>
 

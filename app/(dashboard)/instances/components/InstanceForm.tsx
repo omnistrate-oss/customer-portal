@@ -364,7 +364,7 @@ const InstanceForm = ({
       } else {
         // Only send the fields that have changed
         const requestParams = {},
-          oldResultParams = selectedInstance?.result_params;
+          oldResultParams = selectedInstance?.result_params || selectedInstance?.launch_input_params;
 
         for (const key in data.requestParams) {
           const value = data.requestParams[key];
@@ -816,27 +816,31 @@ const InstanceForm = ({
       instances
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
-          if (instance.result_params?.gcp_project_id) {
+          const result_params = instance?.result_params || instance?.launch_input_params;
+          if (result_params?.gcp_project_id) {
             return values.cloudProvider === "gcp";
-          } else if (instance.result_params?.aws_account_id) {
+          } else if (result_params?.aws_account_id) {
             return values.cloudProvider === "aws";
-          } else if (instance.result_params?.azure_subscription_id) {
+          } else if (result_params?.azure_subscription_id) {
             return values.cloudProvider === "azure";
-          } else if (instance.result_params?.oci_tenancy_id) {
+          } else if (result_params?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
-        .map((instance) => ({
-          ...instance,
-          label: instance.result_params?.gcp_project_id
-            ? `${instance.id} (Project ID - ${instance.result_params?.gcp_project_id})`
-            : instance.result_params?.aws_account_id
-              ? `${instance.id} (Account ID - ${instance.result_params?.aws_account_id})`
-              : instance.result_params?.oci_tenancy_id
-                ? `${instance.id} (Tenancy ID - ${instance.result_params?.oci_tenancy_id})`
-                : `${instance.id} (Subscription ID - ${instance.result_params?.azure_subscription_id})`,
-        })),
+        .map((instance) => {
+          const result_params = instance?.result_params || instance?.launch_input_params;
+          return {
+            ...instance,
+            label: result_params?.gcp_project_id
+              ? `${instance.id} (Project ID - ${result_params?.gcp_project_id})`
+              : result_params?.aws_account_id
+                ? `${instance.id} (Account ID - ${result_params?.aws_account_id})`
+                : result_params?.oci_tenancy_id
+                  ? `${instance.id} (Tenancy ID - ${result_params?.oci_tenancy_id})`
+                  : `${instance.id} (Subscription ID - ${result_params?.azure_subscription_id})`,
+          };
+        }),
     [instances, values.cloudProvider]
   );
 

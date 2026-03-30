@@ -24,6 +24,7 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 
+import { getResultParams } from "../../../../src/utils/instance";
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
@@ -125,9 +126,9 @@ const CloudAccountForm = ({
             },
           ],
           (oldData: any) => {
-            const result_params = {
-              // @ts-ignore
-              ...resourceInstance.result_params,
+            const instance_result_params = getResultParams(resourceInstance);
+            const result_params: Record<string, any> = {
+              ...instance_result_params,
               cloud_provider: values.cloudProvider,
               account_configuration_method: values.accountConfigurationMethod,
             };
@@ -167,7 +168,7 @@ const CloudAccountForm = ({
         setClickedInstance({
           ...resourceInstance,
           result_params: {
-            ...(resourceInstance.result_params || {}),
+            ...getResultParams(resourceInstance),
             account_configuration_method: values.accountConfigurationMethod,
             cloud_provider: values.cloudProvider,
             ...(values.cloudProvider === CLOUD_PROVIDERS.aws
