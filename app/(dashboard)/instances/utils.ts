@@ -19,8 +19,7 @@ import {
   ResourceInstanceNetworkTopology,
 } from "src/types/resourceInstance";
 import { TierVersionSet } from "src/types/tier-version-set";
-
-import { getResultParams } from "../../../src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 
 import { loadStatusLabel, loadStatusMap } from "./constants";
 

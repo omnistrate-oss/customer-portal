@@ -3,7 +3,7 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 
-import { getResultParams } from "../../../src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,

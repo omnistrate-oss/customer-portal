@@ -39,7 +39,7 @@ import {
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCloudAccountsRoute } from "src/utils/routes";
 
-import { getResultParams } from "../../../src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
 import PageContainer from "../components/Layout/PageContainer";
