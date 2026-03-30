@@ -5,8 +5,7 @@ import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
-
-import { getResultParams } from "../../src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 
 export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsPage, instance: ResourceInstance) => {
   const page = instanceDetailsPage.page;
