@@ -28,29 +28,18 @@ const InstallerInstructions = ({ installerInstructions }: InstallerInstructionsP
 
       <Box sx={{ p: 3 }}>
         {installerInstructions && installerInstructions !== '<p class="editor-paragraph"><br></p>' ? (
-          <Box
-            sx={{
-              border: "1px solid #CBD5E1",
-              boxShadow: "0px 2px 4px -2px #1717170F, 0px 4px 8px -2px #1717171A",
-              borderRadius: "8px",
-              padding: "16px",
-              maxHeight: "500px",
-              overflowY: "auto",
+          <div
+            style={{
+              fontSize: "small",
+              fontWeight: 600,
+              color: "#344054",
             }}
-          >
-            <div
-              style={{
-                fontSize: "small",
-                fontWeight: 600,
-                color: "#344054",
-              }}
-              dangerouslySetInnerHTML={{
-                __html: installerInstructions
-                  ? DOMPurify.sanitize(installerInstructions)
-                  : "No installer instructions available.",
-              }}
-            />
-          </Box>
+            dangerouslySetInnerHTML={{
+              __html: installerInstructions
+                ? DOMPurify.sanitize(installerInstructions)
+                : "No installer instructions available.",
+            }}
+          />
         ) : (
           <Box display={"flex"} justifyContent="center" alignItems="center" minHeight="200px">
             <Text color="#344054" size="small" weight="regular">

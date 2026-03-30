@@ -4,7 +4,6 @@ import { FC, useMemo, useState } from "react";
 
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import SideDrawerRight from "src/components/SideDrawerRight/SideDrawerRight";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import useInstallerDownload from "src/hooks/useInstallerDownload";
 import formatDateUTC from "src/utils/formatDateUTC";
@@ -30,7 +29,7 @@ type InstallerHubProps = {
 const columnHelper = createColumnHelper<InstallerRow>();
 
 const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const { isDownloading, download } = useInstallerDownload();
 
@@ -47,12 +46,12 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
     ];
   }, [instanceDetails]);
 
-  function handleDrawerOpen() {
-    setIsDrawerOpen(true);
+  function handleModalOpen() {
+    setIsModalOpen(true);
   }
 
-  function handleDrawerClose() {
-    setIsDrawerOpen(false);
+  function handleModalClose() {
+    setIsModalOpen(false);
   }
 
   const columns = useMemo(() => {
@@ -126,7 +125,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
         noRowsText="No Installer/Upgrader available"
         HeaderComponent={DataGridHeader}
         headerProps={{
-          handleDrawerOpen,
+          handleDrawerOpen: handleModalOpen,
           selectedRows,
         }}
         selectionMode="single"
@@ -134,17 +133,10 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
         onRowSelectionChange={setSelectedRows}
         rowId="id"
       />
-      <SideDrawerRight
-        open={isDrawerOpen}
-        closeDrawer={handleDrawerClose}
-        size="medium"
-        RenderUI={
-          <>
-            <InstallerUpgraderInstructions
-              installerInstructions={instanceDetails?.onPremInstallerDetails?.installerInstructions}
-            />
-          </>
-        }
+      <InstallerUpgraderInstructions
+        open={isModalOpen}
+        handleClose={handleModalClose}
+        installerInstructions={instanceDetails?.onPremInstallerDetails?.installerInstructions}
       />
     </Box>
   );
