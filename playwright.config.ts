@@ -50,7 +50,7 @@ export default defineConfig({
   webServer: {
     command: "yarn dev:test",
     url: process.env.YOUR_SAAS_DOMAIN_URL || "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     env: {
       PROVIDER_EMAIL: process.env.PROVIDER_EMAIL || "",
       PROVIDER_PASSWORD: process.env.PROVIDER_PASSWORD || "",
