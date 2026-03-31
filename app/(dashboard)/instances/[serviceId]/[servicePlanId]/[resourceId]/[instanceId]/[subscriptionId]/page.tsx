@@ -238,6 +238,7 @@ const InstanceDetailsPage = ({
           onViewNodesClick={() => {
             setCurrentTab("Nodes");
           }}
+          serviceModelType={offering?.serviceModelType}
         />
       </Collapse>
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
