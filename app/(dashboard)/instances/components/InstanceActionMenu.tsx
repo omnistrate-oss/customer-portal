@@ -144,7 +144,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         label: "Modify",
         isDisabled:
           !instance ||
-          (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
+          (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
           isProxyResource ||
           !isUpdateAllowedByRBAC,
         onClick: () => {
