@@ -154,7 +154,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : status !== "RUNNING" && status !== "FAILED"
+          : status !== "RUNNING" && status !== "FAILED" && status !== "INSTALLER_READY" && status !== "COMPLETE"
             ? "Instance must be running or failed to modify"
             : isProxyResource
               ? "System managed instances cannot be modified"
@@ -236,7 +236,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           !instance || !["RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string) || !isUpdateAllowedByRBAC,
         disabledMessage: !instance
           ? "Please select an instance"
-          : !["RUNNING", "STOPPED"].includes(status as string)
+          : !["RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string)
             ? "Instance must be running or stopped to upgrade"
             : !isUpdateAllowedByRBAC
               ? "Unauthorized to upgrade instances"
