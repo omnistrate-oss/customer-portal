@@ -22,25 +22,29 @@ export const KubernetesDistributionMap = {
   Generic: "Generic",
 };
 
-const KubernetesDistributionCard = styled(Box)<{ selected?: boolean }>(({ selected }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "8px",
-  borderRadius: "8px",
-  border: "2px solid",
-  borderColor: selected ? `${colors.success500}` : "#E5E7EB",
-  backgroundColor: "#FFFFFF",
-  cursor: "pointer",
-  minWidth: "110px",
-  transition: "all 0.2s ease-in-out",
-  "&:hover": {
-    borderColor: selected ? `${colors.success500}` : "#9CA3AF",
-    backgroundColor: "#F9FAFB",
-  },
-  boxShadow: "0px 1px 2px 0px #0A0D120D",
-}));
+const KubernetesDistributionCard = styled(Box)<{ selected?: boolean; disabled?: boolean }>(
+  ({ selected, disabled }) => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "8px",
+    borderRadius: "8px",
+    border: "2px solid",
+    borderColor: selected ? `${colors.success500}` : "#E5E7EB",
+    backgroundColor: disabled ? "#F3F4F6" : "#FFFFFF",
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.6 : 1,
+    minWidth: "110px",
+    transition: "all 0.2s ease-in-out",
+    pointerEvents: disabled ? "none" : "auto",
+    "&:hover": {
+      borderColor: selected ? `${colors.success500}` : "#9CA3AF",
+      backgroundColor: disabled ? "#F3F4F6" : "#F9FAFB",
+    },
+    boxShadow: "0px 1px 2px 0px #0A0D120D",
+  })
+);
 
 type KubernetesDistribution = "EKS" | "GKE" | "AKS" | "Generic";
 
@@ -49,6 +53,7 @@ type KubernetesDistributionsMultiSelectProps = {
   onPremPlatforms: string | string[];
   multiple?: boolean;
   onPremPlatformOptions?: KubernetesDistribution[];
+  disabled?: boolean;
 };
 
 const KubernetesDistributionsMultiSelect = ({
@@ -56,6 +61,7 @@ const KubernetesDistributionsMultiSelect = ({
   onPremPlatforms,
   multiple = false,
   onPremPlatformOptions,
+  disabled,
 }: KubernetesDistributionsMultiSelectProps) => {
   const fieldValue = onPremPlatforms;
 
@@ -84,7 +90,12 @@ const KubernetesDistributionsMultiSelect = ({
     <>
       <Box display="flex" gap="12px" flexWrap="wrap">
         {onPremPlatformOptions?.map((option) => (
-          <KubernetesDistributionCard key={option} selected={isSelected(option)} onClick={() => handleClick(option)}>
+          <KubernetesDistributionCard
+            disabled={disabled}
+            key={option}
+            selected={isSelected(option)}
+            onClick={() => !disabled && handleClick(option)}
+          >
             <Box marginBottom="1px">{KubernetesDistributionLogoMap[option.toLowerCase()]}</Box>
             <Text size="small" weight="medium">
               {KubernetesDistributionMap[option]}

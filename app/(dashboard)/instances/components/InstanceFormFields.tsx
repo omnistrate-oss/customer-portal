@@ -476,6 +476,7 @@ export const getStandardInformationFields = (
           onPremPlatforms={formData.values.onprem_platform}
           setFieldValue={formData.setFieldValue}
           onPremPlatformOptions={onPremPlatformOptions as ("EKS" | "GKE" | "AKS" | "Generic")[]}
+          disabled={formMode !== "create"}
         />
       ),
       previewValue: values.onprem_platform || null,
