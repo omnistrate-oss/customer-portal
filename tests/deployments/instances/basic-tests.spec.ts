@@ -10,13 +10,15 @@ import {
   TestMetricsTab,
   TestNodesTab,
 } from "test-fixtures/utils/instance-details-tabs";
-import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
+import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 import { ResourceInstance } from "src/types/resourceInstance";
 
 const logPrefix = "Instances -> Basic Tests ->";
-const guard = new BackendSetupGuard("deployments/instances/basic-tests.spec.ts");
 
 test.describe.configure({ mode: "serial" });
 
@@ -27,7 +29,6 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     instanceId: string;
 
   test.beforeEach(async ({ page }) => {
-    test.skip(guard.setupFailed, `Skipping: ${guard.failureMessage}`);
     instancesPage = new InstancesPage(page);
     instanceDetailsPage = new InstanceDetailsPage(page);
     await instancesPage.navigate();

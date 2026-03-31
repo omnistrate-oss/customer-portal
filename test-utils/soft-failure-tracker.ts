@@ -61,17 +61,33 @@ const recordSoftFailure = (entry: SoftFailureEntry) => {
 };
 
 /**
- * Call once during test setup (global-setup.ts) to wire the recorder
- * into backend-error.ts and clear any stale report from previous runs.
+ * Clear any stale report from previous runs.
+ * Call once from globalSetup (runs in its own process before workers start).
  */
-export const initSoftFailureTracker = () => {
-  // Clear stale report
+export const clearSoftFailureReport = () => {
   if (fs.existsSync(REPORT_PATH)) {
     fs.unlinkSync(REPORT_PATH);
   }
+};
 
-  // Register the recorder callback
+/**
+ * Register the recorder callback in the current process.
+ * Call from each worker process (e.g. at module scope in spec files)
+ * so that soft failures are actually written to disk.
+ */
+export const registerSoftFailureRecorder = () => {
   setSoftFailureRecorder(recordSoftFailure);
+};
+
+/**
+ * Call once during test setup (global-setup.ts) to clear stale reports
+ * and register the recorder. Note: the recorder registration only takes
+ * effect in the globalSetup process. Workers must call
+ * registerSoftFailureRecorder() separately.
+ */
+export const initSoftFailureTracker = () => {
+  clearSoftFailureReport();
+  registerSoftFailureRecorder();
 };
 
 /**

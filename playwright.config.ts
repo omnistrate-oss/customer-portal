@@ -47,17 +47,19 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: "yarn dev:test",
-    url: process.env.YOUR_SAAS_DOMAIN_URL || "http://127.0.0.1:3000",
-    reuseExistingServer: true,
-    env: {
-      PROVIDER_EMAIL: process.env.PROVIDER_EMAIL || "",
-      PROVIDER_PASSWORD: process.env.PROVIDER_PASSWORD || "",
-      NEXT_PUBLIC_BACKEND_BASE_DOMAIN: process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.dev",
-      ENVIRONMENT_TYPE: process.env.ENVIRONMENT_TYPE || "DEV",
-      MAIL_USER_EMAIL: process.env.MAIL_USER_EMAIL || "",
-      MAIL_USER_PASSWORD: process.env.MAIL_USER_PASSWORD || "",
-    },
-  },
+  webServer: process.env.CI
+    ? undefined
+    : {
+        command: "yarn dev:test",
+        url: process.env.YOUR_SAAS_DOMAIN_URL || "http://127.0.0.1:3000",
+        reuseExistingServer: true,
+        env: {
+          PROVIDER_EMAIL: process.env.PROVIDER_EMAIL || "",
+          PROVIDER_PASSWORD: process.env.PROVIDER_PASSWORD || "",
+          NEXT_PUBLIC_BACKEND_BASE_DOMAIN: process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.dev",
+          ENVIRONMENT_TYPE: process.env.ENVIRONMENT_TYPE || "DEV",
+          MAIL_USER_EMAIL: process.env.MAIL_USER_EMAIL || "",
+          MAIL_USER_PASSWORD: process.env.MAIL_USER_PASSWORD || "",
+        },
+      },
 });

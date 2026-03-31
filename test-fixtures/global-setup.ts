@@ -1,14 +1,14 @@
 import { yamlTemplates } from "constants/yaml-templates";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
-import { initSoftFailureTracker } from "test-utils/soft-failure-tracker";
+import { clearSoftFailureReport } from "test-utils/soft-failure-tracker";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 async function globalSetup() {
   console.log("Running Global Setup...");
 
-  // Wire backend error tracking
-  initSoftFailureTracker();
+  // Clear stale report from previous runs (recorder is registered per-worker)
+  clearSoftFailureReport();
 
   const apiClient = new ProviderAPIClient();
 

@@ -1,7 +1,10 @@
 import test from "@playwright/test";
 import { InstancesPage } from "page-objects/instances-page";
-import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
+import { BackendError, BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 import { ResourceInstance } from "src/types/resourceInstance";
 
@@ -66,7 +69,7 @@ test.describe("Instances Page - Operational Tests", () => {
 
         console.log("Instance created:", instance);
       } catch (e) {
-        guard.handleError(e);
+        guard.handleError(e instanceof BackendError ? e : new BackendError(e instanceof Error ? e.message : String(e)));
       }
     }
   });

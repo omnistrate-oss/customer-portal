@@ -2,11 +2,13 @@ import test, { expect } from "@playwright/test";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 import { dataTestIds as instanceDataTestIds } from "page-objects/constants/instances-page";
 import { InstancesPage } from "page-objects/instances-page";
-import { BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
+import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 const logPrefix = "Instances -> BYOA Instance Tests ->";
-const guard = new BackendSetupGuard("deployments/instances/byoa-instance.spec.ts");
 
 test.describe.configure({ mode: "serial" });
 
@@ -17,7 +19,6 @@ test.describe("Instances Page - BYOA Instance Tests", () => {
     instanceId: string;
 
   test.beforeEach(async ({ page }) => {
-    test.skip(guard.setupFailed, `Skipping: ${guard.failureMessage}`);
     instancesPage = new InstancesPage(page);
     cloudAccountsPage = new CloudAccountsPage(page);
   });
