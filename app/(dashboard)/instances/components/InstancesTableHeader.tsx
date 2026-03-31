@@ -1,6 +1,9 @@
-import { useMemo } from "react";
 import { CircularProgress } from "@mui/material";
+import { useMemo } from "react";
 
+import Button from "components/Button/Button";
+import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
+import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
@@ -15,9 +18,6 @@ import {
   operationEnum,
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
-import Button from "components/Button/Button";
-import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
-import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
@@ -180,7 +180,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isDisabled:
         !selectedInstance ||
-        (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
+        (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
         isProxyResource ||
         !isUpdateAllowedByRBAC,
       onClick: () => {

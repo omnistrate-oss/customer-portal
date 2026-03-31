@@ -2,20 +2,22 @@
 
 import { cn } from "lib/utils";
 
-import { cloudProviderLabels } from "src/constants/cloudProviders";
-import { colors } from "src/themeConfig";
 import { Text } from "components/Typography/Typography";
+import { colors } from "src/themeConfig";
 
-import AWSIcon from "./AWSIcon";
-import AzureIcon from "./AzureIcon";
-import GcpIcon from "./GCPIcon";
-import OCIIcon from "./OCIIcon";
+import AwsLogo from "../../../../src/components/Logos/AwsLogo";
+import AzureLogo from "../../../../src/components/Logos/AzureLogo";
+import GcpLogo from "../../../../src/components/Logos/GcpLogo";
+import OciLogo from "../../../../src/components/Logos/OciLogo";
 
-const cloudIcons = {
-  aws: <AWSIcon style={{ height: "32px", width: "auto" }} />,
-  gcp: <GcpIcon style={{ height: "32px", width: "auto" }} />,
-  azure: <AzureIcon style={{ height: "32px", width: "auto" }} />,
-  oci: <OCIIcon style={{ height: "32px", width: "auto" }} />,
+import PrivateIcon from "./PrivateIcon";
+
+export const cloudProviderLongLogoMap = {
+  aws: <AwsLogo style={{ height: "32px", width: "auto" }} />,
+  gcp: <GcpLogo style={{ height: "32px", width: "auto" }} />,
+  azure: <AzureLogo style={{ height: "32px", width: "auto" }} />,
+  oci: <OciLogo style={{ height: "32px", width: "auto" }} />,
+  private: <PrivateIcon style={{ height: "25px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
@@ -23,7 +25,7 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
     <div
       data-testid={`${cloudProvider}-card`}
       className={cn(
-        "px-4 py-4 rounded-xl text-center flex flex-col justify-between items-center min-h-28",
+        "px-4 py-4 rounded-xl text-center flex flex-col justify-between items-center min-h-15",
         disabled ? "cursor-default bg-gray-50" : "cursor-pointer"
       )}
       style={{
@@ -35,10 +37,7 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
         }
       }}
     >
-      {cloudIcons[cloudProvider]}
-      <Text size="small" weight="medium" color={disabled ? "#667085" : "#414651"}>
-        {cloudProviderLabels[cloudProvider]}
-      </Text>
+      {cloudProviderLongLogoMap[cloudProvider]}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import OCIIcon from "app/(dashboard)/components/CloudProviderRadio/OCIIcon";
+import PrivateLogo from "app/(dashboard)/components/CloudProviderRadio/PrivateIcon";
 
 import AWSIcon from "src/components/Icons/CloudProviders/AWSLogo";
 import AzureIcon from "src/components/Icons/CloudProviders/AzureLogo";
@@ -13,6 +14,7 @@ export const cloudProviderLabels = {
   aws: "Amazon Web Services",
   azure: "Microsoft Azure",
   oci: "Oracle Cloud Infrastructure",
+  private: "Private",
 };
 
 //short logos map
@@ -29,6 +31,7 @@ export const cloudProviderLongLogoMap = {
   gcp: <GcpLogo />,
   azure: <AzureLogo />,
   oci: <OciLogo />,
+  private: <PrivateLogo />,
 };
 
 export const cloudProviderLabelsShort = {
