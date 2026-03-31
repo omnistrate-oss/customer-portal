@@ -1,8 +1,9 @@
 import createFetchClient from "openapi-fetch";
 
 import { baseDomain } from "src/api/client";
+import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
-import { passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
+import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
 
 // Create the API client
 const apiClient = createFetchClient({
@@ -19,13 +20,22 @@ export default async function handleAction(nextRequest, nextResponse) {
     const { endpoint, method, data = {}, queryParams = {} } = nextRequest.body;
 
     if (endpoint && method && endpoint?.startsWith("/")) {
+      // Reject requests to endpoints not in the allowlist
+      if (!isAllowedRoute(method, endpoint)) {
+        return nextResponse.status(403).send({ message: "Forbidden" });
+      }
+
       try {
-        // Password validation for change-password endpoint
-        if (endpoint === "/change-password") {
+        // Password validation for change-password and update-password endpoints
+        const normalizedEndpoint = normalizeEndpoint(endpoint);
+        if (normalizedEndpoint === "/2022-09-01-00/change-password" || normalizedEndpoint === "/2022-09-01-00/update-password") {
           const password = data.password;
           if (password && typeof password === "string") {
             if (!password.match(passwordRegex)) {
               return nextResponse.status(400).send({ message: passwordRegexFailText });
+            }
+            if (isPasswordSameAsEmail(password, data.email)) {
+              return nextResponse.status(400).send({ message: passwordMatchesEmailText });
             }
           }
         }

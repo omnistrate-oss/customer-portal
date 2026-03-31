@@ -14,6 +14,7 @@ import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
 import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
+import StatusChip from "components/StatusChip/StatusChip";
 import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -110,6 +111,14 @@ const CustomNetworksPage = () => {
       columnHelper.accessor("cidr", {
         id: "cidr",
         header: "CIDR",
+      }),
+      columnHelper.accessor("status", {
+        id: "status",
+        header: "Status",
+        cell: (data) => <StatusChip status={data.row.original.status} />,
+        meta: {
+          minWidth: 120,
+        },
       }),
     ];
   }, []);
