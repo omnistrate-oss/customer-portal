@@ -911,20 +911,3 @@ export function applyCustomDnsNormalization(requestParams: any, resourceKey: str
     delete requestParams.custom_dns_configuration;
   }
 }
-
-/**
- * Returns result_params if non-empty, otherwise falls back to launch_input_params.
- * result_params can be an empty object `{}` which is truthy,
- * so a simple `||` check doesn't work.
- */
-type InstanceParams = Record<string, string>;
-
-export const getResultParams = (
-  resultParams: InstanceParams | undefined,
-  launchInputParams: InstanceParams | undefined
-): InstanceParams | undefined => {
-  if (resultParams && Object.keys(resultParams).length > 0) {
-    return resultParams;
-  }
-  return launchInputParams;
-};
