@@ -1,6 +1,5 @@
+import { baseDomain } from "src/axios";
 import { getInstallerDownload } from "src/server/api/installer-download";
-
-const BACKEND_BASE_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.dev";
 
 export default async function handler(req, res) {
   // Support both GET (browser-managed download) and POST (legacy)
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
     }
   }
 
-  const downloadURL = BACKEND_BASE_DOMAIN + cleanPath;
+  const downloadURL = baseDomain + cleanPath;
 
   try {
     const response = await getInstallerDownload({
