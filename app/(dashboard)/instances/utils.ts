@@ -297,6 +297,22 @@ export const getValidSubscriptionForInstanceCreation = (
   );
 };
 
+export const cloudProviderToPlatformMap: Record<string, string> = {
+  aws: "EKS",
+  gcp: "GKE",
+  azure: "AKS",
+  oci: "OKE",
+  private: "Generic",
+};
+
+export const platformToCloudProviderMap: Record<string, string> = {
+  EKS: "aws",
+  GKE: "gcp",
+  AKS: "azure",
+  OKE: "oci",
+  Generic: "private",
+};
+
 export const getInitialValues = (
   instance: ResourceInstance | undefined,
   subscriptions: Subscription[],
@@ -355,21 +371,6 @@ export const getInitialValues = (
 
   const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
   const isOnPrem = offering?.serviceModelType === "ON_PREM";
-
-  const platformToCloudProviderMap: Record<string, string> = {
-    EKS: "aws",
-    GKE: "gcp",
-    AKS: "azure",
-    OKE: "oci",
-    Generic: "private",
-  };
-  const cloudProviderToPlatformMap: Record<string, string> = {
-    aws: "EKS",
-    gcp: "GKE",
-    azure: "AKS",
-    oci: "OKE",
-    private: "Generic",
-  };
 
   // For on-prem, derive cloudProvider from the first onPremPlatform
   const cloudProvider = isOnPrem

@@ -2,13 +2,13 @@ import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import { FC, useMemo, useState } from "react";
 
+import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import useInstallerDownload from "src/hooks/useInstallerDownload";
+import { styleConfig } from "src/providerConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-
-import LoadingSpinnerSmall from "../../../../../src/components/CircularProgress/CircularProgress";
 
 import DataGridHeader from "./DataGridHeader";
 import InstallerUpgraderInstructions from "./InstallerUpgraderInstructions";
@@ -102,7 +102,9 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                       gap: "4px",
                     }}
                   >
-                    <DownloadCLIIcon color={isInstallerReady && !isDownloading ? "#6941C6" : "#A0A0A0"} />
+                    <DownloadCLIIcon
+                      color={isInstallerReady && !isDownloading ? styleConfig.secondaryButtonText : "#A0A0A0"}
+                    />
                   </IconButton>
                   {isDownloading && <LoadingSpinnerSmall />}
                 </span>

@@ -232,7 +232,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       res.push({
         dataTestId: "upgrade-button",
         label: "Upgrade",
-        isDisabled: !instance || !["RUNNING", "STOPPED"].includes(status as string) || !isUpdateAllowedByRBAC,
+        isDisabled:
+          !instance || !["RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string) || !isUpdateAllowedByRBAC,
         disabledMessage: !instance
           ? "Please select an instance"
           : !["RUNNING", "STOPPED"].includes(status as string)

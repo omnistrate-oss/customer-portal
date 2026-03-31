@@ -55,13 +55,17 @@ export default function useInstallerDownload() {
         const params = new URLSearchParams({ downloadPath, filename });
         const href = `/api/download-installer?${params.toString()}`;
 
-        // Use a hidden <a> tag to trigger the browser's native download manager.
-        // The server responds with Content-Disposition: attachment, so the browser
-        // shows the download in its download bar/panel with progress, pause, resume.
-        // Open the URL directly — the server responds with
-        // Content-Disposition: attachment; filename="..."
-        // which the browser's download manager respects for the filename.
-        window.location.href = href;
+        // Use a hidden <a> tag to trigger the browser's native download manager
+        // without navigating away from the current page. The server responds with
+        // Content-Disposition: attachment, so the browser shows the download in
+        // its download bar/panel with progress, pause, resume.
+        const a = document.createElement("a");
+        a.href = href;
+        a.download = filename;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
         snackbar.showSuccess("Installer download started");
       } catch (error: unknown) {
@@ -75,7 +79,7 @@ export default function useInstallerDownload() {
             isDownloading: false,
             activeInstanceId: null,
           });
-        }, 1500);
+        }, 2500);
       }
     },
     [state.isDownloading, snackbar]

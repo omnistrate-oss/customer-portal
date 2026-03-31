@@ -20,6 +20,7 @@ import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/Subscr
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import { ResourceSummary } from "../hooks/useResources";
 import {
+  cloudProviderToPlatformMap,
   filterSchemaByCloudProvider,
   getCustomNetworksMenuItems,
   getJsonValue,
@@ -29,6 +30,7 @@ import {
   getValidSubscriptionForInstanceCreation,
   getVersionSetResourceMenuItems,
   normalizeCustomDnsValue,
+  platformToCloudProviderMap,
 } from "../utils";
 
 import AccountConfigDescription from "./AccountConfigDescription";
@@ -125,22 +127,6 @@ export const getStandardInformationFields = (
     }
     return options;
   })();
-
-  const cloudProviderToPlatformMap: Record<string, string> = {
-    aws: "EKS",
-    gcp: "GKE",
-    azure: "AKS",
-    oci: "OKE",
-    private: "Generic",
-  };
-
-  const platformToCloudProviderMap: Record<string, string> = {
-    EKS: "aws",
-    GKE: "gcp",
-    AKS: "azure",
-    OKE: "oci",
-    Generic: "private",
-  };
 
   const onPremPlatformOptions: string[] = (() => {
     const options: string[] = [];

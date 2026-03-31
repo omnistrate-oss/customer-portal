@@ -1,4 +1,8 @@
-function InstallerActionIcon(props) {
+import { FC } from "react";
+
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const InstallerActionIcon: FC<SVGIconProps> = (props) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" {...props}>
       <path
@@ -10,6 +14,6 @@ function InstallerActionIcon(props) {
       />
     </svg>
   );
-}
+};
 
 export default InstallerActionIcon;

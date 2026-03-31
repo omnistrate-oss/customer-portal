@@ -1,21 +1,21 @@
 import { Box, styled } from "@mui/material";
 
-import { Text } from "../../../../src/components/Typography/Typography";
-import { colors } from "../../../../src/themeConfig";
+import { Text } from "src/components/Typography/Typography";
+import { colors } from "src/themeConfig";
 
 import AmazonEKSIcon from "./Kubernetes/AmazonEKSIcon";
 import AzureAKSIcon from "./Kubernetes/AzureAKSIcon";
 import GenericIcon from "./Kubernetes/GenericIcon";
 import GoogleGKEIcon from "./Kubernetes/GoogleGKEIcon";
 
-export const kubernetesDistributionLogoMap = {
+export const KubernetesDistributionLogoMap = {
   eks: <AmazonEKSIcon />,
   aks: <AzureAKSIcon />,
   gke: <GoogleGKEIcon />,
   generic: <GenericIcon />,
 };
 
-export const kubernetesDistributionMap = {
+export const KubernetesDistributionMap = {
   EKS: "Amazon EKS",
   GKE: "Google GKE",
   AKS: "Azure AKS",
@@ -85,9 +85,9 @@ const KubernetesDistributionsMultiSelect = ({
       <Box display="flex" gap="12px" flexWrap="wrap">
         {onPremPlatformOptions?.map((option) => (
           <KubernetesDistributionCard key={option} selected={isSelected(option)} onClick={() => handleClick(option)}>
-            <Box marginBottom="1px">{kubernetesDistributionLogoMap[option.toLowerCase()]}</Box>
+            <Box marginBottom="1px">{KubernetesDistributionLogoMap[option.toLowerCase()]}</Box>
             <Text size="small" weight="medium">
-              {kubernetesDistributionMap[option]}
+              {KubernetesDistributionMap[option]}
             </Text>
           </KubernetesDistributionCard>
         ))}

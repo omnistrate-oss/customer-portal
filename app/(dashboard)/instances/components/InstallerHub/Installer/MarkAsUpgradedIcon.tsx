@@ -1,4 +1,8 @@
-function MarkAsUpgradedIcon(props) {
+import { FC } from "react";
+
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const MarkAsUpgradedIcon: FC<SVGIconProps> = (props) => {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -10,6 +14,6 @@ function MarkAsUpgradedIcon(props) {
       />
     </svg>
   );
-}
+};
 
 export default MarkAsUpgradedIcon;

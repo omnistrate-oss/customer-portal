@@ -9,10 +9,12 @@ import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
+import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
 import LoadIndicatorNormal from "src/components/Icons/LoadIndicator/LoadIndicatorNormal";
+import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import InstanceHealthStatusChip, {
   getInstanceHealthStatus,
 } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
@@ -20,15 +22,14 @@ import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
+import useInstallerDownload from "src/hooks/useInstallerDownload";
+import { styleConfig } from "src/providerConfig";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
 
-import LoadingSpinnerSmall from "../../../src/components/CircularProgress/CircularProgress";
-import DownloadCLIIcon from "../../../src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import useInstallerDownload from "../../../src/hooks/useInstallerDownload";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
@@ -241,7 +242,7 @@ const InstancesPage = () => {
                       padding: 0,
                     }}
                   >
-                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : "#6941C6"} />
+                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
                     {isPending && isDownloading && <LoadingSpinnerSmall />}
                   </IconButton>
                 </>

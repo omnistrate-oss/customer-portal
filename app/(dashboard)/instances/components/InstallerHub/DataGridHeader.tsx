@@ -23,7 +23,7 @@ const DataGridHeader: FC<DataGridHeaderProps> = (props) => {
         <DataGridHeaderTitle
           title="List of Installers/Upgraders"
           desc={
-            "Below are the installer and upgrader packages available for this instance.Select a version to download and view detailed installation instructions."
+            "Below are the installer and upgrader packages available for this instance. Select a version to download and view detailed installation instructions."
           }
         />
         <Tooltip title={isNoneSelected ? "Installer/Upgrader is not selected" : ""}>
