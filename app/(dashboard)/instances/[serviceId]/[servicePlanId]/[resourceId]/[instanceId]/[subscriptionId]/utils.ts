@@ -1,6 +1,18 @@
 import { RESOURCE_TYPES } from "src/constants/resource";
 
-export const getTabs = (
+type GetTabsParams = {
+  isMetricsEnabled: boolean | undefined;
+  isLogsEnabled: boolean | undefined;
+  isActive: boolean | undefined;
+  isResourceBYOA: boolean;
+  isCliManagedResource: boolean;
+  resourceType: string | undefined;
+  isBackup: number | undefined;
+  isCustomDNS: boolean;
+  serviceModelType: string | undefined;
+};
+
+export const getTabs = ({
   isMetricsEnabled,
   isLogsEnabled,
   isActive,
@@ -9,8 +21,8 @@ export const getTabs = (
   resourceType,
   isBackup,
   isCustomDNS,
-  serviceModelType
-) => {
+  serviceModelType,
+}: GetTabsParams) => {
   const tabs: Record<string, string | undefined> = {
     resourceInstanceDetails: "Instance Details",
     connectivity: "Connectivity",
@@ -39,7 +51,16 @@ export const getTabs = (
   return tabs;
 };
 
-export const checkCustomDNSEndpoint = (resources) => {
+type CustomDNSEndpoint = {
+  enabled?: boolean;
+};
+
+type CustomDNSResources = {
+  primary?: { customDNSEndpoint?: CustomDNSEndpoint };
+  others?: Array<{ customDNSEndpoint?: CustomDNSEndpoint }>;
+};
+
+export const checkCustomDNSEndpoint = (resources: CustomDNSResources): boolean => {
   if (resources.primary?.customDNSEndpoint && resources.primary?.customDNSEndpoint.enabled === true) {
     return true;
   }

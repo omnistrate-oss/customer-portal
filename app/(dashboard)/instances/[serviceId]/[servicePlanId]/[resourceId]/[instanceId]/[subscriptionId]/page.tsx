@@ -132,18 +132,20 @@ const InstanceDetailsPage = ({
 
   const tabs = useMemo(
     () =>
-      getTabs(
-        resourceInstanceData?.isMetricsEnabled,
-        resourceInstanceData?.isLogsEnabled,
-        resourceInstanceData?.active,
+      getTabs({
+        isMetricsEnabled: resourceInstanceData?.isMetricsEnabled,
+        isLogsEnabled: resourceInstanceData?.isLogsEnabled,
+        isActive: resourceInstanceData?.active,
         isResourceBYOA,
         isCliManagedResource,
         resourceType,
         // @ts-ignore
-        resourceInstanceData?.backupStatus?.backupPeriodInHours,
-        checkCustomDNSEndpoint(resourceInstanceData ? resourceInstanceData?.connectivity?.globalEndpoints : {}),
-        offering?.serviceModelType
-      ),
+        isBackup: resourceInstanceData?.backupStatus?.backupPeriodInHours,
+        isCustomDNS: checkCustomDNSEndpoint(
+          resourceInstanceData ? resourceInstanceData?.connectivity?.globalEndpoints : {}
+        ),
+        serviceModelType: offering?.serviceModelType,
+      }),
     [resourceInstanceData, isCliManagedResource, resourceType, offering]
   );
 
