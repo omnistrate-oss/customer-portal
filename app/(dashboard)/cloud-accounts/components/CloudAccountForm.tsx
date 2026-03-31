@@ -126,29 +126,29 @@ const CloudAccountForm = ({
             },
           ],
           (oldData: any) => {
-            const instance_result_params = getResultParams(resourceInstance);
-            const result_params: Record<string, any> = {
-              ...instance_result_params,
+            const instanceResultParams = getResultParams(resourceInstance);
+            const resultParams: Record<string, any> = {
+              ...instanceResultParams,
               cloud_provider: values.cloudProvider,
               account_configuration_method: values.accountConfigurationMethod,
             };
 
             if (values.cloudProvider === "aws") {
-              result_params.aws_account_id = values.awsAccountId;
-              result_params.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
+              resultParams.aws_account_id = values.awsAccountId;
+              resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
             } else if (values.cloudProvider === "gcp") {
-              result_params.gcp_project_id = values.gcpProjectId;
-              result_params.gcp_project_number = values.gcpProjectNumber;
-              result_params.gcp_service_account_email = getGcpServiceEmail(
+              resultParams.gcp_project_id = values.gcpProjectId;
+              resultParams.gcp_project_number = values.gcpProjectNumber;
+              resultParams.gcp_service_account_email = getGcpServiceEmail(
                 values.gcpProjectId,
                 selectUser?.orgId.toLowerCase()
               );
             } else if (values.cloudProvider === "azure") {
-              result_params.azure_subscription_id = values.azureSubscriptionId;
-              result_params.azure_tenant_id = values.azureTenantId;
+              resultParams.azure_subscription_id = values.azureSubscriptionId;
+              resultParams.azure_tenant_id = values.azureTenantId;
             } else if (values.cloudProvider === "oci") {
-              result_params.oci_tenancy_id = values.ociTenancyId;
-              result_params.oci_domain_id = values.ociDomainId;
+              resultParams.oci_tenancy_id = values.ociTenancyId;
+              resultParams.oci_domain_id = values.ociDomainId;
             }
 
             return {
@@ -157,7 +157,7 @@ const CloudAccountForm = ({
                 ...(oldData?.resourceInstances || []).filter((inst: any) => inst.id !== resourceInstance?.id),
                 {
                   ...(resourceInstance || {}),
-                  result_params: result_params,
+                  result_params: resultParams,
                 },
               ],
             };

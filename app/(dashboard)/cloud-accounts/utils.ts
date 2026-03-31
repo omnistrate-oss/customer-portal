@@ -2,7 +2,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
-
 import { getResultParams } from "src/utils/instance";
 
 export const getValidSubscriptionForInstanceCreation = (
@@ -85,44 +84,44 @@ export const getInitialValues = (
 ) => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
-    const result_params = getResultParams(selectedInstance);
+    const resultParams = getResultParams(selectedInstance);
     return {
       serviceId: subscription?.serviceId || "",
       servicePlanId: subscription?.productTierId || "",
       subscriptionId: subscription?.id || "",
 
       // @ts-ignore
-      cloudProvider: result_params?.gcp_project_id
+      cloudProvider: resultParams?.gcp_project_id
         ? "gcp"
         : //@ts-ignore
-          result_params?.azure_subscription_id
+          resultParams?.azure_subscription_id
           ? "azure"
           : // @ts-ignore
-            result_params?.aws_account_id
+            resultParams?.aws_account_id
             ? "aws"
             : // @ts-ignore
-              result_params?.oci_tenancy_id
+              resultParams?.oci_tenancy_id
               ? "oci"
               : "",
       accountConfigurationMethod:
         // @ts-ignore
-        result_params?.account_configuration_method,
+        resultParams?.account_configuration_method,
       // @ts-ignore
-      awsAccountId: result_params?.aws_account_id,
+      awsAccountId: resultParams?.aws_account_id,
       // @ts-ignore
-      gcpProjectId: result_params?.gcp_project_id,
+      gcpProjectId: resultParams?.gcp_project_id,
       // @ts-ignore
-      gcpProjectNumber: result_params?.gcp_project_number,
+      gcpProjectNumber: resultParams?.gcp_project_number,
       azureSubscriptionId:
         // @ts-ignore
-        result_params?.azure_subscription_id,
+        resultParams?.azure_subscription_id,
       //@ts-ignore
-      azureTenantId: result_params?.azure_tenant_id,
+      azureTenantId: resultParams?.azure_tenant_id,
       ociTenancyId:
         // @ts-ignore
-        result_params?.oci_tenancy_id,
+        resultParams?.oci_tenancy_id,
       // @ts-ignore
-      ociDomainId: result_params?.oci_domain_id,
+      ociDomainId: resultParams?.oci_domain_id,
     };
   }
 

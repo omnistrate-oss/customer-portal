@@ -172,11 +172,11 @@ const CreationTimeInstructions = (props) => {
 
     if (!isMounted.current) return;
 
-    const result_params = getResultParams(resourceInstance);
-    if (result_params?.cloud_provider_account_config_id) {
+    const resultParams = getResultParams(resourceInstance);
+    if (resultParams?.cloud_provider_account_config_id) {
       setClickedInstance((prev) => ({
         ...prev,
-        result_params: { ...getResultParams(prev), ...result_params },
+        result_params: { ...getResultParams(prev), ...resultParams },
       }));
 
       queryClient.setQueryData(
@@ -190,9 +190,9 @@ const CreationTimeInstructions = (props) => {
           },
         ],
         (oldData) => {
-          const result_params = {
+          const resultParams = {
             // @ts-ignore
-            ...getResultParams(oldData?.resourceInstances),
+            ...oldData?.resourceInstances?.result_params,
             ...getResultParams(resourceInstance),
           };
 
@@ -202,7 +202,7 @@ const CreationTimeInstructions = (props) => {
                 instance?.id === resourceInstance?.id
                   ? {
                       ...(resourceInstance || {}),
-                      result_params: result_params,
+                      result_params: resultParams,
                     }
                   : instance
               ),

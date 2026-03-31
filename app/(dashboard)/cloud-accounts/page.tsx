@@ -37,9 +37,9 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
+import { getResultParams } from "src/utils/instance";
 import { getCloudAccountsRoute } from "src/utils/routes";
 
-import { getResultParams } from "src/utils/instance";
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
 import PageContainer from "../components/Layout/PageContainer";
@@ -93,50 +93,50 @@ const CloudAccountsPage = () => {
   const [hasRequestedDeleteForPolling, setHasRequestedDeleteForPolling] = useState(false);
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
-    const result_params = getResultParams(clickedInstance);
-    return result_params?.cloudformation_url;
+    const resultParams = getResultParams(clickedInstance);
+    return resultParams?.cloudformation_url;
   }, [clickedInstance]);
 
   const gcpBootstrapShellCommand = useMemo(() => {
-    const result_params = getResultParams(clickedInstance);
-    if (result_params?.gcp_bootstrap_shell_script) {
-      return result_params?.gcp_bootstrap_shell_script;
-    } else if (result_params?.cloud_provider_account_config_id) {
-      return getGcpBootstrapShellCommand(result_params?.cloud_provider_account_config_id);
+    const resultParams = getResultParams(clickedInstance);
+    if (resultParams?.gcp_bootstrap_shell_script) {
+      return resultParams?.gcp_bootstrap_shell_script;
+    } else if (resultParams?.cloud_provider_account_config_id) {
+      return getGcpBootstrapShellCommand(resultParams?.cloud_provider_account_config_id);
     }
   }, [clickedInstance]);
 
   const azureBootstrapShellCommand = useMemo(() => {
-    const result_params = getResultParams(clickedInstance);
-    if (result_params?.azure_bootstrap_shell_script) {
-      return result_params?.azure_bootstrap_shell_script;
-    } else if (result_params?.cloud_provider_account_config_id) {
-      return getAzureBootstrapShellCommand(result_params?.cloud_provider_account_config_id);
+    const resultParams = getResultParams(clickedInstance);
+    if (resultParams?.azure_bootstrap_shell_script) {
+      return resultParams?.azure_bootstrap_shell_script;
+    } else if (resultParams?.cloud_provider_account_config_id) {
+      return getAzureBootstrapShellCommand(resultParams?.cloud_provider_account_config_id);
     }
   }, [clickedInstance]);
 
   const accountInstructionDetails = useMemo(() => {
-    const result_params = getResultParams(clickedInstance);
+    const resultParams = getResultParams(clickedInstance);
     let details = {};
-    if (result_params?.aws_account_id) {
+    if (resultParams?.aws_account_id) {
       details = {
-        awsAccountID: result_params?.aws_account_id,
+        awsAccountID: resultParams?.aws_account_id,
       };
-    } else if (result_params?.gcp_project_id) {
+    } else if (resultParams?.gcp_project_id) {
       details = {
-        gcpProjectID: result_params?.gcp_project_id,
-        gcpProjectNumber: result_params?.gcp_project_number,
+        gcpProjectID: resultParams?.gcp_project_id,
+        gcpProjectNumber: resultParams?.gcp_project_number,
       };
-    } else if (result_params?.azure_subscription_id) {
+    } else if (resultParams?.azure_subscription_id) {
       details = {
-        azureSubscriptionID: result_params?.azure_subscription_id,
-        azureTenantID: result_params?.azure_tenant_id,
+        azureSubscriptionID: resultParams?.azure_subscription_id,
+        azureTenantID: resultParams?.azure_tenant_id,
       };
-    } else if (result_params?.oci_tenancy_id) {
+    } else if (resultParams?.oci_tenancy_id) {
       details = {
-        ociTenancyID: result_params?.oci_tenancy_id,
-        ociDomainID: result_params?.oci_domain_id,
-        ociBootstrapShellCommand: result_params?.oci_bootstrap_shell_script,
+        ociTenancyID: resultParams?.oci_tenancy_id,
+        ociDomainID: resultParams?.oci_domain_id,
+        ociBootstrapShellCommand: resultParams?.oci_bootstrap_shell_script,
       };
     }
     return details;
@@ -529,41 +529,41 @@ const CloudAccountsPage = () => {
     // during polling briefly sets instances=[] (new query key), making selectedInstance
     // undefined. clickedInstance holds a snapshot captured when the dialog opened.
     const instance = selectedInstance || clickedInstance;
-    const result_params = getResultParams(instance);
+    const resultParams = getResultParams(instance);
     let details: any = {};
-    if (result_params?.aws_account_id) {
+    if (resultParams?.aws_account_id) {
       details = {
-        awsAccountID: result_params?.aws_account_id,
+        awsAccountID: resultParams?.aws_account_id,
       };
-    } else if (result_params?.gcp_project_id) {
+    } else if (resultParams?.gcp_project_id) {
       details = {
-        gcpProjectID: result_params?.gcp_project_id,
-        gcpProjectNumber: result_params?.gcp_project_number,
+        gcpProjectID: resultParams?.gcp_project_id,
+        gcpProjectNumber: resultParams?.gcp_project_number,
       };
-      if (result_params?.cloud_provider_account_config_id) {
+      if (resultParams?.cloud_provider_account_config_id) {
         details.gcpOffboardCommand =
           selectedAccountConfig?.gcpOffboardShellCommand ||
-          getGcpShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+          getGcpShellScriptOffboardCommand(resultParams?.cloud_provider_account_config_id);
       }
-    } else if (result_params?.azure_subscription_id) {
+    } else if (resultParams?.azure_subscription_id) {
       details = {
-        azureSubscriptionID: result_params?.azure_subscription_id,
-        azureTenantID: result_params?.azure_tenant_id,
+        azureSubscriptionID: resultParams?.azure_subscription_id,
+        azureTenantID: resultParams?.azure_tenant_id,
       };
-      if (result_params?.cloud_provider_account_config_id) {
+      if (resultParams?.cloud_provider_account_config_id) {
         details.azureOffboardCommand =
           selectedAccountConfig?.azureOffboardShellCommand ||
-          getAzureShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+          getAzureShellScriptOffboardCommand(resultParams?.cloud_provider_account_config_id);
       }
-    } else if (result_params?.oci_tenancy_id) {
+    } else if (resultParams?.oci_tenancy_id) {
       details = {
-        ociTenancyID: result_params?.oci_tenancy_id,
-        ociDomainID: result_params?.oci_domain_id,
+        ociTenancyID: resultParams?.oci_tenancy_id,
+        ociDomainID: resultParams?.oci_domain_id,
       };
-      if (result_params?.cloud_provider_account_config_id) {
+      if (resultParams?.cloud_provider_account_config_id) {
         details.ociOffboardCommand =
           selectedAccountConfig?.ociOffboardShellCommand ||
-          getOciShellScriptOffboardCommand(result_params?.cloud_provider_account_config_id);
+          getOciShellScriptOffboardCommand(resultParams?.cloud_provider_account_config_id);
       }
     }
     return details;
@@ -690,7 +690,7 @@ const CloudAccountsPage = () => {
   });
 
   // Derive account config ID from describe query data (polled) or fall back to selected instance
-  const describeResultParams = getResultParams(describeQuery.data as any);
+  const describeResultParams = getResultParams(describeQuery.data ?? undefined);
   const polledAccountConfigId = describeResultParams?.cloud_provider_account_config_id as string | undefined;
 
   // Account config query — disabled by default, refetched manually during polling.

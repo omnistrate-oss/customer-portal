@@ -138,7 +138,7 @@ const InstanceForm = ({
         } catch {}
 
         setCreateInstanceModalData({
-          isCustomDNS: formData.values.requestParams?.custom_dns_configuration,
+          isCustomDNS: (formData.values.requestParams as Record<string, any>)?.custom_dns_configuration,
           instanceId: response?.id as string,
           isFirstInstanceInRegion: isFirstInstanceInRegion,
           lifecycleStatus: lifecycleStatus as string,
@@ -505,7 +505,7 @@ const InstanceForm = ({
   const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
-    enabled: values.requestParams?.custom_network_id !== undefined, // Fetch only if custom_network_id is present
+    enabled: (values.requestParams as Record<string, any>)?.custom_network_id !== undefined, // Fetch only if custom_network_id is present
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
@@ -751,7 +751,7 @@ const InstanceForm = ({
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,
     cloudProviderName: values.cloudProvider as CloudProvider,
-    hasCustomAvailabilityZoneField: values.requestParams?.custom_availability_zone !== undefined,
+    hasCustomAvailabilityZoneField: (values.requestParams as Record<string, any>)?.custom_availability_zone !== undefined,
   });
 
   const { isFetching: isFetchingResourceInstanceIds, data: resourceIdInstancesHashMap = {} } = useResourcesInstanceIds(
@@ -816,29 +816,29 @@ const InstanceForm = ({
       instances
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
-          const result_params = getResultParams(instance);
-          if (result_params?.gcp_project_id) {
+          const resultParams = getResultParams(instance);
+          if (resultParams?.gcp_project_id) {
             return values.cloudProvider === "gcp";
-          } else if (result_params?.aws_account_id) {
+          } else if (resultParams?.aws_account_id) {
             return values.cloudProvider === "aws";
-          } else if (result_params?.azure_subscription_id) {
+          } else if (resultParams?.azure_subscription_id) {
             return values.cloudProvider === "azure";
-          } else if (result_params?.oci_tenancy_id) {
+          } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
         .map((instance) => {
-          const result_params = getResultParams(instance);
+          const resultParams = getResultParams(instance);
           return {
             ...instance,
-            label: result_params?.gcp_project_id
-              ? `${instance.id} (Project ID - ${result_params?.gcp_project_id})`
-              : result_params?.aws_account_id
-                ? `${instance.id} (Account ID - ${result_params?.aws_account_id})`
-                : result_params?.oci_tenancy_id
-                  ? `${instance.id} (Tenancy ID - ${result_params?.oci_tenancy_id})`
-                  : `${instance.id} (Subscription ID - ${result_params?.azure_subscription_id})`,
+            label: resultParams?.gcp_project_id
+              ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
+              : resultParams?.aws_account_id
+                ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
+                : resultParams?.oci_tenancy_id
+                  ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
+                  : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
     [instances, values.cloudProvider]
