@@ -15,3 +15,4 @@ const axios = Axios.create({
 
 module.exports = axios;
 module.exports.baseURL = baseURL;
+module.exports.baseDomain = baseDomain;
