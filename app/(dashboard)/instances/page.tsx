@@ -10,6 +10,7 @@ import RegionIcon from "components/Region/RegionIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ViewInstructionsIcon from "src/components/Icons/AccountConfig/ViewInstrcutionsIcon";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
@@ -33,6 +34,7 @@ import { getInstanceDetailsRoute } from "src/utils/routes";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
+import InstallerUpgraderInstructions from "./components/InstallerHub/InstallerUpgraderInstructions";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
@@ -61,7 +63,7 @@ const InstancesPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
   const [instanceId, setInstanceId] = useState("");
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { isDownloading, download: downloadInstaller } = useInstallerDownload();
   const {
     subscriptionsObj,
@@ -83,17 +85,18 @@ const InstancesPage = () => {
     (id: string, downloadURL: string) => {
       setInstanceId(id);
       downloadInstaller(downloadURL, id);
+      handleModalOpen();
     },
     [downloadInstaller]
   );
 
-  // function handleModalOpen() {
-  //   setIsModalOpen(true);
-  // }
+  function handleModalOpen() {
+    setIsModalOpen(true);
+  }
 
-  // function handleModalClose() {
-  //   setIsModalOpen(false);
-  // }
+  function handleModalClose() {
+    setIsModalOpen(false);
+  }
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -245,6 +248,21 @@ const InstancesPage = () => {
                     <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
                     {isPending && isDownloading && <LoadingSpinnerSmall />}
                   </IconButton>
+                  <Tooltip title="View installer instructions">
+                    <Box
+                      sx={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      onClick={() => {
+                        setInstanceId(id || "");
+                        handleModalOpen();
+                      }}
+                    >
+                      <ViewInstructionsIcon />
+                    </Box>
+                  </Tooltip>
                 </>
               )}
             </Stack>
@@ -542,7 +560,7 @@ const InstancesPage = () => {
         refetchData={refetchInstances}
       />
 
-      {/* <InstallerUpgraderInstructions
+      <InstallerUpgraderInstructions
         open={isModalOpen}
         handleClose={handleModalClose}
         installerInstructions={
@@ -550,7 +568,17 @@ const InstancesPage = () => {
             (instance) => instance.id === instanceId && instance?.onPremInstallerDetails?.installerInstructions
           )?.onPremInstallerDetails?.installerInstructions
         }
-      /> */}
+        selectedInstanceOffering={(() => {
+          const matchedInstance = instances.find((instance) => instance.id === instanceId);
+          if (!matchedInstance) return undefined;
+          const subscription = subscriptionsObj[matchedInstance.subscriptionId as string];
+          return serviceOfferingsObj[subscription?.serviceId as string]?.[subscription?.productTierId as string];
+        })()}
+        selectedInstance={instances.find(
+          (instance): instance is ResourceInstance & { id: string } =>
+            instance.id === instanceId && instance.id !== undefined
+        )}
+      />
     </PageContainer>
   );
 };

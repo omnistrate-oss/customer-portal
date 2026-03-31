@@ -3,14 +3,42 @@ import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 
 import Button from "src/components/Button/Button";
 import InstructionsModalIcon from "src/components/Icons/AccountConfig/InstructionsModalIcon";
+import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { Text } from "src/components/Typography/Typography";
 
+import useInstancesDescribe from "../../hooks/useInstancesDescribe";
+
 import InstallerInstructions from "./InstallerInstructions";
+
+interface InstanceDetails {
+  onPremInstallerDetails?: {
+    installerInstructions?: string;
+  };
+}
+
+interface ResourceParameter {
+  resourceId: string;
+  urlKey: string;
+}
 
 interface InstallerUpgraderInstructionsProps {
   open: boolean;
   handleClose: () => void;
   installerInstructions?: string;
+  selectedInstanceOffering?: {
+    serviceProviderId: string;
+    serviceURLKey: string;
+    serviceAPIVersion: string;
+    serviceEnvironmentURLKey: string;
+    serviceModelURLKey: string;
+    productTierURLKey: string;
+    resourceParameters: ResourceParameter[];
+  } | null;
+  selectedInstance?: {
+    id: string;
+    resourceID?: string;
+    subscriptionId?: string;
+  } | null;
 }
 
 const StyledContainer = styled(Box)({
@@ -54,8 +82,36 @@ const InstallerUpgraderInstructions = ({
   open,
   handleClose,
   installerInstructions,
+  selectedInstanceOffering,
+  selectedInstance,
 }: InstallerUpgraderInstructionsProps) => {
-  
+  const selectedResource = selectedInstanceOffering?.resourceParameters.find(
+    (param) => param.resourceId === selectedInstance?.resourceID
+  );
+
+  // Instance describe query — disabled by default, refetched manually during polling.
+  const { data: instanceDetails, isPending } = useInstancesDescribe({
+    serviceProviderId: selectedInstanceOffering?.serviceProviderId ?? "",
+    serviceKey: selectedInstanceOffering?.serviceURLKey ?? "",
+    serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion ?? "",
+    serviceEnvironmentKey: selectedInstanceOffering?.serviceEnvironmentURLKey ?? "",
+    serviceModelKey: selectedInstanceOffering?.serviceModelURLKey ?? "",
+    productTierKey: selectedInstanceOffering?.productTierURLKey ?? "",
+    resourceKey: selectedResource?.urlKey ?? "",
+    id: selectedInstance?.id ?? "",
+    subscriptionId: selectedInstance?.subscriptionId,
+    ignoreGlobalError: true,
+    enabled: Boolean(!installerInstructions && selectedInstanceOffering && selectedResource && selectedInstance),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    retry: false,
+  });
+
+  const typedInstanceDetails = instanceDetails as InstanceDetails | undefined;
+  const installerInstructionsToShow =
+    installerInstructions ?? typedInstanceDetails?.onPremInstallerDetails?.installerInstructions;
+
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth={"md"}>
       <StyledContainer>
@@ -84,7 +140,13 @@ const InstallerUpgraderInstructions = ({
           </IconButton>
         </Header>
         <Content>
-          <InstallerInstructions installerInstructions={installerInstructions ?? ""} />
+          {isPending && !installerInstructionsToShow ? (
+            <LoadingSpinner />
+          ) : installerInstructionsToShow ? (
+            <InstallerInstructions installerInstructions={installerInstructionsToShow} />
+          ) : (
+            <Text>No instructions available for this instance.</Text>
+          )}
         </Content>
         <Footer>
           <Button variant="contained" onClick={handleClose} data-testid="close-instructions-button" fullWidth>
