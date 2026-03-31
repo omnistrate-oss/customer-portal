@@ -1,10 +1,9 @@
 import _ from "lodash";
 
 import { $api } from "src/api/query";
+import { getResultParams } from "src/utils/instance";
 import { calculateInstanceHealthPercentage } from "src/utils/instanceHealthPercentage";
-
-import { getResultParams } from "../utils/instance";
-import processClusterPorts from "../utils/processClusterPorts";
+import processClusterPorts from "src/utils/processClusterPorts";
 
 const useResourceInstance = (queryParams) => {
   const {
