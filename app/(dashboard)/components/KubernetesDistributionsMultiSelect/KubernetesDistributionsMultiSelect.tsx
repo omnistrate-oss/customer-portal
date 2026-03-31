@@ -72,7 +72,7 @@ const KubernetesDistributionsMultiSelect = ({
       const newValues = currentValues.includes(option)
         ? currentValues.filter((v) => v !== option)
         : [...currentValues, option];
-      setFieldValue("onPremPlatforms", newValues);
+      setFieldValue("onprem_platform", newValues);
     } else {
       // In single selection mode, allow toggling the same option or selecting a new one
       const newValue = fieldValue === option ? "" : option;
