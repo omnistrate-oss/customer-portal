@@ -188,13 +188,9 @@ const CloudAccountsPage = () => {
       return res.filter((instance) => {
         const resultParams = getResultParams(instance);
         return (
-          // @ts-ignore
           resultParams?.gcp_project_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          // @ts-ignore
           resultParams?.aws_account_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          // @ts-ignore
           resultParams?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          // @ts-ignore
           resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase())
         );
       });
@@ -246,13 +242,9 @@ const CloudAccountsPage = () => {
         (row) => {
           const resultParams = getResultParams(row);
           return (
-            // @ts-ignore
             resultParams?.gcp_project_id ||
-            // @ts-ignore
             resultParams?.aws_account_id ||
-            // @ts-ignore
             resultParams?.azure_subscription_id ||
-            // @ts-ignore
             resultParams?.oci_tenancy_id ||
             "-"
           );
@@ -263,13 +255,9 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const resultParams = getResultParams(data.row.original);
             const value =
-              // @ts-ignore
               resultParams?.gcp_project_id ||
-              // @ts-ignore
               resultParams?.aws_account_id ||
-              // @ts-ignore
               resultParams?.azure_subscription_id ||
-              // @ts-ignore
               resultParams?.oci_tenancy_id ||
               "-";
 
@@ -446,13 +434,9 @@ const CloudAccountsPage = () => {
         (row) => {
           let cloudProvider: CloudProvider | undefined;
           const resultParams = getResultParams(row);
-          // @ts-ignore
           if (resultParams?.aws_account_id) cloudProvider = "aws";
-          // @ts-ignore
           else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
-          // @ts-ignore
           else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
-          // @ts-ignore
           else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
           return cloudProvider;
         },
@@ -462,13 +446,9 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             let cloudProvider: CloudProvider | undefined;
             const resultParams = getResultParams(data.row.original);
-            // @ts-ignore
             if (resultParams?.aws_account_id) cloudProvider = "aws";
-            // @ts-ignore
             else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
-            // @ts-ignore
             else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
-            // @ts-ignore
             else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
