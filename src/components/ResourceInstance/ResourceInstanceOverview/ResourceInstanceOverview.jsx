@@ -33,6 +33,7 @@ function ResourceInstanceOverview(props) {
     serviceName,
     productTierName,
     serviceLogoURL,
+    serviceModelType,
   } = props;
 
   const healthStatus = getInstanceHealthStatus(detailedNetworkTopology, status);
@@ -121,6 +122,7 @@ function ResourceInstanceOverview(props) {
           detailedNetworkTopology={detailedNetworkTopology}
           onViewNodesClick={onViewNodesClick}
           openLinkInSameTab={true}
+          serviceModelType={serviceModelType}
         />
       </div>
     </div>

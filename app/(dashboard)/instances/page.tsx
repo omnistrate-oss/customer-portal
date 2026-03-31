@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import RegionIcon from "components/Region/RegionIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ViewInstructionsIcon from "src/components/Icons/AccountConfig/ViewInstrcutionsIcon";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
 import LoadIndicatorNormal from "src/components/Icons/LoadIndicator/LoadIndicatorNormal";
+import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import InstanceHealthStatusChip, {
   getInstanceHealthStatus,
 } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
@@ -15,26 +23,24 @@ import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
+import useInstallerDownload from "src/hooks/useInstallerDownload";
+import { styleConfig } from "src/providerConfig";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import RegionIcon from "components/Region/RegionIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
 
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
+import InstallerUpgraderInstructions from "./components/InstallerHub/InstallerUpgraderInstructions";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
-import useInstances from "./hooks/useInstances";
 import { loadStatusMap } from "./constants";
+import useInstances from "./hooks/useInstances";
 import { getMainResourceFromInstance, getRowBorderStyles } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -56,7 +62,9 @@ const InstancesPage = () => {
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
-
+  const [instanceId, setInstanceId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isDownloading, download: downloadInstaller } = useInstallerDownload();
   const {
     subscriptionsObj,
     serviceOfferingsObj,
@@ -72,6 +80,23 @@ const InstancesPage = () => {
     refetch: refetchInstances,
     isError: isInstancesError,
   } = useInstances();
+
+  const handleDownload = useCallback(
+    (id: string, downloadURL: string) => {
+      setInstanceId(id);
+      downloadInstaller(downloadURL, id);
+      handleModalOpen();
+    },
+    [downloadInstaller]
+  );
+
+  function handleModalOpen() {
+    setIsModalOpen(true);
+  }
+
+  function handleModalClose() {
+    setIsModalOpen(false);
+  }
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -197,13 +222,54 @@ const InstancesPage = () => {
         id: "status",
         header: "Lifecycle Status",
         cell: (data) => {
-          const status = data.row.original.status;
+          const { status, id, onPremInstallerDetails } = data.row.original;
           const statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
+          const downloadURL = onPremInstallerDetails?.downloadURL;
+          const isInstallerReady = status === "INSTALLER_READY" && !!downloadURL;
+          const isPending = id === instanceId;
 
-          return <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />;
+          return (
+            <Stack direction="row" alignItems="center" gap="8px">
+              <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
+              {isInstallerReady && (
+                <>
+                  <IconButton
+                    disableRipple
+                    disabled={isPending && isDownloading}
+                    onClick={() => {
+                      if (downloadURL) {
+                        handleDownload(id || "", downloadURL);
+                      }
+                    }}
+                    sx={{
+                      padding: 0,
+                    }}
+                  >
+                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
+                    {isPending && isDownloading && <LoadingSpinnerSmall />}
+                  </IconButton>
+                  <Tooltip title="View installer instructions">
+                    <Box
+                      sx={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      onClick={() => {
+                        setInstanceId(id || "");
+                        handleModalOpen();
+                      }}
+                    >
+                      <ViewInstructionsIcon />
+                    </Box>
+                  </Tooltip>
+                </>
+              )}
+            </Stack>
+          );
         },
         meta: {
-          minWidth: 170,
+          minWidth: 200,
           disableBrowserTooltip: true,
         },
       }),
@@ -234,12 +300,15 @@ const InstancesPage = () => {
               viewType: "Nodes",
             });
 
+            const offering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+
             return (
               <InstanceHealthStatusChip
                 computedHealthStatus={value}
                 detailedNetworkTopology={
                   (data.row.original?.detailedNetworkTopology ?? {}) as Record<string, ResourceInstanceNetworkTopology>
                 }
+                serviceModelType={offering?.serviceModelType} // Pass the service model type to conditionally render the health status
                 viewNodesLink={resourceInstanceUrlLink}
               />
             );
@@ -366,7 +435,7 @@ const InstancesPage = () => {
         },
       }),
     ];
-  }, [subscriptionsObj, serviceOfferingsObj]);
+  }, [subscriptionsObj, serviceOfferingsObj, isDownloading, handleDownload, instanceId]);
 
   useEffect(() => {
     if (isInstancesError) {
@@ -489,6 +558,26 @@ const InstancesPage = () => {
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
         refetchData={refetchInstances}
+      />
+
+      <InstallerUpgraderInstructions
+        open={isModalOpen}
+        handleClose={handleModalClose}
+        installerInstructions={
+          instances.find(
+            (instance) => instance.id === instanceId && instance?.onPremInstallerDetails?.installerInstructions
+          )?.onPremInstallerDetails?.installerInstructions
+        }
+        selectedInstanceOffering={(() => {
+          const matchedInstance = instances.find((instance) => instance.id === instanceId);
+          if (!matchedInstance) return undefined;
+          const subscription = subscriptionsObj[matchedInstance.subscriptionId as string];
+          return serviceOfferingsObj[subscription?.serviceId as string]?.[subscription?.productTierId as string];
+        })()}
+        selectedInstance={instances.find(
+          (instance): instance is ResourceInstance & { id: string } =>
+            instance.id === instanceId && instance.id !== undefined
+        )}
       />
     </PageContainer>
   );

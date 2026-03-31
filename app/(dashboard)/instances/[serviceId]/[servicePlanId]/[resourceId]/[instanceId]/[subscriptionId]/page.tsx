@@ -1,8 +1,5 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, Collapse, Stack } from "@mui/material";
@@ -12,9 +9,23 @@ import InstanceActionMenu from "app/(dashboard)/instances/components/InstanceAct
 import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialogs";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { Overlay } from "app/(dashboard)/instances/page";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { use, useEffect, useMemo, useState } from "react";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
+import Button from "components/Button/Button";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
+import Backup from "components/ResourceInstance/Backup/Backup";
+import Connectivity from "components/ResourceInstance/Connectivity/Connectivity";
+import Logs from "components/ResourceInstance/Logs/Logs";
+import Metrics from "components/ResourceInstance/Metrics/Metrics";
+import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
+import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
+import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
+import { DisplayText } from "components/Typography/Typography";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
 import { Tab, Tabs } from "src/components/Tab/Tab";
@@ -27,17 +38,8 @@ import {
   toggleInstanceDetailsSummaryVisibility,
 } from "src/slices/genericSlice";
 import { NetworkType } from "src/types/common/enums";
-import Button from "components/Button/Button";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
-import Backup from "components/ResourceInstance/Backup/Backup";
-import Connectivity from "components/ResourceInstance/Connectivity/Connectivity";
-import Logs from "components/ResourceInstance/Logs/Logs";
-import Metrics from "components/ResourceInstance/Metrics/Metrics";
-import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
-import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
-import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
-import { DisplayText } from "components/Typography/Typography";
+
+import InstallerHub from "../../../../../components/InstallerHub/InstallerHub";
 
 import { checkCustomDNSEndpoint, getTabs } from "./utils";
 
@@ -130,18 +132,21 @@ const InstanceDetailsPage = ({
 
   const tabs = useMemo(
     () =>
-      getTabs(
-        resourceInstanceData?.isMetricsEnabled,
-        resourceInstanceData?.isLogsEnabled,
-        resourceInstanceData?.active,
+      getTabs({
+        isMetricsEnabled: resourceInstanceData?.isMetricsEnabled,
+        isLogsEnabled: resourceInstanceData?.isLogsEnabled,
+        isActive: resourceInstanceData?.active,
         isResourceBYOA,
         isCliManagedResource,
         resourceType,
         // @ts-ignore
-        resourceInstanceData?.backupStatus?.backupPeriodInHours,
-        checkCustomDNSEndpoint(resourceInstanceData ? resourceInstanceData?.connectivity?.globalEndpoints : {})
-      ),
-    [resourceInstanceData, isCliManagedResource, resourceType]
+        isBackup: resourceInstanceData?.backupStatus?.backupPeriodInHours,
+        isCustomDNS: checkCustomDNSEndpoint(
+          resourceInstanceData ? resourceInstanceData?.connectivity?.globalEndpoints : {}
+        ),
+        serviceModelType: offering?.serviceModelType,
+      }),
+    [resourceInstanceData, isCliManagedResource, resourceType, offering]
   );
 
   const disabledTabs = useMemo(
@@ -235,6 +240,7 @@ const InstanceDetailsPage = ({
           onViewNodesClick={() => {
             setCurrentTab("Nodes");
           }}
+          serviceModelType={offering?.serviceModelType}
         />
       </Collapse>
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
@@ -304,6 +310,7 @@ const InstanceDetailsPage = ({
           customTags={resourceInstanceData?.customTags}
         />
       )}
+      {currentTab === tabs.installerHub && <InstallerHub instanceDetails={resourceInstanceData?.unprocessedData} />}
       {currentTab === tabs.connectivity && (
         <Connectivity
           networkType={resourceInstanceData.connectivity.networkType}

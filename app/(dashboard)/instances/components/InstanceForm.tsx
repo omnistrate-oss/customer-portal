@@ -297,6 +297,20 @@ const InstanceForm = ({
         data.cloud_provider = data.cloudProvider;
         data.custom_network_id = data.requestParams.custom_network_id;
 
+        // For ON_PREM offerings: copy onprem_platform from root level to requestParams,
+        // and remove cloud_provider/cloudProvider since they're not relevant for on-prem
+        const isOnPremSubmission = offering?.serviceModelType === "ON_PREM" && inputParametersObj["onprem_platform"];
+        if (isOnPremSubmission) {
+          if (data.onprem_platform) {
+            data.requestParams.onprem_platform = data.onprem_platform;
+          }
+          delete data.cloud_provider;
+          delete data.cloudProvider;
+          delete data.region;
+        } else {
+          delete data.requestParams.onprem_platform;
+        }
+
         const networkTypeFieldExists =
           inputParametersObj["cloud_provider"] &&
           offering?.productTierType !== productTierTypes.OMNISTRATE_MULTI_TENANCY &&
@@ -547,7 +561,7 @@ const InstanceForm = ({
     const inputParams = filterSchemaByCloudProvider(
       resourceCreateSchema?.inputParameters || [],
       formData.values.cloudProvider
-    );
+    ).filter((param) => !REQUEST_PARAMS_FIELDS_TO_FILTER.includes(param.key));
 
     // Create validation rules for requestParams
     const requestParamsValidation: Record<string, ValidationSchema> = {};
@@ -630,7 +644,7 @@ const InstanceForm = ({
     const inputParams = filterSchemaByCloudProvider(
       resourceModifySchema?.inputParameters || [],
       formData.values.cloudProvider
-    );
+    ).filter((param) => !REQUEST_PARAMS_FIELDS_TO_FILTER.includes(param.key));
 
     // Create validation rules for requestParams
     const requestParamsValidation: Record<string, ValidationSchema> = {};
@@ -713,40 +727,51 @@ const InstanceForm = ({
     return yup.object().shape(requestParamsValidation);
   }, [resourceSchemaData, formData.values.cloudProvider]);
 
+  // Check if the current offering is on-prem (has onprem_platform in input params)
+  const isOnPremOffering = Boolean(
+    offering?.serviceModelType === "ON_PREM" &&
+      resourceCreateSchema?.inputParameters?.some((field) => field.key === "onprem_platform")
+  );
+
   // Update validation schema when requestParams validation changes
   useEffect(() => {
+    const baseFields = {
+      serviceId: yup.string().required("Product is required"),
+      servicePlanId: yup.string().required("A plan with a valid subscription is required"),
+      subscriptionId: yup.string().required("Subscription is required"),
+      resourceId: yup.string().required("Resource is required"),
+      customTags: yup.array().of(
+        yup.object().shape({
+          key: yup.string().required("Name is required"),
+          value: yup.string().required("Value is required"),
+        })
+      ),
+      // Add onprem_platform as required only for on-prem offerings
+      ...(isOnPremOffering && {
+        onprem_platform: yup.string().required("Kubernetes Distribution is required"),
+      }),
+    };
+
     if (formMode === "modify" && selectedInstance) {
       const newValidationSchema = yup.object({
-        serviceId: yup.string().required("Product is required"),
-        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
-        subscriptionId: yup.string().required("Subscription is required"),
-        resourceId: yup.string().required("Resource is required"),
-        customTags: yup.array().of(
-          yup.object().shape({
-            key: yup.string().required("Name is required"),
-            value: yup.string().required("Value is required"),
-          })
-        ),
+        ...baseFields,
         requestParams: requestParamsModifyValidationSchema,
       });
       setValidationSchema(newValidationSchema);
     } else {
       const newValidationSchema = yup.object({
-        serviceId: yup.string().required("Product is required"),
-        servicePlanId: yup.string().required("A plan with a valid subscription is required"),
-        subscriptionId: yup.string().required("Subscription is required"),
-        resourceId: yup.string().required("Resource is required"),
-        customTags: yup.array().of(
-          yup.object().shape({
-            key: yup.string().required("Name is required"),
-            value: yup.string().required("Value is required"),
-          })
-        ),
+        ...baseFields,
         requestParams: requestParamsCreateValidationSchema,
       });
       setValidationSchema(newValidationSchema);
     }
-  }, [requestParamsCreateValidationSchema, requestParamsModifyValidationSchema, formMode, selectedInstance]);
+  }, [
+    requestParamsCreateValidationSchema,
+    requestParamsModifyValidationSchema,
+    formMode,
+    selectedInstance,
+    isOnPremOffering,
+  ]);
 
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,

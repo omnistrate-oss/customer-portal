@@ -17,7 +17,7 @@ import Logo from "src/components/NonDashboardComponents/Logo";
 import { Text } from "src/components/Typography/Typography";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
-import { passwordRegex, passwordText } from "src/utils/passwordRegex";
+import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText } from "src/utils/passwordRegex";
 import DisplayHeading from "components/NonDashboardComponents/DisplayHeading";
 import FieldLabel from "components/NonDashboardComponents/FormElementsV2/FieldLabel";
 import SubmitButton from "components/NonDashboardComponents/FormElementsV2/SubmitButton";
@@ -34,15 +34,9 @@ const signupValidationSchema = Yup.object({
   password: Yup.string()
     .required("Password is required")
     .matches(passwordRegex, passwordText)
-    .test(
-      "password-not-email",
-      "Email cannot be used as password",
-      function (value) {
-        const { email } = this.parent;
-        if (!value || !email) return true;
-        return value.toLowerCase() !== email.toLowerCase();
-      }
-    ),
+    .test("password-not-email", passwordMatchesEmailText, function (value) {
+      return !isPasswordSameAsEmail(value, this.parent.email);
+    }),
   confirmPassword: Yup.string()
     .required("Re-enter your password")
     .oneOf([Yup.ref("password"), null], "Passwords must match"),
