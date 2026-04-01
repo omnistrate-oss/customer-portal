@@ -4,7 +4,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { Text } from "src/components/Typography/Typography";
 
 type InstallerInstructionsProps = {
-  installerInstructions: string;
+  installerInstructions: string | undefined;
 };
 
 const InstallerInstructions = ({ installerInstructions }: InstallerInstructionsProps) => {
