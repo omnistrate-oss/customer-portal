@@ -120,7 +120,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
   }, [isDownloading, download, instanceDetails?.id]);
 
   return (
-    <Box>
+    <Box mt="24px">
       <DataTable
         columns={columns}
         rows={rows}
