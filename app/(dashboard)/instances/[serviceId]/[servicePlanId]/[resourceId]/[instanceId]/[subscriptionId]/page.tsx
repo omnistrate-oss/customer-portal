@@ -40,6 +40,7 @@ import {
 import { NetworkType } from "src/types/common/enums";
 
 import InstallerHub from "../../../../../components/InstallerHub/InstallerHub";
+import { platformToCloudProviderMap } from "../../../../../utils";
 
 import { checkCustomDNSEndpoint, getTabs } from "./utils";
 
@@ -230,7 +231,11 @@ const InstanceDetailsPage = ({
           serviceLogoURL={subscription?.serviceLogoURL}
           resourceInstanceId={instanceId}
           region={resourceInstanceData.region}
-          cloudProvider={cloudProvider}
+          cloudProvider={
+            resourceInstanceData?.unprocessedData?.onpremPlatform
+              ? platformToCloudProviderMap[resourceInstanceData.unprocessedData.onpremPlatform]
+              : cloudProvider
+          }
           status={resourceInstanceData.status}
           createdAt={resourceInstanceData.createdAt}
           modifiedAt={resourceInstanceData.modifiedAt}
