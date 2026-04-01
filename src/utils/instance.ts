@@ -21,7 +21,8 @@ export const getResultParams = (instance?: {
 }): Record<string, any> => {
   const resultParams = instance?.result_params as Record<string, any> | undefined;
   if (resultParams && typeof resultParams === "object" && Object.keys(resultParams).length > 0) {
-    return resultParams;
+    return { ...resultParams };
   }
-  return (instance?.launch_input_params as Record<string, any>) ?? {};
+  const launchParams = (instance?.launch_input_params as Record<string, any>) ?? {};
+  return { ...launchParams };
 };
