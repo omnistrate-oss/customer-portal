@@ -333,6 +333,15 @@ export const getInitialValues = (
       requestParams.custom_network_id = instance.customNetworkDetail.id;
     }
 
+    // For on-prem instances, derive onprem_platform from the root-level onpremPlatform field
+    const instanceCloudProvider = instance.cloud_provider;
+    const onpremPlatform = instance?.onpremPlatform || "";
+
+    const offering = serviceOfferingsObj[subscription?.serviceId || ""]?.[subscription?.productTierId || ""];
+    const isInstanceOnPrem = offering?.serviceModelType === "ON_PREM";
+
+    const derivedCloudProvider = isInstanceOnPrem ? platformToCloudProviderMap[onpremPlatform] : instanceCloudProvider;
+
     return {
       id: instance.id,
       serviceId: subscription?.serviceId || "",
@@ -340,12 +349,13 @@ export const getInitialValues = (
       subscriptionId: instance.subscriptionId || "",
       // @ts-ignore
       resourceId: instance.resourceID || "",
-      cloudProvider: instance.cloud_provider,
+      cloudProvider: derivedCloudProvider,
       region: instance.region,
       network_type: instance.network_type || "",
       productTierVersion: "", // Empty for existing instances
       requestParams,
       customTags: instance.customTags?.length ? instance.customTags : [],
+      ...(isInstanceOnPrem && { onprem_platform: onpremPlatform }),
     };
   }
 
