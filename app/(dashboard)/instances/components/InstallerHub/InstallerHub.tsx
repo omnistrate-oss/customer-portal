@@ -85,7 +85,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
           const isInstallerReady = status === "INSTALLER_READY" && !!downloadURL;
 
           return (
-            <Stack direction="row" gap="12px" width="100%">
+            <Stack direction="row" alignItems="center">
               <Tooltip title={!isInstallerReady ? "Installer is not ready for download" : "Download Installer"}>
                 <span>
                   <IconButton
@@ -94,6 +94,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                     onClick={() => {
                       if (downloadURL) {
                         download(downloadURL, instanceDetails?.id);
+                        handleModalOpen();
                       }
                     }}
                     sx={{
@@ -105,8 +106,8 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
                     <DownloadCLIIcon
                       color={isInstallerReady && !isDownloading ? styleConfig.secondaryButtonText : "#A0A0A0"}
                     />
+                    {isDownloading && <LoadingSpinnerSmall />}
                   </IconButton>
-                  {isDownloading && <LoadingSpinnerSmall />}
                 </span>
               </Tooltip>
             </Stack>

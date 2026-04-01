@@ -229,7 +229,7 @@ const InstancesPage = () => {
           const isPending = id === instanceId;
 
           return (
-            <Stack direction="row" alignItems="center" gap="8px">
+            <Stack direction="row" alignItems="center" gap="4px">
               <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
               {isInstallerReady && (
                 <>
@@ -246,22 +246,22 @@ const InstancesPage = () => {
                     }}
                   >
                     <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
-                    {isPending && isDownloading && <LoadingSpinnerSmall />}
                   </IconButton>
                   <Tooltip title="View installer instructions">
-                    <Box
-                      sx={{
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
+                    <IconButton
+                      disableRipple
+                      disabled={isPending && isDownloading}
                       onClick={() => {
                         setInstanceId(id || "");
                         handleModalOpen();
                       }}
+                      sx={{
+                        padding: 0,
+                      }}
                     >
                       <InstallerActionIcon color="#475467" />
-                    </Box>
+                      {isPending && isDownloading && <LoadingSpinnerSmall />}
+                    </IconButton>
                   </Tooltip>
                 </>
               )}
@@ -269,7 +269,7 @@ const InstancesPage = () => {
           );
         },
         meta: {
-          minWidth: 200,
+          minWidth: 230,
           disableBrowserTooltip: true,
         },
       }),
