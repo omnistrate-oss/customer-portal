@@ -10,7 +10,6 @@ import RegionIcon from "components/Region/RegionIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
-import ViewInstructionsIcon from "src/components/Icons/AccountConfig/ViewInstrcutionsIcon";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
@@ -34,6 +33,7 @@ import { getInstanceDetailsRoute } from "src/utils/routes";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
+import InstallerActionIcon from "./components/InstallerHub/Installer/InstallerActionIcon";
 import InstallerUpgraderInstructions from "./components/InstallerHub/InstallerUpgraderInstructions";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
@@ -260,7 +260,7 @@ const InstancesPage = () => {
                         handleModalOpen();
                       }}
                     >
-                      <ViewInstructionsIcon />
+                      <InstallerActionIcon color="#475467" />
                     </Box>
                   </Tooltip>
                 </>
