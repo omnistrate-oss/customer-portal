@@ -90,7 +90,7 @@ const InstallerUpgraderInstructions = ({
   );
 
   // Instance describe query — disabled by default, refetched manually during polling.
-  const { data: instanceDetails, isRefetching } = useInstancesDescribe({
+  const { data: instanceDetails, isFetching } = useInstancesDescribe({
     serviceProviderId: selectedInstanceOffering?.serviceProviderId ?? "",
     serviceKey: selectedInstanceOffering?.serviceURLKey ?? "",
     serviceAPIVersion: selectedInstanceOffering?.serviceAPIVersion ?? "",
@@ -140,7 +140,7 @@ const InstallerUpgraderInstructions = ({
           </IconButton>
         </Header>
         <Content>
-          {isRefetching && !installerInstructionsToShow ? (
+          {isFetching && !installerInstructionsToShow ? (
             <LoadingSpinner />
           ) : (
             <InstallerInstructions installerInstructions={installerInstructionsToShow} />
