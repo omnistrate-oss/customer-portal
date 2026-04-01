@@ -1,14 +1,15 @@
-import { FC } from "react";
-import dynamic from "next/dynamic";
 import { Box, Stack, styled } from "@mui/material";
+import dynamic from "next/dynamic";
+import { FC } from "react";
 
 import ClusterLocationsIcon from "src/components/Icons/Dashboard/ClusterLocations";
 import { Text } from "src/components/Typography/Typography";
+import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { getResultParams } from "src/utils/instance";
 const DottedWorldMap = dynamic(() => import("./DottedWorldMap"), {
   ssr: false,
 });
-import { CloudProvider } from "src/types/common/enums";
 
 const ContainerCard = styled(Box)({
   border: "1px solid #E4E7EC",
@@ -49,7 +50,7 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
       const region = curr.region;
       let cloudProvider = curr.cloud_provider;
 
-      const resultParams: any = curr.result_params;
+      const resultParams = getResultParams(curr);
 
       //check if instance of type cloud provider account and set cloud provider
       if (

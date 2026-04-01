@@ -1,9 +1,9 @@
 import _ from "lodash";
 
 import { $api } from "src/api/query";
+import { getResultParams } from "src/utils/instance";
 import { calculateInstanceHealthPercentage } from "src/utils/instanceHealthPercentage";
-
-import processClusterPorts from "../utils/processClusterPorts";
+import processClusterPorts from "src/utils/processClusterPorts";
 
 const useResourceInstance = (queryParams) => {
   const {
@@ -290,6 +290,8 @@ const useResourceInstance = (queryParams) => {
 
         const healthStatusPercent = calculateInstanceHealthPercentage(data?.detailedNetworkTopology, data?.status);
 
+        const resultParameters = getResultParams(data);
+
         const final = {
           unprocessedData: data,
           resourceInstanceId: resourceInstanceId,
@@ -323,7 +325,7 @@ const useResourceInstance = (queryParams) => {
             globalEndpoints: globalEndpoints,
           },
           nodes: nodes,
-          resultParameters: data.result_params,
+          resultParameters: resultParameters,
           isLogsEnabled: isLogsEnabled,
           isMetricsEnabled: isMetricsEnabled,
           metricsSocketURL: metricsSocketURL,
