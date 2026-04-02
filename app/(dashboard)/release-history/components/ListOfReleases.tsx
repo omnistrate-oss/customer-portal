@@ -43,16 +43,16 @@ const ListOfReleases: FC<ListOfReleasesProps> = ({
   return (
     <>
       {/* Header Section */}
-      <div className="py-5 px-6 border-b border-gray-200">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="py-5 px-6 border-b border-gray-200 mt-1">
+        <div className="flex items-center justify-between gap-4">
           <DataGridHeaderTitle
             title="List of Releases"
-            desc="Displays all product releases across your on-prem deployments."
+            desc="Displays all product releases across your on-prem deployments"
             count={releases.length}
             units={{ singular: "release", plural: "releases" }}
           />
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
             <SearchInput searchText={searchText} setSearchText={setSearchText} placeholder="Search releases" />
 
             <RefreshWithToolTip refetch={onRefresh} disabled={isLoadingReleases} />

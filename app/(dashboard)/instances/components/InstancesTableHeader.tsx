@@ -131,15 +131,17 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status === "DISCONNECTED"
-          ? "Instance is disconnected"
-          : status !== "RUNNING"
-            ? "Instance must be running to stop it"
-            : isComplexResource || isProxyResource
-              ? "System manages instances cannot be stopped"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to stop instances"
-                : "",
+        : ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status as string)
+          ? "Not applicable for on-prem deployment instances"
+          : status === "DISCONNECTED"
+            ? "Instance is disconnected"
+            : status !== "RUNNING"
+              ? "Instance must be running to stop it"
+              : isComplexResource || isProxyResource
+                ? "System managed instances cannot be stopped"
+                : !isUpdateAllowedByRBAC
+                  ? "Unauthorized to stop instances"
+                  : "",
     });
 
     actions.push({
@@ -163,15 +165,17 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status === "DISCONNECTED"
-          ? "Instance is disconnected"
-          : status !== "STOPPED"
-            ? "Instances must be stopped before starting"
-            : isComplexResource || isProxyResource
-              ? "System managed instances cannot be started"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to start instances"
-                : "",
+        : ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status as string)
+          ? "Not applicable for on-prem deployment instances"
+          : status === "DISCONNECTED"
+            ? "Instance is disconnected"
+            : status !== "STOPPED"
+              ? "Instances must be stopped before starting"
+              : isComplexResource || isProxyResource
+                ? "System managed instances cannot be started"
+                : !isUpdateAllowedByRBAC
+                  ? "Unauthorized to start instances"
+                  : "",
     });
 
     actions.push({

@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "lib/utils";
+import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -150,7 +150,7 @@ const ChartTooltipContent = React.forwardRef<
         style={{
           display: "grid",
           alignItems: "flex-start",
-          minWidth: "8rem",
+          minWidth: "12rem",
           gap: "0.375rem",
           border: "1px solid #E5E7EB",
           borderRadius: "0.375rem",

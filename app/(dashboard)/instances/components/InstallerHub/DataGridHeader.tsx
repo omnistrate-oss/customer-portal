@@ -18,7 +18,7 @@ const DataGridHeader: FC<DataGridHeaderProps> = (props) => {
   const isNoneSelected = selectedRows.length === 0;
 
   return (
-    <Box padding={"20px"}>
+    <Box padding={"20px"} borderBottom="1px solid #EAECF0">
       <Stack direction="row" justifyContent="space-between" alignItems={"center"} gap="16px">
         <DataGridHeaderTitle
           title="List of Installers/Upgraders"
