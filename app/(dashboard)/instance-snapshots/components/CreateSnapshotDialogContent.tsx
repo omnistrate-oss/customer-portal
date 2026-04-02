@@ -1,6 +1,6 @@
-import { useMemo } from "react";
 import { Stack } from "@mui/material";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
+import { useMemo } from "react";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -48,6 +48,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           type: "select",
           menuItems: instances.map((instance) => {
             const status = instance.status ?? "";
+            const installer = ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status);
             const isDisabled = ["DELETING", "DEPLOYING"].includes(status);
             const styles = getResourceInstanceStatusStylesAndLabel(status);
             const data = {
@@ -61,8 +62,12 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
                   <StatusChip status={status} {...styles} />
                 </>
               ),
-              disabled: isDisabled,
-              disabledMessage: isDisabled ? "Cannot create snapshot for Deleting or Deploying instances" : "",
+              disabled: isDisabled || installer,
+              disabledMessage: installer
+                ? "Snapshots are not applicable for on-prem deployment instances"
+                : isDisabled
+                  ? "Cannot create snapshot for Deleting or Deploying instances"
+                  : "",
             };
 
             return data;

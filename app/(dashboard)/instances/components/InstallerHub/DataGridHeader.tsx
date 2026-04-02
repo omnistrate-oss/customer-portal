@@ -4,6 +4,7 @@ import { FC } from "react";
 import Button from "components/Button/Button";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import Tooltip from "src/components/Tooltip/Tooltip";
+import { themeConfig } from "src/themeConfig";
 
 import InstallerActionIcon from "./Installer/InstallerActionIcon";
 
@@ -18,7 +19,7 @@ const DataGridHeader: FC<DataGridHeaderProps> = (props) => {
   const isNoneSelected = selectedRows.length === 0;
 
   return (
-    <Box padding={"20px"}>
+    <Box padding={"20px"} borderBottom={`1px solid ${themeConfig.colors.gray200}`}>
       <Stack direction="row" justifyContent="space-between" alignItems={"center"} gap="16px">
         <DataGridHeaderTitle
           title="List of Installers/Upgraders"

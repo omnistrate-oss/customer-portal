@@ -43,6 +43,9 @@ export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   return menuItems.sort((a, b) => a.label.localeCompare(b.label));
 };
 
+export const isOnpremInstaller = (status) =>
+  ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status);
+
 type SchemaParameter = {
   key: string;
   scope?: {
@@ -355,7 +358,7 @@ export const getInitialValues = (
       cloudProvider: derivedCloudProvider,
       region: instance.region,
       network_type: instance.network_type || "",
-      productTierVersion: "", // Empty for existing instances
+      productTierVersion: instance.tierVersion || "", // Use the instance's actual version
       requestParams,
       customTags: instance.customTags?.length ? instance.customTags : [],
       ...(isInstanceOnPrem && { onprem_platform: onpremPlatform }),

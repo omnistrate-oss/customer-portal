@@ -20,7 +20,7 @@ import {
 } from "src/utils/isAllowedByRBAC";
 
 import { Overlay } from "../page";
-import { getMainResourceFromInstance } from "../utils";
+import { getMainResourceFromInstance, isOnpremInstaller } from "../utils";
 
 import InstanceActionMenu from "./InstanceActionMenu";
 import InstancesFilters from "./InstancesFilters";
@@ -100,6 +100,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
+    const installer = isOnpremInstaller(status);
     const isDeleteProtected = selectedInstance?.resourceInstanceMetadata?.deletionProtection === true;
     // Check if the user has permission to perform the operation - Role from Subscription
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);
@@ -131,15 +132,17 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status === "DISCONNECTED"
-          ? "Instance is disconnected"
-          : status !== "RUNNING"
-            ? "Instance must be running to stop it"
-            : isComplexResource || isProxyResource
-              ? "System manages instances cannot be stopped"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to stop instances"
-                : "",
+        : installer
+          ? "Not applicable for on-prem deployment instances"
+          : status === "DISCONNECTED"
+            ? "Instance is disconnected"
+            : status !== "RUNNING"
+              ? "Instance must be running to stop it"
+              : isComplexResource || isProxyResource
+                ? "System managed instances cannot be stopped"
+                : !isUpdateAllowedByRBAC
+                  ? "Unauthorized to stop instances"
+                  : "",
     });
 
     actions.push({
@@ -163,15 +166,17 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : status === "DISCONNECTED"
-          ? "Instance is disconnected"
-          : status !== "STOPPED"
-            ? "Instances must be stopped before starting"
-            : isComplexResource || isProxyResource
-              ? "System managed instances cannot be started"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to start instances"
-                : "",
+        : installer
+          ? "Not applicable for on-prem deployment instances"
+          : status === "DISCONNECTED"
+            ? "Instance is disconnected"
+            : status !== "STOPPED"
+              ? "Instances must be stopped before starting"
+              : isComplexResource || isProxyResource
+                ? "System managed instances cannot be started"
+                : !isUpdateAllowedByRBAC
+                  ? "Unauthorized to start instances"
+                  : "",
     });
 
     actions.push({

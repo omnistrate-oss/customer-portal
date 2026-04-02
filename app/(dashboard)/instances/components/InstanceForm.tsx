@@ -532,7 +532,7 @@ const InstanceForm = ({
     },
     {
       // Only fetch customer version sets if the offering supports VERSION_SET_OVERRIDE feature
-      enabled: allowCustomerVersionOverride,
+      enabled: allowCustomerVersionOverride && !!values.serviceId && !!values.servicePlanId,
     }
   );
 
