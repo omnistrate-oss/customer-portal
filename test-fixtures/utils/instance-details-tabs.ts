@@ -5,6 +5,7 @@ import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
+import { getResultParams } from "src/utils/instance";
 
 export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsPage, instance: ResourceInstance) => {
   const page = instanceDetailsPage.page;
@@ -77,7 +78,7 @@ export const TestInstanceDetailsTab = async (
   const outputParametersTable = page.getByTestId(dataTestIds.outputParametersTable);
   await expect(outputParametersTable).toBeVisible();
 
-  const parameters = Object.values(instance.result_params as Record<string, string>);
+  const parameters = Object.values(getResultParams(instance) as Record<string, string>);
 
   // Handle Password Parameters
   const showButtons = await outputParametersTable.getByText("Show").all();

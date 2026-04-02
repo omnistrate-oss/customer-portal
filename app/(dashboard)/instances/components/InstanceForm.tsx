@@ -26,7 +26,7 @@ import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
-import { checkBYOADeploymentInstance } from "src/utils/instance";
+import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
@@ -138,7 +138,7 @@ const InstanceForm = ({
         } catch {}
 
         setCreateInstanceModalData({
-          isCustomDNS: formData.values.requestParams?.custom_dns_configuration,
+          isCustomDNS: (formData.values.requestParams as Record<string, any>)?.custom_dns_configuration,
           instanceId: response?.id as string,
           isFirstInstanceInRegion: isFirstInstanceInRegion,
           lifecycleStatus: lifecycleStatus as string,
@@ -378,7 +378,7 @@ const InstanceForm = ({
       } else {
         // Only send the fields that have changed
         const requestParams = {},
-          oldResultParams = selectedInstance?.result_params;
+          oldResultParams = getResultParams(selectedInstance);
 
         for (const key in data.requestParams) {
           const value = data.requestParams[key];
@@ -519,7 +519,7 @@ const InstanceForm = ({
   const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
-    enabled: values.requestParams?.custom_network_id !== undefined, // Fetch only if custom_network_id is present
+    enabled: (values.requestParams as Record<string, any>)?.custom_network_id !== undefined, // Fetch only if custom_network_id is present
     refetchOnWindowFocus: true, // User can create a custom network and come back to this tab
   });
 
@@ -776,7 +776,7 @@ const InstanceForm = ({
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,
     cloudProviderName: values.cloudProvider as CloudProvider,
-    hasCustomAvailabilityZoneField: values.requestParams?.custom_availability_zone !== undefined,
+    hasCustomAvailabilityZoneField: (values.requestParams as Record<string, any>)?.custom_availability_zone !== undefined,
   });
 
   const { isFetching: isFetchingResourceInstanceIds, data: resourceIdInstancesHashMap = {} } = useResourcesInstanceIds(
@@ -841,27 +841,31 @@ const InstanceForm = ({
       instances
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
-          if (instance.result_params?.gcp_project_id) {
+          const resultParams = getResultParams(instance);
+          if (resultParams?.gcp_project_id) {
             return values.cloudProvider === "gcp";
-          } else if (instance.result_params?.aws_account_id) {
+          } else if (resultParams?.aws_account_id) {
             return values.cloudProvider === "aws";
-          } else if (instance.result_params?.azure_subscription_id) {
+          } else if (resultParams?.azure_subscription_id) {
             return values.cloudProvider === "azure";
-          } else if (instance.result_params?.oci_tenancy_id) {
+          } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
-        .map((instance) => ({
-          ...instance,
-          label: instance.result_params?.gcp_project_id
-            ? `${instance.id} (Project ID - ${instance.result_params?.gcp_project_id})`
-            : instance.result_params?.aws_account_id
-              ? `${instance.id} (Account ID - ${instance.result_params?.aws_account_id})`
-              : instance.result_params?.oci_tenancy_id
-                ? `${instance.id} (Tenancy ID - ${instance.result_params?.oci_tenancy_id})`
-                : `${instance.id} (Subscription ID - ${instance.result_params?.azure_subscription_id})`,
-        })),
+        .map((instance) => {
+          const resultParams = getResultParams(instance);
+          return {
+            ...instance,
+            label: resultParams?.gcp_project_id
+              ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
+              : resultParams?.aws_account_id
+                ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
+                : resultParams?.oci_tenancy_id
+                  ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
+                  : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
+          };
+        }),
     [instances, values.cloudProvider]
   );
 

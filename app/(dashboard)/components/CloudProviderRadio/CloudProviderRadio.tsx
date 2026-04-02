@@ -17,7 +17,7 @@ export const cloudProviderLongLogoMap = {
   gcp: <GcpLogo style={{ height: "32px", width: "auto" }} />,
   azure: <AzureLogo style={{ height: "32px", width: "auto" }} />,
   oci: <OciLogo style={{ height: "32px", width: "auto" }} />,
-  private: <PrivateIcon style={{ height: "25px", width: "auto" }} />,
+  private: <PrivateIcon style={{ height: "27px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {

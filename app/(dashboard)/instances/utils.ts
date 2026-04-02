@@ -19,6 +19,7 @@ import {
   ResourceInstanceNetworkTopology,
 } from "src/types/resourceInstance";
 import { TierVersionSet } from "src/types/tier-version-set";
+import { getResultParams } from "src/utils/instance";
 
 import { loadStatusLabel, loadStatusMap } from "./constants";
 
@@ -324,7 +325,7 @@ export const getInitialValues = (
   if (instance) {
     const subscription = subscriptions.find((sub) => sub.id === instance?.subscriptionId);
 
-    const requestParams: any = { ...(instance.result_params as object) };
+    const requestParams = getResultParams(instance);
     if (instance.network_type) {
       requestParams.network_type = instance.network_type;
     }
@@ -920,20 +921,3 @@ export function applyCustomDnsNormalization(requestParams: any, resourceKey: str
     delete requestParams.custom_dns_configuration;
   }
 }
-
-/**
- * Returns result_params if non-empty, otherwise falls back to launch_input_params.
- * result_params can be an empty object `{}` which is truthy,
- * so a simple `||` check doesn't work.
- */
-type InstanceParams = Record<string, string>;
-
-export const getResultParams = (
-  resultParams: InstanceParams | undefined,
-  launchInputParams: InstanceParams | undefined
-): InstanceParams | undefined => {
-  if (resultParams && Object.keys(resultParams).length > 0) {
-    return resultParams;
-  }
-  return launchInputParams;
-};

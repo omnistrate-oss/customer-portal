@@ -1,9 +1,9 @@
 // import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
@@ -13,6 +13,7 @@ import {
   // ACCOUNT_CREATION_METHODS,
   getAccountConfigStatusBasedHeader,
 } from "src/utils/constants/accountConfig";
+import { getResultParams } from "src/utils/instance";
 
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import CopyToClipboardButton from "../CopyClipboardButton/CopyClipboardButton";
@@ -171,11 +172,11 @@ const CreationTimeInstructions = (props) => {
 
     if (!isMounted.current) return;
 
-    const result_params = resourceInstance?.result_params;
-    if (result_params?.cloud_provider_account_config_id) {
+    const resultParams = getResultParams(resourceInstance);
+    if (resultParams?.cloud_provider_account_config_id) {
       setClickedInstance((prev) => ({
         ...prev,
-        result_params: { ...prev?.result_params, ...result_params },
+        result_params: { ...getResultParams(prev), ...resultParams },
       }));
 
       queryClient.setQueryData(
@@ -189,10 +190,10 @@ const CreationTimeInstructions = (props) => {
           },
         ],
         (oldData) => {
-          const result_params = {
+          const resultParams = {
             // @ts-ignore
             ...oldData?.resourceInstances?.result_params,
-            ...resourceInstance.result_params,
+            ...getResultParams(resourceInstance),
           };
 
           return {
@@ -201,7 +202,7 @@ const CreationTimeInstructions = (props) => {
                 instance?.id === resourceInstance?.id
                   ? {
                       ...(resourceInstance || {}),
-                      result_params: result_params,
+                      result_params: resultParams,
                     }
                   : instance
               ),
@@ -486,7 +487,7 @@ const NonCreationTimeInstructions = (props) => {
         <BodyText sx={{ marginTop: "20px", fontWeight: 600 }}>
           {getAccountConfigStatusBasedHeader(
             selectedAccountConfig?.status,
-            selectedAccountConfig?.result_params?.cloud_provider_account_config_id
+            getResultParams(selectedAccountConfig)?.cloud_provider_account_config_id
           )}
         </BodyText>
 
