@@ -23,7 +23,7 @@ const ReleaseNotesCard: FC<ReleaseNotesCardProps> = ({ releaseNotes }) => {
               color: "#535862",
             }}
             dangerouslySetInnerHTML={{
-              __html: releaseNotes ? DOMPurify.sanitize(releaseNotes) : "No installer instructions available.",
+              __html: DOMPurify.sanitize(releaseNotes),
             }}
           />
         ) : (

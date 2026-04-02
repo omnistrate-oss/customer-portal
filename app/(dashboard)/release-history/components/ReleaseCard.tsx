@@ -1,9 +1,8 @@
 import { FC } from "react";
 
 import { Text } from "components/Typography/Typography";
-
-import { TierVersionSet } from "../../../../src/types/tier-version-set";
-import formatDateUTC from "../../../../src/utils/formatDateUTC";
+import { TierVersionSet } from "src/types/tier-version-set";
+import formatDateUTC from "src/utils/formatDateUTC";
 
 import ReleaseNotesCard from "./ReleaseNotesCard";
 

@@ -2,11 +2,11 @@ import { FC } from "react";
 
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
+import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
+import { TierVersionSet } from "src/types/tier-version-set";
 
-import LoadingSpinner from "../../../../src/components/LoadingSpinner/LoadingSpinner";
-import { TierVersionSet } from "../../../../src/types/tier-version-set";
-import { ProductOption, SubscriptionPlanOption } from "../types";
+import { Option } from "../types";
 
 import FilterSelect from "./FilterSelect";
 import ReleaseCard from "./ReleaseCard";
@@ -19,8 +19,8 @@ type ListOfReleasesProps = {
   setSelectedProduct: (value: string) => void;
   selectedPlan: string;
   setSelectedPlan: (value: string) => void;
-  productOptions: ProductOption[];
-  planOptions: SubscriptionPlanOption[];
+  productOptions: Option[];
+  planOptions: Option[];
   onRefresh: () => void;
   isFetchingProducts?: boolean;
   isLoadingReleases?: boolean;
