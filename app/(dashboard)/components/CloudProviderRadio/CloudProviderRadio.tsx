@@ -61,7 +61,12 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   onChange = () => {},
   disabled,
 }) => {
-  if (!cloudProviders.length) {
+  // Filter out cloud providers that don't have a logo/icon defined
+  const validCloudProviders = cloudProviders.filter(
+    (cp) => cp && cloudProviderLongLogoMap[cp]
+  );
+
+  if (!validCloudProviders.length) {
     return (
       <div className="flex items-center justify-center h-10">
         <Text size="small" weight="medium" color={colors.gray500}>
@@ -72,8 +77,8 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   }
 
   return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${cloudProviders.length}, minmax(0, 1fr))` }}>
-      {cloudProviders.map((cloudProvider, index) => {
+    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${validCloudProviders.length}, minmax(0, 1fr))` }}>
+      {validCloudProviders.map((cloudProvider, index) => {
         return (
           <CloudProviderCard
             key={index}
