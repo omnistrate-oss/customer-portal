@@ -104,7 +104,7 @@ function ResourceCustomDNS(props) {
 
   return rows.length === 0 ? (
     <Card
-      mt={3}
+      mt={"32px"}
       sx={{
         paddingTop: "12.5px",
         paddingLeft: "20px",
@@ -117,7 +117,7 @@ function ResourceCustomDNS(props) {
       </Stack>
     </Card>
   ) : (
-    <Box paddingTop={context === "fleet" ? "-10px" : "22px"}>
+    <Box paddingTop={context === "fleet" ? "-10px" : "12px"}>
       <PropertyTable data-testid="connectivity-table" rows={rows} />
     </Box>
   );
