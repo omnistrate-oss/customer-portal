@@ -116,6 +116,10 @@ export const getSignupRoute = () => {
   return "/signup";
 };
 
+export const getReleaseHistoryRoute = () => {
+  return "/release-history";
+};
+
 export const getResetPasswordRoute = () => {
   return "/reset-password";
 };

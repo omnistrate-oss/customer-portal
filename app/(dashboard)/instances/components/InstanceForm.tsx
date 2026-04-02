@@ -241,11 +241,9 @@ const InstanceForm = ({
 
           switch (result?.type?.toLowerCase()) {
             case "number":
-              if (data.requestParams[key] === "") break;
               data.requestParams[key] = Number(data.requestParams[key]);
               break;
             case "float64":
-              if (data.requestParams[key] === "") break;
               const output = Number(data.requestParams[key]);
               if (!Number.isNaN(output)) {
                 data.requestParams[key] = Number(data.requestParams[key]);
@@ -443,11 +441,9 @@ const InstanceForm = ({
 
           switch (result?.type?.toLowerCase()) {
             case "number":
-              if (data.requestParams[key] === "") break;
               data.requestParams[key] = Number(data.requestParams[key]);
               break;
             case "float64":
-              if (data.requestParams[key] === "") break;
               const output = Number(data.requestParams[key]);
               if (!Number.isNaN(output)) {
                 data.requestParams[key] = Number(data.requestParams[key]);
@@ -776,7 +772,8 @@ const InstanceForm = ({
   const { data: customAvailabilityZoneData, isLoading: isFetchingCustomAvailabilityZones } = useAvailabilityZone({
     regionCode: values.region,
     cloudProviderName: values.cloudProvider as CloudProvider,
-    hasCustomAvailabilityZoneField: (values.requestParams as Record<string, any>)?.custom_availability_zone !== undefined,
+    hasCustomAvailabilityZoneField:
+      (values.requestParams as Record<string, any>)?.custom_availability_zone !== undefined,
   });
 
   const { isFetching: isFetchingResourceInstanceIds, data: resourceIdInstancesHashMap = {} } = useResourcesInstanceIds(

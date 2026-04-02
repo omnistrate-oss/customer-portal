@@ -5,10 +5,12 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, Collapse, Stack } from "@mui/material";
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
+import InstallerHub from "app/(dashboard)/instances/components/InstallerHub/InstallerHub";
 import InstanceActionMenu from "app/(dashboard)/instances/components/InstanceActionMenu";
 import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialogs";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { Overlay } from "app/(dashboard)/instances/page";
+import { platformToCloudProviderMap } from "app/(dashboard)/instances/utils";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
@@ -38,8 +40,6 @@ import {
   toggleInstanceDetailsSummaryVisibility,
 } from "src/slices/genericSlice";
 import { NetworkType } from "src/types/common/enums";
-
-import InstallerHub from "../../../../../components/InstallerHub/InstallerHub";
 
 import { checkCustomDNSEndpoint, getTabs } from "./utils";
 
@@ -230,7 +230,11 @@ const InstanceDetailsPage = ({
           serviceLogoURL={subscription?.serviceLogoURL}
           resourceInstanceId={instanceId}
           region={resourceInstanceData.region}
-          cloudProvider={cloudProvider}
+          cloudProvider={
+            resourceInstanceData?.unprocessedData?.onpremPlatform
+              ? platformToCloudProviderMap[resourceInstanceData.unprocessedData.onpremPlatform]
+              : cloudProvider
+          }
           status={resourceInstanceData.status}
           createdAt={resourceInstanceData.createdAt}
           modifiedAt={resourceInstanceData.modifiedAt}
@@ -406,7 +410,6 @@ const InstanceDetailsPage = ({
       {currentTab === tabs.customDNS && (
         <ResourceCustomDNS
           globalEndpoints={resourceInstanceData.connectivity.globalEndpoints}
-          context="access"
           accessQueryParams={queryData}
           refetchInstance={resourceInstanceQuery.refetch}
         />

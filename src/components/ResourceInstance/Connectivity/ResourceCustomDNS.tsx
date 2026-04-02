@@ -8,14 +8,7 @@ import CustomDNS from "./CustomDNS";
 import PropertyTable from "./PropertyTable";
 
 function ResourceCustomDNS(props) {
-  const {
-    globalEndpoints,
-    context,
-    addCustomDNSMutation,
-    removeCustomDNSMutation,
-    accessQueryParams,
-    refetchInstance,
-  } = props;
+  const { globalEndpoints, addCustomDNSMutation, removeCustomDNSMutation, accessQueryParams, refetchInstance } = props;
 
   const primaryResourceName = globalEndpoints?.primary?.resourceName;
   const primaryResourceEndpoint = globalEndpoints?.primary?.endpoint;
@@ -93,7 +86,6 @@ function ResourceCustomDNS(props) {
 
     return res;
   }, [
-    context,
     primaryResourceName,
     primaryResourceEndpoint,
     otherResourceFilteredEndpoints,
@@ -104,7 +96,7 @@ function ResourceCustomDNS(props) {
 
   return rows.length === 0 ? (
     <Card
-      mt={3}
+      mt={"32px"}
       sx={{
         paddingTop: "12.5px",
         paddingLeft: "20px",
@@ -117,7 +109,7 @@ function ResourceCustomDNS(props) {
       </Stack>
     </Card>
   ) : (
-    <Box paddingTop={context === "fleet" ? "-10px" : "22px"}>
+    <Box paddingTop={"12px"}>
       <PropertyTable data-testid="connectivity-table" rows={rows} />
     </Box>
   );

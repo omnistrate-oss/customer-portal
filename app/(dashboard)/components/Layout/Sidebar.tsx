@@ -1,13 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { Collapse } from "@mui/material";
 import useBillingStatus from "app/(dashboard)/billing/hooks/useBillingStatus";
 import clsx from "clsx";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
+import APIDocsIcon from "components/Icons/SideNavbar/APIDocs/APIDocsIcon";
+import DashboardNavIcon from "components/Icons/SideNavbar/Dashboard/Dashboard";
+import DeveloperDocsIcon from "components/Icons/SideNavbar/DeveloperDocs/DeveloperDocsIcon";
+import DownloadCLIIcon from "components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import FileLockIcon from "components/Icons/SideNavbar/FileLock/FileLockIcon";
+import PricingIcon from "components/Icons/SideNavbar/Pricing/PricingIcon";
+import ReleaseHistoryIcon from "components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
+import ResourcesIcon from "components/Icons/SideNavbar/Resources/Resources";
+import ShieldIcon from "components/Icons/SideNavbar/Shield/Shield";
+import SupportIcon from "components/Icons/SideNavbar/Support/SupportIcon";
+import { Text } from "components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
 import {
@@ -20,20 +31,11 @@ import {
   getInstanceSnapshotsRoute,
   getInstancesRoute,
   getNotificationsRoute,
+  getReleaseHistoryRoute,
   getSettingsRoute,
   getSnapshotDetailsRoute,
   getSubscriptionsRoute,
 } from "src/utils/routes";
-import APIDocsIcon from "components/Icons/SideNavbar/APIDocs/APIDocsIcon";
-import DashboardNavIcon from "components/Icons/SideNavbar/Dashboard/Dashboard";
-import DeveloperDocsIcon from "components/Icons/SideNavbar/DeveloperDocs/DeveloperDocsIcon";
-import DownloadCLIIcon from "components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import FileLockIcon from "components/Icons/SideNavbar/FileLock/FileLockIcon";
-import PricingIcon from "components/Icons/SideNavbar/Pricing/PricingIcon";
-import ResourcesIcon from "components/Icons/SideNavbar/Resources/Resources";
-import ShieldIcon from "components/Icons/SideNavbar/Shield/Shield";
-import SupportIcon from "components/Icons/SideNavbar/Support/SupportIcon";
-import { Text } from "components/Typography/Typography";
 
 import FullScreenDrawer from "../FullScreenDrawer/FullScreenDrawer";
 
@@ -186,6 +188,17 @@ const Sidebar = () => {
     );
   }, [serviceOfferings]);
 
+  // Filter serviceOfferings to only include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope
+  const onPremOfferings = useMemo(() => {
+    return serviceOfferings.filter(
+      (offering) =>
+        offering.serviceModelType === "ON_PREM" &&
+        offering.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        )
+    );
+  }, [serviceOfferings]);
+
   // Prefetch Billing Data
   const billingStatusQuery = useBillingStatus();
 
@@ -292,8 +305,17 @@ const Sidebar = () => {
           { name: "Subscriptions", href: getSubscriptionsRoute({}) },
         ],
       },
+      ...(onPremOfferings.length > 0
+        ? [
+            {
+              name: "Release History",
+              icon: ReleaseHistoryIcon,
+              href: getReleaseHistoryRoute(),
+            },
+          ]
+        : []),
     ];
-  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage]);
+  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage, onPremOfferings]);
 
   return (
     <aside

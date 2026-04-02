@@ -169,7 +169,7 @@ function Connectivity(props) {
           rows: connectivitySummaryData,
           flexWrap: true,
         }}
-        mt="20px"
+        mt="32px"
       />
       <>{rows}</>
     </>

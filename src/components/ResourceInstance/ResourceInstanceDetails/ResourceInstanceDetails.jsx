@@ -1,12 +1,12 @@
-import { useMemo } from "react";
 import { Box } from "@mui/material";
 import CustomTagsCell from "app/(dashboard)/instances/components/CustomTagsCell";
 import { Base64 } from "js-base64";
+import { useMemo } from "react";
 
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
 import { INTEGRATION_TYPE_LABEL_MAP } from "src/constants/productTierFeatures";
 import formatDateUTC from "src/utils/formatDateUTC";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import NonOmnistrateIntegrationRow from "./NonOmnistrateIntegrationRow";
 import PropertyDetails from "./PropertyDetails";
@@ -352,7 +352,7 @@ function ResourceInstanceDetails(props) {
   const hasPendingUpgrades = maintenanceTasks?.upgrade_paths?.length > 0;
 
   return (
-    <Box marginTop={"20px"}>
+    <Box marginTop={"32px"}>
       {hasPendingUpgrades && (
         <UpgradeScheduledNotificationBar
           upgradeStatus={maintenanceTasks.upgrade_paths[0].upgrade_status}

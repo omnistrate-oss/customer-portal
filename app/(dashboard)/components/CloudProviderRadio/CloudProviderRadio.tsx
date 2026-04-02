@@ -13,11 +13,11 @@ import OciLogo from "../../../../src/components/Logos/OciLogo";
 import PrivateIcon from "./PrivateIcon";
 
 export const cloudProviderLongLogoMap = {
-  aws: <AwsLogo style={{ height: "32px", width: "auto" }} />,
-  gcp: <GcpLogo style={{ height: "32px", width: "auto" }} />,
-  azure: <AzureLogo style={{ height: "32px", width: "auto" }} />,
-  oci: <OciLogo style={{ height: "32px", width: "auto" }} />,
-  private: <PrivateIcon style={{ height: "27px", width: "auto" }} />,
+  aws: <AwsLogo style={{ height: "24px", width: "auto" }} />,
+  gcp: <GcpLogo style={{ height: "24px", width: "auto" }} />,
+  azure: <AzureLogo style={{ height: "24px", width: "auto" }} />,
+  oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
+  private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
@@ -25,11 +25,13 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
     <div
       data-testid={`${cloudProvider}-card`}
       className={cn(
-        "px-4 py-4 rounded-xl text-center flex flex-col justify-between items-center min-h-15",
+        "px-4 py-4 rounded-xl text-center flex flex-col justify-center items-center",
         disabled ? "cursor-default bg-gray-50" : "cursor-pointer"
       )}
       style={{
         outline: isSelected ? `2px solid ${colors.success500}` : `1px solid ${colors.gray200}`,
+        minWidth: "120px",
+        minHeight: "60px",
       }}
       onClick={() => {
         if (!disabled) {
@@ -37,7 +39,9 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
         }
       }}
     >
-      {cloudProviderLongLogoMap[cloudProvider]}
+      <div className="flex items-center justify-center" style={{ height: "28px" }}>
+        {cloudProviderLongLogoMap[cloudProvider]}
+      </div>
     </div>
   );
 };

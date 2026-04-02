@@ -10,7 +10,6 @@ import RegionIcon from "components/Region/RegionIcon";
 import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "components/StatusChip/StatusChip";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
-import ViewInstructionsIcon from "src/components/Icons/AccountConfig/ViewInstrcutionsIcon";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
 import LoadIndicatorIdle from "src/components/Icons/LoadIndicator/LoadIndicatorIdle";
@@ -34,6 +33,7 @@ import { getInstanceDetailsRoute } from "src/utils/routes";
 import PageContainer from "../components/Layout/PageContainer";
 
 import CustomTagsCell from "./components/CustomTagsCell";
+import InstallerActionIcon from "./components/InstallerHub/Installer/InstallerActionIcon";
 import InstallerUpgraderInstructions from "./components/InstallerHub/InstallerUpgraderInstructions";
 import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
@@ -229,7 +229,7 @@ const InstancesPage = () => {
           const isPending = id === instanceId;
 
           return (
-            <Stack direction="row" alignItems="center" gap="8px">
+            <Stack direction="row" alignItems="center" gap="4px">
               <StatusChip status={status} {...statusStylesAndLabel} showOverflowTitle />
               {isInstallerReady && (
                 <>
@@ -245,23 +245,26 @@ const InstancesPage = () => {
                       padding: 0,
                     }}
                   >
-                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
-                    {isPending && isDownloading && <LoadingSpinnerSmall />}
+                    {isPending && isDownloading ? (
+                      <LoadingSpinnerSmall />
+                    ) : (
+                      <DownloadCLIIcon color={styleConfig.secondaryButtonText} />
+                    )}
                   </IconButton>
                   <Tooltip title="View installer instructions">
-                    <Box
-                      sx={{
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
+                    <IconButton
+                      disableRipple
+                      disabled={isPending && isDownloading}
                       onClick={() => {
                         setInstanceId(id || "");
                         handleModalOpen();
                       }}
+                      sx={{
+                        padding: 0,
+                      }}
                     >
-                      <ViewInstructionsIcon />
-                    </Box>
+                      <InstallerActionIcon color="#475467" />
+                    </IconButton>
                   </Tooltip>
                 </>
               )}
@@ -269,7 +272,7 @@ const InstancesPage = () => {
           );
         },
         meta: {
-          minWidth: 200,
+          minWidth: 190,
           disableBrowserTooltip: true,
         },
       }),
