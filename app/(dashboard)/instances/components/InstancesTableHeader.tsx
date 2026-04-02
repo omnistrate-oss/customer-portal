@@ -100,6 +100,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
+    const installer = ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status ?? "");
     const isDeleteProtected = selectedInstance?.resourceInstanceMetadata?.deletionProtection === true;
     // Check if the user has permission to perform the operation - Role from Subscription
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);
@@ -131,7 +132,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status as string)
+        : installer
           ? "Not applicable for on-prem deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
@@ -165,7 +166,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       },
       disabledMessage: !selectedInstance
         ? "Please select an instance"
-        : ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status as string)
+        : installer
           ? "Not applicable for on-prem deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
