@@ -60,7 +60,10 @@ const ListOfReleases: FC<ListOfReleasesProps> = ({
             <FilterSelect
               id="product-filter"
               value={selectedProduct}
-              onChange={setSelectedProduct}
+              onChange={(value) => {
+                setSelectedProduct(value);
+                setSelectedPlan("");
+              }}
               placeholder="Select Product"
               options={productOptions}
               isLoading={isFetchingProducts}
