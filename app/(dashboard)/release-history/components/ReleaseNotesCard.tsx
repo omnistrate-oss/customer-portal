@@ -29,7 +29,7 @@ const ReleaseNotesCard: FC<ReleaseNotesCardProps> = ({ releaseNotes }) => {
         ) : (
           <Box display={"flex"} justifyContent="center" alignItems="center" minHeight="20px">
             <Text color="#344054" size="small" weight="regular">
-              No installer instructions available.
+              No release notes available.
             </Text>
           </Box>
         )}
