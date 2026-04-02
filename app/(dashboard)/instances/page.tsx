@@ -245,7 +245,11 @@ const InstancesPage = () => {
                       padding: 0,
                     }}
                   >
-                    <DownloadCLIIcon color={isPending && isDownloading ? "#D0D5DD" : styleConfig.secondaryButtonText} />
+                    {isPending && isDownloading ? (
+                      <LoadingSpinnerSmall />
+                    ) : (
+                      <DownloadCLIIcon color={styleConfig.secondaryButtonText} />
+                    )}
                   </IconButton>
                   <Tooltip title="View installer instructions">
                     <IconButton
@@ -260,7 +264,6 @@ const InstancesPage = () => {
                       }}
                     >
                       <InstallerActionIcon color="#475467" />
-                      {isPending && isDownloading && <LoadingSpinnerSmall />}
                     </IconButton>
                   </Tooltip>
                 </>
@@ -269,7 +272,7 @@ const InstancesPage = () => {
           );
         },
         meta: {
-          minWidth: 230,
+          minWidth: 190,
           disableBrowserTooltip: true,
         },
       }),
