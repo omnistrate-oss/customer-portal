@@ -315,7 +315,7 @@ const Sidebar = () => {
           ]
         : []),
     ];
-  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage, onPremOfferings.length]);
+  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage, onPremOfferings]);
 
   return (
     <aside

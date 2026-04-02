@@ -1,7 +1,8 @@
+import type { FC } from "react";
+
 import { styleConfig } from "src/providerConfig";
 import { SVGIconProps } from "src/types/common/generalTypes";
-
-const ReleaseHistoryIcon: React.FC<SVGIconProps> = (props) => {
+const ReleaseHistoryIcon: FC<SVGIconProps> = (props) => {
   const { disabled, ...restProps } = props;
   let color = props.color || styleConfig.sidebarIconColor;
 
