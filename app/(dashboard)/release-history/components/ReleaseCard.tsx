@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { Text } from "components/Typography/Typography";
+import Chip from "src/components/Chip/Chip";
 import { TierVersionSet } from "src/types/tier-version-set";
 import formatDateUTC from "src/utils/formatDateUTC";
 
@@ -18,10 +19,18 @@ const ReleaseCard: FC<ReleaseCardProps> = ({ release }) => {
     >
       <div className="mb-4">
         <Text size="large" weight="semibold" color="#181D27">
-          Release Name - {release.name ?? ""}
+          {release.name ?? ""}{" "}
+          <Chip
+            component="span"
+            size="small"
+            label={release.version}
+            fontColor={"#363F72"}
+            bgColor={"#F8F9FC"}
+            borderColor={"#D5D9EB"}
+          />
         </Text>
         <Text size="small" weight="medium" color="#535862">
-          Release Version - {release.version} Release Date - {formatDateUTC(release.releasedAt)}
+          {formatDateUTC(release.releasedAt)}
         </Text>
       </div>
 
