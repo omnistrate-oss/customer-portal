@@ -2,7 +2,6 @@ import { FC } from "react";
 
 import { Text } from "components/Typography/Typography";
 import Chip from "src/components/Chip/Chip";
-import { colors } from "src/themeConfig";
 import { TierVersionSet } from "src/types/tier-version-set";
 import formatDateUTC from "src/utils/formatDateUTC";
 
@@ -25,9 +24,9 @@ const ReleaseCard: FC<ReleaseCardProps> = ({ release }) => {
             component="span"
             size="small"
             label={release.version}
-            fontColor={colors.gray700}
-            bgColor={colors.gray50}
-            borderColor={colors.gray300}
+            fontColor={"#363F72"}
+            bgColor={"#F8F9FC"}
+            borderColor={"#D5D9EB"}
           />
         </Text>
         <Text size="small" weight="medium" color="#535862">
