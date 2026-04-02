@@ -20,7 +20,7 @@ import {
 } from "src/utils/isAllowedByRBAC";
 
 import { Overlay } from "../page";
-import { getMainResourceFromInstance } from "../utils";
+import { getMainResourceFromInstance, isOnpremInstaller } from "../utils";
 
 import InstanceActionMenu from "./InstanceActionMenu";
 import InstancesFilters from "./InstancesFilters";
@@ -100,7 +100,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
-    const installer = ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status ?? "");
+    const installer = isOnpremInstaller(status);
     const isDeleteProtected = selectedInstance?.resourceInstanceMetadata?.deletionProtection === true;
     // Check if the user has permission to perform the operation - Role from Subscription
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);

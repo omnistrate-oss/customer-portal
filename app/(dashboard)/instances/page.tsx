@@ -41,7 +41,12 @@ import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
 import { loadStatusMap } from "./constants";
 import useInstances from "./hooks/useInstances";
-import { getMainResourceFromInstance, getRowBorderStyles, platformToCloudProviderMap } from "./utils";
+import {
+  getMainResourceFromInstance,
+  getRowBorderStyles,
+  isOnpremInstaller,
+  platformToCloudProviderMap,
+} from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 export type Overlay =
@@ -116,7 +121,7 @@ const InstancesPage = () => {
               <StatusCell upcomingUpgrade={upcomingUpgrade} />
               <Tooltip
                 title={
-                  ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status as string)
+                  isOnpremInstaller(status)
                     ? "Not applicable for on-prem deployment instances"
                     : !isDeleteProtectionSupported
                       ? "Delete protection not supported"

@@ -43,6 +43,9 @@ export const getServiceMenuItems = (serviceOfferings: ServiceOffering[]) => {
   return menuItems.sort((a, b) => a.label.localeCompare(b.label));
 };
 
+export const isOnpremInstaller = (status) =>
+  ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status);
+
 type SchemaParameter = {
   key: string;
   scope?: {
