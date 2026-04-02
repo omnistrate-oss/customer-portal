@@ -14,6 +14,7 @@ import DeveloperDocsIcon from "components/Icons/SideNavbar/DeveloperDocs/Develop
 import DownloadCLIIcon from "components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import FileLockIcon from "components/Icons/SideNavbar/FileLock/FileLockIcon";
 import PricingIcon from "components/Icons/SideNavbar/Pricing/PricingIcon";
+import ReleaseHistoryIcon from "components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
 import ResourcesIcon from "components/Icons/SideNavbar/Resources/Resources";
 import ShieldIcon from "components/Icons/SideNavbar/Shield/Shield";
 import SupportIcon from "components/Icons/SideNavbar/Support/SupportIcon";
@@ -36,7 +37,6 @@ import {
   getSubscriptionsRoute,
 } from "src/utils/routes";
 
-import ReleaseHistoryIcon from "../../../../src/components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
 import FullScreenDrawer from "../FullScreenDrawer/FullScreenDrawer";
 
 import PlanDetails from "./PlanDetails";

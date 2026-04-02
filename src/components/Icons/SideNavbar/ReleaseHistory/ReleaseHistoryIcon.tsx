@@ -1,18 +1,10 @@
 import { styleConfig } from "src/providerConfig";
+import { SVGIconProps } from "src/types/common/generalTypes";
 
-interface ReleaseHistoryNavIconProps {
-  active?: boolean;
-  disabled?: boolean;
-  color?: string;
-}
-
-const ReleaseHistoryIcon: React.FC<ReleaseHistoryNavIconProps> = (props) => {
-  const { active, disabled, ...restProps } = props;
+const ReleaseHistoryIcon: React.FC<SVGIconProps> = (props) => {
+  const { disabled, ...restProps } = props;
   let color = props.color || styleConfig.sidebarIconColor;
 
-  if (active) {
-    color = styleConfig.sidebarIconActiveColor;
-  }
   if (disabled) {
     color = styleConfig.sidebarIconDisabledColor;
   }

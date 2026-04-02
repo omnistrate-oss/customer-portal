@@ -411,7 +411,6 @@ const InstanceDetailsPage = ({
       {currentTab === tabs.customDNS && (
         <ResourceCustomDNS
           globalEndpoints={resourceInstanceData.connectivity.globalEndpoints}
-          context="access"
           accessQueryParams={queryData}
           refetchInstance={resourceInstanceQuery.refetch}
         />

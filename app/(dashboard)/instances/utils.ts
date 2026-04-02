@@ -341,7 +341,9 @@ export const getInitialValues = (
     const offering = serviceOfferingsObj[subscription?.serviceId || ""]?.[subscription?.productTierId || ""];
     const isInstanceOnPrem = offering?.serviceModelType === "ON_PREM";
 
-    const derivedCloudProvider = isInstanceOnPrem ? platformToCloudProviderMap[onpremPlatform] : instanceCloudProvider;
+    const derivedCloudProvider = isInstanceOnPrem
+      ? platformToCloudProviderMap[onpremPlatform] || instanceCloudProvider || ""
+      : instanceCloudProvider || "";
 
     return {
       id: instance.id,

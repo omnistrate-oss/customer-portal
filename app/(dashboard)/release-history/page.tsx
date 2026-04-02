@@ -4,9 +4,9 @@ import { getServiceMenuItems, getServicePlanMenuItems } from "app/(dashboard)/in
 import { useEffect, useMemo, useState } from "react";
 
 import { Text } from "components/Typography/Typography";
+import ReleaseHistoryIcon from "src/components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 
-import ReleaseHistoryIcon from "../../../src/components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 import useCustomerVersionSets from "../instances/hooks/useCustomerVersionSets";

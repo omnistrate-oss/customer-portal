@@ -25,7 +25,7 @@ const FilterSelect: FC<FilterSelectProps> = ({
   disabled = false,
   emptyMessage = "No options available",
 }) => {
-  const handleChange = (e: SelectChangeEvent<unknown>) => {
+  const handleChange = (e: SelectChangeEvent<string>) => {
     onChange(e.target.value as string);
   };
 
