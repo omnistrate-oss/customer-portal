@@ -62,9 +62,7 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   disabled,
 }) => {
   // Filter out cloud providers that don't have a logo/icon defined
-  const validCloudProviders = cloudProviders.filter(
-    (cp) => cp && cloudProviderLongLogoMap[cp]
-  );
+  const validCloudProviders = cloudProviders.filter((cp) => cp && cloudProviderLongLogoMap[cp]);
 
   if (!validCloudProviders.length) {
     return (
@@ -77,7 +75,10 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   }
 
   return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${validCloudProviders.length}, minmax(0, 1fr))` }}>
+    <div
+      className="grid gap-4"
+      style={{ gridTemplateColumns: `repeat(${validCloudProviders.length}, minmax(0, 1fr))` }}
+    >
       {validCloudProviders.map((cloudProvider, index) => {
         return (
           <CloudProviderCard

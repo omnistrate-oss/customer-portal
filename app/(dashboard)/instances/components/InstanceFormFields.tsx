@@ -356,8 +356,8 @@ export const getStandardInformationFields = (
       isLoading: isFetchingVersionSets,
     });
 
-    // Set default value if not already set
-    if (!values.productTierVersion && defaultValue) {
+    // Set default value if not already set (only in create mode)
+    if (!values.productTierVersion && defaultValue && formMode === "create") {
       setFieldValue("productTierVersion", defaultValue);
     }
   }

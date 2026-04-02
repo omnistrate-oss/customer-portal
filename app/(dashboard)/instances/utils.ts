@@ -355,7 +355,7 @@ export const getInitialValues = (
       cloudProvider: derivedCloudProvider,
       region: instance.region,
       network_type: instance.network_type || "",
-      productTierVersion: "", // Empty for existing instances
+      productTierVersion: instance.tierVersion || "", // Use the instance's actual version
       requestParams,
       customTags: instance.customTags?.length ? instance.customTags : [],
       ...(isInstanceOnPrem && { onprem_platform: onpremPlatform }),
