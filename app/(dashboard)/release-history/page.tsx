@@ -9,9 +9,9 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
-import useCustomerVersionSets from "../instances/hooks/useCustomerVersionSets";
 
 import ListOfReleases from "./components/ListOfReleases";
+import useVersionSets from "./hooks/useVersionSets";
 
 const ReleaseHistoryPage = () => {
   const { serviceOfferings, isFetchingServiceOfferings } = useGlobalData();
@@ -67,13 +67,13 @@ const ReleaseHistoryPage = () => {
     }
   }, [planOptions, selectedPlanId]);
 
-  //fetch product tier versions
+  //fetch product tier versions using provider token via server route
   const {
-    data: customerVersionSets = [],
-    refetch: refetchCustomerVersionSets,
+    data: versionSets = [],
+    refetch: refetchVersionSets,
     isFetching: isFetchingReleases,
     isRefetching: isRefetchingReleases,
-  } = useCustomerVersionSets(
+  } = useVersionSets(
     {
       serviceId: selectedServiceId,
       productTierId: selectedPlanId,
@@ -83,7 +83,7 @@ const ReleaseHistoryPage = () => {
 
   // Filter releases based on search
   const filteredReleases = useMemo(() => {
-    let filtered = customerVersionSets;
+    let filtered = versionSets;
 
     if (searchText) {
       const lowerSearch = searchText.toLowerCase();
@@ -95,7 +95,7 @@ const ReleaseHistoryPage = () => {
     }
 
     return filtered;
-  }, [searchText, customerVersionSets]);
+  }, [searchText, versionSets]);
 
   const PageReleaseHistoryIcon = () => <ReleaseHistoryIcon color="#17B26A" />;
 
@@ -118,7 +118,7 @@ const ReleaseHistoryPage = () => {
         setSelectedPlan={setSelectedPlanId}
         productOptions={productOptions}
         planOptions={planOptions}
-        onRefresh={refetchCustomerVersionSets}
+        onRefresh={refetchVersionSets}
         isFetchingProducts={isFetchingServiceOfferings}
         isLoadingReleases={isRefetchingReleases || isFetchingReleases || isFetchingServiceOfferings}
       />
