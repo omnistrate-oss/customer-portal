@@ -47,7 +47,7 @@ const ListOfReleases: FC<ListOfReleasesProps> = ({
         <div className="flex items-center justify-between gap-4">
           <DataGridHeaderTitle
             title="List of Releases"
-            desc="Displays all product releases across your on-prem deployments"
+            desc="Displays all supported versions available for the selected product and subscription plan"
             count={releases.length}
             units={{ singular: "release", plural: "releases" }}
           />
