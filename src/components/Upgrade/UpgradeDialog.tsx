@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
+import { useMemo, useState } from "react";
 
 import { $api } from "src/api/query";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -26,6 +26,7 @@ type UpgradeDialogProps = {
   instance?: ResourceInstance;
   subscription?: Subscription;
   serviceOffering?: ServiceOffering;
+  setSelectedRows: (rows: string[]) => void;
 };
 
 const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
@@ -35,6 +36,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
   instance,
   subscription,
   serviceOffering,
+  setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
   const [selectedVersion, setSelectedVersion] = useState<string>("");
@@ -44,6 +46,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
       snackbar.showSuccess("Instance upgrade initiated successfully");
       refetchInstances();
       setSelectedVersion("");
+      setSelectedRows([]);
     },
   });
 

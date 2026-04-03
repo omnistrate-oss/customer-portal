@@ -130,10 +130,10 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     };
   }, [instance, serviceOffering, subscription, selectedResource]);
 
-  const { data: selectedInstance } = useInstancesDescribe({
+  const { data: selectedInstance, refetch: refetchSelectedInstance } = useInstancesDescribe({
     ...selectedInstanceData,
     enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
-  }) as { data?: DescribeResourceInstanceResponse };
+  }) as { data?: DescribeResourceInstanceResponse; refetch: () => void };
 
   const deleteInstanceMutation = $api.useMutation(
     "delete",
@@ -218,6 +218,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
             setCreateInstanceModalData={setCreateInstanceModalData}
             setIsOverlayOpen={setIsOverlayOpen}
             setOverlayType={setOverlayType}
+            setSelectedRows={setSelectedRows}
           />
         }
       />
@@ -225,10 +226,14 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       <UpgradeDialog
         open={isOverlayOpen && overlayType === "upgrade-dialog"}
         onClose={() => setIsOverlayOpen(false)}
-        refetchInstances={refetchData}
+        refetchInstances={() => {
+          refetchData();
+          refetchSelectedInstance();
+        }}
         instance={selectedInstance}
         subscription={subscription}
         serviceOffering={serviceOffering}
+        setSelectedRows={setSelectedRows}
       />
 
       <TextConfirmationDialog
