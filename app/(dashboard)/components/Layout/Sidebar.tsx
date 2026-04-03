@@ -189,13 +189,11 @@ const Sidebar = () => {
   }, [serviceOfferings]);
 
   // Filter serviceOfferings to only include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope
-  const onPremOfferings = useMemo(() => {
-    return serviceOfferings.filter(
-      (offering) =>
-        offering.serviceModelType === "ON_PREM" &&
-        offering.productTierFeatures?.some(
-          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-        )
+  const versionSetOverrideOfferings = useMemo(() => {
+    return serviceOfferings.filter((offering) =>
+      offering.productTierFeatures?.some(
+        (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+      )
     );
   }, [serviceOfferings]);
 
@@ -305,7 +303,7 @@ const Sidebar = () => {
           { name: "Subscriptions", href: getSubscriptionsRoute({}) },
         ],
       },
-      ...(onPremOfferings.length > 0
+      ...(versionSetOverrideOfferings.length > 0
         ? [
             {
               name: "Release History",
@@ -315,7 +313,7 @@ const Sidebar = () => {
           ]
         : []),
     ];
-  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage, onPremOfferings]);
+  }, [isBillingEnabled, showCloudProvidersPage, showCustomNetworksPage, versionSetOverrideOfferings]);
 
   return (
     <aside

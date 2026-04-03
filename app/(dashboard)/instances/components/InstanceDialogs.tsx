@@ -218,6 +218,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
             setCreateInstanceModalData={setCreateInstanceModalData}
             setIsOverlayOpen={setIsOverlayOpen}
             setOverlayType={setOverlayType}
+            setSelectedRows={setSelectedRows}
           />
         }
       />
@@ -229,6 +230,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
         instance={selectedInstance}
         subscription={subscription}
         serviceOffering={serviceOffering}
+        setSelectedRows={setSelectedRows}
       />
 
       <TextConfirmationDialog
