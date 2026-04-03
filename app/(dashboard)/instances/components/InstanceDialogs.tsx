@@ -130,7 +130,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     };
   }, [instance, serviceOffering, subscription, selectedResource]);
 
-  const { data: selectedInstance, refetch: refetchSelectedInstance } = useInstancesDescribe({
+  const { data: selectedInstance } = useInstancesDescribe({
     ...selectedInstanceData,
     enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
   }) as { data?: DescribeResourceInstanceResponse; refetch: () => void };
@@ -226,10 +226,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       <UpgradeDialog
         open={isOverlayOpen && overlayType === "upgrade-dialog"}
         onClose={() => setIsOverlayOpen(false)}
-        refetchInstances={() => {
-          refetchData();
-          refetchSelectedInstance();
-        }}
+        refetchInstances={refetchData}
         instance={selectedInstance}
         subscription={subscription}
         serviceOffering={serviceOffering}
