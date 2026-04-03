@@ -190,12 +190,10 @@ const Sidebar = () => {
 
   // Filter serviceOfferings to only include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope
   const onPremOfferings = useMemo(() => {
-    return serviceOfferings.filter(
-      (offering) =>
-        offering.serviceModelType === "ON_PREM" &&
-        offering.productTierFeatures?.some(
-          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-        )
+    return serviceOfferings.filter((offering) =>
+      offering.productTierFeatures?.some(
+        (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+      )
     );
   }, [serviceOfferings]);
 
