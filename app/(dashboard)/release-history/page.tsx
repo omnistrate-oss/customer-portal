@@ -102,7 +102,8 @@ const ReleaseHistoryPage = () => {
       <PageContainer>
         <PageTitle icon={PageReleaseHistoryIcon}>Release History</PageTitle>
         <Text size="small" weight="regular" color="#535862" className="mt-1 ml-10">
-          View all product version releases, updates, and improvements across your on-prem deployments
+          View all available versions and release information for products and subscription plans that allow you to
+          choose a deployment version
         </Text>
       </PageContainer>
 
