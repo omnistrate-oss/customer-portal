@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
 import { useMemo, useState } from "react";
 
@@ -39,12 +40,22 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
   setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
+  const queryClient = useQueryClient();
   const [selectedVersion, setSelectedVersion] = useState<string>("");
 
   const upgradeInstanceMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/{id}/version-upgrade", {
     onSuccess: () => {
       snackbar.showSuccess("Instance upgrade initiated successfully");
       refetchInstances();
+      // Invalidate only the current instance's describe cache so tierVersion is fresh when dialog reopens
+      const describeEndpoint =
+        "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}";
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const [method, path, options] = query.queryKey as [string, string, { params?: { path?: { id?: string } } }?];
+          return method === "get" && path === describeEndpoint && options?.params?.path?.id === instance?.id;
+        },
+      });
       setSelectedVersion("");
       setSelectedRows([]);
     },
@@ -104,7 +115,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
         <Stack direction="row" gap="24px" alignItems="center">
           <Box flex="1">
             <FieldLabel>Version from</FieldLabel>
-            <TextField disabled value={instance?.tierVersion || "1.0"} />
+            <TextField disabled value={instance?.tierVersion || ""} />
           </Box>
 
           <Box flex="1">
