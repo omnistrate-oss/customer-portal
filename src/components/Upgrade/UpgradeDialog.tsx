@@ -52,11 +52,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
         "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}";
       queryClient.invalidateQueries({
         predicate: (query) => {
-          const [method, path, options] = query.queryKey as [
-            string,
-            string,
-            { params?: { path?: { id?: string } } }?,
-          ];
+          const [method, path, options] = query.queryKey as [string, string, { params?: { path?: { id?: string } } }?];
           return method === "get" && path === describeEndpoint && options?.params?.path?.id === instance?.id;
         },
       });
