@@ -1,6 +1,6 @@
 import { Box, Stack } from "@mui/material";
-import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
 import { useQueryClient } from "@tanstack/react-query";
+import useCustomerVersionSets from "app/(dashboard)/instances/hooks/useCustomerVersionSets";
 import { useMemo, useState } from "react";
 
 import { $api } from "src/api/query";
@@ -47,12 +47,18 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
     onSuccess: () => {
       snackbar.showSuccess("Instance upgrade initiated successfully");
       refetchInstances();
-      // Invalidate the instance describe cache so tierVersion is fresh when dialog reopens
+      // Invalidate only the current instance's describe cache so tierVersion is fresh when dialog reopens
+      const describeEndpoint =
+        "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}";
       queryClient.invalidateQueries({
-        queryKey: [
-          "get",
-          "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
-        ],
+        predicate: (query) => {
+          const [method, path, options] = query.queryKey as [
+            string,
+            string,
+            { params?: { path?: { id?: string } } }?,
+          ];
+          return method === "get" && path === describeEndpoint && options?.params?.path?.id === instance?.id;
+        },
       });
       setSelectedVersion("");
       setSelectedRows([]);
