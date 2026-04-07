@@ -32,11 +32,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Log Resolved Dependency Versions
+      - name: Log Installed Dependency Versions
         run: |
-          echo "::group::Key dependency versions"
-          yarn list --pattern axios --depth=0 || true
-          yarn list --pattern next --depth=0 || true
+          echo "::group::Installed dependency versions"
+          echo "yarn@$(yarn --version)"
+          echo "axios@$(node -p "require('./node_modules/axios/package.json').version")"
+          echo "next@$(node -p "require('./node_modules/next/package.json').version")"
           echo "::endgroup::"
 
       - name: Install Playwright Browsers
