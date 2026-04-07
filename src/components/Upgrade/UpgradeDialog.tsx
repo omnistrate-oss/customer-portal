@@ -52,6 +52,7 @@ const UpgradeDialog: React.FC<UpgradeDialogProps> = ({
         queryKey: [
           "get",
           "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
+          { params: { path: { id: instance?.id } } },
         ],
       });
       setSelectedVersion("");
