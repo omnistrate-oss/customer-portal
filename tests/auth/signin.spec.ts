@@ -90,20 +90,20 @@ test.describe("Signin Page", () => {
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toContainText(pageElements.cookieConsentText);
 
-    // Click on Allow analytics
+    // Click on Accept All
     await expect(page.getByRole("link", { name: pageElements.cookiePolicyText })).toHaveAttribute(
       "href",
       PageURLs.cookiePolicy
     );
-    await page.getByRole("button", { name: "Allow analytics" }).click();
+    await page.getByRole("button", { name: "Accept All" }).click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).not.toBeVisible();
 
     // Click on Cookie Settings Text
     await page.getByText("Cookie Settings").click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toBeVisible();
 
-    // Click on Allow Necessary
-    await page.getByRole("button", { name: "Allow necessary" }).click();
+    // Click on Reject All
+    await page.getByRole("button", { name: "Reject All" }).click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).not.toBeVisible();
   });
 
