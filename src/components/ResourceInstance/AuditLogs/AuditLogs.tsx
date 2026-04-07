@@ -6,7 +6,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { pageElements } from "page-objects/instance-details-page";
+import { pageElements } from "page-objects/constants/instance-details-page";
 import { OnCopyProps } from "react-json-view";
 
 import SearchInput from "src/components/DataGrid/SearchInput";
