@@ -1,45 +1,15 @@
 import { Page } from "@playwright/test";
+import { BackendError } from "test-utils/backend-error";
 import { UserAPIClient } from "test-utils/user-api-client";
 
+import { dataTestIds } from "./constants/instances-page";
 import { PageURLs } from "./pages";
 
 export class InstancesPage {
   page: Page;
   apiClient = new UserAPIClient();
 
-  dataTestIds = {
-    refreshButton: "refresh-button",
-    stopButton: "stop-button",
-    startButton: "start-button",
-    modifyButton: "modify-button",
-    deleteButton: "delete-button",
-    createButton: "create-button",
-    actionsMenu: "actions-select",
-    rebootButton: "reboot-button",
-    restoreButton: "restore-button",
-    addCapacityButton: "add-capacity-button",
-    removeCapacityButton: "remove-capacity-button",
-    generateTokenButton: "generate-token-button",
-
-    // Form Elements
-    serviceNameSelect: "service-name-select",
-    resourceTypeSelect: "resource-type-select",
-    regionSelect: "region-select",
-    awsCard: "aws-card",
-    gcpCard: "gcp-card",
-    azureCard: "azure-card",
-    ociCard: "oci-card",
-    cloudAccountSelect: "cloud_provider_account_config_id-select",
-    submitButton: "submit-button",
-
-    // Launching Instance Dialog
-    instanceId: "instance-id",
-    closeInstructionsButton: "close-instructions-button",
-
-    // Capacity Dialog
-    capacityInput: "capacity-input",
-    capacitySubmitButton: "capacity-submit-button",
-  };
+  dataTestIds = dataTestIds;
 
   pageElements = {
     launchingInstanceDialogTitle: "Launching Your Instance",
@@ -47,6 +17,23 @@ export class InstancesPage {
 
   constructor(page: Page) {
     this.page = page;
+  }
+
+  /**
+   * Dismisses any blocking overlays (Next.js dev overlay, MUI dialogs, etc.)
+   * that might intercept pointer events and cause click failures.
+   */
+  async dismissBlockingOverlays() {
+    // Remove Next.js dev overlay portals that intercept pointer events
+    await this.page.evaluate(() => {
+      document.querySelectorAll("nextjs-portal").forEach((el) => el.remove());
+    });
+
+    // Press Escape to close any open MUI dialogs, menus, or popovers
+    await this.page.keyboard.press("Escape");
+
+    // Small wait to let any closing animations finish
+    await this.page.waitForTimeout(300);
   }
 
   async navigate() {
@@ -65,6 +52,7 @@ export class InstancesPage {
     const startTime = Date.now();
 
     while (Date.now() - startTime < options.timeout) {
+      await this.dismissBlockingOverlays();
       await this.page.getByTestId(this.dataTestIds.refreshButton).click();
       await this.page.waitForLoadState("networkidle");
 
@@ -78,13 +66,13 @@ export class InstancesPage {
       }
 
       if (status === "Failed" && targetStatus !== "Failed") {
-        throw new Error(`Instance ${instanceId} failed to reach status ${targetStatus}`);
+        throw new BackendError(`Instance ${instanceId} failed to reach status ${targetStatus}`);
       }
 
       await this.page.waitForTimeout(options.pollingInterval);
     }
 
-    throw new Error(`Timeout waiting for instance ${instanceId} to reach status ${targetStatus}`);
+    throw new BackendError(`Timeout waiting for instance ${instanceId} to reach status ${targetStatus}`);
   }
 
   async waitForDelete(
@@ -98,6 +86,7 @@ export class InstancesPage {
     const startTime = Date.now();
 
     while (Date.now() - startTime < options.timeout) {
+      await this.dismissBlockingOverlays();
       await this.page.getByTestId(this.dataTestIds.refreshButton).click();
       await this.page.waitForLoadState("networkidle");
 
@@ -114,7 +103,7 @@ export class InstancesPage {
       await this.page.waitForTimeout(options.pollingInterval);
     }
 
-    throw new Error(`Timeout waiting for instance ${instanceId} to be deleted`);
+    throw new BackendError(`Timeout waiting for instance ${instanceId} to be deleted`);
   }
 
   async navigateToInstanceDetails(instanceId: string) {

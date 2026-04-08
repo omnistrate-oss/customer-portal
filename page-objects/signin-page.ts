@@ -26,7 +26,7 @@ export class SigninPage {
     emailRequiredText: "Email is required",
     passwordRequiredText: "Password is required",
     invalidEmailText: "Invalid email address",
-    cookieConsentText: "We use essential cookies. Analytics cookies are optional.",
+    cookieConsentText: "We care about your privacy",
 
     termsText: "Terms & Conditions",
     privacyPolicyText: "Privacy Policy",
