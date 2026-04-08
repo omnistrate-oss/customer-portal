@@ -48,7 +48,7 @@ jobs:
           yarn build
           yarn start &
           # Wait for server to be ready
-          npx wait-on http://localhost:8080 --timeout 60000
+          yarn wait-on http://localhost:8080 --timeout 60000
         env:
           PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
           PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
