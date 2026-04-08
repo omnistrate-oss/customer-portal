@@ -29,6 +29,12 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
+      - name: Enable Corepack and pin Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn --version
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
