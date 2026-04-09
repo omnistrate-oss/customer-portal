@@ -104,5 +104,9 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "wait-on": "^9.0.4"
-  }
+  },
+  "resolutions": {
+    "axios": "1.13.5"
+  },
+  "packageManager": "yarn@4.5.0"
 }
