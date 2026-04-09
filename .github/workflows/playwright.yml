@@ -29,21 +29,18 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
-      - name: Enable Corepack and pin Yarn
+      - name: Enable Corepack and activate Yarn
         run: |
           corepack enable
-          corepack prepare yarn@1.22.22 --activate
-          yarn --version
+          corepack prepare yarn@4.5.0 --activate
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Log Installed Dependency Versions
         run: |
           echo "::group::Installed dependency versions"
-          echo "yarn@$(yarn --version)"
-          echo "axios@$(node -p "require('./node_modules/axios/package.json').version")"
-          echo "next@$(node -p "require('./node_modules/next/package.json').version")"
+          yarn info --name-only
           echo "::endgroup::"
 
       - name: Install Playwright Browsers

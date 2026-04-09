@@ -8,15 +8,15 @@ WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV="production"
-ARG YARN_VERSION=1.22.21
-RUN npm install -g yarn@$YARN_VERSION --force
+RUN corepack enable && corepack prepare yarn@4.5.0 --activate
 
 # Install packages needed to build node modules
 FROM base AS build
 
 # Install node modules
-COPY --link package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=false --network-timeout 1000000
+COPY --link package.json yarn.lock .yarnrc.yml ./
+COPY --link .yarn .yarn
+RUN yarn install --immutable --network-timeout 1000000
 
 # Copy application code
 COPY --link . .
