@@ -4,12 +4,31 @@
 
 The customer portal uses **httpOnly cookies** for authentication. JWT tokens are managed entirely server-side — client-side JavaScript never has access to the raw token. This mitigates XSS-based token theft.
 
+### Cross-Domain Architecture
+
+The customer portal and the Omnistrate backend API run on **different domains**:
+- Customer portal: `portal.acme.com` (varies per customer)
+- Backend API: `api.omnistrate.cloud` (fixed)
+
+Because they are different origins, the backend **cannot** set cookies on the customer portal's domain. Instead, the Next.js server acts as an intermediary:
+1. The Next.js server receives JWT tokens from the backend in response bodies
+2. The Next.js server sets httpOnly cookies on its own domain (same-origin with the browser)
+3. On subsequent requests, the Next.js server reads the cookie and adds the `Authorization: Bearer` header to backend calls
+
+```
+Browser ←──same-origin──→ Next.js Server ──cross-domain──→ Backend API
+  (cookies work here)        (reads cookie,                  (receives
+                              sets Auth header)               Auth header)
+```
+
+### Cookie Summary
+
 Two cookies are used:
 
-| Cookie | Name | Type | Purpose |
-|--------|------|------|---------|
-| Auth token | `omnistrate_token` | httpOnly, Secure, SameSite=Lax | Holds the JWT. Set and read only by the server. |
-| Indicator | `omnistrate_logged_in` | Regular (JS-accessible) | Lets the UI know the user is authenticated. |
+| Cookie | Name | Type | Set By | Purpose |
+|--------|------|------|--------|---------|
+| Auth token | `omnistrate_token` | httpOnly, Secure, SameSite=Lax | Next.js server | Holds the JWT. Set and read only by the server. |
+| Indicator | `omnistrate_logged_in` | Regular (JS-accessible) | Browser (js-cookie) | Lets the UI know the user is authenticated. |
 
 ## How It Works
 
@@ -17,14 +36,19 @@ Two cookies are used:
 
 ```
 Browser                    Next.js Server              Backend API
+  │                             │                     (different domain)
   │                             │                          │
   ├─ POST /api/signin ─────────►│                          │
   │  { email, password }        ├─ POST /customer-user-signin ──►│
   │                             │                          │
   │                             │◄── { jwtToken: "..." } ──┤
   │                             │                          │
-  │◄── Set-Cookie: omnistrate_token=...; HttpOnly; Secure ─┤
-  │◄── 200 OK (no token in body)│                          │
+  │                             │── (extracts jwtToken,    │
+  │                             │   sets httpOnly cookie)   │
+  │                             │                          │
+  │◄── 200 OK ─────────────────┤                          │
+  │    Set-Cookie: omnistrate_token=...; HttpOnly; Secure  │
+  │    (no token in body)       │                          │
   │                             │                          │
   ├─ Sets omnistrate_logged_in  │                          │
   │  indicator cookie (JS)      │                          │
@@ -32,47 +56,60 @@ Browser                    Next.js Server              Backend API
 ```
 
 1. The browser sends credentials to `/api/signin` (Next.js API route).
-2. The server calls the backend, receives the JWT in the response body.
-3. The server sets the JWT as an **httpOnly cookie** (`omnistrate_token`) on the response — the token never appears in the response body sent to the browser.
+2. The Next.js server calls the backend (cross-domain), receives the JWT in the response body.
+3. The **Next.js server** sets the JWT as an httpOnly cookie (`omnistrate_token`) on its response to the browser — the backend cannot set cookies on the customer's domain because it's a different origin. The token never appears in the response body sent to the browser.
 4. The client sets a regular `omnistrate_logged_in` indicator cookie for UI state (route guards, request gating).
 
 The same flow applies to IDP (SSO) sign-in via `/api/sign-in-with-idp`.
 
 ### Authenticated API Requests
 
-All client-side API calls are proxied through the Next.js server via `POST /api/action`:
+All client-side API calls are proxied through the Next.js server via `POST /api/action`.
+The server reads the httpOnly cookie and adds the `Authorization: Bearer` header before
+forwarding to the backend (since the backend is on a different domain, browsers won't
+send the cookie directly to it):
 
 ```
 Browser                    Next.js Server              Backend API
+  │                             │                     (different domain)
   │                             │                          │
   ├─ POST /api/action ──────────►│                          │
   │  { endpoint, method, data } │                          │
-  │  (cookie sent automatically)│                          │
+  │  (httpOnly cookie sent      │                          │
+  │   automatically, same-origin)│                         │
   │                             ├─ Reads omnistrate_token   │
   │                             │  from request cookies     │
   │                             │                          │
   │                             ├─ GET/POST/... endpoint ──►│
   │                             │  Authorization: Bearer <token>
+  │                             │  (header set by server    │
+  │                             │   from cookie value)      │
   │                             │                          │
   │                             │◄── response ──────────────┤
   │◄── response ────────────────┤                          │
 ```
 
 1. The browser sends requests to `/api/action` with request metadata (endpoint, method, data).
-2. The `omnistrate_token` httpOnly cookie is sent automatically by the browser (same-origin).
-3. The server reads the token from the cookie and adds the `Authorization: Bearer` header to the backend call.
+2. The `omnistrate_token` httpOnly cookie is sent automatically by the browser (same-origin request to Next.js server).
+3. The **Next.js server** reads the token from the cookie and adds the `Authorization: Bearer` header to the backend call — this is necessary because the backend is on a different domain and cannot receive the cookie directly.
 4. The response is forwarded back to the browser.
 
 ### Logout Flow
 
 ```
 Browser                    Next.js Server              Backend API
+  │                             │                     (different domain)
   │                             │                          │
   ├─ POST /api/logout ──────────►│                          │
+  │                             ├─ Reads omnistrate_token   │
+  │                             │  from cookie              │
   │                             ├─ POST /logout ───────────►│
   │                             │  Authorization: Bearer <token>
   │                             │                          │
-  │◄── Set-Cookie: omnistrate_token=; Max-Age=0 ───────────┤
+  │◄── 200 OK ─────────────────┤                          │
+  │    Set-Cookie: omnistrate_token=; Max-Age=0            │
+  │    (Next.js server clears   │                          │
+  │     the httpOnly cookie)    │                          │
   │                             │                          │
   ├─ Removes omnistrate_logged_in│                         │
   ├─ Broadcasts "logout" to     │                          │
@@ -81,7 +118,7 @@ Browser                    Next.js Server              Backend API
 ```
 
 1. The client calls `POST /api/logout`.
-2. The server calls the backend to invalidate the token, then clears the httpOnly cookie.
+2. The Next.js server reads the httpOnly cookie, calls the backend to invalidate the token, then clears the httpOnly cookie (sets `Max-Age=0`). The backend cannot clear the cookie because it's on a different domain — the Next.js server handles it.
 3. The client removes the indicator cookie, clears local state, and redirects to `/signin`.
 
 ### Middleware (Route Protection)
