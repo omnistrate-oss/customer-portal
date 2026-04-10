@@ -1,6 +1,7 @@
 import createFetchClient from "openapi-fetch";
 
 import { baseDomain } from "src/api/client";
+import { getAuthToken } from "src/server/utils/authCookie";
 import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
 import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
@@ -52,12 +53,16 @@ export default async function handleAction(nextRequest, nextResponse) {
         const customUserAgent = `customer-portal/${appVersion} (${originalUserAgent})`;
 
         // Prepare request options
+        // Read auth token from httpOnly cookie (primary) or Authorization header (fallback)
+        const authToken = getAuthToken(nextRequest);
+        const authorization = authToken ? `Bearer ${authToken}` : nextRequest.headers.authorization;
+
         const requestOptions = {
           params: {
             query: queryParams,
           },
           headers: {
-            Authorization: nextRequest.headers.authorization,
+            Authorization: authorization,
             "Client-IP": clientIP,
             "SaaSBuilder-IP": saasBuilderIP,
             "User-Agent": customUserAgent,

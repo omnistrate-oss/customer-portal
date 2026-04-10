@@ -23,9 +23,9 @@ const AxiosGlobalErrorHandler = () => {
 
       // cancel the request if auth cookie is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
-      const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+      const hasAuth = typeof document !== "undefined" && !!Cookies.get("omnistrate_logged_in");
 
-      if (isProtectedEndpoint && !hasAuthToken) {
+      if (isProtectedEndpoint && !hasAuth) {
         // Abort this request with AbortController
         const controller = new AbortController();
         config.signal = controller.signal;

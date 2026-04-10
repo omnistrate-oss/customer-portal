@@ -22,8 +22,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: "Invalid download path" });
   }
 
-  // Auth: prefer Authorization header, fall back to "token" cookie
-  const authToken = req.headers.authorization || (req.cookies?.token ? `Bearer ${req.cookies.token}` : "");
+  // Auth: prefer Authorization header, fall back to httpOnly auth cookie
+  const authToken = req.headers.authorization || (req.cookies?.omnistrate_token ? `Bearer ${req.cookies.omnistrate_token}` : "");
 
   // Read filename from top-level query/body param
   const reqFilename = isGet ? req.query.filename : req.body?.filename;

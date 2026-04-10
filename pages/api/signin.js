@@ -3,6 +3,7 @@ import _ from "lodash";
 import { getProviderUsers } from "src/server/api/provider-users";
 const { customerUserSignIn } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
+const { setAuthCookie } = require("src/server/utils/authCookie");
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
@@ -44,7 +45,14 @@ export default async function handleSignIn(nextRequest, nextResponse) {
       });
 
       const responseData = response?.data || {};
-      nextResponse.status(200).send({ ...responseData });
+      const { jwtToken, ...rest } = responseData;
+
+      // Set httpOnly cookie with the JWT token — the client never sees the raw token
+      if (jwtToken) {
+        setAuthCookie(nextResponse, jwtToken);
+      }
+
+      nextResponse.status(200).send({ ...rest });
     } catch (error) {
       console.error("Error in sign in", error);
       let defaultErrorMessage = "Failed to sign in. Either the credentials are incorrect or the user does not exist";
