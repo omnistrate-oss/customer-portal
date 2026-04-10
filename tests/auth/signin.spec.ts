@@ -164,14 +164,17 @@ test.describe("Signin Page", () => {
     // intercept the request to the identity provider auth endpoint "/api/sign-in-with-idp
     await page.route("**/api/sign-in-with-idp", async (route) => {
       try {
-        // Return mock successful response with httpOnly cookie
+        // Mock must set the httpOnly cookie (like the real server does),
+        // otherwise middleware will block the redirect to /instances
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           headers: {
             "Set-Cookie": `omnistrate_token=${userToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400`,
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({
+            jwtToken: userToken,
+          }),
         });
       } catch (error) {
         console.log("Error in route handler:", error);
