@@ -1,46 +1,57 @@
 # syntax = docker/dockerfile:1
 
-# Adjust NODE_VERSION as desired
+# ---------- base: shared Node Alpine image ----------
 FROM node:22.21.0-alpine AS base
-
-# Next.js app lives here
 WORKDIR /app
-
-# Set production environment
 ENV NODE_ENV="production"
 RUN corepack enable && corepack prepare yarn@4.5.0 --activate
 
-# Install packages needed to build node modules
-FROM base AS build
-
-# Install node modules
+# ---------- deps: install ALL dependencies for building ----------
+FROM base AS deps
 COPY --link package.json yarn.lock .yarnrc.yml ./
 COPY --link .yarn .yarn
-RUN yarn install --immutable --network-timeout 1000000
+# YARN_ENABLE_SCRIPTS=false prevents arbitrary code execution from untrusted packages
+RUN YARN_ENABLE_SCRIPTS=false yarn install --immutable --network-timeout 1000000
+# sharp uses prebuild-install and needs its install script to fetch the native binary
+RUN cd node_modules/sharp && npm run install
 
-# Copy application code
+# ---------- build: compile the Next.js application ----------
+FROM deps AS build
 COPY --link . .
-
-# Build application
 RUN yarn run build
 
-# Final stage for app image
-FROM base
+# ---------- prod-deps: production-only node_modules ----------
+FROM deps AS prod-deps
+RUN npm prune --omit=dev --legacy-peer-deps
+# Re-run sharp install after prune in case npm prune removed the prebuilt binary
+RUN cd node_modules/sharp && npm run install
 
-# App version from GitHub release tag (passed as build arg)
+# ---------- runner: minimal production image ----------
+FROM base AS runner
+
 ARG APP_VERSION="dev"
 ENV APP_VERSION=$APP_VERSION
-
-ENV NODE_ENV="production"
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Copy built application from the previous stage
-COPY --from=build /app /app
 
 RUN adduser -S -u 1001 nextjs
 
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
+# Production node_modules only (no devDependencies)
+COPY --from=prod-deps /app/node_modules ./node_modules
+
+# Built Next.js output
+COPY --from=build /app/.next ./.next
+
+# Runtime config and server files
+COPY --from=build /app/package.json ./
+COPY --from=build /app/next.config.js ./
+COPY --from=build /app/server.js ./
+COPY --from=build /app/public ./public
+
+# Custom server runtime dependencies (mail service, EJS views, API helpers)
+COPY --from=build /app/src/server ./src/server
+COPY --from=build /app/src/axios.js ./src/axios.js
+
+EXPOSE 8080
 
 USER nextjs
 

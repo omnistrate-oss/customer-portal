@@ -11,3 +11,12 @@ README.md
 fly.toml
 fly.*.toml
 *.log
+
+# Test and dev files excluded from build context
+tests
+test-fixtures
+playwright.config.ts
+.prettierrc
+.prettierignore
+.eslintrc.json
+LICENSE
