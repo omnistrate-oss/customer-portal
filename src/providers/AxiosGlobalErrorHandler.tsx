@@ -5,6 +5,7 @@ import _ from "lodash";
 
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
+import { refreshAuth } from "src/api/refreshAuth";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
@@ -23,9 +24,9 @@ const AxiosGlobalErrorHandler = () => {
 
       // cancel the request if auth cookie is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
-      const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+      const hasAuth = typeof document !== "undefined" && !!Cookies.get("omnistrate_logged_in");
 
-      if (isProtectedEndpoint && !hasAuthToken) {
+      if (isProtectedEndpoint && !hasAuth) {
         // Abort this request with AbortController
         const controller = new AbortController();
         config.signal = controller.signal;
@@ -75,6 +76,12 @@ const AxiosGlobalErrorHandler = () => {
 
         if (error.response && error.response.status === 401) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
+            // Attempt silent token refresh before forcing logout
+            const refreshed = await refreshAuth();
+            if (refreshed) {
+              // Retry the original request with the new httpOnly cookie
+              return axios.request(error.config);
+            }
             handleLogout();
           }
         } else if (!ignoreGlobalErrorSnack) {
