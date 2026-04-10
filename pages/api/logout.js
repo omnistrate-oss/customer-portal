@@ -1,5 +1,6 @@
 const { clearAuthCookie, getAuthToken } = require("src/server/utils/authCookie");
-const { baseDomain } = require("src/api/client");
+
+const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
 export default async function handleLogout(nextRequest, nextResponse) {
   if (nextRequest.method === "POST") {
@@ -25,6 +26,7 @@ export default async function handleLogout(nextRequest, nextResponse) {
       nextResponse.status(200).send({ message: "Logged out" });
     }
   } else {
-    nextResponse.status(404).json({ message: "Endpoint not found" });
+    nextResponse.setHeader("Allow", "POST");
+    nextResponse.status(405).json({ message: "Method not allowed" });
   }
 }

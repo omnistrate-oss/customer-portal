@@ -62,7 +62,7 @@ export default async function handleAction(nextRequest, nextResponse) {
             query: queryParams,
           },
           headers: {
-            Authorization: authorization,
+            ...(authorization ? { Authorization: authorization } : {}),
             "Client-IP": clientIP,
             "SaaSBuilder-IP": saasBuilderIP,
             "User-Agent": customUserAgent,

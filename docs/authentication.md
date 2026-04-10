@@ -147,6 +147,7 @@ Customer domain: portal.acme.com
 | `src/server/utils/authCookie.js` | Server-side cookie utility (set, clear, read) |
 | `pages/api/signin.js` | Password sign-in — sets httpOnly cookie |
 | `pages/api/sign-in-with-idp.js` | IDP sign-in — sets httpOnly cookie |
+| `pages/api/idp-auth.js` | Legacy IDP callback (Google/GitHub direct) — sets httpOnly cookie |
 | `pages/api/logout.js` | Clears httpOnly cookie, calls backend logout |
 | `pages/api/action.js` | API proxy — reads cookie, adds Authorization header |
 | `src/api/client.ts` | openapi-fetch client — uses indicator cookie for auth state |
