@@ -5,6 +5,7 @@ import _ from "lodash";
 
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
+import { refreshAuth } from "src/api/refreshAuth";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
@@ -75,6 +76,12 @@ const AxiosGlobalErrorHandler = () => {
 
         if (error.response && error.response.status === 401) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
+            // Attempt silent token refresh before forcing logout
+            const refreshed = await refreshAuth();
+            if (refreshed) {
+              // Retry the original request with the new httpOnly cookie
+              return axios.request(error.config);
+            }
             handleLogout();
           }
         } else if (!ignoreGlobalErrorSnack) {

@@ -1,6 +1,7 @@
 const { customerSignInWithIdentityProvider } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-const { setAuthCookie } = require("src/server/utils/authCookie");
+const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+const { extractBackendRefreshToken } = require("src/server/utils/extractBackendCookies");
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
 export default async function handleSignIn(nextRequest, nextResponse) {
@@ -30,6 +31,12 @@ export default async function handleSignIn(nextRequest, nextResponse) {
 
       if (jwtToken) {
         setAuthCookie(nextResponse, jwtToken);
+      }
+
+      // Capture any refresh token the backend returns via Set-Cookie header
+      const refreshToken = extractBackendRefreshToken(response);
+      if (refreshToken) {
+        setRefreshCookie(nextResponse, refreshToken);
       }
 
       nextResponse.status(200).send({ ...rest });

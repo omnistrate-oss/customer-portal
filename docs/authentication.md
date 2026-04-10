@@ -23,11 +23,12 @@ Browser ←──same-origin──→ Next.js Server ──cross-domain──→
 
 ### Cookie Summary
 
-Two cookies are used:
+Three cookies are used:
 
 | Cookie | Name | Type | Set By | Purpose |
 |--------|------|------|--------|---------|
 | Auth token | `omnistrate_token` | httpOnly, Secure, SameSite=Lax | Next.js server | Holds the JWT. Set and read only by the server. |
+| Refresh token | `omnistrate_refresh_token` | httpOnly, Secure, SameSite=Lax | Next.js server | Holds the refresh token. Used to obtain a new JWT when the current one expires. |
 | Indicator | `omnistrate_logged_in` | Regular (JS-accessible) | Browser (js-cookie) | Lets the UI know the user is authenticated. |
 
 ## How It Works
@@ -42,13 +43,17 @@ Browser                    Next.js Server              Backend API
   │  { email, password }        ├─ POST /customer-user-signin ──►│
   │                             │                          │
   │                             │◄── { jwtToken: "..." } ──┤
+  │                             │    Set-Cookie: refresh_token=...
   │                             │                          │
-  │                             │── (extracts jwtToken,    │
-  │                             │   sets httpOnly cookie)   │
+  │                             │── (extracts jwtToken +   │
+  │                             │   refresh token from     │
+  │                             │   backend response,      │
+  │                             │   sets httpOnly cookies)  │
   │                             │                          │
   │◄── 200 OK ─────────────────┤                          │
   │    Set-Cookie: omnistrate_token=...; HttpOnly; Secure  │
-  │    (no token in body)       │                          │
+  │    Set-Cookie: omnistrate_refresh_token=...; HttpOnly  │
+  │    (no tokens in body)      │                          │
   │                             │                          │
   ├─ Sets omnistrate_logged_in  │                          │
   │  indicator cookie (JS)      │                          │
@@ -56,9 +61,10 @@ Browser                    Next.js Server              Backend API
 ```
 
 1. The browser sends credentials to `/api/signin` (Next.js API route).
-2. The Next.js server calls the backend (cross-domain), receives the JWT in the response body.
+2. The Next.js server calls the backend (cross-domain), receives the JWT in the response body and potentially a refresh token via Set-Cookie headers.
 3. The **Next.js server** sets the JWT as an httpOnly cookie (`omnistrate_token`) on its response to the browser — the backend cannot set cookies on the customer's domain because it's a different origin. The token never appears in the response body sent to the browser.
-4. The client sets a regular `omnistrate_logged_in` indicator cookie for UI state (route guards, request gating).
+4. If the backend returns a refresh token, the server also stores it as `omnistrate_refresh_token` (httpOnly).
+5. The client sets a regular `omnistrate_logged_in` indicator cookie for UI state (route guards, request gating).
 
 The same flow applies to IDP (SSO) sign-in via `/api/sign-in-with-idp`.
 
@@ -108,8 +114,9 @@ Browser                    Next.js Server              Backend API
   │                             │                          │
   │◄── 200 OK ─────────────────┤                          │
   │    Set-Cookie: omnistrate_token=; Max-Age=0            │
+  │    Set-Cookie: omnistrate_refresh_token=; Max-Age=0    │
   │    (Next.js server clears   │                          │
-  │     the httpOnly cookie)    │                          │
+  │     both httpOnly cookies)  │                          │
   │                             │                          │
   ├─ Removes omnistrate_logged_in│                         │
   ├─ Broadcasts "logout" to     │                          │
@@ -118,7 +125,7 @@ Browser                    Next.js Server              Backend API
 ```
 
 1. The client calls `POST /api/logout`.
-2. The Next.js server reads the httpOnly cookie, calls the backend to invalidate the token, then clears the httpOnly cookie (sets `Max-Age=0`). The backend cannot clear the cookie because it's on a different domain — the Next.js server handles it.
+2. The Next.js server reads the httpOnly cookie, calls the backend to invalidate the token, then clears both httpOnly cookies (access + refresh, `Max-Age=0`). The backend cannot clear the cookies because it's on a different domain — the Next.js server handles it.
 3. The client removes the indicator cookie, clears local state, and redirects to `/signin`.
 
 ### Middleware (Route Protection)
@@ -130,14 +137,50 @@ The Next.js middleware (`proxy.js`) runs on every navigation request:
 3. Validates the token by calling `GET /user` on the backend.
 4. Redirects to `/signin` if the token is missing, expired, or invalid.
 
-### 401 Handling
+### 401 Handling & Silent Token Refresh
 
-When any API response returns 401:
+When any API response returns 401, the client attempts a silent token refresh before logging out:
 
-- The **openapi-fetch client** (`src/api/client.ts`) removes the `omnistrate_logged_in` indicator cookie, clears localStorage, and redirects to `/signin`.
-- The **Axios error handler** (`AxiosGlobalErrorHandler.tsx`) calls the logout handler which does the same.
+```
+Browser                    Next.js Server              Backend API
+  │                             │                     (different domain)
+  │                             │                          │
+  ├─ Request returns 401 ──────►│                          │
+  │                             │                          │
+  ├─ POST /api/refresh-token ──►│                          │
+  │  (httpOnly refresh cookie   │                          │
+  │   sent automatically)       │                          │
+  │                             ├─ Reads refresh token     │
+  │                             │  from httpOnly cookie     │
+  │                             │                          │
+  │                             ├─ POST /refresh-token ───►│
+  │                             │  Cookie: refresh_token=...│
+  │                             │                          │
+  │                             │◄── new JWT / Set-Cookie ─┤
+  │                             │                          │
+  │                             │── Sets new               │
+  │                             │   omnistrate_token cookie │
+  │                             │                          │
+  │◄── 200 OK ─────────────────┤                          │
+  │    Set-Cookie: omnistrate_token=...; HttpOnly; Secure  │
+  │                             │                          │
+  ├─ Retries original request   │                          │
+  │  (new httpOnly cookie       │                          │
+  │   sent automatically)       │                          │
+```
 
-The httpOnly cookie is left as-is on 401 — it will be overwritten on the next sign-in or cleared by the middleware redirect.
+**Refresh flow (both openapi-fetch client and Axios):**
+
+1. On 401, the client calls `POST /api/refresh-token` (same-origin, httpOnly cookies included).
+2. The Next.js server reads the `omnistrate_refresh_token` httpOnly cookie.
+3. The server forwards it to the backend's `/refresh-token` endpoint.
+4. If the backend returns a new JWT (in body or Set-Cookie), the server stores it as the new `omnistrate_token` httpOnly cookie.
+5. The client retries the original request — the new cookie is sent automatically.
+6. If refresh fails, the user is logged out and redirected to `/signin`.
+
+**Coalescing:** Multiple concurrent 401s share a single refresh request to avoid hammering the endpoint.
+
+**Graceful degradation:** If the backend doesn't issue a refresh token on signin, the refresh attempt simply fails and the user is redirected to sign in — same as the previous behavior.
 
 ## Why This Architecture Works for Customer-Hosted Domains
 
@@ -169,6 +212,15 @@ Customer domain: portal.acme.com
   maxAge: 86400,       // 1 day — matches backend token TTL
 }
 
+// httpOnly refresh token cookie (set by server)
+{
+  httpOnly: true,
+  secure: true,
+  sameSite: "Lax",
+  path: "/",
+  maxAge: 604800,      // 7 days — longer-lived than access token
+}
+
 // Indicator cookie (set by client JS)
 {
   expires: 1,          // 1 day
@@ -181,14 +233,18 @@ Customer domain: portal.acme.com
 
 | File | Role |
 |------|------|
-| `src/server/utils/authCookie.js` | Server-side cookie utility (set, clear, read) |
-| `pages/api/signin.js` | Password sign-in — sets httpOnly cookie |
-| `pages/api/sign-in-with-idp.js` | IDP sign-in — sets httpOnly cookie |
-| `pages/api/idp-auth.js` | Legacy IDP callback (Google/GitHub direct) — sets httpOnly cookie |
-| `pages/api/logout.js` | Clears httpOnly cookie, calls backend logout |
+| `src/server/utils/authCookie.js` | Server-side cookie utility (set, clear, read access + refresh tokens) |
+| `src/server/utils/extractBackendCookies.js` | Extracts refresh token from backend Set-Cookie headers |
+| `pages/api/signin.js` | Password sign-in — sets httpOnly access + refresh cookies |
+| `pages/api/sign-in-with-idp.js` | IDP sign-in — sets httpOnly access + refresh cookies |
+| `pages/api/idp-auth.js` | Legacy IDP callback (Google/GitHub direct) — sets httpOnly cookies |
+| `pages/api/logout.js` | Clears both httpOnly cookies, calls backend logout |
+| `pages/api/refresh-token.js` | Server-side token refresh — reads refresh cookie, calls backend, sets new access token |
 | `pages/api/action.js` | API proxy — reads cookie, adds Authorization header |
-| `src/api/client.ts` | openapi-fetch client — uses indicator cookie for auth state |
+| `src/api/client.ts` | openapi-fetch client — 401 → refresh → retry → logout |
+| `src/api/refreshAuth.ts` | Client-side refresh utility with request coalescing |
 | `src/axios.js` | Axios client — no longer carries Authorization header |
+| `src/providers/AxiosGlobalErrorHandler.tsx` | Axios error handler — 401 → refresh → retry → logout |
 | `src/hooks/useLogout.js` | Client logout — calls `/api/logout`, clears indicator |
 | `proxy.js` | Middleware — reads httpOnly cookie for route protection |
 

@@ -1,4 +1,4 @@
-const { clearAuthCookie, getAuthToken } = require("src/server/utils/authCookie");
+const { clearAuthCookie, clearRefreshCookie, getAuthToken } = require("src/server/utils/authCookie");
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -21,8 +21,9 @@ export default async function handleLogout(nextRequest, nextResponse) {
     } catch (error) {
       console.error("Error during logout", error);
     } finally {
-      // Always clear the httpOnly cookie, even if backend call fails
+      // Always clear both httpOnly cookies, even if backend call fails
       clearAuthCookie(nextResponse);
+      clearRefreshCookie(nextResponse);
       nextResponse.status(200).send({ message: "Logged out" });
     }
   } else {

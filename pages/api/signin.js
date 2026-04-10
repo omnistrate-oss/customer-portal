@@ -3,7 +3,8 @@ import _ from "lodash";
 import { getProviderUsers } from "src/server/api/provider-users";
 const { customerUserSignIn } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-const { setAuthCookie } = require("src/server/utils/authCookie");
+const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+const { extractBackendRefreshToken } = require("src/server/utils/extractBackendCookies");
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
@@ -50,6 +51,12 @@ export default async function handleSignIn(nextRequest, nextResponse) {
       // Set httpOnly cookie with the JWT token — the client never sees the raw token
       if (jwtToken) {
         setAuthCookie(nextResponse, jwtToken);
+      }
+
+      // Capture any refresh token the backend returns via Set-Cookie header
+      const refreshToken = extractBackendRefreshToken(response);
+      if (refreshToken) {
+        setRefreshCookie(nextResponse, refreshToken);
       }
 
       nextResponse.status(200).send({ ...rest });

@@ -14,6 +14,7 @@ export function checkIsNonProtectedEndpoint(url: string): boolean {
     "/health",
     "/json-schema",
     "/login-with-identity-provider",
+    "/refresh-token",
     "/reset-password",
     "/resource-instance/health",
     "/resource-instance/version",

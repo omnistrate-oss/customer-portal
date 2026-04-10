@@ -2,6 +2,7 @@ import Cookies from "js-cookie";
 import createFetchClient from "openapi-fetch";
 
 import { paths } from "src/types/schema";
+import { refreshAuth } from "./refreshAuth";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 export const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
@@ -106,6 +107,17 @@ apiClient.use({
       if (response.status === 401) {
         // Check if this isn't the signin URL to avoid redirect loops
         if (!response.url.endsWith("/signin")) {
+          // Attempt silent token refresh before forcing logout
+          const refreshed = await refreshAuth();
+          if (refreshed) {
+            // Retry the original request — the new httpOnly cookie is sent automatically
+            const retryResponse = await fetch(request.clone(), { credentials: "include" });
+            if (retryResponse.ok) {
+              return retryResponse;
+            }
+          }
+
+          // Refresh failed or retry still 401 — force logout
           Cookies.remove("omnistrate_logged_in");
           localStorage.removeItem("paymentNotificationHidden");
           try {
