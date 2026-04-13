@@ -41,12 +41,7 @@ import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
 import { loadStatusMap } from "./constants";
 import useInstances from "./hooks/useInstances";
-import {
-  getMainResourceFromInstance,
-  getRowBorderStyles,
-  isOnpremInstaller,
-  platformToCloudProviderMap,
-} from "./utils";
+import { getMainResourceFromInstance, getRowBorderStyles, platformToCloudProviderMap } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 export type Overlay =
@@ -114,20 +109,16 @@ const InstancesPage = () => {
           const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
           const upcomingUpgrade = data.row.original.maintenanceTasks?.upgrade_paths?.[0];
 
-          const status = data.row.original.status;
-
           return (
             <Stack direction="row" alignItems="center" gap="6px">
               <StatusCell upcomingUpgrade={upcomingUpgrade} />
               <Tooltip
                 title={
-                  isOnpremInstaller(status)
-                    ? "Not applicable for on-prem deployment instances"
-                    : !isDeleteProtectionSupported
-                      ? "Delete protection not supported"
-                      : isDeleteProtected
-                        ? "Delete protection enabled"
-                        : "Delete protection disabled"
+                  !isDeleteProtectionSupported
+                    ? "Delete protection not supported"
+                    : isDeleteProtected
+                      ? "Delete protection enabled"
+                      : "Delete protection disabled"
                 }
               >
                 <span>
