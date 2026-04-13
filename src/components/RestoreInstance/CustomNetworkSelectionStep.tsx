@@ -25,7 +25,8 @@ import { Text } from "../Typography/Typography";
 
 type CustomNetworkSelectionStepProps = {
   handleClose: () => void;
-  restoreInstanceMutation: UseMutationResult<void, Error, { customNetwork?: string }, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  restoreInstanceMutation: UseMutationResult<any, Error, { customNetwork?: string }, unknown>;
   cloudProvider?: string;
   region: string;
   customNetworks: CustomNetwork[];

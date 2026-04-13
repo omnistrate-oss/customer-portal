@@ -18,8 +18,8 @@ const AxiosGlobalErrorHandler = () => {
   }
 
   useEffect(() => {
-    axios.interceptors.request.use((config) => {
-      const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url);
+    const requestInterceptorId = axios.interceptors.request.use((config) => {
+      const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url ?? "");
 
       // cancel the request if auth cookie is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
@@ -33,7 +33,7 @@ const AxiosGlobalErrorHandler = () => {
         return config; // Axios will reject the request after seeing the aborted signal
       }
 
-      if (!config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
+      if (config.url && !config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
         //the original request url
         const originalRequestURL = config.url;
         //the original request method
@@ -66,7 +66,7 @@ const AxiosGlobalErrorHandler = () => {
       return config;
     });
 
-    axios.interceptors.response.use(
+    const responseInterceptorId = axios.interceptors.response.use(
       (response) => {
         return response;
       },
@@ -109,8 +109,8 @@ const AxiosGlobalErrorHandler = () => {
     );
 
     return () => {
-      axios.interceptors.request.eject();
-      axios.interceptors.response.eject();
+      axios.interceptors.request.eject(requestInterceptorId);
+      axios.interceptors.response.eject(responseInterceptorId);
     };
   }, [handleLogout]);
 

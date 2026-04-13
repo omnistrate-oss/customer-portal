@@ -29,7 +29,8 @@ type CopySnapshotModalProps = {
   handleClose: () => void;
   offering: ServiceOffering;
   cloudProvider?: string;
-  copySnapshotMutation: UseMutationResult<void, Error, { targetRegion: string }, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  copySnapshotMutation: UseMutationResult<any, Error, { targetRegion: string }, unknown>;
   snapshotCreationType: SnapshotCreationType | null;
   tab?: "backups" | "snapshots";
 };
