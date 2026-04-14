@@ -8,7 +8,7 @@ import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 const environmentType = getEnvironmentType();
 
 export async function proxy(request) {
-  const authToken = request.cookies.get("token");
+  const authToken = request.cookies.get("omnistrate_token");
   const path = request.nextUrl.pathname;
 
   if (path.startsWith("/signup") || path.startsWith("/reset-password") || path.startsWith("/change-password")) {
@@ -80,6 +80,6 @@ export async function proxy(request) {
 
 export const config = {
   matcher: [
-    "/((?!api/action|api/signup|api/signin|api/reset-password|api/provider-details|idp-auth|api/sign-in-with-idp|privacy-policy|cookie-policy|terms-of-use|favicon.ico|_next/image|_next/static|static|validate-token).*)",
+    "/((?!api/action|api/signup|api/signin|api/logout|api/refresh-token|api/reset-password|api/provider-details|idp-auth|api/sign-in-with-idp|privacy-policy|cookie-policy|terms-of-use|favicon.ico|_next/image|_next/static|static|validate-token).*)",
   ],
 };

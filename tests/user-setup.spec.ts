@@ -15,11 +15,16 @@ setup("Authenticate User", async ({ page }) => {
 
   await signinPage.signInWithPassword();
 
-  // Intercept the Request to Get the JWT Token
-  const request = await page.waitForResponse((response) => response.url().includes("/api/signin"));
-  const response = await request.json();
+  // Wait for the signin response — token is now in an httpOnly cookie, not the response body
+  await page.waitForResponse((response) => response.url().includes("/api/signin"));
   console.log("User signin successful!");
-  GlobalStateManager.setState({ userToken: response.jwtToken });
+
+  // Read the httpOnly token from browser cookies (Playwright can access httpOnly cookies)
+  const cookies = await page.context().cookies();
+  const tokenCookie = cookies.find((c) => c.name === "omnistrate_token");
+  if (tokenCookie) {
+    GlobalStateManager.setState({ userToken: tokenCookie.value });
+  }
 
   // Intercept the Request to Get Subscriptions
   const subscriptionsData = await page.waitForResponse(

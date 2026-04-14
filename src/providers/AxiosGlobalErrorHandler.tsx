@@ -3,6 +3,7 @@ import { Alert, Snackbar } from "@mui/material";
 import Cookies from "js-cookie";
 import _ from "lodash";
 
+import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
@@ -21,11 +22,11 @@ const AxiosGlobalErrorHandler = () => {
     const requestInterceptorId = axios.interceptors.request.use((config) => {
       const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url ?? "");
 
-      // cancel the request if auth cookie is missing for protected endpoints
+      // cancel the request if auth indicator is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
-      const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+      const hasAuth = typeof document !== "undefined" && !!Cookies.get("omnistrate_logged_in");
 
-      if (isProtectedEndpoint && !hasAuthToken) {
+      if (isProtectedEndpoint && !hasAuth) {
         // Abort this request with AbortController
         const controller = new AbortController();
         config.signal = controller.signal;
@@ -75,6 +76,15 @@ const AxiosGlobalErrorHandler = () => {
 
         if (error.response && error.response.status === 401) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
+            // Attempt silent token refresh before forcing logout
+            const refreshed = await refreshAuth();
+            if (refreshed && error.config) {
+              try {
+                return await axios.request(error.config);
+              } catch {
+                // Retry failed — fall through to logout
+              }
+            }
             handleLogout();
           }
         } else if (!ignoreGlobalErrorSnack) {

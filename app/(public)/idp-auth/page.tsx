@@ -8,7 +8,6 @@ import { Buffer } from "buffer";
 import Cookies from "js-cookie";
 
 import { customerSignInWithIdentityProvider } from "src/api/customer-user";
-import axios from "src/axios";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import checkRouteValidity from "src/utils/route/checkRouteValidity";
@@ -29,30 +28,25 @@ const IDPAuthPage = () => {
     async (payload, destination) => {
       try {
         hasAttemptedSignIn.current = true;
-        const response = await customerSignInWithIdentityProvider(payload);
-        // @ts-ignore
-        const jwtToken = response.data.jwtToken;
+        await customerSignInWithIdentityProvider(payload);
         sessionStorage.removeItem("authState");
-        if (jwtToken) {
-          Cookies.set("token", jwtToken, { sameSite: "Lax", secure: true });
-          axios.defaults.headers["Authorization"] = "Bearer " + jwtToken;
 
-          try {
-            localStorage.setItem("loggedInUsingSSO", "true");
-          } catch (error) {
-            console.warn("Failed to set SSO state:", error);
-          }
-          const decodedDestination = decodeURIComponent(destination);
-          hasAttemptedSignIn.current = false;
+        // httpOnly cookie is set server-side by /api/sign-in-with-idp — set indicator for UI auth state
+        Cookies.set("omnistrate_logged_in", "true", { expires: 1, sameSite: "Lax", secure: true });
 
-          // Redirect to the Destination URL
-          // Use window.location for full page reload to ensure middleware runs with fresh cookies
-          // This prevents race conditions where middleware might execute with stale cookies
-          if (destination && checkRouteValidity(decodedDestination)) {
-            window.location.href = decodedDestination;
-          } else {
-            window.location.href = getInstancesRoute();
-          }
+        try {
+          localStorage.setItem("loggedInUsingSSO", "true");
+        } catch (error) {
+          console.warn("Failed to set SSO state:", error);
+        }
+        const decodedDestination = decodeURIComponent(destination);
+        hasAttemptedSignIn.current = false;
+
+        // Use window.location for full page reload to ensure middleware runs with fresh cookies
+        if (destination && checkRouteValidity(decodedDestination)) {
+          window.location.href = decodedDestination;
+        } else {
+          window.location.href = getInstancesRoute();
         }
       } catch (error) {
         sessionStorage.removeItem("authState");

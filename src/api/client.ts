@@ -4,6 +4,10 @@ import createFetchClient from "openapi-fetch";
 import { paths } from "src/types/schema";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
+import { refreshAuth } from "./refreshAuth";
+
+export const AUTH_INDICATOR_COOKIE = "omnistrate_logged_in";
+
 export const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
 let globalErrorHandler: ((error: Error) => void) | null = null;
@@ -19,18 +23,15 @@ apiClient.use({
     const pathname = url.pathname;
 
     const isProtectedEndpoint = !checkIsNonProtectedEndpoint(pathname);
-    const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+    const hasAuth = typeof document !== "undefined" && !!Cookies.get(AUTH_INDICATOR_COOKIE);
 
-    if (isProtectedEndpoint && !hasAuthToken) {
+    if (isProtectedEndpoint && !hasAuth) {
       const controller = new AbortController();
-      controller.abort("Request aborted due to missing auth token");
+      controller.abort("Request aborted because the user is not authenticated");
       return new Request(request, { signal: controller.signal });
     }
 
-    const token = Cookies.get("token");
-    if (token) {
-      request.headers.set("Authorization", `Bearer ${token}`);
-    }
+    // Authorization header is added server-side by /api/action using the httpOnly cookie
 
     if (!pathname.startsWith("/api") && pathname.startsWith("/")) {
       // Store original request details
@@ -109,7 +110,18 @@ apiClient.use({
       if (response.status === 401) {
         // Check if this isn't the signin URL to avoid redirect loops
         if (!response.url.endsWith("/signin")) {
-          Cookies.remove("token");
+          // Attempt silent token refresh before forcing logout
+          const refreshed = await refreshAuth();
+          if (refreshed) {
+            // Retry the original request — the new httpOnly cookie is sent automatically
+            const retryResponse = await fetch(request.clone());
+            if (retryResponse.ok) {
+              return retryResponse;
+            }
+          }
+
+          // Refresh failed or retry still 401 — force logout
+          Cookies.remove(AUTH_INDICATOR_COOKIE);
           localStorage.removeItem("paymentNotificationHidden");
           try {
             localStorage.removeItem("loggedInUsingSSO");

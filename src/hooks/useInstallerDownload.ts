@@ -17,7 +17,7 @@ type DownloadState = {
  * 2. Opens it via a hidden `<a>` tag click — this triggers the browser download bar
  * 3. The browser handles progress, pause/resume, and file saving automatically
  *
- * Auth is read from the "token" cookie on the server side, so no
+ * Auth is read from the httpOnly "omnistrate_token" cookie on the server side, so no
  * Authorization header is needed — the cookie is sent automatically
  * with the browser navigation request.
  */
