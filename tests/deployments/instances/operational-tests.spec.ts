@@ -1,4 +1,4 @@
-import test from "@playwright/test";
+import { test } from "test-fixtures/har-test";
 import { InstancesPage } from "page-objects/instances-page";
 import { BackendError, BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";

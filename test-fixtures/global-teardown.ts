@@ -114,7 +114,13 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 };
 
 async function globalTeardown() {
-  console.log("Running Global Teardown...");
+  console.log(`Running Global Teardown... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
+
+  // In replay mode, skip teardown — no real resources to clean up
+  if (process.env.HAR_MODE?.toLowerCase() === "replay") {
+    console.log("Skipping teardown in replay mode");
+    return;
+  }
 
   const providerAPIClient = new ProviderAPIClient();
 

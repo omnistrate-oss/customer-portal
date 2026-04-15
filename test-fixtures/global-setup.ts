@@ -1,14 +1,27 @@
 import { yamlTemplates } from "constants/yaml-templates";
+import { ApiFixture } from "test-fixtures/api-fixture";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
 import { clearSoftFailureReport } from "test-utils/soft-failure-tracker";
 import { UserAPIClient } from "test-utils/user-api-client";
 
+const isReplayMode = process.env.HAR_MODE?.toLowerCase() === "replay";
+const isRecordMode = process.env.HAR_MODE?.toLowerCase() === "record";
+
 async function globalSetup() {
-  console.log("Running Global Setup...");
+  console.log(`Running Global Setup... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
 
   // Clear stale report from previous runs (recorder is registered per-worker)
   clearSoftFailureReport();
+
+  // In replay mode, skip all backend calls — load saved state from fixture
+  if (isReplayMode) {
+    const fixture = new ApiFixture("global-setup");
+    const savedState = await fixture.getOrCreate("globalState", () => ({}));
+    GlobalStateManager.setState(savedState);
+    console.log("Global Setup loaded from fixture (replay mode)");
+    return;
+  }
 
   const apiClient = new ProviderAPIClient();
 
@@ -54,6 +67,14 @@ async function globalSetup() {
   ]);
 
   GlobalStateManager.setState({ date });
+
+  // In record mode, save the global state for replay
+  if (isRecordMode) {
+    const fixture = new ApiFixture("global-setup");
+    await fixture.getOrCreate("globalState", () => GlobalStateManager.loadState());
+    console.log("Global state saved to fixture (record mode)");
+  }
+
   console.log("Global Setup Successful");
 }
 
