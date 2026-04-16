@@ -40,9 +40,14 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
 
     const data = await backendResponse.json().catch(() => ({}));
 
-    if (data.jwtToken) {
-      setAuthCookie(nextResponse, data.jwtToken);
+    if (!data.jwtToken) {
+      // Backend returned 200 but no token — treat as failure
+      clearAuthCookie(nextResponse);
+      clearRefreshCookie(nextResponse);
+      return nextResponse.status(401).json({ message: "Refresh failed — no token in response" });
     }
+
+    setAuthCookie(nextResponse, data.jwtToken);
     if (data.refreshToken) {
       setRefreshCookie(nextResponse, data.refreshToken);
     }

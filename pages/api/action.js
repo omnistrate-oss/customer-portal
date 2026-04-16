@@ -60,9 +60,14 @@ export default async function handleAction(nextRequest, nextResponse) {
         const originalUserAgent = nextRequest.get("User-Agent") || "";
         const customUserAgent = `customer-portal/${appVersion} (${originalUserAgent})`;
 
-        // Read auth token from httpOnly cookie (primary) or Authorization header (fallback for tests)
+        // Read auth token from httpOnly cookie (primary)
+        // Authorization header fallback is restricted to non-production for Playwright tests
         const authToken = getAuthToken(nextRequest);
-        const authorization = authToken ? `Bearer ${authToken}` : nextRequest.headers.authorization;
+        const authorization = authToken
+          ? `Bearer ${authToken}`
+          : process.env.NODE_ENV !== "production"
+            ? nextRequest.headers.authorization
+            : undefined;
 
         // Prepare request options
         const requestOptions = {

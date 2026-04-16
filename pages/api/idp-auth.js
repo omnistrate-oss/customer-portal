@@ -35,9 +35,9 @@ export default async function handleAuth(nextRequest, nextResponse) {
         if (refreshToken) {
           setRefreshCookie(nextResponse, refreshToken);
         }
-        nextResponse.redirect(307, "/signin");
+        return nextResponse.redirect(307, "/signin");
       } catch (err) {
-        console.log("IDP AUTH err", err);
+        console.error("IDP AUTH error", err);
       }
     }
   }

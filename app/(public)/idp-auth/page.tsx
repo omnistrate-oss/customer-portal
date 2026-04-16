@@ -37,6 +37,7 @@ const IDPAuthPage = () => {
           sameSite: "Lax",
           secure: window.location.protocol === "https:",
         });
+        Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
         try {
           localStorage.setItem("loggedInUsingSSO", "true");

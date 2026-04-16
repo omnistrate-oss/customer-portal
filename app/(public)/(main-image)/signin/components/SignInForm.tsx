@@ -71,6 +71,7 @@ const SignInForm: FC<SignInFormProps> = ({
       sameSite: "Lax",
       secure: window.location.protocol === "https:",
     });
+    Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
     try {
       localStorage.removeItem("loggedInUsingSSO");

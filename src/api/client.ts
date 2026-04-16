@@ -26,6 +26,10 @@ apiClient.use({
     const hasAuth = typeof document !== "undefined" && !!Cookies.get(AUTH_INDICATOR_COOKIE);
 
     if (isProtectedEndpoint && !hasAuth) {
+      // Redirect to signin — handles stale sessions (e.g., after deployment migration)
+      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/signin")) {
+        window.location.href = "/signin";
+      }
       const controller = new AbortController();
       controller.abort("Request aborted because the user is not authenticated");
       return new Request(request, { signal: controller.signal });

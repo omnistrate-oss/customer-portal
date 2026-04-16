@@ -49,7 +49,7 @@ export async function proxy(request) {
     if (request.nextUrl.pathname.startsWith("/signin")) {
       let destination = request.nextUrl.searchParams.get("destination");
 
-      if (!destination || !PAGE_TITLE_MAP[destination]) {
+      if (!destination || destination.startsWith("//") || !destination.startsWith("/") || !PAGE_TITLE_MAP[destination]) {
         destination = "/instances";
       }
 
@@ -59,7 +59,7 @@ export async function proxy(request) {
     }
   } catch (error) {
     console.log("Middleware Error", error?.response?.data);
-    redirectToSignIn();
+    return redirectToSignIn();
   }
 
   const response = NextResponse.next();

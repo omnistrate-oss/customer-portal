@@ -57,7 +57,9 @@ export default async function handler(req, res) {
     const contentLength = response.headers["content-length"];
 
     // Priority: top-level query param > extracted from downloadPath > fallback
-    const filename = reqFilename || extractedFilename || "installer.tar.gz";
+    // Sanitize filename to prevent header injection (CRLF, quotes, special chars)
+    const rawFilename = reqFilename || extractedFilename || "installer.tar.gz";
+    const filename = rawFilename.replace(/[^a-zA-Z0-9._-]/g, "_");
 
     res.setHeader("Content-Type", contentType);
     if (contentDisposition) {
