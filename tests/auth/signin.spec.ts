@@ -169,7 +169,7 @@ test.describe("Signin Page", () => {
           status: 200,
           contentType: "application/json",
           headers: {
-            "Set-Cookie": `omnistrate_token=${userToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400`,
+            "Set-Cookie": `omnistrate_token=${userToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`,
           },
           body: JSON.stringify({}),
         });

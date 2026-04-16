@@ -177,7 +177,9 @@ export const TestMetricsTab = async (instanceDetailsPage: InstanceDetailsPage, i
   if (instance.status === "RUNNING") {
     await page.waitForTimeout(5000); // Wait for Metrics Data to Load
     if (
-      page.getByText("Can't access metrics data. Please check if the instance is available and metrics are enabled.")
+      await page
+        .getByText("Can't access metrics data. Please check if the instance is available and metrics are enabled.")
+        .isVisible()
     ) {
       return;
     }
@@ -204,7 +206,11 @@ export const TestLiveLogsTab = async (instanceDetailsPage: InstanceDetailsPage, 
 
   if (instance.status === "RUNNING") {
     await page.waitForTimeout(5000); // Wait for Logs Data to Load
-    if (page.getByText("Can't access logs data. Please check if the instance is available and logs are enabled.")) {
+    if (
+      await page
+        .getByText("Can't access logs data. Please check if the instance is available and logs are enabled.")
+        .isVisible()
+    ) {
       return;
     }
 

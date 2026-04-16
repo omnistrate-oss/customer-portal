@@ -6,17 +6,18 @@ const MAX_AGE = 86400;
 // 7 days for refresh token
 const REFRESH_MAX_AGE = 604800;
 
+const isSecure = process.env.NODE_ENV === "production";
+
 /**
  * Sets the httpOnly auth cookie on the response.
  * @param {import("next").NextApiResponse} res
  * @param {string} token - JWT token
  */
 function setAuthCookie(res, token) {
-  const cookie = [`${COOKIE_NAME}=${token}`, `Path=/`, `HttpOnly`, `Secure`, `SameSite=Lax`, `Max-Age=${MAX_AGE}`].join(
-    "; "
-  );
+  const parts = [`${COOKIE_NAME}=${token}`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=${MAX_AGE}`];
+  if (isSecure) parts.push("Secure");
 
-  appendSetCookieHeader(res, cookie);
+  appendSetCookieHeader(res, parts.join("; "));
 }
 
 /**
@@ -25,16 +26,16 @@ function setAuthCookie(res, token) {
  * @param {string} refreshToken
  */
 function setRefreshCookie(res, refreshToken) {
-  const cookie = [
+  const parts = [
     `${REFRESH_COOKIE_NAME}=${refreshToken}`,
     `Path=/`,
     `HttpOnly`,
-    `Secure`,
     `SameSite=Lax`,
     `Max-Age=${REFRESH_MAX_AGE}`,
-  ].join("; ");
+  ];
+  if (isSecure) parts.push("Secure");
 
-  appendSetCookieHeader(res, cookie);
+  appendSetCookieHeader(res, parts.join("; "));
 }
 
 /**
@@ -42,9 +43,10 @@ function setRefreshCookie(res, refreshToken) {
  * @param {import("next").NextApiResponse} res
  */
 function clearAuthCookie(res) {
-  const cookie = [`${COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `Secure`, `SameSite=Lax`, `Max-Age=0`].join("; ");
+  const parts = [`${COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=0`];
+  if (isSecure) parts.push("Secure");
 
-  appendSetCookieHeader(res, cookie);
+  appendSetCookieHeader(res, parts.join("; "));
 }
 
 /**
@@ -52,9 +54,10 @@ function clearAuthCookie(res) {
  * @param {import("next").NextApiResponse} res
  */
 function clearRefreshCookie(res) {
-  const cookie = [`${REFRESH_COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `Secure`, `SameSite=Lax`, `Max-Age=0`].join("; ");
+  const parts = [`${REFRESH_COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=0`];
+  if (isSecure) parts.push("Secure");
 
-  appendSetCookieHeader(res, cookie);
+  appendSetCookieHeader(res, parts.join("; "));
 }
 
 /**
