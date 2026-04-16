@@ -16,8 +16,8 @@ const isSecure = process.env.NODE_ENV === "production";
  * so we read existing cookies and append to the array.
  */
 function appendSetCookieHeader(res: NextApiResponse, cookie: string) {
-  const existing = res.getHeader("Set-Cookie") || [];
-  const cookies = Array.isArray(existing) ? existing : [existing];
+  const existing = res.getHeader("Set-Cookie");
+  const cookies = Array.isArray(existing) ? existing.map(String) : existing ? [String(existing)] : [];
   res.setHeader("Set-Cookie", [...cookies, cookie]);
 }
 
