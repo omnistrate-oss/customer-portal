@@ -7,7 +7,7 @@ import {
   TestInstanceDetailsTab,
   TestInstanceOverview,
   TestLiveLogsTab,
-  TestMetricsTab,
+  // TestMetricsTab,
   TestNodesTab,
 } from "test-fixtures/utils/instance-details-tabs";
 import { skipOnBackendError } from "test-utils/backend-error";
