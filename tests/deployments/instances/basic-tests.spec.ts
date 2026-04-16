@@ -92,7 +92,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await TestInstanceDetailsTab(instanceDetailsPage, instance, "postgres");
     await TestConnectivityTab(instanceDetailsPage, instance, "postgres");
     await TestNodesTab(instanceDetailsPage, instance);
-    await TestMetricsTab(instanceDetailsPage, instance);
+    // await TestMetricsTab(instanceDetailsPage, instance); Legacy Metrics are Not Working, we're moving to Grafana Dashboards
     await TestLiveLogsTab(instanceDetailsPage, instance);
     await TestEventsTab(instanceDetailsPage, instance);
   });
@@ -116,7 +116,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await TestInstanceDetailsTab(instanceDetailsPage, instance, "postgres");
     await TestConnectivityTab(instanceDetailsPage, instance, "postgres");
     await TestNodesTab(instanceDetailsPage, instance);
-    await TestMetricsTab(instanceDetailsPage, instance);
+    // await TestMetricsTab(instanceDetailsPage, instance); Legacy Metrics are Not Working, we're moving to Grafana Dashboards
     await TestLiveLogsTab(instanceDetailsPage, instance);
     await TestEventsTab(instanceDetailsPage, instance);
   });
