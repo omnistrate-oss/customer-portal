@@ -1,6 +1,6 @@
 import { customerSignInWithIdentityProvider } from "src/server/api/customer-user";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
-const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+import { setAuthCookie, setRefreshCookie } from "src/server/utils/authCookie";
 
 export default async function handleAuth(nextRequest, nextResponse) {
   if (nextRequest.method === "GET") {

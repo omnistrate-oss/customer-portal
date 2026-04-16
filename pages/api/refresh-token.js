@@ -1,10 +1,10 @@
-const {
+import {
   setAuthCookie,
   setRefreshCookie,
   clearAuthCookie,
   clearRefreshCookie,
   getRefreshToken,
-} = require("src/server/utils/authCookie");
+} from "src/server/utils/authCookie";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 

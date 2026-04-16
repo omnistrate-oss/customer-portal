@@ -1,6 +1,6 @@
 const { customerSignInWithIdentityProvider } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+import { setAuthCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
 export default async function handleSignIn(nextRequest, nextResponse) {
