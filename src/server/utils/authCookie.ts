@@ -48,6 +48,18 @@ export function setRefreshCookie(res: NextApiResponse, refreshToken: string) {
 }
 
 /**
+ * Sets the non-httpOnly indicator cookie so client-side auth guards know the user is logged in.
+ * Used by server-side auth handlers (idp-auth, signin) that redirect before client JS runs.
+ */
+export function setIndicatorCookie(res: NextApiResponse) {
+  // Not HttpOnly — must be readable by client-side JavaScript
+  const parts = [`omnistrate_logged_in=true`, `Path=/`, `SameSite=Lax`, `Max-Age=${REFRESH_MAX_AGE}`];
+  if (isSecure) parts.push("Secure");
+
+  appendSetCookieHeader(res, parts.join("; "));
+}
+
+/**
  * Clears the httpOnly auth cookie by setting Max-Age=0.
  */
 export function clearAuthCookie(res: NextApiResponse) {

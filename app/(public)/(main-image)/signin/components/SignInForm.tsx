@@ -67,7 +67,7 @@ const SignInForm: FC<SignInFormProps> = ({
   function handlePasswordSignInSuccess() {
     // httpOnly cookie is set server-side by /api/signin — set indicator for UI auth state
     Cookies.set("omnistrate_logged_in", "true", {
-      expires: 1,
+      expires: 7,
       sameSite: "Lax",
       secure: window.location.protocol === "https:",
     });
