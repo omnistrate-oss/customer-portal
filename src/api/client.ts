@@ -26,6 +26,10 @@ apiClient.use({
     const hasAuth = typeof document !== "undefined" && !!Cookies.get(AUTH_INDICATOR_COOKIE);
 
     if (isProtectedEndpoint && !hasAuth) {
+      // Redirect to signin — handles stale sessions (e.g., after deployment migration)
+      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/signin")) {
+        window.location.href = "/signin";
+      }
       const controller = new AbortController();
       controller.abort("Request aborted because the user is not authenticated");
       return new Request(request, { signal: controller.signal });
@@ -121,6 +125,10 @@ apiClient.use({
           }
 
           // Refresh failed or retry still 401 — force logout
+          // Clear httpOnly cookies via server-side route so middleware
+          // won't redirect back from /signin (breaking the loop)
+          await fetch("/api/logout", { method: "POST" }).catch(() => {});
+
           Cookies.remove(AUTH_INDICATOR_COOKIE);
           localStorage.removeItem("paymentNotificationHidden");
           try {

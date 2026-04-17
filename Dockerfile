@@ -13,6 +13,9 @@ RUN corepack enable && corepack prepare yarn@4.5.0 --activate
 # Install packages needed to build node modules
 FROM base AS build
 
+# Install build tools needed for native modules (tree-sitter) on ARM64
+RUN apk add --no-cache python3 make g++
+
 # Install node modules
 COPY --link package.json yarn.lock .yarnrc.yml ./
 COPY --link .yarn .yarn

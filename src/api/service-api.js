@@ -1,7 +1,9 @@
 import axios from "../axios";
 
 export const downloadCLI = (serviceId, serviceApiId) => {
-  return axios.get(`/service/${serviceId}/service-api/${serviceApiId}/cli`, {
+  return axios.get(`/api/download-cli`, {
+    baseURL: "",
+    params: { serviceId, serviceApiId },
     responseType: "blob",
   });
 };

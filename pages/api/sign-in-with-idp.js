@@ -1,6 +1,6 @@
 const { customerSignInWithIdentityProvider } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+import { setAuthCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
 export default async function handleSignIn(nextRequest, nextResponse) {
@@ -38,7 +38,7 @@ export default async function handleSignIn(nextRequest, nextResponse) {
       nextResponse.status(200).send({ ...rest });
     } catch (error) {
       console.log("IDP Error", error);
-      const defaultErrorMessage = "Someting went wrong. Please retry";
+      const defaultErrorMessage = "Something went wrong. Please retry";
 
       if (error.name === "ProviderAuthError" || error?.response?.status === undefined) {
         nextResponse.status(500).send({

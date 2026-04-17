@@ -3,7 +3,7 @@ import _ from "lodash";
 import { getProviderUsers } from "src/server/api/provider-users";
 const { customerUserSignIn } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
+import { setAuthCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";

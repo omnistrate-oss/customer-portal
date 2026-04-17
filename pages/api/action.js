@@ -60,9 +60,21 @@ export default async function handleAction(nextRequest, nextResponse) {
         const originalUserAgent = nextRequest.get("User-Agent") || "";
         const customUserAgent = `customer-portal/${appVersion} (${originalUserAgent})`;
 
-        // Read auth token from httpOnly cookie (primary) or Authorization header (fallback for tests)
+        // Read auth token from httpOnly cookie (primary)
+        // Authorization header fallback is restricted to non-production for Playwright tests
         const authToken = getAuthToken(nextRequest);
-        const authorization = authToken ? `Bearer ${authToken}` : nextRequest.headers.authorization;
+        const authorization = authToken
+          ? `Bearer ${authToken}`
+          : process.env.NODE_ENV !== "production"
+            ? nextRequest.headers.authorization
+            : undefined;
+
+        // No auth token → return 401 so client-side refresh logic triggers
+        // (without this, the backend returns 400 "token is missing" which
+        // the client doesn't treat as an auth failure)
+        if (!authorization) {
+          return nextResponse.status(401).json({ message: "Not authenticated" });
+        }
 
         // Prepare request options
         const requestOptions = {

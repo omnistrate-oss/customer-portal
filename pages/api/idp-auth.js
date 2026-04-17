@@ -1,6 +1,6 @@
 import { customerSignInWithIdentityProvider } from "src/server/api/customer-user";
+import { setAuthCookie, setIndicatorCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
-const { setAuthCookie, setRefreshCookie } = require("src/server/utils/authCookie");
 
 export default async function handleAuth(nextRequest, nextResponse) {
   if (nextRequest.method === "GET") {
@@ -35,9 +35,10 @@ export default async function handleAuth(nextRequest, nextResponse) {
         if (refreshToken) {
           setRefreshCookie(nextResponse, refreshToken);
         }
-        nextResponse.redirect(307, "/signin");
+        setIndicatorCookie(nextResponse);
+        return nextResponse.redirect(307, "/signin");
       } catch (err) {
-        console.log("IDP AUTH err", err);
+        console.error("IDP AUTH error", err);
       }
     }
   }
