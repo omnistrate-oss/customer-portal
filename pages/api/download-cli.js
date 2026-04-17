@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   const { serviceId, serviceApiId } = req.query;
 
-  if (!serviceId || !serviceApiId) {
+  if (!serviceId || !serviceApiId || typeof serviceId !== "string" || typeof serviceApiId !== "string") {
     return res.status(400).json({ message: "serviceId and serviceApiId are required" });
   }
 

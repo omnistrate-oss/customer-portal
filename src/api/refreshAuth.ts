@@ -41,7 +41,7 @@ async function doRefresh(): Promise<boolean> {
       Cookies.set(AUTH_INDICATOR_COOKIE, "true", {
         sameSite: "Lax",
         secure: window.location.protocol === "https:",
-        expires: 1,
+        expires: 7, // Match refresh token TTL (7 days) so auth guard doesn't block before refresh can run
       });
       return true;
     }

@@ -33,7 +33,7 @@ const IDPAuthPage = () => {
 
         // httpOnly cookie is set server-side by /api/sign-in-with-idp — set indicator for UI auth state
         Cookies.set("omnistrate_logged_in", "true", {
-          expires: 1,
+          expires: 7,
           sameSite: "Lax",
           secure: window.location.protocol === "https:",
         });
