@@ -125,6 +125,10 @@ apiClient.use({
           }
 
           // Refresh failed or retry still 401 — force logout
+          // Clear httpOnly cookies via server-side route so middleware
+          // won't redirect back from /signin (breaking the loop)
+          await fetch("/api/logout", { method: "POST" }).catch(() => {});
+
           Cookies.remove(AUTH_INDICATOR_COOKIE);
           localStorage.removeItem("paymentNotificationHidden");
           try {

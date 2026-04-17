@@ -9,7 +9,7 @@ import useLogout from "src/hooks/useLogout";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
-  const { handleLogout } = useLogout();
+  const { logout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
@@ -20,8 +20,6 @@ const AxiosGlobalErrorHandler = () => {
 
   useEffect(() => {
     const requestInterceptorId = axios.interceptors.request.use((config) => {
-      const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url ?? "");
-
       // cancel the request if auth indicator is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
       const hasAuth = typeof document !== "undefined" && !!Cookies.get("omnistrate_logged_in");
@@ -37,7 +35,7 @@ const AxiosGlobalErrorHandler = () => {
         return config;
       }
 
-      if (config.url && !config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
+      if (config.url && !config.url.startsWith("/api") && config.url.startsWith("/")) {
         //the original request url
         const originalRequestURL = config.url;
         //the original request method
@@ -96,7 +94,7 @@ const AxiosGlobalErrorHandler = () => {
                 // Retry failed — fall through to logout
               }
             }
-            handleLogout();
+            logout();
           }
         } else if (!ignoreGlobalErrorSnack) {
           if (error.response && error.response.data) {
@@ -133,7 +131,7 @@ const AxiosGlobalErrorHandler = () => {
       axios.interceptors.request.eject(requestInterceptorId);
       axios.interceptors.response.eject(responseInterceptorId);
     };
-  }, [handleLogout]);
+  }, [logout]);
 
   return (
     <Snackbar open={isOpen} autoHideDuration={5000} onClose={handleClose}>
