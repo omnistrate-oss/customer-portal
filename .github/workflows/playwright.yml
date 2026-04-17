@@ -18,7 +18,7 @@ on:
 jobs:
   test:
     name: Playwright Tests - SaaSBuilder
-    if: false # temporarily skip all playwright tests
+    if: github.event.pull_request.draft == false
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:

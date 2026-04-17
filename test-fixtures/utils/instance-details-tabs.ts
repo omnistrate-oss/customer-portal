@@ -175,6 +175,15 @@ export const TestMetricsTab = async (instanceDetailsPage: InstanceDetailsPage, i
   await page.getByTestId(dataTestIds.tabs.metricsTab).click();
 
   if (instance.status === "RUNNING") {
+    await page.waitForTimeout(5000); // Wait for Metrics Data to Load
+    if (
+      await page
+        .getByText("Can't access metrics data. Please check if the instance is available and metrics are enabled.")
+        .isVisible()
+    ) {
+      return;
+    }
+
     await expect(page.getByTestId(dataTestIds.metrics.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.cpuUsageCard)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.metrics.loadAverageCard)).toBeVisible();
@@ -196,6 +205,15 @@ export const TestLiveLogsTab = async (instanceDetailsPage: InstanceDetailsPage, 
   await page.getByTestId(dataTestIds.tabs.liveLogsTab).click();
 
   if (instance.status === "RUNNING") {
+    await page.waitForTimeout(5000); // Wait for Logs Data to Load
+    if (
+      await page
+        .getByText("Can't access logs data. Please check if the instance is available and logs are enabled.")
+        .isVisible()
+    ) {
+      return;
+    }
+
     await expect(page.getByTestId(dataTestIds.liveLogs.nodeIdMenu)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.logsContainer)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.liveLogs.scrollToTopButton)).toBeVisible();

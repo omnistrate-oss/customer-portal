@@ -16,11 +16,14 @@ export class UserAPIClient {
       data: { email, password },
     });
 
-    const data = await response.json();
-    const token = data.jwtToken;
+    // Token is now in an httpOnly cookie set by the server, not in the response body
+    const headers = response.headers();
+    const setCookies = headers["set-cookie"] || "";
+    const tokenMatch = setCookies.match(/omnistrate_token=([^;]+)/);
+    const token = tokenMatch?.[1];
 
     if (!token) {
-      throw new Error("Failed to login");
+      throw new Error("Failed to login — omnistrate_token cookie not found in response");
     }
 
     GlobalStateManager.setState({ userToken: token });

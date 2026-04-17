@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import { customerUserSignin } from "src/api/customer-user";
-import axios from "src/axios";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -65,34 +64,36 @@ const SignInForm: FC<SignInFormProps> = ({
     /*eslint-disable-next-line react-hooks/exhaustive-deps*/
   }, [redirect_reason]);
 
-  function handlePasswordSignInSuccess(jwtToken) {
-    if (jwtToken) {
-      Cookies.set("token", jwtToken, { sameSite: "Lax", secure: true });
+  function handlePasswordSignInSuccess() {
+    // httpOnly cookie is set server-side by /api/signin — set indicator for UI auth state
+    Cookies.set("omnistrate_logged_in", "true", {
+      expires: 1,
+      sameSite: "Lax",
+      secure: window.location.protocol === "https:",
+    });
+    Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
-      try {
-        localStorage.removeItem("loggedInUsingSSO");
-      } catch (error) {
-        console.warn("Failed to set SSO state:", error);
-      }
+    try {
+      localStorage.removeItem("loggedInUsingSSO");
+    } catch (error) {
+      console.warn("Failed to set SSO state:", error);
+    }
 
-      axios.defaults.headers["Authorization"] = "Bearer " + jwtToken;
-      const decodedDestination = decodeURIComponent(destination || "");
+    const decodedDestination = decodeURIComponent(destination || "");
 
-      // Redirect to the Destination URL
-      if (destination && checkRouteValidity(decodedDestination)) {
-        router.replace(decodedDestination, {}, { showProgressBar: true });
-      } else {
-        router.replace(getInstancesRoute(), {}, { showProgressBar: true });
-      }
+    // Redirect to the Destination URL
+    if (destination && checkRouteValidity(decodedDestination)) {
+      router.replace(decodedDestination, {}, { showProgressBar: true });
+    } else {
+      router.replace(getInstancesRoute(), {}, { showProgressBar: true });
     }
   }
 
   const passwordSignInMutation = useMutation({
     mutationFn: (payload) => {
-      delete axios.defaults.headers["Authorization"];
       return customerUserSignin(payload);
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       setLoginMethod({
         methodType: "Password",
       });
@@ -101,9 +102,7 @@ const SignInForm: FC<SignInFormProps> = ({
       /*eslint-disable-next-line no-use-before-define*/
       formik.setFieldTouched("password", false);
 
-      //@ts-ignore
-      const jwtToken = response?.data?.jwtToken;
-      handlePasswordSignInSuccess(jwtToken);
+      handlePasswordSignInSuccess();
     },
     onError: (error: any) => {
       if (error.response.data && error.response.data.message) {
