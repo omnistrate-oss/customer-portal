@@ -69,6 +69,13 @@ export default async function handleAction(nextRequest, nextResponse) {
             ? nextRequest.headers.authorization
             : undefined;
 
+        // No auth token → return 401 so client-side refresh logic triggers
+        // (without this, the backend returns 400 "token is missing" which
+        // the client doesn't treat as an auth failure)
+        if (!authorization) {
+          return nextResponse.status(401).json({ message: "Not authenticated" });
+        }
+
         // Prepare request options
         const requestOptions = {
           params: {
