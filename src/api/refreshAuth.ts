@@ -41,7 +41,7 @@ async function doRefresh(): Promise<boolean> {
       Cookies.set(AUTH_INDICATOR_COOKIE, "true", {
         sameSite: "Lax",
         secure: window.location.protocol === "https:",
-        expires: 7,
+        expires: 1,
       });
       return true;
     }
