@@ -2,12 +2,13 @@
 
 import { cn } from "lib/utils";
 
-import { Text } from "components/Typography/Typography";
 import { colors } from "src/themeConfig";
+import { Text } from "components/Typography/Typography";
 
 import AwsLogo from "../../../../src/components/Logos/AwsLogo";
 import AzureLogo from "../../../../src/components/Logos/AzureLogo";
 import GcpLogo from "../../../../src/components/Logos/GcpLogo";
+import NebiusLogo from "../../../../src/components/Logos/NebiusLogo";
 import OciLogo from "../../../../src/components/Logos/OciLogo";
 
 import PrivateIcon from "./PrivateIcon";
@@ -17,6 +18,7 @@ export const cloudProviderLongLogoMap = {
   gcp: <GcpLogo style={{ height: "24px", width: "auto" }} />,
   azure: <AzureLogo style={{ height: "24px", width: "auto" }} />,
   oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
+  nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
   private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
 };
 
