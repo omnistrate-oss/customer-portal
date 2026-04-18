@@ -11,3 +11,26 @@ README.md
 fly.toml
 fly.*.toml
 *.log
+
+# Test and dev files
+tests
+test-fixtures
+test-results
+test-utils
+page-objects
+playwright
+playwright-report
+playwright.config.ts
+.prettierrc
+.prettierignore
+.eslintrc.json
+LICENSE
+
+# Build artifacts that shouldn't enter the build context
+.next/cache
+coverage
+tsconfig.tsbuildinfo
+
+# Yarn caches (re-fetched in deps stage if needed)
+.yarn/cache
+.yarn/install-state.gz
