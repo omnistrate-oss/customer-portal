@@ -1,5 +1,5 @@
-import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import Link from "next/link";
+import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -183,6 +183,8 @@ export const getStandardInformationFields = (
           setFieldValue("region", offering.azureRegions?.[0] || "");
         } else if (cloudProvider === "oci") {
           setFieldValue("region", offering.ociRegions?.[0] || "");
+        } else if (cloudProvider === "nebius") {
+          setFieldValue("region", offering.nebiusRegions?.[0] || "");
         }
 
         // Set default onprem_platform for on-prem offerings
@@ -236,6 +238,8 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.azureRegions?.[0] || "");
             } else if (cloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
+            } else if (cloudProvider === "nebius") {
+              setFieldValue("region", offering.nebiusRegions?.[0] || "");
             }
 
             // Set default onprem_platform for on-prem offerings
@@ -404,6 +408,8 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.azureRegions?.[0] || "");
             } else if (newCloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
+            } else if (newCloudProvider === "nebius") {
+              setFieldValue("region", offering.nebiusRegions?.[0] || "");
             }
           }}
           disabled={formMode !== "create"}
@@ -624,7 +630,9 @@ export const getNetworkConfigurationFields = (
             ? offering.gcpRegions || []
             : values.cloudProvider === "azure"
               ? offering.azureRegions || []
-              : offering.ociRegions || [],
+              : values.cloudProvider === "nebius"
+                ? offering.nebiusRegions || []
+                : offering.ociRegions || [],
         values.region
       ),
       emptyMenuText: "No customer networks available",

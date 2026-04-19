@@ -52,5 +52,4 @@ export const CLOUD_PROVIDERS = {
   gcp: "gcp",
   azure: "azure",
   oci: "oci",
-  nebius: "nebius",
 };
