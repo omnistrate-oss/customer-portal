@@ -67,9 +67,12 @@ const CloudAccountForm = ({
   });
 
   const byoaServiceOfferings = useMemo(() => {
-    return serviceOfferings.filter(
-      (offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT"
-    );
+    return serviceOfferings
+      .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
+      .map((offering) => ({
+        ...offering,
+        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
+      }));
   }, [serviceOfferings]);
 
   const byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>> = useMemo(() => {
@@ -420,9 +423,7 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={(serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []).filter(
-                    (provider) => provider !== "nebius"
-                  )}
+                  cloudProviders={byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
