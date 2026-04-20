@@ -29,10 +29,17 @@ FROM deps AS build
 COPY --link . .
 RUN yarn run build
 
-# ---------- prod-deps: prune devDependencies via Yarn-native workspace focus ----------
-FROM deps AS prod-deps
-RUN YARN_ENABLE_SCRIPTS=false yarn workspaces focus --production --all \
- && yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
+# ---------- prod-deps: production-only node_modules from a clean state ----------
+# Must be FROM base (not FROM deps) — `yarn workspaces focus` only adds, it
+# never removes existing entries, so inheriting `deps` would leave devDeps in
+# place and prune nothing. From a clean state, --production installs only the
+# `dependencies` field of package.json (skipping devDependencies entirely).
+FROM base AS prod-deps
+RUN apk add --no-cache python3 make g++
+COPY --link package.json yarn.lock .yarnrc.yml ./
+COPY --link .yarn .yarn
+RUN YARN_ENABLE_SCRIPTS=false yarn workspaces focus --all --production \
+ && npm rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
 
 # ---------- runner: minimal production image ----------
 FROM base AS runner
@@ -48,6 +55,7 @@ COPY --from=build     --chown=nextjs:nodejs /app/public ./public
 COPY --from=build     --chown=nextjs:nodejs /app/server.js ./server.js
 COPY --from=build     --chown=nextjs:nodejs /app/next.config.js ./next.config.js
 COPY --from=build     --chown=nextjs:nodejs /app/src/server ./src/server
+COPY --from=build     --chown=nextjs:nodejs /app/src/axios.js ./src/axios.js
 COPY --from=build     --chown=nextjs:nodejs /app/package.json ./package.json
 
 USER nextjs

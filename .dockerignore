@@ -13,11 +13,13 @@ fly.*.toml
 *.log
 
 # Test and dev files
+# Note: page-objects/ and test-utils/ are intentionally NOT excluded.
+# Production components (e.g. CreateInstanceModal, AuditLogs, Logs) import
+# dataTestIds/pageElements constants from page-objects/, which transitively
+# imports BackendError/UserAPIClient from test-utils/.
 tests
 test-fixtures
 test-results
-test-utils
-page-objects
 playwright
 playwright-report
 playwright.config.ts
