@@ -4,9 +4,11 @@ import PrivateLogo from "app/(dashboard)/components/CloudProviderRadio/PrivateIc
 import AWSIcon from "src/components/Icons/CloudProviders/AWSLogo";
 import AzureIcon from "src/components/Icons/CloudProviders/AzureLogo";
 import GCPIcon from "src/components/Icons/CloudProviders/GCPLogo";
+import NebiusIcon from "src/components/Icons/CloudProviders/NebiusLogo";
 import AwsLogo from "src/components/Logos/AwsLogo";
 import AzureLogo from "src/components/Logos/AzureLogo";
 import GcpLogo from "src/components/Logos/GcpLogo";
+import NebiusLogo from "src/components/Logos/NebiusLogo";
 import OciLogo from "src/components/Logos/OciLogo";
 
 export const cloudProviderLabels = {
@@ -14,6 +16,7 @@ export const cloudProviderLabels = {
   aws: "Amazon Web Services",
   azure: "Microsoft Azure",
   oci: "Oracle Cloud Infrastructure",
+  nebius: "Nebius",
   private: "Private",
 };
 
@@ -23,6 +26,7 @@ export const cloudProviderLogoMap = {
   gcp: <GCPIcon />,
   azure: <AzureIcon />,
   oci: <OCIIcon />,
+  nebius: <NebiusIcon />,
 };
 
 //long logos map
@@ -31,6 +35,7 @@ export const cloudProviderLongLogoMap = {
   gcp: <GcpLogo />,
   azure: <AzureLogo />,
   oci: <OciLogo />,
+  nebius: <NebiusLogo />,
   private: <PrivateLogo />,
 };
 
@@ -39,6 +44,7 @@ export const cloudProviderLabelsShort = {
   gcp: "GCP",
   azure: "Azure",
   oci: "OCI",
+  nebius: "Nebius",
 };
 
 export const CLOUD_PROVIDERS = {
@@ -46,4 +52,5 @@ export const CLOUD_PROVIDERS = {
   gcp: "gcp",
   azure: "azure",
   oci: "oci",
+  //add nebius later for custom network and cloud account creation
 };

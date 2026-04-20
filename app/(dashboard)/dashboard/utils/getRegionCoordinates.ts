@@ -734,11 +734,45 @@ export const OCI_REGION_COORDINATES = {
   },
 };
 
+const NEBIUS_REGION_COORDINATES = {
+  "eu-north1": {
+    name: "EU North (Finland)",
+    latitude: 61.0,
+    longitude: 25.0,
+  },
+  "eu-west1": {
+    name: "EU West (France)",
+    latitude: 48.86,
+    longitude: 2.35,
+  },
+  "me-west1": {
+    name: "Middle East West (Israel)",
+    latitude: 32.07,
+    longitude: 34.78,
+  },
+  "us-central1": {
+    name: "US Central (Kansas City, Missouri)",
+    latitude: 39.1,
+    longitude: -94.58,
+  },
+  "eu-north2": {
+    name: "EU North (Iceland)",
+    latitude: 64.15,
+    longitude: -21.94,
+  },
+  "uk-south1": {
+    name: "UK South (United Kingdom)",
+    latitude: 51.51,
+    longitude: -0.13,
+  },
+};
+
 export const REGION_COORDINATES = {
   aws: AWS_REGION_COORDINATES,
   gcp: GCP_REGION_COORDINATES,
   azure: AZURE_REGION_COORDINATES,
   oci: OCI_REGION_COORDINATES,
+  nebius: NEBIUS_REGION_COORDINATES,
 };
 
 export function getRegionCoordinates(
