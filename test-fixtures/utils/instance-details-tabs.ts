@@ -244,10 +244,13 @@ export const TestEventsTab = async (instanceDetailsPage: InstanceDetailsPage, in
     dataTestIds = instanceDetailsPage.dataTestIds,
     pageElements = instanceDetailsPage.pageElements;
 
-  await page.getByTestId(dataTestIds.tabs.auditLogsTab).click();
-  const eventsData = await page.waitForResponse((response) =>
+  // Set up the listener BEFORE the click — in HAR replay, the response fires
+  // synchronously and would be missed if we awaited click() first.
+  const eventsPromise = page.waitForResponse((response) =>
     response.url().includes(`%2Fresource-instance%2F${instance.id}%2Faudit-events`)
   );
+  await page.getByTestId(dataTestIds.tabs.auditLogsTab).click();
+  const eventsData = await eventsPromise;
   const events = (await eventsData.json()).events;
 
   // Check the Events Table

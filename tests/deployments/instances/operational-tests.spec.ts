@@ -97,6 +97,13 @@ test.describe("Instances Page - Operational Tests", () => {
   });
 
   test("Wait for Running Instance -> Modify an Instance", async ({ page }) => {
+    // The modify form fetches a resource-parameters schema whose URL includes a
+    // service-offering id. The UI picks that id from a list of 100+ offerings and
+    // the selection isn't stable between record and replay, so the schema URL in
+    // the HAR often doesn't match what the app requests on replay. Record mode
+    // still validates the full flow against a real backend.
+    test.skip(process.env.HAR_MODE?.toLowerCase() === "replay", "Modify flow is non-deterministic in HAR replay");
+
     if (!instance?.id) {
       test.skip(true, `${logPrefix} Instance ID is not present`);
       return;
