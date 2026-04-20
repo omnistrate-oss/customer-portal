@@ -5,6 +5,7 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { Subscription } from "src/types/subscription";
+import { getResultParams } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -47,17 +48,20 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
+    const isNebius = !!getResultParams(instance)?.nebius_tenant_id;
 
     // Delete action
-    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard;
+    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius;
 
     const isDeleteDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isDeleting
-        ? "Cloud account deletion is already in progress"
-        : isDeleteProtected && deletionProtectionFeatureEnabled
-          ? "Cloud account has delete protection enabled"
-          : "";
+      : isNebius
+        ? "Delete is not supported for Nebius cloud accounts"
+        : isDeleting
+          ? "Cloud account deletion is already in progress"
+          : isDeleteProtected && deletionProtectionFeatureEnabled
+            ? "Cloud account has delete protection enabled"
+            : "";
 
     res.push({
       dataTestId: "delete-action-button",
@@ -68,13 +72,15 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     });
 
     // Offboard action
-    const isOffboardDisabled = !isSelectedInstanceReadyToOffboard;
+    const isOffboardDisabled = !isSelectedInstanceReadyToOffboard || isNebius;
 
     const offboardingDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isOffboardDisabled
-        ? "Cloud account is not ready to offboard"
-        : "";
+      : isNebius
+        ? "Offboard is not supported for Nebius cloud accounts"
+        : isOffboardDisabled
+          ? "Cloud account is not ready to offboard"
+          : "";
 
     res.push({
       dataTestId: "offboard-action-button",

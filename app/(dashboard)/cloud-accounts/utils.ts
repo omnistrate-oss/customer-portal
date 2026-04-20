@@ -102,7 +102,10 @@ export const getInitialValues = (
             : // @ts-ignore
               resultParams?.oci_tenancy_id
               ? "oci"
-              : "",
+              : // @ts-ignore
+                resultParams?.nebius_tenant_id
+                ? "nebius"
+                : "",
       accountConfigurationMethod:
         // @ts-ignore
         resultParams?.account_configuration_method,
