@@ -112,7 +112,7 @@ apiClient.use({
       const ignoreGlobalErrorSnack = request.headers.get("x-ignore-global-error");
 
       // Parse the body once up front so isAuthError can inspect the backend's
-      // error message (needed to detect 400 "token is missing from header").
+      // error message (needed to detect 400 "token is missing" / "token is missing from header").
       let parsedMessage: string | null = null;
       let parseError: unknown = null;
       try {
