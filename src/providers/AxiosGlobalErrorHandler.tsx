@@ -6,7 +6,7 @@ import _ from "lodash";
 import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
-import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
+import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
   const { logout } = useLogout();
@@ -82,7 +82,12 @@ const AxiosGlobalErrorHandler = () => {
 
         const ignoreGlobalErrorSnack = error.config?.ignoreGlobalErrorSnack;
 
-        if (error.response && error.response.status === 401) {
+        // Extract backend message from either a plain-string body or a `.message` field
+        // so isAuthError can detect 400 "token is missing from header" in both shapes.
+        const responseMessage =
+          typeof error.response?.data === "string" ? error.response.data : error.response?.data?.message;
+
+        if (error.response && isAuthError(error.response.status, responseMessage)) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
             // Attempt silent token refresh before forcing logout
             const refreshed = await refreshAuth();
