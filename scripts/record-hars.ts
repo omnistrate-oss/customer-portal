@@ -1,7 +1,7 @@
 #!/usr/bin/env -S yarn tsx
 
 import { checkbox, confirm, select, Separator } from "@inquirer/prompts";
-import { execSync, type ExecSyncOptions } from "node:child_process";
+import { execFileSync, execSync, type ExecSyncOptions } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +23,14 @@ const run = (cmd: string, opts?: ExecSyncOptions) => {
 };
 
 const runSilent = (cmd: string): string => execSync(cmd, { encoding: "utf-8" }).trim();
+
+// Use execFileSync to avoid shell interpolation when arguments include values
+// derived from git output or other environment-dependent sources.
+const git = (args: string[], opts?: ExecSyncOptions) => {
+  execFileSync("git", args, { stdio: "inherit", ...opts });
+};
+
+const gitSilent = (args: string[]): string => execFileSync("git", args, { encoding: "utf-8" }).trim();
 
 const heading = (msg: string) => console.log(`\n── ${msg} ──`);
 
@@ -378,10 +386,10 @@ const main = async () => {
   try {
     runSilent("git config user.name");
   } catch {
-    const name = runSilent(`git -C "${repoRoot}" config user.name`);
-    const email = runSilent(`git -C "${repoRoot}" config user.email`);
-    run(`git config user.name "${name}"`);
-    run(`git config user.email "${email}"`);
+    const name = gitSilent(["-C", repoRoot, "config", "user.name"]);
+    const email = gitSilent(["-C", repoRoot, "config", "user.email"]);
+    git(["config", "user.name", name]);
+    git(["config", "user.email", email]);
   }
 
   run("git add -A");
@@ -396,7 +404,7 @@ const main = async () => {
 
   const date = new Date().toISOString().slice(0, 10);
   run("git --no-pager diff --staged --stat");
-  run(`git commit -m "chore: update HAR files (${date})"`);
+  git(["commit", "-m", `chore: update HAR files (${date})`]);
   run("git --no-pager push origin master");
 
   process.chdir(repoRoot);

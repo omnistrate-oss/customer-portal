@@ -116,7 +116,9 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 async function globalTeardown() {
   console.log(`Running Global Teardown... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
 
-  // In replay mode, skip teardown — no real resources to clean up
+  // In replay mode, skip teardown — no real resources to clean up.
+  // Safe because har-test.ts enforces strict replay (throws on any missing HAR entry),
+  // so no live backend mutations can occur in this mode.
   if (process.env.HAR_MODE?.toLowerCase() === "replay") {
     console.log("Skipping teardown in replay mode");
     return;

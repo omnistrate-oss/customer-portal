@@ -3,6 +3,9 @@ name: Playwright HAR Recorder
 # Weekday workflow to record HAR files from real API interactions
 # Runs tests against live backend and commits updated HAR files directly to the HAR sub-repo
 
+permissions:
+  contents: read
+
 on:
   schedule:
     # Run at 2:00 AM UTC (7:30 AM IST) on weekdays (Mon-Fri)
@@ -23,14 +26,14 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Checkout HAR submodule
       run: |
         git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
         git submodule update --init --recursive
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
       with:
         node-version: lts/*
         cache: 'yarn'
@@ -175,17 +178,23 @@ jobs:
           git commit -m "chore: update HAR files (${DATE})
 
         Test result: ${{ steps.playwright.outcome }}"
-          git push origin HEAD:refs/heads/master --force
+          git fetch origin master
+          if ! git rebase origin/master; then
+            echo "Failed to rebase HAR updates onto the latest remote master branch"
+            git rebase --abort 2>/dev/null || true
+            exit 1
+          fi
+          git push origin HEAD:refs/heads/master
         fi
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       if: ${{ !cancelled() }}
       with:
         name: playwright-report-recording
         path: playwright-report/
         retention-days: 7
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       if: ${{ !cancelled() && steps.soft-failures.outputs.has_failures == 'true' }}
       with:
         name: backend-failures

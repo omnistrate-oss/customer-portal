@@ -191,7 +191,10 @@ export const test = base.extend<HarFixtures>({
       }
     } else if (effectiveHarMode === "replay") {
       if (!fs.existsSync(gzPath)) {
-        console.warn(`[HAR] No HAR file: ${gzPath} — falling back to live APIs`);
+        // Missing HAR means this test hasn't been recorded yet. Skip rather than
+        // silently fall back to live APIs — a live fallback would reintroduce
+        // backend flakiness and defeat the purpose of deterministic replay.
+        testInfo.skip(true, `[HAR REPLAY] No HAR file recorded for this test: ${gzPath}`);
         const context = await browser.newContext(baseContextOptions);
         await use(context);
         await context.close();
@@ -237,12 +240,12 @@ export const test = base.extend<HarFixtures>({
           if (last) {
             await route.fulfill(last);
           } else {
-            console.warn(`[HAR REPLAY] No match and no history: ${method} ${url}`);
-            await route.fulfill({
-              status: method === "GET" ? 200 : 204,
-              headers: { "content-type": "application/json" },
-              body: method === "GET" ? "{}" : "",
-            });
+            // Fail fast: serving synthetic responses here masks missing coverage and lets
+            // tests pass against unexpected API calls. Re-record the HAR if this fires.
+            const errorMessage = `[HAR REPLAY] No matching HAR entry found for ${method} ${url}`;
+            console.error(errorMessage);
+            await route.abort("failed");
+            throw new Error(errorMessage);
           }
           return;
         }
