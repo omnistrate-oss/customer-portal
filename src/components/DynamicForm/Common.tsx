@@ -1,8 +1,8 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Box, InputAdornment, Stack } from "@mui/material";
 import Generator from "generate-password";
-import { useRef, useState } from "react";
 
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
 import Select from "components/FormElementsv2/Select/Select";
@@ -11,6 +11,7 @@ import KeyIcon from "components/Icons/Key/KeyIcon";
 import { Text } from "components/Typography/Typography";
 
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
+import CodeEditor from "../CodeEditor/CodeEditor";
 import Autocomplete from "../FormElementsv2/AutoComplete/AutoComplete";
 import FormControlLabel from "../FormElementsv2/FormControlLabel/FormControlLabel";
 import Radio, { RadioGroup } from "../FormElementsv2/Radio/Radio";
@@ -425,6 +426,24 @@ export const MultiSelectAutocomplete = ({ field, formData }) => {
       getOptionLabel={(option) => option.label}
       isOptionEqualToValue={(option, value) => option.value === value.value}
       error={Boolean(formData.touched[field.name] && formData.errors[field.name])}
+    />
+  );
+};
+
+export const CodeEditorField = ({ field, formData }: { field: Field; formData: any }) => {
+  const value = field.value ?? formData.values[field.name] ?? "";
+  return (
+    <CodeEditor
+      language={field.language || "json"}
+      value={typeof value === "string" ? value : JSON.stringify(value, null, 2)}
+      onChange={(val) => {
+        formData.setFieldValue(field.name, val);
+      }}
+      onBlur={() => {
+        formData.setFieldTouched(field.name, true);
+      }}
+      isReadOnly={field.disabled}
+      height="200px"
     />
   );
 };
