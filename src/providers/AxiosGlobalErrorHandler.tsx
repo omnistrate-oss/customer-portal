@@ -6,6 +6,7 @@ import _ from "lodash";
 import { AUTH_INDICATOR_COOKIE } from "src/api/client";
 import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
+import { logoutBroadcastChannel } from "src/broadcastChannel";
 import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
@@ -118,7 +119,17 @@ const AxiosGlobalErrorHandler = () => {
             } catch (err) {
               console.warn("Failed to clear SSO state:", err);
             }
-            window.location.href = "/signin";
+            // Broadcast so other open tabs/windows also log out.
+            if (logoutBroadcastChannel) {
+              try {
+                logoutBroadcastChannel.postMessage("logout");
+              } catch (err) {
+                console.warn("Failed to broadcast logout:", err);
+              }
+            }
+            // Use replace so /signin doesn't get added to history (Back would
+            // land on the protected page and trigger another 401 bounce).
+            window.location.replace("/signin");
           }
         } else if (!ignoreGlobalErrorSnack) {
           if (error.response && error.response.data) {

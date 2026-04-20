@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import createFetchClient from "openapi-fetch";
 
+import { logoutBroadcastChannel } from "src/broadcastChannel";
 import { paths } from "src/types/schema";
 import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
@@ -112,13 +113,23 @@ apiClient.use({
       // are only attempted for authenticated calls, so cloning the body of
       // non-protected calls (signin, refresh-token, etc.) is wasted work.
       if (isProtectedEndpoint) {
-        requestClones.set(modifiedRequest, modifiedRequest.clone());
+        try {
+          requestClones.set(modifiedRequest, modifiedRequest.clone());
+        } catch {
+          // Locked/disturbed body stream — skip retry support rather than
+          // blowing up the request pipeline.
+        }
       }
       return modifiedRequest;
     }
 
     if (isProtectedEndpoint && request.method !== "GET" && request.method !== "HEAD") {
-      requestClones.set(request, request.clone());
+      try {
+        requestClones.set(request, request.clone());
+      } catch {
+        // Locked/disturbed body stream — skip retry support rather than
+        // blowing up the request pipeline.
+      }
     }
     return request;
   },
@@ -169,12 +180,16 @@ apiClient.use({
           // Attempt silent token refresh before forcing logout
           const refreshed = await refreshAuth();
           if (refreshed) {
-            // Retry the original request — the new httpOnly cookie is sent automatically.
-            // Use the clone stashed in onRequest; request.clone() here would throw
-            // because fetch has already consumed the body stream.
-            const retryResponse = await fetch(retryClone ?? request);
-            if (retryResponse.ok) {
-              return retryResponse;
+            // Retry only when it's safe to replay: either we have the
+            // undisturbed clone stashed in onRequest, or the request has no
+            // body (GET/HEAD) so the original Request object is replayable.
+            // Anything else would throw "Request body is already used".
+            const isBodyless = request.method === "GET" || request.method === "HEAD";
+            if (retryClone || isBodyless) {
+              const retryResponse = await fetch(retryClone ?? request);
+              if (retryResponse.ok) {
+                return retryResponse;
+              }
             }
           }
 
@@ -196,7 +211,18 @@ apiClient.use({
             console.warn("Failed to clear SSO state:", error);
           }
 
-          window.location.href = "/signin";
+          // Broadcast so other open tabs/windows also log out.
+          if (logoutBroadcastChannel) {
+            try {
+              logoutBroadcastChannel.postMessage("logout");
+            } catch (error) {
+              console.warn("Failed to broadcast logout:", error);
+            }
+          }
+
+          // Use replace so /signin doesn't get added to history (Back would
+          // land on the protected page and trigger another 401 bounce).
+          window.location.replace("/signin");
         }
       } else if (!ignoreGlobalErrorSnack && globalErrorHandler) {
         const status = String(response.status);
