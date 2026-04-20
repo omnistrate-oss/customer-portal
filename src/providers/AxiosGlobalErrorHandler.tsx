@@ -105,8 +105,7 @@ const AxiosGlobalErrorHandler = () => {
             // Await so the server finishes clearing the httpOnly cookies
             // before /signin loads — middleware redirects away from /signin
             // when the auth cookie is still present and valid, which would
-            // bounce us back. The never-resolving promise below keeps the
-            // caller suspended so the 401 never surfaces as UI error.
+            // bounce us back.
             try {
               await fetch("/api/logout", { method: "POST", keepalive: true });
             } catch {
@@ -120,9 +119,6 @@ const AxiosGlobalErrorHandler = () => {
               console.warn("Failed to clear SSO state:", err);
             }
             window.location.href = "/signin";
-            // Swallow the rejection so callers don't see the 401 while the
-            // hard nav is in flight.
-            return new Promise(() => {});
           }
         } else if (!ignoreGlobalErrorSnack) {
           if (error.response && error.response.data) {

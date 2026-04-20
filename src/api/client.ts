@@ -181,9 +181,7 @@ apiClient.use({
           // Refresh failed or retry still unauthorized — force logout.
           // Await so the server finishes clearing the httpOnly cookies before
           // /signin loads. Middleware redirects away from /signin when the
-          // auth cookie is still present, which would bounce us back. The
-          // never-resolving promise below keeps the caller suspended so the
-          // 401 never reaches React Query's onError / the global snackbar.
+          // auth cookie is still present, which would bounce us back.
           try {
             await fetch("/api/logout", { method: "POST", keepalive: true });
           } catch {
@@ -199,10 +197,6 @@ apiClient.use({
           }
 
           window.location.href = "/signin";
-
-          // Suppress the 401 from bubbling to callers (React Query onError,
-          // mutation snackbars) while the hard nav is in flight.
-          return new Promise<Response>(() => {});
         }
       } else if (!ignoreGlobalErrorSnack && globalErrorHandler) {
         const status = String(response.status);
