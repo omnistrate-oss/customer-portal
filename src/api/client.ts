@@ -108,17 +108,27 @@ apiClient.use({
       // Ensure Content-Type is set for JSON
       modifiedRequest.headers.set("Content-Type", "application/json");
 
-      requestClones.set(modifiedRequest, modifiedRequest.clone());
+      // Only stash a clone for protected endpoints — refresh-based retries
+      // are only attempted for authenticated calls, so cloning the body of
+      // non-protected calls (signin, refresh-token, etc.) is wasted work.
+      if (isProtectedEndpoint) {
+        requestClones.set(modifiedRequest, modifiedRequest.clone());
+      }
       return modifiedRequest;
     }
 
-    if (request.method !== "GET" && request.method !== "HEAD") {
+    if (isProtectedEndpoint && request.method !== "GET" && request.method !== "HEAD") {
       requestClones.set(request, request.clone());
     }
     return request;
   },
 
   async onResponse({ response, request }) {
+    // Pull the stashed retry clone up front and drop the WeakMap entry so the
+    // (potentially large) body doesn't sit in memory longer than needed.
+    const retryClone = requestClones.get(request);
+    requestClones.delete(request);
+
     // Cache the response body so we only read it once across the error-handling
     // block and the downstream empty/non-JSON handling.
     let cachedResponseText: string | null = null;
@@ -162,8 +172,7 @@ apiClient.use({
             // Retry the original request — the new httpOnly cookie is sent automatically.
             // Use the clone stashed in onRequest; request.clone() here would throw
             // because fetch has already consumed the body stream.
-            const retryRequest = requestClones.get(request) ?? request;
-            const retryResponse = await fetch(retryRequest);
+            const retryResponse = await fetch(retryClone ?? request);
             if (retryResponse.ok) {
               return retryResponse;
             }
