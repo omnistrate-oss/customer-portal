@@ -145,8 +145,10 @@ export const test = base.extend<HarFixtures>({
         recordHar: {
           path: rawHarPath,
           content: "embed",
-          // Capture all API routes: /api/action, /api/signin, /api/refresh-token, etc.
-          urlFilter: /\/api\//,
+          // Capture /api/* but skip auth endpoints — their response bodies and
+          // Set-Cookie headers contain credentials that shouldn't land in a
+          // committed HAR. Replay re-authenticates at runtime anyway.
+          urlFilter: /\/api\/(?!signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)/,
         },
       });
 
@@ -205,10 +207,8 @@ export const test = base.extend<HarFixtures>({
         // Missing HAR means this test hasn't been recorded yet. Skip rather than
         // silently fall back to live APIs — a live fallback would reintroduce
         // backend flakiness and defeat the purpose of deterministic replay.
+        // testInfo.skip throws, aborting the fixture before use() is called.
         testInfo.skip(true, `[HAR REPLAY] No HAR file recorded for this test: ${gzPath}`);
-        const context = await browser.newContext(baseContextOptions);
-        await use(context);
-        await context.close();
         return;
       }
 
@@ -278,10 +278,11 @@ export const test = base.extend<HarFixtures>({
           headers[h.name] = h.value;
         }
 
-        // Build response body
+        // Build response body — use explicit null check so an empty-string body
+        // recorded in the HAR is replayed as-is instead of being dropped.
         let body: string | Buffer | undefined;
         const content = entry.response.content;
-        if (content.text) {
+        if (content.text != null) {
           body = content.encoding === "base64" ? Buffer.from(content.text, "base64") : content.text;
         }
 

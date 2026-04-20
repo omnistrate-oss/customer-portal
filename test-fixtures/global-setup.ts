@@ -82,10 +82,17 @@ async function globalSetup() {
 
   GlobalStateManager.setState({ date });
 
-  // In record mode, save the global state for replay
+  // In record mode, save the global state for replay. Strip auth tokens —
+  // replay mode re-authenticates at runtime instead of reading JWTs from the
+  // committed fixture to keep secrets out of version control.
   if (isRecordMode) {
     const fixture = new ApiFixture("global-setup");
-    await fixture.getOrCreate("globalState", () => GlobalStateManager.loadState());
+    await fixture.getOrCreate("globalState", () => {
+      const { providerToken, userToken, ...safeState } = GlobalStateManager.loadState();
+      void providerToken;
+      void userToken;
+      return safeState;
+    });
     console.log("Global state saved to fixture (record mode)");
   }
 
