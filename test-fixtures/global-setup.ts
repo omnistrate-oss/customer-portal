@@ -14,11 +14,25 @@ async function globalSetup() {
   // Clear stale report from previous runs (recorder is registered per-worker)
   clearSoftFailureReport();
 
-  // In replay mode, skip all backend calls — load saved state from fixture
+  // In replay mode, load saved state from fixture — but refresh the provider token
+  // (24h JWT expiry means the stored one goes stale between HAR recording and replay).
   if (isReplayMode) {
     const fixture = new ApiFixture("global-setup");
     const savedState = await fixture.getOrCreate("globalState", () => ({}));
     GlobalStateManager.setState(savedState);
+
+    const email = process.env.PROVIDER_EMAIL;
+    const password = process.env.PROVIDER_PASSWORD;
+    if (email && password) {
+      try {
+        const apiClient = new ProviderAPIClient();
+        await apiClient.providerLogin(email, password);
+        console.log("Provider token refreshed (replay mode)");
+      } catch (error) {
+        console.warn("Failed to refresh provider token in replay mode:", error);
+      }
+    }
+
     console.log("Global Setup loaded from fixture (replay mode)");
     return;
   }

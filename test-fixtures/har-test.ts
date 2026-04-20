@@ -80,6 +80,17 @@ const writeHarGz = (gzPath: string, har: any): void => {
 // Track which HAR files have been cleared this run
 const clearedHarFiles = new Set<string>();
 
+// Match on path+query only so HARs recorded against one host:port (e.g. dev on
+// :3000) replay correctly on another (CI on :8080).
+const normalizeUrl = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname + parsed.search;
+  } catch {
+    return url;
+  }
+};
+
 export const test = base.extend<HarFixtures>({
   harMode: async ({}, use) => {
     await use(getHarMode());
@@ -221,11 +232,16 @@ export const test = base.extend<HarFixtures>({
         const request = route.request();
         const method = request.method();
         const url = request.url();
+        const normalizedUrl = normalizeUrl(url);
 
-        // Find first unconsumed matching entry
+        // Find first unconsumed matching entry (match on path+query, ignore host:port)
         let matchIndex = -1;
         for (let i = 0; i < entryQueue.length; i++) {
-          if (!consumed.has(i) && entryQueue[i].request.method === method && entryQueue[i].request.url === url) {
+          if (
+            !consumed.has(i) &&
+            entryQueue[i].request.method === method &&
+            normalizeUrl(entryQueue[i].request.url) === normalizedUrl
+          ) {
             matchIndex = i;
             break;
           }
@@ -235,7 +251,7 @@ export const test = base.extend<HarFixtures>({
           // No unconsumed match — serve the last known response for this method+URL.
           // This handles: repeated background polling, async refetches after recording,
           // and polling tests where the same URL is called many times.
-          const responseKey = `${method} ${url}`;
+          const responseKey = `${method} ${normalizedUrl}`;
           const last = lastResponse.get(responseKey);
           if (last) {
             await route.fulfill(last);
@@ -272,7 +288,7 @@ export const test = base.extend<HarFixtures>({
         const response = { status: entry.response.status, headers, body };
 
         // Store as last known response for this method+URL (used as fallback for future requests)
-        const responseKey = `${method} ${url}`;
+        const responseKey = `${method} ${normalizedUrl}`;
         lastResponse.set(responseKey, response);
 
         await route.fulfill(response);
