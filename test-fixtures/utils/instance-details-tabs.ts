@@ -1,13 +1,19 @@
 import { expect } from "@playwright/test";
 import _ from "lodash";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
-import { isReplayMode } from "test-fixtures/api-fixture";
+import { ApiFixture } from "test-fixtures/api-fixture";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
+
+// describeSubscription is a direct HTTP call (bypasses browser HAR interception),
+// so cache per-subscription. Record mode stores the real response; replay mode
+// returns it without touching the backend, keeping the test deterministic even
+// when the recorded subscription ID no longer exists (teardown deletes subs).
+const subscriptionFixture = new ApiFixture("subscriptions");
 
 export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsPage, instance: ResourceInstance) => {
   const page = instanceDetailsPage.page;
@@ -22,17 +28,15 @@ export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsP
   await expect(instanceOverview.getByText(instance.region || "")).toBeVisible();
   await expect(instanceOverview.getByText(_.capitalize(instance.status))).toBeVisible();
 
-  // Prefer the cached list from user-setup (populated live). In replay mode we
-  // must not fall back to a live describeSubscription call — that bypasses HAR
-  // and makes the test nondeterministic.
+  // Prefer the live subscriptions cached in GlobalStateManager (user-setup populates
+  // them). Otherwise fall through to the fixture — record mode does the real call and
+  // caches it, replay mode reads the cached response without touching the backend.
   const cachedSubscription = GlobalStateManager.getSubscriptions().find((s) => s.id === instance.subscriptionId);
-  if (!cachedSubscription && isReplayMode()) {
-    throw new Error(
-      `Missing cached subscription ${instance.subscriptionId} in GlobalStateManager during HAR replay. ` +
-        "Re-record HARs so user-setup populates the matching subscription."
-    );
-  }
-  const subscription = cachedSubscription ?? (await apiClient.describeSubscription(instance.subscriptionId));
+  const subscription =
+    cachedSubscription ??
+    (await subscriptionFixture.getOrCreate(instance.subscriptionId || "unknown", () =>
+      apiClient.describeSubscription(instance.subscriptionId)
+    ));
 
   // Expect Service Name, Product Tier, and Subscription Owner to be Visible
   await expect(instanceOverview.getByText(subscription.serviceName)).toBeVisible();
