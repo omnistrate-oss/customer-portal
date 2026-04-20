@@ -108,6 +108,10 @@ apiClient.use({
   },
 
   async onResponse({ response, request }) {
+    // Cache the response body so we only read it once across the error-handling
+    // block and the downstream empty/non-JSON handling.
+    let cachedResponseText: string | null = null;
+
     if (!response.ok) {
       const ignoreGlobalErrorSnack = request.headers.get("x-ignore-global-error");
 
@@ -118,17 +122,21 @@ apiClient.use({
       try {
         const contentType = response.headers.get("content-type");
         const hasJsonContent = contentType && contentType.includes("application/json");
-        const responseText = await response.clone().text();
-        if (hasJsonContent && responseText.trim()) {
+        cachedResponseText = await response.clone().text();
+        const trimmedResponseText = cachedResponseText.trim();
+        if (hasJsonContent && trimmedResponseText) {
           try {
-            const body = JSON.parse(responseText);
-            parsedMessage = body?.message ?? (responseText.trim() || null);
+            const body = JSON.parse(cachedResponseText);
+            // Guard against structured errors where `message` is an object/array —
+            // feeding those into `new Error(...)` yields "[object Object]".
+            const bodyMessage = typeof body?.message === "string" ? body.message : null;
+            parsedMessage = bodyMessage ?? trimmedResponseText;
           } catch (err) {
             parseError = err;
-            parsedMessage = responseText.trim() || null;
+            parsedMessage = trimmedResponseText || null;
           }
-        } else if (responseText.trim()) {
-          parsedMessage = responseText;
+        } else if (trimmedResponseText) {
+          parsedMessage = trimmedResponseText;
         }
       } catch (err) {
         parseError = err;
@@ -186,8 +194,7 @@ apiClient.use({
     }
 
     // Handle empty responses - Happens for some delete operations
-    const clonedResponse = response.clone();
-    const text = await clonedResponse.text();
+    const text = cachedResponseText ?? (await response.clone().text());
     if (text.trim() === "") {
       console.warn("Received empty response for:", request.url);
       return new Response("{}", {
