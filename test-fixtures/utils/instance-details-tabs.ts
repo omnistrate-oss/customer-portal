@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import _ from "lodash";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
+import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
@@ -20,7 +21,10 @@ export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsP
   await expect(instanceOverview.getByText(instance.region || "")).toBeVisible();
   await expect(instanceOverview.getByText(_.capitalize(instance.status))).toBeVisible();
 
-  const subscription = await apiClient.describeSubscription(instance.subscriptionId);
+  // Prefer the cached list from user-setup (populated live) — only fall back to a
+  // direct HTTP call in record/live mode, since describeSubscription bypasses HAR.
+  const cachedSubscription = GlobalStateManager.getSubscriptions().find((s) => s.id === instance.subscriptionId);
+  const subscription = cachedSubscription || (await apiClient.describeSubscription(instance.subscriptionId));
 
   // Expect Service Name, Product Tier, and Subscription Owner to be Visible
   await expect(instanceOverview.getByText(subscription.serviceName)).toBeVisible();

@@ -1,5 +1,6 @@
 import { test } from "test-fixtures/har-test";
 import { InstancesPage } from "page-objects/instances-page";
+import { ApiFixture } from "test-fixtures/api-fixture";
 import { BackendError, BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
@@ -10,6 +11,9 @@ import { ResourceInstance } from "src/types/resourceInstance";
 
 const logPrefix = "Instances -> Operational Tests";
 const guard = new BackendSetupGuard("deployments/instances/operational-tests.spec.ts");
+// createInstance is a direct HTTP call, so cache it in a fixture — replay mode
+// reuses the recorded instance ID which the HAR already references in list/describe responses.
+const instanceFixture = new ApiFixture("operational-tests");
 
 test.describe.configure({ mode: "serial" });
 
@@ -23,49 +27,52 @@ test.describe("Instances Page - Operational Tests", () => {
 
     if (!instance) {
       try {
-        const apiClient = instancesPage.apiClient;
-        const serviceOfferings = GlobalStateManager.getServiceOfferings();
-        const serviceOffering = serviceOfferings.find((offering) =>
-          offering.serviceName.startsWith("SaaSBuilder Postgres DT - ")
-        );
-        const subscriptions = GlobalStateManager.getSubscriptions();
-        const subscription = subscriptions.find(
-          (sub) => sub.serviceId === serviceOffering?.serviceId && sub.productTierId === serviceOffering?.productTierID
-        );
+        instance = await instanceFixture.getOrCreate("postgres-instance", async () => {
+          const apiClient = instancesPage.apiClient;
+          const serviceOfferings = GlobalStateManager.getServiceOfferings();
+          const serviceOffering = serviceOfferings.find((offering) =>
+            offering.serviceName.startsWith("SaaSBuilder Postgres DT - ")
+          );
+          const subscriptions = GlobalStateManager.getSubscriptions();
+          const subscription = subscriptions.find(
+            (sub) =>
+              sub.serviceId === serviceOffering?.serviceId && sub.productTierId === serviceOffering?.productTierID
+          );
 
-        if (!serviceOffering) {
-          throw new Error("Service Offering not found");
-        }
+          if (!serviceOffering) {
+            throw new Error("Service Offering not found");
+          }
 
-        const {
-          serviceProviderId,
-          serviceURLKey,
-          serviceAPIVersion,
-          serviceEnvironmentURLKey,
-          serviceModelURLKey,
-          productTierURLKey,
-          resourceParameters,
-        } = serviceOffering;
+          const {
+            serviceProviderId,
+            serviceURLKey,
+            serviceAPIVersion,
+            serviceEnvironmentURLKey,
+            serviceModelURLKey,
+            productTierURLKey,
+            resourceParameters,
+          } = serviceOffering;
 
-        instance = await apiClient.createInstance(
-          serviceProviderId,
-          serviceURLKey,
-          serviceAPIVersion,
-          serviceEnvironmentURLKey,
-          serviceModelURLKey,
-          productTierURLKey,
-          resourceParameters?.[0].urlKey,
-          subscription?.id || "",
-          {
-            cloud_provider: "aws",
-            network_type: "PUBLIC",
-            region: "ap-south-1",
-            requestParams: {
-              password: "a_secure_password",
-              username: "username",
-            },
-          } as any
-        );
+          return apiClient.createInstance(
+            serviceProviderId,
+            serviceURLKey,
+            serviceAPIVersion,
+            serviceEnvironmentURLKey,
+            serviceModelURLKey,
+            productTierURLKey,
+            resourceParameters?.[0].urlKey,
+            subscription?.id || "",
+            {
+              cloud_provider: "aws",
+              network_type: "PUBLIC",
+              region: "ap-south-1",
+              requestParams: {
+                password: "a_secure_password",
+                username: "username",
+              },
+            } as any
+          );
+        });
 
         console.log("Instance created:", instance);
       } catch (e) {
