@@ -17,6 +17,13 @@ export function setGlobalErrorHandler(handler: ((error: Error) => void) | null) 
 
 export const apiClient = createFetchClient<paths>();
 
+// Stash of untouched Request clones keyed by the Request openapi-fetch sends.
+// openapi-fetch's internal `fetch(request)` disturbs the body stream, so by the
+// time onResponse runs, `request.clone()` would throw "Request body is already
+// used". Cloning inside onRequest (before fetch consumes the body) and looking
+// the clone up by Request identity is the only safe retry path.
+const requestClones = new WeakMap<Request, Request>();
+
 apiClient.use({
   async onRequest({ request }) {
     const url = new URL(request.url);
@@ -101,9 +108,13 @@ apiClient.use({
       // Ensure Content-Type is set for JSON
       modifiedRequest.headers.set("Content-Type", "application/json");
 
+      requestClones.set(modifiedRequest, modifiedRequest.clone());
       return modifiedRequest;
     }
 
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      requestClones.set(request, request.clone());
+    }
     return request;
   },
 
@@ -148,8 +159,11 @@ apiClient.use({
           // Attempt silent token refresh before forcing logout
           const refreshed = await refreshAuth();
           if (refreshed) {
-            // Retry the original request — the new httpOnly cookie is sent automatically
-            const retryResponse = await fetch(request.clone());
+            // Retry the original request — the new httpOnly cookie is sent automatically.
+            // Use the clone stashed in onRequest; request.clone() here would throw
+            // because fetch has already consumed the body stream.
+            const retryRequest = requestClones.get(request) ?? request;
+            const retryResponse = await fetch(retryRequest);
             if (retryResponse.ok) {
               return retryResponse;
             }
