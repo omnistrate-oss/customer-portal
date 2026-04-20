@@ -170,11 +170,16 @@ apiClient.use({
           }
 
           // Refresh failed or retry still unauthorized — force logout.
-          // Clear client state and redirect immediately; fire the server-side
-          // cookie clear as fire-and-forget so we don't block the navigation.
-          // Awaiting here lets React Query surface the 401 as [CRITICAL] and
-          // flashes broken UI before the redirect resolves.
-          fetch("/api/logout", { method: "POST", keepalive: true }).catch(() => {});
+          // Await so the server finishes clearing the httpOnly cookies before
+          // /signin loads. Middleware redirects away from /signin when the
+          // auth cookie is still present, which would bounce us back. The
+          // never-resolving promise below keeps the caller suspended so the
+          // 401 never reaches React Query's onError / the global snackbar.
+          try {
+            await fetch("/api/logout", { method: "POST", keepalive: true });
+          } catch {
+            // Ignore — we're redirecting regardless.
+          }
 
           Cookies.remove(AUTH_INDICATOR_COOKIE);
           localStorage.removeItem("paymentNotificationHidden");

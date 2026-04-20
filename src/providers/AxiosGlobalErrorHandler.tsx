@@ -3,13 +3,12 @@ import { Alert, Snackbar } from "@mui/material";
 import Cookies from "js-cookie";
 import _ from "lodash";
 
+import { AUTH_INDICATOR_COOKIE } from "src/api/client";
 import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
-import useLogout from "src/hooks/useLogout";
 import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
-  const { logout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
@@ -22,7 +21,7 @@ const AxiosGlobalErrorHandler = () => {
     const requestInterceptorId = axios.interceptors.request.use((config) => {
       // cancel the request if auth indicator is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
-      const hasAuth = typeof document !== "undefined" && !!Cookies.get("omnistrate_logged_in");
+      const hasAuth = typeof document !== "undefined" && !!Cookies.get(AUTH_INDICATOR_COOKIE);
 
       if (isProtectedEndpoint && !hasAuth) {
         // Redirect to signin — handles stale sessions (e.g., after deployment migration)
@@ -103,8 +102,17 @@ const AxiosGlobalErrorHandler = () => {
             // router.replace that lets React keep rendering — enough time for
             // the rejected 401 to reach React Query's onError and flash the
             // error snackbar before /signin mounts.
-            fetch("/api/logout", { method: "POST", keepalive: true }).catch(() => {});
-            Cookies.remove("omnistrate_logged_in");
+            // Await so the server finishes clearing the httpOnly cookies
+            // before /signin loads — middleware redirects away from /signin
+            // when the auth cookie is still present and valid, which would
+            // bounce us back. The never-resolving promise below keeps the
+            // caller suspended so the 401 never surfaces as UI error.
+            try {
+              await fetch("/api/logout", { method: "POST", keepalive: true });
+            } catch {
+              // Ignore — we're redirecting regardless.
+            }
+            Cookies.remove(AUTH_INDICATOR_COOKIE);
             localStorage.removeItem("paymentNotificationHidden");
             try {
               localStorage.removeItem("loggedInUsingSSO");
@@ -151,7 +159,7 @@ const AxiosGlobalErrorHandler = () => {
       axios.interceptors.request.eject(requestInterceptorId);
       axios.interceptors.response.eject(responseInterceptorId);
     };
-  }, [logout]);
+  }, []);
 
   return (
     <Snackbar open={isOpen} autoHideDuration={5000} onClose={handleClose}>
