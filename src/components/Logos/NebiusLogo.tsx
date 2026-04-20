@@ -2,10 +2,10 @@ import { FC, useId } from "react";
 
 import { SVGIconProps } from "src/types/common/generalTypes";
 
-const NebiusLogo: FC<SVGIconProps> = () => {
+const NebiusLogo: FC<SVGIconProps> = (props) => {
   const clipId = useId();
   return (
-    <svg width="80" height="22" viewBox="0 0 80 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="80" height="22" viewBox="0 0 80 22" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <g clipPath={`url(#${clipId})`}>
         <path
           d="M74.2101 0H5.48449C2.45598 0 0 2.48334 0 5.54682V16.4532C0 19.5167 2.45598 22 5.48449 22H74.2101C77.2397 22 79.6947 19.5167 79.6947 16.4532V5.54682C79.6947 2.48334 77.2385 0 74.2101 0Z"

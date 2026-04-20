@@ -52,4 +52,5 @@ export const CLOUD_PROVIDERS = {
   gcp: "gcp",
   azure: "azure",
   oci: "oci",
+  //add nebius later for custom network and cloud account creation
 };
