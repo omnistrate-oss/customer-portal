@@ -1,9 +1,15 @@
 import { Page } from "@playwright/test";
+import { isReplayMode } from "test-fixtures/api-fixture";
 import { BackendError } from "test-utils/backend-error";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { dataTestIds } from "./constants/instances-page";
 import { PageURLs } from "./pages";
+
+// Replay serves HAR responses instantly, so poll aggressively to consume state
+// transitions as fast as React can re-render. In live/record mode, wait 15s
+// between polls to match the real backend reconciliation cadence.
+const defaultPollingInterval = () => (isReplayMode() ? 300 : 15000);
 
 export class InstancesPage {
   page: Page;
@@ -46,7 +52,7 @@ export class InstancesPage {
     logPrefix: string,
     options = {
       timeout: 10 * 60 * 1000, // 10 Minutes Max Timeout
-      pollingInterval: 15000, // 15 Seconds
+      pollingInterval: defaultPollingInterval(),
     }
   ) {
     const startTime = Date.now();
@@ -80,7 +86,7 @@ export class InstancesPage {
     logPrefix: string,
     options = {
       timeout: 10 * 60 * 1000, // 10 Minutes Max Timeout
-      pollingInterval: 15000, // 15 Seconds
+      pollingInterval: defaultPollingInterval(),
     }
   ) {
     const startTime = Date.now();
