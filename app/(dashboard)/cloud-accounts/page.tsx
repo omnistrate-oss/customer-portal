@@ -1,18 +1,11 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
 
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -39,6 +32,13 @@ import {
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
 import { getCloudAccountsRoute } from "src/utils/routes";
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -57,8 +57,8 @@ import {
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
-import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
+import { DIALOG_DATA } from "./constants";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -191,7 +191,8 @@ const CloudAccountsPage = () => {
           resultParams?.gcp_project_id?.toLowerCase().includes(searchText.toLowerCase()) ||
           resultParams?.aws_account_id?.toLowerCase().includes(searchText.toLowerCase()) ||
           resultParams?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase())
+          resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase()) ||
+          resultParams?.nebius_tenant_id?.toLowerCase().includes(searchText.toLowerCase())
         );
       });
     }
@@ -246,6 +247,7 @@ const CloudAccountsPage = () => {
             resultParams?.aws_account_id ||
             resultParams?.azure_subscription_id ||
             resultParams?.oci_tenancy_id ||
+            resultParams?.nebius_tenant_id ||
             "-"
           );
         },
@@ -259,6 +261,7 @@ const CloudAccountsPage = () => {
               resultParams?.aws_account_id ||
               resultParams?.azure_subscription_id ||
               resultParams?.oci_tenancy_id ||
+              resultParams?.nebius_tenant_id ||
               "-";
 
             return <GridCellExpand value={value} copyButton={value !== "-"} />;
@@ -274,19 +277,17 @@ const CloudAccountsPage = () => {
         cell: (data) => {
           const status = data.row.original.status;
           let statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
-          const showInstructions = [
-            "VERIFYING",
-            "PENDING",
-            "PENDING_DEPENDENCY",
-            "UNKNOWN",
-            "DEPLOYING",
-            "READY",
-            "FAILED",
-          ].includes(status as string);
+          const resultParams = getResultParams(data.row.original);
+          const isNebius = !!resultParams?.nebius_tenant_id;
+
+          const showInstructions =
+            !isNebius &&
+            ["VERIFYING", "PENDING", "PENDING_DEPENDENCY", "UNKNOWN", "DEPLOYING", "READY", "FAILED"].includes(
+              status as string
+            );
 
           let isReadyToOffboard = false;
           let isOffboarding = false;
-          const resultParams = getResultParams(data.row.original);
 
           const linkedAccountConfig = accountConfigsHash[resultParams?.cloud_provider_account_config_id];
 
@@ -438,6 +439,7 @@ const CloudAccountsPage = () => {
           else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
           else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
           else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
+          else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
           return cloudProvider;
         },
         {
@@ -450,6 +452,7 @@ const CloudAccountsPage = () => {
             else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
             else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
             else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
+            else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
           },
