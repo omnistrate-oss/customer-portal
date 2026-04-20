@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import createFetchClient from "openapi-fetch";
 
 import { paths } from "src/types/schema";
-import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
+import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 import { refreshAuth } from "./refreshAuth";
 
@@ -111,7 +111,30 @@ apiClient.use({
     if (!response.ok) {
       const ignoreGlobalErrorSnack = request.headers.get("x-ignore-global-error");
 
-      if (response.status === 401) {
+      // Parse the body once up front so isAuthError can inspect the backend's
+      // error message (needed to detect 400 "token is missing from header").
+      let parsedMessage: string | null = null;
+      let parseError: unknown = null;
+      try {
+        const contentType = response.headers.get("content-type");
+        const hasJsonContent = contentType && contentType.includes("application/json");
+        const responseText = await response.clone().text();
+        if (hasJsonContent && responseText.trim()) {
+          try {
+            const body = JSON.parse(responseText);
+            parsedMessage = body?.message ?? (responseText.trim() || null);
+          } catch (err) {
+            parseError = err;
+            parsedMessage = responseText.trim() || null;
+          }
+        } else if (responseText.trim()) {
+          parsedMessage = responseText;
+        }
+      } catch (err) {
+        parseError = err;
+      }
+
+      if (isAuthError(response.status, parsedMessage)) {
         // Check if this isn't the signin URL to avoid redirect loops
         if (!response.url.endsWith("/signin")) {
           // Attempt silent token refresh before forcing logout
@@ -124,7 +147,7 @@ apiClient.use({
             }
           }
 
-          // Refresh failed or retry still 401 — force logout
+          // Refresh failed or retry still unauthorized — force logout
           // Clear httpOnly cookies via server-side route so middleware
           // won't redirect back from /signin (breaking the loop)
           await fetch("/api/logout", { method: "POST" }).catch(() => {});
@@ -143,44 +166,20 @@ apiClient.use({
         const status = String(response.status);
 
         if (status.startsWith("4") || status.startsWith("5")) {
-          try {
-            // Check if response has content before trying to parse JSON
-            const contentType = response.headers.get("content-type");
-            const hasJsonContent = contentType && contentType.includes("application/json");
-            const responseText = await response.clone().text();
+          if (parseError) {
+            console.warn("Failed to parse error response:", parseError);
+          }
+          const message = parsedMessage || "Something went wrong please try again later";
 
-            let message = "Something went wrong please try again later";
+          const ignoredMessages = [
+            "You have not been subscribed to a service yet.",
+            "Your provider has not enabled billing for the user.",
+            "You have not been enrolled in a service plan with a billing plan yet.",
+            "Your provider has not enabled billing for the services.",
+          ];
 
-            if (hasJsonContent && responseText.trim()) {
-              try {
-                const error = JSON.parse(responseText);
-                message = error.message || message;
-              } catch (parseError) {
-                console.warn("Failed to parse error response as JSON:", parseError);
-                // Use responseText as message if it's not empty
-                if (responseText.trim()) {
-                  message = responseText;
-                }
-              }
-            } else if (responseText.trim()) {
-              // Use response text if available
-              message = responseText;
-            }
-
-            const ignoredMessages = [
-              "You have not been subscribed to a service yet.",
-              "Your provider has not enabled billing for the user.",
-              "You have not been enrolled in a service plan with a billing plan yet.",
-              "Your provider has not enabled billing for the services.",
-            ];
-
-            if (!ignoredMessages.includes(message)) {
-              globalErrorHandler(new Error(message));
-            }
-          } catch (error) {
-            console.warn("Error handling response:", error);
-            // Fallback to generic error message
-            globalErrorHandler(new Error("Something went wrong please try again later"));
+          if (!ignoredMessages.includes(message)) {
+            globalErrorHandler(new Error(message));
           }
         }
       }

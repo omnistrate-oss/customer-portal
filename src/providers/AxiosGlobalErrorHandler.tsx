@@ -6,7 +6,7 @@ import _ from "lodash";
 import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
 import useLogout from "src/hooks/useLogout";
-import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
+import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
   const { logout } = useLogout();
@@ -82,7 +82,7 @@ const AxiosGlobalErrorHandler = () => {
 
         const ignoreGlobalErrorSnack = error.config?.ignoreGlobalErrorSnack;
 
-        if (error.response && error.response.status === 401) {
+        if (error.response && isAuthError(error.response.status, error.response.data?.message)) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
             // Attempt silent token refresh before forcing logout
             const refreshed = await refreshAuth();

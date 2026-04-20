@@ -27,3 +27,13 @@ export function checkIsNonProtectedEndpoint(url: string): boolean {
 
   return nonProtectedEndpoints.some((endpoint) => url.startsWith(endpoint));
 }
+
+// Backend returns 400 with "token is missing from header" when the auth cookie
+// is absent/empty. Treat it the same as 401 so the refresh-and-retry flow runs.
+export function isAuthError(status: number, message?: string | null): boolean {
+  if (status === 401) return true;
+  if (status === 400 && message) {
+    return /token.*missing.*header/i.test(message);
+  }
+  return false;
+}
