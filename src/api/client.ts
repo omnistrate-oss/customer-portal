@@ -155,10 +155,12 @@ apiClient.use({
             }
           }
 
-          // Refresh failed or retry still unauthorized — force logout
-          // Clear httpOnly cookies via server-side route so middleware
-          // won't redirect back from /signin (breaking the loop)
-          await fetch("/api/logout", { method: "POST" }).catch(() => {});
+          // Refresh failed or retry still unauthorized — force logout.
+          // Clear client state and redirect immediately; fire the server-side
+          // cookie clear as fire-and-forget so we don't block the navigation.
+          // Awaiting here lets React Query surface the 401 as [CRITICAL] and
+          // flashes broken UI before the redirect resolves.
+          fetch("/api/logout", { method: "POST", keepalive: true }).catch(() => {});
 
           Cookies.remove(AUTH_INDICATOR_COOKIE);
           localStorage.removeItem("paymentNotificationHidden");
@@ -169,6 +171,10 @@ apiClient.use({
           }
 
           window.location.href = "/signin";
+
+          // Suppress the 401 from bubbling to callers (React Query onError,
+          // mutation snackbars) while the hard nav is in flight.
+          return new Promise<Response>(() => {});
         }
       } else if (!ignoreGlobalErrorSnack && globalErrorHandler) {
         const status = String(response.status);

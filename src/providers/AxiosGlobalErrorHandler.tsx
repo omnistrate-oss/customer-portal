@@ -99,7 +99,22 @@ const AxiosGlobalErrorHandler = () => {
                 // Retry failed — fall through to logout
               }
             }
-            logout();
+            // Force logout with a hard nav. Using `logout()` here does a soft
+            // router.replace that lets React keep rendering — enough time for
+            // the rejected 401 to reach React Query's onError and flash the
+            // error snackbar before /signin mounts.
+            fetch("/api/logout", { method: "POST", keepalive: true }).catch(() => {});
+            Cookies.remove("omnistrate_logged_in");
+            localStorage.removeItem("paymentNotificationHidden");
+            try {
+              localStorage.removeItem("loggedInUsingSSO");
+            } catch (err) {
+              console.warn("Failed to clear SSO state:", err);
+            }
+            window.location.href = "/signin";
+            // Swallow the rejection so callers don't see the 401 while the
+            // hard nav is in flight.
+            return new Promise(() => {});
           }
         } else if (!ignoreGlobalErrorSnack) {
           if (error.response && error.response.data) {
