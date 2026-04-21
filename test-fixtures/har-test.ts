@@ -23,6 +23,50 @@ import { isRecordMode, isReplayMode } from "./har-mode";
 
 export type HarMode = "record" | "replay" | "off";
 
+// Minimal HAR shape — covers the fields we touch. Avoids `any` leaking through
+// post-processing and replay so missing/renamed fields fail at the boundary.
+type HarHeader = { name: string; value: string };
+type HarPostData = { mimeType?: string; text?: string };
+type HarRequest = { method: string; url: string; headers: HarHeader[]; postData?: HarPostData };
+type HarContent = { text?: string; encoding?: string; mimeType?: string };
+type HarResponse = {
+  status: number;
+  headers: HarHeader[];
+  content: HarContent;
+  _failureText?: string;
+};
+type HarEntry = { request: HarRequest; response: HarResponse };
+type HarFile = { log: { entries: HarEntry[] } };
+
+// Recursively replace values of sensitive-looking keys in JSON bodies. Used to
+// keep credentials out of committed request payloads (e.g. createInstance posts
+// a `password` field). Replay matches on method+URL, so redaction is safe.
+const SENSITIVE_KEY_PATTERN = /password|secret|token|apikey|access[-_]?key|private[-_]?key|credential/i;
+
+const redactSensitive = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(redactSensitive);
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = SENSITIVE_KEY_PATTERN.test(k) ? "[REDACTED]" : redactSensitive(v);
+    }
+    return out;
+  }
+  return value;
+};
+
+const redactJsonPostData = (postData: HarPostData | undefined): void => {
+  if (!postData?.text) return;
+  const mime = (postData.mimeType ?? "").toLowerCase();
+  if (!mime.includes("json")) return;
+  try {
+    const parsed = JSON.parse(postData.text);
+    postData.text = JSON.stringify(redactSensitive(parsed));
+  } catch {
+    // Non-JSON despite the mime type — leave the raw text alone rather than corrupt it.
+  }
+};
+
 type HarFixtures = {
   harMode: HarMode;
   testId: string;
@@ -64,14 +108,14 @@ const ensureDir = (filePath: string): void => {
 };
 
 // Read and decompress a .har.gz file
-const readHarGz = (gzPath: string): any => {
+const readHarGz = (gzPath: string): HarFile => {
   const compressed = fs.readFileSync(gzPath);
   const json = zlib.gunzipSync(new Uint8Array(compressed)).toString("utf-8");
   return JSON.parse(json);
 };
 
 // Compress and write a .har.gz file
-const writeHarGz = (gzPath: string, har: any): void => {
+const writeHarGz = (gzPath: string, har: HarFile): void => {
   const json = JSON.stringify(har);
   const compressed = zlib.gzipSync(new Uint8Array(Buffer.from(json)), { level: 9 });
   fs.writeFileSync(gzPath, new Uint8Array(compressed));
@@ -176,23 +220,25 @@ export const test = base.extend<HarFixtures>({
       // Post-process: remove failed entries, then compress
       if (fs.existsSync(rawHarPath)) {
         try {
-          const har = JSON.parse(fs.readFileSync(rawHarPath, "utf-8"));
-          har.log.entries = har.log.entries.filter((entry: any) => {
+          const har: HarFile = JSON.parse(fs.readFileSync(rawHarPath, "utf-8"));
+          har.log.entries = har.log.entries.filter((entry) => {
             const resp = entry.response;
             if (resp.status < 0) return false;
             if (resp._failureText && resp.status !== 200) return false;
             return true;
           });
 
-          // Strip sensitive headers — they're not used by the replay
-          // matcher (which only matches on method+URL) and are a security concern
+          // Strip sensitive headers and redact sensitive request body fields. The replay
+          // matcher only uses method+URL, so headers/postData aren't needed for matching —
+          // dropping them keeps secrets out of the committed HAR.
           for (const entry of har.log.entries) {
             entry.request.headers = entry.request.headers.filter(
-              (h: any) => !["authorization", "cookie"].includes(h.name.toLowerCase())
+              (h) => !["authorization", "cookie"].includes(h.name.toLowerCase())
             );
             entry.response.headers = entry.response.headers.filter(
-              (h: any) => !["set-cookie"].includes(h.name.toLowerCase())
+              (h) => !["set-cookie"].includes(h.name.toLowerCase())
             );
+            redactJsonPostData(entry.request.postData);
           }
 
           writeHarGz(gzPath, har);
@@ -219,7 +265,7 @@ export const test = base.extend<HarFixtures>({
       // the first unconsumed match. This handles out-of-order requests correctly —
       // if the browser requests URLs in a different order than recorded, each request
       // still gets the right response (first call gets first recorded response, etc.)
-      const entryQueue: any[] = [...har.log.entries];
+      const entryQueue: HarEntry[] = [...har.log.entries];
       const consumed = new Set<number>();
 
       // Track last served response per method+URL for fallback on repeated/polling requests

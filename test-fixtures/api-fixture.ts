@@ -20,6 +20,12 @@ import { isReplayMode } from "./har-mode";
 
 const harsDir = path.resolve(__dirname, "../tests/fixtures/hars", "fixtures");
 
+const readGz = (gzPath: string): Record<string, unknown> => {
+  const compressed = fs.readFileSync(gzPath);
+  const json = zlib.gunzipSync(new Uint8Array(compressed)).toString("utf-8");
+  return JSON.parse(json);
+};
+
 export class ApiFixture {
   private readonly gzPath: string;
   private data: Record<string, unknown> = {};
@@ -28,9 +34,7 @@ export class ApiFixture {
     this.gzPath = path.join(harsDir, `${name}.fixture.json.gz`);
 
     if (isReplayMode() && fs.existsSync(this.gzPath)) {
-      const compressed = fs.readFileSync(this.gzPath);
-      const json = zlib.gunzipSync(new Uint8Array(compressed)).toString("utf-8");
-      this.data = JSON.parse(json);
+      this.data = readGz(this.gzPath);
     }
   }
 
@@ -48,19 +52,37 @@ export class ApiFixture {
 
     const value = await factory();
     this.data[key] = value;
-    this.flush();
+    this.flush(key, value);
     return value;
   }
 
-  // Write fixture data to disk (called automatically after each getOrCreate).
-  private flush(): void {
+  /**
+   * Persist the latest write. Re-reads any concurrent writes from disk and merges before
+   * writing, then renames atomically. Playwright runs workers as separate processes that
+   * may share a fixture file (e.g. the per-subscription fixture); merge-on-write prevents
+   * one worker from clobbering another's keys, and the rename keeps readers from seeing
+   * a half-written file.
+   */
+  private flush(latestKey: string, latestValue: unknown): void {
     const dir = path.dirname(this.gzPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
+
+    if (fs.existsSync(this.gzPath)) {
+      try {
+        const onDisk = readGz(this.gzPath);
+        this.data = { ...onDisk, ...this.data, [latestKey]: latestValue };
+      } catch {
+        // Corrupt or partially-written file from a concurrent flush — overwrite with our copy.
+      }
+    }
+
     const json = JSON.stringify(this.data, null, 2);
     const compressed = zlib.gzipSync(new Uint8Array(Buffer.from(json)), { level: 9 });
-    fs.writeFileSync(this.gzPath, new Uint8Array(compressed));
+    const tmpPath = `${this.gzPath}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpPath, new Uint8Array(compressed));
+    fs.renameSync(tmpPath, this.gzPath);
   }
 }
 
