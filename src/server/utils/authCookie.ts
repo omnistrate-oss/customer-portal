@@ -1,14 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export const COOKIE_NAME = "omnistrate_token";
-export const REFRESH_COOKIE_NAME = "omnistrate_refresh_token";
+import {
+  COOKIE_NAME,
+  INDICATOR_COOKIE_NAME,
+  INDICATOR_MAX_AGE,
+  isSecureCookie,
+  MAX_AGE,
+  REFRESH_COOKIE_NAME,
+  REFRESH_MAX_AGE,
+} from "./authCookieConstants";
 
-// 1 day in seconds
-const MAX_AGE = 86400;
-// 7 days for refresh token
-const REFRESH_MAX_AGE = 604800;
-
-const isSecure = process.env.NODE_ENV === "production";
+export { COOKIE_NAME, REFRESH_COOKIE_NAME };
 
 /**
  * Appends a Set-Cookie header without overwriting existing ones.
@@ -26,7 +28,7 @@ function appendSetCookieHeader(res: NextApiResponse, cookie: string) {
  */
 export function setAuthCookie(res: NextApiResponse, token: string) {
   const parts = [`${COOKIE_NAME}=${token}`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=${MAX_AGE}`];
-  if (isSecure) parts.push("Secure");
+  if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
 }
@@ -42,7 +44,7 @@ export function setRefreshCookie(res: NextApiResponse, refreshToken: string) {
     `SameSite=Lax`,
     `Max-Age=${REFRESH_MAX_AGE}`,
   ];
-  if (isSecure) parts.push("Secure");
+  if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
 }
@@ -53,8 +55,8 @@ export function setRefreshCookie(res: NextApiResponse, refreshToken: string) {
  */
 export function setIndicatorCookie(res: NextApiResponse) {
   // Not HttpOnly — must be readable by client-side JavaScript
-  const parts = [`omnistrate_logged_in=true`, `Path=/`, `SameSite=Lax`, `Max-Age=${REFRESH_MAX_AGE}`];
-  if (isSecure) parts.push("Secure");
+  const parts = [`${INDICATOR_COOKIE_NAME}=true`, `Path=/`, `SameSite=Lax`, `Max-Age=${INDICATOR_MAX_AGE}`];
+  if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
 }
@@ -64,7 +66,7 @@ export function setIndicatorCookie(res: NextApiResponse) {
  */
 export function clearAuthCookie(res: NextApiResponse) {
   const parts = [`${COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=0`];
-  if (isSecure) parts.push("Secure");
+  if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
 }
@@ -74,7 +76,7 @@ export function clearAuthCookie(res: NextApiResponse) {
  */
 export function clearRefreshCookie(res: NextApiResponse) {
   const parts = [`${REFRESH_COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=0`];
-  if (isSecure) parts.push("Secure");
+  if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
 }
