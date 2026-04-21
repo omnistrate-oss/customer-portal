@@ -27,6 +27,9 @@ export type Field = {
   // Password Field
   showPasswordGenerator?: boolean;
 
+  // Code Editor
+  language?: "shell" | "json" | "yaml";
+
   // Generic
   value?: any;
   previewValue?: ((props: { field: Field; formData: any }) => ReactElement | null) | string | null;
