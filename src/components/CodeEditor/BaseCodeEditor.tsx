@@ -128,7 +128,7 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
         <Stack direction="row" gap="5px" alignItems="center">
           {isReadOnly ? <LockIcon /> : <CurlyBracesIcon />}
           <Text weight="regular" size="xsmall" color="#FFFFFF">
-            {isReadOnly ? "Readonly" : (label ?? `${languageLabelMap[language]}`)}
+            {label ?? languageLabelMap[language]}{isReadOnly ? " (Read Only)" : ""}
           </Text>
         </Stack>
         <Stack direction="row" alignItems="center">
