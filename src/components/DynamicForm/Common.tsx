@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Box, InputAdornment, Stack } from "@mui/material";
+import { getJsonValue } from "app/(dashboard)/instances/utils";
 import Generator from "generate-password";
 
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
@@ -435,7 +436,7 @@ export const CodeEditorField = ({ field, formData }: { field: Field; formData: a
   return (
     <CodeEditor
       language={field.language || "json"}
-      value={typeof value === "string" ? value : JSON.stringify(value, null, 2)}
+      value={typeof value === "string" ? value : getJsonValue(value)}
       onChange={(val) => {
         formData.setFieldValue(field.name, val);
       }}
