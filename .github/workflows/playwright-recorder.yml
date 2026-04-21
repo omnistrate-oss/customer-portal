@@ -155,8 +155,10 @@ jobs:
         FAILED_SPECS="${{ steps.soft-failures.outputs.failed_specs }}"
         if [ -n "$FAILED_SPECS" ]; then
           for spec in $FAILED_SPECS; do
-            # HAR dirs are at {project}/{specName}/ — find and unstage all matches
-            MATCHES=$(find . -type d -name "$spec" 2>/dev/null || true)
+            # HAR dirs live at exactly {project}/{specName}/ — depth 2 from repo root.
+            # Restricting depth keeps a stray nested directory with the same name
+            # (e.g. a snapshot folder) from being unstaged.
+            MATCHES=$(find . -mindepth 2 -maxdepth 2 -type d -name "$spec" 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
               echo "Excluding HAR files for soft-failed spec: $spec"
               for dir in $MATCHES; do

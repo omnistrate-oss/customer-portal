@@ -1,18 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
+import { isRecordMode, isReplayMode } from "test-fixtures/har-mode";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-
-const harMode = process.env.HAR_MODE?.toLowerCase();
-const isReplayMode = harMode === "replay";
-const isRecordMode = harMode === "record";
 
 // Replay mode: deterministic (0 retries), instant responses (short timeout)
 // Record mode: 2 workers to balance speed vs deterministic capture
 const getWorkers = () => {
-  if (isRecordMode) return 2;
-  if (isReplayMode) return process.env.CI ? 1 : 3;
+  if (isRecordMode()) return 2;
+  if (isReplayMode()) return process.env.CI ? 1 : 3;
   return process.env.CI ? 1 : 2;
 };
 
@@ -26,11 +23,11 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: isReplayMode ? 0 : process.env.CI ? 2 : 1,
+  retries: isReplayMode() ? 0 : process.env.CI ? 2 : 1,
   workers: getWorkers(),
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"]],
 
-  timeout: isReplayMode ? 60 * 1000 : 12 * 60 * 1000,
+  timeout: isReplayMode() ? 60 * 1000 : 12 * 60 * 1000,
 
   use: {
     actionTimeout: 30 * 1000,

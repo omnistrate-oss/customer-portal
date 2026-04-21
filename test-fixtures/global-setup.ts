@@ -1,12 +1,10 @@
 import { yamlTemplates } from "constants/yaml-templates";
 import { ApiFixture } from "test-fixtures/api-fixture";
+import { isRecordMode, isReplayMode } from "test-fixtures/har-mode";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
 import { clearSoftFailureReport } from "test-utils/soft-failure-tracker";
 import { UserAPIClient } from "test-utils/user-api-client";
-
-const isReplayMode = process.env.HAR_MODE?.toLowerCase() === "replay";
-const isRecordMode = process.env.HAR_MODE?.toLowerCase() === "record";
 
 async function globalSetup() {
   console.log(`Running Global Setup... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
@@ -16,7 +14,7 @@ async function globalSetup() {
 
   // In replay mode, load saved state from fixture — but refresh the provider token
   // (24h JWT expiry means the stored one goes stale between HAR recording and replay).
-  if (isReplayMode) {
+  if (isReplayMode()) {
     const fixture = new ApiFixture("global-setup");
     const savedState = await fixture.getOrCreate("globalState", () => ({}));
     GlobalStateManager.setState(savedState);
@@ -82,16 +80,18 @@ async function globalSetup() {
 
   GlobalStateManager.setState({ date });
 
-  // In record mode, save the global state for replay. Strip auth tokens —
-  // replay mode re-authenticates at runtime instead of reading JWTs from the
-  // committed fixture to keep secrets out of version control.
-  if (isRecordMode) {
+  // In record mode, save the global state for replay. Allowlist the safe fields
+  // explicitly — keeps auth tokens out of the committed fixture, and forces a
+  // deliberate decision when GlobalState gains new fields.
+  if (isRecordMode()) {
     const fixture = new ApiFixture("global-setup");
     await fixture.getOrCreate("globalState", () => {
-      const { providerToken, userToken, ...safeState } = GlobalStateManager.loadState();
-      void providerToken;
-      void userToken;
-      return safeState;
+      const state = GlobalStateManager.loadState();
+      return {
+        date: state.date,
+        serviceOfferings: state.serviceOfferings,
+        subscriptions: state.subscriptions,
+      };
     });
     console.log("Global state saved to fixture (record mode)");
   }

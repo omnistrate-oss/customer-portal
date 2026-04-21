@@ -16,19 +16,13 @@ import * as fs from "fs";
 import * as path from "path";
 import * as zlib from "zlib";
 
+import { isReplayMode } from "./har-mode";
+
 const harsDir = path.resolve(__dirname, "../tests/fixtures/hars", "fixtures");
 
-const isReplayMode = (): boolean => {
-  return process.env.HAR_MODE?.toLowerCase() === "replay";
-};
-
-const isRecordMode = (): boolean => {
-  return process.env.HAR_MODE?.toLowerCase() === "record";
-};
-
 export class ApiFixture {
-  private gzPath: string;
-  private data: Record<string, any> = {};
+  private readonly gzPath: string;
+  private data: Record<string, unknown> = {};
 
   constructor(name: string) {
     this.gzPath = path.join(harsDir, `${name}.fixture.json.gz`);
@@ -70,5 +64,4 @@ export class ApiFixture {
   }
 }
 
-// Returns true if running in replay mode — use to skip cleanup in afterAll
-export { isRecordMode, isReplayMode };
+export { isRecordMode, isReplayMode } from "./har-mode";

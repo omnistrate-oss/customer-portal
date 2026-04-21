@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { isReplayMode } from "test-fixtures/api-fixture";
+import { isReplayMode } from "test-fixtures/har-mode";
 import { BackendError } from "test-utils/backend-error";
 import { UserAPIClient } from "test-utils/user-api-client";
 

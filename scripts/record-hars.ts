@@ -366,10 +366,14 @@ const main = async () => {
   heading("Running Playwright tests in record mode");
 
   const pwArgs = buildPlaywrightArgs(opts);
-  const pwCommand = `yarn playwright test ${pwArgs.join(" ")}`;
 
-  console.log(`> HAR_MODE=record ${pwCommand}\n`);
-  run(pwCommand, { env: { ...process.env, HAR_MODE: "record" } });
+  // execFileSync (not execSync) — pwArgs include resolved spec paths that may
+  // contain spaces or shell metacharacters. Avoid the shell entirely.
+  console.log(`> HAR_MODE=record yarn playwright test ${pwArgs.join(" ")}\n`);
+  execFileSync("yarn", ["playwright", "test", ...pwArgs], {
+    stdio: "inherit",
+    env: { ...process.env, HAR_MODE: "record" },
+  });
 
   console.log("\nTests passed.");
 

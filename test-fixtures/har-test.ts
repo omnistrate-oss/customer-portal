@@ -19,6 +19,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as zlib from "zlib";
 
+import { isRecordMode, isReplayMode } from "./har-mode";
+
 export type HarMode = "record" | "replay" | "off";
 
 type HarFixtures = {
@@ -28,10 +30,8 @@ type HarFixtures = {
 };
 
 const getHarMode = (): HarMode => {
-  const mode = process.env.HAR_MODE?.toLowerCase();
-  if (mode === "record" || mode === "replay") {
-    return mode;
-  }
+  if (isRecordMode()) return "record";
+  if (isReplayMode()) return "replay";
   return "off";
 };
 
@@ -258,10 +258,11 @@ export const test = base.extend<HarFixtures>({
           } else {
             // Fail fast: serving synthetic responses here masks missing coverage and lets
             // tests pass against unexpected API calls. Re-record the HAR if this fires.
-            const errorMessage = `[HAR REPLAY] No matching HAR entry found for ${method} ${url}`;
-            console.error(errorMessage);
+            // The abort surfaces as a network failure to the page; the test will fail on
+            // the resulting expect/await. Throwing from this handler would land as an
+            // unhandled rejection — abort is the deterministic signal.
+            console.error(`[HAR REPLAY] No matching HAR entry found for ${method} ${url}`);
             await route.abort("failed");
-            throw new Error(errorMessage);
           }
           return;
         }
