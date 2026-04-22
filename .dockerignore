@@ -15,8 +15,8 @@ fly.*.toml
 # Test and dev files
 # Note: page-objects/ and test-utils/ are intentionally NOT excluded.
 # Production components (e.g. CreateInstanceModal, AuditLogs, Logs) import
-# dataTestIds/pageElements constants from page-objects/, which transitively
-# imports BackendError/UserAPIClient from test-utils/.
+# dataTestIds/pageElements constants from page-objects/constants/..., so
+# these paths cannot be excluded from the build context.
 tests
 test-fixtures
 test-results

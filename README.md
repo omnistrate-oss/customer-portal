@@ -56,11 +56,15 @@ To build and run the Customer Portal locally
 node --version
 ```
 
-2. Visit the Yarn website: Go to <https://classic.yarnpkg.com/lang/en/docs/install/> and follow platform-specific instructions for your operating system (Linux, macOS, Windows) to install yarn classic (1.x). Check the yarn version (1.22.19 as of March 13, 2024) to confirm successful installation.
+2. Enable Yarn Berry (4.x) via Corepack, which ships with Node.js. The project's `packageManager` field pins the exact Yarn version used by this repo.
 
 ```bash
+corepack enable
+corepack prepare yarn@4.5.0 --activate
 yarn --version
 ```
+
+The install commands below rely on Yarn Berry features (`YARN_ENABLE_SCRIPTS` env var and `yarn rebuild`) that are not available in Yarn 1.x.
 
 3. Clone the Repository: Use Git to clone the repository to your local machine.
 
