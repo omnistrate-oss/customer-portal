@@ -89,10 +89,6 @@ export async function proxy(request) {
       const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Mirror signin: send environmentType so the backend routes the
-        // refresh against the same user pool that minted the token. Without
-        // it, DEV sessions can have their refresh interpreted as PROD and
-        // fail intermittently.
         body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
         // Cap the wait so a stalled backend doesn't hang navigation. A timeout
         // (or any other fetch error) falls through to the catch below and
