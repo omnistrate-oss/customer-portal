@@ -865,7 +865,8 @@ export const getDeploymentConfigurationFields = (
         disabled: formMode !== "create" && param.custom && !param.modifiable,
         name: `requestParams.${param.key}`,
         value: getJsonValue(values.requestParams[param.key]),
-        type: "text-multiline",
+        type: "code-editor",
+        language: "json",
         required: param.required,
         previewValue: getJsonValue(values.requestParams[param.key]),
       });
