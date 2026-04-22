@@ -53,74 +53,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   onDisconnectClick,
   serviceModelType,
 }) => {
-
-
-
-  const isDeploying = selectedInstance?.status === "DEPLOYING";
-  const isAttaching = selectedInstance?.status === "ATTACHING";
-  const isConnecting = selectedInstance?.status === "CONNECTING";
-  const isDisconnected = selectedInstance?.status === "DISCONNECTED";
-
-  const isOnPremCopilot = serviceModelType === "ON_PREM_COPILOT";
-  const isReady = selectedInstance?.status === "READY";
-  const isDisconnecting = selectedInstance?.status === "DISCONNECTING";
-
-  const isDetaching = selectedInstance?.status === "DETACHING";
-  const isPendingDetaching = selectedInstance?.status === "PENDING_DETACHING";
-  const isDeleting = selectedInstance?.status === "DELETING";
-
-  const isDisconnectDisabled =
-    !selectedInstance || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
-
-  const isConnectDisabled =
-    !selectedInstance ||
-    isReady ||
-    isDisconnecting ||
-    isDetaching ||
-    isPendingDetaching ||
-    isDeploying ||
-    !isOnPremCopilot;
-
-  const isDeleteDisabled = !selectedInstance || isDeleting || isDisconnected || isSelectedInstanceReadyToOffboard;
-
-  const isOffboardDisabled = !isSelectedInstanceReadyToOffboard;
-
-  const isDisconnectDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-    : isAttaching || isConnecting
-      ? "Cloud account is connecting"
-      : isDisconnected
-        ? "Cloud account is disconnected"
-        : isDeploying
-          ? "Please wait for the instance to get to Ready state"
-          : !isOnPremCopilot
-            ? "This feature is not supported for this plan"
-            : "";
-  const isConnectDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-    : isReady
-      ? "Cloud account is already connected"
-      : isDisconnecting || isDetaching || isPendingDetaching
-        ? "Cloud account is disconnecting"
-        : isDeploying
-          ? "Please wait for the instance to get to Ready state"
-          : !isOnPremCopilot
-            ? "This feature is not supported for this plan"
-            : "";
-
-  const isDeleteDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-    : isDeleting
-      ? "Cloud account deletion is already in progress"
-      : isDisconnected
-        ? "Cloud account is disconnected"
-        : "";
-
-  const offboardingDisabledMessage = !selectedInstance
-    ? "Please select a cloud account"
-
-
-
   return (
     <div className="py-5 px-6 flex items-center justify-between gap-4">
       <DataGridHeaderTitle
@@ -151,6 +83,9 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           subscription={selectedInstanceSubscription}
           onDeleteClick={onDeleteClick}
           onOffboardClick={() => onOffboardClick?.()}
+          onConnectClick={onConnectClick}
+          onDisconnectClick={onDisconnectClick}
+          serviceModelType={serviceModelType}
           isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
         />
       </div>

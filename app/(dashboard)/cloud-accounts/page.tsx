@@ -358,8 +358,17 @@ const CloudAccountsPage = () => {
                   </Box>
                 </Tooltip>
               )}
-              {showDisconnectInstructions && (
-                <Tooltip title="View disconnect cloud account">
+
+              {(showDisconnectInstructions || showConnectInstructions) && (
+                <Tooltip
+                  title={
+                    showDisconnectInstructions
+                      ? "View disconnect cloud account"
+                      : showConnectInstructions
+                        ? "View connect cloud account"
+                        : ""
+                  }
+                >
                   <Box
                     sx={{
                       cursor: "pointer",
@@ -368,26 +377,14 @@ const CloudAccountsPage = () => {
                     }}
                     onClick={() => {
                       setClickedInstance(data.row.original);
-                      setIsOverlayOpen(true);
-                      setOverlayType("disconnect-dialog");
-                    }}
-                  >
-                    <ViewInstructionsIcon />
-                  </Box>
-                </Tooltip>
-              )}
-              {showConnectInstructions && (
-                <Tooltip title="View connect cloud account">
-                  <Box
-                    sx={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                    onClick={() => {
-                      setClickedInstance(data.row.original);
-                      setIsOverlayOpen(true);
-                      setOverlayType("connect-dialog");
+                      if (showDisconnectInstructions) {
+                        setOverlayType("disconnect-dialog");
+                        setIsOverlayOpen(true);
+                      }
+                      if (showConnectInstructions) {
+                        setOverlayType("connect-dialog");
+                        setIsOverlayOpen(true);
+                      }
                     }}
                   >
                     <ViewInstructionsIcon />
@@ -875,6 +872,16 @@ const CloudAccountsPage = () => {
               setIsOverlayOpen(true);
               setOverlayType("delete-dialog");
             },
+            onConnectClick: () => {
+              setClickedInstance(selectedInstance);
+              setIsOverlayOpen(true);
+              setOverlayType("connect-dialog");
+            },
+            onDisconnectClick: () => {
+              setClickedInstance(selectedInstance);
+              setIsOverlayOpen(true);
+              setOverlayType("disconnect-dialog");
+            },
             selectedInstance,
             refetchInstances: refetchInstances,
             isFetchingInstances: isFetchingInstances,
@@ -884,6 +891,7 @@ const CloudAccountsPage = () => {
             setOverlayType: setOverlayType,
             setIsOverlayOpen: setIsOverlayOpen,
             selectedInstanceSubscription,
+            serviceModelType: selectedInstanceOffering?.serviceModelType,
           }}
           isLoading={isInstancesPending || isAccountConfigsPending}
           selectionMode="single"
