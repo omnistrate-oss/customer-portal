@@ -89,7 +89,14 @@ export async function proxy(request) {
       const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken: refreshToken.value }),
+        // Mirror signin: send environmentType so the backend routes the
+        // refresh against the same user pool that minted the token. Without
+        // it, DEV sessions can have their refresh interpreted as PROD and
+        // fail intermittently.
+        body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
+        // Cap the wait so a stalled backend doesn't hang navigation; the
+        // client-side 401 recovery can still take over on timeout.
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!refreshResponse.ok) {
@@ -109,38 +116,43 @@ export async function proxy(request) {
     }
   }
 
-  try {
-    // Defense in depth for the "JWT present and not yet expired" path — catches
-    // server-side invalidation (admin revoke, user logged out elsewhere). Skip
-    // when we just refreshed, since the backend just minted the JWT.
-    if (!refreshedToken) {
-      const userData = await fetch(`${baseURL}/user`, {
+  // Defense in depth for the "JWT present and not yet expired" path — catches
+  // server-side invalidation (admin revoke, user logged out elsewhere). Skip
+  // when we just refreshed, since the backend just minted the JWT.
+  //
+  // Fail-open on network errors / timeouts: this runs on every navigation,
+  // and a slow backend shouldn't randomly log users out. A definitive non-200
+  // from the backend is the only signal we treat as invalidation — anything
+  // else (timeout, connection reset, DNS blip) falls through and the
+  // client-side 401 flow remains the ultimate safety net.
+  if (!refreshedToken) {
+    let userData;
+    try {
+      userData = await fetch(`${baseURL}/user`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${activeToken}`,
-        },
+        headers: { Authorization: `Bearer ${activeToken}` },
+        signal: AbortSignal.timeout(5000),
       });
-
-      if (userData?.status !== 200) {
-        return redirectToSignInAndClearAuth();
-      }
+    } catch (error) {
+      console.warn("Middleware /user check unavailable, continuing", error instanceof Error ? error.message : error);
     }
 
-    if (path.startsWith("/signin")) {
-      let destination = request.nextUrl.searchParams.get("destination");
-
-      if (!destination || destination.startsWith("//") || !destination.startsWith("/") || !PAGE_TITLE_MAP[destination]) {
-        destination = "/instances";
-      }
-
-      const response = NextResponse.redirect(new URL(destination, request.url));
-      response.headers.set(`x-middleware-cache`, `no-cache`);
-      applyRefreshedCookies(response, refreshedToken);
-      return response;
+    if (userData && userData.status !== 200) {
+      return redirectToSignInAndClearAuth();
     }
-  } catch (error) {
-    console.error("Middleware Error", error instanceof Error ? error.message : error);
-    return redirectToSignInAndClearAuth();
+  }
+
+  if (path.startsWith("/signin")) {
+    let destination = request.nextUrl.searchParams.get("destination");
+
+    if (!destination || destination.startsWith("//") || !destination.startsWith("/") || !PAGE_TITLE_MAP[destination]) {
+      destination = "/instances";
+    }
+
+    const response = NextResponse.redirect(new URL(destination, request.url));
+    response.headers.set(`x-middleware-cache`, `no-cache`);
+    applyRefreshedCookies(response, refreshedToken);
+    return response;
   }
 
   const response = NextResponse.next();

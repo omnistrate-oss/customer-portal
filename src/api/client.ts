@@ -186,9 +186,20 @@ apiClient.use({
             // Anything else would throw "Request body is already used".
             const isBodyless = request.method === "GET" || request.method === "HEAD";
             if (retryClone || isBodyless) {
-              const retryResponse = await fetch(retryClone ?? request);
-              if (retryResponse.ok) {
-                return retryResponse;
+              // Yield a microtask so the Set-Cookie from /api/refresh-token is
+              // reliably visible to this fetch — some browsers don't guarantee
+              // cookie-jar visibility within the same microtask.
+              await Promise.resolve();
+              try {
+                const retryResponse = await fetch(retryClone ?? request);
+                if (retryResponse.ok) {
+                  return retryResponse;
+                }
+              } catch {
+                // Retry threw (network blip, abort, etc.) — fall through to
+                // the logout block below. Without this catch the error escapes
+                // onResponse and app/error.tsx renders for a flash before any
+                // subsequent request triggers the redirect.
               }
             }
           }

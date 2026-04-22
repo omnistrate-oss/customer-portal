@@ -1,6 +1,6 @@
 const Axios = require("axios");
 
-const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
+const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.dev";
 
 const baseURL = baseDomain + "/2022-09-01-00";
 

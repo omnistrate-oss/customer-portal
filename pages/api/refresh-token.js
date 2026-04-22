@@ -1,3 +1,4 @@
+import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 import {
   setAuthCookie,
   setRefreshCookie,
@@ -26,10 +27,13 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
   }
 
   try {
+    // Mirror signin: send environmentType so the backend routes the refresh
+    // against the same user pool that minted the token. Without it, a DEV
+    // portal's refresh can be interpreted as PROD and fail intermittently.
     const backendResponse = await fetch(`${baseDomain}/2022-09-01-00/refresh-token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({ refreshToken, environmentType: getEnvironmentType() }),
     });
 
     if (!backendResponse.ok) {
