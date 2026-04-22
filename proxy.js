@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 import { baseURL } from "src/axios";
 import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
+import { COOKIE_NAME, REFRESH_COOKIE_NAME } from "src/server/utils/authCookieConstants";
 import {
   clearAuthCookieEdge,
   clearIndicatorCookieEdge,
@@ -16,8 +17,8 @@ import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 const environmentType = getEnvironmentType();
 
 export async function proxy(request) {
-  const authToken = request.cookies.get("omnistrate_token");
-  const refreshToken = request.cookies.get("omnistrate_refresh_token");
+  const authToken = request.cookies.get(COOKIE_NAME);
+  const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME);
   const path = request.nextUrl.pathname;
 
   if (path.startsWith("/signup") || path.startsWith("/reset-password") || path.startsWith("/change-password")) {
@@ -40,21 +41,40 @@ export async function proxy(request) {
   };
 
   // Clears all three cookies before redirecting — a stale indicator
-  // cookie would otherwise trick the client into a refresh loop.
-  const redirectToSignInAndClearAuth = () => {
-    const response = buildRedirectToSignIn();
-    if (!response) return undefined;
+  // cookie would otherwise trick the client into a refresh loop. When
+  // we're already on /signin, still clear cookies via NextResponse.next()
+  // rather than returning undefined (no-op).
+  const clearAuthCookies = (response) => {
     clearAuthCookieEdge(response);
     clearRefreshCookieEdge(response);
     clearIndicatorCookieEdge(response);
     return response;
+  };
+  const redirectToSignInAndClearAuth = () => {
+    const redirect = buildRedirectToSignIn();
+    if (redirect) return clearAuthCookies(redirect);
+    const passthrough = NextResponse.next();
+    passthrough.headers.set(`x-middleware-cache`, `no-cache`);
+    return clearAuthCookies(passthrough);
   };
 
   // When non-null, we just refreshed — skip the /user check below.
   let refreshedToken = null;
   let activeToken = authToken?.value;
 
-  const tokenMissingOrExpired = !authToken?.value || jwtDecode(authToken.value).exp < Date.now() / 1000;
+  // jwtDecode throws on malformed tokens; treat any decode failure (or a
+  // missing/non-numeric exp) as expired so the refresh/redirect path runs.
+  const isTokenMissingOrExpired = (tokenValue) => {
+    if (!tokenValue) return true;
+    try {
+      const exp = jwtDecode(tokenValue)?.exp;
+      if (typeof exp !== "number") return true;
+      return exp < Date.now() / 1000;
+    } catch {
+      return true;
+    }
+  };
+  const tokenMissingOrExpired = isTokenMissingOrExpired(authToken?.value);
 
   if (tokenMissingOrExpired) {
     // No refresh token → no recovery path, go to signin.
@@ -119,7 +139,7 @@ export async function proxy(request) {
       return response;
     }
   } catch (error) {
-    console.log("Middleware Error", error?.response?.data);
+    console.error("Middleware Error", error instanceof Error ? error.message : error);
     return redirectToSignInAndClearAuth();
   }
 
