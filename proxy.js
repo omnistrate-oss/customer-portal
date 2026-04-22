@@ -128,7 +128,10 @@ export async function proxy(request) {
       console.warn("Middleware /user check unavailable, continuing", error instanceof Error ? error.message : error);
     }
 
-    if (userData && userData.status !== 200) {
+    // Only treat explicit auth failures as invalidation. 5xx/timeouts/other
+    // transient errors fall through so the client-side 401 path can still
+    // recover during a backend incident.
+    if (userData && (userData.status === 401 || userData.status === 403)) {
       return redirectToSignInAndClearAuth();
     }
   }
