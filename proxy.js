@@ -16,6 +16,15 @@ import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
 
+function applyRefreshedCookies(response, refreshedToken) {
+  if (!refreshedToken) return;
+  setAuthCookieEdge(response, refreshedToken.jwtToken);
+  if (refreshedToken.refreshToken) {
+    setRefreshCookieEdge(response, refreshedToken.refreshToken);
+  }
+  setIndicatorCookieEdge(response);
+}
+
 export async function proxy(request) {
   const authToken = request.cookies.get(COOKIE_NAME);
   const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME);
@@ -82,17 +91,11 @@ export async function proxy(request) {
       return redirectToSignInAndClearAuth();
     }
 
-    // Same silent-refresh path the client interceptors have — without this,
-    // a fresh navigation (e.g., URL copied into a new tab) would bounce
-    // through /signin even when the refresh token is still valid.
     try {
       const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
-        // Cap the wait so a stalled backend doesn't hang navigation. A timeout
-        // (or any other fetch error) falls through to the catch below and
-        // redirects to /signin — same as a definitive refresh failure.
         signal: AbortSignal.timeout(5000),
       });
 
@@ -113,15 +116,6 @@ export async function proxy(request) {
     }
   }
 
-  // Defense in depth for the "JWT present and not yet expired" path — catches
-  // server-side invalidation (admin revoke, user logged out elsewhere). Skip
-  // when we just refreshed, since the backend just minted the JWT.
-  //
-  // Fail-open on network errors / timeouts: this runs on every navigation,
-  // and a slow backend shouldn't randomly log users out. A definitive non-200
-  // from the backend is the only signal we treat as invalidation — anything
-  // else (timeout, connection reset, DNS blip) falls through and the
-  // client-side 401 flow remains the ultimate safety net.
   if (!refreshedToken) {
     let userData;
     try {
@@ -156,15 +150,6 @@ export async function proxy(request) {
   response.headers.set(`x-middleware-cache`, `no-cache`);
   applyRefreshedCookies(response, refreshedToken);
   return response;
-}
-
-function applyRefreshedCookies(response, refreshedToken) {
-  if (!refreshedToken) return;
-  setAuthCookieEdge(response, refreshedToken.jwtToken);
-  if (refreshedToken.refreshToken) {
-    setRefreshCookieEdge(response, refreshedToken.refreshToken);
-  }
-  setIndicatorCookieEdge(response);
 }
 
 /*
