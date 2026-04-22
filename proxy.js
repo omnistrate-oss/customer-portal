@@ -94,8 +94,9 @@ export async function proxy(request) {
         // it, DEV sessions can have their refresh interpreted as PROD and
         // fail intermittently.
         body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
-        // Cap the wait so a stalled backend doesn't hang navigation; the
-        // client-side 401 recovery can still take over on timeout.
+        // Cap the wait so a stalled backend doesn't hang navigation. A timeout
+        // (or any other fetch error) falls through to the catch below and
+        // redirects to /signin — same as a definitive refresh failure.
         signal: AbortSignal.timeout(5000),
       });
 
