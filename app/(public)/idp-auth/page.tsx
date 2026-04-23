@@ -30,10 +30,6 @@ const IDPAuthPage = () => {
         hasAttemptedSignIn.current = true;
         await customerSignInWithIdentityProvider(payload);
         sessionStorage.removeItem("authState");
-
-        // /api/sign-in-with-idp set both the httpOnly cookies and the indicator
-        // cookie server-side with a Max-Age that matches the backend's refresh
-        // lifetime, so the client doesn't hardcode the value here.
         Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
         try {

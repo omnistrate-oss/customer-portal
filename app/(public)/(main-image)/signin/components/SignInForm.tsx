@@ -65,8 +65,6 @@ const SignInForm: FC<SignInFormProps> = ({
   }, [redirect_reason]);
 
   function handlePasswordSignInSuccess() {
-    // /api/signin set both the httpOnly cookies and the indicator cookie
-    // (with Max-Age matching the backend's refresh lifetime) server-side.
     Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
     try {
