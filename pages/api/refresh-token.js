@@ -3,6 +3,7 @@ import {
   clearRefreshCookie,
   getRefreshToken,
   setAuthCookie,
+  setIndicatorCookie,
   setRefreshCookie,
 } from "src/server/utils/authCookie";
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
@@ -49,6 +50,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     }
 
     setAuthCookie(nextResponse, data.jwtToken);
+    setIndicatorCookie(nextResponse);
     if (data.refreshToken) {
       setRefreshCookie(nextResponse, data.refreshToken);
     }

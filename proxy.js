@@ -91,6 +91,7 @@ export async function proxy(request) {
       return redirectToSignInAndClearAuth();
     }
 
+    let refreshStatus = null;
     try {
       const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
         method: "POST",
@@ -99,20 +100,29 @@ export async function proxy(request) {
         signal: AbortSignal.timeout(5000),
       });
 
-      if (!refreshResponse.ok) {
-        return redirectToSignInAndClearAuth();
+      refreshStatus = refreshResponse.status;
+      if (refreshResponse.ok) {
+        const data = await refreshResponse.json().catch(() => ({}));
+        if (data.jwtToken) {
+          refreshedToken = data;
+          activeToken = data.jwtToken;
+        }
       }
-
-      const data = await refreshResponse.json().catch(() => ({}));
-      if (!data.jwtToken) {
-        return redirectToSignInAndClearAuth();
-      }
-
-      refreshedToken = data;
-      activeToken = data.jwtToken;
     } catch (error) {
-      console.error("Middleware refresh failed", error);
-      return redirectToSignInAndClearAuth();
+      console.error("Middleware refresh failed", error instanceof Error ? error.message : error);
+    }
+
+    if (!refreshedToken) {
+      // Only treat explicit auth failures (401/403) as a hard logout — the
+      // refresh token itself is invalid and no client retry will recover.
+      // Transient errors (5xx, timeout, network, missing jwtToken on 200)
+      // fall through so the client-side 401 path can retry.
+      if (refreshStatus === 401 || refreshStatus === 403) {
+        return redirectToSignInAndClearAuth();
+      }
+      const passthrough = NextResponse.next();
+      passthrough.headers.set("x-middleware-cache", "no-cache");
+      return passthrough;
     }
   }
 

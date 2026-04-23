@@ -31,12 +31,9 @@ const IDPAuthPage = () => {
         await customerSignInWithIdentityProvider(payload);
         sessionStorage.removeItem("authState");
 
-        // httpOnly cookie is set server-side by /api/sign-in-with-idp — set indicator for UI auth state
-        Cookies.set("omnistrate_logged_in", "true", {
-          expires: 1,
-          sameSite: "Lax",
-          secure: window.location.protocol === "https:",
-        });
+        // /api/sign-in-with-idp set both the httpOnly cookies and the indicator
+        // cookie server-side with a Max-Age that matches the backend's refresh
+        // lifetime, so the client doesn't hardcode the value here.
         Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
         try {
