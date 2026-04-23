@@ -1,54 +1,14 @@
 import type { NextResponse } from "next/server";
 
-import {
-  COOKIE_NAME,
-  INDICATOR_COOKIE_NAME,
-  INDICATOR_MAX_AGE,
-  isSecureCookie,
-  maxAgeFromJWT,
-  REFRESH_COOKIE_NAME,
-  REFRESH_MAX_AGE,
-} from "./authCookieConstants";
+import { COOKIE_NAME, INDICATOR_COOKIE_NAME, isSecureCookie, REFRESH_COOKIE_NAME } from "./authCookieConstants";
 
-// Edge-runtime equivalents of the Pages API helpers in authCookie.ts.
-// Middleware can't use NextApiResponse — we set cookies via NextResponse.cookies.
-// Attributes must stay in lockstep with authCookie.ts.
-
-export function setAuthCookieEdge(res: NextResponse, token: string) {
-  res.cookies.set({
-    name: COOKIE_NAME,
-    value: token,
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: maxAgeFromJWT(token),
-    secure: isSecureCookie,
-  });
-}
-
-export function setRefreshCookieEdge(res: NextResponse, refreshToken: string) {
-  res.cookies.set({
-    name: REFRESH_COOKIE_NAME,
-    value: refreshToken,
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: REFRESH_MAX_AGE,
-    secure: isSecureCookie,
-  });
-}
-
-export function setIndicatorCookieEdge(res: NextResponse) {
-  // Not HttpOnly — must be readable by client-side JavaScript.
-  res.cookies.set({
-    name: INDICATOR_COOKIE_NAME,
-    value: "true",
-    sameSite: "lax",
-    path: "/",
-    maxAge: INDICATOR_MAX_AGE,
-    secure: isSecureCookie,
-  });
-}
+// Edge-runtime cookie clearers used by proxy.js. Middleware runs on the Edge
+// runtime which can't use NextApiResponse — we clear cookies via
+// NextResponse.cookies. Attributes must stay in lockstep with authCookie.ts.
+//
+// The setter counterparts (setAuthCookieEdge etc.) were removed when the
+// middleware silent-refresh flow was replaced with client-side recovery;
+// reintroduce them from authCookie.ts + the shared constants if ever needed.
 
 export function clearAuthCookieEdge(res: NextResponse) {
   res.cookies.set({

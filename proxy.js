@@ -4,7 +4,11 @@ import { jwtDecode } from "jwt-decode";
 import { baseURL } from "src/axios";
 import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
 import { COOKIE_NAME, REFRESH_COOKIE_NAME } from "src/server/utils/authCookieConstants";
-import { clearIndicatorCookieEdge } from "src/server/utils/authCookieEdge";
+import {
+  clearAuthCookieEdge,
+  clearIndicatorCookieEdge,
+  clearRefreshCookieEdge,
+} from "src/server/utils/authCookieEdge";
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
@@ -29,6 +33,16 @@ export async function proxy(request) {
     if (environmentType === "PROD") return;
   }
 
+  // Reached only when the session is unrecoverable (no refresh cookie, or
+  // /user said the backend has revoked the JWT). Clear all three auth cookies
+  // so the next navigation doesn't re-run the /user check against a dead
+  // session and loop until the indicator's Max-Age expires.
+  const clearAllAuthCookies = (res) => {
+    clearAuthCookieEdge(res);
+    clearRefreshCookieEdge(res);
+    clearIndicatorCookieEdge(res);
+  };
+
   const redirectToSignIn = () => {
     const currentPath = request.nextUrl.pathname;
     const search = request.nextUrl.search || "";
@@ -36,7 +50,7 @@ export async function proxy(request) {
     if (currentPath.startsWith("/signin")) {
       const passthrough = NextResponse.next();
       passthrough.headers.set("x-middleware-cache", "no-cache");
-      clearIndicatorCookieEdge(passthrough);
+      clearAllAuthCookies(passthrough);
       return passthrough;
     }
 
@@ -44,7 +58,7 @@ export async function proxy(request) {
     const redirectPath = destination ? `/signin?destination=${encodeURIComponent(destination + search)}` : "/signin";
     const response = NextResponse.redirect(new URL(redirectPath, request.url));
     response.headers.set("x-middleware-cache", "no-cache");
-    clearIndicatorCookieEdge(response);
+    clearAllAuthCookies(response);
     return response;
   };
 
