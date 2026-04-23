@@ -1,31 +1,13 @@
 import { NextResponse } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
-import { baseDomain, baseURL } from "src/axios";
+import { baseURL } from "src/axios";
 import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
 import { COOKIE_NAME, REFRESH_COOKIE_NAME } from "src/server/utils/authCookieConstants";
-import {
-  clearIndicatorCookieEdge,
-  setAuthCookieEdge,
-  setIndicatorCookieEdge,
-  setRefreshCookieEdge,
-} from "src/server/utils/authCookieEdge";
+import { clearIndicatorCookieEdge } from "src/server/utils/authCookieEdge";
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
-
-// Backend's Origin-header allowlist rejects refresh calls from non-frontend
-// origins. Strip `api.` from the backend domain to derive a whitelisted origin.
-function deriveFrontendOrigin() {
-  if (!baseDomain || !baseDomain.startsWith("http")) return null;
-  try {
-    const url = new URL(baseDomain);
-    const host = url.hostname.startsWith("api.") ? url.hostname.slice(4) : url.hostname;
-    return `${url.protocol}//${host}`;
-  } catch {
-    return null;
-  }
-}
 
 function isTokenMissingOrExpired(tokenValue) {
   if (!tokenValue) return true;
@@ -38,15 +20,6 @@ function isTokenMissingOrExpired(tokenValue) {
   }
 }
 
-function applyRefreshedCookies(response, refreshedToken) {
-  if (!refreshedToken) return;
-  setAuthCookieEdge(response, refreshedToken.jwtToken);
-  if (refreshedToken.refreshToken) {
-    setRefreshCookieEdge(response, refreshedToken.refreshToken);
-  }
-  setIndicatorCookieEdge(response);
-}
-
 export async function proxy(request) {
   const authToken = request.cookies.get(COOKIE_NAME);
   const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME);
@@ -56,9 +29,6 @@ export async function proxy(request) {
     if (environmentType === "PROD") return;
   }
 
-  // Redirect to /signin, preserving the current path as destination.
-  // Only clears the indicator cookie (to break redirect loops) — httpOnly
-  // cookies are left for the backend to overwrite on next signin.
   const redirectToSignIn = () => {
     const currentPath = request.nextUrl.pathname;
     const search = request.nextUrl.search || "";
@@ -78,67 +48,36 @@ export async function proxy(request) {
     return response;
   };
 
-  let refreshedToken = null;
-  let activeToken = authToken?.value;
-  const tokenMissingOrExpired = isTokenMissingOrExpired(authToken?.value);
+  const tokenExpired = isTokenMissingOrExpired(authToken?.value);
 
-  if (tokenMissingOrExpired) {
-    if (!refreshToken?.value) {
-      return redirectToSignIn();
-    }
-
-    const frontendOrigin = deriveFrontendOrigin();
-    try {
-      const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(frontendOrigin ? { Origin: frontendOrigin } : {}),
-        },
-        body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (refreshResponse.ok) {
-        const data = await refreshResponse.json().catch(() => ({}));
-        if (data.jwtToken) {
-          refreshedToken = data;
-          activeToken = data.jwtToken;
-        }
-      } else if (refreshResponse.status === 401 || refreshResponse.status === 403) {
-        return redirectToSignIn();
-      }
-    } catch (error) {
-      console.error("Middleware refresh failed", error instanceof Error ? error.message : error);
-    }
-
-    // Refresh failed for a transient reason (timeout, 5xx, empty response) —
-    // pass through and let the client's 401 interceptor handle recovery.
-    if (!refreshedToken) {
+  if (tokenExpired) {
+    if (refreshToken?.value) {
+      // Refresh token exists — pass through and let the client-side 401
+      // interceptor recover via refreshAuth(). Refreshing here would race
+      // with the client for the single-use refresh token: the loser gets
+      // 401 and logs the user out.
       const passthrough = NextResponse.next();
       passthrough.headers.set("x-middleware-cache", "no-cache");
       return passthrough;
     }
+    return redirectToSignIn();
   }
 
-  // When we didn't just refresh, validate the token with a /user call so the
-  // page never loads with a revoked/invalid token (matches pre-httpOnly UX).
-  if (!refreshedToken && activeToken) {
-    try {
-      const userData = await fetch(`${baseURL}/user`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${activeToken}` },
-        signal: AbortSignal.timeout(5000),
-      });
+  // Token present and not expired — validate with /user so the page never
+  // loads with a revoked token (matches pre-httpOnly UX).
+  try {
+    const userData = await fetch(`${baseURL}/user`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${authToken.value}` },
+      signal: AbortSignal.timeout(5000),
+    });
 
-      if (userData.status === 401 || userData.status === 403) {
-        return redirectToSignIn();
-      }
-    } catch (error) {
-      // Timeout or network error — pass through; don't punish the user for
-      // a backend hiccup. The client's 401 interceptor catches real issues.
-      console.warn("Middleware /user check unavailable, continuing", error instanceof Error ? error.message : error);
+    if (userData.status === 401 || userData.status === 403) {
+      return redirectToSignIn();
     }
+  } catch {
+    // Timeout or network error — pass through; the client's 401 interceptor
+    // catches real issues.
   }
 
   if (path.startsWith("/signin")) {
@@ -150,13 +89,11 @@ export async function proxy(request) {
 
     const response = NextResponse.redirect(new URL(destination, request.url));
     response.headers.set("x-middleware-cache", "no-cache");
-    applyRefreshedCookies(response, refreshedToken);
     return response;
   }
 
   const response = NextResponse.next();
   response.headers.set("x-middleware-cache", "no-cache");
-  applyRefreshedCookies(response, refreshedToken);
   return response;
 }
 

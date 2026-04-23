@@ -25,6 +25,8 @@ export const apiClient = createFetchClient<paths>();
 // the clone up by Request identity is the only safe retry path.
 const requestClones = new WeakMap<Request, Request>();
 
+let logoutInProgress = false;
+
 apiClient.use({
   async onRequest({ request }) {
     const url = new URL(request.url);
@@ -177,18 +179,10 @@ apiClient.use({
       if (isAuthError(response.status, parsedMessage)) {
         // Check if this isn't the signin URL to avoid redirect loops
         if (!response.url.endsWith("/signin")) {
-          // Attempt silent token refresh before forcing logout
           const refreshed = await refreshAuth();
           if (refreshed) {
-            // Retry only when it's safe to replay: either we have the
-            // undisturbed clone stashed in onRequest, or the request has no
-            // body (GET/HEAD) so the original Request object is replayable.
-            // Anything else would throw "Request body is already used".
             const isBodyless = request.method === "GET" || request.method === "HEAD";
             if (retryClone || isBodyless) {
-              // Yield a microtask so the Set-Cookie from /api/refresh-token is
-              // reliably visible to this fetch — some browsers don't guarantee
-              // cookie-jar visibility within the same microtask.
               await Promise.resolve();
               try {
                 const retryResponse = await fetch(retryClone ?? request);
@@ -196,44 +190,43 @@ apiClient.use({
                   return retryResponse;
                 }
               } catch {
-                // Retry threw (network blip, abort, etc.) — fall through to
-                // the logout block below. Without this catch the error escapes
-                // onResponse and app/error.tsx renders for a flash before any
-                // subsequent request triggers the redirect.
+                // Retry network error — refresh worked, so don't logout.
               }
             }
+            // Refresh succeeded — new cookies are set. Don't logout even if
+            // the retry failed; the next user action will use the fresh token.
+            return response;
           }
 
-          // Refresh failed or retry still unauthorized — force logout.
-          // Await so the server finishes clearing the httpOnly cookies before
-          // /signin loads. Middleware redirects away from /signin when the
-          // auth cookie is still present, which would bounce us back.
-          try {
-            await fetch("/api/logout", { method: "POST", keepalive: true });
-          } catch {
-            // Ignore — we're redirecting regardless.
-          }
+          // Refresh truly failed — force logout, but only once across
+          // parallel 401s hitting this block simultaneously.
+          if (!logoutInProgress) {
+            logoutInProgress = true;
 
-          Cookies.remove(AUTH_INDICATOR_COOKIE);
-          localStorage.removeItem("paymentNotificationHidden");
-          try {
-            localStorage.removeItem("loggedInUsingSSO");
-          } catch (error) {
-            console.warn("Failed to clear SSO state:", error);
-          }
-
-          // Broadcast so other open tabs/windows also log out.
-          if (logoutBroadcastChannel) {
             try {
-              logoutBroadcastChannel.postMessage("logout");
-            } catch (error) {
-              console.warn("Failed to broadcast logout:", error);
+              await fetch("/api/logout", { method: "POST", keepalive: true });
+            } catch {
+              // Ignore — we're redirecting regardless.
             }
-          }
 
-          // Use replace so /signin doesn't get added to history (Back would
-          // land on the protected page and trigger another 401 bounce).
-          window.location.replace("/signin");
+            Cookies.remove(AUTH_INDICATOR_COOKIE);
+            localStorage.removeItem("paymentNotificationHidden");
+            try {
+              localStorage.removeItem("loggedInUsingSSO");
+            } catch (error) {
+              console.warn("Failed to clear SSO state:", error);
+            }
+
+            if (logoutBroadcastChannel) {
+              try {
+                logoutBroadcastChannel.postMessage("logout");
+              } catch (error) {
+                console.warn("Failed to broadcast logout:", error);
+              }
+            }
+
+            window.location.replace("/signin");
+          }
         }
       } else if (!ignoreGlobalErrorSnack && globalErrorHandler) {
         const status = String(response.status);

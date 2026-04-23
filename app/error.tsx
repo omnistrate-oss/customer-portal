@@ -1,11 +1,12 @@
 "use client";
 
+import { useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, Stack, styled } from "@mui/material";
 
-import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
+import { ProviderOrgDetailsContext } from "src/providers/ProviderOrgDetailsProvider";
 import { getInstancesRoute } from "src/utils/routes";
 import Button from "components/Button/Button";
 
@@ -37,7 +38,9 @@ const Description = styled("p")({
 
 const ErrorPage = () => {
   const pathname = usePathname();
-  const { orgSupportEmail, email } = useProviderOrgDetails();
+  const providerDetails = useContext(ProviderOrgDetailsContext);
+  const orgSupportEmail = providerDetails?.orgSupportEmail;
+  const email = providerDetails?.email;
 
   return (
     <Stack direction="row" justifyContent="center">

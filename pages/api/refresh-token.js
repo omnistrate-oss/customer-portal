@@ -36,10 +36,12 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     });
 
     if (!backendResponse.ok) {
-      clearAuthCookie(nextResponse);
-      clearRefreshCookie(nextResponse);
-      clearIndicatorCookie(nextResponse);
-      return nextResponse.status(401).json({ message: "Refresh failed" });
+      if (backendResponse.status === 401 || backendResponse.status === 403) {
+        clearAuthCookie(nextResponse);
+        clearRefreshCookie(nextResponse);
+        clearIndicatorCookie(nextResponse);
+      }
+      return nextResponse.status(backendResponse.status).json({ message: "Refresh failed" });
     }
 
     const data = await backendResponse.json().catch(() => ({}));
