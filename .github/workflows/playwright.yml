@@ -35,7 +35,12 @@ jobs:
           corepack prepare yarn@4.5.0 --activate
 
       - name: Install dependencies
-        run: yarn install --immutable
+        # Scripts are disabled by default to prevent supply-chain attacks; only
+        # the security-reviewed allowlist is rebuilt. Browsers are provisioned
+        # explicitly by the `Install Playwright Browsers` step below.
+        run: |
+          YARN_ENABLE_SCRIPTS=false yarn install --immutable
+          yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
 
       - name: Log Installed Dependency Versions
         run: |
