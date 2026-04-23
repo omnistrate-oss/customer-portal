@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 // Shared constants for httpOnly auth cookies — used by both the Pages API
 // helpers (authCookie.ts) and the Edge-runtime helpers (authCookieEdge.ts).
 export const COOKIE_NAME = "omnistrate_token";
@@ -8,11 +10,33 @@ export const INDICATOR_COOKIE_NAME = "omnistrate_logged_in";
 // refresh token lifetime. Setting them longer leaves dead cookies around
 // after the backend stops accepting refreshes, causing "logged in but every
 // refresh fails" states.
-// MAX_AGE is the access-token cookie lifetime and may be longer than the JWT
-// exp in some environments (e.g. shorter-lived Dev access tokens — the
-// cookie sticks around but the JWT inside expires first, triggering refresh).
-export const MAX_AGE = 86400; // access-token cookie lifetime: up to 1 day (15 min JWT exp in Dev)
+// FALLBACK_ACCESS_MAX_AGE is only used if the JWT can't be decoded — real
+// cookie lifetime is derived from the JWT's own `exp` claim so we always
+// honor the backend's actual expiry (see maxAgeFromJWT below).
+export const FALLBACK_ACCESS_MAX_AGE = 86400; // used only when JWT exp is unreadable
 export const REFRESH_MAX_AGE = 86400; // refresh token: 1 day
 export const INDICATOR_MAX_AGE = REFRESH_MAX_AGE; // indicator tracks refresh validity
 
 export const isSecureCookie = process.env.NODE_ENV === "production";
+
+/**
+ * Derive the access-token cookie Max-Age from the JWT's own `exp` claim so
+ * the cookie expires exactly when the backend says the token does. Dev and
+ * Prod have different JWT lifetimes (15 min vs 1 day today, Prod shrinking
+ * soon) — decoding `exp` means we never have to hardcode that schedule.
+ *
+ * Defensive: any malformed token / missing or non-numeric `exp` / negative
+ * remaining time falls back to FALLBACK_ACCESS_MAX_AGE so we never write a
+ * cookie with Max-Age=0 (instant-expire). Caller decides if writing the
+ * cookie at all makes sense.
+ */
+export function maxAgeFromJWT(token: string): number {
+  try {
+    const exp = jwtDecode<{ exp?: number }>(token)?.exp;
+    if (typeof exp !== "number" || !Number.isFinite(exp)) return FALLBACK_ACCESS_MAX_AGE;
+    const remaining = exp - Math.floor(Date.now() / 1000);
+    return remaining > 0 ? remaining : FALLBACK_ACCESS_MAX_AGE;
+  } catch {
+    return FALLBACK_ACCESS_MAX_AGE;
+  }
+}

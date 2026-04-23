@@ -5,7 +5,7 @@ import {
   INDICATOR_COOKIE_NAME,
   INDICATOR_MAX_AGE,
   isSecureCookie,
-  MAX_AGE,
+  maxAgeFromJWT,
   REFRESH_COOKIE_NAME,
   REFRESH_MAX_AGE,
 } from "./authCookieConstants";
@@ -21,7 +21,7 @@ export function setAuthCookieEdge(res: NextResponse, token: string) {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE,
+    maxAge: maxAgeFromJWT(token),
     secure: isSecureCookie,
   });
 }

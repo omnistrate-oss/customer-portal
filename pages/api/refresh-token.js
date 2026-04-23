@@ -1,5 +1,6 @@
 import {
   clearAuthCookie,
+  clearIndicatorCookie,
   clearRefreshCookie,
   getRefreshToken,
   setAuthCookie,
@@ -37,6 +38,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     if (!backendResponse.ok) {
       clearAuthCookie(nextResponse);
       clearRefreshCookie(nextResponse);
+      clearIndicatorCookie(nextResponse);
       return nextResponse.status(401).json({ message: "Refresh failed" });
     }
 
@@ -46,6 +48,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
       // Backend returned 200 but no token — treat as failure
       clearAuthCookie(nextResponse);
       clearRefreshCookie(nextResponse);
+      clearIndicatorCookie(nextResponse);
       return nextResponse.status(401).json({ message: "Refresh failed — no token in response" });
     }
 
@@ -60,6 +63,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     console.error("Error refreshing token", error);
     clearAuthCookie(nextResponse);
     clearRefreshCookie(nextResponse);
+    clearIndicatorCookie(nextResponse);
     return nextResponse.status(401).json({ message: "Refresh failed" });
   }
 }

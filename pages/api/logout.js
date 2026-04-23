@@ -1,4 +1,4 @@
-import { clearAuthCookie, clearRefreshCookie, getAuthToken } from "src/server/utils/authCookie";
+import { clearAuthCookie, clearIndicatorCookie, clearRefreshCookie, getAuthToken } from "src/server/utils/authCookie";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -25,9 +25,12 @@ export default async function handleLogout(nextRequest, nextResponse) {
   } catch (error) {
     console.error("Error during logout", error);
   } finally {
-    // Always clear both httpOnly cookies, even if backend call fails
+    // Always clear all auth cookies (both httpOnly + the indicator) even if the backend call fails.
+    // Missing the indicator clear here is why "log out" used to leave the UI thinking it was still
+    // logged in until the next navigation — /signin reads the indicator to decide redirects.
     clearAuthCookie(nextResponse);
     clearRefreshCookie(nextResponse);
+    clearIndicatorCookie(nextResponse);
     nextResponse.status(200).json({ message: "Logged out" });
   }
 }

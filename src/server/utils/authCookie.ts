@@ -5,7 +5,7 @@ import {
   INDICATOR_COOKIE_NAME,
   INDICATOR_MAX_AGE,
   isSecureCookie,
-  MAX_AGE,
+  maxAgeFromJWT,
   REFRESH_COOKIE_NAME,
   REFRESH_MAX_AGE,
 } from "./authCookieConstants";
@@ -25,9 +25,17 @@ function appendSetCookieHeader(res: NextApiResponse, cookie: string) {
 
 /**
  * Sets the httpOnly auth cookie on the response.
+ * Max-Age is derived from the JWT's own `exp` claim so the cookie tracks
+ * the backend's actual token lifetime (Dev = 15 min, Prod = longer).
  */
 export function setAuthCookie(res: NextApiResponse, token: string) {
-  const parts = [`${COOKIE_NAME}=${token}`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=${MAX_AGE}`];
+  const parts = [
+    `${COOKIE_NAME}=${token}`,
+    `Path=/`,
+    `HttpOnly`,
+    `SameSite=Lax`,
+    `Max-Age=${maxAgeFromJWT(token)}`,
+  ];
   if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
@@ -76,6 +84,17 @@ export function clearAuthCookie(res: NextApiResponse) {
  */
 export function clearRefreshCookie(res: NextApiResponse) {
   const parts = [`${REFRESH_COOKIE_NAME}=`, `Path=/`, `HttpOnly`, `SameSite=Lax`, `Max-Age=0`];
+  if (isSecureCookie) parts.push("Secure");
+
+  appendSetCookieHeader(res, parts.join("; "));
+}
+
+/**
+ * Clears the non-httpOnly indicator cookie by setting Max-Age=0.
+ * Must stay in lockstep with clearIndicatorCookieEdge.
+ */
+export function clearIndicatorCookie(res: NextApiResponse) {
+  const parts = [`${INDICATOR_COOKIE_NAME}=`, `Path=/`, `SameSite=Lax`, `Max-Age=0`];
   if (isSecureCookie) parts.push("Secure");
 
   appendSetCookieHeader(res, parts.join("; "));
