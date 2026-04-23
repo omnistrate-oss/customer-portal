@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
-import { baseURL } from "src/axios";
+import { baseDomain, baseURL } from "src/axios";
 import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
 import { COOKIE_NAME, REFRESH_COOKIE_NAME } from "src/server/utils/authCookieConstants";
 import {
-  clearAuthCookieEdge,
   clearIndicatorCookieEdge,
-  clearRefreshCookieEdge,
   setAuthCookieEdge,
   setIndicatorCookieEdge,
   setRefreshCookieEdge,
@@ -15,6 +13,30 @@ import {
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
+
+// Backend's Origin-header allowlist rejects refresh calls from non-frontend
+// origins. Strip `api.` from the backend domain to derive a whitelisted origin.
+function deriveFrontendOrigin() {
+  if (!baseDomain || !baseDomain.startsWith("http")) return null;
+  try {
+    const url = new URL(baseDomain);
+    const host = url.hostname.startsWith("api.") ? url.hostname.slice(4) : url.hostname;
+    return `${url.protocol}//${host}`;
+  } catch {
+    return null;
+  }
+}
+
+function isTokenMissingOrExpired(tokenValue) {
+  if (!tokenValue) return true;
+  try {
+    const exp = jwtDecode(tokenValue)?.exp;
+    if (typeof exp !== "number") return true;
+    return exp < Date.now() / 1000;
+  } catch {
+    return true;
+  }
+}
 
 function applyRefreshedCookies(response, refreshedToken) {
   if (!refreshedToken) return;
@@ -34,115 +56,88 @@ export async function proxy(request) {
     if (environmentType === "PROD") return;
   }
 
-  const buildRedirectToSignIn = () => {
+  // Redirect to /signin, preserving the current path as destination.
+  // Only clears the indicator cookie (to break redirect loops) — httpOnly
+  // cookies are left for the backend to overwrite on next signin.
+  const redirectToSignIn = () => {
     const currentPath = request.nextUrl.pathname;
     const search = request.nextUrl.search || "";
 
-    // Prevent Redirecting to the Same Page
-    if (currentPath.startsWith("/signin")) return null;
+    if (currentPath.startsWith("/signin")) {
+      const passthrough = NextResponse.next();
+      passthrough.headers.set("x-middleware-cache", "no-cache");
+      clearIndicatorCookieEdge(passthrough);
+      return passthrough;
+    }
+
     const destination = currentPath?.startsWith("/") ? currentPath : "";
-
     const redirectPath = destination ? `/signin?destination=${encodeURIComponent(destination + search)}` : "/signin";
-
     const response = NextResponse.redirect(new URL(redirectPath, request.url));
-    response.headers.set(`x-middleware-cache`, `no-cache`);
-    return response;
-  };
-
-  // Clears all three cookies before redirecting — a stale indicator
-  // cookie would otherwise trick the client into a refresh loop. When
-  // we're already on /signin, still clear cookies via NextResponse.next()
-  // rather than returning undefined (no-op).
-  const clearAuthCookies = (response) => {
-    clearAuthCookieEdge(response);
-    clearRefreshCookieEdge(response);
+    response.headers.set("x-middleware-cache", "no-cache");
     clearIndicatorCookieEdge(response);
     return response;
   };
-  const redirectToSignInAndClearAuth = () => {
-    const redirect = buildRedirectToSignIn();
-    if (redirect) return clearAuthCookies(redirect);
-    const passthrough = NextResponse.next();
-    passthrough.headers.set(`x-middleware-cache`, `no-cache`);
-    return clearAuthCookies(passthrough);
-  };
 
-  // When non-null, we just refreshed — skip the /user check below.
   let refreshedToken = null;
   let activeToken = authToken?.value;
-
-  // jwtDecode throws on malformed tokens; treat any decode failure (or a
-  // missing/non-numeric exp) as expired so the refresh/redirect path runs.
-  const isTokenMissingOrExpired = (tokenValue) => {
-    if (!tokenValue) return true;
-    try {
-      const exp = jwtDecode(tokenValue)?.exp;
-      if (typeof exp !== "number") return true;
-      return exp < Date.now() / 1000;
-    } catch {
-      return true;
-    }
-  };
   const tokenMissingOrExpired = isTokenMissingOrExpired(authToken?.value);
 
   if (tokenMissingOrExpired) {
-    // No refresh token → no recovery path, go to signin.
     if (!refreshToken?.value) {
-      return redirectToSignInAndClearAuth();
+      return redirectToSignIn();
     }
 
-    let refreshStatus = null;
+    const frontendOrigin = deriveFrontendOrigin();
     try {
       const refreshResponse = await fetch(`${baseURL}/refresh-token`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(frontendOrigin ? { Origin: frontendOrigin } : {}),
+        },
         body: JSON.stringify({ refreshToken: refreshToken.value, environmentType }),
         signal: AbortSignal.timeout(5000),
       });
 
-      refreshStatus = refreshResponse.status;
       if (refreshResponse.ok) {
         const data = await refreshResponse.json().catch(() => ({}));
         if (data.jwtToken) {
           refreshedToken = data;
           activeToken = data.jwtToken;
         }
+      } else if (refreshResponse.status === 401 || refreshResponse.status === 403) {
+        return redirectToSignIn();
       }
     } catch (error) {
       console.error("Middleware refresh failed", error instanceof Error ? error.message : error);
     }
 
+    // Refresh failed for a transient reason (timeout, 5xx, empty response) —
+    // pass through and let the client's 401 interceptor handle recovery.
     if (!refreshedToken) {
-      // Only treat explicit auth failures (401/403) as a hard logout — the
-      // refresh token itself is invalid and no client retry will recover.
-      // Transient errors (5xx, timeout, network, missing jwtToken on 200)
-      // fall through so the client-side 401 path can retry.
-      if (refreshStatus === 401 || refreshStatus === 403) {
-        return redirectToSignInAndClearAuth();
-      }
       const passthrough = NextResponse.next();
       passthrough.headers.set("x-middleware-cache", "no-cache");
       return passthrough;
     }
   }
 
-  if (!refreshedToken) {
-    let userData;
+  // When we didn't just refresh, validate the token with a /user call so the
+  // page never loads with a revoked/invalid token (matches pre-httpOnly UX).
+  if (!refreshedToken && activeToken) {
     try {
-      userData = await fetch(`${baseURL}/user`, {
+      const userData = await fetch(`${baseURL}/user`, {
         method: "GET",
         headers: { Authorization: `Bearer ${activeToken}` },
         signal: AbortSignal.timeout(5000),
       });
-    } catch (error) {
-      console.warn("Middleware /user check unavailable, continuing", error instanceof Error ? error.message : error);
-    }
 
-    // Only treat explicit auth failures as invalidation. 5xx/timeouts/other
-    // transient errors fall through so the client-side 401 path can still
-    // recover during a backend incident.
-    if (userData && (userData.status === 401 || userData.status === 403)) {
-      return redirectToSignInAndClearAuth();
+      if (userData.status === 401 || userData.status === 403) {
+        return redirectToSignIn();
+      }
+    } catch (error) {
+      // Timeout or network error — pass through; don't punish the user for
+      // a backend hiccup. The client's 401 interceptor catches real issues.
+      console.warn("Middleware /user check unavailable, continuing", error instanceof Error ? error.message : error);
     }
   }
 
@@ -154,13 +149,13 @@ export async function proxy(request) {
     }
 
     const response = NextResponse.redirect(new URL(destination, request.url));
-    response.headers.set(`x-middleware-cache`, `no-cache`);
+    response.headers.set("x-middleware-cache", "no-cache");
     applyRefreshedCookies(response, refreshedToken);
     return response;
   }
 
   const response = NextResponse.next();
-  response.headers.set(`x-middleware-cache`, `no-cache`);
+  response.headers.set("x-middleware-cache", "no-cache");
   applyRefreshedCookies(response, refreshedToken);
   return response;
 }
