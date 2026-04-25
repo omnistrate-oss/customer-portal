@@ -8315,7 +8315,7 @@ __metadata:
     openapi-fetch: "npm:^0.14.0"
     openapi-react-query: "npm:^0.5.0"
     openapi-typescript: "npm:^7.8.0"
-    postcss: "npm:^8.4.49"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.1.0"
     prop-types: "npm:^15.6.0"
     psl: "npm:^1.15.0"
@@ -8853,7 +8853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.1.7, postcss@npm:^8.4.47, postcss@npm:^8.4.49":
+"postcss@npm:^8.1.7, postcss@npm:^8.4.47":
   version: 8.5.6
   resolution: "postcss@npm:8.5.6"
   dependencies:
@@ -8861,6 +8861,17 @@ __metadata:
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
   checksum: 10c0/5127cc7c91ed7a133a1b7318012d8bfa112da9ef092dddf369ae699a1f10ebbd89b1b9f25f3228795b84585c72aabd5ced5fc11f2ba467eedf7b081a66fad024
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.5.10":
+  version: 8.5.10
+  resolution: "postcss@npm:8.5.10"
+  dependencies:
+    nanoid: "npm:^3.3.11"
+    picocolors: "npm:^1.1.1"
+    source-map-js: "npm:^1.2.1"
+  checksum: 10c0/c592dffa0c4873b401f01955b265538d9942f425040df5e2b8f0ad34c83773a792ea0fa5859ccc99cfb5b955b4ebff118ab7056315388dc83b107b0fa8313576
   languageName: node
   linkType: hard
 
