@@ -5169,7 +5169,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:3.3.3, dompurify@npm:^3.3.0, dompurify@npm:^3.3.2":
+"dompurify@npm:3.4.0":
+  version: 3.4.0
+  resolution: "dompurify@npm:3.4.0"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10c0/5593ac44ee20b9aa521c2120884effc98927fb9128c548183c75e79e0a04357c62ee913a049a267c8f396cb8c9d520ecf72562826c5524c46d4fe03c12063638
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.3.0, dompurify@npm:^3.3.2":
   version: 3.3.3
   resolution: "dompurify@npm:3.3.3"
   dependencies:
@@ -8855,7 +8867,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     date-fns: "npm:^2.29.3"
     dayjs: "npm:^1.11.11"
-    dompurify: "npm:3.3.3"
+    dompurify: "npm:3.4.0"
     dotenv: "npm:^16.4.5"
     dotted-map: "npm:^2.2.3"
     ejs: "npm:^3.1.10"
