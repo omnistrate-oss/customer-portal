@@ -11,3 +11,28 @@ README.md
 fly.toml
 fly.*.toml
 *.log
+
+# Test and dev files
+# Note: page-objects/ and test-utils/ are intentionally NOT excluded.
+# Production components (e.g. CreateInstanceModal, AuditLogs, Logs) import
+# dataTestIds/pageElements constants from page-objects/constants/..., so
+# these paths cannot be excluded from the build context.
+tests
+test-fixtures
+test-results
+playwright
+playwright-report
+playwright.config.ts
+.prettierrc
+.prettierignore
+.eslintrc.json
+LICENSE
+
+# Build artifacts that shouldn't enter the build context
+.next/cache
+coverage
+tsconfig.tsbuildinfo
+
+# Yarn caches (re-fetched in deps stage if needed)
+.yarn/cache
+.yarn/install-state.gz
