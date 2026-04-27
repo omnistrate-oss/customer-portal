@@ -760,7 +760,7 @@ Apply this checklist to every code change. If a control is not applicable, brief
 
 ### Authentication
 - The browser is untrusted. Treat every value held in the client (user ID, org ID, role, feature flag) as a hint for UX only — the backend re-validates.
-- Session tokens must be stored in `HttpOnly`, `Secure`, `SameSite=Lax` (or stricter) cookies. Do not put long-lived tokens in `localStorage` or `sessionStorage`.
+- Session tokens must be stored in `HttpOnly`, `SameSite=Lax` (or stricter) cookies, with `Secure` enabled in production or whenever the app is served over HTTPS. Do not put long-lived tokens in `localStorage` or `sessionStorage`.
 - Never embed a long-lived API key, service account, or signing secret in client code or `NEXT_PUBLIC_*` env vars.
 - Implement silent refresh through a server-side route, not by exposing refresh tokens to the browser.
 
