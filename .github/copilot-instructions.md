@@ -766,7 +766,7 @@ Apply this checklist to every code change. If a control is not applicable, brief
 
 ### Authorization
 - The UI must hide actions the caller cannot perform, but the server is the source of truth — never assume "if the button is hidden, the API is safe".
-- Route guards (`middleware.ts`, layouts) must enforce auth on every protected segment; default-deny for unknown roles.
+- Route guards (`proxy.js` via `export const config.matcher`, layouts) must enforce auth on every protected segment; default-deny for unknown roles.
 - Cross-org / cross-instance navigation must re-fetch authorization context — do not reuse a previous tenant's permissions cache.
 
 ### Tenant Isolation
