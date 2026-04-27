@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import { deleteCustomNetwork } from "src/api/customNetworks";
-import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import useSnackbar from "src/hooks/useSnackbar";
-import { CustomNetwork } from "src/types/customNetwork";
-import { getCustomNetworksRoute } from "src/utils/routes";
 import DataGridText from "components/DataGrid/DataGridText";
 import DataTable from "components/DataTable/DataTable";
 import GridCellExpand from "components/GridCellExpand/GridCellExpand";
 import RegionIcon from "components/Region/RegionIcon";
 import StatusChip from "components/StatusChip/StatusChip";
 import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
+import { deleteCustomNetwork } from "src/api/customNetworks";
+import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import useSnackbar from "src/hooks/useSnackbar";
+import { CustomNetwork } from "src/types/customNetwork";
+import { getCustomNetworksRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CustomNetworksIcon from "../components/Icons/CustomNetworksIcon";
@@ -111,6 +111,13 @@ const CustomNetworksPage = () => {
       columnHelper.accessor("cidr", {
         id: "cidr",
         header: "CIDR",
+      }),
+      columnHelper.accessor("owningUserName", {
+        id: "owningUserName",
+        header: "Subscription Owner",
+        cell: (data) => {
+          return data.row.original.owningUserName || "-";
+        },
       }),
       columnHelper.accessor("status", {
         id: "status",
@@ -223,6 +230,7 @@ const CustomNetworksPage = () => {
             refetchCustomNetworks,
             isFetchingCustomNetworks,
             selectedRows,
+            customNetworks: filteredCustomNetworks,
             onCreateClick: () => {
               setSelectedRows([]);
               setOverlayType("create-custom-network");

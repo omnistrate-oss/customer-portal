@@ -1,15 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
 import { $api } from "src/api/query";
 import Switch from "src/components/Switch/Switch";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
 
 import { CustomNetworkValidationSchema } from "../constants";
 import useSubscriptionOwners from "../hooks/useSubscriptionOwners";
@@ -219,12 +219,28 @@ const CustomNetworkForm = ({
               isLoading: isFetchingSubscriptionOwners,
               menuItems: subscriptionOwnerMenuItems,
               isHidden: formMode === "modify" || !formData.values.shareViaSubscriptionOwner,
+              previewValue: formData.values.subscriptionOwnerId
+                ? (() => {
+                    const owner = subscriptionOwnerMenuItems.find(
+                      (item) => item.value === formData.values.subscriptionOwnerId
+                    );
+                    return owner?.label || formData.values.subscriptionOwnerId;
+                  })()
+                : null,
             },
           ],
         },
       ],
     };
-  }, [cloudProviders, isFetchingRegions, isFetchingSubscriptionOwners, regionMenuItems, subscriptionOwnerMenuItems, formData.values, formMode]);
+  }, [
+    cloudProviders,
+    isFetchingRegions,
+    isFetchingSubscriptionOwners,
+    regionMenuItems,
+    subscriptionOwnerMenuItems,
+    formData.values,
+    formMode,
+  ]);
 
   return (
     <GridDynamicForm
