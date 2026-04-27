@@ -1,0 +1,266 @@
+name: Playwright HAR Recorder
+
+# Weekday workflow to record HAR files from real API interactions
+# Runs tests against live backend and commits updated HAR files directly to the HAR sub-repo
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    # Run at 2:00 AM UTC (7:30 AM IST) on weekdays (Mon-Fri)
+    - cron: '0 2 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for recording"
+        required: false
+        default: "Manual HAR recording"
+
+jobs:
+  record:
+    name: Record HAR Files
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+    - name: Checkout HAR submodule
+      run: |
+        git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
+        git submodule update --init --recursive
+
+    - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      with:
+        node-version: lts/*
+        cache: 'yarn'
+
+    - name: Enable Corepack and activate Yarn
+      run: |
+        corepack enable
+        corepack prepare yarn@4.5.0 --activate
+
+    - name: Install dependencies
+      run: yarn install --immutable
+
+    - name: Log Resolved Dependency Versions
+      run: |
+        echo "::group::Installed dependency versions"
+        yarn info --name-only
+        echo "::endgroup::"
+
+    - name: Install Playwright Browsers
+      run: yarn playwright install --with-deps
+
+    - name: Build Project
+      run: yarn build
+      env:
+        NEXT_PUBLIC_BACKEND_BASE_DOMAIN: https://api.omnistrate.dev
+        NODE_OPTIONS: "--max-old-space-size=4096"
+
+    - name: Start Server
+      # Use node directly — nodemon restarts when Playwright creates test artifacts
+      run: |
+        NODE_ENV=production node server.js &
+        yarn wait-on http://localhost:8080 --timeout 60000
+      env:
+        PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
+        PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
+        NEXT_PUBLIC_BACKEND_BASE_DOMAIN: https://api.omnistrate.dev
+        ENVIRONMENT_TYPE: DEV
+        MAIL_USER_EMAIL: ${{ secrets.MAIL_USER_EMAIL }}
+        MAIL_USER_PASSWORD: ${{ secrets.MAIL_USER_PASSWORD }}
+
+    - name: Run Playwright Tests in Record Mode
+      id: playwright
+      run: yarn test:record
+      env:
+        CI: true
+        YOUR_SAAS_DOMAIN_URL: http://localhost:8080
+        NEXT_PUBLIC_BACKEND_BASE_DOMAIN: https://api.omnistrate.dev
+        ENVIRONMENT_TYPE: DEV
+        PROVIDER_EMAIL: ${{ secrets.PROVIDER_EMAIL }}
+        PROVIDER_PASSWORD: ${{ secrets.PROVIDER_PASSWORD }}
+        USER_EMAIL: ${{ secrets.USER_EMAIL }}
+        USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+        BYOA_AWS_ACCOUNT_ID: ${{ secrets.BYOA_AWS_ACCOUNT_ID }}
+        HAR_MODE: record
+
+    - name: Check for backend soft failures
+      id: soft-failures
+      if: ${{ !cancelled() }}
+      run: |
+        if [ -f tests/backend-failures.json ]; then
+          echo "has_failures=true" >> $GITHUB_OUTPUT
+
+          # Extract failed spec basenames (e.g. "basic-tests upgrades") for HAR exclusion
+          FAILED_SPECS=$(node -e "
+            const path = require('path');
+            const failures = JSON.parse(require('fs').readFileSync('tests/backend-failures.json', 'utf-8'));
+            const names = [...new Set(failures.map(f => path.basename(f.specFile, '.spec.ts')))];
+            console.log(names.join(' '));
+          ")
+          echo "failed_specs=${FAILED_SPECS}" >> $GITHUB_OUTPUT
+
+          # Build a markdown summary for Mattermost
+          SUMMARY=$(node -e "
+            const failures = JSON.parse(require('fs').readFileSync('tests/backend-failures.json', 'utf-8'));
+            // Deduplicate by specFile + testName
+            const seen = new Set();
+            const unique = failures.filter(f => {
+              const key = f.specFile + '::' + f.testName;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            const lines = unique.map(f =>
+              '| ' + f.specFile + ' | ' + f.testName + ' | ' + f.reason + ' |'
+            );
+            console.log('| Spec File | Test | Reason |');
+            console.log('|:--|:--|:--|');
+            lines.forEach(l => console.log(l));
+          ")
+          {
+            echo "summary<<EOFMARKER"
+            echo "${SUMMARY}"
+            echo "EOFMARKER"
+          } >> $GITHUB_OUTPUT
+
+          echo "::warning::Backend soft failures detected — see backend-failures.json artifact"
+          cat tests/backend-failures.json
+        else
+          echo "has_failures=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Push HAR files to sub-repo
+      if: ${{ steps.playwright.outcome == 'success' }}
+      run: |
+        DATE=$(date +%Y-%m-%d)
+        cd tests/fixtures/hars
+
+        git remote set-url origin https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/omnistrate/customer-portal-har-files.git
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        git add -A
+
+        # Exclude HAR files for specs that had backend soft failures
+        # These HAR files would be incomplete/empty and break replay mode
+        FAILED_SPECS="${{ steps.soft-failures.outputs.failed_specs }}"
+        if [ -n "$FAILED_SPECS" ]; then
+          for spec in $FAILED_SPECS; do
+            # HAR dirs live at exactly {project}/{specName}/ — depth 2 from repo root.
+            # Restricting depth keeps a stray nested directory with the same name
+            # (e.g. a snapshot folder) from being unstaged.
+            MATCHES=$(find . -mindepth 2 -maxdepth 2 -type d -name "$spec" 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              echo "Excluding HAR files for soft-failed spec: $spec"
+              for dir in $MATCHES; do
+                git reset HEAD -- "$dir" 2>/dev/null || true
+                git checkout -- "$dir" 2>/dev/null || true
+              done
+            fi
+            # Also unstage any fixture files for this spec
+            git reset HEAD -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
+            git checkout -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
+          done
+        fi
+
+        if git diff --staged --quiet; then
+          echo "No HAR file changes to commit"
+        else
+          echo "HAR file changes detected:"
+          git diff --staged --stat
+          git commit -m "chore: update HAR files (${DATE})
+
+        Test result: ${{ steps.playwright.outcome }}"
+          git fetch origin master
+          if ! git rebase origin/master; then
+            echo "Failed to rebase HAR updates onto the latest remote master branch"
+            git rebase --abort 2>/dev/null || true
+            exit 1
+          fi
+          git push origin HEAD:refs/heads/master
+        fi
+
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-recording
+        path: playwright-report/
+        retention-days: 7
+
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      if: ${{ !cancelled() && steps.soft-failures.outputs.has_failures == 'true' }}
+      with:
+        name: backend-failures
+        path: tests/backend-failures.json
+        retention-days: 7
+
+    - name: Notify Mattermost of test failures
+      if: ${{ !cancelled() && steps.playwright.outcome == 'failure' }}
+      env:
+        MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+      run: |
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+        SOFT_FAILURE_NOTE=""
+        if [ "${{ steps.soft-failures.outputs.has_failures }}" = "true" ]; then
+          printf -v SOFT_FAILURE_NOTE '\n\n**Backend Soft Failures:**\n%s' "${{ steps.soft-failures.outputs.summary }}"
+        fi
+
+        printf -v TEXT '#### :red_circle: SaaSBuilder Playwright HAR Recording Failed\nTests failed — HAR files were **not committed**.\n%s\n:link: [View full run](%s)' "$SOFT_FAILURE_NOTE" "$RUN_URL"
+
+        PAYLOAD=$(jq -n \
+          --arg text "$TEXT" \
+          '{
+            "username": "Playwright Recorder",
+            "icon_url": "https://playwright.dev/img/playwright-logo.svg",
+            "text": $text
+          }')
+
+        curl -s -X POST \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD" \
+          "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+    - name: Notify Mattermost of backend soft failures
+      if: ${{ !cancelled() && steps.playwright.outcome == 'success' && steps.soft-failures.outputs.has_failures == 'true' }}
+      env:
+        MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+      run: |
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+        printf -v TEXT '#### :warning: Backend Soft Failures in SaaSBuilder HAR Recording\nSome tests were skipped due to backend infrastructure issues. These are **not UI code failures** — the backend did not reach the expected state in time.\n\nHAR files for the affected specs were **not committed**.\n\n%s\n\n:link: [View full run](%s)' "${{ steps.soft-failures.outputs.summary }}" "$RUN_URL"
+
+        PAYLOAD=$(jq -n \
+          --arg text "$TEXT" \
+          '{
+            "username": "Playwright Recorder",
+            "icon_url": "https://playwright.dev/img/playwright-logo.svg",
+            "text": $text
+          }')
+
+        curl -s -X POST \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD" \
+          "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: record
+    if: always() && needs.record.result == 'failure'
+    steps:
+      - name: Mattermost Notification
+        uses: tferreira/matterfy@5a3ff436559b90961d816fad08d4246a70c380ce  # v1.9
+        with:
+          type: failure
+          job_name: '*SaaSBuilder Playwright HAR Recorder*'
+          url: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}

@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { PageURLs } from "page-objects/pages";
 import { ResetPasswordPage } from "page-objects/reset-password-page";
 

@@ -1,11 +1,19 @@
 import { expect } from "@playwright/test";
 import _ from "lodash";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
+import { ApiFixture } from "test-fixtures/api-fixture";
+import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { ResourceInstance } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
+
+// describeSubscription is a direct HTTP call (bypasses browser HAR interception),
+// so cache per-subscription. Record mode stores the real response; replay mode
+// returns it without touching the backend, keeping the test deterministic even
+// when the recorded subscription ID no longer exists (teardown deletes subs).
+const subscriptionFixture = new ApiFixture("subscriptions");
 
 export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsPage, instance: ResourceInstance) => {
   const page = instanceDetailsPage.page;
@@ -20,7 +28,15 @@ export const TestInstanceOverview = async (instanceDetailsPage: InstanceDetailsP
   await expect(instanceOverview.getByText(instance.region || "")).toBeVisible();
   await expect(instanceOverview.getByText(_.capitalize(instance.status))).toBeVisible();
 
-  const subscription = await apiClient.describeSubscription(instance.subscriptionId);
+  // Prefer the live subscriptions cached in GlobalStateManager (user-setup populates
+  // them). Otherwise fall through to the fixture — record mode does the real call and
+  // caches it, replay mode reads the cached response without touching the backend.
+  const cachedSubscription = GlobalStateManager.getSubscriptions().find((s) => s.id === instance.subscriptionId);
+  const subscription =
+    cachedSubscription ??
+    (await subscriptionFixture.getOrCreate(instance.subscriptionId || "unknown", () =>
+      apiClient.describeSubscription(instance.subscriptionId)
+    ));
 
   // Expect Service Name, Product Tier, and Subscription Owner to be Visible
   await expect(instanceOverview.getByText(subscription.serviceName)).toBeVisible();
@@ -228,10 +244,13 @@ export const TestEventsTab = async (instanceDetailsPage: InstanceDetailsPage, in
     dataTestIds = instanceDetailsPage.dataTestIds,
     pageElements = instanceDetailsPage.pageElements;
 
-  await page.getByTestId(dataTestIds.tabs.auditLogsTab).click();
-  const eventsData = await page.waitForResponse((response) =>
+  // Set up the listener BEFORE the click — in HAR replay, the response fires
+  // synchronously and would be missed if we awaited click() first.
+  const eventsPromise = page.waitForResponse((response) =>
     response.url().includes(`%2Fresource-instance%2F${instance.id}%2Faudit-events`)
   );
+  await page.getByTestId(dataTestIds.tabs.auditLogsTab).click();
+  const eventsData = await eventsPromise;
   const events = (await eventsData.json()).events;
 
   // Check the Events Table
