@@ -801,8 +801,8 @@ Apply this checklist to every code change. If a control is not applicable, brief
 - Review the bundle for unintentionally shipped server-only modules (e.g., `fs`, `crypto` polyfills pulling secrets-handling code into the client).
 
 ### Content Security
-- Maintain a strict CSP — no `unsafe-inline` script unless gated by a nonce/hash; no `unsafe-eval`.
-- Do not load untrusted third-party scripts; pin SRI hashes for any external script that must be loaded.
+- The current CSP is already permissive in some places. Flag any change that further relaxes CSP, and prefer tightening directives over time — including reducing or removing `unsafe-inline` / `unsafe-eval` where feasible.
+- Do not load untrusted third-party scripts. Any external script that must be loaded should be explicitly justified in the PR, reviewed for CSP impact, and use integrity protections such as SRI where applicable.
 
 ### What to do when unsure
 - If a change introduces a new auth flow, a new cross-tenant boundary, a new HTML sink, or a new third-party domain, call it out explicitly in the PR description.
