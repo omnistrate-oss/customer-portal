@@ -13,6 +13,7 @@ import StatusChip from "components/StatusChip/StatusChip";
 import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
 import { deleteCustomNetwork } from "src/api/customNetworks";
 import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useSnackbar from "src/hooks/useSnackbar";
 import { CustomNetwork } from "src/types/customNetwork";
 import { getCustomNetworksRoute } from "src/utils/routes";
@@ -65,6 +66,7 @@ const CustomNetworksPage = () => {
   }, [customNetworks, searchText]);
 
   const { data: regions = [], isFetching: isFetchingRegions } = useRegions();
+  const { data: subscriptions = [] } = useSubscriptions();
 
   const dataTableColumns = useMemo(() => {
     return [
@@ -231,6 +233,7 @@ const CustomNetworksPage = () => {
             isFetchingCustomNetworks,
             selectedRows,
             customNetworks: filteredCustomNetworks,
+            subscriptions,
             onCreateClick: () => {
               setSelectedRows([]);
               setOverlayType("create-custom-network");

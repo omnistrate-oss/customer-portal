@@ -8,6 +8,7 @@ import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
 import { FormConfiguration } from "components/DynamicForm/types";
 import { $api } from "src/api/query";
 import Switch from "src/components/Switch/Switch";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
 
@@ -197,16 +198,27 @@ const CustomNetworkForm = ({
               name: "shareViaSubscriptionOwner",
               isHidden: formMode === "modify",
               customComponent: (
-                <Switch
-                  checked={formData.values.shareViaSubscriptionOwner}
-                  onChange={(e) => {
-                    formData.setFieldValue("shareViaSubscriptionOwner", e.target.checked);
-                    if (!e.target.checked) {
-                      formData.setFieldValue("subscriptionOwnerId", "");
-                      formData.setFieldTouched("subscriptionOwnerId", false);
-                    }
-                  }}
-                />
+                <Tooltip
+                  title={
+                    !subscriptionOwnerMenuItems.length
+                      ? "No subscription owners available. Please ensure there are users with active subscriptions."
+                      : ""
+                  }
+                >
+                  <span>
+                    <Switch
+                      checked={formData.values.shareViaSubscriptionOwner}
+                      disabled={!subscriptionOwnerMenuItems.length}
+                      onChange={(e) => {
+                        formData.setFieldValue("shareViaSubscriptionOwner", e.target.checked);
+                        if (!e.target.checked) {
+                          formData.setFieldValue("subscriptionOwnerId", "");
+                          formData.setFieldTouched("subscriptionOwnerId", false);
+                        }
+                      }}
+                    />
+                  </span>
+                </Tooltip>
               ),
             },
             {

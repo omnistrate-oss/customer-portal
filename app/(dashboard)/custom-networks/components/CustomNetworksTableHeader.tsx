@@ -7,6 +7,7 @@ import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { CustomNetwork } from "src/types/customNetwork";
+import { Subscription } from "src/types/subscription";
 
 const CustomNetworksTableHeader = ({
   count,
@@ -20,6 +21,7 @@ const CustomNetworksTableHeader = ({
   onModifyClick,
   selectedRows,
   customNetworks = [],
+  subscriptions = [],
 }: {
   count: number;
   searchText: string;
@@ -32,20 +34,33 @@ const CustomNetworksTableHeader = ({
   onModifyClick: () => void;
   selectedRows: string[];
   customNetworks?: CustomNetwork[];
+  subscriptions?: Subscription[];
 }) => {
   const currentUser = useSelector(selectUserrootData);
 
   const isOwnershipBlocked = useMemo(() => {
     if (selectedRows.length !== 1) return false;
     const selectedNetwork = customNetworks.find((n) => n.id === selectedRows[0]);
+    // No owningUserId means no ownership restriction
     if (!selectedNetwork?.owningUserId) return false;
-    return selectedNetwork.owningUserId !== currentUser?.userId;
-  }, [selectedRows, customNetworks, currentUser?.userId]);
+
+    const networkOwnerId = selectedNetwork.owningUserId;
+
+    // If the logged-in user is the owner, allow
+    if (networkOwnerId === currentUser?.id) return false;
+
+    // Check if the user has editor or root role on any subscription belonging to the network owner's org
+    const hasAccess = subscriptions.some(
+      (sub) => sub.rootUserOrgId === networkOwnerId && (sub.roleType === "editor" || sub.roleType === "root")
+    );
+
+    return !hasAccess;
+  }, [selectedRows, customNetworks, currentUser?.userId, subscriptions]);
 
   const getModifyDeleteDisabledMessage = () => {
     if (selectedRows.length !== 1) return "Please select a customer network";
     if (isOwnershipBlocked)
-      return "This network is owned by another subscription owner. Only the owner can perform this action.";
+      return "You don't have permission to modify this network. Only the owner or users with editor access on the subscription can perform this action.";
     return "";
   };
 
