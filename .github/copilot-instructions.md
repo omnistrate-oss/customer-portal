@@ -795,7 +795,7 @@ Apply this checklist to every code change. If a control is not applicable, brief
 - Telemetry events (analytics, RUM, error tracking) must scrub email, names, and free-text input before transmission.
 
 ### Dependencies
-- Run `npm audit` (or `pnpm audit`) on PRs that change `package.json`. Resolve high/critical findings or document the exception.
+- Run `yarn npm audit` (or `yarn audit`, if that is the active workflow) on PRs that change `package.json`. Resolve high/critical findings or document the exception.
 - Prefer first-party / well-maintained packages with TypeScript types. Justify any new dependency in the PR description.
 - Pin GitHub Actions to commit SHAs, not tags.
 - Review the bundle for unintentionally shipped server-only modules (e.g., `fs`, `crypto` polyfills pulling secrets-handling code into the client).
