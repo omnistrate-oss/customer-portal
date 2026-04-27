@@ -70,7 +70,7 @@ test.describe("Instances Page - Operational Tests", () => {
                 password: "a_secure_password",
                 username: "username",
               },
-            } as any
+            }
           );
         });
 

@@ -135,6 +135,12 @@ const normalizeUrl = (url: string): string => {
   }
 };
 
+// Auth endpoints intentionally skipped by record mode's urlFilter (their
+// bodies/Set-Cookie headers contain credentials). Replay must let these fall
+// through to the real Next.js routes — without this, a refresh-token call
+// during a replay test would have no HAR entry and abort("failed").
+const REPLAY_LIVE_API_PATHS = /\/api\/(signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)(?:\/|$|\?)/i;
+
 export const test = base.extend<HarFixtures>({
   harMode: async ({}, use) => {
     await use(getHarMode());
@@ -279,6 +285,11 @@ export const test = base.extend<HarFixtures>({
         const method = request.method();
         const url = request.url();
         const normalizedUrl = normalizeUrl(url);
+
+        if (REPLAY_LIVE_API_PATHS.test(new URL(url).pathname)) {
+          await route.fallback();
+          return;
+        }
 
         // Find first unconsumed matching entry (match on path+query, ignore host:port)
         let matchIndex = -1;
