@@ -806,4 +806,4 @@ Apply this checklist to every code change. If a control is not applicable, brief
 
 ### What to do when unsure
 - If a change introduces a new auth flow, a new cross-tenant boundary, a new HTML sink, or a new third-party domain, call it out explicitly in the PR description.
-- Prefer adding a Playwright/Cypress test that proves the security property (e.g., "user without role X cannot see element Y") over a comment claiming it.
+- Prefer adding a Playwright test that proves the security property (e.g., "user without role X cannot see element Y") over a comment claiming it.
