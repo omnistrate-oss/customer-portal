@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { checkbox, confirm, input, password, select } from "@inquirer/prompts";
 
 type EnvKey = "dev" | "prod";
