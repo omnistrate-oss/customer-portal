@@ -1,8 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
+import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+
+// Replay mode: deterministic (0 retries), instant responses (short timeout)
+// Record mode: 2 workers to balance speed vs deterministic capture
+const getWorkers = () => {
+  if (isRecordMode()) return 2;
+  if (isReplayMode()) return process.env.CI ? 1 : 3;
+  return process.env.CI ? 1 : 2;
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -14,11 +23,11 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : 2,
+  retries: isReplayMode() ? 0 : process.env.CI ? 2 : 1,
+  workers: getWorkers(),
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"]],
 
-  timeout: 12 * 60 * 1000, // 12 minutes per test
+  timeout: isReplayMode() ? 60 * 1000 : 12 * 60 * 1000,
 
   use: {
     actionTimeout: 30 * 1000,

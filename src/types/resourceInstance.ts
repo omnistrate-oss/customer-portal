@@ -1,6 +1,6 @@
 import type { components, paths } from "./schema";
 
-export type CreateResourceInstancePayload = components["schemas"]["CreateResourceInstanceRequest"];
+export type CreateResourceInstancePayload = components["schemas"]["CreateResourceInstanceRequest2"];
 
 export type ListAllResourceInstancesSuccessResponse =
   paths["/2022-09-01-00/resource-instance"]["get"]["responses"]["200"]["content"]["application/json"];

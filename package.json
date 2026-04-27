@@ -12,7 +12,10 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
-    "upgrade:instances": "tsx scripts/saasbuilder-upgrade.ts"
+    "upgrade:instances": "tsx scripts/saasbuilder-upgrade.ts",
+    "test:record": "HAR_MODE=record yarn playwright test",
+    "test:replay": "HAR_MODE=replay yarn playwright test",
+    "record": "yarn tsx scripts/record-hars.ts"
   },
   "next-unused": {
     "alias": {},

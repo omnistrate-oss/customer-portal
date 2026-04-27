@@ -19,10 +19,15 @@ jobs:
   test:
     name: Playwright Tests - SaaSBuilder
     if: github.event.pull_request.draft == false
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout HAR submodule
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          git submodule update --init --recursive
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
@@ -65,11 +70,12 @@ jobs:
           MAIL_USER_EMAIL: ${{ secrets.MAIL_USER_EMAIL }}
           MAIL_USER_PASSWORD: ${{ secrets.MAIL_USER_PASSWORD }}
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (replay mode)
         id: tests
-        run: yarn playwright test
+        run: yarn test:replay
         env:
           CI: true
+          HAR_MODE: replay
           YOUR_SAAS_DOMAIN_URL: http://localhost:8080
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}

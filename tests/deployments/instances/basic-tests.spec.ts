@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
 import { InstancesPage } from "page-objects/instances-page";
 import {
