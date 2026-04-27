@@ -14,9 +14,8 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { isReplayMode } from "test-utils/har-mode";
 import * as zlib from "zlib";
-
-import { isReplayMode } from "./har-mode";
 
 const harsDir = path.resolve(__dirname, "../tests/fixtures/hars", "fixtures");
 
@@ -86,4 +85,4 @@ export class ApiFixture {
   }
 }
 
-export { isRecordMode, isReplayMode } from "./har-mode";
+export { isRecordMode, isReplayMode } from "test-utils/har-mode";

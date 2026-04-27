@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
-import { isReplayMode } from "test-fixtures/har-mode";
 import { BackendError } from "test-utils/backend-error";
+import { isReplayMode } from "test-utils/har-mode";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { dataTestIds } from "./constants/instances-page";

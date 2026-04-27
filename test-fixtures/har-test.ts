@@ -19,7 +19,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as zlib from "zlib";
 
-import { isRecordMode, isReplayMode } from "./har-mode";
+import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 
 export type HarMode = "record" | "replay" | "off";
 

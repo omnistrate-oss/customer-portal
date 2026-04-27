@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-import { isRecordMode, isReplayMode } from "test-fixtures/har-mode";
+import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 

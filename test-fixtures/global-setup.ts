@@ -1,7 +1,7 @@
 import { yamlTemplates } from "constants/yaml-templates";
 import { ApiFixture } from "test-fixtures/api-fixture";
-import { isRecordMode, isReplayMode } from "test-fixtures/har-mode";
 import { GlobalStateManager } from "test-utils/global-state-manager";
+import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
 import { clearSoftFailureReport } from "test-utils/soft-failure-tracker";
 import { UserAPIClient } from "test-utils/user-api-client";
