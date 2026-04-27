@@ -617,21 +617,21 @@ const errorMessage = "An error has occurred while processing your request";
 
 ### 6. Security and Privacy
 
-This repository ships a customer-facing white-label SaaS portal that service providers fork and re-deploy with their own branding and Omnistrate API endpoint. End customers sign in with passwords, manage cloud-deployed instances, and configure cloud accounts. That makes the portal one of the higher-value security targets in the project, and the rules below are non-negotiable.
+This repository ships a customer-facing white-label SaaS portal that SaaS providers fork and re-deploy with their own branding and Omnistrate API endpoint. End customers sign in with passwords, manage cloud-deployed instances, and configure cloud accounts. That makes the portal one of the higher-value security targets in the project, and the rules below are non-negotiable.
 
 #### Authentication and token handling
 
-- **Auth tokens live in httpOnly cookies, never in `localStorage` or `sessionStorage`**. The two cookies of record are `omnistrate_token` (access, ~1 day, HttpOnly + Secure + SameSite=Lax) and `omnistrate_refresh_token` (refresh, ~7 days, HttpOnly + Secure + SameSite=Lax). The non-httpOnly `omnistrate_logged_in=true` flag is the only client-readable auth signal — do not extend it to carry secret values.
+- **Auth tokens live in httpOnly cookies, never in `localStorage` or `sessionStorage`**. The two cookies of record are `omnistrate_token` (access, ~1 day, HttpOnly + SameSite=Lax, with `Secure` enabled in production) and `omnistrate_refresh_token` (refresh, ~7 days, HttpOnly + SameSite=Lax, with `Secure` enabled in production). The `Secure` flag is gated on `process.env.NODE_ENV === "production"` in `src/server/utils/authCookie.ts` so that local development over `http://localhost` works. The non-httpOnly `omnistrate_logged_in=true` flag is the only client-readable auth signal — do not extend it to carry secret values.
 - **Flag any new `localStorage.setItem`, `sessionStorage.setItem`, `document.cookie =`, or in-memory long-lived store** that holds a JWT, bearer token, refresh token, OAuth code, or password. Tokens must never appear in `console.log`, error messages, analytics events, or query params.
 - **Cookie defaults**: Any new auth cookie must inherit `HttpOnly`, `Secure` (in production), and an explicit `SameSite` attribute. Flag PRs that add cookies without all three.
 - **Auth redirects**: After signin, IDP callback, or password reset, the post-login redirect target must be validated against an allowlist (same-origin paths only, no full URLs from query params). This is an open-redirect class bug — flag any `router.push(searchParams.get("next"))` style usage without validation.
-- **Non-protected endpoints** (`/signin`, `/signup`, `/reset-password`, `/change-password`, `/validate-token`, `/refresh-token`, `/logout`) are the only auth-exempt routes. Flag any change that bypasses the auth middleware for an additional route without explicit security justification.
+- **Auth-exempt routes must match the real allowlists**. Do not rely on a hard-coded list in this document. The sources of truth are the Next.js middleware matcher in `proxy.js` (which excludes routes such as `/signin`, `/signup`, `/reset-password`, `/change-password`, `/idp-auth`, `/privacy-policy`, `/cookie-policy`, `/terms-of-use`, and several `/api/*` paths) and the backend non-protected endpoint allowlist in `src/utils/authUtils.ts`. Flag any PR that changes one allowlist without updating the other (and this guidance), or that bypasses auth for a new route without explicit security justification.
 
 #### XSS and HTML injection
 
 Because this is a white-label portal where **provider-supplied content** (organization name, description, logo URL, favicon URL, plan descriptions, support links, install instructions) is rendered to end customers, any path from provider config → DOM is a cross-tenant XSS vector if mishandled.
 
-- **Sanitize all `dangerouslySetInnerHTML` with DOMPurify** (`dompurify` is already a dep). Current known sinks include service plan descriptions, syntax-highlighted logs, and the GA bootstrap. Flag any new sink, any change that drops `DOMPurify.sanitize`, and any sink that renders provider-supplied or backend-supplied HTML without it. The GA bootstrap (a static template-literal string) is the only acceptable un-sanitized use.
+- **Sanitize all `dangerouslySetInnerHTML` with DOMPurify** (`dompurify` is already a dep). Current known sinks include plan descriptions, syntax-highlighted logs, and the GA bootstrap. Flag any new sink, any change that drops `DOMPurify.sanitize`, and any sink that renders provider-supplied or backend-supplied HTML without it. The GA bootstrap (a static template-literal string) is the only acceptable un-sanitized use.
 - **Validate dynamic `href`, `src`, `action`, and `formAction` values**: Provider-supplied logo / favicon / privacy-policy / terms / support URLs must be checked for scheme — only allow `http`, `https`, `mailto`, and same-origin relative paths. Reject `javascript:`, `data:` (in navigation/script contexts), and `vbscript:`. Flag any place that renders `org.logoUrl` or `plan.descriptionHtml` directly without validation or sanitization.
 - **No raw HTML in plan descriptions, error messages, or notification bodies** unless explicitly sanitized.
 
@@ -650,7 +650,7 @@ Because this is a white-label portal where **provider-supplied content** (organi
 
 - **Current third-party surface**: Google Analytics (`googletagmanager.com`), Google OAuth (`accounts.google.com`), Google reCAPTCHA (`google.com/recaptcha`). No PostHog, HubSpot, Intercom, or CRM SDKs are loaded by default — providers may add their own when they fork.
 - **Any new `<script>` tag, `next/script` usage, or npm package making outbound network calls must be flagged** with: CSP impact, cookie-consent gating, data-exfiltration surface, and whether it should be opt-in for forks rather than enabled by default.
-- **CSP in `next.config.js`** is currently permissive in places (`connect-src *`, `frame-src *`). Flag any change that further relaxes CSP, and prefer PRs that tighten these directives. Do not add `'unsafe-eval'` to production builds. New external script/connect/frame origins should be explicitly listed, not wildcarded.
+- **CSP in `next.config.js`** is currently permissive in places (`connect-src *`, `frame-src *`, and `script-src` already includes `'unsafe-eval'` and `'unsafe-inline'`). Flag any change that further relaxes CSP, prefer PRs that tighten these directives, and avoid expanding the use of `'unsafe-eval'` / `'unsafe-inline'`; where feasible, prefer tightening or removing them. New external script/connect/frame origins should be explicitly listed, not wildcarded.
 
 #### Analytics, telemetry, and consent
 
@@ -703,8 +703,16 @@ localStorage.setItem("omnistrate_token", response.data.jwtToken);
 // ❌ Flag this — provider-supplied URL rendered without scheme validation
 <a href={org.privacyPolicyUrl}>Privacy</a>
 
-// ✅ Validate the scheme before rendering
-const target = isSafeHttpUrl(org.privacyPolicyUrl) ?? "/privacy";
+// ✅ Validate the scheme before rendering (parse and allow only http/https)
+let target = "/privacy";
+try {
+  const parsed = new URL(org.privacyPolicyUrl);
+  if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+    target = parsed.toString();
+  }
+} catch {
+  target = "/privacy";
+}
 <a href={target}>Privacy</a>
 ```
 
@@ -721,9 +729,10 @@ import DOMPurify from "dompurify";
 // ❌ Flag this — open redirect from query param
 router.push(searchParams.get("next") ?? "/dashboard");
 
-// ✅ Allowlist same-origin paths only
-const next = searchParams.get("next");
-router.push(isSafeInternalPath(next) ? next : "/dashboard");
+// ✅ Validate against the existing internal-route allowlist
+//    (src/utils/route/checkRouteValidity.ts, backed by PAGE_TITLE_MAP)
+const next = searchParams.get("next") ?? "/dashboard";
+router.push(checkRouteValidity(next) ? next : "/dashboard");
 ```
 
 ```ts
