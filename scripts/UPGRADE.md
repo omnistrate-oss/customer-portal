@@ -4,14 +4,15 @@ Interactive CLI that rolls a new `customer-portal` image across SaaSBuilder flee
 
 ## What it does
 
-For the chosen environment (Dev or Prod), it walks through six steps end-to-end:
+For the chosen environment (Dev or Prod), the tool first prompts you to sign in with your Omnistrate email and password (password is masked). No credentials are read from env vars or disk.
 
-1. **Sign in** — Prompts for your Omnistrate email and password (password is masked). No credentials are read from env vars or disk.
-2. **Update default image** — `PATCH`es the `imageName` input-parameter so new instances launch on the new tag.
-3. **Release a new version set** — `POST /service-api/{saId}/release` with `versionSetName = "Image v<tag>"`, type `Major`, marked preferred.
-4. **Pick source + target versions** — Lists all version sets, then asks which version you want to upgrade FROM and TO. Defaults the target to the version set you just released.
-5. **Upgrade running instances** — Lists instances on the source version, filters to `RUNNING` only, creates an upgrade-path, then polls status every 20 s until the upgrade is `COMPLETE` (or `FAILED` / `CANCELLED`), printing progress (`completed / total`, percent, in-progress, failed).
-6. **Modify instances** — Lists every fleet instance, groups them by current `imageName`, lets you multi-select which groups to update, then `PATCH`es each selected instance to the new image with a 1.5 s delay between calls.
+After sign-in, it walks through five steps end-to-end:
+
+1. **Update default image** — `PATCH`es the `imageName` input-parameter so new instances launch on the new tag.
+2. **Release a new version set** — `POST /service-api/{saId}/release` with `versionSetName = "Image v<tag>"`, type `Major`, marked preferred.
+3. **Pick source + target versions** — Lists all version sets, then asks which version you want to upgrade FROM and TO. Defaults the target to the version set you just released.
+4. **Upgrade running instances** — Lists instances on the source version, filters to `RUNNING` only, creates an upgrade-path, then polls status every 20 s until the upgrade is `COMPLETE` (or `FAILED` / `CANCELLED`), printing progress (`completed / total`, percent, in-progress, failed).
+5. **Modify instances** — Lists every fleet instance, groups them by current `imageName`, lets you multi-select which groups to update, then `PATCH`es each selected instance to the new image with a 1.5 s delay between calls.
 
 Every state-changing step is gated behind a confirmation prompt, so you can skip any step or abort at any point.
 

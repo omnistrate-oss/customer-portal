@@ -377,7 +377,7 @@ async function main() {
           value: v.version,
         };
       }),
-    default: releasedMatch ? releasedMatch.version : undefined,
+    default: releasedMatch && releasedMatch.version !== sourceVersion ? releasedMatch.version : undefined,
   });
 
   console.log(`\nStep 4: list RUNNING instances on v${sourceVersion}`);
