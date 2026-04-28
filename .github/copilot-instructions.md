@@ -751,3 +751,59 @@ logSanitized(error);
 3. **Performance**: Check for potential performance impacts
 4. **Security**: Review for security and privacy best practices (see Security and Privacy section above)
 5. **Consistency**: Ensure alignment with project standards
+
+<!-- security-checklist-managed -->
+
+## Security Checklist
+
+Apply this checklist to every code change. If a control is not applicable, briefly say why in the PR description.
+
+### Authentication
+- The browser is untrusted. Treat every value held in the client (user ID, org ID, role, feature flag) as a hint for UX only — the backend re-validates.
+- Session tokens must be stored in `HttpOnly`, `SameSite=Lax` (or stricter) cookies, with `Secure` enabled in production or whenever the app is served over HTTPS. Do not put long-lived tokens in `localStorage` or `sessionStorage`.
+- Never embed a long-lived API key, service account, or signing secret in client code or `NEXT_PUBLIC_*` env vars.
+- Implement silent refresh through a server-side route, not by exposing refresh tokens to the browser.
+
+### Authorization
+- The UI must hide actions the caller cannot perform, but the server is the source of truth — never assume "if the button is hidden, the API is safe".
+- Route guards (`proxy.js` via `export const config.matcher`, layouts) must enforce auth on every protected segment; default-deny for unknown roles.
+- Cross-org / cross-instance navigation must re-fetch authorization context — do not reuse a previous tenant's permissions cache.
+
+### Tenant Isolation
+- The client may send tenant/resource identifiers for routing, but the **server must derive and enforce tenant membership from the authenticated session/token**. Never treat client-selected `orgID`/`instanceID` as proof of authorization.
+- Caches (`SWR`, `react-query`, in-memory stores) must key on the active `orgID` so that switching tenants cannot leak data from a prior tenant.
+- Avoid placing tenant-identifying data into `localStorage` keyed by a fixed name — namespace by tenant or clear on logout/switch.
+
+### Input Validation & Output Encoding
+- Validate forms on the client for UX, but treat server-side validation as authoritative.
+- Never use `dangerouslySetInnerHTML` on untrusted input. If markdown rendering is required, sanitize with a vetted library (e.g., DOMPurify) and an allowlist.
+- Escape values placed into URLs, query strings, and `href`/`src` attributes; reject `javascript:` / `data:` URIs from user input.
+- Validate redirect targets against an allowlist before issuing a client-side or server-side redirect.
+
+### CSRF & CORS
+- State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) must be protected by `SameSite` cookies and/or a CSRF token; never accept state changes via `GET`.
+- Do not set `Access-Control-Allow-Origin: *` on any authenticated endpoint or proxy.
+
+### Secrets Handling
+- Differentiate `NEXT_PUBLIC_*` (shipped to browser) from server-only env vars. Anything secret must NOT be `NEXT_PUBLIC_*`.
+- Never commit `.env*` files. Provide `.env.example` with placeholders only.
+- Do not write secrets into HTML, JSON-LD, or inline `<script>` blobs.
+
+### Logging Hygiene
+- No `console.log` / `console.error` of tokens, full headers, full request bodies, or PII — neither in client code nor in server-side logs.
+- Sanitize error messages shown to users; never surface raw stack traces, SQL errors, or upstream JSON to the UI.
+- Telemetry events (analytics, RUM, error tracking) must scrub email, names, and free-text input before transmission.
+
+### Dependencies
+- Run `yarn npm audit` (or `yarn audit`, if that is the active workflow) on PRs that change `package.json`. Resolve high/critical findings or document the exception.
+- Prefer first-party / well-maintained packages with TypeScript types. Justify any new dependency in the PR description.
+- Pin GitHub Actions to commit SHAs, not tags.
+- Review the bundle for unintentionally shipped server-only modules (e.g., `fs`, `crypto` polyfills pulling secrets-handling code into the client).
+
+### Content Security
+- The current CSP is already permissive in some places. Flag any change that further relaxes CSP, and prefer tightening directives over time — including reducing or removing `unsafe-inline` / `unsafe-eval` where feasible.
+- Do not load untrusted third-party scripts. Any external script that must be loaded should be explicitly justified in the PR, reviewed for CSP impact, and use integrity protections such as SRI where applicable.
+
+### What to do when unsure
+- If a change introduces a new auth flow, a new cross-tenant boundary, a new HTML sink, or a new third-party domain, call it out explicitly in the PR description.
+- Prefer adding a Playwright test that proves the security property (e.g., "user without role X cannot see element Y") over a comment claiming it.
