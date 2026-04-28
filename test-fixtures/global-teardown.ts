@@ -42,6 +42,9 @@ const deleteInstances = async (instances: Instance[]) => {
       );
 
       console.log(`Deleting Resource Instance: ${instance.id}`);
+
+      // Delay between delete requests to avoid backend rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       deletingInstances.push({
         serviceId: instance.serviceId,
         environmentId: instance.environmentId,
@@ -84,6 +87,8 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
             console.log(`Instance ${inst.id} is in ${inst.status} state, re-triggering deletion...`);
             try {
               await providerClient.deleteInstance(serviceId, environmentId, inst.id!, inst.resourceID!);
+              // Delay between delete requests to avoid backend rate limiting
+              await new Promise((resolve) => setTimeout(resolve, 5000));
             } catch (error) {
               console.error(`Failed to re-delete instance ${inst.id}:`, error);
             }
@@ -109,7 +114,11 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 };
 
 async function globalTeardown() {
-  console.log("Running Global Teardown...");
+  console.log(`Running Global Teardown... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
+
+  // Always run teardown, even in replay mode. Some tests (user-setup, signin) are
+  // marked always-live and can still leak backend state, so skipping cleanup here
+  // is unsafe.
 
   const providerAPIClient = new ProviderAPIClient();
 

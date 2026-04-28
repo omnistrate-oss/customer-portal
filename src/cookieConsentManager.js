@@ -6,7 +6,7 @@ export const getCookieConsentInitialObject = (googleAnalyticsTagID) => {
       {
         category: "necessary",
         services: [
-          { type: "auth", name: "token", cookies: ["token"] },
+          { type: "auth", name: "Authentication", cookies: ["omnistrate_token", "omnistrate_refresh_token", "omnistrate_logged_in"] },
           { type: "OAuth_providers", name: "OAuth" },
         ],
         hide: false,

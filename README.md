@@ -56,11 +56,15 @@ To build and run the Customer Portal locally
 node --version
 ```
 
-2. Visit the Yarn website: Go to <https://classic.yarnpkg.com/lang/en/docs/install/> and follow platform-specific instructions for your operating system (Linux, macOS, Windows) to install yarn classic (1.x). Check the yarn version (1.22.19 as of March 13, 2024) to confirm successful installation.
+2. Enable Yarn Berry (4.x) via Corepack, which ships with Node.js. The project's `packageManager` field pins the exact Yarn version used by this repo.
 
 ```bash
+corepack enable
+corepack prepare yarn@4.5.0 --activate
 yarn --version
 ```
+
+The install commands below rely on Yarn Berry features (`YARN_ENABLE_SCRIPTS` env var and `yarn rebuild`) that are not available in Yarn 1.x.
 
 3. Clone the Repository: Use Git to clone the repository to your local machine.
 
@@ -71,8 +75,11 @@ git clone https://github.com/omnistrate-oss/customer-portal.git
 4. Install dependencies with yarn
 
 ```bash
-yarn install
+YARN_ENABLE_SCRIPTS=false yarn install
+yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
 ```
+
+> **Why two commands?** Package install scripts are disabled by default to prevent supply-chain attacks. In the March 31, 2026 axios npm compromise, malicious versions `axios@1.14.1` and `axios@0.30.4` pulled in a malicious `plain-crypto-js@4.2.1` whose `postinstall` hook fetched and executed a cross-platform RAT — any developer or CI runner that ran `npm/yarn install` on a vulnerable lockfile was compromised silently. The second command re-enables install scripts only for an explicit, security-reviewed allowlist of native packages. If you add a new dependency that needs a build-time script (e.g., a native module), security-review its install script, then add the package name to the `yarn rebuild` line in `Dockerfile`, `.github/workflows/playwright.yml`, and this README.
 
 5. Configure .env.local: Create a .env.local file in the root directory. Populate it with necessary environment variables
 

@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 import { dataTestIds as instanceDataTestIds } from "page-objects/constants/instances-page";
 import { InstancesPage } from "page-objects/instances-page";

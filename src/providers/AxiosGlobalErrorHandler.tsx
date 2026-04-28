@@ -3,12 +3,13 @@ import { Alert, Snackbar } from "@mui/material";
 import Cookies from "js-cookie";
 import _ from "lodash";
 
+import { AUTH_INDICATOR_COOKIE } from "src/api/client";
+import { refreshAuth } from "src/api/refreshAuth";
 import axios, { baseURL } from "src/axios";
-import useLogout from "src/hooks/useLogout";
-import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
+import { logoutBroadcastChannel } from "src/broadcastChannel";
+import { checkIsNonProtectedEndpoint, isAuthError } from "src/utils/authUtils";
 
 const AxiosGlobalErrorHandler = () => {
-  const { handleLogout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
@@ -19,21 +20,22 @@ const AxiosGlobalErrorHandler = () => {
 
   useEffect(() => {
     const requestInterceptorId = axios.interceptors.request.use((config) => {
-      const isCliDownload = /^\/service\/[^/]+\/service-api\/[^/]+\/cli$/.test(config.url ?? "");
-
-      // cancel the request if auth cookie is missing for protected endpoints
+      // cancel the request if auth indicator is missing for protected endpoints
       const isProtectedEndpoint = !checkIsNonProtectedEndpoint(config.url || "");
-      const hasAuthToken = typeof document !== "undefined" && !!Cookies.get("token");
+      const hasAuth = typeof document !== "undefined" && !!Cookies.get(AUTH_INDICATOR_COOKIE);
 
-      if (isProtectedEndpoint && !hasAuthToken) {
-        // Abort this request with AbortController
+      if (isProtectedEndpoint && !hasAuth) {
+        // Redirect to signin — handles stale sessions (e.g., after deployment migration)
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/signin")) {
+          window.location.href = "/signin";
+        }
         const controller = new AbortController();
         config.signal = controller.signal;
         controller.abort("Request aborted due to missing auth token");
-        return config; // Axios will reject the request after seeing the aborted signal
+        return config;
       }
 
-      if (config.url && !config.url.startsWith("/api") && config.url.startsWith("/") && !isCliDownload) {
+      if (config.url && !config.url.startsWith("/api") && config.url.startsWith("/")) {
         //the original request url
         const originalRequestURL = config.url;
         //the original request method
@@ -71,11 +73,63 @@ const AxiosGlobalErrorHandler = () => {
         return response;
       },
       async function (error) {
+        // Silently swallow requests canceled by the auth guard (no indicator cookie).
+        // The auth guard already triggers a redirect to /signin — showing an error toast
+        // would just flash "Something went wrong" before the redirect completes.
+        if (error.code === "ERR_CANCELED") {
+          return Promise.reject(error);
+        }
+
         const ignoreGlobalErrorSnack = error.config?.ignoreGlobalErrorSnack;
 
-        if (error.response && error.response.status === 401) {
+        // Extract backend message from either a plain-string body or a `.message` field
+        // so isAuthError can detect 400 "token is missing from header" in both shapes.
+        const responseMessage =
+          typeof error.response?.data === "string" ? error.response.data : error.response?.data?.message;
+
+        if (error.response && isAuthError(error.response.status, responseMessage)) {
           if (`${baseURL}/signin` !== error.request.responseURL) {
-            handleLogout();
+            // Attempt silent token refresh before forcing logout
+            const refreshed = await refreshAuth();
+            if (refreshed && error.config && !error.config._retried) {
+              try {
+                error.config._retried = true;
+                return await axios.request(error.config);
+              } catch {
+                // Retry failed — fall through to logout
+              }
+            }
+            // Force logout with a hard nav. Using `logout()` here does a soft
+            // router.replace that lets React keep rendering — enough time for
+            // the rejected 401 to reach React Query's onError and flash the
+            // error snackbar before /signin mounts.
+            // Await so the server finishes clearing the httpOnly cookies
+            // before /signin loads — middleware redirects away from /signin
+            // when the auth cookie is still present and valid, which would
+            // bounce us back.
+            try {
+              await fetch("/api/logout", { method: "POST", keepalive: true });
+            } catch {
+              // Ignore — we're redirecting regardless.
+            }
+            Cookies.remove(AUTH_INDICATOR_COOKIE);
+            localStorage.removeItem("paymentNotificationHidden");
+            try {
+              localStorage.removeItem("loggedInUsingSSO");
+            } catch (err) {
+              console.warn("Failed to clear SSO state:", err);
+            }
+            // Broadcast so other open tabs/windows also log out.
+            if (logoutBroadcastChannel) {
+              try {
+                logoutBroadcastChannel.postMessage("logout");
+              } catch (err) {
+                console.warn("Failed to broadcast logout:", err);
+              }
+            }
+            // Use replace so /signin doesn't get added to history (Back would
+            // land on the protected page and trigger another 401 bounce).
+            window.location.replace("/signin");
           }
         } else if (!ignoreGlobalErrorSnack) {
           if (error.response && error.response.data) {
@@ -112,7 +166,7 @@ const AxiosGlobalErrorHandler = () => {
       axios.interceptors.request.eject(requestInterceptorId);
       axios.interceptors.response.eject(responseInterceptorId);
     };
-  }, [handleLogout]);
+  }, []);
 
   return (
     <Snackbar open={isOpen} autoHideDuration={5000} onClose={handleClose}>
