@@ -1,18 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { Box, Dialog, Stack, Step, StepLabel, Stepper, styled } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
-import { $api } from "src/api/query";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
-import useSnackbar from "src/hooks/useSnackbar";
-import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
-import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import TextField from "components/FormElements/TextField/TextField";
 import { Text } from "components/Typography/Typography";
+import { $api } from "src/api/query";
+import useSnackbar from "src/hooks/useSnackbar";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
+import { roundNumberToTwoDecimals } from "src/utils/formatNumber";
 
 import Chip from "../Chip/Chip";
 import { TextContainerToCopy } from "../CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
@@ -90,9 +88,7 @@ const ListItem = styled(Box)({
   gap: "4px",
 });
 
-const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusStopPolling) => {
-  const environmentType = useEnvironmentType();
-  const queryClient = useQueryClient();
+const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusStopPolling, refetchInstances) => {
   const [isPolling, setIsPolling] = useState(true);
   const timeoutId = useRef(null);
   const pollInterval = 5000; // 5 seconds
@@ -105,8 +101,8 @@ const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusS
     try {
       const resourceInstanceResponse = await fetchClickedInstanceDetails();
       resourceInstance = resourceInstanceResponse.data;
-    } catch {
-      console.log("check error in polling ");
+    } catch (error) {
+      console.error("Error polling instance details:", error);
     }
 
     if (resourceInstance?.status) {
@@ -119,39 +115,15 @@ const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusS
         },
       }));
 
-      queryClient.setQueryData(
-        [
-          "get",
-          "/2022-09-01-00/resource-instance",
-          {
-            params: {
-              query: {
-                environmentType,
-              },
-            },
-          },
-        ],
-        (oldData) => ({
-          resourceInstances: (oldData?.resourceInstances || []).map((inst) =>
-            inst?.id === resourceInstance?.id
-              ? {
-                  ...resourceInstance,
-                  status: resourceInstance.status,
-                  result_params: resourceInstance.result_params,
-                }
-              : inst
-          ),
-        })
-      );
-
-      // // Stop polling if the status matches the stop condition
+      // Stop polling and refetch instance list only when final status is reached
       if (resourceInstance?.status === stepStatusStopPolling) {
         setIsPolling(false);
-        return; // Exit the polling
+        refetchInstances?.();
+        return;
       }
     }
 
-    // Continue polling without a limit
+    // Continue polling
     timeoutId.current = setTimeout(startPolling, pollInterval);
   };
 
@@ -233,6 +205,7 @@ const Check = ({
   fetchClickedInstanceDetails,
   setClickedInstance,
   serviceProviderName,
+  refetchInstances,
 }) => {
   useEffect(() => {
     setActiveStepRun(0);
@@ -243,7 +216,7 @@ const Check = ({
       setActiveStepRun(1);
     }
   }, [activeStepRun, setActiveStepRun, instance?.status]);
-  usePolling(fetchClickedInstanceDetails, setClickedInstance, "DISCONNECTED");
+  usePolling(fetchClickedInstanceDetails, setClickedInstance, "DISCONNECTED", refetchInstances);
 
   return (
     <Box width={"100%"} display={"flex"} flexDirection={"column"} gap="10px">
@@ -444,7 +417,7 @@ function DisconnectAccountConfigDialog(props) {
             },
           },
           body: {
-            disconnect: true,
+            setConnection: false,
             serviceId: serviceId,
             subscriptionId: instance?.subscriptionId,
           },
@@ -480,6 +453,7 @@ function DisconnectAccountConfigDialog(props) {
               fetchClickedInstanceDetails={fetchClickedInstanceDetails}
               setClickedInstance={setClickedInstance}
               serviceProviderName={serviceProviderName}
+              refetchInstances={refetchInstances}
             />
           )}
         </Content>
@@ -488,7 +462,6 @@ function DisconnectAccountConfigDialog(props) {
           <Button
             variant="outlined"
             sx={{ height: "40px !important", padding: "10px 14px !important" }}
-            disabled={isFetching}
             onClick={handleCancel}
           >
             Cancel
@@ -506,21 +479,6 @@ function DisconnectAccountConfigDialog(props) {
               onClick={formik.handleSubmit}
             >
               {"Disconnect"} {isFetching || (accountConfigMutation.isPending && <LoadingSpinnerSmall />)}
-            </Button>
-          )}
-          {disconnectState === stateAccountConfigStepper.check && (
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                height: "40px !important",
-                padding: "10px 14px !important",
-              }}
-              disabled={isFetching}
-              bgColor={buttonColor}
-              onClick={handleCancel}
-            >
-              {"Close"} {isFetching && <LoadingSpinnerSmall />}
             </Button>
           )}
         </Footer>
