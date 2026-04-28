@@ -70,10 +70,17 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isPendingDetaching = instance?.status === "PENDING_DETACHING";
 
     const isDisconnectDisabled =
-      !instance || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
+      !instance || isFailed || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
 
     const isConnectDisabled =
-      !instance || isReady || isDisconnecting || isDetaching || isPendingDetaching || isDeploying || !isOnPremCopilot;
+      !instance ||
+      isFailed ||
+      isReady ||
+      isDisconnecting ||
+      isDetaching ||
+      isPendingDetaching ||
+      isDeploying ||
+      !isOnPremCopilot;
 
     const isDisconnectDisabledMessage = !instance
       ? "Please select a cloud account"
@@ -88,7 +95,6 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
               : !isOnPremCopilot
                 ? "This feature is not supported for this plan"
                 : "";
-
     const isConnectDisabledMessage = !instance
       ? "Please select a cloud account"
       : isFailed
