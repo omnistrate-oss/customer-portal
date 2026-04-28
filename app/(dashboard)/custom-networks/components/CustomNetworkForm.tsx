@@ -217,7 +217,7 @@ const CustomNetworkForm = ({
                     formMode === "modify"
                       ? "Cannot change shared subscription setting after creation"
                       : !subscriptionOwnerMenuItems.length
-                        ? "No subscription owners available. Please ensure there are users with active subscriptions."
+                        ? "No shared subscriptions found. You need at least one subscription shared with you to create a network for another owner"
                         : ""
                   }
                 >
