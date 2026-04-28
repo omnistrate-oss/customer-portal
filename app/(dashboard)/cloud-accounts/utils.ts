@@ -90,37 +90,27 @@ export const getInitialValues = (
       servicePlanId: subscription?.productTierId || "",
       subscriptionId: subscription?.id || "",
 
-      // @ts-ignore
       cloudProvider: resultParams?.gcp_project_id
         ? "gcp"
-        : //@ts-ignore
-          resultParams?.azure_subscription_id
+        : resultParams?.azure_subscription_id
           ? "azure"
-          : // @ts-ignore
-            resultParams?.aws_account_id
+          : resultParams?.aws_account_id
             ? "aws"
-            : // @ts-ignore
-              resultParams?.oci_tenancy_id
+            : resultParams?.oci_tenancy_id
               ? "oci"
-              : "",
+              : resultParams?.nebius_tenant_id
+                ? "nebius"
+                : "",
       accountConfigurationMethod:
-        // @ts-ignore
         resultParams?.account_configuration_method,
-      // @ts-ignore
       awsAccountId: resultParams?.aws_account_id,
-      // @ts-ignore
       gcpProjectId: resultParams?.gcp_project_id,
-      // @ts-ignore
       gcpProjectNumber: resultParams?.gcp_project_number,
       azureSubscriptionId:
-        // @ts-ignore
         resultParams?.azure_subscription_id,
-      //@ts-ignore
       azureTenantId: resultParams?.azure_tenant_id,
       ociTenancyId:
-        // @ts-ignore
         resultParams?.oci_tenancy_id,
-      // @ts-ignore
       ociDomainId: resultParams?.oci_domain_id,
     };
   }

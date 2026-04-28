@@ -1,17 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -24,6 +21,9 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -67,9 +67,12 @@ const CloudAccountForm = ({
   });
 
   const byoaServiceOfferings = useMemo(() => {
-    return serviceOfferings.filter(
-      (offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT"
-    );
+    return serviceOfferings
+      .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
+      .map((offering) => ({
+        ...offering,
+        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
+      }));
   }, [serviceOfferings]);
 
   const byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>> = useMemo(() => {
@@ -420,7 +423,7 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={serviceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
+                  cloudProviders={byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
