@@ -25,7 +25,7 @@ import { Text } from "../Typography/Typography";
 
 type CustomNetworkSelectionStepProps = {
   handleClose: () => void;
-  restoreInstanceMutation: UseMutationResult<void, Error, { customNetwork?: string }, unknown>;
+  restoreInstanceMutation: UseMutationResult<unknown, Error, { customNetwork?: string }, unknown>;
   cloudProvider?: string;
   region: string;
   customNetworks: CustomNetwork[];
@@ -67,7 +67,9 @@ const CustomNetworkSelectionStep: FC<CustomNetworkSelectionStepProps> = ({
           ? offering.gcpRegions || []
           : cloudProvider === "azure"
             ? offering.azureRegions || []
-            : offering.ociRegions || [],
+            : cloudProvider === "nebius"
+              ? offering.nebiusRegions || []
+              : offering.ociRegions || [],
       region
     );
   }, [customNetworks, cloudProvider, region, offering]);

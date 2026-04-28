@@ -272,7 +272,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       });
     }
 
-    if (deletionProtectionFeatureEnabled && !isOnPrem) {
+    if (deletionProtectionFeatureEnabled) {
       res.push({
         dataTestId: "enable-deletion-protection-button",
         label: "Enable Delete Protection",

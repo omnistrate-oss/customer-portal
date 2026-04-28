@@ -53,6 +53,7 @@ const InstanceForm = ({
   setOverlayType,
   setIsOverlayOpen,
   setCreateInstanceModalData,
+  setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
 
@@ -160,6 +161,7 @@ const InstanceForm = ({
         formData.resetForm();
         snackbar.showSuccess("Updated Deployment Instance");
         setIsOverlayOpen(false);
+        setSelectedRows([]);
       },
     }
   );

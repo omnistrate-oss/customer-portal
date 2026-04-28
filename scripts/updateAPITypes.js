@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 const puppeteer = require("puppeteer");
 
 const externalAPIUrl = "https://api.omnistrate.dev/docs/external/";
@@ -64,7 +64,7 @@ async function downloadOpenAPISpec() {
 function convertToTypeScript() {
   console.log("Converting OpenAPI spec to TypeScript...");
   try {
-    execSync(`npx openapi-typescript ${jsonOutputPath} -o ${externalAPIOutputPath} --yes`, {
+    execFileSync("yarn", ["openapi-typescript", jsonOutputPath, "-o", externalAPIOutputPath, "--yes"], {
       stdio: "inherit",
     });
     console.log(`TypeScript definitions saved to ${externalAPIOutputPath}`);

@@ -29,7 +29,7 @@ type CopySnapshotModalProps = {
   handleClose: () => void;
   offering: ServiceOffering;
   cloudProvider?: string;
-  copySnapshotMutation: UseMutationResult<void, Error, { targetRegion: string }, unknown>;
+  copySnapshotMutation: UseMutationResult<unknown, Error, { targetRegion: string }, unknown>;
   snapshotCreationType: SnapshotCreationType | null;
   tab?: "backups" | "snapshots";
 };

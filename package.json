@@ -11,7 +11,10 @@
     "format:check": "prettier --check --ignore-path .prettierignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "find:unused": "next-unused",
-    "update-api-types": "node scripts/updateAPITypes.js"
+    "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
+    "test:record": "HAR_MODE=record yarn playwright test",
+    "test:replay": "HAR_MODE=replay yarn playwright test",
+    "record": "yarn tsx scripts/record-hars.ts"
   },
   "next-unused": {
     "alias": {},
@@ -36,7 +39,7 @@
     "@tanstack/react-query": "^5.77.1",
     "@tanstack/react-table": "^8.20.5",
     "ansi-to-react": "^6.1.6",
-    "axios": "1.13.5",
+    "axios": "1.15.0",
     "buffer": "^6.0.3",
     "clipboardy": "^3.0.0",
     "clsx": "^2.1.1",
@@ -53,13 +56,13 @@
     "js-base64": "^3.7.5",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "monaco-editor": "^0.52.0",
-    "next": "16.1.7",
+    "next": "16.2.3",
     "next-nprogress-bar": "^2.4.3",
     "next-plugin-yaml": "^1.0.1",
     "node-cron": "^3.0.3",
-    "nodemailer": "^8.0.4",
+    "nodemailer": "^8.0.5",
     "openapi-fetch": "^0.14.0",
     "openapi-react-query": "^0.5.0",
     "prop-types": "^15.6.0",
@@ -84,6 +87,7 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.2",
+    "@inquirer/prompts": "^8.3.0",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "20.14.11",
@@ -102,28 +106,13 @@
     "prettier": "^3.1.0",
     "puppeteer": "^24.3.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3",
+    "wait-on": "^9.0.4"
   },
   "resolutions": {
-    "tar-fs": "3.1.1",
-    "@babel/runtime-corejs3": "7.29.2",
-    "@babel/runtime": "7.29.2",
-    "prismjs": "1.30.0",
-    "brace-expansion": "2.0.3",
-    "glob": "10.5.0",
-    "js-yaml": "4.1.1",
-    "qs": "6.14.2",
-    "lodash": "4.17.23",
-    "lodash-es": "4.17.23",
-    "minimatch": "5.1.8",
-    "ajv": "^6.14.0",
-    "basic-ftp": "5.2.0",
-    "**/sass/immutable": "5.1.5",
-    "**/swagger-ui-react/**/immutable": "3.8.3",
-    "dompurify": "3.3.3",
-    "path-to-regexp": "0.1.13",
-    "yaml": "1.10.3",
-    "flatted": "3.4.2",
-    "**/tinyglobby/picomatch": "4.0.4"
-  }
+    "axios": "1.15.0",
+    "basic-ftp": "5.2.2"
+  },
+  "packageManager": "yarn@4.5.0"
 }

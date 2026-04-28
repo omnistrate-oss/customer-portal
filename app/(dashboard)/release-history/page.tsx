@@ -21,39 +21,37 @@ const ReleaseHistoryPage = () => {
   const [selectedPlanId, setSelectedPlanId] = useState("");
 
   // Filter serviceOfferings to only include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope
-  const versionSetOfferings = useMemo(() => {
-    return serviceOfferings.filter(
-      (offering) =>
-        offering.serviceModelType === "ON_PREM" &&
-        offering.productTierFeatures?.some(
-          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-        )
+  const versionSetOverrideOfferings = useMemo(() => {
+    return serviceOfferings.filter((offering) =>
+      offering.productTierFeatures?.some(
+        (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+      )
     );
   }, [serviceOfferings]);
 
   // Build product dropdown options from filtered serviceOfferings
   const productOptions = useMemo(() => {
-    return getServiceMenuItems(versionSetOfferings).map((item) => ({
+    return getServiceMenuItems(versionSetOverrideOfferings).map((item) => ({
       label: item.label,
       value: item.value as string,
     }));
-  }, [versionSetOfferings]);
+  }, [versionSetOverrideOfferings]);
 
   // Build plan dropdown options filtered by selected product
   const planOptions = useMemo(() => {
     if (!selectedServiceId) return [];
-    return getServicePlanMenuItems(versionSetOfferings, selectedServiceId).map((item) => ({
+    return getServicePlanMenuItems(versionSetOverrideOfferings, selectedServiceId).map((item) => ({
       label: item.label,
       value: item.value as string,
     }));
-  }, [versionSetOfferings, selectedServiceId]);
+  }, [versionSetOverrideOfferings, selectedServiceId]);
 
   // Auto-select default product (first one) when data loads
   useEffect(() => {
-    if (!selectedServiceId && versionSetOfferings?.length) {
-      setSelectedServiceId(versionSetOfferings[0].serviceId);
+    if (!selectedServiceId && versionSetOverrideOfferings?.length) {
+      setSelectedServiceId(versionSetOverrideOfferings[0].serviceId);
     }
-  }, [versionSetOfferings, selectedServiceId]);
+  }, [versionSetOverrideOfferings, selectedServiceId]);
 
   // Auto-select default plan when product changes or plan list updates
   useEffect(() => {
@@ -104,7 +102,8 @@ const ReleaseHistoryPage = () => {
       <PageContainer>
         <PageTitle icon={PageReleaseHistoryIcon}>Release History</PageTitle>
         <Text size="small" weight="regular" color="#535862" className="mt-1 ml-10">
-          View all product version releases, updates, and improvements across your on-prem deployments
+          View all available versions and release information for products and subscription plans that allow you to
+          choose a deployment version
         </Text>
       </PageContainer>
 

@@ -1,26 +1,51 @@
 import { yamlTemplates } from "constants/yaml-templates";
+import { ApiFixture } from "test-fixtures/api-fixture";
 import { GlobalStateManager } from "test-utils/global-state-manager";
+import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
+import { clearSoftFailureReport } from "test-utils/soft-failure-tracker";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 async function globalSetup() {
-  console.log("Running Global Setup...");
+  console.log(`Running Global Setup... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
 
-  const apiClient = new ProviderAPIClient();
-  let token = GlobalStateManager.getToken("provider");
+  // Clear stale report from previous runs (recorder is registered per-worker)
+  clearSoftFailureReport();
 
-  if (!token) {
+  // In replay mode, load saved state from fixture — but refresh the provider token
+  // (24h JWT expiry means the stored one goes stale between HAR recording and replay).
+  if (isReplayMode()) {
+    const fixture = new ApiFixture("global-setup");
+    const savedState = await fixture.getOrCreate("globalState", () => ({}));
+    GlobalStateManager.setState(savedState);
+
     const email = process.env.PROVIDER_EMAIL;
     const password = process.env.PROVIDER_PASSWORD;
-
-    if (!email || !password) {
-      throw new Error("Missing provider credentials in environment variables");
+    if (email && password) {
+      try {
+        const apiClient = new ProviderAPIClient();
+        await apiClient.providerLogin(email, password);
+        console.log("Provider token refreshed (replay mode)");
+      } catch (error) {
+        console.warn("Failed to refresh provider token in replay mode:", error);
+      }
     }
 
-    token = await apiClient.providerLogin(email, password);
-    GlobalStateManager.setState({ providerToken: token });
+    console.log("Global Setup loaded from fixture (replay mode)");
+    return;
   }
 
+  const apiClient = new ProviderAPIClient();
+
+  const email = process.env.PROVIDER_EMAIL;
+  const password = process.env.PROVIDER_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error("Missing provider credentials in environment variables");
+  }
+
+  const token = await apiClient.providerLogin(email, password);
+  GlobalStateManager.setState({ providerToken: token });
   console.log("Provider Auth Successful");
 
   const userEmail = process.env.USER_EMAIL;
@@ -30,7 +55,8 @@ async function globalSetup() {
   }
 
   const userClient = new UserAPIClient();
-  await userClient.userLogin(userEmail!, userPassword!);
+  await userClient.userLogin(userEmail, userPassword);
+  console.log("User Auth Successful");
 
   const date = `${Date.now()}`;
 
@@ -52,8 +78,24 @@ async function globalSetup() {
     ),
   ]);
 
-  // Used when Deleting Services
   GlobalStateManager.setState({ date });
+
+  // In record mode, save the global state for replay. Allowlist the safe fields
+  // explicitly — keeps auth tokens out of the committed fixture, and forces a
+  // deliberate decision when GlobalState gains new fields.
+  if (isRecordMode()) {
+    const fixture = new ApiFixture("global-setup");
+    await fixture.getOrCreate("globalState", () => {
+      const state = GlobalStateManager.loadState();
+      return {
+        date: state.date,
+        serviceOfferings: state.serviceOfferings,
+        subscriptions: state.subscriptions,
+      };
+    });
+    console.log("Global state saved to fixture (record mode)");
+  }
+
   console.log("Global Setup Successful");
 }
 
