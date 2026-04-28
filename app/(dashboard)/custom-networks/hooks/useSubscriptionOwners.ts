@@ -19,7 +19,7 @@ const useSubscriptionOwners = () => {
 
     const seen = new Set<string>();
     return query.data.subscriptions
-      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId)
+      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader")
       .reduce<{ userId: string; name: string; email: string; orgId: string }[]>((acc, sub) => {
         const orgId = sub.rootUserOrgId!;
         if (!seen.has(orgId)) {
