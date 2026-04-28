@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const versionSets = await getVersionSets({ serviceId, productTierId });
-    return res.status(200).json({ tierVersionSets: versionSets });
+    return res.status(200).json(versionSets);
   } catch (error) {
     console.error("Error fetching version sets:", error);
 

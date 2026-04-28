@@ -9,7 +9,11 @@ function getVersionSets(params = {}) {
     .get(`/service/${serviceId}/productTier/${productTierId}/version-set`)
     .then((response) => {
       const data = response?.data || {};
-      return data.tierVersionSets || [];
+      const versionSets = data.tierVersionSets || [];
+      return versionSets.sort((a, b) => {
+        const getTime = (item) => new Date(item.releasedAt || item.createdAt || 0).getTime() || 0;
+        return getTime(b) - getTime(a);
+      });
     })
     .catch((error) => {
       console.error("getVersionSets error", error?.response?.data || error.message);
