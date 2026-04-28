@@ -1,10 +1,13 @@
 import {
-  setAuthCookie,
-  setRefreshCookie,
   clearAuthCookie,
+  clearIndicatorCookie,
   clearRefreshCookie,
   getRefreshToken,
+  setAuthCookie,
+  setIndicatorCookie,
+  setRefreshCookie,
 } from "src/server/utils/authCookie";
+import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -29,13 +32,16 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     const backendResponse = await fetch(`${baseDomain}/2022-09-01-00/refresh-token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({ refreshToken, environmentType: getEnvironmentType() }),
     });
 
     if (!backendResponse.ok) {
-      clearAuthCookie(nextResponse);
-      clearRefreshCookie(nextResponse);
-      return nextResponse.status(401).json({ message: "Refresh failed" });
+      if (backendResponse.status === 401 || backendResponse.status === 403) {
+        clearAuthCookie(nextResponse);
+        clearRefreshCookie(nextResponse);
+        clearIndicatorCookie(nextResponse);
+      }
+      return nextResponse.status(backendResponse.status).json({ message: "Refresh failed" });
     }
 
     const data = await backendResponse.json().catch(() => ({}));
@@ -44,10 +50,12 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
       // Backend returned 200 but no token — treat as failure
       clearAuthCookie(nextResponse);
       clearRefreshCookie(nextResponse);
+      clearIndicatorCookie(nextResponse);
       return nextResponse.status(401).json({ message: "Refresh failed — no token in response" });
     }
 
     setAuthCookie(nextResponse, data.jwtToken);
+    setIndicatorCookie(nextResponse);
     if (data.refreshToken) {
       setRefreshCookie(nextResponse, data.refreshToken);
     }
@@ -57,6 +65,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
     console.error("Error refreshing token", error);
     clearAuthCookie(nextResponse);
     clearRefreshCookie(nextResponse);
+    clearIndicatorCookie(nextResponse);
     return nextResponse.status(401).json({ message: "Refresh failed" });
   }
 }

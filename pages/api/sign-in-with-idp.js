@@ -1,6 +1,6 @@
 const { customerSignInWithIdentityProvider } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
-import { setAuthCookie, setRefreshCookie } from "src/server/utils/authCookie";
+import { setAuthCookie, setIndicatorCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
 export default async function handleSignIn(nextRequest, nextResponse) {
@@ -30,6 +30,7 @@ export default async function handleSignIn(nextRequest, nextResponse) {
 
       if (jwtToken) {
         setAuthCookie(nextResponse, jwtToken);
+        setIndicatorCookie(nextResponse);
       }
       if (refreshToken) {
         setRefreshCookie(nextResponse, refreshToken);

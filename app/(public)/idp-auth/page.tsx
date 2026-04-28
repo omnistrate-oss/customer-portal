@@ -30,13 +30,6 @@ const IDPAuthPage = () => {
         hasAttemptedSignIn.current = true;
         await customerSignInWithIdentityProvider(payload);
         sessionStorage.removeItem("authState");
-
-        // httpOnly cookie is set server-side by /api/sign-in-with-idp — set indicator for UI auth state
-        Cookies.set("omnistrate_logged_in", "true", {
-          expires: 1,
-          sameSite: "Lax",
-          secure: window.location.protocol === "https:",
-        });
         Cookies.remove("token"); // Clean up legacy cookie from pre-httpOnly migration
 
         try {
