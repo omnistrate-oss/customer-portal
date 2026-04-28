@@ -57,6 +57,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isNebius = !!getResultParams(instance)?.nebius_tenant_id;
 
     const isDeploying = instance?.status === "DEPLOYING";
+    const isFailed = instance?.status === "FAILED";
     const isAttaching = instance?.status === "ATTACHING";
     const isConnecting = instance?.status === "CONNECTING";
     const isDisconnected = instance?.status === "DISCONNECTED";
@@ -76,27 +77,31 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
 
     const isDisconnectDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isAttaching || isConnecting
-        ? "Cloud account is connecting"
-        : isDisconnected
-          ? "Cloud account is disconnected"
-          : isDeploying
-            ? "Please wait for the instance to get to Ready state"
-            : !isOnPremCopilot
-              ? "This feature is not supported for this plan"
-              : "";
+      : isFailed
+        ? "Cloud account is not ready to Disconnect"
+        : isAttaching || isConnecting
+          ? "Cloud account is connecting"
+          : isDisconnected
+            ? "Cloud account is disconnected"
+            : isDeploying
+              ? "Please wait for the instance to get to Ready state"
+              : !isOnPremCopilot
+                ? "This feature is not supported for this plan"
+                : "";
 
     const isConnectDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isReady
-        ? "Cloud account is already connected"
-        : isDisconnecting || isDetaching || isPendingDetaching
-          ? "Cloud account is disconnecting"
-          : isDeploying
-            ? "Please wait for the instance to get to Ready state"
-            : !isOnPremCopilot
-              ? "This feature is not supported for this plan"
-              : "";
+      : isFailed
+        ? "Cloud account is not ready to Connect"
+        : isReady
+          ? "Cloud account is already connected"
+          : isDisconnecting || isDetaching || isPendingDetaching
+            ? "Cloud account is disconnecting"
+            : isDeploying
+              ? "Please wait for the instance to get to Ready state"
+              : !isOnPremCopilot
+                ? "This feature is not supported for this plan"
+                : "";
 
     // Delete action
     const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius || isDisconnected;
