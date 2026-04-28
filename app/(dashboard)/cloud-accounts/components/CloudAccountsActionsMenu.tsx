@@ -85,7 +85,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isDisconnectDisabledMessage = !instance
       ? "Please select a cloud account"
       : isFailed
-        ? "Cloud account is not ready to Disconnect"
+        ? "Cloud account is not ready to disconnect"
         : isAttaching || isConnecting
           ? "Cloud account is connecting"
           : isDisconnected
@@ -98,7 +98,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isConnectDisabledMessage = !instance
       ? "Please select a cloud account"
       : isFailed
-        ? "Cloud account is not ready to Connect"
+        ? "Cloud account is not ready to connect"
         : isReady
           ? "Cloud account is already connected"
           : isDisconnecting || isDetaching || isPendingDetaching
