@@ -199,33 +199,41 @@ apiClient.use({
           }
 
           // Refresh truly failed — force logout, but only once across
-          // parallel 401s hitting this block simultaneously.
+          // parallel 401s hitting this block simultaneously. The flag is
+          // cleared in `finally` after a short delay so that if the
+          // navigation never happens (test harness, SSR, replace stub), a
+          // future 401 can still trigger a fresh logout attempt.
           if (!logoutInProgress) {
             logoutInProgress = true;
-
             try {
-              await fetch("/api/logout", { method: "POST", keepalive: true });
-            } catch {
-              // Ignore — we're redirecting regardless.
-            }
-
-            Cookies.remove(AUTH_INDICATOR_COOKIE);
-            localStorage.removeItem("paymentNotificationHidden");
-            try {
-              localStorage.removeItem("loggedInUsingSSO");
-            } catch (error) {
-              console.warn("Failed to clear SSO state:", error);
-            }
-
-            if (logoutBroadcastChannel) {
               try {
-                logoutBroadcastChannel.postMessage("logout");
-              } catch (error) {
-                console.warn("Failed to broadcast logout:", error);
+                await fetch("/api/logout", { method: "POST", keepalive: true });
+              } catch {
+                // Ignore — we're redirecting regardless.
               }
-            }
 
-            window.location.replace("/signin");
+              Cookies.remove(AUTH_INDICATOR_COOKIE);
+              localStorage.removeItem("paymentNotificationHidden");
+              try {
+                localStorage.removeItem("loggedInUsingSSO");
+              } catch (error) {
+                console.warn("Failed to clear SSO state:", error);
+              }
+
+              if (logoutBroadcastChannel) {
+                try {
+                  logoutBroadcastChannel.postMessage("logout");
+                } catch (error) {
+                  console.warn("Failed to broadcast logout:", error);
+                }
+              }
+
+              window.location.replace("/signin");
+            } finally {
+              setTimeout(() => {
+                logoutInProgress = false;
+              }, 1000);
+            }
           }
         }
       } else if (!ignoreGlobalErrorSnack && globalErrorHandler) {
