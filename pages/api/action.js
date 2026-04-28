@@ -4,6 +4,7 @@ import { baseDomain } from "src/api/client";
 import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
 import { getAuthToken } from "src/server/utils/authCookie";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 import {
   isPasswordSameAsEmail,
   passwordMatchesEmailText,
@@ -71,8 +72,11 @@ export default async function handleAction(nextRequest, nextResponse) {
 
         // No auth token → return 401 so client-side refresh logic triggers
         // (without this, the backend returns 400 "token is missing" which
-        // the client doesn't treat as an auth failure)
-        if (!authorization) {
+        // the client doesn't treat as an auth failure).
+        // Skip for non-protected endpoints (e.g. /change-password, /reset-password,
+        // /signin, /signup) which are used by unauthenticated users and so will
+        // never have an auth cookie.
+        if (!authorization && !checkIsNonProtectedEndpoint(endpoint)) {
           return nextResponse.status(401).json({ message: "Not authenticated" });
         }
 
