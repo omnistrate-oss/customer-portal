@@ -116,7 +116,7 @@ const CustomNetworksPage = () => {
       }),
       columnHelper.accessor("owningUserName", {
         id: "owningUserName",
-        header: "Subscription Owner",
+        header: "Created By",
         cell: (data) => {
           return data.row.original.owningUserName || "-";
         },

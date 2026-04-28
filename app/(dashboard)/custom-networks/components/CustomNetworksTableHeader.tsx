@@ -59,8 +59,7 @@ const CustomNetworksTableHeader = ({
 
   const getModifyDeleteDisabledMessage = () => {
     if (selectedRows.length !== 1) return "Please select a customer network";
-    if (isOwnershipBlocked)
-      return "You don't have permission to modify this network. Only the owner or users with editor access on the subscription can perform this action.";
+    if (isOwnershipBlocked) return "Only the user who created this network can modify or delete it";
     return "";
   };
 

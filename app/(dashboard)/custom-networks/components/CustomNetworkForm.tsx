@@ -52,8 +52,8 @@ const CustomNetworkForm = ({
       cloudProviderName: selectedCustomNetwork?.cloudProviderName || "aws",
       cloudProviderRegion: selectedCustomNetwork?.cloudProviderRegion || "",
       cidr: selectedCustomNetwork?.cidr || "",
-      shareViaSubscriptionOwner: false,
-      subscriptionOwnerId: "",
+      shareViaSubscriptionOwner: !!selectedCustomNetwork?.owningUserId,
+      subscriptionOwnerId: selectedCustomNetwork?.owningUserId || "",
     },
     validationSchema: CustomNetworkValidationSchema,
     onSubmit: (values) => {
@@ -113,11 +113,25 @@ const CustomNetworkForm = ({
   }, [regions]);
 
   const subscriptionOwnerMenuItems = useMemo(() => {
-    return subscriptionOwners.map((user) => ({
-      value: user.userId,
+    const items = subscriptionOwners.map((user) => ({
+      value: user.orgId,
       label: `${user.name} - ${user.email}`,
     }));
-  }, [subscriptionOwners]);
+
+    // In modify mode, ensure the current owner is in the list even if not returned by subscriptions API
+    if (
+      formMode === "modify" &&
+      selectedCustomNetwork?.owningUserId &&
+      !items.some((item) => item.value === selectedCustomNetwork.owningUserId)
+    ) {
+      items.unshift({
+        value: selectedCustomNetwork.owningUserId,
+        label: selectedCustomNetwork.owningUserName || selectedCustomNetwork.owningUserId,
+      });
+    }
+
+    return items;
+  }, [subscriptionOwners, formMode, selectedCustomNetwork]);
 
   const formConfiguration: FormConfiguration = useMemo(() => {
     return {
@@ -193,22 +207,24 @@ const CustomNetworkForm = ({
             },
             {
               dataTestId: "share-via-subscription-owner-toggle",
-              label: "Share via subscription owner",
-              subLabel: "Turn on to share this network with the subscription owner",
+              label: "Create for a shared subscription",
+              subLabel:
+                "Enable to create this network for a subscription that has been shared with you. The network will be visible to the subscription owner and usable on their subscription",
               name: "shareViaSubscriptionOwner",
-              isHidden: formMode === "modify",
               customComponent: (
                 <Tooltip
                   title={
-                    !subscriptionOwnerMenuItems.length
-                      ? "No subscription owners available. Please ensure there are users with active subscriptions."
-                      : ""
+                    formMode === "modify"
+                      ? "Cannot change shared subscription setting after creation"
+                      : !subscriptionOwnerMenuItems.length
+                        ? "No subscription owners available. Please ensure there are users with active subscriptions."
+                        : ""
                   }
                 >
                   <span>
                     <Switch
                       checked={formData.values.shareViaSubscriptionOwner}
-                      disabled={!subscriptionOwnerMenuItems.length}
+                      disabled={formMode === "modify" || !subscriptionOwnerMenuItems.length}
                       onChange={(e) => {
                         formData.setFieldValue("shareViaSubscriptionOwner", e.target.checked);
                         if (!e.target.checked) {
@@ -224,13 +240,15 @@ const CustomNetworkForm = ({
             {
               dataTestId: "subscription-owner-select",
               label: "Subscription Owner",
-              subLabel: "Select the subscription owner for this shared network.",
+              subLabel:
+                "Select the owner of the shared subscription this network is for. Only subscription owners who have shared with you are listed",
               name: "subscriptionOwnerId",
               type: "select",
               required: true,
               isLoading: isFetchingSubscriptionOwners,
               menuItems: subscriptionOwnerMenuItems,
-              isHidden: formMode === "modify" || !formData.values.shareViaSubscriptionOwner,
+              disabled: formMode === "modify",
+              isHidden: !formData.values.shareViaSubscriptionOwner,
               previewValue: formData.values.subscriptionOwnerId
                 ? (() => {
                     const owner = subscriptionOwnerMenuItems.find(
