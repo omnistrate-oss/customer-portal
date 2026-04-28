@@ -615,10 +615,139 @@ const errorMessage = "An error has occurred while processing your request";
 <Text>To confirm deletion type <b>deleteme</b> in the dialog below</Text>
 ```
 
+### 6. Security and Privacy
+
+This repository ships a customer-facing white-label SaaS portal that SaaS providers fork and re-deploy with their own branding and Omnistrate API endpoint. End customers sign in with passwords, manage cloud-deployed instances, and configure cloud accounts. That makes the portal one of the higher-value security targets in the project, and the rules below are non-negotiable.
+
+#### Authentication and token handling
+
+- **Auth tokens live in httpOnly cookies, never in `localStorage` or `sessionStorage`**. The two cookies of record are `omnistrate_token` (access, ~1 day, HttpOnly + SameSite=Lax, with `Secure` enabled in production) and `omnistrate_refresh_token` (refresh, ~7 days, HttpOnly + SameSite=Lax, with `Secure` enabled in production). The `Secure` flag is gated on `process.env.NODE_ENV === "production"` in `src/server/utils/authCookie.ts` so that local development over `http://localhost` works. The non-httpOnly `omnistrate_logged_in=true` flag is the only client-readable auth signal — do not extend it to carry secret values.
+- **Flag any new `localStorage.setItem`, `sessionStorage.setItem`, `document.cookie =`, or in-memory long-lived store** that holds a JWT, bearer token, refresh token, OAuth code, or password. Tokens must never appear in `console.log`, error messages, analytics events, or query params.
+- **Cookie defaults**: Any new auth cookie must inherit `HttpOnly`, `Secure` (in production), and an explicit `SameSite` attribute. Flag PRs that add cookies without all three.
+- **Auth redirects**: After signin, IDP callback, or password reset, the post-login redirect target must be validated against an allowlist (same-origin paths only, no full URLs from query params). This is an open-redirect class bug — flag any `router.push(searchParams.get("next"))` style usage without validation.
+- **Auth-exempt routes must match the real allowlists**. Do not rely on a hard-coded list in this document. The sources of truth are the Next.js middleware matcher in `proxy.js` (which excludes routes such as `/signin`, `/signup`, `/reset-password`, `/change-password`, `/idp-auth`, `/privacy-policy`, `/cookie-policy`, `/terms-of-use`, and several `/api/*` paths) and the backend non-protected endpoint allowlist in `src/utils/authUtils.ts`. Flag any PR that changes one allowlist without updating the other (and this guidance), or that bypasses auth for a new route without explicit security justification.
+
+#### XSS and HTML injection
+
+Because this is a white-label portal where **provider-supplied content** (organization name, description, logo URL, favicon URL, plan descriptions, support links, install instructions) is rendered to end customers, any path from provider config → DOM is a cross-tenant XSS vector if mishandled.
+
+- **Sanitize all `dangerouslySetInnerHTML` with DOMPurify** (`dompurify` is already a dep). Current known sinks include plan descriptions, syntax-highlighted logs, and the GA bootstrap. Flag any new sink, any change that drops `DOMPurify.sanitize`, and any sink that renders provider-supplied or backend-supplied HTML without it. The GA bootstrap (a static template-literal string) is the only acceptable un-sanitized use.
+- **Validate dynamic `href`, `src`, `action`, and `formAction` values**: Provider-supplied logo / favicon / privacy-policy / terms / support URLs must be checked for scheme — only allow `http`, `https`, `mailto`, and same-origin relative paths. Reject `javascript:`, `data:` (in navigation/script contexts), and `vbscript:`. Flag any place that renders `org.logoUrl` or `plan.descriptionHtml` directly without validation or sanitization.
+- **No raw HTML in plan descriptions, error messages, or notification bodies** unless explicitly sanitized.
+
+#### Sensitive data in client state
+
+- Redux (`userDataSlice`, `genericSlice`), React Context, and React Query caches may hold user identifiers, org metadata, and UI state — but **must not hold** full tokens, passwords, OAuth codes, cloud credentials (AWS access keys, GCP service-account JSON, Azure secrets), reCAPTCHA tokens after submission, or unnecessary PII (phone numbers, addresses) beyond what the active view needs.
+- Flag PRs that store backend responses containing secret material into Redux for "later use." Cloud-account credential entry forms must submit and forget — the form state should not be persisted across navigation, modals, or hydration.
+- On logout, Redux state and any sensitive React Query caches must be cleared. Flag changes that skip or weaken the logout cleanup.
+
+#### URL and query param hygiene
+
+- Service IDs, instance IDs, and subscription IDs in URLs are acceptable (they're used for navigation). **Do not** put email addresses, raw customer IDs, tokens, signed URLs, password-reset tokens (beyond the dedicated `?token=` parameter on the reset-password page, which should be consumed and dropped immediately), or anything sensitive into query params that get captured by analytics or the `Referer` header.
+- The `?token=` on `/reset-password` and similar one-time tokens must be: (a) consumed once and removed from the URL via `router.replace`, (b) never logged, (c) never sent in an analytics event.
+
+#### Third-party scripts, SDKs, and CSP
+
+- **Current third-party surface**: Google Analytics (`googletagmanager.com`), Google OAuth (`accounts.google.com`), Google reCAPTCHA (`google.com/recaptcha`). No PostHog, HubSpot, Intercom, or CRM SDKs are loaded by default — providers may add their own when they fork.
+- **Any new `<script>` tag, `next/script` usage, or npm package making outbound network calls must be flagged** with: CSP impact, cookie-consent gating, data-exfiltration surface, and whether it should be opt-in for forks rather than enabled by default.
+- **CSP in `next.config.js`** is currently permissive in places (`connect-src *`, `frame-src *`, and `script-src` already includes `'unsafe-eval'` and `'unsafe-inline'`). Flag any change that further relaxes CSP, prefer PRs that tighten these directives, and avoid expanding the use of `'unsafe-eval'` / `'unsafe-inline'`; where feasible, prefer tightening or removing them. New external script/connect/frame origins should be explicitly listed, not wildcarded.
+
+#### Analytics, telemetry, and consent
+
+- **GA4 (or any analytics SDK) must not capture PII**: no raw email, name, password fields, full URLs containing identifiers, or free-text user input. Cookie-consent manager defaults `analytics_storage` to denied — flag any change that grants storage by default or fires analytics before consent is granted in strict regions (EU/EEA/UK/US/CH).
+- **End-customer identifiers** sent to any analytics platform must be hashed or pseudonymous, never raw email or org name. Free-text fields (search inputs, notes, descriptions) must never be captured as event parameters.
+
+#### CORS and fetch behavior
+
+- For client-side `fetch`, `axios`, and `openapi-fetch` calls: only set `credentials: "include"` / `withCredentials: true` for same-origin requests or the configured Omnistrate API base URL. Never send auth cookies or `Authorization` headers to third-party origins.
+- On the server side (`/api/*` routes, middleware): do not respond with `Access-Control-Allow-Origin: *` together with `Access-Control-Allow-Credentials: true`, and do not echo the request `Origin` back without an allowlist check. The portal is intended to run on the provider's own domain — CORS should reflect that, not be globally open.
+
+#### Form handling
+
+- **Server-side is the security boundary**: Yup/Formik validation is for UX. Backend endpoints must independently enforce length limits, type checks, allowed values, and authorization. Do not weaken or remove server-side validation because the client validates.
+- **Sensitive fields** (password, current password, new password, confirm password, AWS access key, GCP service account JSON, Azure secret, API tokens, reCAPTCHA inputs) must use `type="password"` where appropriate, set `autocomplete` correctly (`current-password`, `new-password`, `off`), and must not be persisted in browser storage or React state beyond the submission.
+- **reCAPTCHA verification on signin / signup / password-reset must remain server-side**. Flag any PR that removes the server check, even if the client still renders the widget.
+
+#### Error boundaries and messages
+
+- Toasts, dialogs, error boundaries, and inline error messages must not surface raw backend error strings, stack traces, internal API paths, SQL fragments, Go panics, trace IDs, or database error codes to end customers. Show a generic friendly message; log technical detail server-side or to a sanitized analytics channel.
+- Provider-facing technical detail (e.g., for debugging) belongs in dev-mode logs or backend logs, not in end-customer-visible UI. Flag changes that read `error.response.data.message` and pass it directly into JSX or toast text without sanitization.
+
+#### File uploads and downloads
+
+- The portal supports file upload for instance restore. For any new file input or upload flow: enforce client-side MIME type and size checks (UX), but rely on the backend as the source of truth for actual validation, virus scanning, and storage decisions.
+- **Never render uploaded HTML, SVG, or PDF inline** without sanitization or sandboxing — SVGs in particular can carry script. Downloaded files should be served with `Content-Disposition: attachment` and a sanitized filename.
+- Logs viewable in the UI are passed through the syntax highlighter; do not bypass that path with a raw `dangerouslySetInnerHTML`.
+
+#### Dependency hygiene
+
+- For each new entry in `package.json` (or major version bump), the review comment should sanity-check: maintenance status, install size, transitive dependency surface, license compatibility, and known CVEs (`yarn npm audit` / GitHub advisories). Flag lockfile diffs that pull in unexpectedly large transitive trees or packages from unfamiliar maintainers. Postinstall scripts should remain disabled.
+- This repo is **fork-friendly by design** — be conservative about adding heavy dependencies that every downstream provider will inherit.
+
+#### White-label / multi-tenant safety
+
+- Treat **all provider-supplied configuration** (organization name, description, logo URL, favicon, support email, privacy policy URL, terms of use URL, plan descriptions, install instructions) as untrusted input from the perspective of the end customer rendering the portal. The same sanitization rules that apply to user input apply here.
+- Defaults shipped in the open-source repo must be safe for any provider to deploy as-is. Do not hard-code Omnistrate-internal URLs, telemetry endpoints, or analytics IDs in a way that a downstream fork inherits silently.
+
+#### Quick "❌ flag this" examples
+
+```ts
+// ❌ Flag this — token in localStorage
+localStorage.setItem("omnistrate_token", response.data.jwtToken);
+
+// ✅ Backend should set httpOnly cookie; client reads only the indicator
+// (see src/server/utils/authCookie.ts)
+```
+
+```tsx
+// ❌ Flag this — provider-supplied URL rendered without scheme validation
+<a href={org.privacyPolicyUrl}>Privacy</a>
+
+// ✅ Validate the scheme before rendering (parse and allow only http/https)
+let target = "/privacy";
+try {
+  const parsed = new URL(org.privacyPolicyUrl);
+  if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+    target = parsed.toString();
+  }
+} catch {
+  target = "/privacy";
+}
+<a href={target}>Privacy</a>
+```
+
+```tsx
+// ❌ Flag this — provider HTML rendered without sanitization
+<div dangerouslySetInnerHTML={{ __html: plan.descriptionHtml }} />
+
+// ✅ Sanitize first
+import DOMPurify from "dompurify";
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(plan.descriptionHtml) }} />
+```
+
+```ts
+// ❌ Flag this — open redirect from query param
+router.push(searchParams.get("next") ?? "/dashboard");
+
+// ✅ Validate against the existing internal-route allowlist
+//    (src/utils/route/checkRouteValidity.ts, backed by PAGE_TITLE_MAP)
+const next = searchParams.get("next") ?? "/dashboard";
+router.push(checkRouteValidity(next) ? next : "/dashboard");
+```
+
+```ts
+// ❌ Flag this — raw backend error rendered to end customer
+toast.error(error.response.data.message);
+
+// ✅ Generic friendly message; log detail to a sanitized channel
+toast.error("Something went wrong. Please try again.");
+logSanitized(error);
+```
+
 ## Review Process
 
 1. **Technical Review**: Check TypeScript implementation, testing, code quality, and naming conventions
 2. **Content Review**: Review grammar, syntax, and terminology consistency
 3. **Performance**: Check for potential performance impacts
-4. **Security**: Review for security best practices
+4. **Security**: Review for security and privacy best practices (see Security and Privacy section above)
 5. **Consistency**: Ensure alignment with project standards

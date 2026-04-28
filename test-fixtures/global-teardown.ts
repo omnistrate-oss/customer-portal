@@ -114,7 +114,11 @@ const waitForDeletion = async (instanceType: "instance" | "cloudAccount", instan
 };
 
 async function globalTeardown() {
-  console.log("Running Global Teardown...");
+  console.log(`Running Global Teardown... (HAR_MODE=${process.env.HAR_MODE || "off"})`);
+
+  // Always run teardown, even in replay mode. Some tests (user-setup, signin) are
+  // marked always-live and can still leak backend state, so skipping cleanup here
+  // is unsafe.
 
   const providerAPIClient = new ProviderAPIClient();
 

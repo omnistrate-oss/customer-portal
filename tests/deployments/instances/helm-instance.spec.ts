@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { InstancesPage } from "page-objects/instances-page";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";

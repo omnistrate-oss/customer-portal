@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { getIdentityProviderButtonLabel } from "app/(public)/(main-image)/signin/utils";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
