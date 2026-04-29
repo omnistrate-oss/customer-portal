@@ -32,8 +32,19 @@ test.describe("Instances Page - Specialized Tests", () => {
     await page.getByTestId("create-button").click();
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
 
-    const date = GlobalStateManager.getDate();
-    await page.getByRole("option", { name: `SaaSBuilder Redis Helm - ${date}` }).click();
+    const serviceOfferings = GlobalStateManager.getServiceOfferings();
+    const preferredPrefix = `SaaSBuilder Redis Helm - ${GlobalStateManager.getDate()}`;
+    const helmOffering =
+      serviceOfferings.find((offering) => offering.serviceName.startsWith(preferredPrefix)) ??
+      serviceOfferings.find((offering) => offering.serviceName.startsWith("SaaSBuilder Redis Helm - ")) ??
+      serviceOfferings.find((offering) => offering.serviceName.includes("Redis Helm"));
+
+    if (!helmOffering) {
+      test.skip(true, `${logPrefix} Redis Helm service offering not available in this environment`);
+      return;
+    }
+
+    await page.getByRole("option", { name: helmOffering.serviceName, exact: true }).click();
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
@@ -92,6 +103,11 @@ test.describe("Instances Page - Specialized Tests", () => {
   // });
 
   test("Delete Instance", async () => {
+    if (!instanceId) {
+      test.skip(true, `${logPrefix} No Helm instance was created in this run`);
+      return;
+    }
+
     await instancesPage.deleteInstance(instanceId);
     await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
   });

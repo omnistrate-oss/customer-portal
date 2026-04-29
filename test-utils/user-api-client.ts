@@ -9,6 +9,7 @@ import { GlobalStateManager } from "./global-state-manager";
 export class UserAPIClient {
   baseURL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN}`;
   apiVersion = "2022-09-01-00";
+  requestTimeoutMs = 120000;
 
   async userLogin(email: string, password: string) {
     const context = await request.newContext({ baseURL: process.env.YOUR_SAAS_DOMAIN_URL });
@@ -36,6 +37,7 @@ export class UserAPIClient {
 
     return request.newContext({
       baseURL: this.baseURL,
+      timeout: this.requestTimeoutMs,
       extraHTTPHeaders: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     });
   }
@@ -126,6 +128,18 @@ export class UserAPIClient {
 
     const instances = (await response.json()).resourceInstances;
     return instances as ResourceInstance[];
+  }
+
+  async listSubscriptions(): Promise<Subscription[]> {
+    const context = await this.createUserRequest();
+    const response = await context.get(`/${this.apiVersion}/subscription`);
+
+    if (!response.ok()) {
+      throw new Error("Failed to list subscriptions");
+    }
+
+    const subscriptions = (await response.json()).subscriptions || [];
+    return subscriptions as Subscription[];
   }
 
   async describeResourceInstance(

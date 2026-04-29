@@ -2,6 +2,7 @@ import { test as setup } from "@playwright/test";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
 import path from "path";
+import { Subscription } from "src/types/subscription";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
@@ -19,23 +20,29 @@ setup("Authenticate User", async ({ page }) => {
   const request = await page.waitForResponse((response) => response.url().includes("/api/signin"));
   const response = await request.json();
   console.log("User signin successful!");
-  GlobalStateManager.setState({ userToken: response.jwtToken });
-
-  // Intercept the Request to Get Subscriptions
-  const subscriptionsData = await page.waitForResponse(
-    (response) => {
-      return (
-        response.url() === `${process.env.YOUR_SAAS_DOMAIN_URL}/api/action?endpoint=%2F2022-09-01-00%2Fsubscription`
-      );
-    },
-    { timeout: 60 * 1000 } // Wait for 60 seconds if needed
-  );
-  const subscriptions = (await subscriptionsData.json()).subscriptions || [];
+  const userToken = response.jwtToken as string;
+  GlobalStateManager.setState({ userToken });
 
   await page.waitForURL(PageURLs.instances);
   await page.context().storageState({ path: authFile });
 
-  // Get the Service Offerings
+  const subscriptionsResponse = await page.request.post("/api/action", {
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    data: {
+      endpoint: "/2022-09-01-00/subscription",
+      method: "GET",
+      queryParams: {
+        environmentType: process.env.ENVIRONMENT_TYPE,
+      },
+    },
+  });
+  if (!subscriptionsResponse.ok()) {
+    throw new Error(`Failed to fetch subscriptions: ${subscriptionsResponse.status()}`);
+  }
+  const subscriptionsData = (await subscriptionsResponse.json()) as { subscriptions?: Subscription[] };
+  const subscriptions = subscriptionsData.subscriptions || [];
   const serviceOfferings = await apiClient.listServiceOffering();
   GlobalStateManager.setState({ serviceOfferings, subscriptions });
 

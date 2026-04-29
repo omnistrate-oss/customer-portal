@@ -1,6 +1,7 @@
 import test, { expect } from "@playwright/test";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { SigninPage } from "page-objects/signin-page";
 import {
   TestConnectivityTab,
   TestEventsTab,
@@ -27,6 +28,11 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     instancesPage = new InstancesPage(page);
     instanceDetailsPage = new InstanceDetailsPage(page);
     await instancesPage.navigate();
+    if (page.url().includes("/signin")) {
+      const signinPage = new SigninPage(page);
+      await signinPage.signInWithPassword();
+      await page.waitForURL(/\/instances(?:\?|$)/);
+    }
     await page.waitForLoadState("networkidle");
   });
 
@@ -42,12 +48,19 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(dataTestIds.createButton)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.actionsMenu)).toBeVisible();
 
-    const date = GlobalStateManager.getDate() || "";
+    const serviceOfferings = GlobalStateManager.getServiceOfferings();
+    const postgresOffering = serviceOfferings.find((offering) =>
+      offering.serviceName.startsWith("SaaSBuilder Postgres DT - ")
+    );
+    if (!postgresOffering) {
+      throw new Error(`${logPrefix} Postgres service offering not found`);
+    }
+
     await page.getByTestId(dataTestIds.createButton).click();
 
     // Wait for the Form to Load and Click the Service Name Dropdown
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
-    await page.getByRole("option", { name: `SaaSBuilder Postgres DT - ${date}` }).click();
+    await page.getByRole("option", { name: postgresOffering.serviceName, exact: true }).click();
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
@@ -61,9 +74,17 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
     await page.waitForTimeout(5000); // Wait 5 seconds
     await page.getByTestId(dataTestIds.submitButton).click();
-    // Wait for the instance ID element to be visible
-    await page.getByTestId(dataTestIds.instanceId).waitFor({ state: "visible" });
-    instanceId = (await page.getByTestId(dataTestIds.instanceId).textContent()) || "";
+    await page.getByText(instancesPage.pageElements.launchingInstanceDialogTitle).waitFor({ state: "visible" });
+
+    const instanceIdElement = page.getByTestId(dataTestIds.instanceId);
+    if ((await instanceIdElement.count()) > 0) {
+      await instanceIdElement.first().waitFor({ state: "visible" });
+      instanceId = (await instanceIdElement.first().textContent()) || "";
+    } else {
+      const instanceIdInput = page.getByRole("dialog").locator('input[value^="instance-"]').first();
+      await instanceIdInput.waitFor({ state: "visible" });
+      instanceId = await instanceIdInput.inputValue();
+    }
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
