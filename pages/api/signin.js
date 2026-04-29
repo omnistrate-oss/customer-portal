@@ -4,6 +4,7 @@ import { getProviderUsers } from "src/server/api/provider-users";
 const { customerUserSignIn } = require("src/server/api/customer-user");
 const { getEnvironmentType } = require("src/server/utils/getEnvironmentType");
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
+import { setAuthCookie, setIndicatorCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
 
@@ -44,7 +45,21 @@ export default async function handleSignIn(nextRequest, nextResponse) {
       });
 
       const responseData = response?.data || {};
-      nextResponse.status(200).send({ ...responseData });
+      const { jwtToken, refreshToken, ...rest } = responseData;
+
+      // Set httpOnly cookies — the client never sees the raw tokens.
+      // Setting the indicator cookie here (not client-side) keeps its Max-Age
+      // aligned with REFRESH_MAX_AGE, so client pages don't have to hardcode
+      // an expiry that drifts from the backend's refresh lifetime.
+      if (jwtToken) {
+        setAuthCookie(nextResponse, jwtToken);
+        setIndicatorCookie(nextResponse);
+      }
+      if (refreshToken) {
+        setRefreshCookie(nextResponse, refreshToken);
+      }
+
+      nextResponse.status(200).send({ ...rest });
     } catch (error) {
       console.error("Error in sign in", error);
       let defaultErrorMessage = "Failed to sign in. Either the credentials are incorrect or the user does not exist";

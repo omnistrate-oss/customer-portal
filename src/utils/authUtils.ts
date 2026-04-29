@@ -14,6 +14,7 @@ export function checkIsNonProtectedEndpoint(url: string): boolean {
     "/health",
     "/json-schema",
     "/login-with-identity-provider",
+    "/refresh-token",
     "/reset-password",
     "/resource-instance/health",
     "/resource-instance/version",
@@ -25,4 +26,15 @@ export function checkIsNonProtectedEndpoint(url: string): boolean {
   ];
 
   return nonProtectedEndpoints.some((endpoint) => url.startsWith(endpoint));
+}
+
+// Backend may return 400 with messages such as "token is missing" or
+// "token is missing from header" when the auth cookie is absent/empty.
+// Treat these the same as 401 so the refresh-and-retry flow runs.
+export function isAuthError(status: number, message?: string | null): boolean {
+  if (status === 401) return true;
+  if (status === 400 && message) {
+    return /token.*missing(?:.*header)?/i.test(message);
+  }
+  return false;
 }

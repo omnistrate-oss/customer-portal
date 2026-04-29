@@ -1,18 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { Box, Dialog, Stack, styled } from "@mui/material";
+import { useFormik } from "formik";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, Dialog, Stack, styled } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
-import { useFormik } from "formik";
+import { useEffect, useRef, useState } from "react";
 
-import { $api } from "src/api/query";
-import useEnvironmentType from "src/hooks/useEnvironmentType";
-import useSnackbar from "src/hooks/useSnackbar";
-import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import TextField from "components/FormElements/TextField/TextField";
 import { Text } from "components/Typography/Typography";
+import { $api } from "src/api/query";
+import useSnackbar from "src/hooks/useSnackbar";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 
 import sandClock from "public/assets/images/cloud-account/sandclock.gif";
 
@@ -87,9 +85,7 @@ const ListItem = styled(Box)({
   gap: "4px",
 });
 
-const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusStopPolling) => {
-  const environmentType = useEnvironmentType();
-  const queryClient = useQueryClient();
+const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusStopPolling, refetchInstances) => {
   const [isPolling, setIsPolling] = useState(true);
   const timeoutId = useRef(null);
   const pollInterval = 5000; // 5 seconds
@@ -102,8 +98,8 @@ const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusS
     try {
       const resourceInstanceResponse = await fetchClickedInstanceDetails();
       resourceInstance = resourceInstanceResponse.data;
-    } catch {
-      console.log("check error in polling ");
+    } catch (error) {
+      console.error("Error polling instance details:", error);
     }
 
     if (resourceInstance?.status) {
@@ -116,46 +112,21 @@ const usePolling = (fetchClickedInstanceDetails, setClickedInstance, stepStatusS
         },
       }));
 
-      queryClient.setQueryData(
-        [
-          "get",
-          "/2022-09-01-00/resource-instance",
-          {
-            params: {
-              query: {
-                environmentType,
-              },
-            },
-          },
-        ],
-        (oldData) => ({
-          resourceInstances: (oldData?.resourceInstances || []).map((inst) =>
-            inst?.id === resourceInstance?.id
-              ? {
-                  ...resourceInstance,
-                  status: resourceInstance.status,
-                  result_params: resourceInstance.result_params,
-                }
-              : inst
-          ),
-        })
-      );
-
-      // // Stop polling if the status matches the stop condition
+      // Stop polling and refetch instance list only when final status is reached
       if (resourceInstance?.status === stepStatusStopPolling) {
         setIsPolling(false);
-        return; // Exit the polling
+        refetchInstances?.();
+        return;
       }
     }
 
-    // Continue polling without a limit
+    // Continue polling
     timeoutId.current = setTimeout(startPolling, pollInterval);
   };
 
   useEffect(() => {
     startPolling();
     isMounted.current = true;
-    // Clean up on unmount
     return () => {
       isMounted.current = false;
       if (timeoutId.current) {
@@ -223,8 +194,14 @@ const Trigger = ({ formData, serviceProviderName }) => {
   );
 };
 
-const Check = ({ instance, fetchClickedInstanceDetails, setClickedInstance, serviceProviderName }) => {
-  usePolling(fetchClickedInstanceDetails, setClickedInstance, "READY");
+const Check = ({
+  instance,
+  fetchClickedInstanceDetails,
+  setClickedInstance,
+  serviceProviderName,
+  refetchInstances,
+}) => {
+  usePolling(fetchClickedInstanceDetails, setClickedInstance, "READY", refetchInstances);
 
   return (
     <Box width={"100%"} display={"flex"} flexDirection={"column"} gap="10px">
@@ -447,6 +424,7 @@ function ConnectAccountConfigDialog(props) {
               fetchClickedInstanceDetails={fetchClickedInstanceDetails}
               setClickedInstance={setClickedInstance}
               serviceProviderName={serviceProviderName}
+              refetchInstances={refetchInstances}
             />
           )}
         </Content>
@@ -455,7 +433,6 @@ function ConnectAccountConfigDialog(props) {
           <Button
             variant="outlined"
             sx={{ height: "40px !important", padding: "10px 14px !important" }}
-            disabled={isFetching}
             onClick={handleCancel}
           >
             Cancel
@@ -473,21 +450,6 @@ function ConnectAccountConfigDialog(props) {
               onClick={formik.handleSubmit}
             >
               {"Connect"} {isFetching || (accountConfigMutation.isPending && <LoadingSpinnerSmall />)}
-            </Button>
-          )}
-          {connectState === stateAccountConfigStepper.check && (
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                height: "40px !important",
-                padding: "10px 14px !important",
-              }}
-              disabled={isFetching}
-              bgColor={buttonColor}
-              onClick={handleCancel}
-            >
-              {"Close"} {isFetching && <LoadingSpinnerSmall />}
             </Button>
           )}
         </Footer>

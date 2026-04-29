@@ -2,8 +2,15 @@ import createFetchClient from "openapi-fetch";
 
 import { baseDomain } from "src/api/client";
 import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
+import { getAuthToken } from "src/server/utils/authCookie";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
-import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
+import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
+import {
+  isPasswordSameAsEmail,
+  passwordMatchesEmailText,
+  passwordRegex,
+  passwordText as passwordRegexFailText,
+} from "src/utils/passwordRegex";
 
 // Create the API client
 const apiClient = createFetchClient({
@@ -28,7 +35,10 @@ export default async function handleAction(nextRequest, nextResponse) {
       try {
         // Password validation for change-password and update-password endpoints
         const normalizedEndpoint = normalizeEndpoint(endpoint);
-        if (normalizedEndpoint === "/2022-09-01-00/change-password" || normalizedEndpoint === "/2022-09-01-00/update-password") {
+        if (
+          normalizedEndpoint === "/2022-09-01-00/change-password" ||
+          normalizedEndpoint === "/2022-09-01-00/update-password"
+        ) {
           const password = data.password;
           if (password && typeof password === "string") {
             if (!password.match(passwordRegex)) {
@@ -51,13 +61,32 @@ export default async function handleAction(nextRequest, nextResponse) {
         const originalUserAgent = nextRequest.get("User-Agent") || "";
         const customUserAgent = `customer-portal/${appVersion} (${originalUserAgent})`;
 
+        // Read auth token from httpOnly cookie (primary)
+        // Authorization header fallback is restricted to non-production for Playwright tests
+        const authToken = getAuthToken(nextRequest);
+        const authorization = authToken
+          ? `Bearer ${authToken}`
+          : process.env.NODE_ENV !== "production"
+            ? nextRequest.headers.authorization
+            : undefined;
+
+        // No auth token → return 401 so client-side refresh logic triggers
+        // (without this, the backend returns 400 "token is missing" which
+        // the client doesn't treat as an auth failure).
+        // Skip for non-protected endpoints (e.g. /change-password, /reset-password,
+        // /signin, /signup) which are used by unauthenticated users and so will
+        // never have an auth cookie.
+        if (!authorization && !checkIsNonProtectedEndpoint(endpoint)) {
+          return nextResponse.status(401).json({ message: "Not authenticated" });
+        }
+
         // Prepare request options
         const requestOptions = {
           params: {
             query: queryParams,
           },
           headers: {
-            Authorization: nextRequest.headers.authorization,
+            ...(authorization ? { Authorization: authorization } : {}),
             "Client-IP": clientIP,
             "SaaSBuilder-IP": saasBuilderIP,
             "User-Agent": customUserAgent,

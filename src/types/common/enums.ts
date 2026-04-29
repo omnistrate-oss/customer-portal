@@ -1,4 +1,4 @@
-export type CloudProvider = "aws" | "gcp" | "azure" | "oci";
+export type CloudProvider = "aws" | "gcp" | "azure" | "oci" | "nebius";
 
 export type FormMode = "view" | "modify" | "create" | "delete";
 

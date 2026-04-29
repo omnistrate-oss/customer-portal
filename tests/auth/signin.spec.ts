@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { getIdentityProviderButtonLabel } from "app/(public)/(main-image)/signin/utils";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
@@ -90,7 +90,7 @@ test.describe("Signin Page", () => {
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toContainText(pageElements.cookieConsentText);
 
-    // Click on Allow analytics
+    // Click on Accept All
     await expect(page.getByRole("link", { name: pageElements.cookiePolicyText })).toHaveAttribute(
       "href",
       PageURLs.cookiePolicy
@@ -102,7 +102,7 @@ test.describe("Signin Page", () => {
     await page.getByText("Cookie Settings").click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).toBeVisible();
 
-    // Click on Allow Necessary
+    // Click on Reject All
     await page.getByRole("button", { name: "Reject All" }).click();
     await expect(page.getByTestId(dataTestIds.cookieConsentBanner)).not.toBeVisible();
   });
@@ -172,15 +172,16 @@ test.describe("Signin Page", () => {
     const userToken = GlobalStateManager.getToken("user");
 
     // intercept the request to the identity provider auth endpoint "/api/sign-in-with-idp
+    // Mock must set the httpOnly cookie (like the real server does)
     await page.route("**/api/sign-in-with-idp", async (route) => {
       try {
-        // Return mock successful response
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            jwtToken: userToken,
-          }),
+          headers: {
+            "Set-Cookie": `omnistrate_token=${userToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`,
+          },
+          body: JSON.stringify({}),
         });
       } catch (error) {
         console.log("Error in route handler:", error);

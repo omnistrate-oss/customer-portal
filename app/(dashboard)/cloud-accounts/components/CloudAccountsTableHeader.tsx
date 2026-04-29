@@ -1,13 +1,13 @@
-import { FC } from "react";
 import { CircularProgress } from "@mui/material";
+import { FC } from "react";
 
-import { AccountConfig } from "src/types/account-config";
-import { ResourceInstance } from "src/types/resourceInstance";
-import { Subscription } from "src/types/subscription";
 import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
+import { AccountConfig } from "src/types/account-config";
+import { ResourceInstance } from "src/types/resourceInstance";
+import { Subscription } from "src/types/subscription";
 
 import { Overlay } from "../page";
 
@@ -29,6 +29,9 @@ type CloudAccountTableHeaderProps = {
   setOverlayType: (overlay: Overlay) => void;
   setIsOverlayOpen: (isOpen: boolean) => void;
   selectedInstanceSubscription?: Subscription;
+  serviceModelType: string;
+  onConnectClick: () => void;
+  onDisconnectClick: () => void;
 };
 
 const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
@@ -46,6 +49,9 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   setOverlayType,
   setIsOverlayOpen,
   selectedInstanceSubscription,
+  onConnectClick,
+  onDisconnectClick,
+  serviceModelType,
 }) => {
   return (
     <div className="py-5 px-6 flex items-center justify-between gap-4">
@@ -77,6 +83,9 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           subscription={selectedInstanceSubscription}
           onDeleteClick={onDeleteClick}
           onOffboardClick={() => onOffboardClick?.()}
+          onConnectClick={onConnectClick}
+          onDisconnectClick={onDisconnectClick}
+          serviceModelType={serviceModelType}
           isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
         />
       </div>

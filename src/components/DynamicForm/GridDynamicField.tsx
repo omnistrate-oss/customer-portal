@@ -3,6 +3,7 @@ import FieldDescription from "../FormElementsv2/FieldDescription/FieldDescriptio
 import FieldError from "../FormElementsv2/FieldError/FieldError";
 
 import {
+  CodeEditorField,
   MultilinePasswordInput,
   MultiSelectAutocomplete,
   RadioField,
@@ -44,6 +45,8 @@ const GridDynamicField: React.FC<GridDynamicFieldProps> = ({ field, formData }) 
     Field = <SingleSelectAutocomplete field={field} formData={formData} />;
   } else if (type === "multi-select-autocomplete") {
     Field = <MultiSelectAutocomplete field={field} formData={formData} />;
+  } else if (type === "code-editor") {
+    Field = <CodeEditorField field={field} formData={formData} />;
   }
 
   return (

@@ -13,6 +13,12 @@ import LockIcon from "./LockIcon";
 import { ResourceType } from "./systemParameters";
 import { getSuggestionsByPrefix } from "./utils";
 
+const languageLabelMap = {
+  yaml: "YAML",
+  json: "JSON",
+  shell: "Shell",
+};
+
 export type BaseCodeEditorProps = {
   value?: string;
   onChange?: OnChange;
@@ -26,6 +32,7 @@ export type BaseCodeEditorProps = {
   customTitleEnd?: React.ReactNode;
   spaces?: number;
   lineToHighlight?: number;
+  label?: string;
 };
 
 loader.init().then((monaco) => {
@@ -52,6 +59,7 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
   customTitleEnd,
   spaces = 2,
   lineToHighlight,
+  label,
 }) => {
   const editorRef = useRef<any>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -120,7 +128,7 @@ const BaseCodeEditor: FC<BaseCodeEditorProps> = ({
         <Stack direction="row" gap="5px" alignItems="center">
           {isReadOnly ? <LockIcon /> : <CurlyBracesIcon />}
           <Text weight="regular" size="xsmall" color="#FFFFFF">
-            {isReadOnly ? "Readonly" : `Main.${language}`}
+            {label ?? languageLabelMap[language]}{isReadOnly ? " (Read Only)" : ""}
           </Text>
         </Stack>
         <Stack direction="row" alignItems="center">

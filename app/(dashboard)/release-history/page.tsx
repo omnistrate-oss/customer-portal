@@ -9,9 +9,9 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
-import useCustomerVersionSets from "../instances/hooks/useCustomerVersionSets";
 
 import ListOfReleases from "./components/ListOfReleases";
+import useVersionSets from "./hooks/useVersionSets";
 
 const ReleaseHistoryPage = () => {
   const { serviceOfferings, isFetchingServiceOfferings } = useGlobalData();
@@ -20,12 +20,14 @@ const ReleaseHistoryPage = () => {
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [selectedPlanId, setSelectedPlanId] = useState("");
 
-  // Filter serviceOfferings to only include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope
+  // Filter serviceOfferings to include those with VERSION_SET_OVERRIDE feature for CUSTOMER scope or ON_PREM service model
   const versionSetOverrideOfferings = useMemo(() => {
-    return serviceOfferings.filter((offering) =>
-      offering.productTierFeatures?.some(
-        (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
-      )
+    return serviceOfferings.filter(
+      (offering) =>
+        offering.serviceModelType === "ON_PREM" &&
+        offering.productTierFeatures?.some(
+          (feature) => feature.feature === "VERSION_SET_OVERRIDE" && feature.scope === "CUSTOMER"
+        )
     );
   }, [serviceOfferings]);
 
@@ -65,13 +67,13 @@ const ReleaseHistoryPage = () => {
     }
   }, [planOptions, selectedPlanId]);
 
-  //fetch product tier versions
+  //fetch product tier versions using provider token via server route
   const {
-    data: customerVersionSets = [],
-    refetch: refetchCustomerVersionSets,
+    data: versionSets = [],
+    refetch: refetchVersionSets,
     isFetching: isFetchingReleases,
     isRefetching: isRefetchingReleases,
-  } = useCustomerVersionSets(
+  } = useVersionSets(
     {
       serviceId: selectedServiceId,
       productTierId: selectedPlanId,
@@ -81,7 +83,7 @@ const ReleaseHistoryPage = () => {
 
   // Filter releases based on search
   const filteredReleases = useMemo(() => {
-    let filtered = customerVersionSets;
+    let filtered = versionSets;
 
     if (searchText) {
       const lowerSearch = searchText.toLowerCase();
@@ -93,7 +95,7 @@ const ReleaseHistoryPage = () => {
     }
 
     return filtered;
-  }, [searchText, customerVersionSets]);
+  }, [searchText, versionSets]);
 
   const PageReleaseHistoryIcon = () => <ReleaseHistoryIcon color="#17B26A" />;
 
@@ -117,7 +119,7 @@ const ReleaseHistoryPage = () => {
         setSelectedPlan={setSelectedPlanId}
         productOptions={productOptions}
         planOptions={planOptions}
-        onRefresh={refetchCustomerVersionSets}
+        onRefresh={refetchVersionSets}
         isFetchingProducts={isFetchingServiceOfferings}
         isLoadingReleases={isRefetchingReleases || isFetchingReleases || isFetchingServiceOfferings}
       />

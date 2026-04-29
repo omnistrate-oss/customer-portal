@@ -23,6 +23,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# yarn
+.yarn/install-state.gz
 .pnpm-debug.log*
 
 # local env files
@@ -45,3 +48,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/auth/
+tests/backend-failures.json

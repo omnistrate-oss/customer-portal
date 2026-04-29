@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 
-import axios from "src/axios";
 import { logoutBroadcastChannel } from "src/broadcastChannel";
 import { initialiseUserData } from "src/slices/userDataSlice";
 
@@ -14,9 +13,9 @@ function useLogout() {
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
-  // remove token from cookies, remove other user data and redirect to signin
+  // remove indicator cookie, clear user data and redirect to signin
   function handleLogout() {
-    Cookies.remove("token");
+    Cookies.remove("omnistrate_logged_in");
     localStorage.removeItem("paymentNotificationHidden");
     try {
       localStorage.removeItem("loggedInUsingSSO");
@@ -34,12 +33,11 @@ function useLogout() {
     }
   }, [pathname]);
 
-  // make backend call and invalidate the token
+  // call server-side logout to clear httpOnly cookie and invalidate the token
   function logout() {
-    axios
-      .post("/logout")
+    fetch("/api/logout", { method: "POST" })
       .catch((error) => {
-        console.log("Logout request failed", error);
+        console.error("Logout request failed", error);
       })
       .finally(() => {
         handleLogout();

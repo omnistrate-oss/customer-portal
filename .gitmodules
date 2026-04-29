@@ -1,0 +1,4 @@
+[submodule "tests/fixtures/hars"]
+	path = tests/fixtures/hars
+	url = https://github.com/omnistrate/customer-portal-har-files.git
+	branch = master
