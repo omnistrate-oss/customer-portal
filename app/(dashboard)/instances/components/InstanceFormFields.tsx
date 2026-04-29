@@ -223,6 +223,7 @@ export const getStandardInformationFields = (
             servicePlanId: string,
             subscriptionId?: string // This is very specific to when we subscribe to the plan for the first time
           ) => {
+            const isPlanChanging = servicePlanId !== values.servicePlanId;
             const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
             const isOfferingOnPrem = offering?.serviceModelType === "ON_PREM";
             const cloudProvider = isOfferingOnPrem
@@ -251,8 +252,13 @@ export const getStandardInformationFields = (
 
             const resources = getResourceMenuItems(offering);
             setFieldValue("resourceId", resources[0]?.value || "");
-            setFieldValue("requestParams", {});
-            setFieldValue("productTierVersion", "");
+            // Only reset requestParams and productTierVersion when the plan actually changes.
+            // When the user subscribes to the already-selected plan, the plan ID doesn't
+            // change, so we should preserve existing default parameter values.
+            if (isPlanChanging) {
+              setFieldValue("requestParams", {});
+              setFieldValue("productTierVersion", "");
+            }
 
             const subscription = getValidSubscriptionForInstanceCreation(
               serviceOfferingsObj,
