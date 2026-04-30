@@ -55,7 +55,7 @@ const CustomNetworksTableHeader = ({
     );
 
     return !hasAccess;
-  }, [selectedRows, customNetworks, currentUser?.userId, subscriptions]);
+  }, [selectedRows, customNetworks, currentUser?.id, subscriptions]);
 
   const getModifyDeleteDisabledMessage = () => {
     if (selectedRows.length !== 1) return "Please select a customer network";

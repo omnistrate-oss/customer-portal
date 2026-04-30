@@ -17,7 +17,7 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
 
   if (previewValue === null) return null;
 
-  if (!previewValue && value !== false && !value) {
+  if (!previewValue && (value === undefined || value === null || value === "")) {
     return null;
   }
 
