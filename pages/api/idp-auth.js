@@ -1,4 +1,5 @@
 import { customerSignInWithIdentityProvider } from "src/server/api/customer-user";
+import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 import { setAuthCookie, setIndicatorCookie, setRefreshCookie } from "src/server/utils/authCookie";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
@@ -15,12 +16,14 @@ export default async function handleAuth(nextRequest, nextResponse) {
         authorizationCode,
         identityProviderName: "Google",
         redirectUri: `${saasDomainURL}/api/idp-auth`,
+        environmentType: getEnvironmentType(),
       };
     } else if (state === "github-auth" && code) {
       const authorizationCode = code;
       authRequestPayload = {
         authorizationCode,
         identityProviderName: "GitHub",
+        environmentType: getEnvironmentType(),
       };
     }
 
@@ -31,11 +34,11 @@ export default async function handleAuth(nextRequest, nextResponse) {
         const refreshToken = response.data.refreshToken;
         if (jwtToken) {
           setAuthCookie(nextResponse, jwtToken);
+          setIndicatorCookie(nextResponse);
         }
         if (refreshToken) {
           setRefreshCookie(nextResponse, refreshToken);
         }
-        setIndicatorCookie(nextResponse);
         return nextResponse.redirect(307, "/signin");
       } catch (err) {
         console.error("IDP AUTH error", err);

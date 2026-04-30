@@ -92,6 +92,10 @@ const AxiosGlobalErrorHandler = () => {
             // Attempt silent token refresh before forcing logout
             const refreshed = await refreshAuth();
             if (refreshed && error.config && !error.config._retried) {
+              // Yield a microtask so the Set-Cookie from /api/refresh-token is
+              // reliably visible to this retry — some browsers don't guarantee
+              // cookie-jar visibility within the same microtask.
+              await Promise.resolve();
               try {
                 error.config._retried = true;
                 return await axios.request(error.config);
