@@ -29,7 +29,9 @@ const CustomNetworkForm = ({
   const subscriptionOwners = useMemo(() => {
     const seen = new Set<string>();
     return subscriptions
-      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader")
+      .filter(
+        (sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader" && sub.roleType !== "root"
+      )
       .reduce<{ name: string; orgIdentifier: string; orgId: string }[]>((acc, sub) => {
         const orgId = sub.rootUserOrgId!;
         if (!seen.has(orgId)) {
