@@ -11,9 +11,9 @@ import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 
 import { CustomNetworkValidationSchema } from "../constants";
-import useSubscriptionOwners from "../hooks/useSubscriptionOwners";
 
 const CustomNetworkForm = ({
   formMode,
@@ -24,7 +24,25 @@ const CustomNetworkForm = ({
   selectedCustomNetwork,
 }) => {
   const snackbar = useSnackbar();
-  const { data: subscriptionOwners = [], isFetching: isFetchingSubscriptionOwners } = useSubscriptionOwners();
+  const { subscriptions, isFetchingSubscriptions } = useGlobalData();
+
+  const subscriptionOwners = useMemo(() => {
+    const seen = new Set<string>();
+    return subscriptions
+      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader")
+      .reduce<{ name: string; orgIdentifier: string; orgId: string }[]>((acc, sub) => {
+        const orgId = sub.rootUserOrgId!;
+        if (!seen.has(orgId)) {
+          seen.add(orgId);
+          acc.push({
+            name: sub.subscriptionOwnerName || sub.rootUserName || sub.rootUserOrgName || "",
+            orgIdentifier: sub.serviceOrgName || sub.rootUserId,
+            orgId,
+          });
+        }
+        return acc;
+      }, []);
+  }, [subscriptions]);
 
   const createCustomNetworkMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/custom-network", {
     onSuccess: () => {
@@ -69,7 +87,8 @@ const CustomNetworkForm = ({
           data.orgId = values.subscriptionOwnerId;
         }
         createCustomNetworkMutation.mutate({
-          body: data as Parameters<typeof createCustomNetworkMutation.mutate>[0]["body"],
+          // @ts-ignore
+          body: data,
         });
       } else {
         updateCustomNetworkMutation.mutate({
@@ -115,7 +134,7 @@ const CustomNetworkForm = ({
   const subscriptionOwnerMenuItems = useMemo(() => {
     const items = subscriptionOwners.map((user) => ({
       value: user.orgId,
-      label: `${user.name} - ${user.email}`,
+      label: user.name && user.orgIdentifier ? `${user.name} - ${user.orgIdentifier}` : user.name || user.orgIdentifier,
     }));
 
     // In modify mode, ensure the current owner is in the list even if not returned by subscriptions API
@@ -245,7 +264,7 @@ const CustomNetworkForm = ({
               name: "subscriptionOwnerId",
               type: "select",
               required: true,
-              isLoading: isFetchingSubscriptionOwners,
+              isLoading: isFetchingSubscriptions,
               menuItems: subscriptionOwnerMenuItems,
               disabled: formMode === "modify",
               isHidden: !formData.values.shareViaSubscriptionOwner,
@@ -265,7 +284,7 @@ const CustomNetworkForm = ({
   }, [
     cloudProviders,
     isFetchingRegions,
-    isFetchingSubscriptionOwners,
+    isFetchingSubscriptions,
     regionMenuItems,
     subscriptionOwnerMenuItems,
     formData.values,
