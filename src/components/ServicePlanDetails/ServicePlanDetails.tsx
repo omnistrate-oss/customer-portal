@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tab, Tabs } from "@mui/material";
+import { Box, Stack, Tab, Tabs } from "@mui/material";
 import DOMPurify from "isomorphic-dompurify";
 
 import useDownloadCLI from "src/hooks/useDownloadCLI";
@@ -103,15 +103,28 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
       )}
 
       {currentTab === "download-cli" && (
-        <div className="flex items-center justify-between gap-4 border border-gray-200 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 border border-gray-200 rounded-lg">
-              <DownloadCLIIcon color="#16B364" />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-gray-900">Download CLI</p>
-            </div>
-          </div>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          gap={2}
+          sx={{ border: "1px solid #E9EAEB", borderRadius: "12px", p: 2 }}
+        >
+          <Stack direction="row" alignItems="center" gap={1.5}>
+            <Box
+              sx={{
+                p: 1,
+                border: "1px solid #E9EAEB",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <DownloadCLIIcon color={colors.success500} />
+            </Box>
+            <Box sx={{ fontWeight: 600, color: "#101828" }}>Download CLI</Box>
+          </Stack>
           <Button
             variant="contained"
             disabled={isDownloading}
@@ -123,7 +136,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
             Download CLI
             {isDownloading && <LoadingSpinnerSmall />}
           </Button>
-        </div>
+        </Stack>
       )}
     </CardWithTitle>
   );
