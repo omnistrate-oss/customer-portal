@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 
-import { $api } from "src/api/query";
-import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import useSnackbar from "src/hooks/useSnackbar";
 import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
 import { FormConfiguration } from "components/DynamicForm/types";
+import { $api } from "src/api/query";
+import Switch from "src/components/Switch/Switch";
+import Tooltip from "src/components/Tooltip/Tooltip";
+import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import useSnackbar from "src/hooks/useSnackbar";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
 
 import { CustomNetworkValidationSchema } from "../constants";
 
@@ -21,6 +24,26 @@ const CustomNetworkForm = ({
   selectedCustomNetwork,
 }) => {
   const snackbar = useSnackbar();
+  const { subscriptions, isFetchingSubscriptions } = useGlobalData();
+
+  const subscriptionOwners = useMemo(() => {
+    const seen = new Set<string>();
+    return subscriptions
+      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader")
+      .reduce<{ name: string; orgIdentifier: string; orgId: string }[]>((acc, sub) => {
+        const orgId = sub.rootUserOrgId!;
+        if (!seen.has(orgId)) {
+          seen.add(orgId);
+          acc.push({
+            name: sub.subscriptionOwnerName || sub.rootUserName || sub.rootUserOrgName || "",
+            orgIdentifier: sub.serviceOrgName || sub.rootUserId,
+            orgId,
+          });
+        }
+        return acc;
+      }, []);
+  }, [subscriptions]);
+
   const createCustomNetworkMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/custom-network", {
     onSuccess: () => {
       onClose();
@@ -47,12 +70,24 @@ const CustomNetworkForm = ({
       cloudProviderName: selectedCustomNetwork?.cloudProviderName || "aws",
       cloudProviderRegion: selectedCustomNetwork?.cloudProviderRegion || "",
       cidr: selectedCustomNetwork?.cidr || "",
+      shareViaSubscriptionOwner: !!selectedCustomNetwork?.owningUserId,
+      subscriptionOwnerId: selectedCustomNetwork?.owningUserId || "",
     },
     validationSchema: CustomNetworkValidationSchema,
     onSubmit: (values) => {
-      const data = { ...values };
+      const data: Record<string, unknown> = {
+        name: values.name,
+        cloudProviderName: values.cloudProviderName,
+        cloudProviderRegion: values.cloudProviderRegion,
+        cidr: values.cidr,
+      };
+
       if (formMode === "create") {
+        if (values.shareViaSubscriptionOwner && values.subscriptionOwnerId) {
+          data.orgId = values.subscriptionOwnerId;
+        }
         createCustomNetworkMutation.mutate({
+          // @ts-ignore
           body: data,
         });
       } else {
@@ -63,7 +98,7 @@ const CustomNetworkForm = ({
             },
           },
           body: {
-            name: data.name,
+            name: values.name,
           },
         });
       }
@@ -95,6 +130,27 @@ const CustomNetworkForm = ({
         .sort((a, b) => a.localeCompare(b))
     );
   }, [regions]);
+
+  const subscriptionOwnerMenuItems = useMemo(() => {
+    const items = subscriptionOwners.map((user) => ({
+      value: user.orgId,
+      label: user.name && user.orgIdentifier ? `${user.name} - ${user.orgIdentifier}` : user.name || user.orgIdentifier,
+    }));
+
+    // In modify mode, ensure the current owner is in the list even if not returned by subscriptions API
+    if (
+      formMode === "modify" &&
+      selectedCustomNetwork?.owningUserId &&
+      !items.some((item) => item.value === selectedCustomNetwork.owningUserId)
+    ) {
+      items.unshift({
+        value: selectedCustomNetwork.owningUserId,
+        label: selectedCustomNetwork.owningUserName || selectedCustomNetwork.owningUserId,
+      });
+    }
+
+    return items;
+  }, [subscriptionOwners, formMode, selectedCustomNetwork]);
 
   const formConfiguration: FormConfiguration = useMemo(() => {
     return {
@@ -168,11 +224,72 @@ const CustomNetworkForm = ({
               required: true,
               disabled: formMode === "modify",
             },
+            {
+              dataTestId: "share-via-subscription-owner-toggle",
+              label: "Create for a shared subscription",
+              subLabel:
+                "Enable to create this network for a subscription that has been shared with you. The network will be visible to the subscription owner and usable on their subscription",
+              name: "shareViaSubscriptionOwner",
+              customComponent: (
+                <Tooltip
+                  title={
+                    formMode === "modify"
+                      ? "Cannot change shared subscription setting after creation"
+                      : !subscriptionOwnerMenuItems.length
+                        ? "No shared subscriptions found. You need at least one subscription shared with you to create a network for another owner"
+                        : ""
+                  }
+                >
+                  <span>
+                    <Switch
+                      checked={formData.values.shareViaSubscriptionOwner}
+                      disabled={formMode === "modify" || !subscriptionOwnerMenuItems.length}
+                      onChange={(e) => {
+                        formData.setFieldValue("shareViaSubscriptionOwner", e.target.checked);
+                        if (!e.target.checked) {
+                          formData.setFieldValue("subscriptionOwnerId", "");
+                          formData.setFieldTouched("subscriptionOwnerId", false);
+                        }
+                      }}
+                    />
+                  </span>
+                </Tooltip>
+              ),
+            },
+            {
+              dataTestId: "subscription-owner-select",
+              label: "Subscription Owner",
+              subLabel:
+                "Select the owner of the shared subscription this network is for. Only subscription owners who have shared with you are listed",
+              name: "subscriptionOwnerId",
+              type: "select",
+              required: true,
+              isLoading: isFetchingSubscriptions,
+              menuItems: subscriptionOwnerMenuItems,
+              disabled: formMode === "modify",
+              isHidden: !formData.values.shareViaSubscriptionOwner,
+              previewValue: formData.values.subscriptionOwnerId
+                ? (() => {
+                    const owner = subscriptionOwnerMenuItems.find(
+                      (item) => item.value === formData.values.subscriptionOwnerId
+                    );
+                    return owner?.label || formData.values.subscriptionOwnerId;
+                  })()
+                : null,
+            },
           ],
         },
       ],
     };
-  }, [cloudProviders, isFetchingRegions, regionMenuItems, formData.values, formMode]);
+  }, [
+    cloudProviders,
+    isFetchingRegions,
+    isFetchingSubscriptions,
+    regionMenuItems,
+    subscriptionOwnerMenuItems,
+    formData.values,
+    formMode,
+  ]);
 
   return (
     <GridDynamicForm

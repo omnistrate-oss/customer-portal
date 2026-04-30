@@ -5,4 +5,10 @@ export const CustomNetworkValidationSchema = yup.object({
   cloudProviderName: yup.string().required("Cloud Provider is required"),
   cloudProviderRegion: yup.string().required("Region is required"),
   name: yup.string().required("Name is required"),
+  shareViaSubscriptionOwner: yup.boolean(),
+  subscriptionOwnerId: yup.string().when("shareViaSubscriptionOwner", {
+    is: true,
+    then: (schema) => schema.required("Subscription Owner is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
 });
