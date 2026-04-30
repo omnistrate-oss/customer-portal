@@ -38,6 +38,22 @@ const CustomNetworksTableHeader = ({
 }) => {
   const currentUser = useSelector(selectUserrootData);
 
+  /**
+   * Determines whether the currently selected network's actions should be blocked
+   * due to ownership restrictions.
+   *
+   * Returns `true` (blocked) when:
+   * - Exactly one row is selected
+   * - The selected network has an `owningUserId`
+   * - The logged-in user is NOT the owner
+   * - The logged-in user does NOT have an "editor" or "root" role on any subscription
+   *   whose `rootUserOrgId` matches the network's `owningUserId`
+   *
+   * @remarks
+   * ⚠️ Potential bug: `rootUserOrgId` is an Org ID while `owningUserId` is a User ID.
+   * These two values represent different entity types and are unlikely to ever be equal,
+   * meaning the `hasAccess` check may always evaluate to `false`.
+   */
   const isOwnershipBlocked = useMemo(() => {
     if (selectedRows.length !== 1) return false;
     const selectedNetwork = customNetworks.find((n) => n.id === selectedRows[0]);
@@ -51,7 +67,7 @@ const CustomNetworksTableHeader = ({
 
     // Check if the user has editor or root role on any subscription belonging to the network owner's org
     const hasAccess = subscriptions.some(
-      (sub) => sub.rootUserOrgId === networkOwnerId && (sub.roleType === "editor" || sub.roleType === "root")
+      (sub) => sub.rootUserId === networkOwnerId && (sub.roleType === "editor" || sub.roleType === "root")
     );
 
     return !hasAccess;
