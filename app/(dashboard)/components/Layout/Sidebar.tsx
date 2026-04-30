@@ -142,7 +142,7 @@ const ExpandibleNavItem = ({ name, icon: Icon, subItems, isExpanded, setExpanded
   );
 };
 
-type Overlay = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation";
+type Overlay = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
 
 const Sidebar = () => {
   const currentPath = usePathname();
@@ -219,7 +219,7 @@ const Sidebar = () => {
         icon: DownloadCLIIcon,
         onClick: () => {
           setIsOverlayOpen(true);
-          setOverlayType("plan-details");
+          setOverlayType("download-cli");
         },
       },
       {
@@ -349,8 +349,12 @@ const Sidebar = () => {
       <FullScreenDrawer
         open={isOverlayOpen}
         closeDrawer={() => setIsOverlayOpen(false)}
-        title="Plan Details"
-        description="View the details of the selected plan"
+        title={overlayType === "download-cli" ? "Download CLI" : "Plan Details"}
+        description={
+          overlayType === "download-cli"
+            ? "View and download CLI for the selected Product and the subscription plan"
+            : "View the details of the selected plan"
+        }
         RenderUI={<PlanDetails startingTab={overlayType} />}
       />
     </aside>

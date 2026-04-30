@@ -12,6 +12,7 @@ import APIDocumentation from "../APIDocumentation/APIDocumentation";
 import Button from "../Button/Button";
 import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
+import DownloadCLIIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
 
@@ -20,12 +21,13 @@ type ServicePlanDetailsProps = {
   startingTab?: CurrentTab;
 };
 
-const tabLabels = {
+const tabLabels: Record<CurrentTab, string> = {
   "plan-details": "Plan Details",
   documentation: "Documentation",
   pricing: "Pricing",
   support: "Support",
   "api-documentation": "API Documentation",
+  "download-cli": "Download CLI",
 };
 
 const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering, startingTab = "plan-details" }) => {
@@ -34,21 +36,8 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
 
   if (!serviceOffering) return null;
 
-  const actionButton = (
-    <Button
-      variant="outlined"
-      disabled={isDownloading}
-      onClick={() => {
-        downloadCLI(serviceOffering.serviceId, serviceOffering.serviceAPIID);
-      }}
-    >
-      Download CLI
-      {isDownloading && <LoadingSpinnerSmall />}
-    </Button>
-  );
-
   return (
-    <CardWithTitle title={serviceOffering.productTierName} actionButton={actionButton}>
+    <CardWithTitle title={serviceOffering.productTierName}>
       <Tabs
         value={currentTab}
         centered
@@ -60,14 +49,14 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
           },
         }}
       >
-        {Object.keys(tabLabels).map((tab) => (
+        {(Object.keys(tabLabels) as CurrentTab[]).map((tab) => (
           <Tab
             key={tab}
             disabled={tab === "download-cli" && isDownloading}
             label={tabLabels[tab]}
             value={tab}
             onClick={() => {
-              setCurrentTab(tab as CurrentTab);
+              setCurrentTab(tab);
             }}
             sx={{
               paddingY: "12px !important",
@@ -111,6 +100,30 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
 
       {currentTab === "api-documentation" && (
         <APIDocumentation serviceId={serviceOffering.serviceId} serviceAPIID={serviceOffering.serviceAPIID} />
+      )}
+
+      {currentTab === "download-cli" && (
+        <div className="flex items-center justify-between gap-4 border border-gray-200 rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 border border-gray-200 rounded-lg">
+              <DownloadCLIIcon color="#16B364" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-gray-900">Download CLI</p>
+            </div>
+          </div>
+          <Button
+            variant="contained"
+            disabled={isDownloading}
+            onClick={() => {
+              downloadCLI(serviceOffering.serviceId, serviceOffering.serviceAPIID);
+            }}
+            startIcon={<DownloadCLIIcon color="#FFFFFF" />}
+          >
+            Download CLI
+            {isDownloading && <LoadingSpinnerSmall />}
+          </Button>
+        </div>
       )}
     </CardWithTitle>
   );
