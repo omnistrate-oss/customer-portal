@@ -965,7 +965,7 @@ const InstanceForm = ({
     [standardInformationFields, networkConfigurationFields, deploymentConfigurationFields]
   );
 
-  if (isFetchingServiceOfferings) {
+  if (isFetchingServiceOfferings || isFetchingSubscriptions || !initialValues) {
     return <LoadingSpinner />;
   }
 

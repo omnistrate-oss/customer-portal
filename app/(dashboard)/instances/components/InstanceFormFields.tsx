@@ -1,5 +1,5 @@
-import Link from "next/link";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
+import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -251,13 +251,22 @@ export const getStandardInformationFields = (
             }
 
             const resources = getResourceMenuItems(offering);
-            setFieldValue("resourceId", resources[0]?.value || "");
-            // Only reset requestParams and productTierVersion when the plan actually changes.
+            // Only reset requestParams, productTierVersion, and resourceId when the plan actually changes.
             // When the user subscribes to the already-selected plan, the plan ID doesn't
-            // change, so we should preserve existing default parameter values.
+            // change, so we should preserve existing selections and default parameter values.
             if (isPlanChanging) {
+              setFieldValue("resourceId", resources[0]?.value || "");
               setFieldValue("requestParams", {});
               setFieldValue("productTierVersion", "");
+            } else {
+              // If the current resourceId is not in the new resource list, reset it
+              // and clear requestParams since the resource context changed
+              const currentResourceId = values.resourceId;
+              const resourceIds = resources.map((r) => r.value);
+              if (!currentResourceId || !resourceIds.includes(currentResourceId)) {
+                setFieldValue("resourceId", resources[0]?.value || "");
+                setFieldValue("requestParams", {});
+              }
             }
 
             const subscription = getValidSubscriptionForInstanceCreation(
