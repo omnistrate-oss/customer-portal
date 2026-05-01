@@ -15,15 +15,14 @@ export const Tabs = styled(MuiTabs)({
 
 export const Tab = styled(MuiTab)({
   textTransform: "none",
-  borderBottom: "0px solid #EAECF0",
   fontSize: 14,
-  padding: "12px 4px !important",
+  padding: "12px 12px !important",
   fontWeight: 600,
   color: "#717680",
   lineHeight: "20px",
   minWidth: "auto",
   minHeight: "32px",
-  marginRight: "16px",
+  marginRight: "4px",
   borderBottom: "2px solid transparent",
   "&:hover": {
     borderBottom: `2px solid ${colors.purple600}`,
