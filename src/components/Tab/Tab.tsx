@@ -5,6 +5,7 @@ import MuiTabs, { tabsClasses, TabsProps } from "@mui/material/Tabs";
 import { Stack } from "@mui/system";
 
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
+import { colors } from "src/themeConfig";
 
 type TabStatus = "failed";
 
@@ -33,12 +34,12 @@ type TabsExtendedProps = TabsProps & {
 export const Tabs = ({ centerTabs, ...rest }: TabsExtendedProps) => {
   if (centerTabs) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", borderBottom: "1px solid #EAECF0" }}>
+      <Box sx={{ display: "flex", justifyContent: "center", borderBottom: `1px solid ${colors.gray200}` }}>
         <StyledTabs {...rest} />
       </Box>
     );
   }
-  return <StyledTabs {...rest} sx={{ ...rest.sx, borderBottom: "1px solid #EAECF0" }} />;
+  return <StyledTabs {...rest} sx={{ ...rest.sx, borderBottom: `1px solid ${colors.gray200}` }} />;
 };
 
 const statusStyles = {
@@ -52,23 +53,22 @@ const statusStyles = {
 
 const StyledTab = styled(MuiTab, {
   shouldForwardProp: (prop) => prop !== "status",
-})<TabV2Props>(({ status, disabled }) => ({
+})<TabV2Props>(({ status }) => ({
   textTransform: "none",
   padding: "0 16px",
   fontWeight: 600,
   fontSize: "14px",
   lineHeight: "20px",
-  color: "#717680",
+  color: colors.gray500,
   minHeight: "auto",
   minWidth: "auto",
   borderRadius: 0,
   position: "relative",
-  // Add horizontal padding to child content
+  // Add padding to child content
   "& > *": {
     padding: "14px 16px",
     borderRadius: "4px 4px 0 0",
     borderBottom: "none",
-    opacity: disabled ? 0.5 : 1,
     ...(status && statusStyles[status]
       ? {
           backgroundColor: statusStyles[status].backgroundColor,
@@ -99,7 +99,7 @@ const StyledTab = styled(MuiTab, {
     top: "9px",
     bottom: "9px",
     width: "1px",
-    backgroundColor: "#EAECF0",
+    backgroundColor: colors.gray200,
   },
 
   // Hide separator on last tab
@@ -108,23 +108,26 @@ const StyledTab = styled(MuiTab, {
   },
 
   [`&.${tabClasses.selected}`]: {
-    color: "#6941C6",
+    color: colors.purple700,
     "&::before": {
-      backgroundColor: "#6941C6",
+      backgroundColor: colors.purple700,
     },
   },
 
   "&:hover": {
-    color: "#6941C6",
+    color: colors.purple700,
     "&::before": {
-      backgroundColor: "#6941C6",
+      backgroundColor: colors.purple700,
     },
   },
 
   [`&.${tabClasses.disabled}`]: {
-    color: "#A4A7AE",
+    color: colors.gray400,
+    "& > *": {
+      opacity: 0.5,
+    },
     "&:hover": {
-      color: "#A4A7AE",
+      color: colors.gray400,
       "&::before": {
         backgroundColor: "transparent",
       },
@@ -136,7 +139,7 @@ export const Tab = ({ status, label, ...rest }: TabV2Props) => {
   const statusConfig = status ? statusStyles[status] : undefined;
 
   const wrappedLabel = statusConfig ? (
-    <Stack direction="row" alignItems="center" gap="8px">
+    <Stack direction="row" alignItems="center" spacing={1}>
       {statusConfig.icon}
       {label}
     </Stack>
@@ -152,13 +155,13 @@ export const Tab = ({ status, label, ...rest }: TabV2Props) => {
 // Reference implementation in ResourceConfig/components/ConfigurationPanelTabs.tsx
 export const disabledTabStyles = {
   [`&.${tabClasses.root}`]: {
-    color: "#A4A7AE",
+    color: colors.gray400,
     cursor: "not-allowed",
     "& > *": {
       opacity: 0.5,
     },
     "&:hover": {
-      color: "#A4A7AE",
+      color: colors.gray400,
       "&::before": {
         backgroundColor: "transparent",
       },
