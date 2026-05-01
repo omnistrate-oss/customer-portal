@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "src/components/Tab/Tab";
 import DOMPurify from "isomorphic-dompurify";
 
 import useDownloadCLI from "src/hooks/useDownloadCLI";
-import { colors } from "src/themeConfig";
 import { ServiceOffering } from "src/types/serviceOffering";
 
 import APIDocumentation from "../APIDocumentation/APIDocumentation";
@@ -54,10 +53,6 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
         centered
         sx={{
           mb: "32px",
-          borderBottom: "1px solid #E9EAEB",
-          "& .MuiTabs-indicator": {
-            backgroundColor: colors.purple700,
-          },
         }}
       >
         {Object.keys(tabLabels).map((tab) => (
@@ -69,17 +64,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
             onClick={() => {
               setCurrentTab(tab as CurrentTab);
             }}
-            sx={{
-              paddingY: "12px !important",
-              paddingX: "16px !important",
-              minWidth: "0px",
-              textTransform: "none",
-              fontWeight: "600",
-              color: "#717680",
-              "&.Mui-selected": {
-                color: colors.purple700,
-              },
-            }}
+            disableRipple
           />
         ))}
       </Tabs>
