@@ -12,6 +12,7 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
+    "upgrade:instances": "tsx scripts/saasbuilder-upgrade.ts",
     "test:record": "HAR_MODE=record yarn playwright test",
     "test:replay": "HAR_MODE=replay yarn playwright test",
     "record": "yarn tsx scripts/record-hars.ts"
@@ -87,7 +88,7 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.2",
-    "@inquirer/prompts": "^8.3.0",
+    "@inquirer/prompts": "^8.4.1",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "20.14.11",
@@ -106,7 +107,7 @@
     "prettier": "^3.1.0",
     "puppeteer": "^24.3.1",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.19.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "wait-on": "^9.0.4"
   },
