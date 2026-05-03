@@ -299,7 +299,6 @@ async function modifyInstance(cfg: EnvConfig, token: string, instanceId: string,
     {
       requestParams: { imageName: newImageName },
       resourceId: cfg.resourceId,
-      customTags: [],
     }
   );
 }
@@ -440,7 +439,7 @@ async function main() {
     for (const id of ids) console.log(`    - ${id}`);
     if (
       await confirm({
-        message: `Create upgrade-path v${sourceVersion} → v${targetChoice} for ${ids.length} instance(s)?`,
+        message: `Create upgrade-path v${sourceVersion} → v${targetChoice} for ${ids.length} instance(s)? (customers will be notified)`,
         default: true,
       })
     ) {
