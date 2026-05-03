@@ -102,6 +102,26 @@ function sleep(ms: number): Promise<void> {
   });
 }
 
+class ApiError extends Error {
+  status: number;
+  retryAfterMs?: number;
+  constructor(message: string, status: number, retryAfterMs?: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.retryAfterMs = retryAfterMs;
+  }
+}
+
+function parseRetryAfter(header: string | null): number | undefined {
+  if (!header) return undefined;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) return Math.max(0, seconds * 1000);
+  const dateMs = Date.parse(header);
+  if (!Number.isNaN(dateMs)) return Math.max(0, dateMs - Date.now());
+  return undefined;
+}
+
 async function apiRequest<T>(method: string, url: string, token: string, body?: unknown): Promise<T> {
   const res = await fetch(url, {
     method: method,
@@ -115,11 +135,33 @@ async function apiRequest<T>(method: string, url: string, token: string, body?: 
     const text = await res.text().catch(function () {
       return "";
     });
-    throw new Error(`${method} ${url} → ${res.status} ${res.statusText}\n${text}`);
+    const retryAfterMs = parseRetryAfter(res.headers.get("retry-after"));
+    throw new ApiError(`${method} ${url} → ${res.status} ${res.statusText}\n${text}`, res.status, retryAfterMs);
   }
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   return text ? (JSON.parse(text) as T) : (undefined as T);
+}
+
+async function withBackoffRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  const maxAttempts = 6;
+  const baseDelayMs = 2000;
+  const maxDelayMs = 30000;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const retryable = err instanceof ApiError && (err.status === 429 || err.status >= 500);
+      if (!retryable || attempt === maxAttempts) throw err;
+      const exp = Math.min(baseDelayMs * Math.pow(2, attempt - 1), maxDelayMs);
+      const jitter = Math.floor(Math.random() * 500);
+      const wait = (err as ApiError).retryAfterMs ?? exp + jitter;
+      const status = (err as ApiError).status;
+      console.log(`    ! ${label}: ${status}, retrying in ${Math.round(wait / 1000)}s (attempt ${attempt}/${maxAttempts - 1})`);
+      await sleep(wait);
+    }
+  }
+  throw new Error("unreachable");
 }
 
 async function signIn(apiBase: string, email: string, pw: string): Promise<string> {
@@ -486,7 +528,9 @@ async function main() {
   let failed = 0;
   for (const id of modifiableIds) {
     try {
-      await modifyInstance(cfg, token, id, newImage);
+      await withBackoffRetry(function () {
+        return modifyInstance(cfg, token, id, newImage);
+      }, id);
       ok++;
       console.log(`    \u2713 ${id}`);
     } catch (err) {
