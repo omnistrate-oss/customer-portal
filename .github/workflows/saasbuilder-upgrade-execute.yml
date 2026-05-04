@@ -1,0 +1,165 @@
+name: SaaSBuilder Upgrade — Execute
+
+# Stage 2 of a two-stage rollout. Takes the operator's selections (made after
+# reading the Prepare run summary) and runs Steps 4 (create + poll upgrade-path)
+# and 5 (PATCH selected fleet instances). Long-running: timeout is 4 h to give
+# headroom over the 3 h typical rollout. Per-instance modify failures do NOT
+# fail the job — they are reported in the run summary and Mattermost ping.
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment (must match Prepare)"
+        type: choice
+        required: true
+        options:
+          - dev
+          - prod
+      image_tag:
+        description: "New image tag (must match Prepare)"
+        type: string
+        required: true
+      source_version:
+        description: "Upgrade FROM (e.g. 0.3.115) — pick from Prepare summary"
+        type: string
+        required: true
+      target_version:
+        description: "Upgrade TO (e.g. 0.3.116) — usually equals image_tag"
+        type: string
+        required: true
+      image_groups_json:
+        description: 'JSON array of image strings to PATCH in Step 5 — copy from Prepare summary, e.g. ["omnistrate-oss/customer-portal:0.3.115"]'
+        type: string
+        required: true
+      skip_upgrade_path:
+        description: "Skip Step 4 (no upgrade-path created/polled)"
+        type: boolean
+        default: false
+      skip_modify:
+        description: "Skip Step 5 (no per-instance PATCH)"
+        type: boolean
+        default: false
+      continue_on_upgrade_failure:
+        description: "Run Step 5 even if Step 4 ends as FAILED/CANCELLED"
+        type: boolean
+        default: false
+
+concurrency:
+  group: saasbuilder-upgrade-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    name: Execute upgrade (${{ inputs.environment }} → ${{ inputs.image_tag }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    environment: saasbuilder-upgrade-${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Enable Corepack and activate Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.0 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Notify Mattermost (starting)
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          printf -v TEXT '@channel\n#### :hourglass_flowing_sand: SaaSBuilder Upgrade — Execute STARTING (`%s` → `%s`)\nv%s → v%s. May take up to 4 h. The job timeout is the only expected failure mode.\n:link: [Watch run](%s)' \
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "$RUN_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+      - name: Run execute
+        id: execute
+        env:
+          OMNI_ENV: ${{ inputs.environment }}
+          OMNI_EMAIL: ${{ inputs.environment == 'prod' && secrets.OMNISTRATE_PROD_EMAIL || secrets.OMNISTRATE_DEV_EMAIL }}
+          OMNI_PASSWORD: ${{ inputs.environment == 'prod' && secrets.OMNISTRATE_PROD_PASSWORD || secrets.OMNISTRATE_DEV_PASSWORD }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          SOURCE_VERSION: ${{ inputs.source_version }}
+          TARGET_VERSION: ${{ inputs.target_version }}
+          IMAGE_GROUPS_JSON: ${{ inputs.image_groups_json }}
+          SKIP_UPGRADE_PATH: ${{ inputs.skip_upgrade_path }}
+          SKIP_MODIFY: ${{ inputs.skip_modify }}
+          CONTINUE_ON_UPGRADE_FAILURE: ${{ inputs.continue_on_upgrade_failure }}
+        run: yarn upgrade:execute
+
+      - name: Upload execute summary
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: upgrade-execute-summary-${{ inputs.environment }}-${{ inputs.image_tag }}
+          path: upgrade-execute-summary.json
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Notify Mattermost (success)
+        if: ${{ steps.execute.outcome == 'success' }}
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Pull headline numbers from the summary JSON if it exists.
+          STATS="(see run summary)"
+          if [ -f upgrade-execute-summary.json ]; then
+            STATS=$(jq -r '
+              "step4=" + (.step4.finalStatus // (if .step4.skipped then "skipped" else "no-op" end)) +
+              ", modified=" + (.step5.modified | tostring) +
+              ", failed=" + (.step5.failed | tostring) +
+              " of " + (.step5.targetedInstanceCount | tostring)
+            ' upgrade-execute-summary.json)
+          fi
+
+          printf -v TEXT '@channel\n#### :white_check_mark: SaaSBuilder Upgrade — Execute DONE (`%s` → `%s`)\nv%s → v%s. %s\n:link: [Run summary](%s)' \
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "$STATS" "$RUN_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+      - name: Notify Mattermost (failure or cancelled)
+        if: ${{ failure() || cancelled() }}
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          STATUS_LINE="${{ cancelled() && 'CANCELLED or TIMED OUT' || 'FAILED' }}"
+
+          printf -v TEXT '@channel\n#### :red_circle: SaaSBuilder Upgrade — Execute %s (`%s` → `%s`)\nv%s → v%s. Check the run logs and the partial summary artifact (if any).\n:link: [View run](%s)' \
+            "$STATUS_LINE" "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "$RUN_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"

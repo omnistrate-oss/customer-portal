@@ -1,0 +1,116 @@
+name: SaaSBuilder Upgrade — Prepare
+
+# Stage 1 of a two-stage rollout. PATCHes the imageName default, releases a new
+# version set, then lists every version set + image group so the operator can
+# copy-paste those values into the Execute workflow. No fleet-wide changes happen
+# in this stage beyond Steps 1 and 2 (toggleable via the skip_* inputs).
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        type: choice
+        required: true
+        options:
+          - dev
+          - prod
+      image_tag:
+        description: "New image tag (e.g. 0.3.116) — applied as omnistrate-oss/customer-portal:<tag>"
+        type: string
+        required: true
+      skip_patch_default:
+        description: "Skip Step 1 (PATCH imageName default)"
+        type: boolean
+        default: false
+      skip_release:
+        description: "Skip Step 2 (release new version set)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: saasbuilder-upgrade-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare upgrade (${{ inputs.environment }} → ${{ inputs.image_tag }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: saasbuilder-upgrade-${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Enable Corepack and activate Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.0 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run prepare
+        id: prepare
+        env:
+          OMNI_ENV: ${{ inputs.environment }}
+          OMNI_EMAIL: ${{ inputs.environment == 'prod' && secrets.OMNISTRATE_PROD_EMAIL || secrets.OMNISTRATE_DEV_EMAIL }}
+          OMNI_PASSWORD: ${{ inputs.environment == 'prod' && secrets.OMNISTRATE_PROD_PASSWORD || secrets.OMNISTRATE_DEV_PASSWORD }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          SKIP_PATCH_DEFAULT: ${{ inputs.skip_patch_default }}
+          SKIP_RELEASE: ${{ inputs.skip_release }}
+        run: yarn upgrade:prepare
+
+      - name: Upload prepare summary
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: upgrade-prepare-summary-${{ inputs.environment }}-${{ inputs.image_tag }}
+          path: upgrade-prepare-summary.json
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Notify Mattermost (success)
+        if: ${{ steps.prepare.outcome == 'success' }}
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXECUTE_URL="${{ github.server_url }}/${{ github.repository }}/actions/workflows/saasbuilder-upgrade-execute.yml"
+
+          printf -v TEXT '@channel\n#### :rocket: SaaSBuilder Upgrade — Prepare ready (`%s` → `%s`)\nSteps 1 + 2 done. Read the run summary for the suggested Execute inputs, then trigger **Execute**.\n- :clipboard: [Prepare run summary & artifact](%s)\n- :gear: [Open Execute workflow](%s)' \
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "$RUN_URL" "$EXECUTE_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+      - name: Notify Mattermost (failure)
+        if: ${{ failure() }}
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          printf -v TEXT '@channel\n#### :red_circle: SaaSBuilder Upgrade — Prepare FAILED (`%s` → `%s`)\nThe Prepare stage failed before completing. Check the run logs.\n:link: [View run](%s)' \
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "$RUN_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"
