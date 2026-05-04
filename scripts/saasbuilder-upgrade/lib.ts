@@ -304,12 +304,12 @@ export function formatProgress(u: UpgradePath): string {
 }
 
 export async function waitForUpgrade(cfg: EnvConfig, token: string, upgradePathId: string): Promise<UpgradePath> {
-  console.log(`\n  polling ${upgradePathId} every ${UPGRADE_POLL_INTERVAL_MS / 1000}s...`);
+  console.log(`\n  polling upgrade-path every ${UPGRADE_POLL_INTERVAL_MS / 1000}s...`);
   const terminal = ["COMPLETE", "COMPLETED", "FAILED", "CANCELLED"];
   while (true) {
     const u = await withBackoffRetry(function () {
       return getUpgradePath(cfg, token, upgradePathId);
-    }, `getUpgradePath ${upgradePathId}`);
+    }, "getUpgradePath");
     console.log(formatProgress(u));
     if (terminal.indexOf(u.status.toUpperCase()) !== -1) return u;
     await sleep(UPGRADE_POLL_INTERVAL_MS);

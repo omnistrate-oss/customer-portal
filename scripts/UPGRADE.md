@@ -80,6 +80,17 @@ The `dev` / `prod` choice is the operator's `workflow_dispatch` input — pickin
 
 **Timeout:** 4 hours (`timeout-minutes: 240`). The only expected failure mode is hitting this timeout; if a regular rollout starts to approach it, raise to 360 (the GitHub-hosted runner maximum).
 
+### Public-repo data hygiene
+
+This repo is public, which means **Actions logs, uploaded artifacts, and step summaries are world-readable**. To avoid systematically publishing the customer roster every rollout, the CI entrypoints redact:
+
+- Per-instance success/failure log lines show `${i+1}/${total}` progress, **not** the instance ID.
+- `upgrade-prepare-summary.json` lists `imageGroups` as `{ image, count }` only — no `instanceIds[]`.
+- `upgrade-execute-summary.json` reports `failureReasons` as `{ reason, count }` aggregations and omits the upgrade-path ID.
+- API errors are sanitized to the HTTP status (e.g. `HTTP 503`) before they hit logs or artifacts; the full URL (which contains the instance ID) and response body are dropped.
+
+When investigating a failed rollout, use the credentials directly to re-query the API for specific instance IDs — the counts in the summary tell you what to look for. The local `yarn upgrade:instances` flow is unchanged and still prints full IDs (only your terminal sees them).
+
 ### Failure handling
 
 The script is engineered so that **only timeouts and hard configuration errors fail the workflow**:

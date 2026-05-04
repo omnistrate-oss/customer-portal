@@ -17,10 +17,11 @@ import {
   withBackoffRetry,
 } from "./lib";
 
+// Repo is public — keep this summary count-only. Operator can re-query the API
+// with their fleet-admin credentials to get specific instance IDs.
 type ImageGroupSummary = {
   image: string;
   count: number;
-  instanceIds: string[];
 };
 
 type PrepareSummary = {
@@ -152,12 +153,7 @@ async function main(): Promise<void> {
     return b[1].length - a[1].length;
   });
   summary.imageGroups = groupEntries.map(function (entry) {
-    const ids: string[] = [];
-    for (const inst of entry[1]) {
-      const cri = inst.consumptionResourceInstanceResult;
-      if (cri && cri.id) ids.push(cri.id);
-    }
-    return { image: entry[0], count: entry[1].length, instanceIds: ids };
+    return { image: entry[0], count: entry[1].length };
   });
   for (const g of summary.imageGroups) {
     console.log(`  ${g.count.toString().padStart(3)}  ${g.image}`);

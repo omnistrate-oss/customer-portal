@@ -1,6 +1,7 @@
 import { appendFileSync, writeFileSync } from "node:fs";
 
 import {
+  ApiError,
   ENV_CONFIG,
   IMAGE_PREFIX,
   Instance,
@@ -20,6 +21,15 @@ import {
   withBackoffRetry,
 } from "./lib";
 
+// Repo is public — never put customer instance IDs or full API URLs/bodies in
+// strings that end up in logs, artifacts, or step summaries. Sanitize errors
+// down to the HTTP status only.
+function sanitizeError(err: unknown): string {
+  if (err instanceof ApiError) return `HTTP ${err.status}`;
+  if (err instanceof Error) return err.name || "Error";
+  return "Error";
+}
+
 type ExecuteSummary = {
   env: "dev" | "prod";
   apiBase: string;
@@ -32,7 +42,7 @@ type ExecuteSummary = {
     skipped: boolean;
     sourceInstanceCount: number;
     runningInstanceCount: number;
-    upgradePathId?: string;
+    upgradePathCreated: boolean;
     finalStatus?: string;
     completedCount?: number;
     failedCount?: number;
@@ -44,7 +54,8 @@ type ExecuteSummary = {
     targetedInstanceCount: number;
     modified: number;
     failed: number;
-    failures: { id: string; reason: string }[];
+    // No instance IDs — repo is public and the artifact would expose them.
+    failureReasons: { reason: string; count: number }[];
   };
   generatedAt: string;
 };
@@ -112,8 +123,8 @@ async function main(): Promise<void> {
     sourceVersion: sourceVersion,
     targetVersion: targetVersion,
     selectedImageGroups: selectedImageGroups,
-    step4: { skipped: skipUpgradePath, sourceInstanceCount: 0, runningInstanceCount: 0 },
-    step5: { skipped: skipModify, targetedInstanceCount: 0, modified: 0, failed: 0, failures: [] },
+    step4: { skipped: skipUpgradePath, sourceInstanceCount: 0, runningInstanceCount: 0, upgradePathCreated: false },
+    step5: { skipped: skipModify, targetedInstanceCount: 0, modified: 0, failed: 0, failureReasons: [] },
     generatedAt: new Date().toISOString(),
   };
 
@@ -143,8 +154,8 @@ async function main(): Promise<void> {
       const created = await withBackoffRetry(function () {
         return createUpgradePath(cfg, token, sourceVersion, targetVersion, ids);
       }, "createUpgradePath");
-      summary.step4.upgradePathId = created.upgradePathId;
-      console.log(`  created upgradePathId=${created.upgradePathId}`);
+      summary.step4.upgradePathCreated = true;
+      console.log(`  upgrade-path created`);
       // waitForUpgrade already wraps each poll in withBackoffRetry inside lib.ts.
       upgradeOutcome = await waitForUpgrade(cfg, token, created.upgradePathId);
       summary.step4.finalStatus = upgradeOutcome.status;
@@ -202,21 +213,31 @@ async function main(): Promise<void> {
     summary.step5.targetedInstanceCount = ids.length;
     console.log(`  modifying ${ids.length} instance(s)`);
 
-    for (const id of ids) {
+    const reasonCounts = new Map<string, number>();
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
+      const progress = `${i + 1}/${ids.length}`;
       try {
         await withBackoffRetry(function () {
           return modifyInstance(cfg, token, id, newImage);
-        }, id);
+        }, "modifyInstance");
         summary.step5.modified++;
-        console.log(`    ✓ ${id}`);
+        console.log(`    ✓ ${progress}`);
       } catch (err) {
         summary.step5.failed++;
-        const reason = err instanceof Error ? err.message.split("\n")[0] : String(err);
-        summary.step5.failures.push({ id: id, reason: reason });
-        console.error(`    ✗ ${id}: ${reason}`);
+        const reason = sanitizeError(err);
+        reasonCounts.set(reason, (reasonCounts.get(reason) || 0) + 1);
+        console.error(`    ✗ ${progress}: ${reason}`);
       }
       await sleep(MODIFY_DELAY_MS);
     }
+    summary.step5.failureReasons = Array.from(reasonCounts.entries())
+      .map(function (e) {
+        return { reason: e[0], count: e[1] };
+      })
+      .sort(function (a, b) {
+        return b.count - a.count;
+      });
   }
 
   const outputPath = "upgrade-execute-summary.json";
@@ -225,7 +246,7 @@ async function main(): Promise<void> {
 
   const upgradeLine = summary.step4.skipped
     ? "skipped"
-    : summary.step4.upgradePathId
+    : summary.step4.upgradePathCreated
       ? `${summary.step4.finalStatus} (${summary.step4.completedCount}/${summary.step4.totalCount} completed, ${summary.step4.failedCount} failed)`
       : "no RUNNING instances on source version";
   const modifyLine = summary.step5.skipped
@@ -251,10 +272,10 @@ async function main(): Promise<void> {
     ``,
     `${modifyLine}`,
     ``,
-    summary.step5.failures.length > 0 ? `**Failures:**` : "",
-    summary.step5.failures.length > 0 ? "" : "",
-    ...summary.step5.failures.map(function (f) {
-      return `- \`${f.id}\`: ${f.reason}`;
+    summary.step5.failureReasons.length > 0 ? `**Failure breakdown** (counts only — re-query the API for specific IDs):` : "",
+    summary.step5.failureReasons.length > 0 ? "" : "",
+    ...summary.step5.failureReasons.map(function (f) {
+      return `- ${f.reason}: ${f.count}`;
     }),
     ``,
     `_Full machine-readable detail in artifact \`upgrade-execute-summary.json\`._`,
