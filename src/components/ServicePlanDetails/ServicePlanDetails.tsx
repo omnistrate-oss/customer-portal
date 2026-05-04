@@ -12,8 +12,8 @@ import APIDocumentation from "../APIDocumentation/APIDocumentation";
 import Button from "../Button/Button";
 import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
+import DownloadCLITitleIcon from "../Icons/DownloadCLI/DownloadCLITitleIcon";
 import DownloadCLIIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import DownloadCLITitleIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLITitleIcon";
 import { DisplayText, Text } from "../Typography/Typography";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
@@ -54,7 +54,6 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
         {(Object.keys(tabLabels) as CurrentTab[]).map((tab) => (
           <Tab
             key={tab}
-            disabled={tab === "download-cli" && isDownloading}
             label={tabLabels[tab]}
             value={tab}
             onClick={() => {
@@ -116,16 +115,16 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
             <Box
               sx={{
                 p: 1,
-                border: "1px solid #E9EAEB",
+                border: `1px solid ${colors.gray200}`,
                 borderRadius: "8px",
                 display: "flex",
                 alignItems: "center",
-                marginTop: "-20px",
+                backgroundColor: colors.white,
               }}
             >
               <DownloadCLITitleIcon color={colors.success500} />
             </Box>
-            <Box flex={"columns"}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
               {/* @ts-ignore */}
               <DisplayText size="xsmall" weight="bold" color="#181D27">
                 Download CLI
