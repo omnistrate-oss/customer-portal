@@ -13,6 +13,7 @@
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
     "upgrade:instances": "tsx scripts/saasbuilder-upgrade.ts",
+    "typecheck:scripts": "tsc -p scripts/tsconfig.json",
     "test:record": "HAR_MODE=record yarn playwright test",
     "test:replay": "HAR_MODE=replay yarn playwright test",
     "record": "yarn tsx scripts/record-hars.ts"

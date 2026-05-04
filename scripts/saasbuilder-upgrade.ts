@@ -39,6 +39,7 @@ const ENV_CONFIG: Record<EnvKey, EnvConfig> = {
 const IMAGE_PREFIX = "omnistrate-oss/customer-portal";
 const UPGRADE_POLL_INTERVAL_MS = 20000;
 const MODIFY_DELAY_MS = 1500;
+const MAX_CONCURRENT_UPGRADES = 25;
 
 type InputParameter = {
   id: string;
@@ -69,14 +70,17 @@ type VersionSet = {
   releasedAt?: string;
 };
 
+type InstanceParams = {
+  imageName?: string;
+  [k: string]: unknown;
+};
+
 type Instance = {
   consumptionResourceInstanceResult?: {
     id?: string;
     status?: string;
-  };
-  input_params?: {
-    imageName?: string;
-    [k: string]: unknown;
+    result_params?: InstanceParams;
+    launch_input_params?: InstanceParams;
   };
   resourceVersionSummaries?: { version?: string; latestVersion?: string }[];
   tierVersion?: string;
@@ -199,16 +203,18 @@ async function loginWithRetry(apiBase: string): Promise<string> {
 }
 
 async function fetchImageParam(cfg: EnvConfig, token: string): Promise<InputParameter> {
-  const data = await apiRequest<{ inputParameters: InputParameter[] }>(
-    "GET",
-    `${cfg.apiBase}/service/${cfg.serviceId}/resource/${cfg.resourceId}/input-parameter`,
-    token
-  );
-  const param = data.inputParameters.find(function (p) {
-    return p.id === cfg.imageParamId;
-  });
-  if (!param) throw new Error(`imageName parameter ${cfg.imageParamId} not found`);
-  return param;
+  const baseUrl = `${cfg.apiBase}/service/${cfg.serviceId}/resource/${cfg.resourceId}/input-parameter`;
+  let nextPageToken: string | undefined = undefined;
+  do {
+    const url = nextPageToken ? `${baseUrl}?nextPageToken=${encodeURIComponent(nextPageToken)}` : baseUrl;
+    const data = await apiRequest<{ inputParameters: InputParameter[]; nextPageToken?: string }>("GET", url, token);
+    const param = (data.inputParameters || []).find(function (p) {
+      return p.id === cfg.imageParamId;
+    });
+    if (param) return param;
+    nextPageToken = data.nextPageToken;
+  } while (nextPageToken);
+  throw new Error(`imageName parameter ${cfg.imageParamId} not found`);
 }
 
 async function patchImageParam(
@@ -256,8 +262,7 @@ async function listAllInstances(cfg: EnvConfig, token: string): Promise<Instance
   const url =
     `${cfg.apiBase}/fleet/service/${cfg.serviceId}/environment/${cfg.environmentId}/instances` +
     `?ProductTierId=${cfg.productTierId}` +
-    `&Filter=excludeCloudAccounts` +
-    `&ExcludeDetail=true`;
+    `&Filter=excludeCloudAccounts`;
   const data = await apiRequest<{ resourceInstances: Instance[] }>("GET", url, token);
   return data.resourceInstances || [];
 }
@@ -278,7 +283,7 @@ async function createUpgradePath(
       targetVersion: targetVersion,
       upgradeFilters: { INSTANCE_IDS: instanceIds },
       notifyCustomer: true,
-      maxConcurrentUpgrades: 25,
+      maxConcurrentUpgrades: MAX_CONCURRENT_UPGRADES,
     }
   );
 }
@@ -315,17 +320,33 @@ async function waitForUpgrade(cfg: EnvConfig, token: string, upgradePathId: stri
   console.log(`\n  polling ${upgradePathId} every ${UPGRADE_POLL_INTERVAL_MS / 1000}s...`);
   const terminal = ["COMPLETE", "COMPLETED", "FAILED", "CANCELLED"];
   while (true) {
-    const u = await getUpgradePath(cfg, token, upgradePathId);
+    const u = await withBackoffRetry(function () {
+      return getUpgradePath(cfg, token, upgradePathId);
+    }, `getUpgradePath ${upgradePathId}`);
     console.log(formatProgress(u));
     if (terminal.indexOf(u.status.toUpperCase()) !== -1) return u;
     await sleep(UPGRADE_POLL_INTERVAL_MS);
   }
 }
 
+function getInstanceImageName(inst: Instance): string | undefined {
+  const cri = inst.consumptionResourceInstanceResult;
+  if (!cri) return undefined;
+  const result = cri.result_params;
+  if (result && typeof result === "object" && Object.keys(result).length > 0 && typeof result.imageName === "string") {
+    return result.imageName;
+  }
+  const launch = cri.launch_input_params;
+  if (launch && typeof launch === "object" && typeof launch.imageName === "string") {
+    return launch.imageName;
+  }
+  return undefined;
+}
+
 function groupByImage(instances: Instance[]): Map<string, Instance[]> {
   const groups = new Map<string, Instance[]>();
   for (const inst of instances) {
-    const img = inst.input_params && inst.input_params.imageName ? inst.input_params.imageName : "(no imageName)";
+    const img = getInstanceImageName(inst) || "(no imageName)";
     if (!groups.has(img)) groups.set(img, []);
     (groups.get(img) as Instance[]).push(inst);
   }
@@ -406,18 +427,21 @@ async function main() {
   const releasedMatch = versions.find(function (v) {
     return v.name === versionSetName;
   });
+  const targetVersions = versions.filter(function (v) {
+    return v.version !== sourceVersion;
+  });
+  if (targetVersions.length === 0) {
+    console.log("  no other version sets available to upgrade to; stopping");
+    return;
+  }
   const targetChoice = await select<string>({
     message: "Target version (upgrade TO):",
-    choices: versions
-      .filter(function (v) {
-        return v.version !== sourceVersion;
-      })
-      .map(function (v) {
-        return {
-          name: `${v.name}  —  v${v.version}  [${v.status}]`,
-          value: v.version,
-        };
-      }),
+    choices: targetVersions.map(function (v) {
+      return {
+        name: `${v.name}  —  v${v.version}  [${v.status}]`,
+        value: v.version,
+      };
+    }),
     default: releasedMatch && releasedMatch.version !== sourceVersion ? releasedMatch.version : undefined,
   });
 
@@ -485,6 +509,14 @@ async function main() {
     const img = entry[0];
     const insts = entry[1];
     console.log(`    ${insts.length.toString().padStart(3)}  ${img}`);
+  }
+
+  const selectableEntries = groupEntries.filter(function (entry) {
+    return entry[0] !== newImage;
+  });
+  if (selectableEntries.length === 0) {
+    console.log(`\n  all instances are already on '${newImage}'; nothing to modify`);
+    return;
   }
 
   const selectedImages = await checkbox<string>({
