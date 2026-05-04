@@ -50,14 +50,7 @@ Two `workflow_dispatch` workflows run as a chain. The pause between them is the 
 | `OMNISTRATE_PROD_EMAIL` / `OMNISTRATE_PROD_PASSWORD` | both workflows when `environment=prod` | Sign in to `api.omnistrate.cloud` |
 | `MATTERMOST_UI_TEAM_WEBHOOK` | both workflows | Send `@channel` notifications |
 
-### Required GitHub Environments
-
-Configure under **Settings → Environments**:
-
-- `saasbuilder-upgrade-dev` — optional reviewers
-- `saasbuilder-upgrade-prod` — required reviewers (recommended ≥ 1 fleet-admin)
-
-Required reviewers on the prod environment give a one-click human approval gate before either workflow can start. Both Prepare and Execute reference the same environment, so prod runs require approval twice (once per stage), which is the right safety posture for a fleet-wide rollout.
+The `dev` / `prod` choice is the operator's `workflow_dispatch` input — picking it from the dropdown and clicking "Run workflow" is the human approval. No GitHub Environments needed.
 
 ### Stage 1 — `SaaSBuilder Upgrade — Prepare`
 
