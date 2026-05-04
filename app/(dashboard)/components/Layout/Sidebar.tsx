@@ -349,12 +349,8 @@ const Sidebar = () => {
       <FullScreenDrawer
         open={isOverlayOpen}
         closeDrawer={() => setIsOverlayOpen(false)}
-        title={overlayType === "download-cli" ? "Download CLI" : "Plan Details"}
-        description={
-          overlayType === "download-cli"
-            ? "View and download CLI for the selected Product and the subscription plan"
-            : "View the details of the selected plan"
-        }
+        title="Plan Details"
+        description="View the details of the selected plan"
         RenderUI={<PlanDetails startingTab={overlayType} />}
       />
     </aside>

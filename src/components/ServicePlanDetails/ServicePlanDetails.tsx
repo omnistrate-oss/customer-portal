@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Box, Stack, Tab, Tabs } from "@mui/material";
 import DOMPurify from "isomorphic-dompurify";
+import { useState } from "react";
 
 import useDownloadCLI from "src/hooks/useDownloadCLI";
 import { colors } from "src/themeConfig";
@@ -13,6 +13,8 @@ import Button from "../Button/Button";
 import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import DownloadCLIIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import DownloadCLITitleIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLITitleIcon";
+import { DisplayText, Text } from "../Typography/Typography";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
 
@@ -118,12 +120,19 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
                 borderRadius: "8px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
+                marginTop: "-20px",
               }}
             >
-              <DownloadCLIIcon color={colors.success500} />
+              <DownloadCLITitleIcon color={colors.success500} />
             </Box>
-            <Box sx={{ fontWeight: 600, color: "#101828" }}>Download CLI</Box>
+            <Box flex={"columns"}>
+              <DisplayText size="xsmall" weight="bold" color="#181D27">
+                Download CLI
+              </DisplayText>
+              <Text size="small" weight="regular" color="#535862">
+                Supported platform:<b> Linux ARM64</b> 
+              </Text>
+            </Box>
           </Stack>
           <Button
             variant="contained"
