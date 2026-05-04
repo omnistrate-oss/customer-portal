@@ -252,7 +252,11 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
 
   return (
     <TableContainer sx={{ borderRadius: "8px", ...tableStyles }}>
-      {HeaderComponent && <HeaderComponent {...headerProps} />}
+      {HeaderComponent && (
+        <Box sx={{ borderBottom: "1px solid #EAECF0" }}>
+          <HeaderComponent {...headerProps} />
+        </Box>
+      )}
       <Stack minHeight={minHeight || "605px"} justifyContent="space-between">
         <Box sx={{ overflowX: "auto", flexGrow: 1, position: "relative" }}>
           <Table

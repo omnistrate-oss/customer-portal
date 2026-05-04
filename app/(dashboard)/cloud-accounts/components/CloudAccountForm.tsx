@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { CLOUD_PROVIDERS, cloudProviderLongLogoMap, sortCloudProviders } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -29,16 +29,27 @@ import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
 import CustomLabelDescription from "./CustomLabelDescription";
+import {
+  AddBindingButton,
+  EMPTY_NEBIUS_BINDING,
+  formatKeyExpiry,
+  isExistingBinding,
+  NebiusBindingFormValue,
+  RemoveBindingButton,
+} from "./NebiusBindingsInput";
 
 const CloudAccountForm = ({
   initialFormValues, // These are from URL Params
   onClose,
   formMode,
   selectedInstance,
+  selectedAccountConfig,
   setIsAccountCreation,
   setOverlayType,
   setClickedInstance,
   instances,
+  refetchInstances,
+  refetchAccountConfigs,
 }) => {
   const queryClient = useQueryClient();
   const environmentType = useEnvironmentType();
@@ -67,12 +78,9 @@ const CloudAccountForm = ({
   });
 
   const byoaServiceOfferings = useMemo(() => {
-    return serviceOfferings
-      .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
-      .map((offering) => ({
-        ...offering,
-        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
-      }));
+    return serviceOfferings.filter(
+      (offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT"
+    );
   }, [serviceOfferings]);
 
   const byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>> = useMemo(() => {
@@ -167,7 +175,6 @@ const CloudAccountForm = ({
           }
         );
 
-        setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
           result_params: {
@@ -193,11 +200,46 @@ const CloudAccountForm = ({
                         oci_tenancy_id: values.ociTenancyId,
                         oci_domain_id: values.ociDomainId,
                       }
-                    : {}),
+                    : values.cloudProvider === CLOUD_PROVIDERS.nebius
+                      ? {
+                          nebius_tenant_id: values.nebiusTenantId,
+                        }
+                      : {}),
           },
         });
-        setOverlayType("view-instructions-dialog");
+
+        // Nebius is verified up-front via Public/Private key bindings —
+        // there are no post-create shell-script instructions to display.
+        if (values.cloudProvider === "nebius") {
+          onClose();
+        } else {
+          setIsAccountCreation(true);
+          setOverlayType("view-instructions-dialog");
+        }
         snackbar.showSuccess("Cloud Account created successfully");
+      },
+    }
+  );
+
+  // The API only accepts the four input fields per binding; strip the
+  // read-only metadata (status, region, fingerprints, …) before send.
+  const sanitizeNebiusBindings = (bindings: NebiusBindingFormValue[]) =>
+    bindings.map((b) => ({
+      projectID: b.projectID,
+      serviceAccountID: b.serviceAccountID,
+      publicKeyID: b.publicKeyID,
+      privateKeyPEM: b.privateKeyPEM,
+    }));
+
+  const updateCloudAccountMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
+    {
+      onSuccess: () => {
+        snackbar.showSuccess("Cloud Account updated successfully");
+        refetchInstances?.();
+        refetchAccountConfigs?.();
+        onClose();
       },
     }
   );
@@ -209,13 +251,50 @@ const CloudAccountForm = ({
       byoaSubscriptions,
       byoaServiceOfferingsObj,
       byoaServiceOfferings,
-      allInstances
+      allInstances,
+      selectedAccountConfig
     ),
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
     onSubmit: (values) => {
       const { serviceId, servicePlanId } = values;
       const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
+
+      const resource = offering?.resourceParameters.find((resource) =>
+        resource.resourceId.startsWith("r-injectedaccountconfig")
+      );
+
+      if (!resource) {
+        return snackbar.showError("BYOA Resource not found");
+      }
+
+      // Modify is currently only meaningful for Nebius — its bindings can be
+      // edited post-creation. Other providers have an immutable account
+      // surface so the action menu doesn't surface a Modify option for them.
+      if (formMode === "modify") {
+        if (values.cloudProvider !== "nebius" || !selectedInstance) return;
+        updateCloudAccountMutation.mutate({
+          params: {
+            path: {
+              serviceProviderId: offering.serviceProviderId,
+              serviceKey: offering.serviceURLKey,
+              serviceAPIVersion: offering.serviceAPIVersion,
+              serviceEnvironmentKey: offering.serviceEnvironmentURLKey,
+              serviceModelKey: offering.serviceModelURLKey,
+              productTierKey: offering.productTierURLKey,
+              resourceKey: resource.urlKey,
+              id: selectedInstance.id as string,
+            },
+            query: { subscriptionId: values.subscriptionId },
+          },
+          body: {
+            requestParams: {
+              nebius_bindings: sanitizeNebiusBindings(values.nebiusBindings ?? []),
+            },
+          },
+        });
+        return;
+      }
 
       let requestParams: Record<string, any> = {};
       if (values.cloudProvider === "aws") {
@@ -247,14 +326,12 @@ const CloudAccountForm = ({
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
         };
-      }
-
-      const resource = offering?.resourceParameters.find((resource) =>
-        resource.resourceId.startsWith("r-injectedaccountconfig")
-      );
-
-      if (!resource) {
-        return snackbar.showError("BYOA Resource not found");
+      } else if (values.cloudProvider === "nebius") {
+        requestParams = {
+          cloud_provider: values.cloudProvider,
+          nebius_tenant_id: values.nebiusTenantId,
+          nebius_bindings: sanitizeNebiusBindings(values.nebiusBindings ?? []),
+        };
       }
 
       createCloudAccountMutation.mutate({
@@ -294,6 +371,7 @@ const CloudAccountForm = ({
       footer: {
         submitButton: {
           create: "Create",
+          modify: "Save",
         },
       },
       sections: [
@@ -423,7 +501,9 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
+                  cloudProviders={sortCloudProviders(
+                    byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []
+                  )}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
@@ -513,6 +593,18 @@ const CloudAccountForm = ({
               previewValue: cloudProvider === "oci" ? values.ociTenancyId : null,
             },
             {
+              dataTestId: "nebius-tenant-id-input",
+              label: "Nebius Tenant ID",
+              subLabel: "Nebius Tenant ID to use for the account",
+              name: "nebiusTenantId",
+              type: "text",
+              required: true,
+              // Tenant ID is the account's identity — locked once created.
+              disabled: formMode !== "create",
+              isHidden: values.cloudProvider !== "nebius",
+              previewValue: cloudProvider === "nebius" ? values.nebiusTenantId : null,
+            },
+            {
               dataTestId: "oci-domain-id-input",
               label: "Domain OCID",
               subLabel: "OCI Domain OCID to use for the account",
@@ -526,6 +618,108 @@ const CloudAccountForm = ({
             },
           ],
         },
+        // Each Nebius binding gets its own top-level section to match the
+        // visual hierarchy of "Standard Information". Bindings are scoped
+        // to nebius — for other providers the array is empty.
+        ...(values.cloudProvider === "nebius"
+          ? ((values.nebiusBindings ?? []) as NebiusBindingFormValue[]).map((binding, index) => {
+              const path = `nebiusBindings[${index}]`;
+              const existing = isExistingBinding(binding);
+              const isFormDisabled = formMode === "view";
+
+              return {
+                title: `Binding ${index + 1}`,
+                actionButton: (
+                  <RemoveBindingButton
+                    index={index}
+                    disabled={isFormDisabled}
+                    onRemove={() => {
+                      const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+                      setFieldValue(
+                        "nebiusBindings",
+                        current.filter((_, i) => i !== index)
+                      );
+                    }}
+                  />
+                ),
+                fields: [
+                  {
+                    label: "Project ID",
+                    subLabel: "The Nebius project that will be used for this binding",
+                    name: `${path}.projectID`,
+                    type: "text",
+                    // Project ID is the binding's identity — locked once
+                    // it has been created on the server.
+                    required: !existing,
+                    disabled: existing || isFormDisabled,
+                    value: binding.projectID,
+                    previewValue: binding.projectID || null,
+                  },
+                  // Region is server-derived from the project + service
+                  // account. Show it for context but never as a writable
+                  // field; only relevant once the binding exists.
+                  ...(existing
+                    ? [
+                        {
+                          label: "Region",
+                          subLabel: "The Nebius deployment region enabled by this binding",
+                          name: `${path}._region`,
+                          type: "text",
+                          disabled: true,
+                          value: binding.region ?? "",
+                          previewValue: null,
+                        },
+                      ]
+                    : []),
+                  {
+                    label: "Service Account ID",
+                    subLabel:
+                      "Service account with project-level permissions to create and manage required infrastructure",
+                    name: `${path}.serviceAccountID`,
+                    type: "text",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.serviceAccountID,
+                    previewValue: binding.serviceAccountID || null,
+                  },
+                  {
+                    label: "Public Key ID",
+                    subLabel: "The ID of the authorized public key associated with this service account",
+                    name: `${path}.publicKeyID`,
+                    type: "text",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.publicKeyID,
+                    previewValue: binding.publicKeyID || null,
+                  },
+                  {
+                    label: "Private Key PEM",
+                    subLabel: "The private key PEM that matches this binding's Public Key ID",
+                    name: `${path}.privateKeyPEM`,
+                    type: "password",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.privateKeyPEM,
+                    previewValue: binding.privateKeyPEM ? "********" : null,
+                  },
+                  ...(existing
+                    ? [
+                        {
+                          label: "Private Key Expiry",
+                          subLabel:
+                            "The expiration date of the private key or authorized key used for this binding",
+                          name: `${path}._keyExpiresAt`,
+                          type: "text",
+                          disabled: true,
+                          value: formatKeyExpiry(binding.keyExpiresAt),
+                          previewValue: null,
+                        },
+                      ]
+                    : []),
+                ],
+              };
+            })
+          : []),
       ],
     };
   }, [formMode, subscriptions, byoaServiceOfferings, values]);
@@ -538,10 +732,21 @@ const CloudAccountForm = ({
     <GridDynamicForm
       formConfiguration={formConfiguration}
       formData={formData}
-      formMode="create"
+      formMode={formMode}
       onClose={onClose}
-      isFormSubmitting={createCloudAccountMutation.isPending}
+      isFormSubmitting={createCloudAccountMutation.isPending || updateCloudAccountMutation.isPending}
       previewCardTitle="Cloud Account Summary"
+      afterSections={
+        values.cloudProvider === "nebius" && formMode !== "view" ? (
+          <AddBindingButton
+            disabled={createCloudAccountMutation.isPending || updateCloudAccountMutation.isPending}
+            onAdd={() => {
+              const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+              setFieldValue("nebiusBindings", [...current, { ...EMPTY_NEBIUS_BINDING }]);
+            }}
+          />
+        ) : null
+      }
     />
   );
 };

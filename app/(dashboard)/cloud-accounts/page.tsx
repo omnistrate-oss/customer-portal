@@ -67,6 +67,7 @@ export type Overlay =
   | "delete-dialog"
   | "create-instance-form"
   | "view-instance-form"
+  | "modify-instance-form"
   | "view-instructions-dialog"
   | "connect-dialog"
   | "disconnect-dialog"
@@ -870,6 +871,12 @@ const CloudAccountsPage = () => {
               setOverlayType("delete-dialog");
             },
 
+            onModifyClick: () => {
+              setClickedInstance(selectedInstance);
+              setIsOverlayOpen(true);
+              setOverlayType("modify-instance-form");
+            },
+
             onOffboardClick: () => {
               setClickedInstance(selectedInstance);
               setIsOverlayOpen(true);
@@ -905,8 +912,15 @@ const CloudAccountsPage = () => {
 
       <FullScreenDrawer
         title="Cloud Account"
-        description="Create a new cloud account"
-        open={isOverlayOpen && (overlayType === "create-instance-form" || overlayType === "view-instance-form")}
+        description={
+          overlayType === "modify-instance-form" ? "Modify this cloud account" : "Create a new cloud account"
+        }
+        open={
+          isOverlayOpen &&
+          (overlayType === "create-instance-form" ||
+            overlayType === "view-instance-form" ||
+            overlayType === "modify-instance-form")
+        }
         closeDrawer={() => {
           setIsOverlayOpen(false);
           setClickedInstance(undefined);
@@ -915,14 +929,23 @@ const CloudAccountsPage = () => {
           <CloudAccountForm
             initialFormValues={initialFormValues}
             selectedInstance={selectedInstance}
+            selectedAccountConfig={selectedAccountConfig}
             onClose={() => {
               setIsOverlayOpen(false);
             }}
-            formMode={overlayType === "view-instance-form" ? "view" : "create"}
+            formMode={
+              overlayType === "view-instance-form"
+                ? "view"
+                : overlayType === "modify-instance-form"
+                  ? "modify"
+                  : "create"
+            }
             setIsAccountCreation={setIsAccountCreation}
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            refetchInstances={refetchInstances}
+            refetchAccountConfigs={refetchAccountConfigs}
           />
         }
       />

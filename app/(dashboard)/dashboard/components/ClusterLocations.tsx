@@ -1,6 +1,6 @@
-import { Box, Stack, styled } from "@mui/material";
-import dynamic from "next/dynamic";
 import { FC } from "react";
+import dynamic from "next/dynamic";
+import { Box, Stack, styled } from "@mui/material";
 
 import ClusterLocationsIcon from "src/components/Icons/Dashboard/ClusterLocations";
 import { Text } from "src/components/Typography/Typography";
@@ -55,7 +55,9 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
       //check if instance of type cloud provider account and set cloud provider
       if (
         resultParams &&
-        ((resultParams.gcp_project_id && resultParams.gcp_project_number) || resultParams.aws_account_id)
+        ((resultParams.gcp_project_id && resultParams.gcp_project_number) ||
+          resultParams.aws_account_id ||
+          resultParams.nebius_tenant_id)
       ) {
         if (resultParams.gcp_project_id) {
           cloudProvider = "gcp";
@@ -63,6 +65,8 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
           cloudProvider = "azure";
         } else if (resultParams.aws_account_id) {
           cloudProvider = "aws";
+        } else if (resultParams.nebius_tenant_id) {
+          cloudProvider = "nebius";
         } else {
           cloudProvider = "oci";
         }

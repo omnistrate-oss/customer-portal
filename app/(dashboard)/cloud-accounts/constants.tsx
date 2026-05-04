@@ -9,7 +9,13 @@ export const CloudAccountValidationSchema = yup.object({
   servicePlanId: yup.string().required("Subscription Plan ID is required"),
   subscriptionId: yup.string().required("Subscription ID is required"),
   cloudProvider: yup.string().required("Cloud Provider is required"),
-  accountConfigurationMethod: yup.string().required("Account Configuration Method is required"),
+  // Nebius doesn't use the script/CloudFormation creation methods, so this is
+  // only required for the other providers.
+  accountConfigurationMethod: yup.string().when("cloudProvider", {
+    is: (cloudProvider) => cloudProvider && cloudProvider !== "nebius",
+    then: yup.string().required("Account Configuration Method is required"),
+    otherwise: yup.string(),
+  }),
   awsAccountId: yup.string().when("cloudProvider", {
     is: "aws",
     then: yup
@@ -80,6 +86,26 @@ export const CloudAccountValidationSchema = yup.object({
         "OCI Domain OCID must start with 'ocid1.domain.oc1.' or 'ocid1.user.oc1.' followed by alphanumeric characters"
       ),
     otherwise: yup.string(),
+  }),
+  nebiusTenantId: yup.string().when("cloudProvider", {
+    is: "nebius",
+    then: yup.string().required("Nebius Tenant ID is required"),
+    otherwise: yup.string(),
+  }),
+  nebiusBindings: yup.array().when("cloudProvider", {
+    is: "nebius",
+    then: yup
+      .array()
+      .of(
+        yup.object().shape({
+          projectID: yup.string().required("Project ID is required"),
+          serviceAccountID: yup.string().required("Service Account ID is required"),
+          publicKeyID: yup.string().required("Public Key ID is required"),
+          privateKeyPEM: yup.string().required("Private Key PEM is required"),
+        })
+      )
+      .min(1, "At least one binding is required"),
+    otherwise: yup.array(),
   }),
 });
 

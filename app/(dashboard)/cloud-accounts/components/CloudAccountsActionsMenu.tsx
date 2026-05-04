@@ -24,6 +24,7 @@ type CloudAccountsActionMenuProps = {
   setIsOverlayOpen: SetState<boolean>;
   onDeleteClick: () => void;
   onOffboardClick: () => void;
+  onModifyClick?: () => void;
   isSelectedInstanceReadyToOffboard: boolean;
   onConnectClick: () => void;
   onDisconnectClick: () => void;
@@ -39,6 +40,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
   setIsOverlayOpen,
   onDeleteClick,
   onOffboardClick,
+  onModifyClick,
   isSelectedInstanceReadyToOffboard,
   // serviceModelType,
   // onConnectClick,
@@ -121,6 +123,32 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
           : isDeleteProtected && deletionProtectionFeatureEnabled
             ? "Cloud account has delete protection enabled"
             : "";
+
+    // Modify is currently only meaningful for Nebius — its bindings can be
+    // edited post-creation. Other providers' BYOA cloud accounts are
+    // immutable post-creation, so the action shows disabled with a tooltip
+    // for them.
+    const isModifyDisabled = !instance || !isNebius || !isUpdateAllowedByRBAC || isDeleting;
+    const modifyDisabledMessage = !instance
+      ? "Please select a cloud account"
+      : !isNebius
+        ? "Modify is only supported for Nebius cloud accounts"
+        : isDeleting
+          ? "Cloud account is being deleted"
+          : !isUpdateAllowedByRBAC
+            ? "Unauthorized to modify cloud account"
+            : "";
+
+    res.push({
+      dataTestId: "modify-action-button",
+      label: "Modify",
+      isDisabled: isModifyDisabled,
+      onClick: () => {
+        if (!instance) return snackbar.showError("Please select a cloud account");
+        onModifyClick?.();
+      },
+      disabledMessage: modifyDisabledMessage,
+    });
 
     res.push({
       dataTestId: "delete-action-button",
@@ -223,6 +251,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     isSelectedInstanceReadyToOffboard,
     onDeleteClick,
     onOffboardClick,
+    onModifyClick,
     setIsOverlayOpen,
     setOverlayType,
     snackbar,

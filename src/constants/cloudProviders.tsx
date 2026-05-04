@@ -52,5 +52,20 @@ export const CLOUD_PROVIDERS = {
   gcp: "gcp",
   azure: "azure",
   oci: "oci",
-  //add nebius later for custom network and cloud account creation
+  nebius: "nebius",
+};
+
+// Sort Order for Cloud Providers
+export const CLOUD_PROVIDER_DISPLAY_ORDER = ["aws", "azure", "gcp", "oci", "nebius"];
+
+export const sortCloudProviders = (providers: string[]): string[] => {
+  return [...providers].sort((a, b) => {
+    const aIdx = CLOUD_PROVIDER_DISPLAY_ORDER.indexOf(a);
+    const bIdx = CLOUD_PROVIDER_DISPLAY_ORDER.indexOf(b);
+    // Unknown providers go last, alphabetically among themselves.
+    if (aIdx === -1 && bIdx === -1) return a.localeCompare(b);
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+    return aIdx - bIdx;
+  });
 };

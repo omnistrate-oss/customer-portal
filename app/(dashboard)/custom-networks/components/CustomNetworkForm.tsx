@@ -1,17 +1,17 @@
 "use client";
 
+import { useMemo } from "react";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
 import { $api } from "src/api/query";
 import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
-import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { CLOUD_PROVIDERS, cloudProviderLongLogoMap, sortCloudProviders } from "src/constants/cloudProviders";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
 
 import { CustomNetworkValidationSchema } from "../constants";
 
@@ -119,18 +119,14 @@ const CustomNetworkForm = ({
   }, [regions, formData.values.cloudProviderName]);
 
   const cloudProviders = useMemo(() => {
-    return (
-      regions
-        .reduce((acc, region) => {
-          if (!acc.includes(region.cloudProviderName)) {
-            acc.push(region.cloudProviderName);
-          }
-          return acc;
-        }, [])
-        .filter((provider) => Object.values(CLOUD_PROVIDERS).includes(provider))
-        // Sort as ['aws', 'azure', 'gcp', 'oci']
-        .sort((a, b) => a.localeCompare(b))
-    );
+    const unique = regions.reduce((acc, region) => {
+      if (!acc.includes(region.cloudProviderName)) {
+        acc.push(region.cloudProviderName);
+      }
+      return acc;
+    }, [] as string[]);
+
+    return sortCloudProviders(unique.filter((provider) => Object.values(CLOUD_PROVIDERS).includes(provider)));
   }, [regions]);
 
   const subscriptionOwnerMenuItems = useMemo(() => {

@@ -19,6 +19,7 @@ type CloudAccountTableHeaderProps = {
   setSearchText: (text: string) => void;
   onCreateClick: () => void;
   onDeleteClick: () => void;
+  onModifyClick?: () => void;
   selectedInstance: ResourceInstance;
   refetchInstances: () => void;
   isFetchingInstances: boolean;
@@ -40,6 +41,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   setSearchText,
   onCreateClick,
   onDeleteClick,
+  onModifyClick,
   selectedInstance,
   refetchInstances,
   isFetchingInstances,
@@ -82,6 +84,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           instance={selectedInstance}
           subscription={selectedInstanceSubscription}
           onDeleteClick={onDeleteClick}
+          onModifyClick={onModifyClick}
           onOffboardClick={() => onOffboardClick?.()}
           onConnectClick={onConnectClick}
           onDisconnectClick={onDisconnectClick}
