@@ -5,7 +5,7 @@ Rolls a new `customer-portal` image across SaaSBuilder fleet instances on Omnist
 - **Local interactive** (`yarn upgrade:instances`) — original prompt-driven CLI for a single operator at a terminal.
 - **GitHub Actions** (`SaaSBuilder Upgrade — Prepare` and `SaaSBuilder Upgrade — Execute` workflows) — two-stage non-interactive run with credentials from secrets, Mattermost notifications, and a 4 h timeout.
 
-Both modes call the same underlying library (`scripts/saasbuilder-upgrade/lib.ts`), so behavior is identical.
+Both modes call the same underlying library (`scripts/saasbuilder-upgrade/lib.ts`) for every API operation; only the I/O shells differ. There are a few small mode-specific behaviors — most notably, the CI Prepare flow treats an already-released version set as a no-op so re-runs are idempotent, while the local interactive flow surfaces the API error.
 
 ## What it does
 

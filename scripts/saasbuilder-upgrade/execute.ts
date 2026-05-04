@@ -4,7 +4,6 @@ import {
   ApiError,
   ENV_CONFIG,
   IMAGE_PREFIX,
-  Instance,
   MODIFY_DELAY_MS,
   UpgradePath,
   createUpgradePath,
@@ -192,23 +191,29 @@ async function main(): Promise<void> {
       return listAllInstances(cfg, token);
     }, "listAllInstances");
     const groups = groupByImage(all);
-    const targeted: Instance[] = [];
+    // Dedupe the input — IMAGE_GROUPS_JSON is a free-form workflow input so an
+    // operator could easily paste the same image string twice. Without this,
+    // duplicates would PATCH the same fleet instances multiple times in one run.
+    const uniqueSelectedGroups = Array.from(new Set(selectedImageGroups));
+    const seenIds = new Set<string>();
+    const ids: string[] = [];
     const missingGroups: string[] = [];
-    for (const img of selectedImageGroups) {
+    for (const img of uniqueSelectedGroups) {
       const list = groups.get(img);
       if (!list || list.length === 0) {
         missingGroups.push(img);
         continue;
       }
-      for (const inst of list) targeted.push(inst);
+      for (const inst of list) {
+        const cri = inst.consumptionResourceInstanceResult;
+        if (cri && cri.id && !seenIds.has(cri.id)) {
+          seenIds.add(cri.id);
+          ids.push(cri.id);
+        }
+      }
     }
     if (missingGroups.length > 0) {
       console.log(`  warning: these selected groups had no current instances: ${JSON.stringify(missingGroups)}`);
-    }
-    const ids: string[] = [];
-    for (const inst of targeted) {
-      const cri = inst.consumptionResourceInstanceResult;
-      if (cri && cri.id) ids.push(cri.id);
     }
     summary.step5.targetedInstanceCount = ids.length;
     console.log(`  modifying ${ids.length} instance(s)`);

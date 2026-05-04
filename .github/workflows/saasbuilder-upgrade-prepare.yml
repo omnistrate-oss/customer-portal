@@ -57,6 +57,28 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # Guard against the `A && B || C` ternary silently falling back to the
+      # other env's secret when the chosen env's secret is unset (empty string
+      # is falsy in GHA expressions).
+      - name: Verify env-specific secrets are present
+        env:
+          PROD_EMAIL: ${{ secrets.OMNISTRATE_PROD_EMAIL }}
+          PROD_PASSWORD: ${{ secrets.OMNISTRATE_PROD_PASSWORD }}
+          DEV_EMAIL: ${{ secrets.OMNISTRATE_DEV_EMAIL }}
+          DEV_PASSWORD: ${{ secrets.OMNISTRATE_DEV_PASSWORD }}
+        run: |
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            if [ -z "$PROD_EMAIL" ] || [ -z "$PROD_PASSWORD" ]; then
+              echo "::error::OMNISTRATE_PROD_EMAIL and OMNISTRATE_PROD_PASSWORD must be set in repo secrets for environment=prod (refusing to fall back to dev creds)"
+              exit 1
+            fi
+          else
+            if [ -z "$DEV_EMAIL" ] || [ -z "$DEV_PASSWORD" ]; then
+              echo "::error::OMNISTRATE_DEV_EMAIL and OMNISTRATE_DEV_PASSWORD must be set in repo secrets for environment=dev"
+              exit 1
+            fi
+          fi
+
       - name: Run prepare
         id: prepare
         env:

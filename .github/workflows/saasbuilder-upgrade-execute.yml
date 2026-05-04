@@ -74,6 +74,28 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # Guard against the `A && B || C` ternary silently falling back to the
+      # other env's secret when the chosen env's secret is unset (empty string
+      # is falsy in GHA expressions).
+      - name: Verify env-specific secrets are present
+        env:
+          PROD_EMAIL: ${{ secrets.OMNISTRATE_PROD_EMAIL }}
+          PROD_PASSWORD: ${{ secrets.OMNISTRATE_PROD_PASSWORD }}
+          DEV_EMAIL: ${{ secrets.OMNISTRATE_DEV_EMAIL }}
+          DEV_PASSWORD: ${{ secrets.OMNISTRATE_DEV_PASSWORD }}
+        run: |
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            if [ -z "$PROD_EMAIL" ] || [ -z "$PROD_PASSWORD" ]; then
+              echo "::error::OMNISTRATE_PROD_EMAIL and OMNISTRATE_PROD_PASSWORD must be set in repo secrets for environment=prod (refusing to fall back to dev creds)"
+              exit 1
+            fi
+          else
+            if [ -z "$DEV_EMAIL" ] || [ -z "$DEV_PASSWORD" ]; then
+              echo "::error::OMNISTRATE_DEV_EMAIL and OMNISTRATE_DEV_PASSWORD must be set in repo secrets for environment=dev"
+              exit 1
+            fi
+          fi
+
       - name: Notify Mattermost (starting)
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
@@ -115,26 +137,78 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-      - name: Notify Mattermost (success)
+      # The script intentionally exits 0 even on partial failures (the user's
+      # explicit "no failures except timeout" goal). So `outcome == success`
+      # is necessary but NOT sufficient to declare a healthy rollout — the
+      # summary JSON has the actual signal. We compute a status from it and
+      # branch into either green DONE or yellow PARTIAL Mattermost messages
+      # so a non-clean rollout doesn't pose as healthy in the channel.
+      - name: Compute rollout status from summary
+        id: status
         if: ${{ steps.execute.outcome == 'success' }}
+        run: |
+          if [ ! -f upgrade-execute-summary.json ]; then
+            echo "rollout_status=unknown" >> "$GITHUB_OUTPUT"
+            echo "stats=(no summary written)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          STEP4_OK=$(jq -r '
+            (.step4.finalStatus // "" | ascii_upcase) as $s |
+            (.step4.skipped == true)
+              or (.step4.upgradePathCreated == false)
+              or ($s == "COMPLETE")
+              or ($s == "COMPLETED")
+          ' upgrade-execute-summary.json)
+          STEP5_FAILED=$(jq -r '.step5.failed' upgrade-execute-summary.json)
+
+          if [ "$STEP4_OK" = "true" ] && [ "$STEP5_FAILED" = "0" ]; then
+            ROLLOUT_STATUS="clean"
+          else
+            ROLLOUT_STATUS="partial"
+          fi
+
+          STATS=$(jq -r '
+            "step4=" + (.step4.finalStatus // (if .step4.skipped then "skipped" else "no-op" end)) +
+            ", modified=" + (.step5.modified | tostring) +
+            ", failed=" + (.step5.failed | tostring) +
+            " of " + (.step5.targetedInstanceCount | tostring)
+          ' upgrade-execute-summary.json)
+
+          echo "rollout_status=$ROLLOUT_STATUS" >> "$GITHUB_OUTPUT"
+          {
+            echo "stats<<EOF"
+            echo "$STATS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Notify Mattermost (clean success)
+        if: ${{ steps.execute.outcome == 'success' && steps.status.outputs.rollout_status == 'clean' }}
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          # Pull headline numbers from the summary JSON if it exists.
-          STATS="(see run summary)"
-          if [ -f upgrade-execute-summary.json ]; then
-            STATS=$(jq -r '
-              "step4=" + (.step4.finalStatus // (if .step4.skipped then "skipped" else "no-op" end)) +
-              ", modified=" + (.step5.modified | tostring) +
-              ", failed=" + (.step5.failed | tostring) +
-              " of " + (.step5.targetedInstanceCount | tostring)
-            ' upgrade-execute-summary.json)
-          fi
-
           printf -v TEXT '@channel\n#### :white_check_mark: SaaSBuilder Upgrade — Execute DONE (`%s` → `%s`)\nv%s → v%s. %s\n:link: [Run summary](%s)' \
-            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "$STATS" "$RUN_URL"
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "${{ steps.status.outputs.stats }}" "$RUN_URL"
+
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            "username": "SaaSBuilder Upgrade",
+            "icon_emoji": ":rocket:",
+            "text": $text
+          }')
+
+          curl -sS -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "$MATTERMOST_UI_TEAM_WEBHOOK"
+
+      - name: Notify Mattermost (partial — needs review)
+        if: ${{ steps.execute.outcome == 'success' && steps.status.outputs.rollout_status != 'clean' }}
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          printf -v TEXT '@channel\n#### :warning: SaaSBuilder Upgrade — Execute finished WITH ISSUES (`%s` → `%s`)\nv%s → v%s. The script ran to completion but the rollout is not clean — Step 4 ended non-COMPLETE OR Step 5 had per-instance failures.\n%s\n:link: [Run summary & artifact](%s)' \
+            "${{ inputs.environment }}" "${{ inputs.image_tag }}" "${{ inputs.source_version }}" "${{ inputs.target_version }}" "${{ steps.status.outputs.stats }}" "$RUN_URL"
 
           PAYLOAD=$(jq -n --arg text "$TEXT" '{
             "username": "SaaSBuilder Upgrade",
