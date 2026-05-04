@@ -126,6 +126,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
               <DownloadCLITitleIcon color={colors.success500} />
             </Box>
             <Box flex={"columns"}>
+              {/* @ts-ignore */}
               <DisplayText size="xsmall" weight="bold" color="#181D27">
                 Download CLI
               </DisplayText>
