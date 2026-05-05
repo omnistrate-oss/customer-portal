@@ -159,6 +159,9 @@ export const Tab = ({ status, label, ...rest }: TabV2Props) => {
   return <StyledTab status={status} label={wrappedLabel} disableRipple {...rest} />;
 };
 
+// Use this to only apply disabled styles visually without disabling the tab
+// This is useful when we want custom disabled functionality like showing a tooltip or other pointer events to work
+
 export const disabledTabStyles = {
   [`&.${tabClasses.root}`]: {
     color: colors.gray400,
