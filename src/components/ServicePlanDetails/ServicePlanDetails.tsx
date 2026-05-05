@@ -127,7 +127,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
             onClick={() => {
               downloadCLI(serviceOffering.serviceId, serviceOffering.serviceAPIID);
             }}
-            startIcon={<DownloadCLIIcon color="#FFFFFF" />}
+            startIcon={<DownloadCLIIcon color="#FFFFFF" disabled={isDownloading} />}
           >
             Download CLI
             {isDownloading && <LoadingSpinnerSmall />}
