@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack, Tab, Tabs } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import DOMPurify from "isomorphic-dompurify";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import DownloadCLITitleIcon from "../Icons/DownloadCLI/DownloadCLITitleIcon";
 import DownloadCLIIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import { Tab, Tabs } from "../Tab/Tab";
 import { DisplayText, Text } from "../Typography/Typography";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
@@ -42,13 +43,9 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
     <CardWithTitle title={serviceOffering.productTierName}>
       <Tabs
         value={currentTab}
-        centered
-        sx={{
+        centerTabs
+        wrapperSx={{
           mb: "32px",
-          borderBottom: "1px solid #E9EAEB",
-          "& .MuiTabs-indicator": {
-            backgroundColor: colors.purple700,
-          },
         }}
       >
         {(Object.keys(tabLabels) as CurrentTab[]).map((tab) => (
@@ -59,17 +56,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
             onClick={() => {
               setCurrentTab(tab);
             }}
-            sx={{
-              paddingY: "12px !important",
-              paddingX: "16px !important",
-              minWidth: "0px",
-              textTransform: "none",
-              fontWeight: "600",
-              color: "#717680",
-              "&.Mui-selected": {
-                color: colors.purple700,
-              },
-            }}
+            disableRipple
           />
         ))}
       </Tabs>
