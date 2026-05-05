@@ -12,6 +12,8 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
+    "upgrade:instances": "tsx scripts/saasbuilder-upgrade.ts",
+    "typecheck:scripts": "tsc -p scripts/tsconfig.json",
     "test:record": "HAR_MODE=record yarn playwright test",
     "test:replay": "HAR_MODE=replay yarn playwright test",
     "record": "yarn tsx scripts/record-hars.ts"
@@ -45,7 +47,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.11",
-    "dompurify": "3.3.3",
+    "dompurify": "3.4.0",
     "dotenv": "^16.4.5",
     "dotted-map": "^2.2.3",
     "ejs": "^3.1.10",
@@ -87,7 +89,7 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.2",
-    "@inquirer/prompts": "^8.3.0",
+    "@inquirer/prompts": "^8.4.1",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "20.14.11",
@@ -102,17 +104,21 @@
     "next-unused": "^0.0.6",
     "nodemon": "^3.1.0",
     "openapi-typescript": "^7.8.0",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.10",
     "prettier": "^3.1.0",
     "puppeteer": "^24.3.1",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.19.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "wait-on": "^9.0.4"
   },
   "resolutions": {
     "axios": "1.15.0",
-    "basic-ftp": "5.2.2"
+    "basic-ftp": "5.3.0",
+    "dompurify": "3.4.0",
+    "follow-redirects": "1.16.0",
+    "postcss": "^8.5.10",
+    "uuid": "14.0.0"
   },
   "packageManager": "yarn@4.5.0"
 }
