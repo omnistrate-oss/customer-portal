@@ -69,18 +69,10 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isDetaching = instance?.status === "DETACHING";
     const isPendingDetaching = instance?.status === "PENDING_DETACHING";
 
-    const isDisconnectDisabled =
-      !instance || isFailed || isAttaching || isConnecting || isDisconnected || isDeploying || !isOnPremCopilot;
+    const isDisconnectDisabled = !instance || isFailed || isAttaching || isConnecting || isDisconnected || isDeploying;
 
     const isConnectDisabled =
-      !instance ||
-      isFailed ||
-      isReady ||
-      isDisconnecting ||
-      isDetaching ||
-      isPendingDetaching ||
-      isDeploying ||
-      !isOnPremCopilot;
+      !instance || isFailed || isReady || isDisconnecting || isDetaching || isPendingDetaching || isDeploying;
 
     const isDisconnectDisabledMessage = !instance
       ? "Please select a cloud account"
@@ -92,9 +84,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
             ? "Cloud account is disconnected"
             : isDeploying
               ? "Please wait for the instance to get to Ready state"
-              : !isOnPremCopilot
-                ? "This feature is not supported for this plan"
-                : "";
+              : "";
     const isConnectDisabledMessage = !instance
       ? "Please select a cloud account"
       : isFailed
@@ -105,9 +95,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
             ? "Cloud account is disconnecting"
             : isDeploying
               ? "Please wait for the instance to get to Ready state"
-              : !isOnPremCopilot
-                ? "This feature is not supported for this plan"
-                : "";
+              : "";
 
     // Delete action
     const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius || isDisconnected;
@@ -223,6 +211,9 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     isSelectedInstanceReadyToOffboard,
     onDeleteClick,
     onOffboardClick,
+    onConnectClick,
+    onDisconnectClick,
+    serviceModelType,
     setIsOverlayOpen,
     setOverlayType,
     snackbar,
