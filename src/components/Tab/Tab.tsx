@@ -29,17 +29,26 @@ const StyledTabs = styled(MuiTabs)({
 
 type TabsExtendedProps = TabsProps & {
   centerTabs?: boolean;
+  /** sx applied to the outer wrapper Box when centerTabs is true */
+  wrapperSx?: TabsProps["sx"];
 };
 
-export const Tabs = ({ centerTabs, ...rest }: TabsExtendedProps) => {
+export const Tabs = ({ centerTabs, wrapperSx, sx, ...rest }: TabsExtendedProps) => {
+  const normalizeSx = (value: TabsProps["sx"]) => (Array.isArray(value) ? value : value ? [value] : []);
+
   if (centerTabs) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", borderBottom: `1px solid ${colors.gray200}` }}>
-        <StyledTabs {...rest} />
+      <Box
+        sx={[
+          { display: "flex", justifyContent: "center", borderBottom: `1px solid ${colors.gray200}` },
+          ...normalizeSx(wrapperSx),
+        ]}
+      >
+        <StyledTabs {...rest} sx={normalizeSx(sx)} />
       </Box>
     );
   }
-  return <StyledTabs {...rest} sx={{ ...rest.sx, borderBottom: `1px solid ${colors.gray200}` }} />;
+  return <StyledTabs {...rest} sx={[...normalizeSx(sx), { borderBottom: `1px solid ${colors.gray200}` }]} />;
 };
 
 const statusStyles = {
@@ -150,9 +159,6 @@ export const Tab = ({ status, label, ...rest }: TabV2Props) => {
   return <StyledTab status={status} label={wrappedLabel} disableRipple {...rest} />;
 };
 
-// Use this to only apply disabled styles visually without disabling the tab
-// This is useful when we want custom disabled functionality like showing a tooltip or other pointer events to work
-// Reference implementation in ResourceConfig/components/ConfigurationPanelTabs.tsx
 export const disabledTabStyles = {
   [`&.${tabClasses.root}`]: {
     color: colors.gray400,

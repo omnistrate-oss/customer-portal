@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack, Tab, Tabs } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import DOMPurify from "isomorphic-dompurify";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ import CardWithTitle from "../Card/CardWithTitle";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import DownloadCLITitleIcon from "../Icons/DownloadCLI/DownloadCLITitleIcon";
 import DownloadCLIIcon from "../Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import { Tab, Tabs } from "../Tab/Tab";
 import { DisplayText, Text } from "../Typography/Typography";
 
 type CurrentTab = "plan-details" | "documentation" | "pricing" | "support" | "api-documentation" | "download-cli";
@@ -42,8 +43,8 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
     <CardWithTitle title={serviceOffering.productTierName}>
       <Tabs
         value={currentTab}
-        centered
-        sx={{
+        centerTabs
+        wrapperSx={{
           mb: "32px",
         }}
       >
