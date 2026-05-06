@@ -292,7 +292,6 @@ async function main(): Promise<void> {
 }
 
 main().catch(function (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  console.error(`\nError: ${msg}`);
+  console.error(`\nError: ${sanitizeError(err)}`);
   process.exit(1);
 });

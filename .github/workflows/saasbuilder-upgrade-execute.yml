@@ -97,6 +97,9 @@ jobs:
           fi
 
       - name: Notify Mattermost (starting)
+        # A chat-webhook outage must not block the rollout — only timeouts
+        # and hard configuration errors should fail this workflow.
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |
@@ -184,6 +187,7 @@ jobs:
 
       - name: Notify Mattermost (clean success)
         if: ${{ steps.execute.outcome == 'success' && steps.status.outputs.rollout_status == 'clean' }}
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |
@@ -202,6 +206,7 @@ jobs:
 
       - name: Notify Mattermost (partial — needs review)
         if: ${{ steps.execute.outcome == 'success' && steps.status.outputs.rollout_status != 'clean' }}
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |
@@ -220,6 +225,7 @@ jobs:
 
       - name: Notify Mattermost (failure or cancelled)
         if: ${{ failure() || cancelled() }}
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |

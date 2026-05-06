@@ -101,6 +101,10 @@ jobs:
 
       - name: Notify Mattermost (success)
         if: ${{ steps.prepare.outcome == 'success' }}
+        # A chat-webhook outage must not flip a successful prepare into a
+        # failed workflow — the run summary + artifact are the authoritative
+        # signal, the Mattermost ping is just a convenience.
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |
@@ -120,6 +124,7 @@ jobs:
 
       - name: Notify Mattermost (failure)
         if: ${{ failure() }}
+        continue-on-error: true
         env:
           MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
         run: |

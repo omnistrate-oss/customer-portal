@@ -1,12 +1,13 @@
 import { appendFileSync, writeFileSync } from "node:fs";
 
 import {
+  ApiError,
   ENV_CONFIG,
-  IMAGE_PREFIX,
   envFlag,
   fetchImageParam,
   getInstanceImageName,
   groupByImage,
+  IMAGE_PREFIX,
   listAllInstances,
   listVersionSets,
   parseEnvKey,
@@ -16,6 +17,14 @@ import {
   signIn,
   withBackoffRetry,
 } from "./lib";
+
+// Repo is public — never put full API URLs/response bodies in messages that
+// reach the public Actions log. Reduce errors to status/name only.
+function sanitizeError(err: unknown): string {
+  if (err instanceof ApiError) return `HTTP ${err.status}`;
+  if (err instanceof Error) return err.name || "Error";
+  return "Error";
+}
 
 // Repo is public — keep this summary count-only. Operator can re-query the API
 // with their fleet-admin credentials to get specific instance IDs.
@@ -165,9 +174,12 @@ async function main(): Promise<void> {
 
   // Build markdown for $GITHUB_STEP_SUMMARY so the operator can copy values
   // straight from the run summary into the Execute workflow inputs.
+  // Include the "(no imageName)" bucket so the suggested input matches what
+  // the interactive flow would PATCH; execute.ts looks groups up by exact
+  // string and the operator can edit the JSON if they want to skip them.
   const groupsToModify = summary.imageGroups
     .filter(function (g) {
-      return g.image !== newImage && g.image !== "(no imageName)";
+      return g.image !== newImage;
     })
     .map(function (g) {
       return g.image;
@@ -180,6 +192,13 @@ async function main(): Promise<void> {
       .sort(function (a, b) {
         return (b.instanceCount || 0) - (a.instanceCount || 0);
       })[0]?.version || "";
+  // Derive target_version from the actual version set (matched by name) so the
+  // suggested input points at a real version even if the backend assigned a
+  // version that doesn't equal imageTag, or the release was skipped/reused.
+  const releasedMatch = summary.versionSets.find(function (v) {
+    return v.name === versionSetName;
+  });
+  const suggestedTarget = releasedMatch?.version || imageTag;
 
   const md = [
     `## SaaSBuilder Upgrade — Prepare`,
@@ -217,7 +236,7 @@ async function main(): Promise<void> {
     `- \`environment\`: \`${envKey}\``,
     `- \`image_tag\`: \`${imageTag}\``,
     `- \`source_version\`: \`${suggestedSource || "<pick from table above>"}\``,
-    `- \`target_version\`: \`${imageTag}\``,
+    `- \`target_version\`: \`${suggestedTarget}\``,
     `- \`image_groups_json\`: \`${escapeJsonForMarkdown(groupsToModify)}\``,
     ``,
     `_The artifact \`upgrade-prepare-summary.json\` has the full data in machine-readable form._`,
@@ -229,7 +248,6 @@ async function main(): Promise<void> {
 }
 
 main().catch(function (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  console.error(`\nError: ${msg}`);
+  console.error(`\nError: ${sanitizeError(err)}`);
   process.exit(1);
 });
