@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Tab, Tabs } from "@mui/material";
 import { useSelector } from "react-redux";
 
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useUserData from "src/hooks/usersData";
+import { Tab, Tabs } from "src/components/Tab/Tab";
 import { selectUserrootData } from "src/slices/userDataSlice";
-import { colors } from "src/themeConfig";
 
 import AccountManagementHeader from "../components/AccountManagement/AccountManagementHeader";
 import SettingsIcon from "../components/Icons/SettingsIcon";
@@ -37,62 +36,26 @@ const SettingsPage = () => {
           Settings
         </PageTitle>
 
-        <Tabs
-          value={currentTab}
-          sx={{
-            mb: "24px",
-            borderBottom: "1px solid #E9EAEB",
-            "& .MuiTabs-indicator": {
-              backgroundColor: colors.purple700,
-            },
-          }}
-        >
+        <Tabs value={currentTab} sx={{ mb: "24px" }}>
           <Tab
             label={tabLabels.profile}
             value={"profile"}
             onClick={() => setCurrentTab("profile")}
-            sx={{
-              paddingY: "12px !important",
-              paddingX: "16px !important",
-              minWidth: "0px",
-              textTransform: "none",
-              fontWeight: "600",
-              "&.Mui-selected": {
-                color: colors.purple700,
-              },
-            }}
+            disableRipple
           />
 
           <Tab
             label={tabLabels.password}
             value={"password"}
             onClick={() => setCurrentTab("password")}
-            sx={{
-              paddingY: "12px !important",
-              paddingX: "16px !important",
-              minWidth: "0px",
-              textTransform: "none",
-              fontWeight: "600",
-              "&.Mui-selected": {
-                color: colors.purple700,
-              },
-            }}
+            disableRipple
           />
           {isProduction && (
             <Tab
               label={tabLabels.deleteAccount}
               value={"deleteAccount"}
               onClick={() => setCurrentTab("deleteAccount")}
-              sx={{
-                paddingY: "12px !important",
-                paddingX: "16px !important",
-                minWidth: "0px",
-                textTransform: "none",
-                fontWeight: "600",
-                "&.Mui-selected": {
-                  color: colors.purple700,
-                },
-              }}
+              disableRipple
             />
           )}
         </Tabs>
