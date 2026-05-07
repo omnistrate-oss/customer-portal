@@ -166,15 +166,26 @@ const InstanceForm = ({
     }
   );
 
+  // Memoize initialValues so that subscriptions list changes (e.g. after subscribing)
+  // don't cause formik to reinitialize and wipe out requestParams defaults
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialValues = useMemo(
+    () =>
+      getInitialValues(
+        selectedInstance,
+        subscriptions,
+        serviceOfferingsObj,
+        serviceOfferings,
+        nonCloudAccountInstances,
+        [] // Will be updated later when customerVersionSets loads
+      ),
+    // Only recompute when the selected instance changes (modify mode) or on first mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedInstance?.id]
+  );
+
   const formData = useFormik({
-    initialValues: getInitialValues(
-      selectedInstance,
-      subscriptions,
-      serviceOfferingsObj,
-      serviceOfferings,
-      nonCloudAccountInstances,
-      [] // Will be updated later when customerVersionSets loads
-    ),
+    initialValues,
     enableReinitialize: true,
     validationSchema: validationSchema,
     validateOnBlur: true,
@@ -954,7 +965,7 @@ const InstanceForm = ({
     [standardInformationFields, networkConfigurationFields, deploymentConfigurationFields]
   );
 
-  if (isFetchingServiceOfferings) {
+  if (isFetchingServiceOfferings || isFetchingSubscriptions || !initialValues) {
     return <LoadingSpinner />;
   }
 

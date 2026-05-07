@@ -17,7 +17,7 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
 
   if (previewValue === null) return null;
 
-  if (!previewValue && !value) {
+  if (!previewValue && (value === undefined || value === null || value === "")) {
     return null;
   }
 
@@ -47,10 +47,11 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
   };
 
   const renderValue = (): ReactNode => {
-    if (value) {
+    if (value !== undefined && value !== null && value !== "") {
+      const displayValue = typeof value === "boolean" ? String(value) : value;
       return (
         <Text
-          title={value}
+          title={String(value)}
           size="small"
           weight="medium"
           color={colors.gray900}
@@ -61,7 +62,7 @@ const FieldValue = ({ field, formData }: { field: Field; formData: any }) => {
             width: "100%",
           }}
         >
-          {value}
+          {displayValue}
         </Text>
       );
     }

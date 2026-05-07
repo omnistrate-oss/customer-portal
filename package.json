@@ -45,7 +45,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.11",
-    "dompurify": "3.3.3",
+    "dompurify": "3.4.0",
     "dotenv": "^16.4.5",
     "dotted-map": "^2.2.3",
     "ejs": "^3.1.10",
@@ -102,7 +102,7 @@
     "next-unused": "^0.0.6",
     "nodemon": "^3.1.0",
     "openapi-typescript": "^7.8.0",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.10",
     "prettier": "^3.1.0",
     "puppeteer": "^24.3.1",
     "tailwindcss": "^3.4.17",
@@ -112,7 +112,11 @@
   },
   "resolutions": {
     "axios": "1.15.0",
-    "basic-ftp": "5.2.2"
+    "basic-ftp": "5.3.0",
+    "dompurify": "3.4.0",
+    "follow-redirects": "1.16.0",
+    "postcss": "^8.5.10",
+    "uuid": "14.0.0"
   },
   "packageManager": "yarn@4.5.0"
 }

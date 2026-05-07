@@ -180,13 +180,7 @@ jobs:
           git commit -m "chore: update HAR files (${DATE})
 
         Test result: ${{ steps.playwright.outcome }}"
-          git fetch origin master
-          if ! git rebase origin/master; then
-            echo "Failed to rebase HAR updates onto the latest remote master branch"
-            git rebase --abort 2>/dev/null || true
-            exit 1
-          fi
-          git push origin HEAD:refs/heads/master
+          git push origin HEAD:refs/heads/master --force
         fi
 
     - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
