@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 5: Dashboard
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 test.describe("Dashboard Page", () => {
   test.beforeEach(async ({ page }) => {

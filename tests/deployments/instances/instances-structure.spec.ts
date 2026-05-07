@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 6: Instances — Listing and Page Structure
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 import { InstancesPage } from "page-objects/instances-page";
 
 test.describe("Instances Page — Structure and UI", () => {

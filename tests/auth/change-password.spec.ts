@@ -1,7 +1,7 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 4: Authentication — Change Password
 // seed: N/A (public page, no auth required)
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 
 test.describe("Change Password Page", () => {
   const assertChangePasswordOrSignin = async (page: import("@playwright/test").Page) => {

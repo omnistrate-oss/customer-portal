@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 9: Cloud Accounts (BYOA)
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 
 test.describe("Cloud Accounts Page — Structure and UI", () => {

@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 17: Release History
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 test.describe("Release History Page", () => {
   test.beforeEach(async ({ page }) => {

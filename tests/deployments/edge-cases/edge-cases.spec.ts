@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 22: Edge Cases and Error Scenarios
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 test.describe("Edge Cases and Error Scenarios", () => {
   // 22.5 404 Page

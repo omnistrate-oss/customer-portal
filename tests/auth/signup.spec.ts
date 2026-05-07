@@ -1,7 +1,7 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 2: Authentication — Sign Up
 // seed: N/A (public page, no auth required)
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { PageURLs } from "page-objects/pages";
 
 test.describe("Signup Page", () => {

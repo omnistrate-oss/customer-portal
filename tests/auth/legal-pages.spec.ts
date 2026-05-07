@@ -1,7 +1,7 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 20: Legal / Static Pages
 // seed: N/A (public pages, no auth required)
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
 import { PageURLs } from "page-objects/pages";
 
 test.describe("Legal / Static Pages", () => {

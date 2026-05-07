@@ -1,7 +1,10 @@
 // spec: docs/COMPREHENSIVE_TEST_PLAN.md — Section 19: Layout and Navigation
 // seed: tests/user-setup.spec.ts
 
-import test, { expect } from "@playwright/test";
+import { test, expect } from "test-fixtures/har-test";
+import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+registerSoftFailureRecorder();
 
 // Helper: Sidebar sections are collapsible. Items auto-expand when the current URL matches.
 // Section headers: "Deployments", "Governance Hub", "Account Management"
