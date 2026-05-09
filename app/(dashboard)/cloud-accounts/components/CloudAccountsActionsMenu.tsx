@@ -112,10 +112,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
             ? "Cloud account has delete protection enabled"
             : "";
 
-    // Modify is currently only meaningful for Nebius — its bindings can be
-    // edited post-creation. Other providers' BYOA cloud accounts are
-    // immutable post-creation, so the action shows disabled with a tooltip
-    // for them.
+    // Modify is Nebius-only (bindings can be edited post-creation).
     const isModifyDisabled = !instance || !isNebius || !isUpdateAllowedByRBAC || isDeleting;
     const modifyDisabledMessage = !instance
       ? "Please select a cloud account"

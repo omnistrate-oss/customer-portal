@@ -122,12 +122,14 @@ const InstanceForm = ({
                     instance?.awsAccountID ||
                     instance?.gcpProjectID ||
                     instance?.azureSubscriptionID ||
-                    instance?.ociTenancyID;
+                    instance?.ociTenancyID ||
+                    (instance as any)?.nebiusTenantID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
                     createdInstance?.azureSubscriptionID ||
-                    createdInstance?.ociTenancyID;
+                    createdInstance?.ociTenancyID ||
+                    (createdInstance as any)?.nebiusTenantID;
 
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
@@ -884,10 +886,7 @@ const InstanceForm = ({
     [instances, values.cloudProvider]
   );
 
-  // BYOA + Nebius: regions are scoped to the selected cloud account's
-  // bindings. The form stores a BYOA *instance* ID; the linked
-  // AccountConfig (ac-…) lives at instance.result_params
-  // .cloud_provider_account_config_id, and that's where the bindings live.
+  // The form value is a BYOA *instance* id; the AccountConfig (ac-…) lives in its result_params.
   const selectedNebiusAccountConfigId = useMemo(() => {
     if (values.cloudProvider !== "nebius") return "";
     const instanceId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id as

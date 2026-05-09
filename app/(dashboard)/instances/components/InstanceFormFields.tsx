@@ -52,12 +52,9 @@ export const getStandardInformationFields = (
   instances: ResourceInstance[],
   versionSets: TierVersionSet[],
   isFetchingVersionSets: boolean,
-  // BYOA only: the cloud-account instances to populate the
-  // "Cloud Provider Account Config ID" select that we hoist between
-  // Cloud Provider and Region.
+  // BYOA only.
   cloudAccountInstances: (ResourceInstance & { label: string })[] = [],
-  // For Nebius BYOA: the regions that the *selected* cloud account's
-  // bindings declare. Region menu is filtered to this set.
+  // Nebius BYOA only — region menu filters to this set.
   nebiusBindingRegions: string[] = []
 ) => {
   if (isFetchingServiceOfferings) return [];
@@ -106,8 +103,7 @@ export const getStandardInformationFields = (
   const cloudProviderFieldExists = inputParametersObj["cloud_provider"];
   const regionFieldExists = inputParametersObj["region"];
   const customAvailabilityZoneFieldExists = inputParametersObj["custom_availability_zone"];
-  // BYOA flows declare this in the schema. We hoist it out of the request
-  // params section so users pick the cloud account before the region.
+  // Hoisted out of the requestParams loop so it can render between Cloud Provider and Region.
   const accountConfigFieldSchema = inputParametersObj["cloud_provider_account_config_id"];
 
   const isOnPrem =
@@ -433,9 +429,7 @@ export const getStandardInformationFields = (
             } else if (newCloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
             } else if (newCloudProvider === "nebius") {
-              // For Nebius the region is constrained by the selected
-              // account's bindings, so we wait for the user to pick an
-              // account before defaulting one.
+              // Region is account-scoped — wait for account selection.
               setFieldValue("region", "");
             }
             if (accountConfigFieldSchema) {
@@ -471,8 +465,7 @@ export const getStandardInformationFields = (
         ? "Select a cloud provider"
         : "No cloud accounts available",
       onChange: () => {
-        // The account scopes the available regions for Nebius, so the
-        // current selection is no longer guaranteed to be valid.
+        // Reset region — Nebius regions are scoped to the selected account.
         if (values.cloudProvider === "nebius") {
           setFieldValue("region", "");
         }
@@ -489,10 +482,7 @@ export const getStandardInformationFields = (
     const isRegionLockedForNebius = isNebius && Boolean(accountConfigFieldSchema) && !hasNebiusAccount;
 
     const fullMenu = getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider);
-    // For Nebius BYOA, intersect the offering's regions with the bindings
-    // of the selected account. If no account is picked yet, the menu is
-    // empty (the field is disabled below) and the empty-state message
-    // tells the user what to do next.
+    // Nebius BYOA: intersect with the selected account's binding regions.
     const menuItems =
       isNebius && accountConfigFieldSchema
         ? hasNebiusAccount

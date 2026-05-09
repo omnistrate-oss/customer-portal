@@ -132,10 +132,11 @@ const DeleteAccountConfigConfirmationDialog: FC<DeleteAccountConfigConfirmationD
   const snackbar = useSnackbar();
   const stepChangedToOffboard = useRef(false);
 
+  const isNebius = (accountConfig as { cloudProvider?: string } | undefined)?.cloudProvider === "nebius";
   const isLastInstance = !accountConfig?.byoaInstanceIDs || accountConfig?.byoaInstanceIDs?.length === 1;
 
-  //show offboard step only if the instance is the last instance and the account config is found
-  const isMultiStepDialog = Boolean(isLastInstance && accountConfig);
+  // Nebius has no offboarding shell command, so skip the offboard step entirely.
+  const isMultiStepDialog = Boolean(isLastInstance && accountConfig && !isNebius);
 
   //This variable is used infer whether to show spinner on the delete button when the delete request is made on step one
   // The spinner needs to be shown when the button when the mutation is in pending state or if the instance is in deleting state and the account config is not ready to offboard

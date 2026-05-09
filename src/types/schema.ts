@@ -2097,6 +2097,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/2022-09-01-00/revoke-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * RevokeToken signin-api
+         * @description Revoke a single refresh token, preventing further JWT renewal from that session. The access JWT continues until its natural TTL expiry. Idempotent: revoking an unknown or already-revoked token returns success.
+         */
+        post: operations["signin-api/RevokeToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/2022-09-01-00/revoke-user-role": {
         parameters: {
             query?: never;
@@ -4351,6 +4371,7 @@ export interface components {
          * @example {
          *       "createdAt": "2026-04-23T19:37:16Z",
          *       "createdByUserId": "user-12345678",
+         *       "createdByUserName": "Alice Admin",
          *       "description": "Used by the prod CI pipeline to call the deploy API.",
          *       "expiresAt": "2027-01-01T00:00:00Z",
          *       "id": "apikey-12345678",
@@ -4359,6 +4380,7 @@ export interface components {
          *       "prefix": "om",
          *       "revokedAt": "2026-04-30T12:00:00Z",
          *       "revokedByUserId": "user-87654321",
+         *       "revokedByUserName": "Bob Ops",
          *       "roleType": "admin",
          *       "status": "active"
          *     }
@@ -4375,6 +4397,11 @@ export interface components {
              * @example Laboriosam veniam quaerat.
              */
             createdByUserId: string;
+            /**
+             * @description Display name of the user that created the key. Null if the creating user has been hard-deleted.
+             * @example Alice Admin
+             */
+            createdByUserName?: string;
             /**
              * @description Optional free-text description. Editable via Update metadata.
              * @example Used by the prod CI pipeline to call the deploy API.
@@ -4418,6 +4445,11 @@ export interface components {
              * @example At voluptatem qui nostrum distinctio.
              */
             revokedByUserId?: string;
+            /**
+             * @description Display name of the user that revoked the key. Null when the key is not revoked or if the revoking user has been hard-deleted.
+             * @example Bob Ops
+             */
+            revokedByUserName?: string;
             /**
              * @description Type of the role
              * @example root|editor|reader|service_editor|service_reader|admin|service_operator
@@ -6692,7 +6724,7 @@ export interface components {
          * @example {
          *       "email": "abc@gmail.com",
          *       "newRoleType": "reader",
-         *       "token": "1fq"
+         *       "token": "yry"
          *     }
          */
         ChangeUserRoleRequest: {
@@ -6708,7 +6740,7 @@ export interface components {
             newRoleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ke7
+             * @example 4l
              */
             token: string;
         };
@@ -8010,19 +8042,19 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "name": "MySQL multi-writer service hosted model",
@@ -8054,25 +8086,25 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -8120,13 +8152,13 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "name": "MySQL multi-writer service hosted model",
@@ -8155,19 +8187,19 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -8263,6 +8295,7 @@ export interface components {
          *       "metadata": {
          *         "createdAt": "2026-04-23T19:37:16Z",
          *         "createdByUserId": "user-12345678",
+         *         "createdByUserName": "Alice Admin",
          *         "description": "Used by the prod CI pipeline to call the deploy API.",
          *         "expiresAt": "2027-01-01T00:00:00Z",
          *         "id": "apikey-12345678",
@@ -8271,6 +8304,7 @@ export interface components {
          *         "prefix": "om",
          *         "revokedAt": "2026-04-30T12:00:00Z",
          *         "revokedByUserId": "user-87654321",
+         *         "revokedByUserName": "Bob Ops",
          *         "roleType": "admin",
          *         "status": "active"
          *       }
@@ -9024,7 +9058,7 @@ export interface components {
             emailIdentifiers?: string;
             /**
              * @description The type of environment to filter costs by
-             * @example Blanditiis voluptatem modi deserunt voluptatem.
+             * @example Repudiandae veritatis blanditiis voluptatem modi deserunt voluptatem.
              */
             environmentType?: string;
             /**
@@ -9054,7 +9088,7 @@ export interface components {
             scopes?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example a
+             * @example rr
              */
             token: string;
             /**
@@ -12494,25 +12528,25 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "modelType": "CUSTOMER_HOSTED",
@@ -12543,25 +12577,25 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -12604,19 +12638,19 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
@@ -12645,25 +12679,25 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -14512,7 +14546,7 @@ export interface components {
         /**
          * @example {
          *       "email": "abc@example.com",
-         *       "token": "2rn"
+         *       "token": "n"
          *     }
          */
         CustomerResetPasswordRequest: {
@@ -14523,7 +14557,7 @@ export interface components {
             email: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ho
+             * @example ot2
              */
             token: string;
         };
@@ -14545,7 +14579,7 @@ export interface components {
          *       "environmentType": "DEV",
          *       "hashedPassword": "deprecated",
          *       "password": "password",
-         *       "token": "zrd"
+         *       "token": "rd4"
          *     }
          */
         CustomerSigninRequest: {
@@ -14565,7 +14599,7 @@ export interface components {
             password?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 2aa
+             * @example aa8
              */
             token: string;
         };
@@ -14622,7 +14656,7 @@ export interface components {
          *       "legalCompanyName": "mywebsite",
          *       "name": "John Doe",
          *       "password": "password",
-         *       "token": "g2r"
+         *       "token": "8"
          *     }
          */
         CustomerSignupRequest: {
@@ -14659,7 +14693,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 4l
+             * @example c
              */
             token: string;
         };
@@ -14730,6 +14764,24 @@ export interface components {
             /**
              * @description JWT token used to perform authorization
              * @example nqy
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "id": "apikey-12345678",
+         *       "token": "z"
+         *     }
+         */
+        DeleteAPIKeyRequest: {
+            /**
+             * @description ID of an API Key
+             * @example apikey-12345678
+             */
+            id: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example fo
              */
             token: string;
         };
@@ -14856,18 +14908,18 @@ export interface components {
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "l"
+         *       "token": "z"
          *     }
          */
         DeleteIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Aut est explicabo a nisi consequatur quia.
+             * @example Consequatur quia non.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example i
+             * @example t99
              */
             token: string;
         };
@@ -15453,13 +15505,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "6o"
+         *       "token": "9hb"
          *     }
          */
         DeleteUserRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example r
+             * @example c7
              */
             token: string;
         };
@@ -16638,6 +16690,7 @@ export interface components {
          *       "metadata": {
          *         "createdAt": "2026-04-23T19:37:16Z",
          *         "createdByUserId": "user-12345678",
+         *         "createdByUserName": "Alice Admin",
          *         "description": "Used by the prod CI pipeline to call the deploy API.",
          *         "expiresAt": "2027-01-01T00:00:00Z",
          *         "id": "apikey-12345678",
@@ -16646,6 +16699,7 @@ export interface components {
          *         "prefix": "om",
          *         "revokedAt": "2026-04-30T12:00:00Z",
          *         "revokedByUserId": "user-87654321",
+         *         "revokedByUserName": "Bob Ops",
          *         "roleType": "admin",
          *         "status": "active"
          *       }
@@ -17726,18 +17780,18 @@ export interface components {
         /**
          * @example {
          *       "id": "az-12345678",
-         *       "token": "ad"
+         *       "token": "us"
          *     }
          */
         DescribeAvailabilityZoneRequest: {
             /**
              * @description ID of an AZ
-             * @example Minus quo.
+             * @example Nobis quia ex mollitia exercitationem quidem.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example fo
+             * @example sa
              */
             token: string;
         };
@@ -17768,7 +17822,7 @@ export interface components {
             description: string;
             /**
              * @description ID of an AZ
-             * @example Quia ex mollitia exercitationem.
+             * @example Minus explicabo veniam cumque quis.
              */
             id: string;
             /**
@@ -18031,7 +18085,7 @@ export interface components {
         /**
          * @example {
          *       "returnUrl": "https://mysaasportal.com",
-         *       "token": "v4e"
+         *       "token": "qxj"
          *     }
          */
         DescribeConsumptionBillingDetailsRequest: {
@@ -18042,7 +18096,7 @@ export interface components {
             returnUrl?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example l7
+             * @example yc
              */
             token: string;
         };
@@ -18104,13 +18158,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "2"
+         *       "token": "wf"
          *     }
          */
         DescribeConsumptionBillingStatusRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example 8q
+             * @example s4
              */
             token: string;
         };
@@ -18129,18 +18183,18 @@ export interface components {
         /**
          * @example {
          *       "id": "user-abcd1234",
-         *       "token": "r92"
+         *       "token": "8q"
          *     }
          */
         DescribeConsumptionUserBillingDetailsRequest: {
             /**
              * @description ID of a User
-             * @example Praesentium molestiae recusandae quia itaque est.
+             * @example Et dolor inventore dolorum officiis voluptatem.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 8
+             * @example adq
              */
             token: string;
         };
@@ -18176,7 +18230,7 @@ export interface components {
             paymentInfoPortalURL?: string;
             /**
              * @description ID of a User
-             * @example Recusandae quo.
+             * @example Aut nesciunt et et et.
              */
             userId?: string;
         };
@@ -18397,18 +18451,18 @@ export interface components {
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "a"
+         *       "token": "u"
          *     }
          */
         DescribeIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Aliquid vel cupiditate excepturi officiis voluptatum beatae.
+             * @example Quia consequatur cupiditate ex perspiciatis consectetur.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example c
+             * @example k
              */
             token: string;
         };
@@ -21903,19 +21957,19 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "id": "sm-12345678",
@@ -21961,13 +22015,13 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -23751,7 +23805,7 @@ export interface components {
         /**
          * @example {
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "vz"
+         *       "token": "sui"
          *     }
          */
         DescribeUsersBySubscriptionRequest: {
@@ -23762,7 +23816,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example v
+             * @example glq
              */
             token: string;
         };
@@ -24211,7 +24265,7 @@ export interface components {
             billingProviderType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example k
+             * @example b
              */
             token: string;
         };
@@ -24313,7 +24367,7 @@ export interface components {
         };
         /**
          * @example {
-         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY",
+         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
          *       "token": "t"
@@ -24322,7 +24376,7 @@ export interface components {
         DisableServiceModelFeatureRequest: {
             /**
              * @description Name of the service model feature
-             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY
+             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC
              */
             feature: string;
             /**
@@ -24343,22 +24397,22 @@ export interface components {
         };
         /**
          * @example {
-         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *     }
          */
         DisableServiceModelFeatureRequest2: {
-            /** @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY */
+            /** @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC */
             feature: string;
         };
         /**
          * @example {
-         *       "token": "1d"
+         *       "token": "0"
          *     }
          */
         DisableTenantBillingRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example m
+             * @example rk
              */
             token: string;
         };
@@ -24423,7 +24477,7 @@ export interface components {
          *       "billingProviderType": "STRIPE",
          *       "logoURL": "https://example.com/logo.png",
          *       "name": "Stripe",
-         *       "token": "wbd"
+         *       "token": "x7k"
          *     }
          */
         EnableBillingProviderRequest: {
@@ -24449,7 +24503,7 @@ export interface components {
             name?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example r2
+             * @example cml
              */
             token: string;
         };
@@ -24654,7 +24708,7 @@ export interface components {
          *       "configuration": {
          *         "status": "ON"
          *       },
-         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY",
+         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
          *       "token": "2"
@@ -24664,7 +24718,7 @@ export interface components {
             configuration: components["schemas"]["ServiceModelFeatureConfiguration"];
             /**
              * @description Name of the service model feature
-             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY
+             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC
              */
             feature: string;
             /**
@@ -24688,7 +24742,7 @@ export interface components {
          *       "configuration": {
          *         "status": "ON"
          *       },
-         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *     }
          */
         EnableServiceModelFeatureRequest2: {
@@ -24700,18 +24754,18 @@ export interface components {
             configuration: {
                 [key: string]: unknown;
             };
-            /** @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY */
+            /** @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC */
             feature: string;
         };
         /**
          * @example {
-         *       "token": "jym"
+         *       "token": "hwb"
          *     }
          */
         EnableTenantBillingRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example rj9
+             * @example jr
              */
             token: string;
         };
@@ -24989,13 +25043,13 @@ export interface components {
          *       "productTierID": "pt-12345678",
          *       "resourceKey": "mysql",
          *       "serviceID": "s-12345678",
-         *       "token": "j9c"
+         *       "token": "zwk"
          *     }
          */
         ExpressionEvaluatorRequest: {
             /**
              * @description ID of a Host Cluster
-             * @example Et officia labore autem molestiae fugiat tempora.
+             * @example Voluptatem doloribus deserunt.
              */
             deploymentCellID?: string;
             /**
@@ -25020,7 +25074,7 @@ export interface components {
             instanceID?: string;
             /**
              * @description ID of a Product Tier
-             * @example Saepe ullam commodi aliquid eius voluptatem sequi.
+             * @example Molestias ea recusandae.
              */
             productTierID?: string;
             /**
@@ -25035,7 +25089,7 @@ export interface components {
             serviceID: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 7
+             * @example q
              */
             token: string;
         };
@@ -25548,7 +25602,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "code": "us-east-1a",
-         *       "token": "q"
+         *       "token": "axu"
          *     }
          */
         GetAvailabilityZoneByCodeRequest: {
@@ -25564,7 +25618,7 @@ export interface components {
             code: string;
             /**
              * @description JWT token used to perform authorization
-             * @example aus
+             * @example r
              */
             token: string;
         };
@@ -25591,7 +25645,7 @@ export interface components {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "startDate": "2023-01-01T10:00:00Z",
          *       "subscriptionID": "sub-12345678",
-         *       "token": "v2"
+         *       "token": "vz"
          *     }
          */
         GetConsumptionUsageRequest: {
@@ -25609,12 +25663,12 @@ export interface components {
             startDate?: string;
             /**
              * @description ID of a Subscription
-             * @example Nihil occaecati qui tempore aut sapiente.
+             * @example Odit delectus aut.
              */
             subscriptionID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 6c
+             * @example ndn
              */
             token: string;
         };
@@ -25659,18 +25713,18 @@ export interface components {
         /**
          * @example {
          *       "subscriptionID": "sub-12345678",
-         *       "token": "g"
+         *       "token": "v2"
          *     }
          */
         GetCurrentConsumptionUsageRequest: {
             /**
              * @description ID of a Subscription
-             * @example Et beatae placeat voluptas laborum.
+             * @example Nihil occaecati qui tempore aut sapiente.
              */
             subscriptionID?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example 6c
              */
             token: string;
         };
@@ -25887,13 +25941,13 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "serviceModelId": "sm-12345678",
@@ -26086,13 +26140,13 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -26120,13 +26174,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "x7k"
+         *       "token": "g"
          *     }
          */
         GetTenantBillingStatusRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example cml
+             * @example lri
              */
             token: string;
         };
@@ -27501,7 +27555,7 @@ export interface components {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "v"
+         *       "token": "5"
          *     }
          */
         InviteConsumptionUserRequest: {
@@ -27522,7 +27576,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ndn
+             * @example q
              */
             token: string;
         };
@@ -28066,6 +28120,7 @@ export interface components {
          *         {
          *           "createdAt": "2026-04-23T19:37:16Z",
          *           "createdByUserId": "user-12345678",
+         *           "createdByUserName": "Alice Admin",
          *           "description": "Used by the prod CI pipeline to call the deploy API.",
          *           "expiresAt": "2027-01-01T00:00:00Z",
          *           "id": "apikey-12345678",
@@ -28074,12 +28129,14 @@ export interface components {
          *           "prefix": "om",
          *           "revokedAt": "2026-04-30T12:00:00Z",
          *           "revokedByUserId": "user-87654321",
+         *           "revokedByUserName": "Bob Ops",
          *           "roleType": "admin",
          *           "status": "active"
          *         },
          *         {
          *           "createdAt": "2026-04-23T19:37:16Z",
          *           "createdByUserId": "user-12345678",
+         *           "createdByUserName": "Alice Admin",
          *           "description": "Used by the prod CI pipeline to call the deploy API.",
          *           "expiresAt": "2027-01-01T00:00:00Z",
          *           "id": "apikey-12345678",
@@ -28088,6 +28145,7 @@ export interface components {
          *           "prefix": "om",
          *           "revokedAt": "2026-04-30T12:00:00Z",
          *           "revokedByUserId": "user-87654321",
+         *           "revokedByUserName": "Bob Ops",
          *           "roleType": "admin",
          *           "status": "active"
          *         }
@@ -28101,6 +28159,7 @@ export interface components {
              *       {
              *         "createdAt": "2026-04-23T19:37:16Z",
              *         "createdByUserId": "user-12345678",
+             *         "createdByUserName": "Alice Admin",
              *         "description": "Used by the prod CI pipeline to call the deploy API.",
              *         "expiresAt": "2027-01-01T00:00:00Z",
              *         "id": "apikey-12345678",
@@ -28109,12 +28168,14 @@ export interface components {
              *         "prefix": "om",
              *         "revokedAt": "2026-04-30T12:00:00Z",
              *         "revokedByUserId": "user-87654321",
+             *         "revokedByUserName": "Bob Ops",
              *         "roleType": "admin",
              *         "status": "active"
              *       },
              *       {
              *         "createdAt": "2026-04-23T19:37:16Z",
              *         "createdByUserId": "user-12345678",
+             *         "createdByUserName": "Alice Admin",
              *         "description": "Used by the prod CI pipeline to call the deploy API.",
              *         "expiresAt": "2027-01-01T00:00:00Z",
              *         "id": "apikey-12345678",
@@ -28123,6 +28184,7 @@ export interface components {
              *         "prefix": "om",
              *         "revokedAt": "2026-04-30T12:00:00Z",
              *         "revokedByUserId": "user-87654321",
+             *         "revokedByUserName": "Bob Ops",
              *         "roleType": "admin",
              *         "status": "active"
              *       }
@@ -30141,7 +30203,7 @@ export interface components {
         /**
          * @example {
          *       "environmentType": "DEV",
-         *       "token": "5"
+         *       "token": "877"
          *     }
          */
         ListAllSubscriptionUsersRequest: {
@@ -30152,7 +30214,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example q
+             * @example 8
              */
             token: string;
         };
@@ -30548,7 +30610,7 @@ export interface components {
          * @example {
          *       "cloudProviderName": "aws",
          *       "regionCode": "us-east-1",
-         *       "token": "yh"
+         *       "token": "ym"
          *     }
          */
         ListAvailabilityZonesByRegionCodeRequest: {
@@ -30561,7 +30623,7 @@ export interface components {
             regionCode: string;
             /**
              * @description JWT token used to perform authorization
-             * @example t5
+             * @example w
              */
             token: string;
         };
@@ -30591,7 +30653,7 @@ export interface components {
         /**
          * @example {
          *       "cloudProviderName": "aws",
-         *       "token": "06"
+         *       "token": "5vy"
          *     }
          */
         ListAvailabilityZonesRequest: {
@@ -30602,7 +30664,7 @@ export interface components {
             cloudProviderName: string;
             /**
              * @description JWT token used to perform authorization
-             * @example y
+             * @example 1
              */
             token: string;
         };
@@ -33024,13 +33086,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "1"
+         *       "token": "c"
          *     }
          */
         ListIdentityProviderTypesRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example wkt
+             * @example ut4
              */
             token: string;
         };
@@ -33085,13 +33147,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "ut4"
+         *       "token": "5i"
          *     }
          */
         ListIdentityProvidersRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example co
+             * @example su
              */
             token: string;
         };
@@ -38461,25 +38523,25 @@ export interface components {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             }
          *           ],
          *           "serviceModelId": "sm-12345678",
@@ -38549,25 +38611,25 @@ export interface components {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             },
          *             {
          *               "configuration": {
          *                 "status": "ON"
          *               },
-         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *             }
          *           ],
          *           "serviceModelId": "sm-12345678",
@@ -38649,25 +38711,25 @@ export interface components {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           }
              *         ],
              *         "serviceModelId": "sm-12345678",
@@ -38737,25 +38799,25 @@ export interface components {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           },
              *           {
              *             "configuration": {
              *               "status": "ON"
              *             },
-             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *             "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *           }
              *         ],
              *         "serviceModelId": "sm-12345678",
@@ -40944,13 +41006,13 @@ export interface components {
         };
         /**
          * @example {
-         *       "token": "nxs"
+         *       "token": "cw"
          *     }
          */
         LogoutRequest: {
             /**
              * @description JWT token used to perform authorization
-             * @example gz
+             * @example u
              */
             token: string;
         };
@@ -43603,7 +43665,7 @@ export interface components {
          *       "environmentType": "production",
          *       "loginHint": "user@domain.com",
          *       "redirectUrl": "https://example.com/redirect",
-         *       "token": "rr"
+         *       "token": "b"
          *     }
          */
         RenderIdentityProvidersRequest: {
@@ -43624,7 +43686,7 @@ export interface components {
             redirectUrl?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example b
+             * @example aty
              */
             token: string;
         };
@@ -45120,6 +45182,7 @@ export interface components {
          *       "metadata": {
          *         "createdAt": "2026-04-23T19:37:16Z",
          *         "createdByUserId": "user-12345678",
+         *         "createdByUserName": "Alice Admin",
          *         "description": "Used by the prod CI pipeline to call the deploy API.",
          *         "expiresAt": "2027-01-01T00:00:00Z",
          *         "id": "apikey-12345678",
@@ -45128,6 +45191,7 @@ export interface components {
          *         "prefix": "om",
          *         "revokedAt": "2026-04-30T12:00:00Z",
          *         "revokedByUserId": "user-87654321",
+         *         "revokedByUserName": "Bob Ops",
          *         "roleType": "admin",
          *         "status": "active"
          *       }
@@ -45141,7 +45205,7 @@ export interface components {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
          *       "subscriptionId": "sub-abcd1234",
-         *       "token": "sui"
+         *       "token": "9"
          *     }
          */
         RevokeConsumptionUserRoleRequest: {
@@ -45162,7 +45226,7 @@ export interface components {
             subscriptionId: string;
             /**
              * @description JWT token used to perform authorization
-             * @example glq
+             * @example bpk
              */
             token: string;
         };
@@ -45183,9 +45247,21 @@ export interface components {
         };
         /**
          * @example {
+         *       "refreshToken": "nxs"
+         *     }
+         */
+        RevokeTokenRequest: {
+            /**
+             * @description The refresh token to revoke. Optional when the refresh token is provided via httpOnly cookie.
+             * @example gz
+             */
+            refreshToken?: string;
+        };
+        /**
+         * @example {
          *       "email": "abc@gmail.com",
          *       "roleType": "reader",
-         *       "token": "9hb"
+         *       "token": "1fq"
          *     }
          */
         RevokeUserRoleRequest: {
@@ -45201,7 +45277,7 @@ export interface components {
             roleType: string;
             /**
              * @description JWT token used to perform authorization
-             * @example c7
+             * @example ke7
              */
             token: string;
         };
@@ -46366,14 +46442,14 @@ export interface components {
          *       "configuration": {
          *         "status": "ON"
          *       },
-         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *     }
          */
         ServiceModelFeatureDetail: {
             configuration: components["schemas"]["ServiceModelFeatureConfiguration"];
             /**
              * @description Name of the service model feature
-             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY
+             * @example CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC
              */
             feature: string;
         };
@@ -46474,19 +46550,19 @@ export interface components {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         },
          *         {
          *           "configuration": {
          *             "status": "ON"
          *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
          *         }
          *       ],
          *       "serviceModelID": "sm-12345678",
@@ -46724,25 +46800,25 @@ export interface components {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       },
              *       {
              *         "configuration": {
              *           "status": "ON"
              *         },
-             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+             *         "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
              *       }
              *     ]
              */
@@ -48281,6 +48357,7 @@ export interface components {
          *       "metadata": {
          *         "createdAt": "2026-04-23T19:37:16Z",
          *         "createdByUserId": "user-12345678",
+         *         "createdByUserName": "Alice Admin",
          *         "description": "Used by the prod CI pipeline to call the deploy API.",
          *         "expiresAt": "2027-01-01T00:00:00Z",
          *         "id": "apikey-12345678",
@@ -48289,6 +48366,7 @@ export interface components {
          *         "prefix": "om",
          *         "revokedAt": "2026-04-30T12:00:00Z",
          *         "revokedByUserId": "user-87654321",
+         *         "revokedByUserName": "Bob Ops",
          *         "roleType": "admin",
          *         "status": "active"
          *       }
@@ -48946,7 +49024,7 @@ export interface components {
          *       "loginButtonText": "Login with Google",
          *       "name": "Google for my company",
          *       "scopes": "openid email profile",
-         *       "token": "n",
+         *       "token": "0",
          *       "tokenEndpoint": "https://oauth2.googleapis.com/token",
          *       "userInfoEndpoint": "https://www.googleapis.com/oauth2/v3/userinfo"
          *     }
@@ -48984,7 +49062,7 @@ export interface components {
             environmentType?: string;
             /**
              * @description ID of an Identity Provider
-             * @example Dolorum tempora itaque asperiores explicabo mollitia sunt.
+             * @example Aliquid et aut.
              */
             id: string;
             /**
@@ -49009,7 +49087,7 @@ export interface components {
             scopes?: string;
             /**
              * @description JWT token used to perform authorization
-             * @example ug0
+             * @example e9k
              */
             token: string;
             /**
@@ -50124,7 +50202,7 @@ export interface components {
          *       "currentPassword": "currentPassword",
          *       "currentPasswordHash": "currentPasswordHash",
          *       "password": "password",
-         *       "token": "cw"
+         *       "token": "6o"
          *     }
          */
         UpdatePasswordRequest: {
@@ -50136,7 +50214,7 @@ export interface components {
             password: string;
             /**
              * @description JWT token used to perform authorization
-             * @example u
+             * @example r
              */
             token: string;
         };
@@ -53416,18 +53494,18 @@ export interface components {
         /**
          * @example {
          *       "id": "idp-12345678",
-         *       "token": "aty"
+         *       "token": "2"
          *     }
          */
         VerifyIdentityProviderRequest: {
             /**
              * @description ID of an Identity Provider
-             * @example Eligendi distinctio similique voluptatem inventore ex sint.
+             * @example Quis eligendi distinctio similique voluptatem inventore.
              */
             id: string;
             /**
              * @description JWT token used to perform authorization
-             * @example 03d
+             * @example 3
              */
             token: string;
         };
@@ -56487,6 +56565,7 @@ export interface operations {
                      *         {
                      *           "createdAt": "2026-04-23T19:37:16Z",
                      *           "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *           "createdByUserName": "Alice Admin",
                      *           "description": "Used by the prod CI pipeline to call the deploy API.",
                      *           "expiresAt": "2027-01-01T00:00:00Z",
                      *           "id": "apikey-12345678",
@@ -56495,12 +56574,14 @@ export interface operations {
                      *           "prefix": "om",
                      *           "revokedAt": "2026-04-30T12:00:00Z",
                      *           "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *           "revokedByUserName": "Bob Ops",
                      *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *           "status": "active|expired|revoked"
                      *         },
                      *         {
                      *           "createdAt": "2026-04-23T19:37:16Z",
                      *           "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *           "createdByUserName": "Alice Admin",
                      *           "description": "Used by the prod CI pipeline to call the deploy API.",
                      *           "expiresAt": "2027-01-01T00:00:00Z",
                      *           "id": "apikey-12345678",
@@ -56509,12 +56590,14 @@ export interface operations {
                      *           "prefix": "om",
                      *           "revokedAt": "2026-04-30T12:00:00Z",
                      *           "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *           "revokedByUserName": "Bob Ops",
                      *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *           "status": "active|expired|revoked"
                      *         },
                      *         {
                      *           "createdAt": "2026-04-23T19:37:16Z",
                      *           "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *           "createdByUserName": "Alice Admin",
                      *           "description": "Used by the prod CI pipeline to call the deploy API.",
                      *           "expiresAt": "2027-01-01T00:00:00Z",
                      *           "id": "apikey-12345678",
@@ -56523,6 +56606,7 @@ export interface operations {
                      *           "prefix": "om",
                      *           "revokedAt": "2026-04-30T12:00:00Z",
                      *           "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *           "revokedByUserName": "Bob Ops",
                      *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *           "status": "active|expired|revoked"
                      *         }
@@ -56604,6 +56688,7 @@ export interface operations {
                      *       "metadata": {
                      *         "createdAt": "2026-04-23T19:37:16Z",
                      *         "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *         "createdByUserName": "Alice Admin",
                      *         "description": "Used by the prod CI pipeline to call the deploy API.",
                      *         "expiresAt": "2027-01-01T00:00:00Z",
                      *         "id": "apikey-12345678",
@@ -56612,6 +56697,7 @@ export interface operations {
                      *         "prefix": "om",
                      *         "revokedAt": "2026-04-30T12:00:00Z",
                      *         "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *         "revokedByUserName": "Bob Ops",
                      *         "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *         "status": "active|expired|revoked"
                      *       }
@@ -56702,6 +56788,7 @@ export interface operations {
                      *       "metadata": {
                      *         "createdAt": "2026-04-23T19:37:16Z",
                      *         "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *         "createdByUserName": "Alice Admin",
                      *         "description": "Used by the prod CI pipeline to call the deploy API.",
                      *         "expiresAt": "2027-01-01T00:00:00Z",
                      *         "id": "apikey-12345678",
@@ -56710,6 +56797,7 @@ export interface operations {
                      *         "prefix": "om",
                      *         "revokedAt": "2026-04-30T12:00:00Z",
                      *         "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *         "revokedByUserName": "Bob Ops",
                      *         "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *         "status": "active|expired|revoked"
                      *       }
@@ -56780,32 +56868,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK response. */
-            200: {
+            /** @description No Content response. */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    /**
-                     * @example {
-                     *       "metadata": {
-                     *         "createdAt": "2026-04-23T19:37:16Z",
-                     *         "createdByUserId": "Qui ullam quibusdam aliquam.",
-                     *         "description": "Used by the prod CI pipeline to call the deploy API.",
-                     *         "expiresAt": "2027-01-01T00:00:00Z",
-                     *         "id": "apikey-12345678",
-                     *         "lastUsedAt": "2026-04-23T19:37:16Z",
-                     *         "name": "ci-pipeline-prod",
-                     *         "prefix": "om",
-                     *         "revokedAt": "2026-04-30T12:00:00Z",
-                     *         "revokedByUserId": "Quis voluptatem molestiae vel odio.",
-                     *         "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
-                     *         "status": "active|expired|revoked"
-                     *       }
-                     *     }
-                     */
-                    "application/json": components["schemas"]["RevokeAPIKeyResult"];
-                };
+                content?: never;
             };
             /** @description bad_request: Response used on a bad request */
             400: {
@@ -56843,7 +56911,7 @@ export interface operations {
                     "application/vnd.goa.error": components["schemas"]["Error"];
                 };
             };
-            /** @description failed_request: Response used on failure to revoke an API key */
+            /** @description failed_request: Response used on failure to delete an API key */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -56890,6 +56958,7 @@ export interface operations {
                      *       "metadata": {
                      *         "createdAt": "2026-04-23T19:37:16Z",
                      *         "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *         "createdByUserName": "Alice Admin",
                      *         "description": "Used by the prod CI pipeline to call the deploy API.",
                      *         "expiresAt": "2027-01-01T00:00:00Z",
                      *         "id": "apikey-12345678",
@@ -56898,6 +56967,7 @@ export interface operations {
                      *         "prefix": "om",
                      *         "revokedAt": "2026-04-30T12:00:00Z",
                      *         "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *         "revokedByUserName": "Bob Ops",
                      *         "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *         "status": "active|expired|revoked"
                      *       }
@@ -56988,6 +57058,7 @@ export interface operations {
                      *       "metadata": {
                      *         "createdAt": "2026-04-23T19:37:16Z",
                      *         "createdByUserId": "Qui ullam quibusdam aliquam.",
+                     *         "createdByUserName": "Alice Admin",
                      *         "description": "Used by the prod CI pipeline to call the deploy API.",
                      *         "expiresAt": "2027-01-01T00:00:00Z",
                      *         "id": "apikey-12345678",
@@ -56996,6 +57067,7 @@ export interface operations {
                      *         "prefix": "om",
                      *         "revokedAt": "2026-04-30T12:00:00Z",
                      *         "revokedByUserId": "Quis voluptatem molestiae vel odio.",
+                     *         "revokedByUserName": "Bob Ops",
                      *         "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
                      *         "status": "active|expired|revoked"
                      *       }
@@ -71587,6 +71659,42 @@ export interface operations {
             };
         };
     };
+    "signin-api/RevokeToken": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "refreshToken": "wd"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RevokeTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content response. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description bad_request: Response used when no refresh token is provided */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "users-api/RevokeUserRole": {
         parameters: {
             query?: never;
@@ -72391,14 +72499,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72418,14 +72526,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72445,14 +72553,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72472,14 +72580,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72489,8 +72597,8 @@ export interface operations {
                      *               "visibility": "PUBLIC"
                      *             }
                      *           ],
-                     *           "serviceLogoURL": "Molestiae necessitatibus ratione non quis officiis.",
-                     *           "serviceProviderID": "Id adipisci ducimus dicta eveniet sit expedita.",
+                     *           "serviceLogoURL": "Expedita qui earum.",
+                     *           "serviceProviderID": "Veniam error dolorem qui quasi.",
                      *           "serviceProviderName": "Omnistrate, Inc."
                      *         },
                      *         {
@@ -72512,14 +72620,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72539,14 +72647,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72566,14 +72674,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72593,14 +72701,14 @@ export interface operations {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 },
                      *                 {
                      *                   "description": "A Basic product tier",
                      *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *                   "name": "Basic",
-                     *                   "productTierID": "Commodi ut quisquam.",
+                     *                   "productTierID": "Occaecati temporibus.",
                      *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *                 }
                      *               ],
@@ -72610,8 +72718,250 @@ export interface operations {
                      *               "visibility": "PUBLIC"
                      *             }
                      *           ],
-                     *           "serviceLogoURL": "Molestiae necessitatibus ratione non quis officiis.",
-                     *           "serviceProviderID": "Id adipisci ducimus dicta eveniet sit expedita.",
+                     *           "serviceLogoURL": "Expedita qui earum.",
+                     *           "serviceProviderID": "Veniam error dolorem qui quasi.",
+                     *           "serviceProviderName": "Omnistrate, Inc."
+                     *         },
+                     *         {
+                     *           "createdAt": "2019-01-01T00:00:00Z",
+                     *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+                     *           "id": "s-123456",
+                     *           "key": "mysql",
+                     *           "name": "MySQL multi-writer service",
+                     *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
+                     *           "serviceEnvironments": [
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             }
+                     *           ],
+                     *           "serviceLogoURL": "Expedita qui earum.",
+                     *           "serviceProviderID": "Veniam error dolorem qui quasi.",
+                     *           "serviceProviderName": "Omnistrate, Inc."
+                     *         },
+                     *         {
+                     *           "createdAt": "2019-01-01T00:00:00Z",
+                     *           "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+                     *           "id": "s-123456",
+                     *           "key": "mysql",
+                     *           "name": "MySQL multi-writer service",
+                     *           "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
+                     *           "serviceEnvironments": [
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             },
+                     *             {
+                     *               "id": "se-123456",
+                     *               "name": "dev",
+                     *               "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
+                     *               "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+                     *               "saasPortalUrl": "https://saas-portal.example.com",
+                     *               "servicePlans": [
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 },
+                     *                 {
+                     *                   "description": "A Basic product tier",
+                     *                   "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+                     *                   "name": "Basic",
+                     *                   "productTierID": "Occaecati temporibus.",
+                     *                   "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+                     *                 }
+                     *               ],
+                     *               "sourceEnvironmentID": "se-123456",
+                     *               "sourceEnvironmentName": "dev",
+                     *               "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+                     *               "visibility": "PUBLIC"
+                     *             }
+                     *           ],
+                     *           "serviceLogoURL": "Expedita qui earum.",
+                     *           "serviceProviderID": "Veniam error dolorem qui quasi.",
                      *           "serviceProviderName": "Omnistrate, Inc."
                      *         }
                      *       ]
@@ -72689,7 +73039,7 @@ export interface operations {
                  * @example {
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
                  *       "name": "MySQL multi-writer service",
-                 *       "serviceLogoURL": "http://zulaufpouros.org/amina_wolff"
+                 *       "serviceLogoURL": "http://bogan.biz/ward_wehner"
                  *     }
                  */
                 "application/json": components["schemas"]["CreateServiceRequest2"];
@@ -73432,14 +73782,14 @@ export interface operations {
                      *               "description": "A Basic product tier",
                      *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
+                     *               "productTierID": "Occaecati temporibus.",
                      *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *             },
                      *             {
                      *               "description": "A Basic product tier",
                      *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
+                     *               "productTierID": "Occaecati temporibus.",
                      *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *             }
                      *           ],
@@ -73459,41 +73809,14 @@ export interface operations {
                      *               "description": "A Basic product tier",
                      *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
+                     *               "productTierID": "Occaecati temporibus.",
                      *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *             },
                      *             {
                      *               "description": "A Basic product tier",
                      *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
-                     *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
-                     *             }
-                     *           ],
-                     *           "sourceEnvironmentID": "se-123456",
-                     *           "sourceEnvironmentName": "dev",
-                     *           "type": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                     *           "visibility": "PUBLIC"
-                     *         },
-                     *         {
-                     *           "id": "se-123456",
-                     *           "name": "dev",
-                     *           "promoteStatus": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
-                     *           "saasPortalStatus": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
-                     *           "saasPortalUrl": "https://saas-portal.example.com",
-                     *           "servicePlans": [
-                     *             {
-                     *               "description": "A Basic product tier",
-                     *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
-                     *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
-                     *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
-                     *             },
-                     *             {
-                     *               "description": "A Basic product tier",
-                     *               "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
-                     *               "name": "Basic",
-                     *               "productTierID": "Commodi ut quisquam.",
+                     *               "productTierID": "Occaecati temporibus.",
                      *               "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *             }
                      *           ],
@@ -73503,8 +73826,8 @@ export interface operations {
                      *           "visibility": "PUBLIC"
                      *         }
                      *       ],
-                     *       "serviceLogoURL": "Dolores saepe ut exercitationem explicabo.",
-                     *       "serviceProviderID": "Fugit error architecto quam et.",
+                     *       "serviceLogoURL": "Voluptatum quia ex velit incidunt eveniet.",
+                     *       "serviceProviderID": "Fuga voluptatem officia at.",
                      *       "serviceProviderName": "Omnistrate, Inc."
                      *     }
                      */
@@ -73665,7 +73988,7 @@ export interface operations {
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
                  *       "dryRun": true,
                  *       "name": "MySQL multi-writer service",
-                 *       "serviceLogoURL": "Sed quod ipsum est nostrum voluptatibus."
+                 *       "serviceLogoURL": "Facilis dolore ab dolor ratione cum."
                  *     }
                  */
                 "application/json": components["schemas"]["UpdateServiceRequest2"];
@@ -74805,7 +75128,7 @@ export interface operations {
                 /**
                  * @example {
                  *       "autoApproveSubscription": false,
-                 *       "deploymentConfigId": "Fugiat dolores.",
+                 *       "deploymentConfigId": "Aut explicabo ratione quod eveniet officia sit.",
                  *       "description": "The production environment for the MySQL multi-writer service",
                  *       "name": "Production",
                  *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
@@ -74913,20 +75236,12 @@ export interface operations {
                     /**
                      * @example {
                      *       "autoApproveSubscription": false,
-                     *       "deploymentConfigId": "Occaecati eaque velit assumenda delectus et.",
+                     *       "deploymentConfigId": "Sit ab vero molestias.",
                      *       "description": "The production environment for the MySQL multi-writer service",
                      *       "id": "se-123456",
                      *       "key": "production",
                      *       "name": "Production",
                      *       "promotionStatus": [
-                     *         {
-                     *           "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
-                     *           "targetEnvironmentID": "se-123456"
-                     *         },
-                     *         {
-                     *           "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
-                     *           "targetEnvironmentID": "se-123456"
-                     *         },
                      *         {
                      *           "status": "IN_SYNC|OUT_OF_SYNC|UNKNOWN",
                      *           "targetEnvironmentID": "se-123456"
@@ -75111,7 +75426,7 @@ export interface operations {
                 /**
                  * @example {
                  *       "autoApproveSubscription": false,
-                 *       "deploymentConfigId": "Tempore est occaecati quo.",
+                 *       "deploymentConfigId": "Temporibus laboriosam ut itaque est ipsum ut.",
                  *       "description": "The production environment for the MySQL multi-writer service",
                  *       "name": "Production",
                  *       "serviceAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExXBS01nPRugGbKCN8m9sSSTkGvPT\n7a1Jn74No2dTkp+tQ+ZyBa7ClKbEXFaR2mzy06q0ivJAxPi1pixofIXE0Q==\n-----END PUBLIC KEY-----\n",
@@ -75313,7 +75628,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "productTierId": "Doloremque reprehenderit maiores beatae velit aut quis."
+                 *       "productTierId": "Blanditiis dolores repellat sit unde et."
                  *     }
                  */
                 "application/json": components["schemas"]["PromoteServiceEnvironmentRequest2"];
@@ -75485,13 +75800,13 @@ export interface operations {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             },
                      *             {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             }
                      *           ],
                      *           "serviceModelId": "Ut impedit.",
@@ -75561,13 +75876,13 @@ export interface operations {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             },
                      *             {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             }
                      *           ],
                      *           "serviceModelId": "Ut impedit.",
@@ -75637,13 +75952,13 @@ export interface operations {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             },
                      *             {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             }
                      *           ],
                      *           "serviceModelId": "Ut impedit.",
@@ -75713,13 +76028,13 @@ export interface operations {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             },
                      *             {
                      *               "configuration": {
                      *                 "status": "ON"
                      *               },
-                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *               "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *             }
                      *           ],
                      *           "serviceModelId": "Ut impedit.",
@@ -77963,24 +78278,18 @@ export interface operations {
                  *           "configuration": {
                  *             "status": "ON"
                  *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *         },
                  *         {
                  *           "configuration": {
                  *             "status": "ON"
                  *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-                 *         },
-                 *         {
-                 *           "configuration": {
-                 *             "status": "ON"
-                 *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *         }
                  *       ],
                  *       "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                  *       "name": "MySQL multi-writer service hosted model",
-                 *       "serviceApiId": "Odio libero."
+                 *       "serviceApiId": "Quaerat quisquam molestias nam dolor id vitae."
                  *     }
                  */
                 "application/json": components["schemas"]["CreateServiceModelRequest2"];
@@ -78095,22 +78404,28 @@ export interface operations {
                      *           "configuration": {
                      *             "status": "ON"
                      *           },
-                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *         },
                      *         {
                      *           "configuration": {
                      *             "status": "ON"
                      *           },
-                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *         },
                      *         {
                      *           "configuration": {
                      *             "status": "ON"
                      *           },
-                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
+                     *         },
+                     *         {
+                     *           "configuration": {
+                     *             "status": "ON"
+                     *           },
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *         }
                      *       ],
-                     *       "id": "Dolorum cumque id.",
+                     *       "id": "Voluptatum voluptatibus.",
                      *       "key": "mysql-multi-writer-service-hosted-model",
                      *       "modelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
                      *       "name": "MySQL multi-writer service hosted model",
@@ -78118,7 +78433,7 @@ export interface operations {
                      *         "pt-12345678",
                      *         "pt-87654321"
                      *       ],
-                     *       "serviceApiId": "Autem officia.",
+                     *       "serviceApiId": "Libero sint.",
                      *       "serviceId": "s-123456"
                      *     }
                      */
@@ -78379,7 +78694,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "accountConfigId": "Dicta quo odit odio excepturi."
+                 *       "accountConfigId": "Voluptas animi accusantium."
                  *     }
                  */
                 "application/json": components["schemas"]["AddAccountConfigToServiceModelRequest2"];
@@ -78471,7 +78786,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "accountConfigId": "Consequatur maiores dignissimos explicabo nesciunt autem."
+                 *       "accountConfigId": "Consequatur quia."
                  *     }
                  */
                 "application/json": components["schemas"]["RemoveAccountConfigFromServiceModelRequest2"];
@@ -78654,7 +78969,7 @@ export interface operations {
                  *       "configuration": {
                  *         "status": "ON"
                  *       },
-                 *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *     }
                  */
                 "application/json": components["schemas"]["EnableServiceModelFeatureRequest2"];
@@ -78746,7 +79061,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *       "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *     }
                  */
                 "application/json": components["schemas"]["DisableServiceModelFeatureRequest2"];
@@ -78935,8 +79250,10 @@ export interface operations {
                     /**
                      * @example {
                      *       "ids": [
-                     *         "Laborum et ut velit.",
-                     *         "Dolores nihil illum ducimus."
+                     *         "Ut ratione numquam sunt.",
+                     *         "Vel sunt provident ut.",
+                     *         "Hic consequatur.",
+                     *         "Nihil et inventore."
                      *       ],
                      *       "nextPageToken": "next-token"
                      *     }
@@ -79141,19 +79458,13 @@ export interface operations {
                  *           "configuration": {
                  *             "status": "ON"
                  *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *         },
                  *         {
                  *           "configuration": {
                  *             "status": "ON"
                  *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
-                 *         },
-                 *         {
-                 *           "configuration": {
-                 *             "status": "ON"
-                 *           },
-                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                 *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                  *         }
                  *       ],
                  *       "name": "MySQL multi-writer service hosted model",
@@ -80479,7 +80790,7 @@ export interface operations {
                  *       "privateRegions": [
                  *         "n/a"
                  *       ],
-                 *       "serviceModelId": "Quis sapiente error.",
+                 *       "serviceModelId": "Sunt corporis dolor eveniet.",
                  *       "support": "Any support",
                  *       "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                  *     }
@@ -80645,6 +80956,13 @@ export interface operations {
                      *           },
                      *           "feature": "LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY",
                      *           "scope": "INTERNAL|CUSTOMER"
+                     *         },
+                     *         {
+                     *           "configuration": {
+                     *             "provider": "native"
+                     *           },
+                     *           "feature": "LOGS|METRICS|CLOUD_INSURANCE|MARKETPLACE|OPERATIONAL_STATUS|COMPLIANCE|APPLICATION_SECURITY",
+                     *           "scope": "INTERNAL|CUSTOMER"
                      *         }
                      *       ],
                      *       "exportUsageMetering": true,
@@ -80664,7 +80982,7 @@ export interface operations {
                      *       "gcpRegions": [
                      *         "us-central1"
                      *       ],
-                     *       "id": "Rem magni ipsa saepe ut reiciendis.",
+                     *       "id": "Consequatur dolorem.",
                      *       "isDisabled": false,
                      *       "key": "premium",
                      *       "maxNumberOfInstances": 5,
@@ -80705,7 +81023,7 @@ export interface operations {
                      *         "n/a"
                      *       ],
                      *       "serviceId": "s-123456",
-                     *       "serviceModelId": "Ex quibusdam nostrum ut.",
+                     *       "serviceModelId": "Provident autem.",
                      *       "support": "Any support",
                      *       "tierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                      *     }
@@ -81302,13 +81620,13 @@ export interface operations {
                      *           "configuration": {
                      *             "status": "ON"
                      *           },
-                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *         },
                      *         {
                      *           "configuration": {
                      *             "status": "ON"
                      *           },
-                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY"
+                     *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
                      *         }
                      *       ],
                      *       "serviceModelId": "Blanditiis doloribus consequatur quam aut omnis est.",
@@ -81461,7 +81779,7 @@ export interface operations {
                  *       "privateRegions": [
                  *         "n/a"
                  *       ],
-                 *       "serviceModelId": "Vel ducimus esse quasi a atque quae.",
+                 *       "serviceModelId": "Recusandae aut.",
                  *       "support": "Any support",
                  *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
                  *     }
@@ -83089,88 +83407,8 @@ export interface operations {
                      *       "resourceChangeSets": {
                      *         "Consequuntur fugiat quaerat eaque est.": {
                      *           "categorizedResourceChanges": {
-                     *             "Eveniet veniam blanditiis.": {
+                     *             "Eligendi beatae reiciendis ab beatae distinctio.": {
                      *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Fugit eveniet cum quasi est velit enim.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Voluptates vel voluptates consequatur perspiciatis.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
                      *                 {
                      *                   "attributes": {
                      *                     "resourceId": "r-12345678"
@@ -83192,103 +83430,23 @@ export interface operations {
                      *           "deploymentArtifactChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "imageConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "imageConfigId": "Quis enim aut numquam.",
+                     *             "imageConfigId": "Quasi est velit enim cum.",
                      *             "imageName": "mysql"
                      *           },
                      *           "infraConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "infraConfigId": "Corporis sed aut unde.",
+                     *             "infraConfigId": "Pariatur eveniet veniam blanditiis omnis fugit eveniet.",
                      *             "name": "MySQL Writer Infra Config"
                      *           },
                      *           "overallResourceStatus": "NO_CHANGE|PENDING_CHANGE|NONE",
                      *           "productTierFeatureChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "resourceChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *           "resourceName": "Et assumenda."
+                     *           "resourceName": "Voluptates consequatur perspiciatis."
                      *         },
                      *         "Hic impedit non harum.": {
                      *           "categorizedResourceChanges": {
-                     *             "Eveniet veniam blanditiis.": {
+                     *             "Eligendi beatae reiciendis ab beatae distinctio.": {
                      *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Fugit eveniet cum quasi est velit enim.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Voluptates vel voluptates consequatur perspiciatis.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
                      *                 {
                      *                   "attributes": {
                      *                     "resourceId": "r-12345678"
@@ -83310,103 +83468,23 @@ export interface operations {
                      *           "deploymentArtifactChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "imageConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "imageConfigId": "Quis enim aut numquam.",
+                     *             "imageConfigId": "Quasi est velit enim cum.",
                      *             "imageName": "mysql"
                      *           },
                      *           "infraConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "infraConfigId": "Corporis sed aut unde.",
+                     *             "infraConfigId": "Pariatur eveniet veniam blanditiis omnis fugit eveniet.",
                      *             "name": "MySQL Writer Infra Config"
                      *           },
                      *           "overallResourceStatus": "NO_CHANGE|PENDING_CHANGE|NONE",
                      *           "productTierFeatureChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "resourceChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *           "resourceName": "Et assumenda."
+                     *           "resourceName": "Voluptates consequatur perspiciatis."
                      *         },
                      *         "Maxime quasi repellat consequatur illum repudiandae dolorum.": {
                      *           "categorizedResourceChanges": {
-                     *             "Eveniet veniam blanditiis.": {
+                     *             "Eligendi beatae reiciendis ab beatae distinctio.": {
                      *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Fugit eveniet cum quasi est velit enim.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Voluptates vel voluptates consequatur perspiciatis.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
                      *                 {
                      *                   "attributes": {
                      *                     "resourceId": "r-12345678"
@@ -83428,18 +83506,18 @@ export interface operations {
                      *           "deploymentArtifactChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "imageConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "imageConfigId": "Quis enim aut numquam.",
+                     *             "imageConfigId": "Quasi est velit enim cum.",
                      *             "imageName": "mysql"
                      *           },
                      *           "infraConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "infraConfigId": "Corporis sed aut unde.",
+                     *             "infraConfigId": "Pariatur eveniet veniam blanditiis omnis fugit eveniet.",
                      *             "name": "MySQL Writer Infra Config"
                      *           },
                      *           "overallResourceStatus": "NO_CHANGE|PENDING_CHANGE|NONE",
                      *           "productTierFeatureChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "resourceChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *           "resourceName": "Et assumenda."
+                     *           "resourceName": "Voluptates consequatur perspiciatis."
                      *         }
                      *       },
                      *       "serviceId": "s-123456",
@@ -90554,9 +90632,9 @@ export interface operations {
                     /**
                      * @example {
                      *       "apiVersion": "v1",
-                     *       "deploymentConfigId": "A voluptas quas aliquam qui nobis praesentium.",
+                     *       "deploymentConfigId": "Perferendis corporis.",
                      *       "description": "A MySQL SaaS API specializing in multi-writer multi-tenant clusters for high availability",
-                     *       "id": "Natus eos voluptates quia odit fugiat modi.",
+                     *       "id": "Est iusto.",
                      *       "serviceEnvironmentId": "se-123456",
                      *       "serviceId": "s-123456",
                      *       "serviceName": "mysql"
@@ -90830,92 +90908,12 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "id": "Qui soluta.",
+                     *       "id": "Rerum praesentium tempora dignissimos doloribus id sunt.",
                      *       "resourceChangeSets": {
-                     *         "Reiciendis ab beatae distinctio porro quia.": {
+                     *         "Incidunt accusantium sed et aut assumenda.": {
                      *           "categorizedResourceChanges": {
-                     *             "Eveniet veniam blanditiis.": {
+                     *             "Eligendi beatae reiciendis ab beatae distinctio.": {
                      *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Fugit eveniet cum quasi est velit enim.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 }
-                     *               ],
-                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
-                     *             },
-                     *             "Voluptates vel voluptates consequatur perspiciatis.": {
-                     *               "changes": [
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
-                     *                 {
-                     *                   "attributes": {
-                     *                     "resourceId": "r-12345678"
-                     *                   },
-                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *                   "name": "Customer metrics"
-                     *                 },
                      *                 {
                      *                   "attributes": {
                      *                     "resourceId": "r-12345678"
@@ -90937,18 +90935,56 @@ export interface operations {
                      *           "deploymentArtifactChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "imageConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "imageConfigId": "Quis enim aut numquam.",
+                     *             "imageConfigId": "Quasi est velit enim cum.",
                      *             "imageName": "mysql"
                      *           },
                      *           "infraConfigChanges": {
                      *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *             "infraConfigId": "Corporis sed aut unde.",
+                     *             "infraConfigId": "Pariatur eveniet veniam blanditiis omnis fugit eveniet.",
                      *             "name": "MySQL Writer Infra Config"
                      *           },
                      *           "overallResourceStatus": "NO_CHANGE|PENDING_CHANGE|NONE",
                      *           "productTierFeatureChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
                      *           "resourceChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
-                     *           "resourceName": "Et assumenda."
+                     *           "resourceName": "Voluptates consequatur perspiciatis."
+                     *         },
+                     *         "Similique rem ut.": {
+                     *           "categorizedResourceChanges": {
+                     *             "Eligendi beatae reiciendis ab beatae distinctio.": {
+                     *               "changes": [
+                     *                 {
+                     *                   "attributes": {
+                     *                     "resourceId": "r-12345678"
+                     *                   },
+                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *                   "name": "Customer metrics"
+                     *                 },
+                     *                 {
+                     *                   "attributes": {
+                     *                     "resourceId": "r-12345678"
+                     *                   },
+                     *                   "changeType": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *                   "name": "Customer metrics"
+                     *                 }
+                     *               ],
+                     *               "status": "NO_CHANGE|PENDING_CHANGE|NONE"
+                     *             }
+                     *           },
+                     *           "deploymentArtifactChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *           "imageConfigChanges": {
+                     *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *             "imageConfigId": "Quasi est velit enim cum.",
+                     *             "imageName": "mysql"
+                     *           },
+                     *           "infraConfigChanges": {
+                     *             "changeState": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *             "infraConfigId": "Pariatur eveniet veniam blanditiis omnis fugit eveniet.",
+                     *             "name": "MySQL Writer Infra Config"
+                     *           },
+                     *           "overallResourceStatus": "NO_CHANGE|PENDING_CHANGE|NONE",
+                     *           "productTierFeatureChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *           "resourceChanges": "PENDING_NEW|PENDING_UPDATE|ACTIVE|PENDING_DELETE|PENDING_DEPRECATE",
+                     *           "resourceName": "Voluptates consequatur perspiciatis."
                      *         }
                      *       },
                      *       "serviceId": "s-123456"
@@ -91210,7 +91246,7 @@ export interface operations {
                  *       "copySpecFromPreviousVersion": false,
                  *       "dryRun": false,
                  *       "isPreferred": true,
-                 *       "productTierId": "Sequi asperiores.",
+                 *       "productTierId": "Id debitis eum esse quaerat molestiae.",
                  *       "versionSetName": "v1",
                  *       "versionSetType": "Major|Incremental|UserDefined"
                  *     }
@@ -93114,25 +93150,26 @@ export interface operations {
                 /**
                  * @example {
                  *       "configs": {
-                 *         "Aut ut id iure.": "Autem est sed.",
-                 *         "Deleniti dicta repellat.": "Blanditiis ducimus nulla eveniet esse.",
-                 *         "Quibusdam voluptas eos quam.": "Praesentium facilis doloribus eius sit velit."
+                 *         "Reprehenderit dolor labore eius.": "Totam voluptatem.",
+                 *         "Ut aut ut id iure.": "Autem est sed.",
+                 *         "Voluptas eos quam sunt praesentium.": "Doloribus eius sit."
                  *       },
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
                  *       "dryrun": true,
                  *       "environment": "dev",
                  *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                 *       "fileContent": "Quia culpa.",
+                 *       "fileContent": "Ducimus nulla eveniet esse.",
                  *       "forceCreateNewServicePlanVersion": true,
                  *       "name": "MySQL multi-writer service",
                  *       "release": true,
                  *       "releaseAsPreferred": true,
                  *       "releaseVersionName": "mysql",
                  *       "secrets": {
-                 *         "Dolor labore eius id totam voluptatem.": "Corrupti laboriosam illo.",
-                 *         "Et recusandae.": "Voluptatum esse eos aliquid repudiandae eum."
+                 *         "Et laboriosam eligendi.": "Voluptatem ut minima sequi sint voluptate dolor.",
+                 *         "Eum temporibus voluptate inventore est consectetur omnis.": "Deserunt voluptas.",
+                 *         "Laboriosam illo placeat et recusandae soluta.": "Esse eos aliquid."
                  *       },
-                 *       "serviceLogoURL": "http://raynorschaden.info/xavier_dickens"
+                 *       "serviceLogoURL": "http://lednerhand.info/marie"
                  *     }
                  */
                 "application/json": components["schemas"]["BuildServiceFromComposeSpecRequest2"];
@@ -93148,7 +93185,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "isNewServicePlanVersionCreated": true,
-                     *       "productTierID": "Est consectetur omnis occaecati deserunt voluptas pariatur.",
+                     *       "productTierID": "Laborum incidunt corrupti.",
                      *       "serviceEnvironmentID": "se-123456",
                      *       "serviceID": "s-123456",
                      *       "undefinedResources": {
@@ -93227,11 +93264,11 @@ export interface operations {
                 /**
                  * @example {
                  *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-                 *       "fileContent": "Illo qui recusandae omnis vel.",
+                 *       "fileContent": "Ratione dolorem quia iure voluptas.",
                  *       "fileFormat": "text/plain",
                  *       "fileName": "mysql.yaml",
                  *       "name": "MySQL multi-writer service",
-                 *       "serviceLogoURL": "http://mrazschaden.net/myrna_bahringer"
+                 *       "serviceLogoURL": "http://howewindler.name/georgianna"
                  *     }
                  */
                 "application/json": components["schemas"]["CreateServiceFromComposeSpecRequest2"];
@@ -93319,13 +93356,13 @@ export interface operations {
                  *       "dryrun": true,
                  *       "environment": "dev",
                  *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                 *       "fileContent": "Aperiam a et alias nihil eaque.",
+                 *       "fileContent": "Iure aut iusto earum eum ab.",
                  *       "forceCreateNewServicePlanVersion": true,
                  *       "name": "MySQL multi-writer service",
                  *       "release": true,
                  *       "releaseAsPreferred": true,
                  *       "releaseVersionName": "mysql",
-                 *       "serviceLogoURL": "http://ullrichgreen.com/colleen"
+                 *       "serviceLogoURL": "http://howe.name/corene"
                  *     }
                  */
                 "application/json": components["schemas"]["BuildServiceFromServicePlanSpecRequest2"];
@@ -93341,7 +93378,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "isNewServicePlanVersionCreated": true,
-                     *       "productTierID": "Earum eum ab earum sed.",
+                     *       "productTierID": "Eos ullam voluptatum fuga aut optio similique.",
                      *       "serviceEnvironmentID": "se-123456",
                      *       "serviceID": "s-123456",
                      *       "undefinedResources": {
@@ -93421,7 +93458,7 @@ export interface operations {
                  * @example {
                  *       "environment": "dev",
                  *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-                 *       "fileContent": "Labore nobis aliquid cum quos.",
+                 *       "fileContent": "Quae numquam.",
                  *       "name": "MySQL multi-writer service"
                  *     }
                  */
@@ -93468,7 +93505,7 @@ export interface operations {
                      *         }
                      *       ],
                      *       "isNewProductTierCreated": true,
-                     *       "productTierID": "Quae numquam.",
+                     *       "productTierID": "Sequi quidem.",
                      *       "serviceEnvironmentID": "se-123456",
                      *       "serviceID": "s-123456"
                      *     }
@@ -93804,7 +93841,7 @@ export interface operations {
                      *           }
                      *         }
                      *       },
-                     *       "id": "Fuga nostrum.",
+                     *       "id": "Aut magni culpa harum.",
                      *       "isPerEnvClusterEnabled": true
                      *     }
                      */
