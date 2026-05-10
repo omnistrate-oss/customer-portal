@@ -8,9 +8,9 @@ import { FormConfiguration } from "components/DynamicForm/types";
 import GridDynamicField from "components/DynamicForm/GridDynamicField";
 
 type AddNewAccountStepProps = {
-  // FormikProps<any> is intentional here – the form values shape is dynamic
-  // based on the selected cloud provider, same pattern as GridDynamicForm.
-  formData: FormikProps<any>;
+  // FormikProps<Record<string, unknown>> preserves type-safety for the dynamic
+  // form values structure (varies by cloud provider) without using plain `any`.
+  formData: FormikProps<Record<string, unknown>>;
   formConfiguration: FormConfiguration;
   formMode: "create" | "view";
 };

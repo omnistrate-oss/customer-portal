@@ -566,6 +566,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         },
       ],
     }),
+    // All visible form fields depend on `values` (changes trigger full recomputation).
+    // Other listed deps (isFetchingServiceOfferings, subscriptions, byoaServiceOfferings)
+    // change infrequently and cover the remaining data dependencies.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isFetchingServiceOfferings, subscriptions, byoaServiceOfferings, values]
   );

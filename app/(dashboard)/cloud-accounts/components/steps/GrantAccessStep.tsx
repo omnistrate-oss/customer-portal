@@ -155,7 +155,10 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       resourceInstance = res.data;
     } catch (err) {
       // Error is intentionally ignored: polling will retry automatically.
-      // Failed fetches don't need to surface to the user during background polling.
+      // Failed fetches during background polling don't need to surface to the user.
+      if (process.env.NODE_ENV === "development") {
+        console.error("[GrantAccessStep] polling error:", err);
+      }
     }
 
     if (!isMounted.current) return;
@@ -199,6 +202,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       isMounted.current = false;
       if (timeoutId.current) clearTimeout(timeoutId.current);
     };
+    // This effect runs only once on mount to initiate polling for setup instructions.
+    // The dependency flags (needsCloudFormation etc.) are derived from the initial props
+    // snapshot and should not trigger re-runs; re-running would restart polling prematurely.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
