@@ -214,7 +214,9 @@ const InstanceDetailsPage = ({
     <PageContainer>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Link href="/instances">
-          <Button startIcon={<RiArrowGoBackFill />}>Back to list of Deployment Instances</Button>
+          <Button data-testid="back-to-instances-button" startIcon={<RiArrowGoBackFill />}>
+            Back to list of Deployment Instances
+          </Button>
         </Link>
         <Button
           endIcon={insightsVisible ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}

@@ -1,5 +1,11 @@
 import { expect, Page } from "@playwright/test";
 
+const lifecycleStatusOptionTestId: Record<"Running" | "Stopped" | "Failed", string> = {
+  Running: "filter-option-running",
+  Stopped: "filter-option-stopped",
+  Failed: "filter-option-failed",
+};
+
 export class CommonInstanceAgent {
   page: Page;
 
@@ -28,11 +34,8 @@ export class CommonInstanceAgent {
 
   /**
    * Applies the Instances filter by status label (e.g. "Running", "Stopped", "Failed").
-   * The status value is normalized to match the filter option data-testid format.
    */
-  async applyLifecycleStatusFilter(status: string) {
-    const normalizedStatus = status.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
+  async applyLifecycleStatusFilter(status: "Running" | "Stopped" | "Failed") {
     const filterTrigger = this.page.getByTestId("data-grid-filter-trigger");
     await expect(filterTrigger).toBeVisible();
     await filterTrigger.click();
@@ -41,7 +44,7 @@ export class CommonInstanceAgent {
     await expect(lifecycleFilter).toBeVisible();
     await lifecycleFilter.click();
 
-    const statusOption = this.page.getByTestId(`filter-option-${normalizedStatus}`);
+    const statusOption = this.page.getByTestId(lifecycleStatusOptionTestId[status]);
     await expect(statusOption).toBeVisible();
     await statusOption.click();
 
@@ -59,7 +62,7 @@ export class CommonInstanceAgent {
   }
 
   async verifyInstanceDetailsPageLoaded() {
-    await expect(this.page.getByRole("button", { name: "Back to list of Deployment Instances" })).toBeVisible();
+    await expect(this.page.getByTestId("back-to-instances-button")).toBeVisible();
     await expect(this.page.getByTestId("instance-details-tab")).toBeVisible();
   }
 }
