@@ -456,7 +456,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       } catch {
         if (!cancelled && !hasShownVpcRefreshError.current) {
           hasShownVpcRefreshError.current = true;
-          snackbar.showError("Unable to refresh account configuration. Please try again.");
+          snackbar.showError(
+            "Unable to refresh account configuration. Wait a moment and try again. If this continues, verify setup in Grant Access."
+          );
         }
       }
     };
