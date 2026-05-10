@@ -98,7 +98,7 @@ const ChecklistItem = ({ label, isComplete, isInProgress, children }: ChecklistI
 );
 
 export type GrantAccessStepProps = {
-  selectedAccountConfig: any;
+  selectedAccountConfig?: { status?: string; [key: string]: unknown };
   cloudFormationTemplateUrl?: string;
   gcpBootstrapShellCommand?: string;
   azureBootstrapShellCommand?: string;
@@ -153,8 +153,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     try {
       const res = await fetchClickedInstanceDetails();
       resourceInstance = res.data;
-    } catch {
-      // ignore
+    } catch (err) {
+      // Error is intentionally ignored: polling will retry automatically.
+      // Failed fetches don't need to surface to the user during background polling.
     }
 
     if (!isMounted.current) return;

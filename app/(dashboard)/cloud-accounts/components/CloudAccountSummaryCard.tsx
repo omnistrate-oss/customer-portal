@@ -65,7 +65,7 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
               style={{ gap: "8px 8px" }}
             >
               {section.items.map((item, iIdx) => (
-                item.value != null ? (
+                item.value !== null && item.value !== undefined ? (
                   <Fragment key={iIdx}>
                     <div className="col-span-2">
                       <Text

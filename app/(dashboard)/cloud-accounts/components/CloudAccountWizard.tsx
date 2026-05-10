@@ -399,7 +399,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   )}
                   name="servicePlanId"
                   formData={formData}
-                  // @ts-ignore
+                  // @ts-ignore – SubscriptionPlanRadio onChange signature is broader than the typed prop
                   onChange={(planId: string, subId?: string) => {
                     const offering = byoaServiceOfferingsObj[serviceId]?.[planId];
                     const cp = offering?.cloudProviders?.[0] || "";
@@ -464,7 +464,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   }
                   name="cloudProvider"
                   formData={formData}
-                  // @ts-ignore
+                  // @ts-ignore – CloudProviderRadio onChange signature is broader than the typed prop
                   onChange={(cp: string) => {
                     setFieldValue(
                       "accountConfigurationMethod",
@@ -620,7 +620,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     if (currentStep === 2) {
       const vpcItems = [
         {
-          label: "Creating new V...",
+          label: "Creating new VPCs",
           value: vpcValues.enableNewVpcs ? (
             <StatusChip
               status="ENABLED"
@@ -631,7 +631,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ) : undefined,
         },
         {
-          label: "Enable existing...",
+          label: "Enable existing VPCs",
           value: vpcValues.bringOwnVpcs ? (
             <StatusChip
               status="ENABLED"
@@ -722,7 +722,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               accountInstructionDetails={accountInstructionDetails}
               isAccessPage={true}
               fetchClickedInstanceDetails={fetchClickedInstanceDetails}
-              setClickedInstance={setClickedInstance as any}
+              setClickedInstance={(updater) =>
+                setClickedInstance((prev) => updater(prev) as ResourceInstance | undefined)
+              }
             />
           )}
 

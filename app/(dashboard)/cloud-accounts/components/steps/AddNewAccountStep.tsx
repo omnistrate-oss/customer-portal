@@ -1,17 +1,21 @@
 "use client";
 
+import { FormikProps } from "formik";
+
 import CardWithTitle from "src/components/Card/CardWithTitle";
 
 import { FormConfiguration } from "components/DynamicForm/types";
 import GridDynamicField from "components/DynamicForm/GridDynamicField";
 
 type AddNewAccountStepProps = {
-  formData: any;
+  // FormikProps<any> is intentional here – the form values shape is dynamic
+  // based on the selected cloud provider, same pattern as GridDynamicForm.
+  formData: FormikProps<any>;
   formConfiguration: FormConfiguration;
   formMode: "create" | "view";
 };
 
-const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({ formData, formConfiguration, formMode }) => {
+const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({ formData, formConfiguration }) => {
   const sections = formConfiguration.sections || [];
 
   return (

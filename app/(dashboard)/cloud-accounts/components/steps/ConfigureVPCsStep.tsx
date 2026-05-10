@@ -150,6 +150,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   cloudProvider = "aws",
 }) => {
   const [showAllInstructions, setShowAllInstructions] = useState(false);
+  const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
   const selectedVpcs = availableVpcs.filter((v) => values.selectedVpcIds.includes(v.id));
 
@@ -185,7 +186,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
 
   const displayedInstructions = showAllInstructions
     ? privateConnectInstructions
-    : privateConnectInstructions;
+    : privateConnectInstructions.slice(0, 3);
 
   return (
     <Stack gap="20px">
@@ -536,13 +537,34 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               alignItems="center"
               gap="4px"
               sx={{ cursor: "pointer" }}
-              onClick={() => {}}
+              onClick={() => setShowKubernetesInstructions((prev) => !prev)}
             >
               <Text size="small" weight="medium" color="#6941C6">
                 Show me how
               </Text>
-              <KeyboardArrowDownIcon sx={{ color: "#6941C6", fontSize: 18 }} />
+              {showKubernetesInstructions ? (
+                <KeyboardArrowUpIcon sx={{ color: "#6941C6", fontSize: 18 }} />
+              ) : (
+                <KeyboardArrowDownIcon sx={{ color: "#6941C6", fontSize: 18 }} />
+              )}
             </Stack>
+            {showKubernetesInstructions && (
+              <Box
+                sx={{
+                  mt: "8px",
+                  p: "12px",
+                  border: "1px solid #E9EAEB",
+                  borderRadius: "8px",
+                  bgcolor: "#F9FAFB",
+                }}
+              >
+                <Text size="small" weight="regular" color="#344054">
+                  Add the Kubernetes subnet tag to your subnets to enable internal load balancers.
+                  Tag key: <strong>kubernetes.io/role/internal-elb</strong>, Tag value:{" "}
+                  <strong>1</strong>
+                </Text>
+              </Box>
+            )}
           </Stack>
         </CardWithTitle>
       )}
