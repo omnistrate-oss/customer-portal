@@ -582,25 +582,52 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Summary card sections ─────────────────────────────────────────────────
   const summarySections = useMemo((): SummarySection[] => {
     const rp = getResultParams(clickedInstance);
-    const accountId =
-      rp?.aws_account_id ||
-      rp?.gcp_project_id ||
-      rp?.azure_subscription_id ||
-      rp?.oci_tenancy_id ||
-      (values.cloudProvider === "aws"
-        ? values.awsAccountId
-        : values.cloudProvider === "gcp"
-          ? values.gcpProjectId
-          : values.cloudProvider === "azure"
-            ? values.azureSubscriptionId
-            : values.cloudProvider === "oci"
-              ? values.ociTenancyId
-              : null);
+    const selectedProvider = rp?.cloud_provider || values.cloudProvider;
     const privateConnectivityFlag = getResultParams(clickedInstance)?.enable_private_connectivity;
     const privateConnectivityEnabled =
       typeof privateConnectivityFlag === "boolean"
         ? privateConnectivityFlag
         : enablePrivateConnectivity;
+    const accountIdentityItems =
+      selectedProvider === "gcp"
+        ? [
+            {
+              label: "GCP Project ID",
+              value: rp?.gcp_project_id || values.gcpProjectId || undefined,
+            },
+            {
+              label: "GCP Project Number",
+              value: rp?.gcp_project_number || values.gcpProjectNumber || undefined,
+            },
+          ]
+        : selectedProvider === "azure"
+          ? [
+              {
+                label: "Azure Subscription ID",
+                value: rp?.azure_subscription_id || values.azureSubscriptionId || undefined,
+              },
+              {
+                label: "Azure Tenant ID",
+                value: rp?.azure_tenant_id || values.azureTenantId || undefined,
+              },
+            ]
+          : selectedProvider === "oci"
+            ? [
+                {
+                  label: "Tenancy OCID",
+                  value: rp?.oci_tenancy_id || values.ociTenancyId || undefined,
+                },
+                {
+                  label: "Domain OCID",
+                  value: rp?.oci_domain_id || values.ociDomainId || undefined,
+                },
+              ]
+            : [
+                {
+                  label: "AWS Account ID",
+                  value: rp?.aws_account_id || values.awsAccountId || undefined,
+                },
+              ];
 
     const standardItems = [
       {
@@ -622,10 +649,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ? cloudProviderLongLogoMap[values.cloudProvider as keyof typeof cloudProviderLongLogoMap]
           : undefined,
       },
-      {
-        label: "Account ID",
-        value: accountId || undefined,
-      },
+      ...accountIdentityItems,
       {
         label: "Private Connectivity",
         value: privateConnectivityEnabled ? (
