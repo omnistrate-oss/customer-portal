@@ -1,0 +1,32 @@
+"use client";
+
+import CardWithTitle from "src/components/Card/CardWithTitle";
+
+import { FormConfiguration } from "components/DynamicForm/types";
+import GridDynamicField from "components/DynamicForm/GridDynamicField";
+
+type AddNewAccountStepProps = {
+  formData: any;
+  formConfiguration: FormConfiguration;
+  formMode: "create" | "view";
+};
+
+const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({ formData, formConfiguration, formMode }) => {
+  const sections = formConfiguration.sections || [];
+
+  return (
+    <div className="space-y-6">
+      {sections.map((section, sIdx) => (
+        <CardWithTitle key={sIdx} title={section.title}>
+          <div className="space-y-6">
+            {section.fields.map((field, fIdx) => (
+              <GridDynamicField key={fIdx} field={field} formData={formData} />
+            ))}
+          </div>
+        </CardWithTitle>
+      ))}
+    </div>
+  );
+};
+
+export default AddNewAccountStep;

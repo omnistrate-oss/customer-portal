@@ -48,6 +48,7 @@ import useInstancesDescribe from "../instances/hooks/useInstancesDescribe";
 import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWithDescribe";
 
 import CloudAccountForm from "./components/CloudAccountForm";
+import CloudAccountWizard from "./components/CloudAccountWizard";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
@@ -903,10 +904,33 @@ const CloudAccountsPage = () => {
         />
       </div>
 
+      {/* Create flow – 3-step wizard */}
       <FullScreenDrawer
         title="Cloud Account"
         description="Create a new cloud account"
-        open={isOverlayOpen && (overlayType === "create-instance-form" || overlayType === "view-instance-form")}
+        open={isOverlayOpen && overlayType === "create-instance-form"}
+        closeDrawer={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        RenderUI={
+          <CloudAccountWizard
+            initialFormValues={initialFormValues}
+            selectedInstance={selectedInstance}
+            onClose={() => {
+              setIsOverlayOpen(false);
+              setClickedInstance(undefined);
+            }}
+            instances={instances}
+          />
+        }
+      />
+
+      {/* View form – existing read-only form */}
+      <FullScreenDrawer
+        title="Cloud Account"
+        description="View cloud account details"
+        open={isOverlayOpen && overlayType === "view-instance-form"}
         closeDrawer={() => {
           setIsOverlayOpen(false);
           setClickedInstance(undefined);
@@ -918,7 +942,7 @@ const CloudAccountsPage = () => {
             onClose={() => {
               setIsOverlayOpen(false);
             }}
-            formMode={overlayType === "view-instance-form" ? "view" : "create"}
+            formMode="view"
             setIsAccountCreation={setIsAccountCreation}
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
