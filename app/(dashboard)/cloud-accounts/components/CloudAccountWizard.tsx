@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -277,11 +277,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const { values, setFieldValue } = formData;
 
   const accountConfigId = useMemo(() => {
-    const rp = getResultParams(clickedInstance);
+    const rp = getResultParams(clickedInstance || selectedInstance);
     return typeof rp?.cloud_provider_account_config_id === "string"
       ? rp.cloud_provider_account_config_id
       : undefined;
-  }, [clickedInstance]);
+  }, [clickedInstance, selectedInstance]);
 
   const cloudNativeNetworksQuery = $api.useQuery(
     "get",
@@ -297,7 +297,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       },
     },
     {
-      enabled: Boolean(currentStep === 2 && accountConfigId),
+      enabled: Boolean(currentStep === 2 && vpcValues.bringOwnVpcs && accountConfigId),
       retry: false,
     }
   );
@@ -412,10 +412,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     return {};
   }, [clickedInstance]);
 
-  const fetchClickedInstanceDetails = async () => {
-    const rp = getResultParams(clickedInstance);
-    if (!clickedInstance || !rp) return;
-    const subscription = subscriptionsObj[clickedInstance.subscriptionId as string];
+  const fetchClickedInstanceDetails = useCallback(async () => {
+    const instance = clickedInstance || selectedInstance;
+    const rp = getResultParams(instance);
+    if (!instance || !rp) return;
+    const subscription = subscriptionsObj[instance.subscriptionId as string];
     const offering = serviceOfferingsObj[subscription?.serviceId]?.[subscription?.productTierId];
     const resource = offering?.resourceParameters?.find((r) =>
       r.resourceId.startsWith("r-injectedaccountconfig")
@@ -428,10 +429,39 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       offering?.serviceModelURLKey,
       offering?.productTierURLKey,
       resource?.urlKey,
-      clickedInstance.id,
-      clickedInstance.subscriptionId
+      instance.id,
+      instance.subscriptionId
     );
-  };
+  }, [clickedInstance, selectedInstance, serviceOfferingsObj, subscriptionsObj]);
+
+  useEffect(() => {
+    if (currentStep !== 2 || !vpcValues.bringOwnVpcs || accountConfigId || !clickedInstance) return;
+
+    let cancelled = false;
+    const refreshAccountConfigId = async () => {
+      try {
+        const response = await fetchClickedInstanceDetails();
+        const refreshedParams = getResultParams(response?.data);
+        if (!cancelled && refreshedParams?.cloud_provider_account_config_id) {
+          setClickedInstance((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  result_params: { ...getResultParams(prev), ...refreshedParams },
+                }
+              : prev
+          );
+        }
+      } catch {
+        // Best-effort refresh in Step 3; errors are intentionally ignored here.
+      }
+    };
+
+    void refreshAccountConfigId();
+    return () => {
+      cancelled = true;
+    };
+  }, [accountConfigId, clickedInstance, currentStep, fetchClickedInstanceDetails, vpcValues.bringOwnVpcs]);
 
   // ─── Form configuration for Step 1 ────────────────────────────────────────
   const { serviceId, servicePlanId, cloudProvider } = values;
