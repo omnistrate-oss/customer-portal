@@ -2,12 +2,17 @@
 
 ## How It Works
 
-Tests run **live against the real backend** on every non-draft PR. There is no HAR record/replay — each run exercises the actual Omnistrate API.
+Tests support **HAR record/replay mode**:
+- `HAR_MODE=record`: run live against the backend and record `/api/*` responses to `tests/fixtures/hars/`
+- `HAR_MODE=replay`: replay recorded HAR files for deterministic PR validation
+- default/off: run live against the backend
 
 | Environment | Command | Workers | Retries |
 |-------------|---------|---------|---------|
-| **Local** | `yarn playwright test` | 3 | 0 |
-| **CI** | `yarn playwright test` (via `playwright.yml`) | 1 | 2 |
+| **Local (live)** | `yarn playwright test` | 2 | 1 |
+| **Local (record)** | `yarn test:record` | 2 | 1 |
+| **Local (replay)** | `yarn test:replay` | 3 | 0 |
+| **CI (replay)** | `HAR_MODE=replay yarn playwright test` | 1 | 0 |
 
 ## Directory Structure
 
@@ -56,6 +61,12 @@ page-objects/              # Page object models
 ```bash
 # Starts the dev server (via webServer config) and runs all tests
 yarn playwright test
+
+# Record HAR files
+yarn test:record
+
+# Replay using recorded HAR files
+yarn test:replay
 
 # Run a specific test file
 yarn playwright test tests/deployments/instances/basic-tests.spec.ts

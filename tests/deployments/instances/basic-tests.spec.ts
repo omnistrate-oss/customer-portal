@@ -10,6 +10,7 @@ import {
   // TestMetricsTab,
   TestNodesTab,
 } from "test-fixtures/utils/instance-details-tabs";
+import { CommonInstanceAgent } from "test-fixtures/utils/common-instance-agent";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
@@ -25,12 +26,14 @@ test.describe.configure({ mode: "serial" });
 test.describe("Instances Page - Basic Lifecycle Tests", () => {
   let instancesPage: InstancesPage,
     instanceDetailsPage: InstanceDetailsPage,
+    commonInstanceAgent: CommonInstanceAgent,
     instance: ResourceInstance,
     instanceId: string;
 
   test.beforeEach(async ({ page }) => {
     instancesPage = new InstancesPage(page);
     instanceDetailsPage = new InstanceDetailsPage(page);
+    commonInstanceAgent = new CommonInstanceAgent(page);
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");
   });
@@ -46,6 +49,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(dataTestIds.deleteButton)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.createButton)).toBeVisible();
     await expect(page.getByTestId(dataTestIds.actionsMenu)).toBeVisible();
+    await commonInstanceAgent.verifyCommonColumns();
 
     const date = GlobalStateManager.getDate() || "";
     await page.getByTestId(dataTestIds.createButton).click();
@@ -79,7 +83,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
       await instancesPage.waitForStatus(instanceId, "Running", logPrefix);
     });
 
-    await instancesPage.navigateToInstanceDetails(instanceId);
+    await commonInstanceAgent.openInstanceDetails(instanceId);
+    await commonInstanceAgent.verifyInstanceDetailsPageLoaded();
 
     const instanceDetails = await page.waitForResponse((response) =>
       response.url().includes("/api/action?endpoint=%2F2022-09-01-00%2Fresource-instance%2F")
@@ -95,6 +100,15 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     // await TestMetricsTab(instanceDetailsPage, instance); Legacy Metrics are Not Working, we're moving to Grafana Dashboards
     // await TestLiveLogsTab(instanceDetailsPage, instance); Live Logs are Not Working for Postgres DT, need to Investigate Further
     await TestEventsTab(instanceDetailsPage, instance);
+  });
+
+  test("Search/Filter Instances by Lifecycle Status", async ({ page }) => {
+    await skipOnBackendError(test, async () => {
+      await instancesPage.waitForStatus(instanceId, "Running", logPrefix);
+    });
+
+    await commonInstanceAgent.applyLifecycleStatusFilter("Running");
+    await expect(page.getByTestId(instanceId)).toBeVisible();
   });
 
   test("Stop Instance -> Test Stopped State", async ({ page }) => {
