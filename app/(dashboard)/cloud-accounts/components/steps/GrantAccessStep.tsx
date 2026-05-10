@@ -153,12 +153,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     try {
       const res = await fetchClickedInstanceDetails();
       resourceInstance = res.data;
-    } catch (err) {
+    } catch {
       // Error is intentionally ignored: polling will retry automatically.
       // Failed fetches during background polling don't need to surface to the user.
-      if (process.env.NODE_ENV === "development") {
-        console.error("[GrantAccessStep] polling error:", err);
-      }
     }
 
     if (!isMounted.current) return;
