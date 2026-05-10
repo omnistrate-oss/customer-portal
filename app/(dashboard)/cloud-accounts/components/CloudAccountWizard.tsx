@@ -81,9 +81,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     selectedRegions: [],
     selectedVpcIds: [],
   });
-  const [availableVpcs] = useState<VpcRecord[]>([]);
-  const [isLoadingVpcs] = useState(false);
-
   // ─── Service/plan/subscription data ──────────────────────────────────────
   const allInstances: ResourceInstance[] = instances;
   const subscriptionInstanceCountHash: Record<string, number> = {};
@@ -278,6 +275,106 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   });
 
   const { values, setFieldValue } = formData;
+
+  const accountConfigId = useMemo(() => {
+    const rp = getResultParams(clickedInstance);
+    return typeof rp?.cloud_provider_account_config_id === "string"
+      ? rp.cloud_provider_account_config_id
+      : undefined;
+  }, [clickedInstance]);
+
+  const cloudNativeNetworksQuery = $api.useQuery(
+    "get",
+    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
+    {
+      params: {
+        path: {
+          id: accountConfigId || "",
+        },
+      },
+      headers: {
+        "x-ignore-global-error": true,
+      },
+    },
+    {
+      enabled: Boolean(currentStep === 2 && accountConfigId),
+      retry: false,
+    }
+  );
+
+  const syncCloudNativeNetworksMutation = $api.useMutation(
+    "post",
+    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/sync",
+    {
+      onSuccess: () => {
+        cloudNativeNetworksQuery.refetch();
+      },
+      onError: () => {
+        snackbar.showError("Failed to sync networks. Please try again.");
+      },
+    }
+  );
+
+  const allCloudNativeNetworks = cloudNativeNetworksQuery.data?.cloudNativeNetworks || [];
+
+  const availableRegions = useMemo(() => {
+    const regions = allCloudNativeNetworks
+      .map((network) => network.region)
+      .filter((region): region is string => Boolean(region));
+    return Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
+  }, [allCloudNativeNetworks]);
+
+  const availableVpcs = useMemo<VpcRecord[]>(() => {
+    const filteredNetworks =
+      vpcValues.selectedRegions.length > 0
+        ? allCloudNativeNetworks.filter((network) => vpcValues.selectedRegions.includes(network.region))
+        : allCloudNativeNetworks;
+
+    return filteredNetworks.map((network) => {
+      const normalizedStatus =
+        network.status === "AVAILABLE" || network.status === "READY"
+          ? "Available"
+          : network.status === "FAILED"
+            ? "Unavailable"
+            : "Unknown";
+
+      return {
+        id: network.cloudNativeNetworkId || network.id,
+        name: network.name || network.cloudNativeNetworkId || network.id,
+        status: normalizedStatus,
+        statusMessage: network.statusMessage,
+        networkId: network.cloudNativeNetworkId,
+      };
+    });
+  }, [allCloudNativeNetworks, vpcValues.selectedRegions]);
+
+  const lastSyncedAt = useMemo(() => {
+    if (!allCloudNativeNetworks.length) return undefined;
+    const latest = allCloudNativeNetworks.reduce<string | undefined>((maxDate, network) => {
+      if (!network.updatedAt) return maxDate;
+      if (!maxDate) return network.updatedAt;
+      return new Date(network.updatedAt) > new Date(maxDate) ? network.updatedAt : maxDate;
+    }, undefined);
+
+    return latest ? new Date(latest).toLocaleString() : undefined;
+  }, [allCloudNativeNetworks]);
+
+  const isLoadingVpcs = cloudNativeNetworksQuery.isFetching || syncCloudNativeNetworksMutation.isPending;
+
+  const handleResyncVpcs = () => {
+    if (!accountConfigId) return;
+
+    syncCloudNativeNetworksMutation.mutate({
+      params: {
+        path: {
+          id: accountConfigId,
+        },
+      },
+      body: {
+        regions: vpcValues.selectedRegions.length > 0 ? vpcValues.selectedRegions : undefined,
+      },
+    });
+  };
 
   // ─── Grant Access derived data ─────────────────────────────────────────────
   const cloudFormationTemplateUrl = useMemo(() => {
@@ -791,8 +888,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             <ConfigureVPCsStep
               values={vpcValues}
               onChange={(patch) => setVpcValues((prev) => ({ ...prev, ...patch }))}
+              availableRegions={availableRegions.length > 0 ? availableRegions : undefined}
               availableVpcs={availableVpcs}
               isLoadingVpcs={isLoadingVpcs}
+              onResync={handleResyncVpcs}
+              lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
             />
           )}
