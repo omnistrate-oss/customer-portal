@@ -28,8 +28,8 @@ import {
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
 import { FormConfiguration } from "components/DynamicForm/types";
+import Chip from "components/Chip/Chip";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import StatusChip from "components/StatusChip/StatusChip";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -72,6 +72,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Step state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState<WizardStep>(0);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
+  const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -151,6 +152,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ...instanceResultParams,
           cloud_provider: values.cloudProvider,
           account_configuration_method: values.accountConfigurationMethod,
+          enable_private_connectivity: enablePrivateConnectivity,
         };
 
         if (values.cloudProvider === "aws") {
@@ -217,6 +219,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_account_id: values.awsAccountId,
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
+          enable_private_connectivity: enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -228,6 +231,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             values.gcpProjectId,
             selectUser?.orgId.toLowerCase()
           ),
+          enable_private_connectivity: enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "azure") {
         requestParams = {
@@ -235,6 +239,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           azure_subscription_id: values.azureSubscriptionId,
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
+          enable_private_connectivity: enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "oci") {
         requestParams = {
@@ -242,6 +247,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           oci_tenancy_id: values.ociTenancyId,
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
+          enable_private_connectivity: enablePrivateConnectivity,
         };
       }
 
@@ -590,6 +596,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             : values.cloudProvider === "oci"
               ? values.ociTenancyId
               : null);
+    const privateConnectivityFlag = getResultParams(clickedInstance)?.enable_private_connectivity;
+    const privateConnectivityEnabled =
+      typeof privateConnectivityFlag === "boolean"
+        ? privateConnectivityFlag
+        : enablePrivateConnectivity;
 
     const standardItems = [
       {
@@ -615,6 +626,24 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         label: "Account ID",
         value: accountId || undefined,
       },
+      {
+        label: "Private Connectivity",
+        value: privateConnectivityEnabled ? (
+          <Chip
+            label="Enabled"
+            fontColor="#067647"
+            bgColor="#ECFDF3"
+            borderColor="#ABEFC6"
+          />
+        ) : (
+          <Chip
+            label="Disabled"
+            fontColor="#B54708"
+            bgColor="#FFFAEB"
+            borderColor="#FEDF89"
+          />
+        ),
+      },
     ];
 
     const sections: SummarySection[] = [{ title: "Standard Information", items: standardItems }];
@@ -625,22 +654,22 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         {
           label: "Creating new VPCs",
           value: vpcValues.enableNewVpcs ? (
-            <StatusChip
-              status="ENABLED"
+            <Chip
               label="Enabled"
+              fontColor="#067647"
               bgColor="#ECFDF3"
-              chipStyles={{ color: "#067647", border: "1px solid #ABEFC6" }}
+              borderColor="#ABEFC6"
             />
           ) : undefined,
         },
         {
           label: "Enable existing VPCs",
           value: vpcValues.bringOwnVpcs ? (
-            <StatusChip
-              status="ENABLED"
+            <Chip
               label="Enabled"
+              fontColor="#067647"
               bgColor="#ECFDF3"
-              chipStyles={{ color: "#067647", border: "1px solid #ABEFC6" }}
+              borderColor="#ABEFC6"
             />
           ) : undefined,
         },
@@ -667,6 +696,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     currentStep,
     values,
     clickedInstance,
+    enablePrivateConnectivity,
     servicesObj,
     serviceOfferingsObj,
     subscriptionsObj,
@@ -712,6 +742,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 formData={formData}
                 formConfiguration={formConfiguration}
                 formMode="create"
+                enablePrivateConnectivity={enablePrivateConnectivity}
+                onTogglePrivateConnectivity={setEnablePrivateConnectivity}
               />
             </form>
           )}

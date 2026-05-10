@@ -1,8 +1,12 @@
 "use client";
 
+import { ChangeEvent } from "react";
 import { FormikProps } from "formik";
+import { Box, Stack } from "@mui/material";
 
 import CardWithTitle from "src/components/Card/CardWithTitle";
+import Switch from "src/components/Switch/Switch";
+import { Text } from "src/components/Typography/Typography";
 
 import { FormConfiguration } from "components/DynamicForm/types";
 import GridDynamicField from "components/DynamicForm/GridDynamicField";
@@ -13,9 +17,16 @@ type AddNewAccountStepProps = {
   formData: FormikProps<Record<string, unknown>>;
   formConfiguration: FormConfiguration;
   formMode: "create" | "view";
+  enablePrivateConnectivity: boolean;
+  onTogglePrivateConnectivity: (value: boolean) => void;
 };
 
-const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({ formData, formConfiguration }) => {
+const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
+  formData,
+  formConfiguration,
+  enablePrivateConnectivity,
+  onTogglePrivateConnectivity,
+}) => {
   const sections = formConfiguration.sections || [];
 
   return (
@@ -29,6 +40,25 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({ formData, formCon
           </div>
         </CardWithTitle>
       ))}
+      <CardWithTitle title="Network Access">
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Text size="small" weight="semibold" color="#101828">
+              Enable Private Connectivity
+            </Text>
+            <Text size="xsmall" weight="regular" color="#535862">
+              Enable private connectivity configuration for this cloud account.
+            </Text>
+          </Box>
+          <Switch
+            checked={enablePrivateConnectivity}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onTogglePrivateConnectivity(event.target.checked)
+            }
+            inputProps={{ "aria-label": "Enable Private Connectivity toggle" }}
+          />
+        </Stack>
+      </CardWithTitle>
     </div>
   );
 };

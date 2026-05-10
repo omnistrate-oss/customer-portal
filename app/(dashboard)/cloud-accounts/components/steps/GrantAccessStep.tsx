@@ -130,7 +130,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const environmentType = useEnvironmentType();
   const queryClient = useQueryClient();
   const [isPolling, setIsPolling] = useState(false);
-  const timeoutId = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollCountRef = useRef(0);
   const pollInterval = 2000;
   const isMounted = useRef(true);
@@ -211,6 +211,8 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const accountConfigStatus = selectedAccountConfig?.status;
   const isFailed = accountConfigStatus === "FAILED";
   const isReady = accountConfigStatus === "READY";
+  const isRequestOrDataPending =
+    isPolling || ["PENDING", "VERIFYING", "DEPLOYING", "ATTACHING", "CONNECTING"].includes(String(accountConfigStatus));
 
   // Determine checklist states
   const isSetupComplete = true; // Account was just created
@@ -475,7 +477,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         <ChecklistItem
           label="This account configuration verification succeeded"
           isComplete={isVerificationComplete && !isFailed}
-          isInProgress={isPolling}
+          isInProgress={isRequestOrDataPending && !isVerificationComplete && !isFailed}
         >
           {renderVerificationInstructions()}
         </ChecklistItem>
@@ -492,7 +494,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         <ChecklistItem
           label={stackDeployedLabel}
           isComplete={isStackDeployed}
-          isInProgress={isVerificationComplete && !isStackDeployed && !isFailed}
+          isInProgress={isRequestOrDataPending && !isStackDeployed && !isFailed}
         />
       </Stack>
     </CardWithTitle>
