@@ -3,15 +3,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
+import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
+import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
+import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
-import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
-import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
-import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -21,24 +21,24 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import {
   getAwsBootstrapArn,
-  getGcpBootstrapShellCommand,
   getAzureBootstrapShellCommand,
+  getGcpBootstrapShellCommand,
   getGcpServiceEmail,
 } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
-import { FormConfiguration } from "components/DynamicForm/types";
 import Chip from "components/Chip/Chip";
+import { FormConfiguration } from "components/DynamicForm/types";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
-import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
-import CustomLabelDescription from "./CustomLabelDescription";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
+import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
+import CustomLabelDescription from "./CustomLabelDescription";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
 type CloudAccountWizardProps = {
@@ -74,6 +74,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
   const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
   const hasShownVpcRefreshError = useRef(false);
+  const allowNewCloudNativeNetworkCreation = true;
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -151,6 +152,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           cloud_provider: values.cloudProvider,
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
         };
 
         if (values.cloudProvider === "aws") {
@@ -218,6 +221,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
           enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -230,6 +235,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             selectUser?.orgId.toLowerCase()
           ),
           enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
         };
       } else if (values.cloudProvider === "azure") {
         requestParams = {
@@ -238,6 +245,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
         };
       } else if (values.cloudProvider === "oci") {
         requestParams = {
@@ -246,6 +255,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
         };
       }
 
@@ -723,7 +734,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const summarySections = useMemo((): SummarySection[] => {
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
-    const privateConnectivityFlag = getResultParams(clickedInstance)?.enable_private_connectivity;
+    const privateConnectivityFlag =
+      getResultParams(clickedInstance)?.enable_private_connectivity ??
+      getResultParams(clickedInstance)?.PrivateLink;
     const privateConnectivityEnabled =
       typeof privateConnectivityFlag === "boolean"
         ? privateConnectivityFlag
