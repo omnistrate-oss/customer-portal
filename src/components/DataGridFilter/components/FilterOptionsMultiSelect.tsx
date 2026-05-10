@@ -36,6 +36,7 @@ const Row = ({
   const option = filteredOptions[index];
   return (
     <Box
+      data-testid={`filter-option-${option.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
       style={style}
       display="flex"
       alignItems="center"

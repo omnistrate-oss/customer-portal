@@ -26,16 +26,18 @@ export class CommonInstanceAgent {
     }
   }
 
-  async applyLifecycleStatusFilter(status: "Running" | "Stopped" | "Failed") {
-    const filterTrigger = this.page.getByText("Filter").first();
+  async applyLifecycleStatusFilter(status: string) {
+    const normalizedStatus = status.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+    const filterTrigger = this.page.getByTestId("data-grid-filter-trigger");
     await expect(filterTrigger).toBeVisible();
     await filterTrigger.click();
 
-    const lifecycleFilter = this.page.getByText("Lifecycle Status").first();
+    const lifecycleFilter = this.page.getByTestId("filter-left-menu-lifecycle-status");
     await expect(lifecycleFilter).toBeVisible();
     await lifecycleFilter.click();
 
-    const statusOption = this.page.getByText(status, { exact: true }).first();
+    const statusOption = this.page.getByTestId(`filter-option-${normalizedStatus}`);
     await expect(statusOption).toBeVisible();
     await statusOption.click();
 

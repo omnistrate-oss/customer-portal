@@ -33,6 +33,7 @@ const LeftMenuItem = ({
 }) => {
   return (
     <Box
+      data-testid={`filter-left-menu-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
       p="8px 12px"
       borderRadius="6px"
       onClick={onClick || (() => {})}

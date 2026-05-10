@@ -291,6 +291,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
       </Box>
 
       <Box
+        data-testid="data-grid-filter-trigger"
         ref={containerRef}
         display="flex"
         alignItems="center"
