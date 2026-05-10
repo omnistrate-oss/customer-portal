@@ -27,14 +27,29 @@ export class CommonInstanceAgent {
   }
 
   async applyLifecycleStatusFilter(status: "Running" | "Stopped" | "Failed") {
-    await this.page.getByText("Filter").first().click();
-    await this.page.getByText("Lifecycle Status").first().click();
-    await this.page.getByText(status, { exact: true }).first().click();
-    await this.page.getByRole("button", { name: "Apply" }).click();
+    const filterTrigger = this.page.getByText("Filter").first();
+    await expect(filterTrigger).toBeVisible();
+    await filterTrigger.click();
+
+    const lifecycleFilter = this.page.getByText("Lifecycle Status").first();
+    await expect(lifecycleFilter).toBeVisible();
+    await lifecycleFilter.click();
+
+    const statusOption = this.page.getByText(status, { exact: true }).first();
+    await expect(statusOption).toBeVisible();
+    await statusOption.click();
+
+    const applyButton = this.page.getByRole("button", { name: "Apply" });
+    await expect(applyButton).toBeVisible();
+    await applyButton.click();
   }
 
   async openInstanceDetails(instanceId: string) {
-    await this.page.getByTestId(instanceId).getByText(instanceId).click();
+    const row = this.page.getByTestId(instanceId);
+    await expect(row).toBeVisible();
+    const instanceLink = row.getByText(instanceId);
+    await expect(instanceLink).toBeVisible();
+    await instanceLink.click();
   }
 
   async verifyInstanceDetailsPageLoaded() {
