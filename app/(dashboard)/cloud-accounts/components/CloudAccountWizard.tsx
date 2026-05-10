@@ -48,6 +48,8 @@ type CloudAccountWizardProps = {
   instances: ResourceInstance[];
 };
 
+const ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION = true;
+
 const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   initialFormValues,
   selectedInstance,
@@ -74,7 +76,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
   const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
   const hasShownVpcRefreshError = useRef(false);
-  const allowNewCloudNativeNetworkCreation = true;
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -153,7 +154,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
 
         if (values.cloudProvider === "aws") {
@@ -222,7 +223,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -236,7 +237,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ),
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "azure") {
         requestParams = {
@@ -246,7 +247,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "oci") {
         requestParams = {
@@ -256,7 +257,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           account_configuration_method: values.accountConfigurationMethod,
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: allowNewCloudNativeNetworkCreation,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       }
 
