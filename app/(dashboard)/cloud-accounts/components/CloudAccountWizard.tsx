@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -73,6 +73,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const [currentStep, setCurrentStep] = useState<WizardStep>(0);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
   const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
+  const hasShownVpcRefreshError = useRef(false);
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -453,7 +454,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           );
         }
       } catch {
-        // Best-effort refresh in Step 3; errors are intentionally ignored here.
+        if (!cancelled && !hasShownVpcRefreshError.current) {
+          hasShownVpcRefreshError.current = true;
+          snackbar.showError("Unable to refresh account configuration. Please try again.");
+        }
       }
     };
 
@@ -461,7 +465,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [accountConfigId, clickedInstance, currentStep, fetchClickedInstanceDetails, vpcValues.bringOwnVpcs]);
+  }, [
+    accountConfigId,
+    clickedInstance,
+    currentStep,
+    fetchClickedInstanceDetails,
+    snackbar,
+    vpcValues.bringOwnVpcs,
+  ]);
 
   // ─── Form configuration for Step 1 ────────────────────────────────────────
   const { serviceId, servicePlanId, cloudProvider } = values;
