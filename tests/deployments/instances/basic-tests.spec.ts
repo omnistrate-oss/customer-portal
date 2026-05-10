@@ -109,6 +109,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
 
     await commonInstanceAgent.applyLifecycleStatusFilter("Running");
     await expect(page.getByTestId(instanceId)).toBeVisible();
+    await expect(page.getByTestId(instanceId).getByTestId("status")).toContainText("Running");
   });
 
   test("Stop Instance -> Test Stopped State", async ({ page }) => {

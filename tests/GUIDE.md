@@ -7,7 +7,7 @@ Tests support **HAR record/replay mode**:
 - `HAR_MODE=replay`: replay recorded HAR files for deterministic PR validation
 - default/off: run live against the backend
 
-Live mode is still supported and used when HAR mode is not set. HAR files are intended to be committed via the HAR recording workflow (`yarn record`) after successful recording.
+Live mode is still supported and used when HAR mode is not set. HAR files are intended to be committed via the HAR recording workflow (`yarn test:record`) after successful recording.
 Use **live mode** when validating backend/API behavior changes, and use **replay mode** for deterministic CI and local runs that should not depend on backend timing/availability.
 
 | Environment | Command | Workers | Retries |

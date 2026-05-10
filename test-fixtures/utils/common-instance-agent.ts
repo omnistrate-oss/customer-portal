@@ -26,6 +26,10 @@ export class CommonInstanceAgent {
     }
   }
 
+  /**
+   * Applies the Instances filter by status label (e.g. "Running", "Stopped", "Failed").
+   * The status value is normalized to match the filter option data-testid format.
+   */
   async applyLifecycleStatusFilter(status: string) {
     const normalizedStatus = status.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
@@ -49,7 +53,7 @@ export class CommonInstanceAgent {
   async openInstanceDetails(instanceId: string) {
     const row = this.page.getByTestId(instanceId);
     await expect(row).toBeVisible();
-    const instanceLink = row.getByText(instanceId);
+    const instanceLink = row.getByRole("link", { name: instanceId });
     await expect(instanceLink).toBeVisible();
     await instanceLink.click();
   }
