@@ -59,7 +59,7 @@ import {
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import useAccountConfig from "./hooks/useAccountConfig";
 import { DIALOG_DATA } from "./constants";
-import { getOffboardReadiness } from "./utils";
+import { getOffboardReadiness, InitialFormValuesFromUrl } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -84,7 +84,7 @@ const CloudAccountsPage = () => {
   const subscriptionId = searchParams?.get("subscriptionId");
 
   const { subscriptionsObj, serviceOfferingsObj } = useGlobalData();
-  const [initialFormValues, setInitialFormValues] = useState<any>();
+  const [initialFormValues, setInitialFormValues] = useState<InitialFormValuesFromUrl | undefined>();
   const [searchText, setSearchText] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");

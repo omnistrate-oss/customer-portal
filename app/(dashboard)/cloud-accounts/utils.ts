@@ -92,15 +92,21 @@ export const mapNebiusBindingsToFormValue = (accountConfig?: AccountConfig): Neb
   }));
 };
 
+export type InitialFormValuesFromUrl = {
+  serviceId?: string;
+  servicePlanId?: string;
+  subscriptionId?: string;
+};
+
 export const getInitialValues = (
-  initialFormValues: any,
+  initialFormValues: InitialFormValuesFromUrl | undefined,
   selectedInstance: ResourceInstance | undefined,
   byoaSubscriptions: Subscription[],
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   byoaServiceOfferings: ServiceOffering[],
   instances: ResourceInstance[],
   selectedAccountConfig?: AccountConfig
-) => {
+): Record<string, any> => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
     const resultParams = getResultParams(selectedInstance);
@@ -146,10 +152,10 @@ export const getInitialValues = (
     )
   );
 
-  if (isValidFormValues) {
+  if (isValidFormValues && initialFormValues) {
     const cloudProvider =
-      byoaServiceOfferingsObj[initialFormValues?.serviceId]?.[initialFormValues?.servicePlanId]?.cloudProviders?.[0] ||
-      "";
+      byoaServiceOfferingsObj[initialFormValues.serviceId ?? ""]?.[initialFormValues.servicePlanId ?? ""]
+        ?.cloudProviders?.[0] || "";
 
     return {
       ...initialFormValues,

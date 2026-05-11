@@ -11,7 +11,7 @@ import { Text } from "../Typography/Typography";
 
 import GridDynamicField from "./GridDynamicField";
 import PreviewCard from "./PreviewCard";
-import { FormConfiguration, Section } from "./types";
+import { FormConfiguration } from "./types";
 
 type GridDynamicFormProps = {
   formData: any;
@@ -46,18 +46,15 @@ const GridDynamicForm: React.FC<GridDynamicFormProps> = ({
       onSubmit={formData.handleSubmit}
     >
       <div className="col-span-5 space-y-6">
-        {sections.map((section, index) => {
-          const sectionRenderer = section as Section & { actionButton?: React.ReactNode };
-          return (
-            <CardWithTitle key={index} title={section.title} actionButton={sectionRenderer.actionButton}>
-              <div className="space-y-6">
-                {section.fields.map((field, index) => {
-                  return <GridDynamicField key={index} field={field} formData={formData} />;
-                })}
-              </div>
-            </CardWithTitle>
-          );
-        })}
+        {sections.map((section, index) => (
+          <CardWithTitle key={index} title={section.title} actionButton={section.actionButton}>
+            <div className="space-y-6">
+              {section.fields.map((field, fieldIndex) => (
+                <GridDynamicField key={fieldIndex} field={field} formData={formData} />
+              ))}
+            </div>
+          </CardWithTitle>
+        ))}
         {afterSections}
       </div>
 

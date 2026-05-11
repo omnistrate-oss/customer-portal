@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 
 import { FormMode } from "src/types/common/enums";
 
@@ -42,6 +42,7 @@ export type Field = {
 export type Section = {
   title: string;
   fields: Field[];
+  actionButton?: ReactNode;
 };
 
 export type FormConfiguration = {
