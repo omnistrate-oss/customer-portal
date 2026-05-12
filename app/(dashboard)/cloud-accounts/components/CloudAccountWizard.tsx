@@ -293,11 +293,17 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   }, [clickedInstance, selectedInstance]);
 
   const accountConfigStatus = useMemo(() => {
-    const rp = getResultParams(clickedInstance || selectedInstance);
-    return typeof rp?.account_config_status === "string" ? rp.account_config_status : undefined;
+    const instance = clickedInstance || selectedInstance;
+    const rp = getResultParams(instance);
+    // Check result_params first, then fall back to the instance status
+    if (typeof rp?.account_config_status === "string") return rp.account_config_status;
+    if (typeof instance?.status === "string") return instance.status;
+    return undefined;
   }, [clickedInstance, selectedInstance]);
 
-  const isAccountConfigReady = accountConfigStatus === "READY";
+  // account_config_status uses "READY"; instance.status may be "RUNNING", "READY", or "COMPLETE"
+  const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
+  const isAccountConfigReady = Boolean(accountConfigStatus && READY_STATUSES.includes(accountConfigStatus));
 
   const cloudNativeNetworksQuery = $api.useQuery(
     "get",
@@ -490,19 +496,21 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     const refreshAccountConfigId = async () => {
       try {
         const response = await fetchClickedInstanceDetails();
-        const refreshedParams = getResultParams(response?.data);
+        const resourceInstance = response?.data;
+        const refreshedParams = getResultParams(resourceInstance);
         if (!cancelled && refreshedParams) {
           setClickedInstance((prev) =>
             prev
               ? {
                   ...prev,
+                  status: resourceInstance?.status || prev?.status,
                   result_params: { ...getResultParams(prev), ...refreshedParams },
                 }
               : prev
           );
           // If still not ready, retry after a delay
-          const status = refreshedParams.account_config_status;
-          if (status !== "READY" && !cancelled) {
+          const status = refreshedParams.account_config_status || resourceInstance?.status;
+          if (!(status && READY_STATUSES.includes(status)) && !cancelled) {
             retryTimer = setTimeout(refreshAccountConfigId, 5000);
           }
         }

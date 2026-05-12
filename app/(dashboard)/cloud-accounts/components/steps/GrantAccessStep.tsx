@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Box, Stack } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
 import { Text } from "src/components/Typography/Typography";
-import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import { getResultParams } from "src/utils/instance";
 
 import sandClock from "public/assets/images/cloud-account/sandclock.gif";
@@ -89,11 +89,7 @@ const ChecklistItem = ({ label, isComplete, isInProgress, children }: ChecklistI
         {label}
       </Text>
     </Stack>
-    {children && (
-      <Box sx={{ ml: "36px" }}>
-        {children}
-      </Box>
-    )}
+    {children && <Box sx={{ ml: "36px" }}>{children}</Box>}
   </Stack>
 );
 
@@ -123,7 +119,6 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   gcpBootstrapShellCommand,
   azureBootstrapShellCommand,
   accountInstructionDetails,
-  isAccessPage = true,
   fetchClickedInstanceDetails,
   setClickedInstance,
 }) => {
@@ -143,8 +138,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const needsCloudFormation = hasAwsAccount && !cloudFormationTemplateUrl;
   const needsGcpScript = hasGcpAccount && !gcpBootstrapShellCommand;
   const needsAzureScript = hasAzureAccount && !azureBootstrapShellCommand;
-  const needsOciScript =
-    hasOciAccount && !accountInstructionDetails?.ociBootstrapShellCommand;
+  const needsOciScript = hasOciAccount && !accountInstructionDetails?.ociBootstrapShellCommand;
 
   const startPolling = async () => {
     if (!isMounted.current || !fetchClickedInstanceDetails || !setClickedInstance) return;
@@ -167,11 +161,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         result_params: { ...getResultParams(prev), ...resultParams },
       }));
       queryClient.setQueryData(
-        [
-          "get",
-          "/2022-09-01-00/resource-instance",
-          { params: { query: { environmentType } } },
-        ],
+        ["get", "/2022-09-01-00/resource-instance", { params: { query: { environmentType } } }],
         (oldData: any) => ({
           resourceInstances: (oldData?.resourceInstances || []).map((inst: any) =>
             inst?.id === resourceInstance?.id
@@ -205,24 +195,94 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ─── Status polling: poll every 10s, max 5 min, until READY or FAILED ───
+  const STATUS_POLL_INTERVAL = 10_000; // 10 seconds
+  const STATUS_POLL_MAX_DURATION = 5 * 60 * 1000; // 5 minutes
+  const [isStatusPolling, setIsStatusPolling] = useState(false);
+  const statusPollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const statusPollStart = useRef<number>(0);
+
   const accountConfigStatus = selectedAccountConfig?.status;
   const isFailed = accountConfigStatus === "FAILED";
   const isReady = accountConfigStatus === "READY";
-  const isRequestOrDataPending =
-    isPolling || ["PENDING", "VERIFYING", "DEPLOYING", "ATTACHING", "CONNECTING"].includes(String(accountConfigStatus));
 
-  // Determine checklist states
-  const isSetupComplete = true; // Account was just created
   const isVerificationComplete =
     (hasAwsAccount && !!cloudFormationTemplateUrl) ||
     (hasGcpAccount && !!gcpBootstrapShellCommand) ||
     (hasAzureAccount && !!azureBootstrapShellCommand) ||
     (hasOciAccount && !!accountInstructionDetails?.ociBootstrapShellCommand);
+
+  useEffect(() => {
+    // Start status polling once verification instructions are available and status is not terminal
+    if (!isVerificationComplete || isReady || isFailed || !fetchClickedInstanceDetails || !setClickedInstance) return;
+
+    setIsStatusPolling(true);
+    statusPollStart.current = Date.now();
+
+    const pollStatus = async () => {
+      if (!isMounted.current) return;
+
+      // Check if max duration exceeded
+      if (Date.now() - statusPollStart.current >= STATUS_POLL_MAX_DURATION) {
+        setIsStatusPolling(false);
+        return;
+      }
+
+      try {
+        const res = await fetchClickedInstanceDetails();
+        const resourceInstance = res?.data;
+        const resultParams = getResultParams(resourceInstance);
+
+        if (!isMounted.current) return;
+
+        if (resultParams) {
+          setClickedInstance((prev: any) => ({
+            ...prev,
+            status: resourceInstance?.status || prev?.status,
+            result_params: { ...getResultParams(prev), ...resultParams },
+          }));
+
+          const status = resultParams.account_config_status || resourceInstance?.status;
+          const TERMINAL_STATUSES = ["READY", "RUNNING", "COMPLETE", "FAILED"];
+          if (status && TERMINAL_STATUSES.includes(status)) {
+            setIsStatusPolling(false);
+            return;
+          }
+        }
+      } catch {
+        // Silently retry on error
+      }
+
+      if (isMounted.current) {
+        statusPollTimer.current = setTimeout(pollStatus, STATUS_POLL_INTERVAL);
+      }
+    };
+
+    pollStatus();
+
+    return () => {
+      if (statusPollTimer.current) clearTimeout(statusPollTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVerificationComplete, isReady, isFailed]);
+
+  // Clean up status polling on unmount
+  useEffect(() => {
+    return () => {
+      if (statusPollTimer.current) clearTimeout(statusPollTimer.current);
+    };
+  }, []);
+
+  const isRequestOrDataPending =
+    isPolling ||
+    isStatusPolling ||
+    ["PENDING", "VERIFYING", "DEPLOYING", "ATTACHING", "CONNECTING"].includes(String(accountConfigStatus));
+
+  // Determine checklist states
+  const isSetupComplete = true; // Account was just created
   const isStackDeployed = isReady;
 
-  const cloudFormationGuide = (
-    <StyledLink href="https://youtu.be/c3HNnM8UJBE">here</StyledLink>
-  );
+  const cloudFormationGuide = <StyledLink href="https://youtu.be/c3HNnM8UJBE">here</StyledLink>;
   const cloudformationlink = cloudFormationTemplateUrl ? (
     <StyledLink href={cloudFormationTemplateUrl}>here</StyledLink>
   ) : null;
@@ -232,20 +292,12 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       Google Cloud Shell
     </StyledLink>
   );
-  const gcpShellScriptGuide = (
-    <StyledLink href="https://youtu.be/isTGi8tQA2w?si=a12mJXnlA-y2ipVC">here</StyledLink>
-  );
+  const gcpShellScriptGuide = <StyledLink href="https://youtu.be/isTGi8tQA2w?si=a12mJXnlA-y2ipVC">here</StyledLink>;
 
-  const azureCloudShellLink = (
-    <StyledLink href="https://portal.azure.com/#cloudshell/">Azure Cloud Shell</StyledLink>
-  );
-  const azureShellScriptGuide = (
-    <StyledLink href="https://youtu.be/7A9WbZjuXgQ?si=y-AvMmtdFIycqzOS">here</StyledLink>
-  );
+  const azureCloudShellLink = <StyledLink href="https://portal.azure.com/#cloudshell/">Azure Cloud Shell</StyledLink>;
+  const azureShellScriptGuide = <StyledLink href="https://youtu.be/7A9WbZjuXgQ?si=y-AvMmtdFIycqzOS">here</StyledLink>;
 
-  const ociCloudShellLink = (
-    <StyledLink href="https://cloud.oracle.com/?cloudshell=true">OCI Cloud Shell</StyledLink>
-  );
+  const ociCloudShellLink = <StyledLink href="https://cloud.oracle.com/?cloudshell=true">OCI Cloud Shell</StyledLink>;
 
   const renderVerificationInstructions = () => {
     if (isFailed) {
@@ -259,8 +311,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       return (
         <Stack gap="8px">
           <Text size="small" weight="regular" color="#344054">
-            You may delete this failed configuration and retry after carefully verifying the{" "}
-            {providerText}.
+            You may delete this failed configuration and retry after carefully verifying the {providerText}.
           </Text>
           <Text size="small" weight="regular" color="#344054">
             If the issue persists, please contact Support for assistance.
@@ -295,13 +346,11 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
                 To complete the account configuration, the instructions are provided below:
               </Text>
               <Text size="small" weight="regular" color="#344054">
-                Please create your CloudFormation Stack using the provided template{" "}
-                {cloudformationlink}.
+                Please create your CloudFormation Stack using the provided template {cloudformationlink}.
               </Text>
               <Text size="small" weight="regular" color="#344054">
-                If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while
-                creating the CloudFormation stack, set the parameter CreateLoadBalancerPolicy to
-                &quot;false&quot;.
+                If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
+                CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
               </Text>
               <Text size="small" weight="regular" color="#344054">
                 For guidance, our instructional video is available {cloudFormationGuide}.
@@ -309,8 +358,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
             </Stack>
           ) : (
             <Text size="small" weight="regular" color="#344054">
-              Your account details are being configured. Please check back shortly for detailed
-              setup instructions.
+              Your account details are being configured. Please check back shortly for detailed setup instructions.
             </Text>
           )}
         </Stack>
@@ -331,10 +379,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="medium" color="#344054">
                 GCP Project Number
               </Text>
-              <TextContainerToCopy
-                text={accountInstructionDetails.gcpProjectNumber || ""}
-                marginTop="6px"
-              />
+              <TextContainerToCopy text={accountInstructionDetails.gcpProjectNumber || ""} marginTop="6px" />
             </Box>
           </Stack>
           {gcpBootstrapShellCommand ? (
@@ -364,19 +409,13 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="medium" color="#344054">
                 Azure Subscription ID
               </Text>
-              <TextContainerToCopy
-                text={accountInstructionDetails.azureSubscriptionID!}
-                marginTop="6px"
-              />
+              <TextContainerToCopy text={accountInstructionDetails.azureSubscriptionID!} marginTop="6px" />
             </Box>
             <Box flex={1}>
               <Text size="small" weight="medium" color="#344054">
                 Azure Tenant ID
               </Text>
-              <TextContainerToCopy
-                text={accountInstructionDetails.azureTenantID || ""}
-                marginTop="6px"
-              />
+              <TextContainerToCopy text={accountInstructionDetails.azureTenantID || ""} marginTop="6px" />
             </Box>
           </Stack>
           {azureBootstrapShellCommand ? (
@@ -406,19 +445,13 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="medium" color="#344054">
                 OCI Tenancy OCID
               </Text>
-              <TextContainerToCopy
-                text={accountInstructionDetails.ociTenancyID!}
-                marginTop="6px"
-              />
+              <TextContainerToCopy text={accountInstructionDetails.ociTenancyID!} marginTop="6px" />
             </Box>
             <Box flex={1}>
               <Text size="small" weight="medium" color="#344054">
                 OCI Domain OCID
               </Text>
-              <TextContainerToCopy
-                text={accountInstructionDetails.ociDomainID || ""}
-                marginTop="6px"
-              />
+              <TextContainerToCopy text={accountInstructionDetails.ociDomainID || ""} marginTop="6px" />
             </Box>
           </Stack>
           {accountInstructionDetails.ociBootstrapShellCommand ? (
@@ -426,11 +459,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="regular" color="#344054">
                 Please open the {ociCloudShellLink} environment and execute the command below.
               </Text>
-              <TextContainerToCopy
-                text={addQuotesToShellCommand(
-                  accountInstructionDetails.ociBootstrapShellCommand
-                )}
-              />
+              <TextContainerToCopy text={addQuotesToShellCommand(accountInstructionDetails.ociBootstrapShellCommand)} />
             </Stack>
           ) : (
             <Text size="small" weight="regular" color="#344054">
@@ -443,8 +472,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
 
     return (
       <Text size="small" weight="regular" color="#344054">
-        Your account details are being configured. Please check back shortly for detailed setup
-        instructions.
+        Your account details are being configured. Please check back shortly for detailed setup instructions.
       </Text>
     );
   };
