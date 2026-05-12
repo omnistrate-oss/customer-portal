@@ -49,6 +49,7 @@ type CloudAccountWizardProps = {
 };
 
 const ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION = true;
+const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
 
 const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   initialFormValues,
@@ -301,8 +302,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     return undefined;
   }, [clickedInstance, selectedInstance]);
 
-  // account_config_status uses "READY"; instance.status may be "RUNNING", "READY", or "COMPLETE"
-  const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
   const isAccountConfigReady = Boolean(accountConfigStatus && READY_STATUSES.includes(accountConfigStatus));
 
   const cloudNativeNetworksQuery = $api.useQuery(
@@ -338,10 +337,13 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     }
   );
 
-  const allCloudNativeNetworks = cloudNativeNetworksQuery.data?.cloudNativeNetworks || [];
+  const allCloudNativeNetworks = useMemo(
+    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
+    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
+  );
 
   // Regions from the selected service offering, filtered by cloud provider
-  const offeringRegions = useMemo(() => {
+  const availableRegions = useMemo(() => {
     const { serviceId, servicePlanId, cloudProvider } = formData.values;
     const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
     if (!offering || !cloudProvider) return [];
@@ -355,15 +357,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
     return (regionMap[cloudProvider] ?? []).slice().sort((a, b) => a.localeCompare(b));
   }, [formData.values, byoaServiceOfferingsObj]);
-
-  const availableRegions = useMemo(() => {
-    const regions = allCloudNativeNetworks
-      .map((network) => network.region)
-      .filter((region): region is string => Boolean(region));
-    const networkRegions = Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
-    // Prefer regions from the cloud-native networks API; fall back to offering regions
-    return networkRegions.length > 0 ? networkRegions : offeringRegions;
-  }, [allCloudNativeNetworks, offeringRegions]);
 
   const availableVpcs = useMemo<VpcRecord[]>(() => {
     const filteredNetworks =
