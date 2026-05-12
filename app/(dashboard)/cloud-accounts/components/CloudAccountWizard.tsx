@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
@@ -8,8 +7,12 @@ import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/Subscr
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
+import Chip from "components/Chip/Chip";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -27,18 +30,15 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
-import Chip from "components/Chip/Chip";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
+import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
+import CustomLabelDescription from "./CustomLabelDescription";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
-import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
-import CustomLabelDescription from "./CustomLabelDescription";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
 type CloudAccountWizardProps = {
@@ -105,11 +105,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>> = useMemo(
     () =>
-      byoaServiceOfferings.reduce((acc, o) => {
-        acc[o.serviceId] = acc[o.serviceId] || {};
-        acc[o.serviceId][o.productTierID] = o;
-        return acc;
-      }, {} as Record<string, Record<string, ServiceOffering>>),
+      byoaServiceOfferings.reduce(
+        (acc, o) => {
+          acc[o.serviceId] = acc[o.serviceId] || {};
+          acc[o.serviceId][o.productTierID] = o;
+          return acc;
+        },
+        {} as Record<string, Record<string, ServiceOffering>>
+      ),
     [byoaServiceOfferings]
   );
 
@@ -231,10 +234,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           gcp_project_id: values.gcpProjectId,
           gcp_project_number: values.gcpProjectNumber,
           account_configuration_method: values.accountConfigurationMethod,
-          gcp_service_account_email: getGcpServiceEmail(
-            values.gcpProjectId,
-            selectUser?.orgId.toLowerCase()
-          ),
+          gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
@@ -261,9 +261,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         };
       }
 
-      const resource = offering?.resourceParameters.find((r) =>
-        r.resourceId.startsWith("r-injectedaccountconfig")
-      );
+      const resource = offering?.resourceParameters.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
       if (!resource) return snackbar.showError("BYOA Resource not found");
 
       createCloudAccountMutation.mutate({
@@ -291,10 +289,15 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const accountConfigId = useMemo(() => {
     const rp = getResultParams(clickedInstance || selectedInstance);
-    return typeof rp?.cloud_provider_account_config_id === "string"
-      ? rp.cloud_provider_account_config_id
-      : undefined;
+    return typeof rp?.cloud_provider_account_config_id === "string" ? rp.cloud_provider_account_config_id : undefined;
   }, [clickedInstance, selectedInstance]);
+
+  const accountConfigStatus = useMemo(() => {
+    const rp = getResultParams(clickedInstance || selectedInstance);
+    return typeof rp?.account_config_status === "string" ? rp.account_config_status : undefined;
+  }, [clickedInstance, selectedInstance]);
+
+  const isAccountConfigReady = accountConfigStatus === "READY";
 
   const cloudNativeNetworksQuery = $api.useQuery(
     "get",
@@ -310,8 +313,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       },
     },
     {
-      enabled: Boolean(currentStep === 2 && vpcValues.bringOwnVpcs && accountConfigId),
-      retry: false,
+      enabled: Boolean(currentStep === 2 && vpcValues.bringOwnVpcs && accountConfigId && isAccountConfigReady),
+      retry: 2,
+      retryDelay: 3000,
     }
   );
 
@@ -330,12 +334,30 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const allCloudNativeNetworks = cloudNativeNetworksQuery.data?.cloudNativeNetworks || [];
 
+  // Regions from the selected service offering, filtered by cloud provider
+  const offeringRegions = useMemo(() => {
+    const { serviceId, servicePlanId, cloudProvider } = formData.values;
+    const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
+    if (!offering || !cloudProvider) return [];
+
+    const regionMap: Record<string, string[] | undefined> = {
+      aws: offering.awsRegions,
+      gcp: offering.gcpRegions,
+      azure: offering.azureRegions,
+      oci: offering.ociRegions,
+    };
+
+    return (regionMap[cloudProvider] ?? []).slice().sort((a, b) => a.localeCompare(b));
+  }, [formData.values, byoaServiceOfferingsObj]);
+
   const availableRegions = useMemo(() => {
     const regions = allCloudNativeNetworks
       .map((network) => network.region)
       .filter((region): region is string => Boolean(region));
-    return Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
-  }, [allCloudNativeNetworks]);
+    const networkRegions = Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
+    // Prefer regions from the cloud-native networks API; fall back to offering regions
+    return networkRegions.length > 0 ? networkRegions : offeringRegions;
+  }, [allCloudNativeNetworks, offeringRegions]);
 
   const availableVpcs = useMemo<VpcRecord[]>(() => {
     const filteredNetworks =
@@ -397,23 +419,28 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const gcpBootstrapShellCommand = useMemo(() => {
     const rp = getResultParams(clickedInstance);
-    return rp?.gcp_bootstrap_shell_script || (rp?.cloud_provider_account_config_id
-      ? getGcpBootstrapShellCommand(rp.cloud_provider_account_config_id)
-      : undefined);
+    return (
+      rp?.gcp_bootstrap_shell_script ||
+      (rp?.cloud_provider_account_config_id
+        ? getGcpBootstrapShellCommand(rp.cloud_provider_account_config_id)
+        : undefined)
+    );
   }, [clickedInstance]);
 
   const azureBootstrapShellCommand = useMemo(() => {
     const rp = getResultParams(clickedInstance);
-    return rp?.azure_bootstrap_shell_script || (rp?.cloud_provider_account_config_id
-      ? getAzureBootstrapShellCommand(rp.cloud_provider_account_config_id)
-      : undefined);
+    return (
+      rp?.azure_bootstrap_shell_script ||
+      (rp?.cloud_provider_account_config_id
+        ? getAzureBootstrapShellCommand(rp.cloud_provider_account_config_id)
+        : undefined)
+    );
   }, [clickedInstance]);
 
   const accountInstructionDetails = useMemo(() => {
     const rp = getResultParams(clickedInstance);
     if (rp?.aws_account_id) return { awsAccountID: rp.aws_account_id };
-    if (rp?.gcp_project_id)
-      return { gcpProjectID: rp.gcp_project_id, gcpProjectNumber: rp.gcp_project_number };
+    if (rp?.gcp_project_id) return { gcpProjectID: rp.gcp_project_id, gcpProjectNumber: rp.gcp_project_number };
     if (rp?.azure_subscription_id)
       return { azureSubscriptionID: rp.azure_subscription_id, azureTenantID: rp.azure_tenant_id };
     if (rp?.oci_tenancy_id)
@@ -431,9 +458,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     if (!instance || !rp) return;
     const subscription = subscriptionsObj[instance.subscriptionId as string];
     const offering = serviceOfferingsObj[subscription?.serviceId]?.[subscription?.productTierId];
-    const resource = offering?.resourceParameters?.find((r) =>
-      r.resourceId.startsWith("r-injectedaccountconfig")
-    );
+    const resource = offering?.resourceParameters?.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
     return getResourceInstanceDetails(
       offering?.serviceProviderId,
       offering?.serviceURLKey,
@@ -448,14 +473,25 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   }, [clickedInstance, selectedInstance, serviceOfferingsObj, subscriptionsObj]);
 
   useEffect(() => {
-    if (currentStep !== 2 || !vpcValues.bringOwnVpcs || accountConfigId || !clickedInstance) return;
+    // Poll until we have a valid account config ID and the account is READY
+    const needsAccountConfigId = !accountConfigId;
+    const needsReadyStatus = accountConfigId && !isAccountConfigReady;
+    if (
+      currentStep !== 2 ||
+      !vpcValues.bringOwnVpcs ||
+      !clickedInstance ||
+      (!needsAccountConfigId && !needsReadyStatus)
+    )
+      return;
 
     let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout>;
+
     const refreshAccountConfigId = async () => {
       try {
         const response = await fetchClickedInstanceDetails();
         const refreshedParams = getResultParams(response?.data);
-        if (!cancelled && refreshedParams?.cloud_provider_account_config_id) {
+        if (!cancelled && refreshedParams) {
           setClickedInstance((prev) =>
             prev
               ? {
@@ -464,6 +500,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 }
               : prev
           );
+          // If still not ready, retry after a delay
+          const status = refreshedParams.account_config_status;
+          if (status !== "READY" && !cancelled) {
+            retryTimer = setTimeout(refreshAccountConfigId, 5000);
+          }
         }
       } catch {
         if (!cancelled && !hasShownVpcRefreshError.current) {
@@ -478,9 +519,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     void refreshAccountConfigId();
     return () => {
       cancelled = true;
+      clearTimeout(retryTimer);
     };
   }, [
     accountConfigId,
+    isAccountConfigReady,
     clickedInstance,
     currentStep,
     fetchClickedInstanceDetails,
@@ -491,10 +534,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Form configuration for Step 1 ────────────────────────────────────────
   const { serviceId, servicePlanId, cloudProvider } = values;
 
-  const serviceMenuItems = useMemo(
-    () => getServiceMenuItems(byoaServiceOfferings),
-    [byoaServiceOfferings]
-  );
+  const serviceMenuItems = useMemo(() => getServiceMenuItems(byoaServiceOfferings), [byoaServiceOfferings]);
   const subscriptionMenuItems = useMemo(
     () => byoaSubscriptions.filter((sub) => sub.productTierId === servicePlanId),
     [byoaSubscriptions, servicePlanId]
@@ -534,10 +574,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 setFieldValue("servicePlanId", planId);
                 setFieldValue("subscriptionId", subId);
                 setFieldValue("cloudProvider", cp);
-                setFieldValue(
-                  "accountConfigurationMethod",
-                  cp === "aws" ? "CloudFormation" : "Terraform"
-                );
+                setFieldValue("accountConfigurationMethod", cp === "aws" ? "CloudFormation" : "Terraform");
                 formData.setFieldTouched("servicePlanId", false);
                 formData.setFieldTouched("subscriptionId", false);
                 formData.setFieldTouched("cloudProvider", false);
@@ -562,10 +599,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                     const offering = byoaServiceOfferingsObj[serviceId]?.[planId];
                     const cp = offering?.cloudProviders?.[0] || "";
                     setFieldValue("cloudProvider", cp);
-                    setFieldValue(
-                      "accountConfigurationMethod",
-                      CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]
-                    );
+                    setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]);
                     const subscription = getValidSubscriptionForInstanceCreation(
                       byoaServiceOfferingsObj,
                       byoaSubscriptions,
@@ -617,17 +651,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={
-                    byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []
-                  }
+                  cloudProviders={byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore – CloudProviderRadio onChange signature is broader than the typed prop
                   onChange={(cp: string) => {
-                    setFieldValue(
-                      "accountConfigurationMethod",
-                      CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]
-                    );
+                    setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]);
                   }}
                   disabled={false}
                 />
@@ -736,12 +765,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
     const privateConnectivityFlag =
-      getResultParams(clickedInstance)?.enable_private_connectivity ??
-      getResultParams(clickedInstance)?.PrivateLink;
+      getResultParams(clickedInstance)?.enable_private_connectivity ?? getResultParams(clickedInstance)?.PrivateLink;
     const privateConnectivityEnabled =
-      typeof privateConnectivityFlag === "boolean"
-        ? privateConnectivityFlag
-        : enablePrivateConnectivity;
+      typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : enablePrivateConnectivity;
     const accountIdentityItems =
       selectedProvider === "gcp"
         ? [
@@ -790,8 +816,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       },
       {
         label: "Subscription Plan",
-        value:
-          serviceOfferingsObj[values.serviceId]?.[values.servicePlanId]?.productTierName || undefined,
+        value: serviceOfferingsObj[values.serviceId]?.[values.servicePlanId]?.productTierName || undefined,
       },
       {
         label: "Subscription",
@@ -807,19 +832,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       {
         label: "Private Connectivity",
         value: privateConnectivityEnabled ? (
-          <Chip
-            label="Enabled"
-            fontColor="#067647"
-            bgColor="#ECFDF3"
-            borderColor="#ABEFC6"
-          />
+          <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
         ) : (
-          <Chip
-            label="Disabled"
-            fontColor="#B54708"
-            bgColor="#FFFAEB"
-            borderColor="#FEDF89"
-          />
+          <Chip label="Disabled" fontColor="#B54708" bgColor="#FFFAEB" borderColor="#FEDF89" />
         ),
       },
     ];
@@ -832,38 +847,22 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         {
           label: "Creating new VPCs",
           value: vpcValues.enableNewVpcs ? (
-            <Chip
-              label="Enabled"
-              fontColor="#067647"
-              bgColor="#ECFDF3"
-              borderColor="#ABEFC6"
-            />
+            <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
           ) : undefined,
         },
         {
           label: "Enable existing VPCs",
           value: vpcValues.bringOwnVpcs ? (
-            <Chip
-              label="Enabled"
-              fontColor="#067647"
-              bgColor="#ECFDF3"
-              borderColor="#ABEFC6"
-            />
+            <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
           ) : undefined,
         },
         {
           label: "Regions",
-          value:
-            vpcValues.selectedRegions.length > 0
-              ? `${vpcValues.selectedRegions.length} selected`
-              : undefined,
+          value: vpcValues.selectedRegions.length > 0 ? `${vpcValues.selectedRegions.length} selected` : undefined,
         },
         {
           label: "Networks",
-          value:
-            vpcValues.selectedVpcIds.length > 0
-              ? `${vpcValues.selectedVpcIds.length} selected`
-              : undefined,
+          value: vpcValues.selectedVpcIds.length > 0 ? `${vpcValues.selectedVpcIds.length} selected` : undefined,
         },
       ];
       sections.push({ title: "VPC Configuration", items: vpcItems });
@@ -894,8 +893,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     }
   };
 
-  const nextLabel =
-    currentStep === 0 ? "Next" : currentStep === 1 ? "Next" : "Configure";
+  const nextLabel = currentStep === 0 ? "Next" : currentStep === 1 ? "Next" : "Configure";
   const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
 
   // ─── Loading ───────────────────────────────────────────────────────────────
@@ -945,7 +943,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             <ConfigureVPCsStep
               values={vpcValues}
               onChange={(patch) => setVpcValues((prev) => ({ ...prev, ...patch }))}
-              availableRegions={availableRegions.length > 0 ? availableRegions : undefined}
+              availableRegions={availableRegions}
               availableVpcs={availableVpcs}
               isLoadingVpcs={isLoadingVpcs}
               onResync={handleResyncVpcs}

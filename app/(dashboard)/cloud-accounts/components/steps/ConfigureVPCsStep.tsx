@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { Autocomplete, Box, Checkbox, Chip, Stack, TextField } from "@mui/material";
+import { useState } from "react";
 
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
@@ -35,25 +35,6 @@ type ConfigureVPCsStepProps = {
   lastSyncedAt?: string;
   cloudProvider?: string;
 };
-
-const AWS_REGIONS = [
-  "us-east-1",
-  "us-east-2",
-  "us-west-1",
-  "us-west-2",
-  "ca-central-1",
-  "eu-west-1",
-  "eu-west-2",
-  "eu-west-3",
-  "eu-central-1",
-  "eu-north-1",
-  "ap-southeast-1",
-  "ap-southeast-2",
-  "ap-northeast-1",
-  "ap-northeast-2",
-  "ap-south-1",
-  "sa-east-1",
-];
 
 const VPC_STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   Available: { bg: "#ECFDF3", text: "#067647", border: "#ABEFC6" },
@@ -103,13 +84,7 @@ const InstructionItem = ({
         </Box>
       </Stack>
       <Box sx={{ ml: "36px" }}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap="4px"
-          sx={{ cursor: "pointer" }}
-          onClick={() => setOpen(!open)}
-        >
+        <Stack direction="row" alignItems="center" gap="4px" sx={{ cursor: "pointer" }} onClick={() => setOpen(!open)}>
           <Text size="small" weight="medium" color="#6941C6">
             {expandLabel}
           </Text>
@@ -142,7 +117,7 @@ const InstructionItem = ({
 const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   values,
   onChange,
-  availableRegions = AWS_REGIONS,
+  availableRegions = [],
   availableVpcs = [],
   isLoadingVpcs = false,
   onResync,
@@ -335,12 +310,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                     </Stack>
                   </Stack>
 
-                  <Text
-                    size="xsmall"
-                    weight="regular"
-                    color="#535862"
-                    sx={{ px: "16px", py: "8px", display: "block" }}
-                  >
+                  <Text size="xsmall" weight="regular" color="#535862" sx={{ px: "16px", py: "8px", display: "block" }}>
                     Choose among the available VPCs in the selected regions
                   </Text>
 
@@ -386,8 +356,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                         ) : (
                           availableVpcs.map((vpc) => {
                             const isSelected = values.selectedVpcIds.includes(vpc.id);
-                            const statusColors =
-                              VPC_STATUS_COLORS[vpc.status] || VPC_STATUS_COLORS.Unknown;
+                            const statusColors = VPC_STATUS_COLORS[vpc.status] || VPC_STATUS_COLORS.Unknown;
                             return (
                               <tr
                                 key={vpc.id}
@@ -559,9 +528,8 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                 }}
               >
                 <Text size="small" weight="regular" color="#344054">
-                  Add the Kubernetes subnet tag to your subnets to enable internal load balancers.
-                  Tag key: <strong>kubernetes.io/role/internal-elb</strong>, Tag value:{" "}
-                  <strong>1</strong>
+                  Add the Kubernetes subnet tag to your subnets to enable internal load balancers. Tag key:{" "}
+                  <strong>kubernetes.io/role/internal-elb</strong>, Tag value: <strong>1</strong>
                 </Text>
               </Box>
             )}

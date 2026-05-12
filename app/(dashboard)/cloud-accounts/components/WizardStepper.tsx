@@ -37,8 +37,8 @@ const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
         sx={{
           position: "absolute",
           top: "12px",
-          left: "calc(32px + 44px)",
-          right: "calc(32px + 44px)",
+          left: "calc(32px + 48px)",
+          right: "calc(32px + 48px)",
           height: "2px",
           zIndex: 1,
         }}
