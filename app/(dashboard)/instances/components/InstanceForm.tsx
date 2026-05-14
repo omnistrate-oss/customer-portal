@@ -876,7 +876,7 @@ const InstanceForm = ({
           return {
             ...instance,
             label: resultParams?.cluster_name
-              ? `${resultParams.cluster_name} (${instance.id})`
+              ? `${instance.id} (Cluster Name - ${resultParams?.cluster_name})`
               : resultParams?.gcp_project_id
                 ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
                 : resultParams?.aws_account_id
