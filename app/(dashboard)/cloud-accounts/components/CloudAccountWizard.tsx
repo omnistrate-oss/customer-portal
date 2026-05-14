@@ -414,6 +414,44 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const isLoadingVpcs = cloudNativeNetworksQuery.isFetching || syncCloudNativeNetworksMutation.isPending;
 
+  // Auto-sync when Existing VPCs is enabled and list comes back empty
+  const hasSyncedOnEmpty = useRef(false);
+  useEffect(() => {
+    if (
+      currentStep === 2 &&
+      vpcValues.bringOwnVpcs &&
+      accountConfigId &&
+      isAccountConfigReady &&
+      !cloudNativeNetworksQuery.isFetching &&
+      cloudNativeNetworksQuery.isSuccess &&
+      allCloudNativeNetworks.length === 0 &&
+      !syncCloudNativeNetworksMutation.isPending &&
+      !hasSyncedOnEmpty.current
+    ) {
+      hasSyncedOnEmpty.current = true;
+      syncCloudNativeNetworksMutation.mutate({
+        params: { path: { id: accountConfigId } },
+        body: {
+          regions: vpcValues.selectedRegions.length > 0 ? vpcValues.selectedRegions : undefined,
+        },
+      });
+    }
+    // Reset flag when bringOwnVpcs is toggled off or account changes
+    if (!vpcValues.bringOwnVpcs || !accountConfigId) {
+      hasSyncedOnEmpty.current = false;
+    }
+  }, [
+    currentStep,
+    vpcValues.bringOwnVpcs,
+    vpcValues.selectedRegions,
+    accountConfigId,
+    isAccountConfigReady,
+    cloudNativeNetworksQuery.isFetching,
+    cloudNativeNetworksQuery.isSuccess,
+    allCloudNativeNetworks.length,
+    syncCloudNativeNetworksMutation,
+  ]);
+
   const handleResyncVpcs = () => {
     if (!accountConfigId) return;
 
