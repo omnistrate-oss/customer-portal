@@ -58,8 +58,8 @@ import {
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
 import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
-import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
+import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
 import { getOffboardReadiness } from "./utils";
@@ -423,7 +423,7 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const value = data.getValue();
             if (value === "NA") {
-              return <StatusChip status="N/A" />;
+              return <StatusChip status="N/A" category="unknown" />;
             }
             return <StatusChip label={value} category={value === "Yes" ? "success" : "failed"} />;
           },

@@ -10,11 +10,11 @@ import { useFormik } from "formik";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import Chip from "components/Chip/Chip";
 import { FormConfiguration } from "components/DynamicForm/types";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
+import StatusChip from "src/components/StatusChip/StatusChip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -272,7 +272,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           PrivateLink: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
-      } else if (values.cloudProvider === "private") {
+      } else if (values.cloudProvider === "byoc-onprem") {
         requestParams = {
           cloud_provider: values.cloudProvider,
           cluster_name: values.clusterName,
@@ -777,8 +777,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               type: "text",
               required: true,
               disabled: false,
-              isHidden: values.cloudProvider !== "private",
-              previewValue: cloudProvider === "private" ? values.clusterName : null,
+              isHidden: values.cloudProvider !== "byoc-onprem",
+              previewValue: cloudProvider === "byoc-onprem" ? values.clusterName : null,
             },
             {
               dataTestId: "cluster-description-input",
@@ -788,8 +788,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               type: "text",
               required: false,
               disabled: false,
-              isHidden: values.cloudProvider !== "private",
-              previewValue: cloudProvider === "private" ? values.clusterDescription : null,
+              isHidden: values.cloudProvider !== "byoc-onprem",
+              previewValue: cloudProvider === "byoc-onprem" ? values.clusterDescription : null,
             },
           ],
         },
@@ -844,7 +844,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   value: rp?.oci_domain_id || values.ociDomainId || undefined,
                 },
               ]
-            : selectedProvider === "private"
+            : selectedProvider === "byoc-onprem"
               ? [
                   {
                     label: "Kubernetes Cluster Name",
@@ -886,14 +886,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           : undefined,
       },
       ...accountIdentityItems,
-      ...(selectedProvider !== "private"
+      ...(selectedProvider !== "byoc-onprem"
         ? [
             {
               label: "Private Connectivity",
               value: privateConnectivityEnabled ? (
-                <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
+                <StatusChip label="Enabled" category="success" />
               ) : (
-                <Chip label="Disabled" fontColor="#B54708" bgColor="#FFFAEB" borderColor="#FEDF89" />
+                <StatusChip label="Disabled" category="unknown" />
               ),
             },
           ]
@@ -907,15 +907,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       const vpcItems = [
         {
           label: "Creating new VPCs",
-          value: vpcValues.enableNewVpcs ? (
-            <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-          ) : undefined,
+          value: vpcValues.enableNewVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
         },
         {
           label: "Enable existing VPCs",
-          value: vpcValues.bringOwnVpcs ? (
-            <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-          ) : undefined,
+          value: vpcValues.bringOwnVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
         },
         {
           label: "Regions",
@@ -941,9 +937,16 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     vpcValues,
   ]);
 
+  const isBYOCOnpremCloud = values.cloudProvider === "byoc-onprem";
+  const cancelLabel =
+    currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
+  const nextLabel =
+    currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
+  const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
+
   // ─── Navigation ────────────────────────────────────────────────────────────
   const handleNext = () => {
-    if (currentStep === 0) {
+    if (currentStep === 0 || isBYOCOnpremCloud) {
       // Submit form to create account
       formData.handleSubmit();
     } else if (currentStep === 1) {
@@ -954,10 +957,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     }
   };
 
-  const isPrivateCloud = values.cloudProvider === "private";
-  const nextLabel = currentStep === 0 ? (isPrivateCloud ? "Create" : "Next") : currentStep === 1 ? "Next" : "Configure";
-  const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
-
   // ─── Loading ───────────────────────────────────────────────────────────────
   if (isFetchingServiceOfferings) {
     return <LoadingSpinner />;
@@ -966,7 +965,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   return (
     <div data-testid="cloud-account-wizard">
       {/* Stepper – hidden for private/OnPrem cloud accounts */}
-      {!isPrivateCloud && (
+      {!isBYOCOnpremCloud && (
         <Box sx={{ mb: "32px" }}>
           <WizardStepper currentStep={currentStep} />
         </Box>
@@ -1023,6 +1022,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             sections={summarySections}
             onDoItLater={onClose}
             onNext={handleNext}
+            cancelLabel={cancelLabel}
             nextLabel={nextLabel}
             isNextLoading={isNextLoading}
             isNextDisabled={false}

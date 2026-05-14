@@ -21,6 +21,7 @@ type CloudAccountSummaryCardProps = {
   sections: SummarySection[];
   onDoItLater: () => void;
   onNext?: () => void;
+  cancelLabel?: string;
   nextLabel?: string;
   isNextDisabled?: boolean;
   isNextLoading?: boolean;
@@ -31,6 +32,7 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
   sections,
   onDoItLater,
   onNext,
+  cancelLabel = "Do it later",
   nextLabel = "Next",
   isNextDisabled = false,
   isNextLoading = false,
@@ -60,11 +62,8 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
             <Text size="small" weight="semibold" color={colors.purple600} sx={{ mb: "10px", display: "block" }}>
               {section.title}
             </Text>
-            <div
-              className="grid grid-cols-5 items-baseline"
-              style={{ gap: "8px 8px" }}
-            >
-              {section.items.map((item, iIdx) => (
+            <div className="grid grid-cols-5 items-baseline" style={{ gap: "8px 8px" }}>
+              {section.items.map((item, iIdx) =>
                 item.value !== null && item.value !== undefined ? (
                   <Fragment key={iIdx}>
                     <div className="col-span-2">
@@ -106,7 +105,7 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
                     </div>
                   </Fragment>
                 ) : null
-              ))}
+              )}
             </div>
           </div>
         ))}
@@ -127,7 +126,7 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
           onClick={onDoItLater}
           sx={{ height: "40px !important", padding: "10px 14px !important" }}
         >
-          Do it later
+          {cancelLabel}
         </Button>
         {!hideNext && (
           <Button
