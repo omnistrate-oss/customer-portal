@@ -29,7 +29,7 @@ export const cloudProviderLogoMap = {
   azure: <AzureIcon />,
   oci: <OCIIcon />,
   nebius: <NebiusIcon />,
-  "byoc-onprem": <OnPremIcon height="20px" width="auto" />,
+  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 //long logos map
@@ -40,7 +40,7 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo />,
   nebius: <NebiusLogo />,
   private: <PrivateLogo />,
-  "byoc-onprem": <OnPremIcon height="20px" width="auto" />,
+  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 export const cloudProviderLabelsShort = {
