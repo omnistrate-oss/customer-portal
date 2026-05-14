@@ -150,9 +150,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     if (!accountConfigId) return;
     syncCloudNativeNetworksMutation.mutate({
       params: { path: { id: accountConfigId } },
-      body: {
-        regions: vpcValues.selectedRegions.length > 0 ? vpcValues.selectedRegions : undefined,
-      },
+      body: {},
     });
   };
 
