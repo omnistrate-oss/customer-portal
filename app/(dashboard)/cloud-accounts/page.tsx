@@ -253,6 +253,7 @@ const CloudAccountsPage = () => {
             resultParams?.azure_subscription_id ||
             resultParams?.oci_tenancy_id ||
             resultParams?.nebius_tenant_id ||
+            resultParams?.cluster_name ||
             "-"
           );
         },
@@ -267,6 +268,7 @@ const CloudAccountsPage = () => {
               resultParams?.azure_subscription_id ||
               resultParams?.oci_tenancy_id ||
               resultParams?.nebius_tenant_id ||
+              resultParams?.cluster_name ||
               "-";
 
             return <GridCellExpand value={value} copyButton={value !== "-"} />;
@@ -423,7 +425,7 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const value = data.getValue();
             if (value === "NA") {
-              return <StatusChip status="N/A" category="unknown" />;
+              return "-";
             }
             return <StatusChip label={value} category={value === "Yes" ? "success" : "failed"} />;
           },
@@ -446,7 +448,7 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const value = data.getValue();
             if (value === "NA") {
-              return <StatusChip status="N/A" category="unknown" />;
+              return "-";
             }
             if (value === "Not configured") {
               return <StatusChip status="Not configured" category="unknown" />;
@@ -471,7 +473,7 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const value = data.getValue();
             if (value === "NA") {
-              return <StatusChip status="N/A" category="unknown" />;
+              return "-";
             }
             return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
           },
@@ -531,6 +533,7 @@ const CloudAccountsPage = () => {
             else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
             else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
             else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
+            else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
           },

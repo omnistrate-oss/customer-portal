@@ -239,7 +239,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
                 { label: "Tenancy OCID", value: resultParams?.oci_tenancy_id || undefined },
                 { label: "Domain OCID", value: resultParams?.oci_domain_id || undefined },
               ]
-            : cloudProvider === "private"
+            : cloudProvider === "byoc-onprem"
               ? [{ label: "Kubernetes Cluster Name", value: resultParams?.cluster_name || undefined }]
               : [{ label: "Account ID", value: resultParams?.aws_account_id || undefined }];
 
@@ -254,7 +254,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
           : undefined,
       },
       ...accountIdentityItems,
-      ...(cloudProvider !== "private"
+      ...(cloudProvider !== "byoc-onprem"
         ? [
             {
               label: "Private Connectivity",

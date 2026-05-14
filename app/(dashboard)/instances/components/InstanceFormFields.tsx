@@ -12,7 +12,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
-import { getResultParams } from "src/utils/instance";
 
 import { Link } from "../../../../src/components/NonDashboardComponents/FormElements/FormElements";
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
@@ -451,47 +450,11 @@ export const getStandardInformationFields = (
     });
   }
 
-  // Cluster Name dropdown – shown only for byoc-onprem cloud provider
-  const clusterNameParam = (resourceSchema?.inputParameters || []).find((p) => p.key === "cluster_name");
-  if (isBYOCOnprem && clusterNameParam) {
-    const byocOnpremAccounts = cloudAccountInstances
-      ?.filter((el) => el.subscriptionId === values.subscriptionId)
-      .filter((el) => {
-        const rp = getResultParams(el);
-        return rp?.cluster_name;
-      });
-
-    fields.push({
-      dataTestId: "cluster-name-select",
-      label: "Cluster Name",
-      subLabel: "Cluster identifier for the private Kubernetes target",
-      name: `requestParams.cluster_name`,
-      value: requestParams["cluster_name"] || "",
-      type: "select",
-      menuItems: byocOnpremAccounts.map((account) => {
-        const rp = getResultParams(account);
-        return {
-          label: rp?.cluster_name ? `${rp.cluster_name} (${account.id})` : account.id,
-          value: account.id,
-        };
-      }),
-      required: true,
-      disabled: formMode !== "create",
-      isLoading: isFetchingResourceInstanceIds,
-      emptyMenuText: "No private clusters available",
-      previewValue: (() => {
-        const selected = byocOnpremAccounts.find((a) => a.id === requestParams["cluster_name"]);
-        const rp = selected ? getResultParams(selected) : null;
-        return rp?.cluster_name || requestParams["cluster_name"];
-      })(),
-    });
-  }
-
   // Cloud Provider Account Config ID – moved here from Deployment Configuration
   const accountConfigParam = (resourceSchema?.inputParameters || []).find(
     (p) => p.key === "cloud_provider_account_config_id"
   );
-  if (accountConfigParam && !isBYOCOnprem) {
+  if (accountConfigParam) {
     fields.push({
       dataTestId: `${accountConfigParam.key}-select`,
       label: accountConfigParam.displayName || accountConfigParam.key,

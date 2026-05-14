@@ -356,6 +356,21 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     }
   );
 
+  const importCloudNativeNetworksMutation = $api.useMutation(
+    "post",
+    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/import",
+    {
+      onSuccess: () => {
+        snackbar.showSuccess("VPCs updated successfully");
+        cloudNativeNetworksQuery.refetch();
+        setVpcValues((prev) => ({ ...prev, selectedVpcIds: [] }));
+      },
+      onError: () => {
+        snackbar.showError("Failed to update VPCs. Please try again.");
+      },
+    }
+  );
+
   const allCloudNativeNetworks = useMemo(
     () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
     [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
@@ -384,17 +399,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         : allCloudNativeNetworks;
 
     return filteredNetworks.map((network) => {
-      const normalizedStatus =
-        network.status === "AVAILABLE" || network.status === "READY"
-          ? "Available"
-          : network.status === "FAILED"
-            ? "Unavailable"
-            : "Unknown";
-
       return {
         id: network.cloudNativeNetworkId || network.id,
         name: network.name || network.cloudNativeNetworkId || network.id,
-        status: normalizedStatus,
+        status: network.status || "PENDING",
         statusMessage: network.statusMessage,
         networkId: network.cloudNativeNetworkId,
       };
@@ -431,9 +439,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       hasSyncedOnEmpty.current = true;
       syncCloudNativeNetworksMutation.mutate({
         params: { path: { id: accountConfigId } },
-        body: {
-          regions: vpcValues.selectedRegions.length > 0 ? vpcValues.selectedRegions : undefined,
-        },
+        body: {},
       });
     }
     // Reset flag when bringOwnVpcs is toggled off or account changes
@@ -443,7 +449,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   }, [
     currentStep,
     vpcValues.bringOwnVpcs,
-    vpcValues.selectedRegions,
     accountConfigId,
     isAccountConfigReady,
     cloudNativeNetworksQuery.isFetching,
@@ -461,9 +466,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           id: accountConfigId,
         },
       },
-      body: {
-        regions: vpcValues.selectedRegions.length > 0 ? vpcValues.selectedRegions : undefined,
-      },
+      body: {},
     });
   };
 
@@ -980,7 +983,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
   const nextLabel =
     currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
-  const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
+  const isNextLoading =
+    (currentStep === 0 && createCloudAccountMutation.isPending) ||
+    (currentStep === 2 && importCloudNativeNetworksMutation.isPending);
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   const handleNext = () => {
@@ -990,7 +995,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     } else if (currentStep === 1) {
       setCurrentStep(2);
     } else {
-      // Step 3 – "Configure" button
+      // Step 3 – "Configure" button: close the wizard
       onClose();
     }
   };
@@ -1048,6 +1053,25 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               availableVpcs={availableVpcs}
               isLoadingVpcs={isLoadingVpcs}
               onResync={handleResyncVpcs}
+              onImport={(vpcIds) => {
+                if (!accountConfigId) return;
+                importCloudNativeNetworksMutation.mutate({
+                  params: { path: { id: accountConfigId } },
+                  body: {
+                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: true })),
+                  },
+                });
+              }}
+              onUnimport={(vpcIds) => {
+                if (!accountConfigId) return;
+                importCloudNativeNetworksMutation.mutate({
+                  params: { path: { id: accountConfigId } },
+                  body: {
+                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: false })),
+                  },
+                });
+              }}
+              isImporting={importCloudNativeNetworksMutation.isPending}
               lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
             />

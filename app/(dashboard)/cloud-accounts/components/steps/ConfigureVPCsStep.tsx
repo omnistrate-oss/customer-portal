@@ -34,12 +34,15 @@ type ConfigureVPCsStepProps = {
   availableVpcs?: VpcRecord[];
   isLoadingVpcs?: boolean;
   onResync?: () => void;
+  onImport?: (vpcIds: string[]) => void;
+  onUnimport?: (vpcIds: string[]) => void;
+  isImporting?: boolean;
   lastSyncedAt?: string;
   cloudProvider?: string;
 };
 
 // Map backend VPC status to StatusChip category
-const vpcStatusCategoryMap: Record<string, "success" | "inProgress" | "pending" | "failed" | "unknown"> = {
+const vpcStatusCategoryMap = {
   READY: "success",
   AVAILABLE: "success",
   IN_USE: "inProgress",
@@ -127,6 +130,9 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   availableVpcs = [],
   isLoadingVpcs = false,
   onResync,
+  onImport,
+  onUnimport,
+  isImporting = false,
   lastSyncedAt,
   cloudProvider = "aws",
 }) => {
@@ -463,6 +469,30 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                     </table>
                   </Box>
                 </Box>
+              )}
+
+              {/* Import / Unimport buttons */}
+              {values.selectedVpcIds.length > 0 && (
+                <Stack direction="row" gap="12px" sx={{ mt: "12px" }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => onImport?.(values.selectedVpcIds)}
+                    disabled={isImporting}
+                    data-testid="import-vpcs-button"
+                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
+                  >
+                    Import {values.selectedVpcIds.length} VPC{values.selectedVpcIds.length !== 1 ? "s" : ""}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => onUnimport?.(values.selectedVpcIds)}
+                    disabled={isImporting}
+                    data-testid="unimport-vpcs-button"
+                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
+                  >
+                    Unimport
+                  </Button>
+                </Stack>
               )}
             </Stack>
           )}
