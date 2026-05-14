@@ -27,6 +27,7 @@ type CloudAccountsActionMenuProps = {
   isSelectedInstanceReadyToOffboard: boolean;
   onConnectClick: () => void;
   onDisconnectClick: () => void;
+  onModifyVpcsClick: () => void;
   serviceModelType: string;
 };
 
@@ -40,6 +41,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
   onDeleteClick,
   onOffboardClick,
   isSelectedInstanceReadyToOffboard,
+  onModifyVpcsClick,
   // serviceModelType,
   // onConnectClick,
   // onDisconnectClick,
@@ -162,6 +164,28 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     //   });
     // }
 
+    // Modify VPCs action
+    const isModifyVpcsDisabled = !instance || isDeleting || isNebius || instance?.status === "FAILED";
+    const modifyVpcsDisabledMessage = !instance
+      ? "Please select a cloud account"
+      : instance?.status === "FAILED"
+        ? "Cannot modify VPCs for a failed cloud account"
+        : isNebius
+          ? "Not supported for Nebius cloud accounts"
+          : isDeleting
+            ? "Cloud account is being deleted"
+            : !isUpdateAllowedByRBAC
+              ? "Unauthorized to modify VPCs"
+              : "";
+
+    res.push({
+      dataTestId: "modify-vpcs-action-button",
+      label: "Modify VPCs",
+      isDisabled: isModifyVpcsDisabled || !isUpdateAllowedByRBAC,
+      onClick: onModifyVpcsClick,
+      disabledMessage: modifyVpcsDisabledMessage,
+    });
+
     if (deletionProtectionFeatureEnabled) {
       res.push({
         dataTestId: "enable-deletion-protection-button",
@@ -211,6 +235,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     isSelectedInstanceReadyToOffboard,
     onDeleteClick,
     onOffboardClick,
+    onModifyVpcsClick,
     // onConnectClick,
     // onDisconnectClick,
     // serviceModelType,

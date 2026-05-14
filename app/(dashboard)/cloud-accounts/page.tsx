@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -32,13 +39,6 @@ import {
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
 import { getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -48,8 +48,8 @@ import useInstancesDescribe from "../instances/hooks/useInstancesDescribe";
 import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWithDescribe";
 
 import CloudAccountForm from "./components/CloudAccountForm";
-import CloudAccountWizard from "./components/CloudAccountWizard";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
+import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
@@ -57,9 +57,11 @@ import {
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
+import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
+import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
-import useAccountConfig from "./hooks/useAccountConfig";
 import { DIALOG_DATA } from "./constants";
+import useAccountConfig from "./hooks/useAccountConfig";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -72,6 +74,8 @@ export type Overlay =
   | "connect-dialog"
   | "disconnect-dialog"
   | "offboard-dialog"
+  | "modify-vpcs"
+  | "private-cluster-setup"
   | "enable-deletion-protection-dialog"
   | "disable-deletion-protection-dialog";
 
@@ -352,6 +356,13 @@ const CloudAccountsPage = () => {
                     }}
                     onClick={() => {
                       setClickedInstance(data.row.original);
+                      const rp = getResultParams(data.row.original);
+                      if (rp?.cluster_name) {
+                        // Private/OnPrem – open the Kubernetes cluster setup dialog
+                        setIsOverlayOpen(true);
+                        setOverlayType("private-cluster-setup");
+                        return;
+                      }
                       setIsOverlayOpen(true);
                       setOverlayType("view-instructions-dialog");
                     }}
@@ -400,6 +411,75 @@ const CloudAccountsPage = () => {
           minWidth: 200,
         },
       }),
+      columnHelper.accessor(
+        (row) => {
+          const resultParams = getResultParams(row);
+          if (!resultParams?.cloud_provider_account_config_id) return "NA";
+          return resultParams?.allow_new_vpcs === false ? "No" : "Yes";
+        },
+        {
+          id: "allowNewVPCs",
+          header: "Allow New VPCs",
+          cell: (data) => {
+            const value = data.getValue();
+            if (value === "NA") {
+              return <StatusChip status="N/A" />;
+            }
+            return <StatusChip label={value} category={value === "Yes" ? "success" : "failed"} />;
+          },
+          meta: {
+            minWidth: 100,
+          },
+        }
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const resultParams = getResultParams(row);
+          if (!resultParams?.cloud_provider_account_config_id) return "NA";
+          const count = resultParams?.num_cloud_native_networks;
+          if (count === undefined || count === null) return "Not configured";
+          return String(count);
+        },
+        {
+          id: "existingVPCs",
+          header: "Existing VPCs",
+          cell: (data) => {
+            const value = data.getValue();
+            if (value === "NA") {
+              return <StatusChip status="N/A" category="unknown" />;
+            }
+            if (value === "Not configured") {
+              return <StatusChip status="Not configured" category="unknown" />;
+            }
+            const count = Number(value);
+            return <StatusChip label={`${count} ${count === 1 ? "VPC" : "VPCs"}`} category="info" />;
+          },
+          meta: {
+            minWidth: 140,
+          },
+        }
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const resultParams = getResultParams(row);
+          if (!resultParams?.cloud_provider_account_config_id) return "NA";
+          return resultParams?.network_type === "INTERNAL" ? "Enabled" : "Disabled";
+        },
+        {
+          id: "privateLink",
+          header: "Private link",
+          cell: (data) => {
+            const value = data.getValue();
+            if (value === "NA") {
+              return <StatusChip status="N/A" category="unknown" />;
+            }
+            return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
+          },
+          meta: {
+            minWidth: 120,
+          },
+        }
+      ),
       columnHelper.accessor(
         (row) => {
           const subscription = subscriptionsObj[row.subscriptionId as string];
@@ -886,6 +966,11 @@ const CloudAccountsPage = () => {
               setIsOverlayOpen(true);
               setOverlayType("disconnect-dialog");
             },
+            onModifyVpcsClick: () => {
+              setClickedInstance(selectedInstance);
+              setIsOverlayOpen(true);
+              setOverlayType("modify-vpcs");
+            },
             selectedInstance,
             refetchInstances: refetchInstances,
             isFetchingInstances: isFetchingInstances,
@@ -948,6 +1033,28 @@ const CloudAccountsPage = () => {
             setClickedInstance={setClickedInstance}
             instances={instances}
           />
+        }
+      />
+
+      {/* Modify VPCs flow */}
+      <FullScreenDrawer
+        title="Modify VPCs"
+        description="Update how deployments use VPCs in this cloud account — enable VPC creation, bring your own, and adjust which regions and VPCs are available."
+        open={isOverlayOpen && overlayType === "modify-vpcs"}
+        closeDrawer={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        RenderUI={
+          selectedInstance ? (
+            <ModifyVPCsDrawer
+              selectedInstance={selectedInstance}
+              onClose={() => {
+                setIsOverlayOpen(false);
+                setClickedInstance(undefined);
+              }}
+            />
+          ) : null
         }
       />
 
@@ -1031,6 +1138,18 @@ const CloudAccountsPage = () => {
         accountConfigMethod={getResultParams(clickedInstance)?.account_configuration_method}
         fetchClickedInstanceDetails={fetchClickedInstanceDetails}
         setClickedInstance={setClickedInstance}
+      />
+
+      <SetupPrivateClusterDialog
+        open={isOverlayOpen && overlayType === "private-cluster-setup"}
+        onClose={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        instanceId={(clickedInstance?.id as string) || ""}
+        clusterName={getResultParams(clickedInstance)?.cluster_name || ""}
+        offering={clickedInstanceOffering || undefined}
+        subscriptionId={clickedInstance?.subscriptionId as string}
       />
 
       <TextConfirmationDialog

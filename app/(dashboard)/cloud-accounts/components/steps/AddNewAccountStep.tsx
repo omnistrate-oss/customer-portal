@@ -7,6 +7,7 @@ import { ChangeEvent } from "react";
 
 import GridDynamicField from "components/DynamicForm/GridDynamicField";
 import { FormConfiguration } from "components/DynamicForm/types";
+import Tooltip from "components/Tooltip/Tooltip";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import Switch from "src/components/Switch/Switch";
@@ -42,6 +43,8 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
             ? "OCI private connectivity"
             : "provider-native private connectivity";
 
+  const isPrivateConnectivitySupported = cloudProvider === "aws";
+
   return (
     <div className="space-y-6">
       {sections.map((section, sIdx) => (
@@ -51,50 +54,64 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
               <GridDynamicField key={fIdx} field={field} formData={formData} />
             ))}
 
-            <Stack gap="14px">
-              <div className="grid grid-cols-6" style={{ gridTemplateColumns: "repeat(6, minmax(0, 1fr))" }}>
-                <div className="col-span-2" style={{ paddingRight: "32px" }}>
-                  <Text size="small" weight="semibold" color="#101828">
-                    Enable Private Connectivity
-                  </Text>
-                  <Stack gap="10px">
-                    <Text size="small" weight="regular" color="#535862">
-                      Route all control-plane and app-plane communication over provider-native private connectivity (
-                      {privateConnectivityType}).
+            {/* Private connectivity toggle – not applicable for private/OnPrem cloud */}
+            {cloudProvider !== "byoc-onprem" && (
+              <Stack gap="14px">
+                <div className="grid grid-cols-6" style={{ gridTemplateColumns: "repeat(6, minmax(0, 1fr))" }}>
+                  <div className="col-span-2" style={{ paddingRight: "32px" }}>
+                    <Text size="small" weight="semibold" color="#101828">
+                      Enable Private Connectivity
                     </Text>
-
-                    <Stack direction="row" alignItems="flex-start" gap="6px">
-                      <KeyboardArrowRightIcon sx={{ color: "#101828", fontSize: 22, mt: "-2px" }} />
-                      <Text size="small" weight="regular" color="#344054">
-                        No traffic traverses the public internet
+                    <Stack gap="10px">
+                      <Text size="small" weight="regular" color="#535862">
+                        Route all control-plane and app-plane communication over provider-native private connectivity (
+                        {privateConnectivityType}).
                       </Text>
-                    </Stack>
 
-                    <Stack direction="row" alignItems="flex-start" gap="8px">
-                      <Box sx={{ mt: "2px" }}>
-                        <AlertTriangle color="#F79009" />
-                      </Box>
-                      <Text size="small" weight="regular" color="#344054">
-                        Additional charges apply per endpoint-hour and GB processed
-                      </Text>
-                    </Stack>
-                  </Stack>
-                </div>
-                <div className="col-span-4">
-                  <Switch
-                    checked={enablePrivateConnectivity}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                      onTogglePrivateConnectivity(event.target.checked)
-                    }
-                    inputProps={{ "aria-label": "Enable Private Connectivity toggle" }}
-                  />
-                </div>
-              </div>
+                      <Stack direction="row" alignItems="flex-start" gap="6px">
+                        <KeyboardArrowRightIcon sx={{ color: "#101828", fontSize: 22, mt: "-2px" }} />
+                        <Text size="small" weight="regular" color="#344054">
+                          No traffic traverses the public internet
+                        </Text>
+                      </Stack>
 
-              <div className="grid grid-cols-6" style={{ gridTemplateColumns: "repeat(6, minmax(0, 1fr))" }}>
-                <div className="col-span-4" />
-              </div>
-            </Stack>
+                      <Stack direction="row" alignItems="flex-start" gap="8px">
+                        <Box sx={{ mt: "2px" }}>
+                          <AlertTriangle color="#F79009" />
+                        </Box>
+                        <Text size="small" weight="regular" color="#344054">
+                          Additional charges apply per endpoint-hour and GB processed
+                        </Text>
+                      </Stack>
+                    </Stack>
+                  </div>
+                  <div className="col-span-4">
+                    <Tooltip
+                      title={
+                        isPrivateConnectivitySupported ? "" : "Private connectivity is currently available for AWS only"
+                      }
+                      placement="top"
+                      arrow
+                    >
+                      <span>
+                        <Switch
+                          checked={isPrivateConnectivitySupported && enablePrivateConnectivity}
+                          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                            onTogglePrivateConnectivity(event.target.checked)
+                          }
+                          disabled={!isPrivateConnectivitySupported}
+                          inputProps={{ "aria-label": "Enable Private Connectivity toggle" }}
+                        />
+                      </span>
+                    </Tooltip>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-6" style={{ gridTemplateColumns: "repeat(6, minmax(0, 1fr))" }}>
+                  <div className="col-span-4" />
+                </div>
+              </Stack>
+            )}
           </div>
         </CardWithTitle>
       ))}

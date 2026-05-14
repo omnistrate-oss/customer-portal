@@ -36,6 +36,7 @@ import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../ut
 
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 import CustomLabelDescription from "./CustomLabelDescription";
+import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
@@ -77,6 +78,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
   const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
   const hasShownVpcRefreshError = useRef(false);
+  const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
+  const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -196,6 +199,15 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         } as ResourceInstance;
 
         setClickedInstance(instanceWithParams);
+
+        if (values.cloudProvider === "byoc-onprem") {
+          // Private/OnPrem accounts don't need Grant Access or Configure VPCs steps
+          snackbar.showSuccess("Cloud Account created successfully");
+          setCreatedInstanceId(instanceId as string);
+          setShowPrivateClusterDialog(true);
+          return;
+        }
+
         setCurrentStep(1); // Move to Grant Access step
         snackbar.showSuccess("Cloud Account created successfully");
       },
@@ -259,6 +271,13 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           enable_private_connectivity: enablePrivateConnectivity,
           PrivateLink: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
+        };
+      } else if (values.cloudProvider === "private") {
+        requestParams = {
+          cloud_provider: values.cloudProvider,
+          cluster_name: values.clusterName,
+          cluster_description: values.clusterDescription || undefined,
+          account_configuration_method: values.accountConfigurationMethod || "Terraform",
         };
       }
 
@@ -750,6 +769,28 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               isHidden: values.cloudProvider !== "oci",
               previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
             },
+            {
+              dataTestId: "cluster-name-input",
+              label: "Kubernetes Cluster Name",
+              subLabel: "Name of the Kubernetes cluster to connect",
+              name: "clusterName",
+              type: "text",
+              required: true,
+              disabled: false,
+              isHidden: values.cloudProvider !== "private",
+              previewValue: cloudProvider === "private" ? values.clusterName : null,
+            },
+            {
+              dataTestId: "cluster-description-input",
+              label: "Kubernetes Cluster Description",
+              subLabel: "Optional description for the Kubernetes cluster",
+              name: "clusterDescription",
+              type: "text",
+              required: false,
+              disabled: false,
+              isHidden: values.cloudProvider !== "private",
+              previewValue: cloudProvider === "private" ? values.clusterDescription : null,
+            },
           ],
         },
       ],
@@ -803,12 +844,27 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   value: rp?.oci_domain_id || values.ociDomainId || undefined,
                 },
               ]
-            : [
-                {
-                  label: "AWS Account ID",
-                  value: rp?.aws_account_id || values.awsAccountId || undefined,
-                },
-              ];
+            : selectedProvider === "private"
+              ? [
+                  {
+                    label: "Kubernetes Cluster Name",
+                    value: rp?.cluster_name || values.clusterName || undefined,
+                  },
+                  ...(rp?.cluster_description || values.clusterDescription
+                    ? [
+                        {
+                          label: "Cluster Description",
+                          value: rp?.cluster_description || values.clusterDescription || undefined,
+                        },
+                      ]
+                    : []),
+                ]
+              : [
+                  {
+                    label: "AWS Account ID",
+                    value: rp?.aws_account_id || values.awsAccountId || undefined,
+                  },
+                ];
 
     const standardItems = [
       {
@@ -830,14 +886,18 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           : undefined,
       },
       ...accountIdentityItems,
-      {
-        label: "Private Connectivity",
-        value: privateConnectivityEnabled ? (
-          <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-        ) : (
-          <Chip label="Disabled" fontColor="#B54708" bgColor="#FFFAEB" borderColor="#FEDF89" />
-        ),
-      },
+      ...(selectedProvider !== "private"
+        ? [
+            {
+              label: "Private Connectivity",
+              value: privateConnectivityEnabled ? (
+                <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
+              ) : (
+                <Chip label="Disabled" fontColor="#B54708" bgColor="#FFFAEB" borderColor="#FEDF89" />
+              ),
+            },
+          ]
+        : []),
     ];
 
     const sections: SummarySection[] = [{ title: "Standard Information", items: standardItems }];
@@ -894,7 +954,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     }
   };
 
-  const nextLabel = currentStep === 0 ? "Next" : currentStep === 1 ? "Next" : "Configure";
+  const isPrivateCloud = values.cloudProvider === "private";
+  const nextLabel = currentStep === 0 ? (isPrivateCloud ? "Create" : "Next") : currentStep === 1 ? "Next" : "Configure";
   const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
 
   // ─── Loading ───────────────────────────────────────────────────────────────
@@ -904,10 +965,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   return (
     <div data-testid="cloud-account-wizard">
-      {/* Stepper */}
-      <Box sx={{ mb: "32px" }}>
-        <WizardStepper currentStep={currentStep} />
-      </Box>
+      {/* Stepper – hidden for private/OnPrem cloud accounts */}
+      {!isPrivateCloud && (
+        <Box sx={{ mb: "32px" }}>
+          <WizardStepper currentStep={currentStep} />
+        </Box>
+      )}
 
       {/* Content grid: 5 cols left + 2 cols right */}
       <div className="grid grid-cols-7 items-start gap-8">
@@ -966,6 +1029,19 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           />
         </div>
       </div>
+
+      {/* Private Kubernetes cluster setup dialog – shown after creating a private cloud account */}
+      <SetupPrivateClusterDialog
+        open={showPrivateClusterDialog}
+        onClose={() => {
+          setShowPrivateClusterDialog(false);
+          onClose();
+        }}
+        instanceId={createdInstanceId}
+        clusterName={formData.values.clusterName}
+        offering={byoaServiceOfferingsObj[formData.values.serviceId]?.[formData.values.servicePlanId]}
+        subscriptionId={formData.values.subscriptionId}
+      />
     </div>
   );
 };

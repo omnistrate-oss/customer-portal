@@ -6,14 +6,16 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { Autocomplete, Box, Checkbox, Chip, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 
+import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
+import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
 export type VpcRecord = {
   id: string;
   name: string;
-  status: "Available" | "Unavailable" | "Unknown";
+  status: string;
   statusMessage?: string;
   networkId?: string;
 };
@@ -36,10 +38,14 @@ type ConfigureVPCsStepProps = {
   cloudProvider?: string;
 };
 
-const VPC_STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Available: { bg: "#ECFDF3", text: "#067647", border: "#ABEFC6" },
-  Unavailable: { bg: "#FEF3F2", text: "#B42318", border: "#FECDCA" },
-  Unknown: { bg: "#F9FAFB", text: "#344054", border: "#D0D5DD" },
+// Map backend VPC status to StatusChip category
+const vpcStatusCategoryMap: Record<string, "success" | "inProgress" | "pending" | "failed" | "unknown"> = {
+  READY: "success",
+  AVAILABLE: "success",
+  IN_USE: "inProgress",
+  VERIFYING: "inProgress",
+  PENDING: "pending",
+  FAILED: "failed",
 };
 
 const InstructionItem = ({
@@ -168,38 +174,73 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
       <CardWithTitle title="VPC Configuration">
         <Stack gap="16px">
           {/* Enable new VPCs */}
-          <Stack direction="row" alignItems="center" gap="12px">
-            <Checkbox
-              data-testid="enable-new-vpcs-checkbox"
-              checked={values.enableNewVpcs}
-              onChange={(e) => onChange({ enableNewVpcs: e.target.checked })}
-              sx={{
-                p: 0,
-                color: "#D0D5DD",
-                "&.Mui-checked": { color: "#7F56D9" },
-              }}
-            />
-            <Text size="small" weight="medium" color="#344054">
-              Enable creating new VPCs (enabled by default)
-            </Text>
-          </Stack>
+          {(() => {
+            const canUncheckNewVpcs = values.bringOwnVpcs;
+            return (
+              <Tooltip
+                title={!canUncheckNewVpcs && values.enableNewVpcs ? "At least one VPC option must be enabled" : ""}
+                placement="top"
+                arrow
+              >
+                <Stack direction="row" alignItems="center" gap="12px">
+                  <Checkbox
+                    data-testid="enable-new-vpcs-checkbox"
+                    checked={values.enableNewVpcs}
+                    onChange={(e) => {
+                      if (!e.target.checked && !values.bringOwnVpcs) return;
+                      onChange({ enableNewVpcs: e.target.checked });
+                    }}
+                    sx={{
+                      p: 0,
+                      color: "#D0D5DD",
+                      "&.Mui-checked": { color: "#7F56D9" },
+                    }}
+                  />
+                  <Text size="small" weight="medium" color="#344054">
+                    Enable creating new VPCs (enabled by default)
+                  </Text>
+                </Stack>
+              </Tooltip>
+            );
+          })()}
 
-          {/* Bring own VPCs */}
-          <Stack direction="row" alignItems="center" gap="12px">
-            <Checkbox
-              data-testid="bring-own-vpcs-checkbox"
-              checked={values.bringOwnVpcs}
-              onChange={(e) => onChange({ bringOwnVpcs: e.target.checked })}
-              sx={{
-                p: 0,
-                color: "#D0D5DD",
-                "&.Mui-checked": { color: "#7F56D9" },
-              }}
-            />
-            <Text size="small" weight="medium" color="#344054">
-              Bring your own VPCs for deployments
-            </Text>
-          </Stack>
+          {/* Bring own VPCs – only available for AWS and GCP */}
+          {(() => {
+            const isBringOwnVpcsSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+            return (
+              <Tooltip
+                title={
+                  !isBringOwnVpcsSupported
+                    ? "Bring your own VPCs is currently available for AWS and GCP only"
+                    : !values.enableNewVpcs && values.bringOwnVpcs
+                      ? "At least one VPC option must be enabled"
+                      : ""
+                }
+                placement="top"
+                arrow
+              >
+                <Stack direction="row" alignItems="center" gap="12px">
+                  <Checkbox
+                    data-testid="bring-own-vpcs-checkbox"
+                    checked={isBringOwnVpcsSupported && values.bringOwnVpcs}
+                    onChange={(e) => {
+                      if (!e.target.checked && !values.enableNewVpcs) return;
+                      onChange({ bringOwnVpcs: e.target.checked });
+                    }}
+                    disabled={!isBringOwnVpcsSupported}
+                    sx={{
+                      p: 0,
+                      color: "#D0D5DD",
+                      "&.Mui-checked": { color: "#7F56D9" },
+                    }}
+                  />
+                  <Text size="small" weight="medium" color={isBringOwnVpcsSupported ? "#344054" : "#98A2B3"}>
+                    Bring your own VPCs for deployments
+                  </Text>
+                </Stack>
+              </Tooltip>
+            );
+          })()}
 
           {/* Regions selector – shown when bringOwnVpcs is checked */}
           {values.bringOwnVpcs && (
@@ -356,7 +397,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                         ) : (
                           availableVpcs.map((vpc) => {
                             const isSelected = values.selectedVpcIds.includes(vpc.id);
-                            const statusColors = VPC_STATUS_COLORS[vpc.status] || VPC_STATUS_COLORS.Unknown;
                             return (
                               <tr
                                 key={vpc.id}
@@ -388,17 +428,9 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                                   </Text>
                                 </td>
                                 <td style={{ padding: "8px 16px" }}>
-                                  <Chip
-                                    label={vpc.status}
-                                    size="small"
-                                    sx={{
-                                      bgcolor: statusColors.bg,
-                                      color: statusColors.text,
-                                      border: `1px solid ${statusColors.border}`,
-                                      borderRadius: "16px",
-                                      fontWeight: 500,
-                                      fontSize: 12,
-                                    }}
+                                  <StatusChip
+                                    status={vpc.status}
+                                    category={vpcStatusCategoryMap[vpc.status] || "unknown"}
                                   />
                                 </td>
                                 <td style={{ padding: "8px 16px" }}>
