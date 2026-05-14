@@ -57,6 +57,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
     const isNebius = !!getResultParams(instance)?.nebius_tenant_id;
+    const isBYOCOnprem = getResultParams(instance)?.cloud_provider === "byoc-onprem";
 
     // const isDeploying = instance?.status === "DEPLOYING";
     // const isFailed = instance?.status === "FAILED";
@@ -165,18 +166,20 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     // }
 
     // Modify VPCs action
-    const isModifyVpcsDisabled = !instance || isDeleting || isNebius || instance?.status === "FAILED";
+    const isModifyVpcsDisabled = !instance || isDeleting || isNebius || isBYOCOnprem || instance?.status === "FAILED";
     const modifyVpcsDisabledMessage = !instance
       ? "Please select a cloud account"
       : instance?.status === "FAILED"
         ? "Cannot modify VPCs for a failed cloud account"
         : isNebius
           ? "Not supported for Nebius cloud accounts"
-          : isDeleting
-            ? "Cloud account is being deleted"
-            : !isUpdateAllowedByRBAC
-              ? "Unauthorized to modify VPCs"
-              : "";
+          : isBYOCOnprem
+            ? "Not supported for onprem cloud accounts"
+            : isDeleting
+              ? "Cloud account is being deleted"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to modify VPCs"
+                : "";
 
     res.push({
       dataTestId: "modify-vpcs-action-button",
