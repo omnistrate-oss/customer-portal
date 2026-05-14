@@ -187,7 +187,8 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
               Deploy this chart
             </Text>
             <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
-              Run the following Helm command in the target cluster to complete registration.
+              Run the command below from a terminal that has kubectl access to the Kubernetes cluster you want to
+              connect
             </Text>
             <Box
               sx={{
@@ -223,6 +224,26 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
                   iconProps={{ color: "#CECFD2", width: "20px", height: "20px" }}
                 />
               </Box>
+            </Box>
+            <Box
+              sx={{
+                mt: "16px",
+                p: "16px",
+                borderRadius: "8px",
+                border: "1px solid #E9EAEB",
+                background: "#F9FAFB",
+              }}
+            >
+              <Text size="small" weight="semibold" color="#414651" sx={{ mb: "12px" }}>
+                Installation Instructions
+              </Text>
+              <Stack gap="10px">
+                <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
+                  The command installs the dataplane agent and registers this cluster with your account configuration.
+                  After the installation completes successfully, registration can take up to 15 minutes to finish, and
+                  the lifecycle status will change to Ready
+                </Text>
+              </Stack>
             </Box>
           </Box>
         </Stack>
