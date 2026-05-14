@@ -123,11 +123,16 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
+          position: "fixed",
+          top: 0,
+          right: "50%",
+          transform: "translateX(50%)",
           borderRadius: "12px",
           padding: "24px",
           maxWidth: "620px",
           width: "100%",
           boxShadow: "0px 8px 8px -4px rgba(16, 24, 40, 0.03), 0px 20px 24px -4px rgba(16, 24, 40, 0.08)",
+          margin: 0,
         },
       }}
     >
