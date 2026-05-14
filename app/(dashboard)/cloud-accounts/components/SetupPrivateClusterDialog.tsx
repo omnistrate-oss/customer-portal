@@ -12,6 +12,8 @@ import { Text } from "src/components/Typography/Typography";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getResultParams } from "src/utils/instance";
 
+import { TextContainerToCopy } from "../../../../src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+
 type SetupPrivateClusterDialogProps = {
   open: boolean;
   onClose: () => void;
@@ -170,22 +172,8 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
             <Text size="small" weight="medium" color="#414651" sx={{ mb: "6px" }}>
               Kubernetes Cluster Name
             </Text>
-            <Stack
-              direction="row"
-              alignItems="center"
-              gap="8px"
-              sx={{
-                border: "1px solid #D0D5DD",
-                borderRadius: "8px",
-                padding: "10px 14px",
-                background: "#F9FAFB",
-              }}
-            >
-              <Text size="small" weight="medium" color="#101828" sx={{ flex: 1 }}>
-                {displayClusterName}
-              </Text>
-              <CopyToClipboardButton text={displayClusterName} />
-            </Stack>
+
+            <TextContainerToCopy text={displayClusterName} marginTop="6px" />
           </Box>
 
           {/* Deploy this chart */}
