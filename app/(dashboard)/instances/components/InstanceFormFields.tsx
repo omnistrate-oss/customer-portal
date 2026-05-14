@@ -191,7 +191,7 @@ export const getStandardInformationFields = (
         } else if (cloudProvider === "nebius") {
           setFieldValue("region", offering.nebiusRegions?.[0] || "");
         } else if (cloudProvider === "byoc-onprem") {
-          setFieldValue("byocOnpremRegions", offering?.byocOnpremRegions?.[0] || "on-prem");
+          setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
         }
 
         // Set default onprem_platform for on-prem offerings
@@ -249,7 +249,7 @@ export const getStandardInformationFields = (
             } else if (cloudProvider === "nebius") {
               setFieldValue("region", offering.nebiusRegions?.[0] || "");
             } else if (cloudProvider === "byoc-onprem") {
-              setFieldValue("byocOnpremRegions", offering?.byocOnpremRegions?.[0] || "on-prem");
+              setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
 
             // Set default onprem_platform for on-prem offerings
@@ -435,7 +435,7 @@ export const getStandardInformationFields = (
             } else if (newCloudProvider === "nebius") {
               setFieldValue("region", offering.nebiusRegions?.[0] || "");
             } else if (newCloudProvider === "byoc-onprem") {
-              setFieldValue("byocOnpremRegions", offering?.byocOnpremRegions?.[0] || "on-prem");
+              setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
           }}
           disabled={formMode !== "create"}
