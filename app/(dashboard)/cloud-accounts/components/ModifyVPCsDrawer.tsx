@@ -157,15 +157,15 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   // ─── Polling for account config readiness ─────────────────────────────────
   const fetchInstanceDetails = useCallback(async () => {
     const resource = offering?.resourceParameters?.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
-    if (!resource) return;
+    if (!resource || !offering) return;
     return getResourceInstanceDetails(
-      offering?.serviceProviderId,
-      offering?.serviceURLKey,
-      offering?.serviceAPIVersion,
-      offering?.serviceEnvironmentURLKey,
-      offering?.serviceModelURLKey,
-      offering?.productTierURLKey,
-      resource?.urlKey,
+      offering.serviceProviderId,
+      offering.serviceURLKey,
+      offering.serviceAPIVersion,
+      offering.serviceEnvironmentURLKey,
+      offering.serviceModelURLKey,
+      offering.productTierURLKey,
+      resource.urlKey,
       selectedInstance.id,
       selectedInstance.subscriptionId
     );
