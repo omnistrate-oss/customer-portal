@@ -1,4 +1,5 @@
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
+import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -13,7 +14,6 @@ import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
 
-import { Link } from "../../../../src/components/NonDashboardComponents/FormElements/FormElements";
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistributionsMultiSelect/KubernetesDistributionsMultiSelect";
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
@@ -52,11 +52,7 @@ export const getStandardInformationFields = (
   isFetchingCustomAvailabilityZones: boolean,
   instances: ResourceInstance[],
   versionSets: TierVersionSet[],
-  isFetchingVersionSets: boolean,
-  cloudAccountInstances: any[],
-  isFetchingResourceInstanceIds: boolean,
-  cloudNativeNetworks: any[],
-  isFetchingCloudNativeNetworks: boolean
+  isFetchingVersionSets: boolean
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -144,7 +140,6 @@ export const getStandardInformationFields = (
     }
     return options;
   })();
-  const isBYOCOnprem = cloudProvider === "byoc-onprem";
 
   const fields: Field[] = [
     {
@@ -190,8 +185,6 @@ export const getStandardInformationFields = (
           setFieldValue("region", offering.ociRegions?.[0] || "");
         } else if (cloudProvider === "nebius") {
           setFieldValue("region", offering.nebiusRegions?.[0] || "");
-        } else if (cloudProvider === "byoc-onprem") {
-          setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
         }
 
         // Set default onprem_platform for on-prem offerings
@@ -248,8 +241,6 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.ociRegions?.[0] || "");
             } else if (cloudProvider === "nebius") {
               setFieldValue("region", offering.nebiusRegions?.[0] || "");
-            } else if (cloudProvider === "byoc-onprem") {
-              setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
 
             // Set default onprem_platform for on-prem offerings
@@ -434,8 +425,6 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.ociRegions?.[0] || "");
             } else if (newCloudProvider === "nebius") {
               setFieldValue("region", offering.nebiusRegions?.[0] || "");
-            } else if (newCloudProvider === "byoc-onprem") {
-              setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
           }}
           disabled={formMode !== "create"}
@@ -450,40 +439,7 @@ export const getStandardInformationFields = (
     });
   }
 
-  // Cloud Provider Account Config ID – moved here from Deployment Configuration
-  const accountConfigParam = (resourceSchema?.inputParameters || []).find(
-    (p) => p.key === "cloud_provider_account_config_id"
-  );
-  if (accountConfigParam) {
-    fields.push({
-      dataTestId: `${accountConfigParam.key}-select`,
-      label: accountConfigParam.displayName || accountConfigParam.key,
-      subLabel: accountConfigParam.description,
-      name: `requestParams.${accountConfigParam.key}`,
-      description: (
-        <AccountConfigDescription
-          serviceId={values.serviceId}
-          servicePlanId={values.servicePlanId}
-          subscriptionId={values.subscriptionId}
-        />
-      ),
-      value: requestParams[accountConfigParam.key] || "",
-      type: "select",
-      menuItems: cloudAccountInstances
-        ?.filter((el) => el.subscriptionId === values.subscriptionId)
-        .map((config) => ({
-          label: config.label,
-          value: config.id,
-        })),
-      required: accountConfigParam.required,
-      disabled: formMode !== "create",
-      previewValue: cloudAccountInstances.find((config) => config.id === requestParams[accountConfigParam.key])?.label,
-      emptyMenuText: "No cloud accounts available",
-      isLoading: isFetchingResourceInstanceIds,
-    });
-  }
-
-  if (regionFieldExists && !isBYOCOnprem) {
+  if (regionFieldExists) {
     fields.push({
       dataTestId: "region-select",
       label: "Region",
@@ -499,60 +455,6 @@ export const getStandardInformationFields = (
       menuItems: getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider),
       disabled: formMode !== "create",
     });
-  }
-
-  if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
-    const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
-    const vpcType = requestParams._vpcType || "create_new";
-
-    fields.push({
-      label: "VPCs",
-      subLabel: "",
-      name: "requestParams._vpcType",
-      value: vpcType,
-      type: "radio",
-      required: true,
-      options: [
-        {
-          dataTestId: "create-new-vpc-radio",
-          label: "Create new VPC",
-          value: "create_new",
-        },
-        {
-          dataTestId: "choose-existing-vpc-radio",
-          label: isExistingVpcSupported
-            ? "Choose from Existing VPCs"
-            : "Choose from Existing VPCs (available for AWS / GCP)",
-          value: "choose_existing",
-          disabled: !isExistingVpcSupported,
-        },
-      ],
-      previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
-    });
-
-    if (vpcType === "choose_existing" && isExistingVpcSupported) {
-      const filteredNetworks = cloudNativeNetworks.filter((n) => !region || n.region === region);
-      fields.push({
-        dataTestId: "existing-vpc-select",
-        label: "Select VPC",
-        subLabel: "Choose an existing VPC from your cloud account",
-        name: `requestParams.vpc_id`,
-        value: requestParams["vpc_id"] || "",
-        type: "select",
-        menuItems: filteredNetworks.map((n) => ({
-          label: n.name || n.cloudNativeNetworkId || n.id,
-          value: n.cloudNativeNetworkId || n.id,
-        })),
-        required: true,
-        disabled: formMode !== "create",
-        isLoading: isFetchingCloudNativeNetworks,
-        emptyMenuText: region ? "No VPCs found in this region" : "Select a region first",
-        previewValue: (() => {
-          const selected = filteredNetworks.find((n) => (n.cloudNativeNetworkId || n.id) === requestParams["vpc_id"]);
-          return selected?.name || requestParams["vpc_id"];
-        })(),
-      });
-    }
   }
 
   if (isOnPrem) {
@@ -621,21 +523,20 @@ export const getStandardInformationFields = (
       previewValue: requestParams.custom_availability_zone,
     });
   }
-  if (!isBYOCOnprem) {
-    fields.push({
-      dataTestId: "instance-custom-tags",
-      label: "Tags",
-      subLabel: "Add tags to your instance",
-      name: "customTags",
-      customComponent: <CustomTagsField formData={formData} />,
-      previewValue: formData?.values.customTags?.filter((tag) => tag.key && tag.value)?.length
-        ? formData.values.customTags
-            ?.filter((tag) => tag.key && tag.value)
-            ?.map((tag) => `${tag.key}:${tag.value}`)
-            .join(", ")
-        : null,
-    });
-  }
+
+  fields.push({
+    dataTestId: "instance-custom-tags",
+    label: "Tags",
+    subLabel: "Add tags to your instance",
+    name: "customTags",
+    customComponent: <CustomTagsField formData={formData} />,
+    previewValue: formData?.values.customTags?.filter((tag) => tag.key && tag.value)?.length
+      ? formData.values.customTags
+          ?.filter((tag) => tag.key && tag.value)
+          ?.map((tag) => `${tag.key}:${tag.value}`)
+          .join(", ")
+      : null,
+  });
 
   return fields;
 };
@@ -654,8 +555,6 @@ export const getNetworkConfigurationFields = (
   const { serviceId, servicePlanId } = values;
   const offering = serviceOfferingsObj[serviceId]?.[servicePlanId];
   const isMultiTenancy = offering?.productTierType === productTierTypes.OMNISTRATE_MULTI_TENANCY;
-
-  const isBYOCOnprem = values.cloudProvider === "byoc-onprem";
 
   const inputParametersObj = (resourceSchema?.inputParameters || []).reduce((acc, param) => {
     acc[param.key] = param;
@@ -700,8 +599,7 @@ export const getNetworkConfigurationFields = (
     return "";
   };
 
-  const networkTypeFieldExists =
-    cloudProviderFieldExists && !isMultiTenancy && offering?.supportsPublicNetwork && !isBYOCOnprem;
+  const networkTypeFieldExists = cloudProviderFieldExists && !isMultiTenancy && offering?.supportsPublicNetwork;
 
   if (networkTypeFieldExists) {
     fields.push({
@@ -727,7 +625,7 @@ export const getNetworkConfigurationFields = (
     });
   }
 
-  if (customNetworkFieldExists && !isBYOCOnprem) {
+  if (customNetworkFieldExists) {
     fields.push({
       dataTestId: "custom-network-id-select",
       label: "Customer Network ID",
@@ -762,8 +660,7 @@ export const getNetworkConfigurationFields = (
     cloudProviderNativeNetworkIdFieldExists &&
     cloudProviderFieldExists &&
     values.cloudProvider !== "gcp" &&
-    values.cloudProvider !== "azure" &&
-    !isBYOCOnprem
+    values.cloudProvider !== "azure"
   ) {
     const param = inputParametersObj["cloud_provider_native_network_id"];
     fields.push({
@@ -849,7 +746,6 @@ export const getDeploymentConfigurationFields = (
 
   const filteredSchema = filterSchemaByCloudProvider(resourceSchema?.inputParameters || [], values.cloudProvider)
     .filter((param) => !REQUEST_PARAMS_FIELDS_TO_FILTER.includes(param.key))
-    .filter((param) => param.key !== "cloud_provider_account_config_id")
     .sort((a, b) => {
       if (a.tabIndex === undefined || b.tabIndex === undefined) {
         return 0;
