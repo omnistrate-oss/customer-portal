@@ -3,6 +3,7 @@ export const CLOUD_PROVIDER_DEFAULT_CREATION_METHOD = {
   gcp: "GCPScript",
   azure: "AzureScript",
   oci: "OCIScript",
+  "byoc-onprem": "OnPremScript",
 };
 
 export const getAccountConfigStatusBasedHeader = (status, cloud_provider_account_config_id = "") => {
