@@ -16,12 +16,20 @@ type Dashboard = {
   description: string;
 };
 
-type MetricsFeature = {
+export type MetricsFeature = {
   dashboards?: Record<string, Dashboard>;
   grafanaEndpoint?: string;
   instanceOrgId?: string;
   instanceOrgPassword?: string;
-  enabled?: boolean;
+};
+
+const isSafeDashboardUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
 };
 
 type GrafanaMetricsProps = {
@@ -130,10 +138,13 @@ const CredentialRow: FC<{
 const DashboardCard: FC<{
   dashboardKey: string;
   dashboard: Dashboard;
-}> = ({ dashboardKey, dashboard }) => {
+  instanceStatus?: string;
+}> = ({ dashboardKey, dashboard, instanceStatus }) => {
   const displayName = getDashboardDisplayName(dashboard.description);
   const typeLabel = getDashboardTypeLabel(dashboardKey);
   const typeColor = getDashboardTypeColor(dashboardKey);
+  const linkIsSafe = isSafeDashboardUrl(dashboard.dashboardLink);
+  const isRunning = instanceStatus === "RUNNING";
 
   return (
     <Box
@@ -160,19 +171,26 @@ const DashboardCard: FC<{
             sx={{ flexShrink: 0 }}
           />
         </Stack>
-        <Text size="small" weight="regular" color="#535862">
-          {dashboard.description}
-        </Text>
+        {dashboard.description !== displayName && (
+          <Text size="small" weight="regular" color="#535862">
+            {dashboard.description}
+          </Text>
+        )}
       </Box>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <StatusChip label="Available" category="success" dot />
+        {isRunning ? (
+          <StatusChip label="Available" category="success" dot />
+        ) : (
+          <StatusChip label="Unavailable" category="unknown" dot />
+        )}
         <Button
           variant="contained"
           size="xsmall"
-          href={dashboard.dashboardLink}
+          href={linkIsSafe ? dashboard.dashboardLink : undefined}
           target="_blank"
           rel="noopener noreferrer"
+          disabled={!linkIsSafe}
           endIcon={<ExternalArrowIcon color="#FFFFFF" />}
           sx={{
             backgroundColor: "#7F56D9",
@@ -254,7 +272,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
           }}
         >
           {dashboardEntries.map(([key, dashboard]) => (
-            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} />
+            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} instanceStatus={instanceStatus} />
           ))}
         </Box>
       </ContainerCard>
