@@ -300,6 +300,12 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
+        // Remove internal _vpcType field and clear native network id when creating new VPC
+        if (data.requestParams._vpcType === "create_new" || !data.requestParams._vpcType) {
+          delete data.requestParams.cloud_provider_native_network_id;
+        }
+        delete data.requestParams._vpcType;
+
         // Check for Required Fields
         const requiredFields = filterSchema
           .filter((field) => !["cloud_provider", "region"].includes(field.key))
@@ -852,7 +858,9 @@ const InstanceForm = ({
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
           const resultParams = getResultParams(instance);
-          if (resultParams?.gcp_project_id) {
+          if (resultParams?.cluster_name) {
+            return values.cloudProvider === "byoc-onprem";
+          } else if (resultParams?.gcp_project_id) {
             return values.cloudProvider === "gcp";
           } else if (resultParams?.aws_account_id) {
             return values.cloudProvider === "aws";
@@ -867,16 +875,40 @@ const InstanceForm = ({
           const resultParams = getResultParams(instance);
           return {
             ...instance,
-            label: resultParams?.gcp_project_id
-              ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
-              : resultParams?.aws_account_id
-                ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
-                : resultParams?.oci_tenancy_id
-                  ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
-                  : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
+            label: resultParams?.cluster_name
+              ? `${instance.id} (Cluster Name - ${resultParams?.cluster_name})`
+              : resultParams?.gcp_project_id
+                ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
+                : resultParams?.aws_account_id
+                  ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
+                  : resultParams?.oci_tenancy_id
+                    ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
+                    : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
     [instances, values.cloudProvider]
+  );
+
+  // Fetch cloud native networks (VPCs) for the selected account config
+  const selectedAccountConfigId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id;
+  const cloudNativeNetworksQuery = $api.useQuery(
+    "get",
+    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
+    {
+      params: {
+        path: { id: selectedAccountConfigId || "" },
+      },
+      headers: { "x-ignore-global-error": true },
+    },
+    {
+      enabled: Boolean(selectedAccountConfigId),
+      retry: 2,
+    }
+  );
+
+  const cloudNativeNetworks = useMemo(
+    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
+    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
   );
 
   const standardInformationFields = useMemo(() => {
@@ -895,7 +927,11 @@ const InstanceForm = ({
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances,
       customerVersionSets,
-      isFetchingVersionSets
+      isFetchingVersionSets,
+      cloudAccountInstances,
+      isFetchingResourceInstanceIds,
+      cloudNativeNetworks,
+      cloudNativeNetworksQuery.isFetching
     );
   }, [
     formMode,
@@ -906,6 +942,10 @@ const InstanceForm = ({
     nonCloudAccountInstances,
     customerVersionSets,
     isFetchingVersionSets,
+    cloudAccountInstances,
+    isFetchingResourceInstanceIds,
+    cloudNativeNetworks,
+    cloudNativeNetworksQuery.isFetching,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
