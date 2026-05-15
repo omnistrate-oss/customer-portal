@@ -221,7 +221,15 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
     );
   }
 
-  const dashboardEntries = Object.entries(dashboards);
+  const dashboardOrder = ["overview", "networking"];
+  const dashboardEntries = Object.entries(dashboards).sort(([a], [b]) => {
+    const aIndex = dashboardOrder.indexOf(a);
+    const bIndex = dashboardOrder.indexOf(b);
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    return a.localeCompare(b);
+  });
 
   return (
     <Stack gap="20px" mt="32px">
