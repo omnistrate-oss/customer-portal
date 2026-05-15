@@ -424,7 +424,9 @@ const CloudAccountsPage = () => {
           header: "Allow New VPCs",
           cell: (data) => {
             const value = data.getValue();
-            if (value === "NA") {
+            const resultParams = getResultParams(data.row.original);
+            const isBYOCOnprem = !!resultParams?.cluster_name;
+            if (value === "NA" || isBYOCOnprem) {
               return "-";
             }
             return <StatusChip label={value} category={value === "Yes" ? "success" : "failed"} />;
@@ -447,7 +449,9 @@ const CloudAccountsPage = () => {
           header: "Existing VPCs",
           cell: (data) => {
             const value = data.getValue();
-            if (value === "NA") {
+            const resultParams = getResultParams(data.row.original);
+            const isBYOCOnprem = !!resultParams?.cluster_name;
+            if (value === "NA" || isBYOCOnprem) {
               return "-";
             }
             if (value === "Not configured") {
