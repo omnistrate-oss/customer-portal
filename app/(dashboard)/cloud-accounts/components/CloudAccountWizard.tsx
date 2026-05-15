@@ -824,7 +824,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             {
               dataTestId: "cluster-description-input",
               label: "Kubernetes Cluster Description",
-              subLabel: "Optional description for the Kubernetes cluster",
+              subLabel: "Description for the Kubernetes cluster",
               name: "clusterDescription",
               type: "text",
               required: false,
