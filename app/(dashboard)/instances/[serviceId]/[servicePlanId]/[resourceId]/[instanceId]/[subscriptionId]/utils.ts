@@ -17,7 +17,6 @@ export const getTabs = ({
   isLogsEnabled,
   isActive,
   isResourceBYOA,
-  isCliManagedResource,
   resourceType,
   isBackup,
   isCustomDNS,
@@ -28,7 +27,7 @@ export const getTabs = ({
     connectivity: "Connectivity",
     nodes: "Nodes",
   };
-  if (isMetricsEnabled && !isResourceBYOA && !isCliManagedResource) tabs["metrics"] = "Metrics";
+  if (isMetricsEnabled && !isResourceBYOA) tabs["metrics"] = "Metrics";
   if (isLogsEnabled && !isResourceBYOA) tabs["logs"] = "Live Logs";
 
   if (!isActive || resourceType === RESOURCE_TYPES.Terraform) {
