@@ -890,17 +890,7 @@ const InstanceForm = ({
   );
 
   // Fetch cloud native networks (VPCs) for the selected account config
-  const selectedCloudAccountInstanceId = (values.requestParams as Record<string, any>)
-    ?.cloud_provider_account_config_id;
-  const selectedAccountConfigId = useMemo(() => {
-    if (!selectedCloudAccountInstanceId) return undefined;
-    const selectedCloudAccount = cloudAccountInstances.find((i) => i.id === selectedCloudAccountInstanceId);
-    if (!selectedCloudAccount) return undefined;
-    const rp = getResultParams(selectedCloudAccount);
-    return rp?.cloud_provider_account_config_id as string | undefined;
-  }, [selectedCloudAccountInstanceId, cloudAccountInstances]);
-
-  const isBYOCOnprem = values.cloudProvider === "byoc-onprem";
+  const selectedAccountConfigId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id;
   const cloudNativeNetworksQuery = $api.useQuery(
     "get",
     "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
@@ -911,7 +901,7 @@ const InstanceForm = ({
       headers: { "x-ignore-global-error": true },
     },
     {
-      enabled: Boolean(selectedAccountConfigId && !isBYOCOnprem),
+      enabled: Boolean(selectedAccountConfigId),
       retry: 2,
     }
   );
