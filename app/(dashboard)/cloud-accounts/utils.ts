@@ -1,8 +1,11 @@
+import { AccountConfig } from "src/types/account-config";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+
+import { EMPTY_NEBIUS_BINDING, NebiusBindingFormValue } from "./components/NebiusBindingsInput";
 
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
@@ -70,18 +73,40 @@ export const getValidSubscriptionForInstanceCreation = (
   return editorSubscriptions.find((sub) => isSubscriptionValid(sub, true));
 };
 
+/**
+ * Maps an account config's bindings (with masked metadata) into the form's
+ * binding shape. PEM is sourced from `keyFingerprint` as a placeholder until
+ * the backend ships the real field.
+ */
+export const mapNebiusBindingsToFormValue = (accountConfig?: AccountConfig): NebiusBindingFormValue[] => {
+  const bindings = (accountConfig as any)?.nebiusBindings ?? [];
+  return bindings.map((b: any) => ({
+    projectID: b.projectID ?? "",
+    serviceAccountID: b.serviceAccountID ?? "",
+    publicKeyID: b.publicKeyID ?? "",
+    // TODO: Update fieldname after we get from the API.
+    privateKeyPEM: b.keyFingerprint ?? "",
+    status: b.status,
+    region: b.region,
+    keyExpiresAt: b.keyExpiresAt,
+  }));
+};
+
+export type InitialFormValuesFromUrl = {
+  serviceId?: string;
+  servicePlanId?: string;
+  subscriptionId?: string;
+};
+
 export const getInitialValues = (
-  initialFormValues: {
-    serviceId: string;
-    servicePlanId: string;
-    subscriptionId: string;
-  },
+  initialFormValues: InitialFormValuesFromUrl | undefined,
   selectedInstance: ResourceInstance | undefined,
   byoaSubscriptions: Subscription[],
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   byoaServiceOfferings: ServiceOffering[],
-  instances: ResourceInstance[]
-) => {
+  instances: ResourceInstance[],
+  selectedAccountConfig?: AccountConfig
+): Record<string, any> => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
     const resultParams = getResultParams(selectedInstance);
@@ -112,6 +137,8 @@ export const getInitialValues = (
       ociTenancyId:
         resultParams?.oci_tenancy_id,
       ociDomainId: resultParams?.oci_domain_id,
+      nebiusTenantId: resultParams?.nebius_tenant_id ?? "",
+      nebiusBindings: mapNebiusBindingsToFormValue(selectedAccountConfig),
     };
   }
 
@@ -125,10 +152,10 @@ export const getInitialValues = (
     )
   );
 
-  if (isValidFormValues) {
+  if (isValidFormValues && initialFormValues) {
     const cloudProvider =
-      byoaServiceOfferingsObj[initialFormValues?.serviceId]?.[initialFormValues?.servicePlanId]?.cloudProviders?.[0] ||
-      "";
+      byoaServiceOfferingsObj[initialFormValues.serviceId ?? ""]?.[initialFormValues.servicePlanId ?? ""]
+        ?.cloudProviders?.[0] || "";
 
     return {
       ...initialFormValues,
@@ -167,6 +194,8 @@ export const getInitialValues = (
     gcpProjectNumber: "",
     ociTenancyId: "",
     ociDomainId: "",
+    nebiusTenantId: "",
+    nebiusBindings: [{ ...EMPTY_NEBIUS_BINDING }] as NebiusBindingFormValue[],
   };
 };
 

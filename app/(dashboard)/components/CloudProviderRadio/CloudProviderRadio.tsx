@@ -2,25 +2,9 @@
 
 import { cn } from "lib/utils";
 
+import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { colors } from "src/themeConfig";
 import { Text } from "components/Typography/Typography";
-
-import AwsLogo from "../../../../src/components/Logos/AwsLogo";
-import AzureLogo from "../../../../src/components/Logos/AzureLogo";
-import GcpLogo from "../../../../src/components/Logos/GcpLogo";
-import NebiusLogo from "../../../../src/components/Logos/NebiusLogo";
-import OciLogo from "../../../../src/components/Logos/OciLogo";
-
-import PrivateIcon from "./PrivateIcon";
-
-export const cloudProviderLongLogoMap = {
-  aws: <AwsLogo style={{ height: "24px", width: "auto" }} />,
-  gcp: <GcpLogo style={{ height: "24px", width: "auto" }} />,
-  azure: <AzureLogo style={{ height: "24px", width: "auto" }} />,
-  oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
-  nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
-  private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
-};
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
   return (
@@ -76,11 +60,10 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
     );
   }
 
+  const columns = Math.min(validCloudProviders.length, 4);
+
   return (
-    <div
-      className="grid gap-4"
-      style={{ gridTemplateColumns: `repeat(${validCloudProviders.length}, minmax(0, 1fr))` }}
-    >
+    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
       {validCloudProviders.map((cloudProvider, index) => {
         return (
           <CloudProviderCard

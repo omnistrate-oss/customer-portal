@@ -189,6 +189,12 @@ const CustomNetworksPage = () => {
         title: "Domain ID",
         value: networkInstance.ociDomainID,
       });
+    } else if ((networkInstance as any).nebiusTenantID) {
+      res.push({
+        title: "Tenant ID",
+        value: (networkInstance as any).nebiusTenantID,
+        icon: cloudProviderLogoMap.nebius,
+      });
     }
 
     if (networkInstance.cloudProviderNativeNetworkId) {

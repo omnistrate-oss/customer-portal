@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLongLogoMap, sortCloudProviders } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -29,16 +29,85 @@ import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
 import CustomLabelDescription from "./CustomLabelDescription";
+import {
+  AddBindingButton,
+  EMPTY_NEBIUS_BINDING,
+  formatKeyExpiry,
+  isExistingBinding,
+  NebiusBindingFormValue,
+  RemoveBindingButton,
+} from "./NebiusBindingsInput";
+
+// Per-provider account-id field definitions for the form (only one provider's
+// fields are visible at a time, gated by isHidden).
+const PROVIDER_ID_FIELDS: Array<{
+  provider: "aws" | "gcp" | "azure" | "oci" | "nebius";
+  dataTestId: string;
+  label: string;
+  subLabel: string;
+  name: "awsAccountId" | "gcpProjectId" | "gcpProjectNumber" | "azureSubscriptionId" | "azureTenantId" | "ociTenancyId" | "ociDomainId" | "nebiusTenantId";
+  descriptionVariant?:
+    | "aws"
+    | "gcpProjectId"
+    | "gcpProjectNumber"
+    | "azureSubscriptionId"
+    | "azureTenantId"
+    | "ociTenancyId"
+    | "ociDomainId";
+}> = [
+  { provider: "aws", dataTestId: "aws-account-id-input", label: "AWS Account ID", subLabel: "AWS Account ID to use for the account", name: "awsAccountId", descriptionVariant: "aws" },
+  { provider: "gcp", dataTestId: "gcp-project-id-input", label: "GCP Project ID", subLabel: "GCP Project ID to use for the account", name: "gcpProjectId", descriptionVariant: "gcpProjectId" },
+  { provider: "gcp", dataTestId: "gcp-project-number-input", label: "GCP Project Number", subLabel: "GCP Project Number to use for the account", name: "gcpProjectNumber", descriptionVariant: "gcpProjectNumber" },
+  { provider: "azure", dataTestId: "azure-subscription-id-input", label: "Azure Subscription ID", subLabel: "Azure Subscription ID to use for the account", name: "azureSubscriptionId", descriptionVariant: "azureSubscriptionId" },
+  { provider: "azure", dataTestId: "azure-tenant-id-input", label: "Azure Tenant ID", subLabel: "Azure Tenant ID to use for the account", name: "azureTenantId", descriptionVariant: "azureTenantId" },
+  { provider: "oci", dataTestId: "oci-tenancy-id-input", label: "Tenancy OCID", subLabel: "OCI Tenancy OCID to use for the account", name: "ociTenancyId", descriptionVariant: "ociTenancyId" },
+  { provider: "oci", dataTestId: "oci-domain-id-input", label: "Domain OCID", subLabel: "OCI Domain OCID to use for the account", name: "ociDomainId", descriptionVariant: "ociDomainId" },
+  { provider: "nebius", dataTestId: "nebius-tenant-id-input", label: "Nebius Tenant ID", subLabel: "Nebius Tenant ID to use for the account", name: "nebiusTenantId" },
+];
+
+// Maps form values to the provider-specific snake_case fields used by the API.
+const buildProviderResultParams = (values: any, orgId?: string): Record<string, any> => {
+  switch (values.cloudProvider) {
+    case "aws":
+      return {
+        aws_account_id: values.awsAccountId,
+        aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
+      };
+    case "gcp":
+      return {
+        gcp_project_id: values.gcpProjectId,
+        gcp_project_number: values.gcpProjectNumber,
+        gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, orgId),
+      };
+    case "azure":
+      return {
+        azure_subscription_id: values.azureSubscriptionId,
+        azure_tenant_id: values.azureTenantId,
+      };
+    case "oci":
+      return {
+        oci_tenancy_id: values.ociTenancyId,
+        oci_domain_id: values.ociDomainId,
+      };
+    case "nebius":
+      return { nebius_tenant_id: values.nebiusTenantId };
+    default:
+      return {};
+  }
+};
 
 const CloudAccountForm = ({
   initialFormValues, // These are from URL Params
   onClose,
   formMode,
   selectedInstance,
+  selectedAccountConfig,
   setIsAccountCreation,
   setOverlayType,
   setClickedInstance,
   instances,
+  refetchInstances,
+  refetchAccountConfigs,
 }) => {
   const queryClient = useQueryClient();
   const environmentType = useEnvironmentType();
@@ -67,12 +136,9 @@ const CloudAccountForm = ({
   });
 
   const byoaServiceOfferings = useMemo(() => {
-    return serviceOfferings
-      .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
-      .map((offering) => ({
-        ...offering,
-        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
-      }));
+    return serviceOfferings.filter(
+      (offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT"
+    );
   }, [serviceOfferings]);
 
   const byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>> = useMemo(() => {
@@ -129,30 +195,12 @@ const CloudAccountForm = ({
             },
           ],
           (oldData: any) => {
-            const instanceResultParams = getResultParams(resourceInstance);
             const resultParams: Record<string, any> = {
-              ...instanceResultParams,
+              ...getResultParams(resourceInstance),
               cloud_provider: values.cloudProvider,
               account_configuration_method: values.accountConfigurationMethod,
+              ...buildProviderResultParams(values, selectUser?.orgId?.toLowerCase()),
             };
-
-            if (values.cloudProvider === "aws") {
-              resultParams.aws_account_id = values.awsAccountId;
-              resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
-            } else if (values.cloudProvider === "gcp") {
-              resultParams.gcp_project_id = values.gcpProjectId;
-              resultParams.gcp_project_number = values.gcpProjectNumber;
-              resultParams.gcp_service_account_email = getGcpServiceEmail(
-                values.gcpProjectId,
-                selectUser?.orgId.toLowerCase()
-              );
-            } else if (values.cloudProvider === "azure") {
-              resultParams.azure_subscription_id = values.azureSubscriptionId;
-              resultParams.azure_tenant_id = values.azureTenantId;
-            } else if (values.cloudProvider === "oci") {
-              resultParams.oci_tenancy_id = values.ociTenancyId;
-              resultParams.oci_domain_id = values.ociDomainId;
-            }
 
             return {
               resourceInstances: [
@@ -167,40 +215,46 @@ const CloudAccountForm = ({
           }
         );
 
-        setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
           result_params: {
             ...getResultParams(resourceInstance),
             account_configuration_method: values.accountConfigurationMethod,
             cloud_provider: values.cloudProvider,
-            ...(values.cloudProvider === CLOUD_PROVIDERS.aws
-              ? {
-                  aws_account_id: values.awsAccountId,
-                }
-              : values.cloudProvider === CLOUD_PROVIDERS.gcp
-                ? {
-                    gcp_project_id: values.gcpProjectId,
-                    gcp_project_number: values.gcpProjectNumber,
-                  }
-                : values.cloudProvider === CLOUD_PROVIDERS.azure
-                  ? {
-                      azure_subscription_id: values.azureSubscriptionId,
-                      azure_tenant_id: values.azureTenantId,
-                    }
-                  : values.cloudProvider === CLOUD_PROVIDERS.oci
-                    ? {
-                        oci_tenancy_id: values.ociTenancyId,
-                        oci_domain_id: values.ociDomainId,
-                      }
-                    : {}),
+            ...buildProviderResultParams(values, selectUser?.orgId?.toLowerCase()),
           },
         });
-        setOverlayType("view-instructions-dialog");
+
+        // Nebius has no post-create instructions to display.
+        if (values.cloudProvider === "nebius") {
+          onClose();
+        } else {
+          setIsAccountCreation(true);
+          setOverlayType("view-instructions-dialog");
+        }
         snackbar.showSuccess("Cloud Account created successfully");
       },
     }
   );
+
+  // Strip read-only metadata before sending to create/update.
+  const sanitizeNebiusBindings = (bindings: NebiusBindingFormValue[]) =>
+    bindings.map((b) => ({
+      projectID: b.projectID,
+      serviceAccountID: b.serviceAccountID,
+      publicKeyID: b.publicKeyID,
+      privateKeyPEM: b.privateKeyPEM,
+    }));
+
+  // Bindings live on the AccountConfig — modify via PUT /accountconfig/{id}.
+  const updateAccountConfigMutation = $api.useMutation("put", "/2022-09-01-00/accountconfig/{id}", {
+    onSuccess: () => {
+      snackbar.showSuccess("Cloud Account updated successfully");
+      refetchInstances?.();
+      refetchAccountConfigs?.();
+      onClose();
+    },
+  });
 
   const formData = useFormik({
     initialValues: getInitialValues(
@@ -209,7 +263,8 @@ const CloudAccountForm = ({
       byoaSubscriptions,
       byoaServiceOfferingsObj,
       byoaServiceOfferings,
-      allInstances
+      allInstances,
+      selectedAccountConfig
     ),
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
@@ -217,44 +272,35 @@ const CloudAccountForm = ({
       const { serviceId, servicePlanId } = values;
       const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
 
-      let requestParams: Record<string, any> = {};
-      if (values.cloudProvider === "aws") {
-        requestParams = {
-          cloud_provider: values.cloudProvider,
-          aws_account_id: values.awsAccountId,
-          account_configuration_method: values.accountConfigurationMethod,
-          aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
-        };
-      } else if (values.cloudProvider === "gcp") {
-        requestParams = {
-          cloud_provider: values.cloudProvider,
-          gcp_project_id: values.gcpProjectId,
-          gcp_project_number: values.gcpProjectNumber,
-          account_configuration_method: values.accountConfigurationMethod,
-          gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
-        };
-      } else if (values.cloudProvider === "azure") {
-        requestParams = {
-          cloud_provider: values.cloudProvider,
-          azure_subscription_id: values.azureSubscriptionId,
-          azure_tenant_id: values.azureTenantId,
-          account_configuration_method: values.accountConfigurationMethod,
-        };
-      } else if (values.cloudProvider === "oci") {
-        requestParams = {
-          cloud_provider: values.cloudProvider,
-          oci_tenancy_id: values.ociTenancyId,
-          oci_domain_id: values.ociDomainId,
-          account_configuration_method: values.accountConfigurationMethod,
-        };
-      }
-
       const resource = offering?.resourceParameters.find((resource) =>
         resource.resourceId.startsWith("r-injectedaccountconfig")
       );
 
       if (!resource) {
         return snackbar.showError("BYOA Resource not found");
+      }
+
+      // Modify is Nebius-only; bindings live on the AccountConfig.
+      if (formMode === "modify") {
+        if (values.cloudProvider !== "nebius") return;
+        if (!selectedAccountConfig?.id) {
+          return snackbar.showError("Cloud account is still loading. Try again in a moment.");
+        }
+        updateAccountConfigMutation.mutate({
+          params: { path: { id: selectedAccountConfig.id } },
+          body: { nebiusBindings: sanitizeNebiusBindings(values.nebiusBindings ?? []) } as any,
+        });
+        return;
+      }
+
+      const requestParams: Record<string, any> = {
+        cloud_provider: values.cloudProvider,
+        ...buildProviderResultParams(values, selectUser?.orgId?.toLowerCase()),
+      };
+      if (values.cloudProvider === "nebius") {
+        requestParams.nebius_bindings = sanitizeNebiusBindings(values.nebiusBindings ?? []);
+      } else {
+        requestParams.account_configuration_method = values.accountConfigurationMethod;
       }
 
       createCloudAccountMutation.mutate({
@@ -294,6 +340,7 @@ const CloudAccountForm = ({
       footer: {
         submitButton: {
           create: "Create",
+          modify: "Save",
         },
       },
       sections: [
@@ -423,7 +470,9 @@ const CloudAccountForm = ({
               isHidden: !serviceId || !servicePlanId,
               customComponent: (
                 <CloudProviderRadio
-                  cloudProviders={byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []}
+                  cloudProviders={sortCloudProviders(
+                    byoaServiceOfferingsObj[serviceId]?.[servicePlanId]?.cloudProviders || []
+                  )}
                   name="cloudProvider"
                   formData={formData}
                   // @ts-ignore
@@ -440,92 +489,118 @@ const CloudAccountForm = ({
                     return cloudProviderLongLogoMap[cloudProvider];
                   },
             },
-            {
-              dataTestId: "aws-account-id-input",
-              label: "AWS Account ID",
-              subLabel: "AWS Account ID to use for the account",
-              description: <CustomLabelDescription variant="aws" />,
-              name: "awsAccountId",
-              type: "text",
+            ...PROVIDER_ID_FIELDS.map((def) => ({
+              dataTestId: def.dataTestId,
+              label: def.label,
+              subLabel: def.subLabel,
+              description: def.descriptionVariant ? <CustomLabelDescription variant={def.descriptionVariant} /> : undefined,
+              name: def.name,
+              type: "text" as const,
               required: true,
+              // Identity fields are locked once the account is created.
               disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "aws",
-              previewValue: cloudProvider === "aws" ? values.awsAccountId : null,
-            },
-            {
-              dataTestId: "gcp-project-id-input",
-              label: "GCP Project ID",
-              subLabel: "GCP Project ID to use for the account",
-              description: <CustomLabelDescription variant="gcpProjectId" />,
-              name: "gcpProjectId",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "gcp",
-              previewValue: cloudProvider === "gcp" ? values.gcpProjectId : null,
-            },
-            {
-              dataTestId: "gcp-project-number-input",
-              label: "GCP Project Number",
-              subLabel: "GCP Project Number to use for the account",
-              description: <CustomLabelDescription variant="gcpProjectNumber" />,
-              name: "gcpProjectNumber",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "gcp",
-              previewValue: cloudProvider === "gcp" ? values.gcpProjectNumber : null,
-            },
-            {
-              dataTestId: "azure-subscription-id-input",
-              label: "Azure Subscription ID",
-              subLabel: "Azure Subscription ID to use for the account",
-              description: <CustomLabelDescription variant="azureSubscriptionId" />,
-              name: "azureSubscriptionId",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "azure",
-              previewValue: cloudProvider === "azure" ? values.azureSubscriptionId : null,
-            },
-            {
-              dataTestId: "azure-tenant-id-input",
-              label: "Azure Tenant ID",
-              subLabel: "Azure Tenant ID to use for the account",
-              description: <CustomLabelDescription variant="azureTenantId" />,
-              name: "azureTenantId",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "azure",
-              previewValue: cloudProvider === "azure" ? values.azureTenantId : null,
-            },
-            {
-              dataTestId: "oci-tenancy-id-input",
-              label: "Tenancy OCID",
-              subLabel: "OCI Tenancy OCID to use for the account",
-              description: <CustomLabelDescription variant="ociTenancyId" />,
-              name: "ociTenancyId",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "oci",
-              previewValue: cloudProvider === "oci" ? values.ociTenancyId : null,
-            },
-            {
-              dataTestId: "oci-domain-id-input",
-              label: "Domain OCID",
-              subLabel: "OCI Domain OCID to use for the account",
-              description: <CustomLabelDescription variant="ociDomainId" />,
-              name: "ociDomainId",
-              type: "text",
-              required: true,
-              disabled: formMode !== "create",
-              isHidden: values.cloudProvider !== "oci",
-              previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
-            },
+              isHidden: values.cloudProvider !== def.provider,
+              previewValue: cloudProvider === def.provider ? values[def.name] : null,
+            })),
           ],
         },
+        // One section per Nebius binding.
+        ...(values.cloudProvider === "nebius"
+          ? ((values.nebiusBindings ?? []) as NebiusBindingFormValue[]).map((binding, index) => {
+              const path = `nebiusBindings[${index}]`;
+              const existing = isExistingBinding(binding);
+              const isFormDisabled = formMode === "view";
+
+              return {
+                title: `Binding ${index + 1}`,
+                actionButton: (
+                  <RemoveBindingButton
+                    index={index}
+                    disabled={isFormDisabled}
+                    onRemove={() => {
+                      const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+                      setFieldValue(
+                        "nebiusBindings",
+                        current.filter((_, i) => i !== index)
+                      );
+                    }}
+                  />
+                ),
+                fields: [
+                  {
+                    label: "Project ID",
+                    subLabel: "The Nebius project that will be used for this binding",
+                    name: `${path}.projectID`,
+                    type: "text",
+                    // Project ID is the binding's identity — locked once created.
+                    required: !existing,
+                    disabled: existing || isFormDisabled,
+                    value: binding.projectID,
+                    previewValue: binding.projectID || null,
+                  },
+                  // Region is server-derived; show read-only once the binding exists.
+                  ...(existing
+                    ? [
+                        {
+                          label: "Region",
+                          subLabel: "The Nebius deployment region enabled by this binding",
+                          name: `${path}._region`,
+                          type: "text",
+                          disabled: true,
+                          value: binding.region ?? "",
+                          previewValue: null,
+                        },
+                      ]
+                    : []),
+                  {
+                    label: "Service Account ID",
+                    subLabel:
+                      "Service account with project-level permissions to create and manage required infrastructure",
+                    name: `${path}.serviceAccountID`,
+                    type: "text",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.serviceAccountID,
+                    previewValue: binding.serviceAccountID || null,
+                  },
+                  {
+                    label: "Public Key ID",
+                    subLabel: "The ID of the authorized public key associated with this service account",
+                    name: `${path}.publicKeyID`,
+                    type: "text",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.publicKeyID,
+                    previewValue: binding.publicKeyID || null,
+                  },
+                  {
+                    label: "Private Key PEM",
+                    subLabel: "The private key PEM that matches this binding's Public Key ID",
+                    name: `${path}.privateKeyPEM`,
+                    type: "password",
+                    required: true,
+                    disabled: isFormDisabled,
+                    value: binding.privateKeyPEM,
+                    previewValue: binding.privateKeyPEM ? "********" : null,
+                  },
+                  ...(existing
+                    ? [
+                        {
+                          label: "Private Key Expiry",
+                          subLabel:
+                            "The expiration date of the private key or authorized key used for this binding",
+                          name: `${path}._keyExpiresAt`,
+                          type: "text",
+                          disabled: true,
+                          value: formatKeyExpiry(binding.keyExpiresAt),
+                          previewValue: null,
+                        },
+                      ]
+                    : []),
+                ],
+              };
+            })
+          : []),
       ],
     };
   }, [formMode, subscriptions, byoaServiceOfferings, values]);
@@ -538,10 +613,21 @@ const CloudAccountForm = ({
     <GridDynamicForm
       formConfiguration={formConfiguration}
       formData={formData}
-      formMode="create"
+      formMode={formMode}
       onClose={onClose}
-      isFormSubmitting={createCloudAccountMutation.isPending}
+      isFormSubmitting={createCloudAccountMutation.isPending || updateAccountConfigMutation.isPending}
       previewCardTitle="Cloud Account Summary"
+      afterSections={
+        values.cloudProvider === "nebius" && formMode !== "view" ? (
+          <AddBindingButton
+            disabled={createCloudAccountMutation.isPending || updateAccountConfigMutation.isPending}
+            onAdd={() => {
+              const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+              setFieldValue("nebiusBindings", [...current, { ...EMPTY_NEBIUS_BINDING }]);
+            }}
+          />
+        ) : null
+      }
     />
   );
 };

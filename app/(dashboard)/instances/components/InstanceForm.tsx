@@ -15,6 +15,7 @@ import PreviewCard from "components/DynamicForm/PreviewCard";
 import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
+import useAccountConfig from "app/(dashboard)/cloud-accounts/hooks/useAccountConfig";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
@@ -121,12 +122,14 @@ const InstanceForm = ({
                     instance?.awsAccountID ||
                     instance?.gcpProjectID ||
                     instance?.azureSubscriptionID ||
-                    instance?.ociTenancyID;
+                    instance?.ociTenancyID ||
+                    (instance as any)?.nebiusTenantID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
                     createdInstance?.azureSubscriptionID ||
-                    createdInstance?.ociTenancyID;
+                    createdInstance?.ociTenancyID ||
+                    (createdInstance as any)?.nebiusTenantID;
 
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
@@ -860,6 +863,8 @@ const InstanceForm = ({
             return values.cloudProvider === "azure";
           } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
+          } else if (resultParams?.nebius_tenant_id) {
+            return values.cloudProvider === "nebius";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
@@ -873,10 +878,33 @@ const InstanceForm = ({
                 ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
                 : resultParams?.oci_tenancy_id
                   ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
-                  : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
+                  : resultParams?.nebius_tenant_id
+                    ? `${instance.id} (Tenant ID - ${resultParams?.nebius_tenant_id})`
+                    : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
     [instances, values.cloudProvider]
+  );
+
+  // The form value is a BYOA *instance* id; the AccountConfig (ac-…) lives in its result_params.
+  const selectedNebiusAccountConfigId = useMemo(() => {
+    if (values.cloudProvider !== "nebius") return "";
+    const instanceId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id as
+      | string
+      | undefined;
+    if (!instanceId) return "";
+    const matched = instances.find((i) => i?.id === instanceId);
+    return getResultParams(matched)?.cloud_provider_account_config_id ?? "";
+  }, [values.cloudProvider, values.requestParams, instances]);
+
+  const { data: nebiusAccountConfig } = useAccountConfig({
+    accountConfigId: selectedNebiusAccountConfigId,
+    enabled: Boolean(selectedNebiusAccountConfigId),
+  });
+
+  const nebiusBindingRegions = useMemo<string[]>(
+    () => ((nebiusAccountConfig as any)?.nebiusBindings ?? []).map((b: any) => b?.region).filter(Boolean),
+    [nebiusAccountConfig]
   );
 
   const standardInformationFields = useMemo(() => {
@@ -895,7 +923,9 @@ const InstanceForm = ({
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances,
       customerVersionSets,
-      isFetchingVersionSets
+      isFetchingVersionSets,
+      cloudAccountInstances,
+      nebiusBindingRegions
     );
   }, [
     formMode,
@@ -906,6 +936,8 @@ const InstanceForm = ({
     nonCloudAccountInstances,
     customerVersionSets,
     isFetchingVersionSets,
+    cloudAccountInstances,
+    nebiusBindingRegions,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
@@ -935,17 +967,9 @@ const InstanceForm = ({
       formData.values,
       resourceCreateSchema,
       resourceIdInstancesHashMap,
-      isFetchingResourceInstanceIds,
-      cloudAccountInstances
+      isFetchingResourceInstanceIds
     );
-  }, [
-    formMode,
-    formData.values,
-    resourceCreateSchema,
-    resourceIdInstancesHashMap,
-    isFetchingResourceInstanceIds,
-    cloudAccountInstances,
-  ]);
+  }, [formMode, formData.values, resourceCreateSchema, resourceIdInstancesHashMap, isFetchingResourceInstanceIds]);
 
   const sections = useMemo(
     () => [

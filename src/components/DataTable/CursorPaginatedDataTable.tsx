@@ -179,7 +179,9 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
 
   return (
     <TableContainer sx={{ borderRadius: "8px", ...tableStyles }}>
-      <HeaderComponent {...headerProps} />
+      <Box sx={{ borderBottom: "1px solid #EAECF0" }}>
+        <HeaderComponent {...headerProps} />
+      </Box>
       <Stack minHeight={minHeight ? minHeight : showPagination ? "605px" : "540px"} justifyContent="space-between">
         <Box sx={{ overflowX: "auto", flexGrow: 1, position: "relative" }}>
           <Table

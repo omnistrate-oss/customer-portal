@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLongLogoMap, sortCloudProviders } from "src/constants/cloudProviders";
 import { productTierTypes } from "src/constants/servicePlan";
 import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyles/versionSet";
 import { AvailabilityZone } from "src/types/availabilityZone";
@@ -33,7 +33,6 @@ import {
   platformToCloudProviderMap,
 } from "../utils";
 
-import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
 import CustomTagsField from "./CustomTagsField";
 
@@ -52,7 +51,11 @@ export const getStandardInformationFields = (
   isFetchingCustomAvailabilityZones: boolean,
   instances: ResourceInstance[],
   versionSets: TierVersionSet[],
-  isFetchingVersionSets: boolean
+  isFetchingVersionSets: boolean,
+  // BYOA only.
+  cloudAccountInstances: (ResourceInstance & { label: string })[] = [],
+  // Nebius BYOA only — region menu filters to this set.
+  nebiusBindingRegions: string[] = []
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -100,6 +103,8 @@ export const getStandardInformationFields = (
   const cloudProviderFieldExists = inputParametersObj["cloud_provider"];
   const regionFieldExists = inputParametersObj["region"];
   const customAvailabilityZoneFieldExists = inputParametersObj["custom_availability_zone"];
+  // Hoisted out of the requestParams loop so it can render between Cloud Provider and Region.
+  const accountConfigFieldSchema = inputParametersObj["cloud_provider_account_config_id"];
 
   const isOnPrem =
     offering?.serviceModelType === "ON_PREM" &&
@@ -410,7 +415,7 @@ export const getStandardInformationFields = (
       required: true,
       customComponent: (
         <CloudProviderRadio
-          cloudProviders={offering?.cloudProviders || []}
+          cloudProviders={sortCloudProviders(offering?.cloudProviders || [])}
           name="cloudProvider"
           formData={formData}
           // @ts-ignore
@@ -424,7 +429,11 @@ export const getStandardInformationFields = (
             } else if (newCloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
             } else if (newCloudProvider === "nebius") {
-              setFieldValue("region", offering.nebiusRegions?.[0] || "");
+              // Region is account-scoped — wait for account selection.
+              setFieldValue("region", "");
+            }
+            if (accountConfigFieldSchema) {
+              setFieldValue("requestParams.cloud_provider_account_config_id", "");
             }
           }}
           disabled={formMode !== "create"}
@@ -439,7 +448,48 @@ export const getStandardInformationFields = (
     });
   }
 
+  // BYOA: Cloud Provider Account Config ID sits between Cloud Provider and Region.
+  if (accountConfigFieldSchema) {
+    fields.push({
+      dataTestId: "cloud-provider-account-config-id-select",
+      label: accountConfigFieldSchema.displayName || "Cloud Provider Account Config ID",
+      subLabel: accountConfigFieldSchema.description || "Select the cloud account to deploy this instance into",
+      name: "requestParams.cloud_provider_account_config_id",
+      type: "select",
+      required: accountConfigFieldSchema.required,
+      disabled: formMode !== "create",
+      menuItems: cloudAccountInstances
+        .filter((acc) => acc.subscriptionId === values.subscriptionId)
+        .map((acc) => ({ label: acc.label, value: acc.id })),
+      emptyMenuText: !cloudProvider
+        ? "Select a cloud provider"
+        : "No cloud accounts available",
+      onChange: () => {
+        // Reset region — Nebius regions are scoped to the selected account.
+        if (values.cloudProvider === "nebius") {
+          setFieldValue("region", "");
+        }
+      },
+      previewValue:
+        cloudAccountInstances.find((acc) => acc.id === values.requestParams?.cloud_provider_account_config_id)
+          ?.label || null,
+    });
+  }
+
   if (regionFieldExists) {
+    const isNebius = values.cloudProvider === "nebius";
+    const hasNebiusAccount = Boolean(values.requestParams?.cloud_provider_account_config_id);
+    const isRegionLockedForNebius = isNebius && Boolean(accountConfigFieldSchema) && !hasNebiusAccount;
+
+    const fullMenu = getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider);
+    // Nebius BYOA: intersect with the selected account's binding regions.
+    const menuItems =
+      isNebius && accountConfigFieldSchema
+        ? hasNebiusAccount
+          ? fullMenu.filter((item) => nebiusBindingRegions.includes(item.value as string))
+          : []
+        : fullMenu;
+
     fields.push({
       dataTestId: "region-select",
       label: "Region",
@@ -447,13 +497,17 @@ export const getStandardInformationFields = (
       name: "region",
       required: true,
       type: "select",
-      emptyMenuText: !resourceId
-        ? "Select a resource"
-        : !cloudProvider
-          ? "Select a cloud provider"
-          : "No regions available",
-      menuItems: getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider),
-      disabled: formMode !== "create",
+      emptyMenuText: isRegionLockedForNebius
+        ? "Select a Nebius cloud account first to see its configured regions"
+        : !resourceId
+          ? "Select a resource"
+          : !cloudProvider
+            ? "Select a cloud provider"
+            : isNebius && accountConfigFieldSchema && menuItems.length === 0
+              ? "The selected Nebius account has no configured regions yet"
+              : "No regions available",
+      menuItems,
+      disabled: formMode !== "create" || isRegionLockedForNebius,
     });
   }
 
@@ -465,7 +519,9 @@ export const getStandardInformationFields = (
       required: true,
       customComponent: (
         <CloudProviderRadio
-          cloudProviders={cloudProviderOptions.length > 0 ? cloudProviderOptions : offering?.cloudProviders || []}
+          cloudProviders={sortCloudProviders(
+            cloudProviderOptions.length > 0 ? cloudProviderOptions : offering?.cloudProviders || []
+          )}
           name="cloudProvider"
           formData={formData}
           // @ts-ignore
@@ -738,8 +794,9 @@ export const getDeploymentConfigurationFields = (
   values: any,
   resourceSchema: APIEntity,
   resourceIdInstancesHashMap,
-  isFetchingResourceInstanceIds: boolean,
-  cloudAccountInstances
+  isFetchingResourceInstanceIds: boolean
+  // Note: cloudAccountInstances was previously passed to render the
+  // cloud-account select. That field is now hoisted to Standard Information.
 ) => {
   const fields: Field[] = [];
   if (!resourceSchema?.inputParameters) return fields;
@@ -845,32 +902,10 @@ export const getDeploymentConfigurationFields = (
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
     } else if (param.key === "cloud_provider_account_config_id") {
-      fields.push({
-        dataTestId: `${param.key}-select`,
-        label: param.displayName || param.key,
-        subLabel: param.description,
-        name: `requestParams.${param.key}`,
-        description: (
-          <AccountConfigDescription
-            serviceId={values.serviceId}
-            servicePlanId={values.servicePlanId}
-            subscriptionId={values.subscriptionId}
-          />
-        ),
-        value: values.requestParams[param.key] || "",
-        type: "select",
-        menuItems: cloudAccountInstances
-          // Filter cloud accounts based on the selected subscription
-          ?.filter((el) => el.subscriptionId === values.subscriptionId)
-          .map((config) => ({
-            label: config.label,
-            value: config.id,
-          })),
-        required: param.required,
-        disabled: formMode !== "create",
-        previewValue: cloudAccountInstances.find((config) => config.id === values.requestParams[param.key])?.label,
-        emptyMenuText: "No cloud accounts available",
-      });
+      // The cloud-account select is hoisted to the Standard Information
+      // section (between Cloud Provider and Region) — skip it here so it
+      // doesn't render twice.
+      return;
     } else if (param.type?.toUpperCase() === "ANY") {
       // Handle JSON type fields
       fields.push({
