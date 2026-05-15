@@ -336,11 +336,15 @@ const InstanceForm = ({
         if (!data.network_type) {
           delete data.network_type;
         }
-
+        
         if (!data.cloudProvider && inputParametersObj["cloud_provider"]) {
           return snackbar.showError("Cloud Provider is required");
         } else if (!data.region && inputParametersObj["region"]) {
-          return snackbar.showError("Region is required");
+          if (data.cloudProvider === "byoc-onprem") {
+            data.region = "on-prem";
+          } else {
+            return snackbar.showError("Region is required");
+          }
         } else if (!data.network_type && networkTypeFieldExists) {
           return snackbar.showError("Network Type is required");
         }
