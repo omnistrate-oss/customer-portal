@@ -19,8 +19,8 @@ type Dashboard = {
 type MetricsFeature = {
   dashboards?: Record<string, Dashboard>;
   grafanaEndpoint?: string;
-  serviceProviderOrgId?: string;
-  serviceProviderOrgPassword?: string;
+  instanceOrgId?: string;
+  instanceOrgPassword?: string;
   enabled?: boolean;
 };
 
@@ -204,7 +204,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
   if (!dashboards || !grafanaEndpoint || Object.keys(dashboards).length === 0) {
     return (
       <Card
-        mt={3}
+        mt={4}
         sx={{
           paddingTop: "12.5px",
           paddingLeft: "20px",
@@ -224,15 +224,15 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
   const dashboardEntries = Object.entries(dashboards);
 
   return (
-    <Stack gap="24px" mt="24px">
+    <Stack gap="20px" mt="32px">
       {/* Grafana Access Section */}
       <ContainerCard title="Grafana Access" description="Use these credentials to access the Grafana dashboards">
         <CredentialRow label="Grafana Endpoint" value={grafanaEndpoint} />
-        {metricsFeature.serviceProviderOrgId && (
-          <CredentialRow label="Username" value={metricsFeature.serviceProviderOrgId} />
+        {metricsFeature.instanceOrgId && (
+          <CredentialRow label="Username" value={metricsFeature.instanceOrgId} />
         )}
-        {metricsFeature.serviceProviderOrgPassword && (
-          <CredentialRow label="Password" value={metricsFeature.serviceProviderOrgPassword} isPassword isLast />
+        {metricsFeature.instanceOrgPassword && (
+          <CredentialRow label="Password" value={metricsFeature.instanceOrgPassword} isPassword isLast />
         )}
       </ContainerCard>
 
