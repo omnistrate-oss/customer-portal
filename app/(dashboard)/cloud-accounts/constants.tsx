@@ -1,8 +1,9 @@
+import * as yup from "yup";
+
 import LockIcon from "src/components/Icons/Lock/LockIcon";
 import UnlockIcon from "src/components/Icons/Unlock/UnlockIcon";
 import OverlappingCirclesIconWrapper from "src/components/OverlappingCirclesIconWrapper/OverlappingCirclesIconWrapper";
 import { colors } from "src/themeConfig";
-import * as yup from "yup";
 
 export const CloudAccountValidationSchema = yup.object({
   serviceId: yup.string().required("Product ID is required"),
@@ -81,6 +82,12 @@ export const CloudAccountValidationSchema = yup.object({
       ),
     otherwise: yup.string(),
   }),
+  clusterName: yup.string().when("cloudProvider", {
+    is: "byoc-onprem",
+    then: yup.string().required("Kubernetes Cluster Name is required"),
+    otherwise: yup.string(),
+  }),
+  clusterDescription: yup.string(),
 });
 
 export const cloudAccountOffboardingSteps = [
