@@ -5,7 +5,6 @@ type GetTabsParams = {
   isLogsEnabled: boolean | undefined;
   isActive: boolean | undefined;
   isResourceBYOA: boolean;
-  isCliManagedResource: boolean;
   resourceType: string | undefined;
   isBackup: number | undefined;
   isCustomDNS: boolean;
