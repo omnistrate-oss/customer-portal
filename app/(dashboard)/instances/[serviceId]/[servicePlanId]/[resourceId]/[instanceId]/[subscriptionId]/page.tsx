@@ -23,7 +23,7 @@ import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
 import Backup from "components/ResourceInstance/Backup/Backup";
 import Connectivity from "components/ResourceInstance/Connectivity/Connectivity";
 import Logs from "components/ResourceInstance/Logs/Logs";
-import Metrics from "components/ResourceInstance/Metrics/Metrics";
+import GrafanaMetrics from "components/ResourceInstance/Metrics/GrafanaMetrics";
 import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
 import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
 import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
@@ -346,15 +346,9 @@ const InstanceDetailsPage = ({
         />
       )}
       {currentTab === tabs.metrics && (
-        <Metrics
-          resourceInstanceId={instanceId}
-          nodes={resourceInstanceData.nodes}
-          socketBaseURL={resourceInstanceData.metricsSocketURL}
+        <GrafanaMetrics
+          metricsFeature={resourceInstanceData?.unprocessedData?.productTierFeatures?.METRICS as any}
           instanceStatus={resourceInstanceData.status}
-          resourceKey={resourceInstanceData.resourceKey}
-          customMetrics={resourceInstanceData.customMetrics || []}
-          mainResourceHasCompute={resourceInstanceData.mainResourceHasCompute}
-          productTierType={offering.productTierType}
         />
       )}
       {currentTab === tabs.logs && (
