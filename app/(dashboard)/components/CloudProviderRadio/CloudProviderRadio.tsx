@@ -2,9 +2,9 @@
 
 import { cn } from "lib/utils";
 
+import { Text } from "components/Typography/Typography";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { colors } from "src/themeConfig";
-import { Text } from "components/Typography/Typography";
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
   return (
@@ -16,7 +16,7 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
       )}
       style={{
         outline: isSelected ? `2px solid ${colors.success500}` : `1px solid ${colors.gray200}`,
-        minWidth: "120px",
+        width: "120px",
         minHeight: "60px",
       }}
       onClick={() => {

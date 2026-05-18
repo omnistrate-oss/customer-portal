@@ -125,20 +125,21 @@ export const getInitialValues = (
               ? "oci"
               : resultParams?.nebius_tenant_id
                 ? "nebius"
-                : "",
-      accountConfigurationMethod:
-        resultParams?.account_configuration_method,
+                : resultParams?.cluster_name
+                  ? "byoc-onprem"
+                  : "",
+      accountConfigurationMethod: resultParams?.account_configuration_method,
       awsAccountId: resultParams?.aws_account_id,
       gcpProjectId: resultParams?.gcp_project_id,
       gcpProjectNumber: resultParams?.gcp_project_number,
-      azureSubscriptionId:
-        resultParams?.azure_subscription_id,
+      azureSubscriptionId: resultParams?.azure_subscription_id,
       azureTenantId: resultParams?.azure_tenant_id,
-      ociTenancyId:
-        resultParams?.oci_tenancy_id,
+      ociTenancyId: resultParams?.oci_tenancy_id,
       ociDomainId: resultParams?.oci_domain_id,
       nebiusTenantId: resultParams?.nebius_tenant_id ?? "",
       nebiusBindings: mapNebiusBindingsToFormValue(selectedAccountConfig),
+      clusterName: resultParams?.cluster_name || "",
+      clusterDescription: resultParams?.cluster_description || "",
     };
   }
 
@@ -196,6 +197,8 @@ export const getInitialValues = (
     ociDomainId: "",
     nebiusTenantId: "",
     nebiusBindings: [{ ...EMPTY_NEBIUS_BINDING }] as NebiusBindingFormValue[],
+    clusterName: "",
+    clusterDescription: "",
   };
 };
 
