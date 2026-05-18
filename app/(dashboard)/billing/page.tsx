@@ -24,6 +24,7 @@ import PageTitle from "../components/Layout/PageTitle";
 import ConsumptionUsage from "./components/ConsumptionUsage";
 import { StripeIcon } from "./components/Icons";
 import InvoicesTable from "./components/InvoicesTable";
+import PaymentMethodSection from "./components/PaymentMethodSection";
 import useBillingDetails from "./hooks/useBillingDetails";
 import useBillingStatus from "./hooks/useBillingStatus";
 import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
@@ -41,7 +42,12 @@ const BillingPage = () => {
 
   const isBillingEnabled = Boolean(billingStatusQuery.data?.enabled);
 
-  const { isPending: isBillingDetailsPending, data: billingDetails, error } = useBillingDetails(isBillingEnabled);
+  const {
+    isPending: isBillingDetailsPending,
+    data: billingDetails,
+    error,
+    refetch: refetchBillingDetails,
+  } = useBillingDetails(isBillingEnabled);
   const { data: consumptionUsageData, isPending: isConsumptionDataPending } = useConsumptionUsage();
   const { data: invoicesData, isPending: isInvoicesPending } = useConsumptionInvoices();
 
@@ -115,6 +121,7 @@ const BillingPage = () => {
 
   if (isLoading) return <LoadingSpinner />;
   const isStripe = selectedBillingProvider === "STRIPE";
+  const isCustomPaymentPortalEnabled = isStripe && !billingDetails?.paymentInfoPortalURL;
   const balanceDueLink =
     billingDetails?.billingProviders?.find((provider) => provider.type === selectedBillingProvider)?.balanceDueLink ||
     "#";
@@ -261,40 +268,50 @@ const BillingPage = () => {
                     </Text>
                   </Box>
 
-                  <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">
-                    <StatusChip
-                      label={
-                        !isStripe ? "Non Configurable" : paymentConfigured === true ? "Configured" : "Not Configured"
-                      }
-                      category={!isStripe ? "failed" : paymentConfigured === true ? "success" : "failed"}
-                      sx={{ alignSelf: "center" }}
+                  {isCustomPaymentPortalEnabled ? (
+                    <PaymentMethodSection
+                      enabled={isCustomPaymentPortalEnabled}
+                      onPaymentMethodsChanged={async () => {
+                        await refetchBillingDetails();
+                        refetchSubscriptions();
+                      }}
                     />
-                    {isStripe && billingDetails?.paymentInfoPortalURL ? (
-                      <Link href={billingDetails?.paymentInfoPortalURL} target="_blank">
+                  ) : (
+                    <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">
+                      <StatusChip
+                        label={
+                          !isStripe ? "Non Configurable" : paymentConfigured === true ? "Configured" : "Not Configured"
+                        }
+                        category={!isStripe ? "failed" : paymentConfigured === true ? "success" : "failed"}
+                        sx={{ alignSelf: "center" }}
+                      />
+                      {isStripe && billingDetails?.paymentInfoPortalURL ? (
+                        <Link href={billingDetails?.paymentInfoPortalURL} target="_blank">
+                          <Button
+                            disabled={!isStripe}
+                            variant="contained"
+                            endIcon={<ArrowOutwardIcon sx={{ fontSize: "18px" }} />}
+                          >
+                            Configure
+                          </Button>
+                        </Link>
+                      ) : (
                         <Button
-                          disabled={!isStripe}
                           variant="contained"
-                          endIcon={<ArrowOutwardIcon sx={{ fontSize: "18px" }} />}
+                          endIcon={
+                            <ArrowOutwardIcon
+                              sx={{
+                                fontSize: "18px",
+                              }}
+                            />
+                          }
+                          disabled
                         >
                           Configure
                         </Button>
-                      </Link>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        endIcon={
-                          <ArrowOutwardIcon
-                            sx={{
-                              fontSize: "18px",
-                            }}
-                          />
-                        }
-                        disabled
-                      >
-                        Configure
-                      </Button>
-                    )}
-                  </Stack>
+                      )}
+                    </Stack>
+                  )}
                 </Card>
               </div>
             )}

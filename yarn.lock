@@ -2083,6 +2083,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stripe/react-stripe-js@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "@stripe/react-stripe-js@npm:6.3.0"
+  dependencies:
+    prop-types: "npm:^15.7.2"
+  peerDependencies:
+    "@stripe/stripe-js": ">=9.3.1 <10.0.0"
+    react: ">=16.8.0 <20.0.0"
+    react-dom: ">=16.8.0 <20.0.0"
+  checksum: 10c0/a2a81cd5035485e44c2abf00ee8107c9db13e07b02dc3d1fb44869021a58fb47ce4f89eb6e89e3a657a608cf651ad263acf78f1ffef75cafe4b79c90dba6a71f
+  languageName: node
+  linkType: hard
+
+"@stripe/stripe-js@npm:^9.5.0":
+  version: 9.5.0
+  resolution: "@stripe/stripe-js@npm:9.5.0"
+  checksum: 10c0/b37fe330bbea0b328f8822d439229760e40df893606fcaffa2c161cebd7cb85caf610f4a2518e0af23d70a60f0d9d78fec7162e9dced35f129644c64e72f6100
+  languageName: node
+  linkType: hard
+
 "@swagger-api/apidom-ast@npm:^1.10.0":
   version: 1.10.0
   resolution: "@swagger-api/apidom-ast@npm:1.10.0"
@@ -8864,6 +8884,8 @@ __metadata:
     "@playwright/test": "npm:^1.55.1"
     "@react-oauth/google": "npm:^0.12.1"
     "@reduxjs/toolkit": "npm:^1.9.1"
+    "@stripe/react-stripe-js": "npm:^6.3.0"
+    "@stripe/stripe-js": "npm:^9.5.0"
     "@tailwindcss/typography": "npm:^0.5.16"
     "@tanstack/react-query": "npm:^5.77.1"
     "@tanstack/react-table": "npm:^8.20.5"

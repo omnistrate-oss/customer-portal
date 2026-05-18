@@ -22,3 +22,28 @@ export type ConsumptionUsagePerDay = components["schemas"]["GetConsumptionUsageR
 export type ConsumptionUsage = components["schemas"]["GetConsumptionUsageResult"];
 
 export type UsageDimension = "Memory GiB hours" | "Storage GiB hours" | "CPU core hours" | "Replica hours";
+
+export type ConsumptionPaymentMethod = {
+  id: string;
+  type: string;
+  displayName: string;
+  brand?: string;
+  last4?: string;
+  expMonth?: number;
+  expYear?: number;
+  bankName?: string;
+  isDefault: boolean;
+};
+
+export type ListConsumptionPaymentMethodsSuccessResponse = {
+  paymentMethods?: ConsumptionPaymentMethod[];
+};
+
+export type CreateConsumptionSetupIntentSuccessResponse = {
+  clientSecret: string;
+};
+
+export type ConsumptionStripeConfigResponse = {
+  publishableKey: string;
+  stripeAccountId?: string;
+};
