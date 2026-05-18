@@ -55,6 +55,7 @@ const useResourceInstance = (queryParams) => {
       select: (data) => {
         let isLogsEnabled = false;
         let isMetricsEnabled = false;
+        let metricsSocketURL = "";
         let logsSocketURL = "";
         let customNetworkDetails: any = null;
 
@@ -81,6 +82,8 @@ const useResourceInstance = (queryParams) => {
           globalEndpoints.others = [];
         }
 
+        const customMetrics: any[] = [];
+        // let otherResourcesCustomMetrics = [];
         const productTierFeatures: any = data?.productTierFeatures;
 
         if (productTierFeatures?.LOGS?.enabled) {
@@ -89,6 +92,25 @@ const useResourceInstance = (queryParams) => {
 
         if (productTierFeatures?.METRICS?.enabled) {
           isMetricsEnabled = true;
+
+          const additionalMetrics = productTierFeatures?.METRICS?.additionalMetrics;
+
+          //check if custom metrics are configured
+          if (additionalMetrics) {
+            Object.entries(additionalMetrics).forEach(([resourceKey, data]: any) => {
+              const metricsData = data?.metrics;
+              if (metricsData) {
+                Object.entries(metricsData).forEach(([metricName, labelsObj]) => {
+                  const labels = Object.keys(labelsObj || {});
+                  customMetrics.push({
+                    metricName,
+                    labels,
+                    resourceKey,
+                  });
+                });
+              }
+            });
+          }
         }
         if (topologyDetails?.hasCompute === true) {
           if (topologyDetails?.nodes) {
@@ -156,13 +178,15 @@ const useResourceInstance = (queryParams) => {
         topologyDetailsOtherThanMain?.forEach(([resourceId, topologyDetails]: any) => {
           const { resourceKey } = topologyDetails;
           if (resourceKey === "omnistrateobserv") {
-            // Show Logs if Observability Resource Present
+            // Show Both Logs and Metrics if Observability Resource Present
             // isLogsEnabled = true;
+            // isMetricsEnabled = true;
 
             const clusterEndpoint = topologyDetails.clusterEndpoint;
             const [userPass, baseURL] = clusterEndpoint.split("@");
             if (userPass && baseURL) {
               const [username, password] = userPass.split(":");
+              metricsSocketURL = `wss://${baseURL}/metrics?username=${username}&password=${password}`;
               logsSocketURL = `wss://${baseURL}/logs?username=${username}&password=${password}`;
             }
 
@@ -304,10 +328,12 @@ const useResourceInstance = (queryParams) => {
           resultParameters: resultParameters,
           isLogsEnabled: isLogsEnabled,
           isMetricsEnabled: isMetricsEnabled,
+          metricsSocketURL: metricsSocketURL,
           logsSocketURL: logsSocketURL,
           healthStatusPercent: healthStatusPercent,
           active: data?.active,
           mainResourceHasCompute: Boolean(topologyDetails?.hasCompute),
+          customMetrics: customMetrics,
           customNetworkDetails,
           detailedNetworkTopology: data?.detailedNetworkTopology || {},
           maintenanceTasks: data.maintenanceTasks || {},

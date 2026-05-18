@@ -2,8 +2,8 @@
 
 import { cn } from "lib/utils";
 
-import { Text } from "components/Typography/Typography";
 import { colors } from "src/themeConfig";
+import { Text } from "components/Typography/Typography";
 
 import AwsLogo from "../../../../src/components/Logos/AwsLogo";
 import AzureLogo from "../../../../src/components/Logos/AzureLogo";
@@ -11,7 +11,6 @@ import GcpLogo from "../../../../src/components/Logos/GcpLogo";
 import NebiusLogo from "../../../../src/components/Logos/NebiusLogo";
 import OciLogo from "../../../../src/components/Logos/OciLogo";
 
-import OnPremIcon from "./OnPremIcon";
 import PrivateIcon from "./PrivateIcon";
 
 export const cloudProviderLongLogoMap = {
@@ -21,7 +20,6 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
   nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
   private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
-  "byoc-onprem": <OnPremIcon height="24px" width="auto" />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
@@ -34,7 +32,7 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => 
       )}
       style={{
         outline: isSelected ? `2px solid ${colors.success500}` : `1px solid ${colors.gray200}`,
-        width: "120px",
+        minWidth: "120px",
         minHeight: "60px",
       }}
       onClick={() => {
@@ -79,7 +77,10 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div
+      className="grid gap-4"
+      style={{ gridTemplateColumns: `repeat(${validCloudProviders.length}, minmax(0, 1fr))` }}
+    >
       {validCloudProviders.map((cloudProvider, index) => {
         return (
           <CloudProviderCard
