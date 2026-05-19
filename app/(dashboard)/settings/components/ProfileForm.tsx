@@ -42,6 +42,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userData, isLoadingUserData, 
     enableReinitialize: true,
     onSubmit: (values) => {
       const data: typeof values & { attributes?: Record<string, string> } = { ...values };
+      // Trim string values
+      for (const key in data) {
+        if (typeof data[key] === "string") {
+          (data as Record<string, unknown>)[key] = data[key].trim();
+        }
+      }
       // Remove Empty Fields
       for (const key in data) {
         if (data[key] === "" && key !== "affiliateCode") {

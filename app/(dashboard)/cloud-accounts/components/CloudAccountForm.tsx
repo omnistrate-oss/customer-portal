@@ -221,30 +221,30 @@ const CloudAccountForm = ({
       if (values.cloudProvider === "aws") {
         requestParams = {
           cloud_provider: values.cloudProvider,
-          aws_account_id: values.awsAccountId,
+          aws_account_id: values.awsAccountId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
-          aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
+          aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId.trim()),
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
           cloud_provider: values.cloudProvider,
-          gcp_project_id: values.gcpProjectId,
-          gcp_project_number: values.gcpProjectNumber,
+          gcp_project_id: values.gcpProjectId.trim(),
+          gcp_project_number: values.gcpProjectNumber.trim(),
           account_configuration_method: values.accountConfigurationMethod,
-          gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
+          gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId.trim(), selectUser?.orgId.toLowerCase()),
         };
       } else if (values.cloudProvider === "azure") {
         requestParams = {
           cloud_provider: values.cloudProvider,
-          azure_subscription_id: values.azureSubscriptionId,
-          azure_tenant_id: values.azureTenantId,
+          azure_subscription_id: values.azureSubscriptionId.trim(),
+          azure_tenant_id: values.azureTenantId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
         };
       } else if (values.cloudProvider === "oci") {
         requestParams = {
           cloud_provider: values.cloudProvider,
-          oci_tenancy_id: values.ociTenancyId,
-          oci_domain_id: values.ociDomainId,
+          oci_tenancy_id: values.ociTenancyId.trim(),
+          oci_domain_id: values.ociDomainId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
         };
       }

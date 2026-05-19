@@ -89,9 +89,10 @@ const SignupPage = (props) => {
       data["reCaptchaToken"] = token;
     }
 
+    const fieldsToSkipTrim = ["password", "confirmPassword"];
     for (const key in values) {
       if (values[key]) {
-        data[key] = values[key];
+        data[key] = typeof values[key] === "string" && !fieldsToSkipTrim.includes(key) ? values[key].trim() : values[key];
       }
     }
 
