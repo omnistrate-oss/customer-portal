@@ -385,9 +385,16 @@ const CloudAccountForm = ({
         return;
       }
 
+      // GCP bootstrap email is built from orgId; missing orgId produces an
+      // `bootstrap-undefined@...` email that the backend silently rejects.
+      const orgId = selectUser?.orgId?.toLowerCase();
+      if (values.cloudProvider === "gcp" && !orgId) {
+        return snackbar.showError("Organization ID is required for GCP. Please reload and try again.");
+      }
+
       const requestParams: Record<string, any> = {
         cloud_provider: values.cloudProvider,
-        ...buildProviderResultParams(values, selectUser?.orgId?.toLowerCase()),
+        ...buildProviderResultParams(values, orgId),
       };
       if (values.cloudProvider === "nebius") {
         requestParams.nebius_bindings = sanitizeNebiusBindings(values.nebiusBindings ?? []);

@@ -123,13 +123,13 @@ const InstanceForm = ({
                     instance?.gcpProjectID ||
                     instance?.azureSubscriptionID ||
                     instance?.ociTenancyID ||
-                    (instance as any)?.nebiusTenantID;
+                    instance?.nebiusTenantID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
                     createdInstance?.azureSubscriptionID ||
                     createdInstance?.ociTenancyID ||
-                    (createdInstance as any)?.nebiusTenantID;
+                    createdInstance?.nebiusTenantID;
 
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
@@ -914,10 +914,11 @@ const InstanceForm = ({
     enabled: Boolean(selectedNebiusAccountConfigId),
   });
 
-  const nebiusBindingRegions = useMemo<string[]>(
-    () => ((nebiusAccountConfig as any)?.nebiusBindings ?? []).map((b: any) => b?.region).filter(Boolean),
-    [nebiusAccountConfig]
-  );
+  const nebiusBindingRegions = useMemo<string[]>(() => {
+    // useAccountConfig's wrapper doesn't propagate the response type — narrow it here.
+    const bindings = (nebiusAccountConfig as { nebiusBindings?: { region?: string }[] } | undefined)?.nebiusBindings;
+    return (bindings ?? []).map((b) => b?.region).filter((r): r is string => Boolean(r));
+  }, [nebiusAccountConfig]);
 
   const standardInformationFields = useMemo(() => {
     return getStandardInformationFields(
