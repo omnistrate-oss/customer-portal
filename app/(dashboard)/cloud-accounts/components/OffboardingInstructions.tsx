@@ -1,10 +1,10 @@
-import { FC } from "react";
-import Link from "next/link";
 import { Box, Stack, styled } from "@mui/material";
+import Link from "next/link";
+import { FC } from "react";
 
+import { Text } from "components/Typography/Typography";
 import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
-import { Text } from "components/Typography/Typography";
 
 const StyledLink = styled(Link)({
   textDecoration: "underline",
@@ -252,10 +252,7 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               </Text>
 
               {offboardingInstructionDetails?.byocOnpremUninstallCommand && (
-                <TextContainerToCopy
-                  text={offboardingInstructionDetails.byocOnpremUninstallCommand}
-                  marginTop="12px"
-                />
+                <TextContainerToCopy text={offboardingInstructionDetails.byocOnpremUninstallCommand} marginTop="12px" />
               )}
             </Box>
           </ListItem>
