@@ -11,8 +11,6 @@ import GcpLogo from "src/components/Logos/GcpLogo";
 import NebiusLogo from "src/components/Logos/NebiusLogo";
 import OciLogo from "src/components/Logos/OciLogo";
 
-import OnPremIcon from "../../app/(dashboard)/components/CloudProviderRadio/OnPremIcon";
-
 export const cloudProviderLabels = {
   gcp: "Google Cloud Platform",
   aws: "Amazon Web Services",
@@ -29,7 +27,6 @@ export const cloudProviderLogoMap = {
   azure: <AzureIcon />,
   oci: <OCIIcon />,
   nebius: <NebiusIcon />,
-  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 //long logos map
@@ -40,7 +37,6 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo />,
   nebius: <NebiusLogo />,
   private: <PrivateLogo />,
-  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 export const cloudProviderLabelsShort = {
@@ -49,7 +45,6 @@ export const cloudProviderLabelsShort = {
   azure: "Azure",
   oci: "OCI",
   nebius: "Nebius",
-  "byoc-onprem": "Onprem",
 };
 
 export const CLOUD_PROVIDERS = {
@@ -58,11 +53,10 @@ export const CLOUD_PROVIDERS = {
   azure: "azure",
   oci: "oci",
   nebius: "nebius",
-  "byoc-onprem": "byoc-onprem",
 };
 
 // Sort Order for Cloud Providers
-export const CLOUD_PROVIDER_DISPLAY_ORDER = ["aws", "azure", "gcp", "oci", "nebius", "byoc-onprem"];
+export const CLOUD_PROVIDER_DISPLAY_ORDER = ["aws", "azure", "gcp", "oci", "nebius"];
 
 export const sortCloudProviders = (providers: string[]): string[] => {
   return [...providers].sort((a, b) => {

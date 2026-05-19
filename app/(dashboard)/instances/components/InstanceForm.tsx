@@ -315,12 +315,6 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        // Remove internal _vpcType field and clear native network id when creating new VPC
-        if (data.requestParams._vpcType === "create_new" || !data.requestParams._vpcType) {
-          delete data.requestParams.cloud_provider_native_network_id;
-        }
-        delete data.requestParams._vpcType;
-
         // Check for Required Fields
         const requiredFields = filterSchema
           .filter((field) => !["cloud_provider", "region"].includes(field.key))
@@ -355,11 +349,7 @@ const InstanceForm = ({
         if (!data.cloudProvider && inputParametersObj["cloud_provider"]) {
           return snackbar.showError("Cloud Provider is required");
         } else if (!data.region && inputParametersObj["region"]) {
-          if (data.cloudProvider === "byoc-onprem") {
-            data.region = "on-prem";
-          } else {
-            return snackbar.showError("Region is required");
-          }
+          return snackbar.showError("Region is required");
         } else if (!data.network_type && networkTypeFieldExists) {
           return snackbar.showError("Network Type is required");
         }
@@ -877,9 +867,7 @@ const InstanceForm = ({
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
           const resultParams = getResultParams(instance);
-          if (resultParams?.cluster_name) {
-            return values.cloudProvider === "byoc-onprem";
-          } else if (resultParams?.gcp_project_id) {
+          if (resultParams?.gcp_project_id) {
             return values.cloudProvider === "gcp";
           } else if (resultParams?.aws_account_id) {
             return values.cloudProvider === "aws";
@@ -896,17 +884,15 @@ const InstanceForm = ({
           const resultParams = getResultParams(instance);
           return {
             ...instance,
-            label: resultParams?.cluster_name
-              ? `${instance.id} (Cluster Name - ${resultParams?.cluster_name})`
-              : resultParams?.gcp_project_id
-                ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
-                : resultParams?.aws_account_id
-                  ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
-                  : resultParams?.oci_tenancy_id
-                    ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
-                    : resultParams?.nebius_tenant_id
-                      ? `${instance.id} (Tenant ID - ${resultParams?.nebius_tenant_id})`
-                      : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
+            label: resultParams?.gcp_project_id
+              ? `${instance.id} (Project ID - ${resultParams?.gcp_project_id})`
+              : resultParams?.aws_account_id
+                ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
+                : resultParams?.oci_tenancy_id
+                  ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
+                  : resultParams?.nebius_tenant_id
+                    ? `${instance.id} (Tenant ID - ${resultParams?.nebius_tenant_id})`
+                    : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
     [instances, values.cloudProvider]
@@ -933,38 +919,6 @@ const InstanceForm = ({
     [nebiusAccountConfig]
   );
 
-  // Fetch cloud native networks (VPCs) for the selected account config
-  const selectedCloudAccountInstanceId = (values.requestParams as Record<string, any>)
-    ?.cloud_provider_account_config_id;
-  const selectedAccountConfigId = useMemo(() => {
-    if (!selectedCloudAccountInstanceId) return undefined;
-    const selectedCloudAccount = cloudAccountInstances.find((i) => i.id === selectedCloudAccountInstanceId);
-    if (!selectedCloudAccount) return undefined;
-    const rp = getResultParams(selectedCloudAccount);
-    return rp?.cloud_provider_account_config_id as string | undefined;
-  }, [selectedCloudAccountInstanceId, cloudAccountInstances]);
-
-  const isBYOCOnprem = values.cloudProvider === "byoc-onprem";
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: { id: selectedAccountConfigId || "" },
-      },
-      headers: { "x-ignore-global-error": true },
-    },
-    {
-      enabled: Boolean(selectedAccountConfigId && !isBYOCOnprem),
-      retry: 2,
-    }
-  );
-
-  const cloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
-  );
-
   const standardInformationFields = useMemo(() => {
     return getStandardInformationFields(
       servicesObj,
@@ -984,8 +938,6 @@ const InstanceForm = ({
       isFetchingVersionSets,
       cloudAccountInstances,
       isFetchingResourceInstanceIds,
-      cloudNativeNetworks,
-      cloudNativeNetworksQuery.isFetching,
       nebiusBindingRegions
     );
   }, [
@@ -999,8 +951,6 @@ const InstanceForm = ({
     isFetchingVersionSets,
     cloudAccountInstances,
     isFetchingResourceInstanceIds,
-    cloudNativeNetworks,
-    cloudNativeNetworksQuery.isFetching,
     nebiusBindingRegions,
   ]);
 

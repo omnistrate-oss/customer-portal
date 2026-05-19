@@ -17,7 +17,7 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled, disab
       )}
       style={{
         outline: isSelected ? `2px solid ${colors.success500}` : `1px solid ${colors.gray200}`,
-        width: "120px",
+        minWidth: "120px",
         minHeight: "60px",
         opacity: disabled ? 0.5 : 1,
       }}

@@ -33,7 +33,6 @@ type CloudAccountTableHeaderProps = {
   serviceModelType: string;
   onConnectClick: () => void;
   onDisconnectClick: () => void;
-  onModifyVpcsClick: () => void;
 };
 
 const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
@@ -54,7 +53,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   selectedInstanceSubscription,
   onConnectClick,
   onDisconnectClick,
-  onModifyVpcsClick,
   serviceModelType,
 }) => {
   return (
@@ -90,7 +88,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           onOffboardClick={() => onOffboardClick?.()}
           onConnectClick={onConnectClick}
           onDisconnectClick={onDisconnectClick}
-          onModifyVpcsClick={onModifyVpcsClick}
           serviceModelType={serviceModelType}
           isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
         />
