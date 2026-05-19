@@ -506,6 +506,9 @@ export const getStandardInformationFields = (
     const isExistingVpcSupported = canChooseExistingVpc(cloudProvider, values.network_type);
     const vpcType = requestParams._vpcType || "create_new";
     const selectedVpcType = vpcType === "choose_existing" && !isExistingVpcSupported ? "create_new" : vpcType;
+    const chooseExistingVpcLabel = isExistingVpcSupported
+      ? "Choose from Existing VPCs"
+      : "Choose from Existing VPCs (available for AWS, or GCP with Public network)";
 
     fields.push({
       label: "VPCs",
@@ -522,11 +525,7 @@ export const getStandardInformationFields = (
         },
         {
           dataTestId: "choose-existing-vpc-radio",
-          label: isExistingVpcSupported
-            ? "Choose from Existing VPCs"
-            : values.network_type === "INTERNAL"
-              ? "Choose from Existing VPCs (available for AWS with Private network)"
-              : "Choose from Existing VPCs (available for AWS / GCP)",
+          label: chooseExistingVpcLabel,
           value: "choose_existing",
           disabled: !isExistingVpcSupported,
         },
