@@ -92,7 +92,8 @@ const SignupPage = (props) => {
     const fieldsToSkipTrim = ["password", "confirmPassword"];
     for (const key in values) {
       if (values[key]) {
-        data[key] = typeof values[key] === "string" && !fieldsToSkipTrim.includes(key) ? values[key].trim() : values[key];
+        const shouldTrim = typeof values[key] === "string" && !fieldsToSkipTrim.includes(key);
+        data[key] = shouldTrim ? values[key].trim() : values[key];
       }
     }
 

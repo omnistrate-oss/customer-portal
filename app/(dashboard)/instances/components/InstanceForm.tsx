@@ -228,12 +228,7 @@ const InstanceForm = ({
       // Trim string values in requestParams (excluding password-type fields)
       if (data.requestParams && typeof data.requestParams === "object") {
         // eslint-disable-next-line no-use-before-define
-        const allSchemaParams = [
-          // eslint-disable-next-line no-use-before-define
-          ...(resourceSchemaData?.apis?.find((api) => api.verb === "CREATE")?.inputParameters || []),
-          // eslint-disable-next-line no-use-before-define
-          ...(resourceSchemaData?.apis?.find((api) => api.verb === "UPDATE")?.inputParameters || []),
-        ];
+        const allSchemaParams = resourceSchemaData?.apis?.flatMap((api) => api.inputParameters || []) || [];
         for (const key in data.requestParams) {
           if (typeof data.requestParams[key] === "string") {
             const schemaParam = allSchemaParams.find((p) => p.key === key);
