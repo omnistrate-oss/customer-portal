@@ -111,6 +111,7 @@ export const getInitialValues = (
       azureTenantId: resultParams?.azure_tenant_id,
       ociTenancyId: resultParams?.oci_tenancy_id,
       ociDomainId: resultParams?.oci_domain_id,
+      nebiusTenantId: resultParams?.nebius_tenant_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
     };
@@ -168,6 +169,7 @@ export const getInitialValues = (
     gcpProjectNumber: "",
     ociTenancyId: "",
     ociDomainId: "",
+    nebiusTenantId: "",
     clusterName: "",
     clusterDescription: "",
   };

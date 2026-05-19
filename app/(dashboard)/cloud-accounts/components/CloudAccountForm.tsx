@@ -71,7 +71,6 @@ const CloudAccountForm = ({
       .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
       .map((offering) => ({
         ...offering,
-        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
       }));
   }, [serviceOfferings]);
 

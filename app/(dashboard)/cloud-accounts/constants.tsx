@@ -82,6 +82,11 @@ export const CloudAccountValidationSchema = yup.object({
       ),
     otherwise: yup.string(),
   }),
+  nebiusTenantId: yup.string().when("cloudProvider", {
+    is: "nebius",
+    then: yup.string().required("Nebius Tenant ID is required"),
+    otherwise: yup.string(),
+  }),
   clusterName: yup.string().when("cloudProvider", {
     is: "byoc-onprem",
     then: yup.string().required("Kubernetes Cluster Name is required"),

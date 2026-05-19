@@ -476,7 +476,10 @@ const CloudAccountsPage = () => {
           header: "Private link",
           cell: (data) => {
             const value = data.getValue();
-            if (value === "NA") {
+            const resultParams = getResultParams(data.row.original);
+            const isNebius = !!resultParams?.nebius_tenant_id;
+            const isBYOCOnprem = !!resultParams?.cluster_name;
+            if (value === "NA" || isNebius || isBYOCOnprem) {
               return "-";
             }
             return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
