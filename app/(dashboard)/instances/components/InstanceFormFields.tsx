@@ -22,6 +22,7 @@ import { ResourceSummary } from "../hooks/useResources";
 import {
   cloudProviderToPlatformMap,
   filterSchemaByCloudProvider,
+  canChooseExistingVpc,
   getCustomNetworksMenuItems,
   getJsonValue,
   getRegionMenuItems,
@@ -145,7 +146,6 @@ export const getStandardInformationFields = (
     return options;
   })();
   const isBYOCOnprem = cloudProvider === "byoc-onprem";
-  const isPrivateNetwork = values.network_type === "INTERNAL";
 
   const fields: Field[] = [
     {
@@ -503,7 +503,7 @@ export const getStandardInformationFields = (
   }
 
   if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
-    const isExistingVpcSupported = cloudProvider === "aws" || (cloudProvider === "gcp" && !isPrivateNetwork);
+    const isExistingVpcSupported = canChooseExistingVpc(cloudProvider, values.network_type);
     const vpcType = requestParams._vpcType || "create_new";
     const selectedVpcType = vpcType === "choose_existing" && !isExistingVpcSupported ? "create_new" : vpcType;
 
@@ -524,7 +524,7 @@ export const getStandardInformationFields = (
           dataTestId: "choose-existing-vpc-radio",
           label: isExistingVpcSupported
             ? "Choose from Existing VPCs"
-            : isPrivateNetwork
+            : values.network_type === "INTERNAL"
               ? "Choose from Existing VPCs (available for AWS with Private network)"
               : "Choose from Existing VPCs (available for AWS / GCP)",
           value: "choose_existing",

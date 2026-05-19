@@ -199,6 +199,11 @@ export const getRegionMenuItems = (offering?: ServiceOffering, cloudProvider?: C
   return menuItems;
 };
 
+export const canChooseExistingVpc = (cloudProvider?: string, networkType?: string) => {
+  const isPrivateNetwork = networkType === "INTERNAL";
+  return cloudProvider === "aws" || (cloudProvider === "gcp" && !isPrivateNetwork);
+};
+
 export const getCustomNetworksMenuItems = (
   customNetworks: CustomNetwork[],
   cloudProvider?: CloudProvider,

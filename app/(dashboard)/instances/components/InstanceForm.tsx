@@ -32,7 +32,7 @@ import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
-import { applyCustomDnsNormalization, filterSchemaByCloudProvider, getInitialValues } from "../utils";
+import { applyCustomDnsNormalization, canChooseExistingVpc, filterSchemaByCloudProvider, getInitialValues } from "../utils";
 
 import {
   getDeploymentConfigurationFields,
@@ -300,11 +300,11 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        const isPrivateNetwork = data.network_type === "INTERNAL";
-        const canChooseExistingVpc = data.cloudProvider === "aws" || (data.cloudProvider === "gcp" && !isPrivateNetwork);
-
         // Remove internal _vpcType field and clear VPC fields when existing VPC isn't allowed or not selected
-        if (data.requestParams._vpcType !== "choose_existing" || !canChooseExistingVpc) {
+        if (
+          data.requestParams._vpcType !== "choose_existing" ||
+          !canChooseExistingVpc(data.cloudProvider, data.network_type)
+        ) {
           delete data.requestParams.cloud_provider_native_network_id;
           delete data.requestParams.vpc_id;
         }
