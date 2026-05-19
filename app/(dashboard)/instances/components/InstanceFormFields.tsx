@@ -145,6 +145,7 @@ export const getStandardInformationFields = (
     return options;
   })();
   const isBYOCOnprem = cloudProvider === "byoc-onprem";
+  const isPrivateNetwork = values.network_type === "INTERNAL";
 
   const fields: Field[] = [
     {
@@ -502,14 +503,15 @@ export const getStandardInformationFields = (
   }
 
   if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
-    const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+    const isExistingVpcSupported = cloudProvider === "aws" || (cloudProvider === "gcp" && !isPrivateNetwork);
     const vpcType = requestParams._vpcType || "create_new";
+    const selectedVpcType = vpcType === "choose_existing" && !isExistingVpcSupported ? "create_new" : vpcType;
 
     fields.push({
       label: "VPCs",
       subLabel: "",
       name: "requestParams._vpcType",
-      value: vpcType,
+      value: selectedVpcType,
       type: "radio",
       required: true,
       options: [
@@ -522,15 +524,17 @@ export const getStandardInformationFields = (
           dataTestId: "choose-existing-vpc-radio",
           label: isExistingVpcSupported
             ? "Choose from Existing VPCs"
-            : "Choose from Existing VPCs (available for AWS / GCP)",
+            : isPrivateNetwork
+              ? "Choose from Existing VPCs (available for AWS with Private network)"
+              : "Choose from Existing VPCs (available for AWS / GCP)",
           value: "choose_existing",
           disabled: !isExistingVpcSupported,
         },
       ],
-      previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
+      previewValue: selectedVpcType === "choose_existing" ? "Existing VPC" : "New VPC",
     });
 
-    if (vpcType === "choose_existing" && isExistingVpcSupported) {
+    if (selectedVpcType === "choose_existing" && isExistingVpcSupported) {
       const filteredNetworks = cloudNativeNetworks.filter((n) => !region || n.region === region);
       fields.push({
         dataTestId: "existing-vpc-select",

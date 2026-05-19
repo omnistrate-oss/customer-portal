@@ -300,9 +300,13 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        // Remove internal _vpcType field and clear native network id when creating new VPC
-        if (data.requestParams._vpcType === "create_new" || !data.requestParams._vpcType) {
+        const isPrivateNetwork = data.network_type === "INTERNAL";
+        const canChooseExistingVpc = data.cloudProvider === "aws" || (data.cloudProvider === "gcp" && !isPrivateNetwork);
+
+        // Remove internal _vpcType field and clear VPC fields when existing VPC isn't allowed or not selected
+        if (data.requestParams._vpcType !== "choose_existing" || !canChooseExistingVpc) {
           delete data.requestParams.cloud_provider_native_network_id;
+          delete data.requestParams.vpc_id;
         }
         delete data.requestParams._vpcType;
 
@@ -872,6 +876,8 @@ const InstanceForm = ({
             return values.cloudProvider === "azure";
           } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
+          } else if (resultParams?.nebius_tenant_id) {
+            return values.cloudProvider === "nebius";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
@@ -887,6 +893,8 @@ const InstanceForm = ({
                   ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
                   : resultParams?.oci_tenancy_id
                     ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
+                    : resultParams?.nebius_tenant_id
+                      ? `${instance.id} (Tenant ID - ${resultParams?.nebius_tenant_id})`
                     : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
