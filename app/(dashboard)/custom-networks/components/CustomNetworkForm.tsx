@@ -193,6 +193,7 @@ const CustomNetworkForm = ({
                     formData.setFieldTouched("cloudProviderRegion", false);
                   }}
                   disabled={formMode === "modify"}
+                  disabledProviders={{ nebius: "Customer Networks are not supported for Nebius" }}
                 />
               ),
               previewValue: formData.values.cloudProviderName

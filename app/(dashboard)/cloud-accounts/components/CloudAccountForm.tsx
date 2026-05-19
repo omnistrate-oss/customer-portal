@@ -1,17 +1,14 @@
 "use client";
 
+import { useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { cloudProviderLongLogoMap, sortCloudProviders } from "src/constants/cloudProviders";
@@ -24,6 +21,9 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -45,7 +45,15 @@ const PROVIDER_ID_FIELDS: Array<{
   dataTestId: string;
   label: string;
   subLabel: string;
-  name: "awsAccountId" | "gcpProjectId" | "gcpProjectNumber" | "azureSubscriptionId" | "azureTenantId" | "ociTenancyId" | "ociDomainId" | "nebiusTenantId";
+  name:
+    | "awsAccountId"
+    | "gcpProjectId"
+    | "gcpProjectNumber"
+    | "azureSubscriptionId"
+    | "azureTenantId"
+    | "ociTenancyId"
+    | "ociDomainId"
+    | "nebiusTenantId";
   descriptionVariant?:
     | "aws"
     | "gcpProjectId"
@@ -55,14 +63,69 @@ const PROVIDER_ID_FIELDS: Array<{
     | "ociTenancyId"
     | "ociDomainId";
 }> = [
-  { provider: "aws", dataTestId: "aws-account-id-input", label: "AWS Account ID", subLabel: "AWS Account ID to use for the account", name: "awsAccountId", descriptionVariant: "aws" },
-  { provider: "gcp", dataTestId: "gcp-project-id-input", label: "GCP Project ID", subLabel: "GCP Project ID to use for the account", name: "gcpProjectId", descriptionVariant: "gcpProjectId" },
-  { provider: "gcp", dataTestId: "gcp-project-number-input", label: "GCP Project Number", subLabel: "GCP Project Number to use for the account", name: "gcpProjectNumber", descriptionVariant: "gcpProjectNumber" },
-  { provider: "azure", dataTestId: "azure-subscription-id-input", label: "Azure Subscription ID", subLabel: "Azure Subscription ID to use for the account", name: "azureSubscriptionId", descriptionVariant: "azureSubscriptionId" },
-  { provider: "azure", dataTestId: "azure-tenant-id-input", label: "Azure Tenant ID", subLabel: "Azure Tenant ID to use for the account", name: "azureTenantId", descriptionVariant: "azureTenantId" },
-  { provider: "oci", dataTestId: "oci-tenancy-id-input", label: "Tenancy OCID", subLabel: "OCI Tenancy OCID to use for the account", name: "ociTenancyId", descriptionVariant: "ociTenancyId" },
-  { provider: "oci", dataTestId: "oci-domain-id-input", label: "Domain OCID", subLabel: "OCI Domain OCID to use for the account", name: "ociDomainId", descriptionVariant: "ociDomainId" },
-  { provider: "nebius", dataTestId: "nebius-tenant-id-input", label: "Nebius Tenant ID", subLabel: "Nebius Tenant ID to use for the account", name: "nebiusTenantId" },
+  {
+    provider: "aws",
+    dataTestId: "aws-account-id-input",
+    label: "AWS Account ID",
+    subLabel: "AWS Account ID to use for the account",
+    name: "awsAccountId",
+    descriptionVariant: "aws",
+  },
+  {
+    provider: "gcp",
+    dataTestId: "gcp-project-id-input",
+    label: "GCP Project ID",
+    subLabel: "GCP Project ID to use for the account",
+    name: "gcpProjectId",
+    descriptionVariant: "gcpProjectId",
+  },
+  {
+    provider: "gcp",
+    dataTestId: "gcp-project-number-input",
+    label: "GCP Project Number",
+    subLabel: "GCP Project Number to use for the account",
+    name: "gcpProjectNumber",
+    descriptionVariant: "gcpProjectNumber",
+  },
+  {
+    provider: "azure",
+    dataTestId: "azure-subscription-id-input",
+    label: "Azure Subscription ID",
+    subLabel: "Azure Subscription ID to use for the account",
+    name: "azureSubscriptionId",
+    descriptionVariant: "azureSubscriptionId",
+  },
+  {
+    provider: "azure",
+    dataTestId: "azure-tenant-id-input",
+    label: "Azure Tenant ID",
+    subLabel: "Azure Tenant ID to use for the account",
+    name: "azureTenantId",
+    descriptionVariant: "azureTenantId",
+  },
+  {
+    provider: "oci",
+    dataTestId: "oci-tenancy-id-input",
+    label: "Tenancy OCID",
+    subLabel: "OCI Tenancy OCID to use for the account",
+    name: "ociTenancyId",
+    descriptionVariant: "ociTenancyId",
+  },
+  {
+    provider: "oci",
+    dataTestId: "oci-domain-id-input",
+    label: "Domain OCID",
+    subLabel: "OCI Domain OCID to use for the account",
+    name: "ociDomainId",
+    descriptionVariant: "ociDomainId",
+  },
+  {
+    provider: "nebius",
+    dataTestId: "nebius-tenant-id-input",
+    label: "Nebius Tenant ID",
+    subLabel: "Nebius Tenant ID to use for the account",
+    name: "nebiusTenantId",
+  },
 ];
 
 // Maps form values to the provider-specific snake_case fields used by the API.
@@ -256,8 +319,22 @@ const CloudAccountForm = ({
     },
   });
 
-  const formData = useFormik({
-    initialValues: getInitialValues(
+  // Cache initial values so that subscriptions/serviceOfferings arriving late
+  // (e.g. after a 401 → token refresh) can trigger an auto-select once, without
+  // wiping user-entered fields afterwards. We re-derive only while the previously
+  // derived servicePlanId is still empty.
+  const cachedInitialValuesRef = useRef<any>(null);
+  const cachedSelectedInstanceIdRef = useRef<string | undefined>(undefined);
+  const initialValues = useMemo(() => {
+    const instanceId = selectedInstance?.id;
+    if (cachedSelectedInstanceIdRef.current !== instanceId) {
+      cachedInitialValuesRef.current = null;
+      cachedSelectedInstanceIdRef.current = instanceId;
+    }
+    if (cachedInitialValuesRef.current?.servicePlanId) {
+      return cachedInitialValuesRef.current;
+    }
+    const computed = getInitialValues(
       initialFormValues,
       selectedInstance,
       byoaSubscriptions,
@@ -265,7 +342,22 @@ const CloudAccountForm = ({
       byoaServiceOfferings,
       allInstances,
       selectedAccountConfig
-    ),
+    );
+    cachedInitialValuesRef.current = computed;
+    return computed;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedInstance?.id,
+    byoaSubscriptions,
+    byoaServiceOfferings,
+    byoaServiceOfferingsObj,
+    allInstances,
+    selectedAccountConfig,
+    initialFormValues,
+  ]);
+
+  const formData = useFormik({
+    initialValues,
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
     onSubmit: (values) => {
@@ -493,7 +585,9 @@ const CloudAccountForm = ({
               dataTestId: def.dataTestId,
               label: def.label,
               subLabel: def.subLabel,
-              description: def.descriptionVariant ? <CustomLabelDescription variant={def.descriptionVariant} /> : undefined,
+              description: def.descriptionVariant ? (
+                <CustomLabelDescription variant={def.descriptionVariant} />
+              ) : undefined,
               name: def.name,
               type: "text" as const,
               required: true,
@@ -506,17 +600,21 @@ const CloudAccountForm = ({
         },
         // One section per Nebius binding.
         ...(values.cloudProvider === "nebius"
-          ? ((values.nebiusBindings ?? []) as NebiusBindingFormValue[]).map((binding, index) => {
+          ? ((values.nebiusBindings ?? []) as NebiusBindingFormValue[]).map((binding, index, arr) => {
               const path = `nebiusBindings[${index}]`;
               const existing = isExistingBinding(binding);
               const isFormDisabled = formMode === "view";
+              const isLastBinding = arr.length <= 1;
+              const removeDisabled = isFormDisabled || isLastBinding;
 
               return {
                 title: `Binding ${index + 1}`,
+                actionButtonPosition: "left" as const,
                 actionButton: (
                   <RemoveBindingButton
                     index={index}
-                    disabled={isFormDisabled}
+                    disabled={removeDisabled}
+                    disabledMessage={isLastBinding && !isFormDisabled ? "At least one binding is required" : undefined}
                     onRemove={() => {
                       const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
                       setFieldValue(
@@ -587,8 +685,7 @@ const CloudAccountForm = ({
                     ? [
                         {
                           label: "Private Key Expiry",
-                          subLabel:
-                            "The expiration date of the private key or authorized key used for this binding",
+                          subLabel: "The expiration date of the private key or authorized key used for this binding",
                           name: `${path}._keyExpiresAt`,
                           type: "text",
                           disabled: true,

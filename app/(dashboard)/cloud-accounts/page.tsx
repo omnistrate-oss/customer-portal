@@ -729,7 +729,11 @@ const CloudAccountsPage = () => {
 
   const isLastInstance =
     !deleteDialogAccountConfig?.byoaInstanceIDs || deleteDialogAccountConfig?.byoaInstanceIDs?.length === 1;
-  const isMultiStepDialog = Boolean(isLastInstance && deleteDialogAccountConfig);
+  // Nebius skips the offboard step; mirror DeleteConfirmationDialog's gate so polling
+  // doesn't wait for an offboard transition that will never happen.
+  const isDeleteDialogNebius =
+    (deleteDialogAccountConfig as { cloudProvider?: string } | undefined)?.cloudProvider === "nebius";
+  const isMultiStepDialog = Boolean(isLastInstance && deleteDialogAccountConfig && !isDeleteDialogNebius);
 
   const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
     open: showDeleteDialog,

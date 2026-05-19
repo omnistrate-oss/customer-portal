@@ -4,9 +4,10 @@ import { FC } from "react";
 import { Add } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-import DeleteIcon from "src/components/Icons/Delete/Delete";
+import DeleteMinusCircle from "src/components/Icons/DeleteMinusCircle/DeleteMinusCircle";
 import formatDateUTC from "src/utils/formatDateUTC";
 import Button from "components/Button/Button";
+import Tooltip from "components/Tooltip/Tooltip";
 
 export type NebiusBindingFormValue = {
   // User-editable fields
@@ -41,22 +42,36 @@ export const isExistingBinding = (binding: NebiusBindingFormValue) => Boolean(bi
 type RemoveButtonProps = {
   onRemove: () => void;
   disabled?: boolean;
+  disabledMessage?: string;
   index: number;
 };
 
 /** Action button rendered in the section header to remove a binding. */
-export const RemoveBindingButton: FC<RemoveButtonProps> = ({ onRemove, disabled, index }) => (
-  <IconButton
-    type="button"
-    size="small"
-    disabled={disabled}
-    onClick={onRemove}
-    aria-label={`Remove Binding ${index + 1}`}
-    data-testid={`remove-nebius-binding-${index}`}
-  >
-    <DeleteIcon />
-  </IconButton>
-);
+export const RemoveBindingButton: FC<RemoveButtonProps> = ({ onRemove, disabled, disabledMessage, index }) => {
+  const button = (
+    <IconButton
+      type="button"
+      size="small"
+      disabled={disabled}
+      onClick={onRemove}
+      aria-label={`Remove Binding ${index + 1}`}
+      data-testid={`remove-nebius-binding-${index}`}
+      sx={{ padding: 0, cursor: disabled ? "not-allowed" : "pointer" }}
+    >
+      <DeleteMinusCircle disabled={disabled} />
+    </IconButton>
+  );
+
+  if (disabled && disabledMessage) {
+    return (
+      <Tooltip title={disabledMessage} placement="top" arrow>
+        <span>{button}</span>
+      </Tooltip>
+    );
+  }
+
+  return button;
+};
 
 type AddBindingButtonProps = {
   onAdd: () => void;

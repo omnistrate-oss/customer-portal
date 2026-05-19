@@ -75,8 +75,9 @@ export const getValidSubscriptionForInstanceCreation = (
 
 /**
  * Maps an account config's bindings (with masked metadata) into the form's
- * binding shape. PEM is sourced from `keyFingerprint` as a placeholder until
- * the backend ships the real field.
+ * binding shape. The backend never returns the PEM — leave it blank so the
+ * user can either save without rotating (existing key is preserved by the
+ * server when PEM is omitted) or paste a new PEM to rotate.
  */
 export const mapNebiusBindingsToFormValue = (accountConfig?: AccountConfig): NebiusBindingFormValue[] => {
   const bindings = (accountConfig as any)?.nebiusBindings ?? [];
@@ -84,8 +85,7 @@ export const mapNebiusBindingsToFormValue = (accountConfig?: AccountConfig): Neb
     projectID: b.projectID ?? "",
     serviceAccountID: b.serviceAccountID ?? "",
     publicKeyID: b.publicKeyID ?? "",
-    // TODO: Update fieldname after we get from the API.
-    privateKeyPEM: b.keyFingerprint ?? "",
+    privateKeyPEM: "",
     status: b.status,
     region: b.region,
     keyExpiresAt: b.keyExpiresAt,

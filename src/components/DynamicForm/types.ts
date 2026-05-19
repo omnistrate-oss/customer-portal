@@ -43,6 +43,8 @@ export type Section = {
   title: string;
   fields: Field[];
   actionButton?: ReactNode;
+  /** Where to render `actionButton` relative to the title. Defaults to "right". */
+  actionButtonPosition?: "left" | "right";
 };
 
 export type FormConfiguration = {

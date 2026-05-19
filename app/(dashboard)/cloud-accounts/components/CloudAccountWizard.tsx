@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
@@ -7,11 +8,8 @@ import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/Subscr
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -30,16 +28,25 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
-import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
-import CustomLabelDescription from "./CustomLabelDescription";
-import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
+import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
+import CustomLabelDescription from "./CustomLabelDescription";
+import {
+  AddBindingButton,
+  EMPTY_NEBIUS_BINDING,
+  isExistingBinding,
+  NebiusBindingFormValue,
+  RemoveBindingButton,
+} from "./NebiusBindingsInput";
+import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
 type CloudAccountWizardProps = {
@@ -97,13 +104,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   });
 
   const byoaServiceOfferings = useMemo(
-    () =>
-      serviceOfferings
-        .filter((o) => o.serviceModelType === "BYOA" || o.serviceModelType === "ON_PREM_COPILOT")
-        .map((o) => ({
-          ...o,
-          cloudProviders: o.cloudProviders?.filter((p) => p !== "nebius"),
-        })),
+    () => serviceOfferings.filter((o) => o.serviceModelType === "BYOA" || o.serviceModelType === "ON_PREM_COPILOT"),
     [serviceOfferings]
   );
 
@@ -180,6 +181,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         } else if (values.cloudProvider === "oci") {
           resultParams.oci_tenancy_id = values.ociTenancyId;
           resultParams.oci_domain_id = values.ociDomainId;
+        } else if (values.cloudProvider === "nebius") {
+          resultParams.nebius_tenant_id = values.nebiusTenantId;
         }
 
         // Update query cache
@@ -205,6 +208,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           snackbar.showSuccess("Cloud Account created successfully");
           setCreatedInstanceId(instanceId as string);
           setShowPrivateClusterDialog(true);
+          return;
+        }
+
+        if (values.cloudProvider === "nebius") {
+          // Nebius authenticates via bindings supplied at create time —
+          // no Grant Access or Configure VPCs steps are needed.
+          snackbar.showSuccess("Cloud Account created successfully");
+          onClose();
           return;
         }
 
@@ -278,6 +289,20 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           cluster_name: values.clusterName,
           cluster_description: values.clusterDescription || undefined,
           account_configuration_method: values.accountConfigurationMethod || "Terraform",
+        };
+      } else if (values.cloudProvider === "nebius") {
+        requestParams = {
+          cloud_provider: values.cloudProvider,
+          nebius_tenant_id: values.nebiusTenantId,
+          nebius_bindings: (values.nebiusBindings ?? []).map((b: NebiusBindingFormValue) => ({
+            projectID: b.projectID,
+            serviceAccountID: b.serviceAccountID,
+            publicKeyID: b.publicKeyID,
+            privateKeyPEM: b.privateKeyPEM,
+          })),
+          enable_private_connectivity: enablePrivateConnectivity,
+          PrivateLink: enablePrivateConnectivity,
+          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       }
 
@@ -811,6 +836,17 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
             },
             {
+              dataTestId: "nebius-tenant-id-input",
+              label: "Nebius Tenant ID",
+              subLabel: "Nebius Tenant ID to use for the account",
+              name: "nebiusTenantId",
+              type: "text",
+              required: true,
+              disabled: false,
+              isHidden: values.cloudProvider !== "nebius",
+              previewValue: cloudProvider === "nebius" ? values.nebiusTenantId : null,
+            },
+            {
               dataTestId: "cluster-name-input",
               label: "Kubernetes Cluster Name",
               subLabel: "Name of the Kubernetes cluster to connect",
@@ -834,6 +870,73 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             },
           ],
         },
+        // One section per Nebius binding.
+        ...(values.cloudProvider === "nebius"
+          ? ((values.nebiusBindings ?? []) as NebiusBindingFormValue[]).map((binding, index) => {
+              const path = `nebiusBindings[${index}]`;
+              const existing = isExistingBinding(binding);
+              const totalBindings = (values.nebiusBindings ?? []).length;
+              const isLastBinding = totalBindings <= 1;
+              return {
+                title: `Binding ${index + 1}`,
+                actionButtonPosition: "left" as const,
+                actionButton: (
+                  <RemoveBindingButton
+                    index={index}
+                    disabled={isLastBinding}
+                    disabledMessage="At least one binding is required"
+                    onRemove={() => {
+                      const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+                      setFieldValue(
+                        "nebiusBindings",
+                        current.filter((_, i) => i !== index)
+                      );
+                    }}
+                  />
+                ),
+                fields: [
+                  {
+                    label: "Project ID",
+                    subLabel: "The Nebius project that will be used for this binding",
+                    name: `${path}.projectID`,
+                    type: "text",
+                    required: !existing,
+                    disabled: existing,
+                    value: binding.projectID,
+                    previewValue: binding.projectID || null,
+                  },
+                  {
+                    label: "Service Account ID",
+                    subLabel:
+                      "Service account with project-level permissions to create and manage required infrastructure",
+                    name: `${path}.serviceAccountID`,
+                    type: "text",
+                    required: true,
+                    value: binding.serviceAccountID,
+                    previewValue: binding.serviceAccountID || null,
+                  },
+                  {
+                    label: "Public Key ID",
+                    subLabel: "The ID of the authorized public key associated with this service account",
+                    name: `${path}.publicKeyID`,
+                    type: "text",
+                    required: true,
+                    value: binding.publicKeyID,
+                    previewValue: binding.publicKeyID || null,
+                  },
+                  {
+                    label: "Private Key PEM",
+                    subLabel: "The private key PEM that matches this binding's Public Key ID",
+                    name: `${path}.privateKeyPEM`,
+                    type: "password",
+                    required: true,
+                    value: binding.privateKeyPEM,
+                    previewValue: binding.privateKeyPEM ? "********" : null,
+                  },
+                ],
+              };
+            })
+          : []),
       ],
     }),
     // All visible form fields depend on `values` (changes trigger full recomputation).
@@ -885,27 +988,41 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   value: rp?.oci_domain_id || values.ociDomainId || undefined,
                 },
               ]
-            : selectedProvider === "byoc-onprem"
+            : selectedProvider === "nebius"
               ? [
                   {
-                    label: "Kubernetes Cluster Name",
-                    value: rp?.cluster_name || values.clusterName || undefined,
+                    label: "Nebius Tenant ID",
+                    value: rp?.nebius_tenant_id || values.nebiusTenantId || undefined,
                   },
-                  ...(rp?.cluster_description || values.clusterDescription
-                    ? [
-                        {
-                          label: "Cluster Description",
-                          value: rp?.cluster_description || values.clusterDescription || undefined,
-                        },
-                      ]
-                    : []),
-                ]
-              : [
                   {
-                    label: "AWS Account ID",
-                    value: rp?.aws_account_id || values.awsAccountId || undefined,
+                    label: "Bindings",
+                    value:
+                      (values.nebiusBindings ?? []).length > 0
+                        ? `${(values.nebiusBindings ?? []).length} configured`
+                        : undefined,
                   },
-                ];
+                ]
+              : selectedProvider === "byoc-onprem"
+                ? [
+                    {
+                      label: "Kubernetes Cluster Name",
+                      value: rp?.cluster_name || values.clusterName || undefined,
+                    },
+                    ...(rp?.cluster_description || values.clusterDescription
+                      ? [
+                          {
+                            label: "Cluster Description",
+                            value: rp?.cluster_description || values.clusterDescription || undefined,
+                          },
+                        ]
+                      : []),
+                  ]
+                : [
+                    {
+                      label: "AWS Account ID",
+                      value: rp?.aws_account_id || values.awsAccountId || undefined,
+                    },
+                  ];
 
     const standardItems = [
       {
@@ -979,17 +1096,19 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   ]);
 
   const isBYOCOnpremCloud = values.cloudProvider === "byoc-onprem";
+  const isNebiusCloud = values.cloudProvider === "nebius";
+  const isSingleStepFlow = isBYOCOnpremCloud || isNebiusCloud;
   const cancelLabel =
-    currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
+    currentStep === 0 ? (isSingleStepFlow ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
   const nextLabel =
-    currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
+    currentStep === 0 ? (isSingleStepFlow ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
   const isNextLoading =
     (currentStep === 0 && createCloudAccountMutation.isPending) ||
     (currentStep === 2 && importCloudNativeNetworksMutation.isPending);
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   const handleNext = () => {
-    if (currentStep === 0 || isBYOCOnpremCloud) {
+    if (currentStep === 0 || isSingleStepFlow) {
       // Submit form to create account
       formData.handleSubmit();
     } else if (currentStep === 1) {
@@ -1007,8 +1126,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   return (
     <div data-testid="cloud-account-wizard">
-      {/* Stepper – hidden for private/OnPrem cloud accounts */}
-      {!isBYOCOnpremCloud && (
+      {/* Stepper – hidden for single-step flows (private/OnPrem, Nebius) */}
+      {!isSingleStepFlow && (
         <Box sx={{ mb: "32px" }}>
           <WizardStepper currentStep={currentStep} />
         </Box>
@@ -1027,6 +1146,17 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 enablePrivateConnectivity={enablePrivateConnectivity}
                 onTogglePrivateConnectivity={setEnablePrivateConnectivity}
               />
+              {isNebiusCloud && (
+                <Box sx={{ mt: 2 }}>
+                  <AddBindingButton
+                    disabled={createCloudAccountMutation.isPending}
+                    onAdd={() => {
+                      const current = (values.nebiusBindings ?? []) as NebiusBindingFormValue[];
+                      setFieldValue("nebiusBindings", [...current, { ...EMPTY_NEBIUS_BINDING }]);
+                    }}
+                  />
+                </Box>
+              )}
             </form>
           )}
 

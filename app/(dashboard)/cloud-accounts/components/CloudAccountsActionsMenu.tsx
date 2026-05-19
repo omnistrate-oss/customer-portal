@@ -102,18 +102,17 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     //           ? "Please wait for the instance to get to Ready state"
     //           : "";
 
-    // Delete action
-    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius;
+    // Delete action — Nebius accounts skip the multi-step offboard flow and
+    // delete directly (see DeleteConfirmationDialog isMultiStepDialog gate).
+    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard;
 
     const isDeleteDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isNebius
-        ? "Delete is not supported for Nebius cloud accounts"
-        : isDeleting
-          ? "Cloud account deletion is already in progress"
-          : isDeleteProtected && deletionProtectionFeatureEnabled
-            ? "Cloud account has delete protection enabled"
-            : "";
+      : isDeleting
+        ? "Cloud account deletion is already in progress"
+        : isDeleteProtected && deletionProtectionFeatureEnabled
+          ? "Cloud account has delete protection enabled"
+          : "";
 
     // Modify is Nebius-only (bindings can be edited post-creation).
     const isModifyDisabled = !instance || !isNebius || !isUpdateAllowedByRBAC || isDeleting;

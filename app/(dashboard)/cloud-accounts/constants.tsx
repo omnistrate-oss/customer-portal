@@ -102,6 +102,8 @@ export const CloudAccountValidationSchema = yup.object({
           projectID: yup.string().required("Project ID is required"),
           serviceAccountID: yup.string().required("Service Account ID is required"),
           publicKeyID: yup.string().required("Public Key ID is required"),
+          // Backend doesn't return the PEM; user must re-enter it for every
+          // binding when modifying.
           privateKeyPEM: yup.string().required("Private Key PEM is required"),
         })
       )

@@ -3,7 +3,7 @@
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { StringSchema } from "yup";
 import * as yup from "yup";
 
@@ -170,22 +170,34 @@ const InstanceForm = ({
   );
 
   // Memoize initialValues so that subscriptions list changes (e.g. after subscribing)
-  // don't cause formik to reinitialize and wipe out requestParams defaults
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialValues = useMemo(
-    () =>
-      getInitialValues(
-        selectedInstance,
-        subscriptions,
-        serviceOfferingsObj,
-        serviceOfferings,
-        nonCloudAccountInstances,
-        [] // Will be updated later when customerVersionSets loads
-      ),
-    // Only recompute when the selected instance changes (modify mode) or on first mount
+  // don't cause formik to reinitialize and wipe out requestParams defaults.
+  // Exception: if the previous derivation produced an empty servicePlanId (auto-select
+  // failed because subscriptions/serviceOfferings hadn't loaded yet — e.g. after a 401
+  // refresh), allow re-derivation once real data arrives so auto-select can succeed.
+  const cachedInitialValuesRef = useRef<ReturnType<typeof getInitialValues> | null>(null);
+  const cachedInstanceIdRef = useRef<string | undefined>(undefined);
+
+  const initialValues = useMemo(() => {
+    const instanceId = selectedInstance?.id;
+    if (cachedInstanceIdRef.current !== instanceId) {
+      cachedInitialValuesRef.current = null;
+      cachedInstanceIdRef.current = instanceId;
+    }
+    if (cachedInitialValuesRef.current?.servicePlanId) {
+      return cachedInitialValuesRef.current;
+    }
+    const computed = getInitialValues(
+      selectedInstance,
+      subscriptions,
+      serviceOfferingsObj,
+      serviceOfferings,
+      nonCloudAccountInstances,
+      [] // Will be updated later when customerVersionSets loads
+    );
+    cachedInitialValuesRef.current = computed;
+    return computed;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedInstance?.id]
-  );
+  }, [selectedInstance?.id, subscriptions, serviceOfferings, serviceOfferingsObj, nonCloudAccountInstances]);
 
   const formData = useFormik({
     initialValues,

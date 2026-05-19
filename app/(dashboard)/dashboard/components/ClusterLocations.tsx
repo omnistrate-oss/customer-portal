@@ -97,7 +97,17 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
           Cluster Locations
         </Text>
       </Stack>
-      <Box marginTop="8px" sx={{ marginInline: "auto", maxWidth: "1200px" }}>
+      <Box
+        marginTop="8px"
+        sx={{
+          marginInline: "auto",
+          maxWidth: "1200px",
+          // Reserve space matching the SVG map's 230:137 aspect ratio so the
+          // dynamically-imported map doesn't cause a layout shift while loading.
+          aspectRatio: "230 / 137",
+          minHeight: { xs: "240px", sm: "360px", md: "500px" },
+        }}
+      >
         <DottedWorldMap regionsWithInstanceCount={regionsWithInstanceCount} />
       </Box>
     </ContainerCard>

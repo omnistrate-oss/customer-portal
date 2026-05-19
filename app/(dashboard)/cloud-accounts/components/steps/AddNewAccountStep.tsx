@@ -1,17 +1,17 @@
 "use client";
 
+import { ChangeEvent } from "react";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Box, Stack } from "@mui/material";
 import { FormikProps } from "formik";
-import { ChangeEvent } from "react";
 
-import GridDynamicField from "components/DynamicForm/GridDynamicField";
-import { FormConfiguration } from "components/DynamicForm/types";
-import Tooltip from "components/Tooltip/Tooltip";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import Switch from "src/components/Switch/Switch";
 import { Text } from "src/components/Typography/Typography";
+import GridDynamicField from "components/DynamicForm/GridDynamicField";
+import { FormConfiguration } from "components/DynamicForm/types";
+import Tooltip from "components/Tooltip/Tooltip";
 
 type AddNewAccountStepProps = {
   // FormikProps<Record<string, unknown>> preserves type-safety for the dynamic
@@ -41,21 +41,30 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
           ? "Azure Private Link"
           : cloudProvider === "oci"
             ? "OCI private connectivity"
-            : "provider-native private connectivity";
+            : cloudProvider === "nebius"
+              ? "Nebius private connectivity"
+              : "provider-native private connectivity";
 
   const isPrivateConnectivitySupported = cloudProvider === "aws";
 
   return (
     <div className="space-y-6">
       {sections.map((section, sIdx) => (
-        <CardWithTitle key={sIdx} title={section.title}>
+        <CardWithTitle
+          key={sIdx}
+          title={section.title}
+          actionButton={section.actionButton}
+          actionButtonPosition={section.actionButtonPosition}
+        >
           <div className="space-y-6">
             {section.fields.map((field, fIdx) => (
               <GridDynamicField key={fIdx} field={field} formData={formData} />
             ))}
 
-            {/* Private connectivity toggle – not applicable for private/OnPrem cloud */}
-            {cloudProvider !== "byoc-onprem" && (
+            {/* Private connectivity toggle – not applicable for private/OnPrem cloud.
+                Renders on the first (Standard Information) section only — additional
+                sections (e.g. Nebius bindings) shouldn't repeat it. */}
+            {sIdx === 0 && cloudProvider !== "byoc-onprem" && (
               <Stack gap="14px">
                 <div className="grid grid-cols-6" style={{ gridTemplateColumns: "repeat(6, minmax(0, 1fr))" }}>
                   <div className="col-span-2" style={{ paddingRight: "32px" }}>

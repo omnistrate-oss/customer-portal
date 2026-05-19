@@ -47,7 +47,12 @@ const GridDynamicForm: React.FC<GridDynamicFormProps> = ({
     >
       <div className="col-span-5 space-y-6">
         {sections.map((section, index) => (
-          <CardWithTitle key={index} title={section.title} actionButton={section.actionButton}>
+          <CardWithTitle
+            key={index}
+            title={section.title}
+            actionButton={section.actionButton}
+            actionButtonPosition={section.actionButtonPosition}
+          >
             <div className="space-y-6">
               {section.fields.map((field, fieldIndex) => (
                 <GridDynamicField key={fieldIndex} field={field} formData={formData} />
