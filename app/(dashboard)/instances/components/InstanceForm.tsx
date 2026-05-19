@@ -300,11 +300,12 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        // Remove internal _vpcType field and clear VPC-related fields when existing VPC isn't allowed or not selected
-        if (
+        const shouldClearVpcFields =
           data.requestParams._vpcType !== "choose_existing" ||
-          !canChooseExistingVpc(data.cloudProvider, data.network_type)
-        ) {
+          !canChooseExistingVpc(data.cloudProvider, data.network_type);
+
+        // Clear VPC-related fields when creating a new VPC or when existing VPC is unsupported.
+        if (shouldClearVpcFields) {
           delete data.requestParams.cloud_provider_native_network_id;
           delete data.requestParams.vpc_id;
         }

@@ -505,10 +505,11 @@ export const getStandardInformationFields = (
   if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
     const isExistingVpcSupported = canChooseExistingVpc(cloudProvider, values.network_type);
     const vpcType = requestParams._vpcType || "create_new";
+    // Keep form state valid when provider/network changes make existing VPC unsupported.
     const selectedVpcType = vpcType === "choose_existing" && !isExistingVpcSupported ? "create_new" : vpcType;
     const chooseExistingVpcLabel = isExistingVpcSupported
       ? "Choose from Existing VPCs"
-      : "Choose from Existing VPCs (available for AWS, or GCP with Public network)";
+      : "Choose from Existing VPCs (AWS / GCP Public only)";
 
     fields.push({
       label: "VPCs",
