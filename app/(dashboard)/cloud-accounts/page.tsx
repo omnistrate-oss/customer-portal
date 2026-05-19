@@ -633,6 +633,11 @@ const CloudAccountsPage = () => {
           selectedAccountConfig?.ociOffboardShellCommand ||
           getOciShellScriptOffboardCommand(resultParams?.cloud_provider_account_config_id);
       }
+    } else if (resultParams?.cluster_name) {
+      details = {
+        byocOnpremClusterName: resultParams.cluster_name,
+        byocOnpremUninstallCommand: resultParams.byoc_onprem_uninstall_command || "",
+      };
     }
     return details;
   }, [selectedInstance, clickedInstance, selectedAccountConfig]);
