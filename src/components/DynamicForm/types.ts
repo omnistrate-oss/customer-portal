@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactElement } from "react";
 
 import { FormMode } from "src/types/common/enums";
 
@@ -42,9 +42,6 @@ export type Field = {
 export type Section = {
   title: string;
   fields: Field[];
-  actionButton?: ReactNode;
-  /** Where to render `actionButton` relative to the title. Defaults to "right". */
-  actionButtonPosition?: "left" | "right";
 };
 
 export type FormConfiguration = {
