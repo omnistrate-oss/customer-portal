@@ -582,6 +582,8 @@ const CloudAccountsPage = () => {
     }
   }, [selectedInstance, accountConfigsHash]);
 
+  const isSelectedInstanceNebius = Boolean(getResultParams(selectedInstance)?.nebius_tenant_id);
+
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
     selectedAccountConfig?.status
@@ -684,6 +686,14 @@ const CloudAccountsPage = () => {
       return deleteResourceInstance(requestPayload);
     },
     onSuccess: async () => {
+      if (isSelectedInstanceNebius) {
+        setSelectedRows([]);
+        setIsOverlayOpen(false);
+        snackbar.showSuccess("Deleting cloud account...");
+        await refetchInstances();
+        return;
+      }
+
       const isLastInstance =
         !selectedAccountConfig?.byoaInstanceIDs || selectedAccountConfig?.byoaInstanceIDs?.length === 1;
       if (!isLastInstance) {
@@ -1088,7 +1098,7 @@ const CloudAccountsPage = () => {
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
-        accountConfig={deleteDialogAccountConfig}
+        accountConfig={isSelectedInstanceNebius ? undefined : deleteDialogAccountConfig}
         isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");

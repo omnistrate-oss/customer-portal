@@ -101,17 +101,15 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     //           : "";
 
     // Delete action
-    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius;
+    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard;
 
     const isDeleteDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isNebius
-        ? "Delete is not supported for Nebius cloud accounts"
-        : isDeleting
-          ? "Cloud account deletion is already in progress"
-          : isDeleteProtected && deletionProtectionFeatureEnabled
-            ? "Cloud account has delete protection enabled"
-            : "";
+      : isDeleting
+        ? "Cloud account deletion is already in progress"
+        : isDeleteProtected && deletionProtectionFeatureEnabled
+          ? "Cloud account has delete protection enabled"
+          : "";
 
     res.push({
       dataTestId: "delete-action-button",
