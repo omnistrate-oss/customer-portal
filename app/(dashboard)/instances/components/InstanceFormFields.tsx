@@ -37,6 +37,10 @@ import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
 import CustomTagsField from "./CustomTagsField";
 
+type CloudAccountInstanceOption = ResourceInstance & {
+  label: string;
+};
+
 export const getStandardInformationFields = (
   servicesObj,
   serviceOfferings: ServiceOffering[],
@@ -54,7 +58,7 @@ export const getStandardInformationFields = (
   versionSets: TierVersionSet[],
   isFetchingVersionSets: boolean,
   isFetchingResourceInstanceIds: boolean,
-  cloudAccountInstances: ResourceInstance[]
+  cloudAccountInstances: CloudAccountInstanceOption[]
 ) => {
   if (isFetchingServiceOfferings) return [];
 
