@@ -59,7 +59,7 @@ import {
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import useAccountConfig from "./hooks/useAccountConfig";
 import { DIALOG_DATA } from "./constants";
-import { getOffboardReadiness } from "./utils";
+import { getOffboardReadiness, InitialFormValuesFromUrl } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -67,6 +67,7 @@ export type Overlay =
   | "delete-dialog"
   | "create-instance-form"
   | "view-instance-form"
+  | "modify-instance-form"
   | "view-instructions-dialog"
   | "connect-dialog"
   | "disconnect-dialog"
@@ -83,7 +84,7 @@ const CloudAccountsPage = () => {
   const subscriptionId = searchParams?.get("subscriptionId");
 
   const { subscriptionsObj, serviceOfferingsObj } = useGlobalData();
-  const [initialFormValues, setInitialFormValues] = useState<any>();
+  const [initialFormValues, setInitialFormValues] = useState<InitialFormValuesFromUrl | undefined>();
   const [searchText, setSearchText] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
@@ -640,7 +641,11 @@ const CloudAccountsPage = () => {
 
   const isLastInstance =
     !deleteDialogAccountConfig?.byoaInstanceIDs || deleteDialogAccountConfig?.byoaInstanceIDs?.length === 1;
-  const isMultiStepDialog = Boolean(isLastInstance && deleteDialogAccountConfig);
+  // Nebius skips the offboard step; mirror DeleteConfirmationDialog's gate so polling
+  // doesn't wait for an offboard transition that will never happen.
+  const isDeleteDialogNebius =
+    (deleteDialogAccountConfig as { cloudProvider?: string } | undefined)?.cloudProvider === "nebius";
+  const isMultiStepDialog = Boolean(isLastInstance && deleteDialogAccountConfig && !isDeleteDialogNebius);
 
   const shouldPollDeleteDialogStatus = shouldPollInstanceStatus({
     open: showDeleteDialog,
@@ -870,6 +875,12 @@ const CloudAccountsPage = () => {
               setOverlayType("delete-dialog");
             },
 
+            onModifyClick: () => {
+              setClickedInstance(selectedInstance);
+              setIsOverlayOpen(true);
+              setOverlayType("modify-instance-form");
+            },
+
             onOffboardClick: () => {
               setClickedInstance(selectedInstance);
               setIsOverlayOpen(true);
@@ -905,8 +916,19 @@ const CloudAccountsPage = () => {
 
       <FullScreenDrawer
         title="Cloud Account"
-        description="Create a new cloud account"
-        open={isOverlayOpen && (overlayType === "create-instance-form" || overlayType === "view-instance-form")}
+        description={
+          overlayType === "modify-instance-form"
+            ? "Modify this cloud account"
+            : overlayType === "view-instance-form"
+              ? "View cloud account details"
+              : "Create a new cloud account"
+        }
+        open={
+          isOverlayOpen &&
+          (overlayType === "create-instance-form" ||
+            overlayType === "view-instance-form" ||
+            overlayType === "modify-instance-form")
+        }
         closeDrawer={() => {
           setIsOverlayOpen(false);
           setClickedInstance(undefined);
@@ -915,14 +937,23 @@ const CloudAccountsPage = () => {
           <CloudAccountForm
             initialFormValues={initialFormValues}
             selectedInstance={selectedInstance}
+            selectedAccountConfig={selectedAccountConfig}
             onClose={() => {
               setIsOverlayOpen(false);
             }}
-            formMode={overlayType === "view-instance-form" ? "view" : "create"}
+            formMode={
+              overlayType === "modify-instance-form"
+                ? "modify"
+                : overlayType === "view-instance-form"
+                  ? "view"
+                  : "create"
+            }
             setIsAccountCreation={setIsAccountCreation}
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            refetchInstances={refetchInstances}
+            refetchAccountConfigs={refetchAccountConfigs}
           />
         }
       />

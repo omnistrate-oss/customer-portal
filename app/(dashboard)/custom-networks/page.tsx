@@ -189,6 +189,14 @@ const CustomNetworksPage = () => {
         title: "Domain ID",
         value: networkInstance.ociDomainID,
       });
+    } else if ((networkInstance as { nebiusTenantID?: string }).nebiusTenantID) {
+      // CustomNetworkInstance schema doesn't expose nebiusTenantID yet; backend
+      // sends it. Narrow to a typed shape rather than `any`.
+      res.push({
+        title: "Tenant ID",
+        value: (networkInstance as { nebiusTenantID?: string }).nebiusTenantID,
+        icon: cloudProviderLogoMap.nebius,
+      });
     }
 
     if (networkInstance.cloudProviderNativeNetworkId) {

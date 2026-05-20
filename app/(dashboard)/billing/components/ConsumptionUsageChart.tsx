@@ -276,14 +276,23 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                   stroke={COLORS[index % COLORS.length]}
                   strokeDasharray="3 3"
                   dot={false}
-                  activeDot={(props) => (
-                    <circle
-                      {...props}
-                      transform={`translate(${translateX[index]}, 0)`}
-                      r={4}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  )}
+                  activeDot={(props) => {
+                    // Strip Recharts-internal props that aren't valid SVG attributes
+                    const { dataKey, payload, value, index: _i, points, ...svgProps } = props as any;
+                    void dataKey;
+                    void payload;
+                    void value;
+                    void _i;
+                    void points;
+                    return (
+                      <circle
+                        {...svgProps}
+                        transform={`translate(${translateX[index]}, 0)`}
+                        r={4}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    );
+                  }}
                   transform={`translate(${translateX[index]}, 0)`}
                 />
               ))}

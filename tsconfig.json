@@ -1,13 +1,7 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -21,29 +15,16 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "src/*": [
-        "src/*"
-      ],
-      "components/*": [
-        "src/components/*"
-      ],
-      "hooks/*": [
-        "src/hooks/*"
-      ],
-      "utils/*": [
-        "src/utils/*"
-      ],
-      "public/*": [
-        "public/*"
-      ],
-      "lib/*": [
-        "lib/*"
-      ],
-      "@/components/*": [
-        "components/*"
-      ]
+      "src/*": ["src/*"],
+      "components/*": ["src/components/*"],
+      "hooks/*": ["src/hooks/*"],
+      "utils/*": ["src/utils/*"],
+      "public/*": ["public/*"],
+      "lib/*": ["lib/*"],
+      "@/components/*": ["components/*"]
     },
     "target": "es5",
+    "ignoreDeprecations": "5.0",
     "forceConsistentCasingInFileNames": true,
     "plugins": [
       {
@@ -61,8 +42,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "scripts"
-  ]
+  "exclude": ["node_modules", "scripts"]
 }
