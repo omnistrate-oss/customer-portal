@@ -536,8 +536,8 @@ export const getStandardInformationFields = (
         dataTestId: "existing-vpc-select",
         label: "Select VPC",
         subLabel: "Choose an existing VPC from your cloud account",
-        name: `requestParams.vpc_id`,
-        value: requestParams["vpc_id"] || "",
+        name: "requestParams.cloudNativeNetworkId",
+        value: requestParams["cloudNativeNetworkId"] || "",
         type: "select",
         menuItems: filteredNetworks.map((n) => ({
           label: n.name || n.cloudNativeNetworkId || n.id,
@@ -548,8 +548,10 @@ export const getStandardInformationFields = (
         isLoading: isFetchingCloudNativeNetworks,
         emptyMenuText: region ? "No VPCs found in this region" : "Select a region first",
         previewValue: (() => {
-          const selected = filteredNetworks.find((n) => (n.cloudNativeNetworkId || n.id) === requestParams["vpc_id"]);
-          return selected?.name || requestParams["vpc_id"];
+          const selected = filteredNetworks.find(
+            (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]
+          );
+          return selected?.name || requestParams["cloudNativeNetworkId"];
         })(),
       });
     }
