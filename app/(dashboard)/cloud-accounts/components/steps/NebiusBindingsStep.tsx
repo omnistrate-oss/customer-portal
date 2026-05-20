@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
   Accordion,
@@ -90,7 +94,81 @@ const getBindingStatusMessage = (binding: NebiusBinding) => {
     return "Access verified. This binding can be used for deployments.";
   }
 
+  if (binding.status === "VERIFYING") {
+    return binding.statusMessage || "Verifying access. This binding is being checked for deployment readiness.";
+  }
+
+  if (binding.status === "FAILED") {
+    return binding.statusMessage || "Access verification failed. Review the binding details and verify again.";
+  }
+
   return binding.statusMessage;
+};
+
+const getBindingStatusBannerStyle = (status?: string) => {
+  switch (status) {
+    case "READY":
+      return {
+        backgroundColor: "#ECFDF3",
+        borderColor: "#ABEFC6",
+        color: "#027A48",
+        icon: <CheckCircleOutlineIcon fontSize="small" />,
+      };
+    case "VERIFYING":
+      return {
+        backgroundColor: "#FFFAEB",
+        borderColor: "#FEDF89",
+        color: "#B54708",
+        icon: <HourglassEmptyIcon fontSize="small" />,
+      };
+    case "FAILED":
+      return {
+        backgroundColor: "#FEF3F2",
+        borderColor: "#FECDCA",
+        color: "#B42318",
+        icon: <ErrorOutlineIcon fontSize="small" />,
+      };
+    default:
+      return {
+        backgroundColor: "#F9FAFB",
+        borderColor: "#EAECF0",
+        color: "#475467",
+        icon: <InfoOutlinedIcon fontSize="small" />,
+      };
+  }
+};
+
+const BindingStatusBanner = ({ binding }: { binding: NebiusBinding }) => {
+  const message = getBindingStatusMessage(binding);
+
+  if (!message) {
+    return null;
+  }
+
+  const styles = getBindingStatusBannerStyle(binding.status);
+
+  return (
+    <Box sx={{ px: "24px", pb: "20px" }}>
+      <Stack
+        direction="row"
+        gap="10px"
+        alignItems="flex-start"
+        sx={{
+          backgroundColor: styles.backgroundColor,
+          border: `1px solid ${styles.borderColor}`,
+          borderRadius: "8px",
+          color: styles.color,
+          px: "14px",
+          py: "12px",
+        }}
+      >
+        <Box sx={{ color: styles.color, display: "flex", mt: "1px" }}>{styles.icon}</Box>
+        <Text size="small" weight="medium" color={styles.color}>
+          {message}
+        </Text>
+      </Stack>
+    </Box>
+  );
 };
 
 const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId, nebiusTenantId }) => {
@@ -344,13 +422,7 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
                     ))}
                   </Stack>
 
-                  {getBindingStatusMessage(binding) && (
-                    <Box sx={{ px: "24px", pb: "20px" }}>
-                      <Text size="small" weight="regular" color={binding.status === "FAILED" ? "#D92D20" : "#667085"}>
-                        {getBindingStatusMessage(binding)}
-                      </Text>
-                    </Box>
-                  )}
+                  <BindingStatusBanner binding={binding} />
 
                   <Stack
                     direction="row"
