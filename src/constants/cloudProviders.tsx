@@ -11,6 +11,8 @@ import GcpLogo from "src/components/Logos/GcpLogo";
 import NebiusLogo from "src/components/Logos/NebiusLogo";
 import OciLogo from "src/components/Logos/OciLogo";
 
+import OnPremIcon from "../../app/(dashboard)/components/CloudProviderRadio/OnPremIcon";
+
 export const cloudProviderLabels = {
   gcp: "Google Cloud Platform",
   aws: "Amazon Web Services",
@@ -18,6 +20,7 @@ export const cloudProviderLabels = {
   oci: "Oracle Cloud Infrastructure",
   nebius: "Nebius",
   private: "Private",
+  "byoc-onprem": "Onprem",
 };
 
 //short logos map
@@ -27,6 +30,7 @@ export const cloudProviderLogoMap = {
   azure: <AzureIcon />,
   oci: <OCIIcon />,
   nebius: <NebiusIcon />,
+  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 //long logos map
@@ -37,6 +41,7 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo />,
   nebius: <NebiusLogo />,
   private: <PrivateLogo />,
+  "byoc-onprem": <OnPremIcon width="80" height="24" />,
 };
 
 export const cloudProviderLabelsShort = {
@@ -45,6 +50,7 @@ export const cloudProviderLabelsShort = {
   azure: "Azure",
   oci: "OCI",
   nebius: "Nebius",
+  "byoc-onprem": "Onprem",
 };
 
 export const CLOUD_PROVIDERS = {
@@ -52,5 +58,6 @@ export const CLOUD_PROVIDERS = {
   gcp: "gcp",
   azure: "azure",
   oci: "oci",
+  "byoc-onprem": "byoc-onprem",
   //add nebius later for custom network and cloud account creation
 };
