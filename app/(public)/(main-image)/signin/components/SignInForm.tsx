@@ -109,7 +109,7 @@ const SignInForm: FC<SignInFormProps> = ({
   });
 
   async function handleFormSubmit(values) {
-    const data = { ...values };
+    const data = { ...values, email: values.email.trim() };
 
     if (reCaptchaRef.current && !hasCaptchaErrored) {
       const token = await reCaptchaRef.current.executeAsync();

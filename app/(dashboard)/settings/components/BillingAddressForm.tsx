@@ -47,7 +47,13 @@ const BillingAddressForm: React.FC<BillingAddressFormProps> = ({ userData, isLoa
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      const data = { ...values };
+      const data = { ...values, address: { ...values.address } };
+      // Trim string address fields
+      for (const key in data.address) {
+        if (typeof data.address[key] === "string") {
+          data.address[key] = data.address[key].trim();
+        }
+      }
       // Remove Empty Fields
       for (const key in data) {
         if (data[key] === "") {

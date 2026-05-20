@@ -131,29 +131,33 @@ const PROVIDER_ID_FIELDS: Array<{
 // Maps form values to the provider-specific snake_case fields used by the API.
 const buildProviderResultParams = (values: any, orgId?: string): Record<string, any> => {
   switch (values.cloudProvider) {
-    case "aws":
+    case "aws": {
+      const awsAccountId = values.awsAccountId.trim();
       return {
-        aws_account_id: values.awsAccountId,
-        aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
+        aws_account_id: awsAccountId,
+        aws_bootstrap_role_arn: getAwsBootstrapArn(awsAccountId),
       };
-    case "gcp":
+    }
+    case "gcp": {
+      const gcpProjectId = values.gcpProjectId.trim();
       return {
-        gcp_project_id: values.gcpProjectId,
-        gcp_project_number: values.gcpProjectNumber,
-        gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, orgId),
+        gcp_project_id: gcpProjectId,
+        gcp_project_number: values.gcpProjectNumber.trim(),
+        gcp_service_account_email: getGcpServiceEmail(gcpProjectId, orgId),
       };
+    }
     case "azure":
       return {
-        azure_subscription_id: values.azureSubscriptionId,
-        azure_tenant_id: values.azureTenantId,
+        azure_subscription_id: values.azureSubscriptionId.trim(),
+        azure_tenant_id: values.azureTenantId.trim(),
       };
     case "oci":
       return {
-        oci_tenancy_id: values.ociTenancyId,
-        oci_domain_id: values.ociDomainId,
+        oci_tenancy_id: values.ociTenancyId.trim(),
+        oci_domain_id: values.ociDomainId.trim(),
       };
     case "nebius":
-      return { nebius_tenant_id: values.nebiusTenantId };
+      return { nebius_tenant_id: values.nebiusTenantId.trim() };
     default:
       return {};
   }

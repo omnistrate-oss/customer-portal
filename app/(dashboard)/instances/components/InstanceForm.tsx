@@ -240,6 +240,29 @@ const InstanceForm = ({
         ...cloneDeep(values),
       };
 
+      // Trim string values in requestParams (excluding password-type fields)
+      if (data.requestParams && typeof data.requestParams === "object") {
+        // eslint-disable-next-line no-use-before-define
+        const allSchemaParams = resourceSchemaData?.apis?.flatMap((api) => api.inputParameters || []) || [];
+        for (const key in data.requestParams) {
+          if (typeof data.requestParams[key] === "string") {
+            const schemaParam = allSchemaParams.find((p) => p.key === key);
+            if (!schemaParam || schemaParam.type?.toLowerCase() !== "password") {
+              data.requestParams[key] = data.requestParams[key].trim();
+            }
+          }
+        }
+      }
+
+      // Trim customTags key/value
+      if (Array.isArray(data.customTags)) {
+        data.customTags = data.customTags.map((tag: { key: string; value: string }) => ({
+          ...tag,
+          key: typeof tag.key === "string" ? tag.key.trim() : tag.key,
+          value: typeof tag.value === "string" ? tag.value.trim() : tag.value,
+        }));
+      }
+
       // Remove productTierVersion if allowCustomerVersionOverride is false or if we're not creating
       if (!allowCustomerVersionOverride || formMode !== "create") {
         delete data.productTierVersion;
