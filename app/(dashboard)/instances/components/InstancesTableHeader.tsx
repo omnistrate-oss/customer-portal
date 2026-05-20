@@ -312,7 +312,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
         </div>
       </div>
 
-      <div className="px-6 py-4">
+      <div className="px-6 py-4 border-b-[1px]">
         <InstancesFilters instances={instances} setFilteredInstances={setFilteredInstances} />
       </div>
     </div>

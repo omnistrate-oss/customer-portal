@@ -14,7 +14,6 @@ export const TableHead = styled(MuiTableHead)({
     lineHeight: "18px",
     background: "#F9FAFB",
     height: "44px",
-    borderBottom: "1px solid #EAECF0",
   },
   "& .MuiTableRow-head": {
     height: "44px",
