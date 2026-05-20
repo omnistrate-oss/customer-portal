@@ -879,6 +879,8 @@ const InstanceForm = ({
             return values.cloudProvider === "azure";
           } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
+          } else if (resultParams?.cluster_name) {
+            return values.cloudProvider === "byoc-onprem";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
