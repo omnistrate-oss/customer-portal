@@ -33,35 +33,40 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
   const [methodToRemove, setMethodToRemove] = useState<ConsumptionPaymentMethod | null>(null);
   const [removeError, setRemoveError] = useState("");
 
-  const configQuery = useStripeBillingConfig(enabled);
+  const configQuery = useStripeBillingConfig(enabled && isAddOpen);
   const paymentMethodsQuery = usePaymentMethods(enabled);
   const removeMutation = useRemovePaymentMethod();
   const setDefaultMutation = useSetDefaultPaymentMethod();
 
   const paymentMethods = paymentMethodsQuery.data || [];
-  const isLoading = configQuery.isPending || paymentMethodsQuery.isPending;
+  const isLoading = paymentMethodsQuery.isPending;
   const isMutating = removeMutation.isPending || setDefaultMutation.isPending;
-  const errorMessage = configQuery.error
-    ? getErrorMessage(configQuery.error, "Unable to load Stripe configuration.")
-    : paymentMethodsQuery.error
-      ? getErrorMessage(paymentMethodsQuery.error, "Unable to load payment methods.")
-      : "";
+  const errorMessage = paymentMethodsQuery.error
+    ? getErrorMessage(paymentMethodsQuery.error, "Unable to load payment methods.")
+    : "";
 
   const refreshAll = async () => {
     await paymentMethodsQuery.refetch();
     await onPaymentMethodsChanged();
   };
 
-  const handleAddSuccess = async () => {
+  const refreshBillingState = async () => {
+    await onPaymentMethodsChanged();
+  };
+
+  const handleAddSuccess = async (options?: { defaultFailed?: boolean }) => {
     setIsAddOpen(false);
     await refreshAll();
-    snackbar.showSuccess("Payment method added successfully");
+    if (options?.defaultFailed) {
+      snackbar.showError("Payment method added, but it could not be set as default. Choose Set Default from the list.");
+    } else {
+      snackbar.showSuccess("Payment method added successfully");
+    }
   };
 
   const handleSetDefault = async (method: ConsumptionPaymentMethod) => {
     try {
       await setDefaultMutation.mutateAsync(method.id);
-      await refreshAll();
       snackbar.showSuccess("Default payment method updated");
     } catch (error) {
       snackbar.showError(getErrorMessage(error, "Failed to update default payment method"));
@@ -77,7 +82,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
     try {
       await removeMutation.mutateAsync(methodToRemove.id);
       setMethodToRemove(null);
-      await refreshAll();
+      await refreshBillingState();
       snackbar.showSuccess("Payment method removed successfully");
     } catch (error) {
       setRemoveError(getErrorMessage(error, "Failed to remove payment method"));
@@ -101,6 +106,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
               <IconButton
                 size="small"
                 disabled={isLoading || paymentMethodsQuery.isFetching}
+                aria-label="Refresh payment methods"
                 onClick={() => refreshAll()}
                 sx={{
                   border: `1px solid ${colors.gray300}`,
@@ -109,7 +115,11 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
                   height: 36,
                 }}
               >
-                {paymentMethodsQuery.isFetching ? <LoadingSpinnerSmall /> : <RefreshIcon sx={{ fontSize: 18 }} />}
+                {paymentMethodsQuery.isFetching ? (
+                  <LoadingSpinnerSmall sx={{ marginLeft: 0 }} />
+                ) : (
+                  <RefreshIcon sx={{ fontSize: 18 }} />
+                )}
               </IconButton>
             </span>
           </Tooltip>
@@ -167,6 +177,8 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
       <AddPaymentMethodModal
         open={isAddOpen}
         config={configQuery.data}
+        configError={configQuery.error}
+        isConfigLoading={isAddOpen && (configQuery.isPending || configQuery.isFetching)}
         existingMethods={paymentMethods}
         onClose={() => setIsAddOpen(false)}
         onSuccess={handleAddSuccess}

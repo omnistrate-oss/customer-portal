@@ -33,15 +33,22 @@ const RemovePaymentMethodModal = ({
       open={open}
       onClose={isLoading ? undefined : onClose}
       PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: 520,
-          padding: "24px",
+        style: {
+          borderRadius: "12px",
+          minWidth: "520px",
+          maxWidth: "520px",
         },
       }}
     >
-      <DialogTitle sx={{ padding: 0 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap="16px">
+      <DialogTitle
+        sx={{
+          px: "24px",
+          pt: "24px",
+          pb: "16px",
+          position: "relative",
+        }}
+      >
+        <Stack direction="row" alignItems="center" gap="16px">
           <Stack direction="row" alignItems="center" gap="12px">
             <Stack
               alignItems="center"
@@ -60,27 +67,32 @@ const RemovePaymentMethodModal = ({
               Remove Payment Method
             </Text>
           </Stack>
-          <IconButton onClick={onClose} disabled={isLoading}>
-            <CloseIcon />
-          </IconButton>
         </Stack>
+        <IconButton
+          onClick={onClose}
+          disabled={isLoading}
+          aria-label="Close remove payment method dialog"
+          sx={{
+            position: "absolute",
+            right: "16px",
+            top: "16px",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ padding: 0, marginTop: "20px" }}>
+      <DialogContent sx={{ px: "24px", py: 0 }}>
         <Text size="small" weight="regular" color={colors.gray600}>
           {method
             ? `Remove ${getPaymentMethodPrimaryLabel(method)} from this billing account?`
             : "Remove this payment method from this billing account?"}
         </Text>
-        <Text size="small" weight="regular" color={colors.gray600} mt={1}>
-          The backend will block removal if unpaid invoices exist, or if this is the last method while current usage or
-          active subscriptions still require a payment method.
-        </Text>
-        {errorMessage && (
+        {errorMessage ? (
           <Text
             size="small"
             weight="medium"
             color={colors.error700}
-            mt={2}
+            mt={1}
             sx={{
               backgroundColor: colors.error50,
               border: `1px solid ${colors.error200}`,
@@ -90,9 +102,14 @@ const RemovePaymentMethodModal = ({
           >
             {errorMessage}
           </Text>
+        ) : (
+          <Text size="small" weight="regular" color={colors.gray600} mt={1}>
+            Removal is blocked when unpaid invoices, current usage, or active subscriptions still require a payment
+            method.
+          </Text>
         )}
       </DialogContent>
-      <DialogActions sx={{ padding: 0, paddingTop: "24px" }}>
+      <DialogActions sx={{ p: "24px", gap: "12px" }}>
         <Button variant="outlined" size="large" disabled={isLoading} onClick={onClose}>
           Cancel
         </Button>
@@ -101,7 +118,7 @@ const RemovePaymentMethodModal = ({
           size="large"
           bgColor={colors.error700}
           fontColor="#FFFFFF"
-          disabled={isLoading}
+          disabled={isLoading || Boolean(errorMessage)}
           isLoading={isLoading}
           onClick={onConfirm}
         >

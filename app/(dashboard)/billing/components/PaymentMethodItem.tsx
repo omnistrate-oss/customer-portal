@@ -25,6 +25,7 @@ const bankMethodTypes = new Set(["us_bank_account", "sepa_debit", "bacs_debit", 
 
 const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: PaymentMethodItemProps) => {
   const Icon = bankMethodTypes.has(method.type) ? AccountBalanceIcon : CreditCardIcon;
+  const primaryLabel = getPaymentMethodPrimaryLabel(method);
 
   return (
     <Box
@@ -55,7 +56,7 @@ const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: P
           <Box minWidth={0}>
             <Stack direction="row" alignItems="center" gap="8px" flexWrap="wrap">
               <Text size="small" weight="semibold" color={colors.gray900} ellipsis maxWidth="320px">
-                {getPaymentMethodPrimaryLabel(method)}
+                {primaryLabel}
               </Text>
               {method.isDefault && <StatusChip label="Default" category="success" />}
             </Stack>
@@ -82,6 +83,7 @@ const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: P
               <IconButton
                 size="small"
                 disabled={disableActions}
+                aria-label={`Remove ${primaryLabel}`}
                 onClick={() => onRemove(method)}
                 sx={{
                   border: `1px solid ${colors.gray300}`,

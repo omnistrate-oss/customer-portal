@@ -1672,6 +1672,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/2022-09-01-00/resource-instance/billing/stripe/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GetConsumptionStripeConfig consumption-payment-method-api
+         * @description Get Stripe publishable key and connected account ID for mounting Elements
+         */
+        get: operations["consumption-payment-method-api/GetConsumptionStripeConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/billing/stripe/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ListConsumptionPaymentMethods consumption-payment-method-api
+         * @description List all payment methods for the end customer
+         */
+        get: operations["consumption-payment-method-api/ListConsumptionPaymentMethods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/setup-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * CreateConsumptionSetupIntent consumption-payment-method-api
+         * @description Create a Stripe SetupIntent for adding a new payment method via the connected account
+         */
+        post: operations["consumption-payment-method-api/CreateConsumptionSetupIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * RemoveConsumptionPaymentMethod consumption-payment-method-api
+         * @description Remove a payment method from the connected account. Blocked if unpaid invoices exist.
+         */
+        delete: operations["consumption-payment-method-api/RemoveConsumptionPaymentMethod"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/{id}/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * SetDefaultConsumptionPaymentMethod consumption-payment-method-api
+         * @description Set a payment method as default on the connected account
+         */
+        post: operations["consumption-payment-method-api/SetDefaultConsumptionPaymentMethod"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/2022-09-01-00/resource-instance/custom-network": {
         parameters: {
             query?: never;
@@ -8534,6 +8634,30 @@ export interface components {
              */
             rootVolumeSizeGi?: number;
             warmPoolConfiguration?: components["schemas"]["WarmPoolConfiguration"];
+        };
+        /**
+         * @example {
+         *       "token": "vz"
+         *     }
+         */
+        CreateConsumptionSetupIntentRequest: {
+            /**
+             * @description JWT token used to perform authorization
+             * @example v
+             */
+            token: string;
+        };
+        /**
+         * @example {
+         *       "clientSecret": "seti_1NVChw2eZvKYlo2C_secret_..."
+         *     }
+         */
+        CreateSetupIntentResult: {
+            /**
+             * @description SetupIntent client secret for Stripe Elements
+             * @example seti_1NVChw2eZvKYlo2C_secret_...
+             */
+            clientSecret: string;
         };
         /**
          * @description Custom domain including the role required to access
@@ -24887,6 +25011,18 @@ export interface components {
         };
         /**
          * @example {
+         *       "token": "v2"
+         *     }
+         */
+        GetConsumptionStripeConfigRequest: {
+            /**
+             * @description JWT token used to perform authorization
+             * @example 8g
+             */
+            token: string;
+        };
+        /**
+         * @example {
          *       "endDate": "2024-01-01T10:00:00Z",
          *       "startDate": "2023-01-01T10:00:00Z",
          *       "subscriptionID": "sub-12345678",
@@ -30593,8 +30729,20 @@ export interface components {
              *       "c5.xlarge",
              *       "r5.xlarge"
              *     ]
-             */
+            */
             types: string[];
+        };
+        /**
+         * @example {
+         *       "token": "v"
+         *     }
+         */
+        ListConsumptionPaymentMethodsRequest: {
+            /**
+             * @description JWT token used to perform authorization
+             * @example ndn
+             */
+            token: string;
         };
         /**
          * @example {
@@ -33832,8 +33980,31 @@ export interface components {
              *         "valueType": "Boolean|Float64|String|Secret|Password"
              *       }
              *     ]
-             */
+            */
             outputParameters?: components["schemas"]["DescribeOutputParameterResult"][];
+        };
+        /**
+         * @example {
+         *       "paymentMethods": [
+         *         {
+         *           "bankName": "STRIPE TEST BANK",
+         *           "brand": "visa",
+         *           "displayName": "Visa ending 4242",
+         *           "expMonth": 12,
+         *           "expYear": 2030,
+         *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+         *           "isDefault": true,
+         *           "last4": "4242",
+         *           "type": "card"
+         *         }
+         *       ]
+         *     }
+         */
+        ListPaymentMethodsResult: {
+            /**
+             * @description List of payment methods attached to the customer
+             */
+            paymentMethods?: components["schemas"]["PaymentMethod"][];
         };
         /**
          * @example {
@@ -42286,6 +42457,67 @@ export interface components {
             /**
              * @description The parameter type
              * @example Boolean|Float64|String|JSON|Resource
+            */
+            type: string;
+        };
+        /**
+         * @example {
+         *       "brand": "visa",
+         *       "displayName": "Visa ending 4242",
+         *       "expMonth": 12,
+         *       "expYear": 2030,
+         *       "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+         *       "isDefault": true,
+         *       "last4": "4242",
+         *       "type": "card"
+         *     }
+         */
+        PaymentMethod: {
+            /**
+             * @description Bank name when the payment method is a bank account
+             * @example STRIPE TEST BANK
+             */
+            bankName?: string;
+            /**
+             * @description Card brand when the payment method is a card
+             * @example visa
+             */
+            brand?: string;
+            /**
+             * @description Display-safe payment method label
+             * @example Visa ending 4242
+             */
+            displayName: string;
+            /**
+             * Format: int64
+             * @description Card expiration month when the payment method is a card
+             * @example 12
+             */
+            expMonth?: number;
+            /**
+             * Format: int64
+             * @description Card expiration year when the payment method is a card
+             * @example 2030
+             */
+            expYear?: number;
+            /**
+             * @description Stripe payment method ID
+             * @example pm_1NVChw2eZvKYlo2CwkOranTh
+             */
+            id: string;
+            /**
+             * @description Whether this is the default payment method
+             * @example true
+             */
+            isDefault: boolean;
+            /**
+             * @description Last four digits or characters when Stripe exposes them
+             * @example 4242
+             */
+            last4?: string;
+            /**
+             * @description Stripe payment method type (card, us_bank_account, sepa_debit, etc.)
+             * @example card
              */
             type: string;
         };
@@ -43323,6 +43555,24 @@ export interface components {
              * @example Major version set
              */
             name?: string;
+        };
+        /**
+         * @example {
+         *       "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+         *       "token": "5"
+         *     }
+         */
+        RemoveConsumptionPaymentMethodRequest: {
+            /**
+             * @description Payment method ID to remove
+             * @example pm_1NVChw2eZvKYlo2CwkOranTh
+             */
+            id: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example q
+             */
+            token: string;
         };
         /**
          * @example {
@@ -46864,6 +47114,24 @@ export interface components {
         };
         /**
          * @example {
+         *       "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+         *       "token": "sui"
+         *     }
+         */
+        SetDefaultConsumptionPaymentMethodRequest: {
+            /**
+             * @description Payment method ID to set as default
+             * @example pm_1NVChw2eZvKYlo2CwkOranTh
+             */
+            id: string;
+            /**
+             * @description JWT token used to perform authorization
+             * @example glq
+             */
+            token: string;
+        };
+        /**
+         * @example {
          *       "accountConfigId": "ac-12345678",
          *       "id": "sm-12345678",
          *       "serviceId": "s-12345678",
@@ -47229,6 +47497,24 @@ export interface components {
              * @example https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_12345678&scope=read_write&state=12345678
              */
             authorizeURL?: string;
+        };
+        /**
+         * @example {
+         *       "publishableKey": "pk_test_51...",
+         *       "stripeAccountId": "acct_1M2JTkLkdIwHu7ix"
+         *     }
+         */
+        StripeConfigResult: {
+            /**
+             * @description Stripe publishable key for mounting Elements
+             * @example pk_test_51...
+             */
+            publishableKey: string;
+            /**
+             * @description Connected Stripe account ID (SP-tier only)
+             * @example acct_1M2JTkLkdIwHu7ix
+             */
+            stripeAccountId?: string;
         };
         /**
          * @description Details of a single subnet in a VPC
@@ -68392,6 +68678,321 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["OmnistrateServiceHealthResult"];
+                };
+            };
+        };
+    };
+    "consumption-payment-method-api/GetConsumptionStripeConfig": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StripeConfigResult"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when billing is not configured */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "consumption-payment-method-api/ListConsumptionPaymentMethods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListPaymentMethodsResult"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when billing is not configured */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to list payment methods */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "consumption-payment-method-api/CreateConsumptionSetupIntent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateSetupIntentResult"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when billing is not configured */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to create setup intent */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "consumption-payment-method-api/RemoveConsumptionPaymentMethod": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Payment method ID to remove
+                 * @example pm_1NVChw2eZvKYlo2CwkOranTh
+                 */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content response. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the payment method is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description invalid_state: Response used when removal is blocked by unpaid invoices or active resources */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to remove payment method */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "consumption-payment-method-api/SetDefaultConsumptionPaymentMethod": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Payment method ID to set as default
+                 * @example pm_1NVChw2eZvKYlo2CwkOranTh
+                 */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content response. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description bad_request: Response used on a bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description auth_failure: Response used on authentication failure */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description forbidden: Response used on authorization failure */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description not_found: Response used when the payment method is not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
+                };
+            };
+            /** @description failed_request: Response used on failure to set default */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.goa.error": components["schemas"]["Error"];
                 };
             };
         };

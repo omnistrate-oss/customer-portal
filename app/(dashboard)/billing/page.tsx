@@ -30,6 +30,22 @@ import useBillingStatus from "./hooks/useBillingStatus";
 import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
 import useConsumptionUsage from "./hooks/useConsumptionUsage";
 
+const getSafeExternalURL = (url?: string) => {
+  if (!url) {
+    return "";
+  }
+
+  try {
+    const parsedURL = new URL(url);
+    if (parsedURL.protocol !== "https:") {
+      return "";
+    }
+    return parsedURL.toString();
+  } catch {
+    return "";
+  }
+};
+
 const BillingPage = () => {
   const { refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
@@ -125,6 +141,10 @@ const BillingPage = () => {
   const balanceDueLink =
     billingDetails?.billingProviders?.find((provider) => provider.type === selectedBillingProvider)?.balanceDueLink ||
     "#";
+  const safePaymentURL = getSafeExternalURL(paymentURL);
+  const safeBalanceDueLink = getSafeExternalURL(balanceDueLink);
+  const safePaymentInfoPortalURL = getSafeExternalURL(billingDetails?.paymentInfoPortalURL);
+  const payNowLink = isStripe ? safePaymentURL : safeBalanceDueLink;
 
   return (
     <div>
@@ -226,8 +246,8 @@ const BillingPage = () => {
                     <DisplayText size="small" weight="semibold">
                       {selectedBillingProvider === "STRIPE" ? `$${invoicesTotalAmount}` : "NA"}
                     </DisplayText>
-                    {!isStripe || paymentURL ? (
-                      <Link href={isStripe ? paymentURL : balanceDueLink} target="_blank">
+                    {payNowLink ? (
+                      <Link href={payNowLink} target="_blank" rel="noopener noreferrer">
                         <Button
                           variant="contained"
                           endIcon={
@@ -251,7 +271,7 @@ const BillingPage = () => {
                             }}
                           />
                         }
-                        disabled={!paymentURL}
+                        disabled={!payNowLink}
                       >
                         Pay Now
                       </Button>
@@ -285,8 +305,8 @@ const BillingPage = () => {
                         category={!isStripe ? "failed" : paymentConfigured === true ? "success" : "failed"}
                         sx={{ alignSelf: "center" }}
                       />
-                      {isStripe && billingDetails?.paymentInfoPortalURL ? (
-                        <Link href={billingDetails?.paymentInfoPortalURL} target="_blank">
+                      {isStripe && safePaymentInfoPortalURL ? (
+                        <Link href={safePaymentInfoPortalURL} target="_blank" rel="noopener noreferrer">
                           <Button
                             disabled={!isStripe}
                             variant="contained"

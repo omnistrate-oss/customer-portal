@@ -20,15 +20,17 @@ import { getErrorMessage } from "./paymentMethodUtils";
 type AddPaymentMethodModalProps = {
   open: boolean;
   config?: ConsumptionStripeConfigResponse;
+  configError?: unknown;
+  isConfigLoading?: boolean;
   existingMethods: ConsumptionPaymentMethod[];
   onClose: () => void;
-  onSuccess: () => Promise<void> | void;
+  onSuccess: (options?: { defaultFailed?: boolean }) => Promise<void> | void;
 };
 
 type AddPaymentMethodFormProps = {
   existingMethods: ConsumptionPaymentMethod[];
   onCancel: () => void;
-  onSuccess: () => Promise<void> | void;
+  onSuccess: (options?: { defaultFailed?: boolean }) => Promise<void> | void;
   setErrorMessage: (message: string) => void;
 };
 
@@ -63,14 +65,22 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
     const paymentMethodID =
       typeof result.setupIntent?.payment_method === "string" ? result.setupIntent.payment_method : undefined;
 
-    try {
-      if (!existingMethods.some((method) => method.isDefault) && paymentMethodID) {
-        await setDefaultMutation.mutateAsync(paymentMethodID);
-      }
+    let defaultFailed = false;
 
-      await onSuccess();
+    if (!existingMethods.some((method) => method.isDefault) && paymentMethodID) {
+      try {
+        await setDefaultMutation.mutateAsync(paymentMethodID);
+      } catch {
+        defaultFailed = true;
+      }
+    }
+
+    try {
+      await onSuccess({ defaultFailed });
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "Payment method was saved, but setting it as default failed."));
+      setErrorMessage(
+        getErrorMessage(error, "Payment method was saved, but the payment methods list could not refresh.")
+      );
       setIsSubmitting(false);
       return;
     }
@@ -80,7 +90,7 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
 
   return (
     <>
-      <DialogContent sx={{ padding: 0, marginTop: "20px" }}>
+      <DialogContent sx={{ px: "24px", py: 0 }}>
         <PaymentElement
           options={{
             fields: {
@@ -91,7 +101,7 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
           }}
         />
       </DialogContent>
-      <DialogActions sx={{ padding: 0, paddingTop: "24px" }}>
+      <DialogActions sx={{ p: "24px", gap: "12px" }}>
         <Button variant="outlined" size="large" disabled={isSubmitting} onClick={onCancel}>
           Cancel
         </Button>
@@ -109,10 +119,20 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
   );
 };
 
-const AddPaymentMethodModal = ({ open, config, existingMethods, onClose, onSuccess }: AddPaymentMethodModalProps) => {
+const AddPaymentMethodModal = ({
+  open,
+  config,
+  configError,
+  isConfigLoading = false,
+  existingMethods,
+  onClose,
+  onSuccess,
+}: AddPaymentMethodModalProps) => {
   const createSetupIntentMutation = useCreateSetupIntent();
   const [clientSecret, setClientSecret] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const configErrorMessage = configError ? getErrorMessage(configError, "Unable to load Stripe configuration.") : "";
 
   const stripePromise = useMemo(() => {
     if (!config?.publishableKey) {
@@ -128,7 +148,7 @@ const AddPaymentMethodModal = ({ open, config, existingMethods, onClose, onSucce
     let cancelled = false;
 
     const createSetupIntent = async () => {
-      if (!open) {
+      if (!open || !config?.publishableKey || configErrorMessage) {
         return;
       }
 
@@ -154,57 +174,76 @@ const AddPaymentMethodModal = ({ open, config, existingMethods, onClose, onSucce
     };
     // mutateAsync is stable enough for this flow; including it reopens setup for internal mutation state changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [config?.publishableKey, configErrorMessage, open]);
 
   const handleClose = () => {
-    if (createSetupIntentMutation.isPending) {
+    if (createSetupIntentMutation.isPending || isConfigLoading) {
       return;
     }
     onClose();
   };
+
+  const modalErrorMessage = configErrorMessage || errorMessage;
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: 620,
-          padding: "24px",
+        style: {
+          borderRadius: "12px",
+          minWidth: "620px",
+          maxWidth: "620px",
         },
       }}
     >
-      <DialogTitle sx={{ padding: 0 }}>
+      <DialogTitle
+        sx={{
+          px: "24px",
+          pt: "24px",
+          pb: "16px",
+          position: "relative",
+        }}
+      >
         <Stack direction="row" alignItems="center" justifyContent="space-between" gap="16px">
           <Text size="large" weight="bold">
             Add Payment Method
           </Text>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
         </Stack>
+        <IconButton
+          onClick={handleClose}
+          aria-label="Close add payment method dialog"
+          sx={{
+            position: "absolute",
+            right: "16px",
+            top: "16px",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
-      {!stripePromise || createSetupIntentMutation.isPending || !clientSecret ? (
-        <DialogContent sx={{ padding: 0, marginTop: "28px", minHeight: 180 }}>
-          {errorMessage ? (
-            <Text
-              size="small"
-              weight="medium"
-              color={colors.error700}
-              sx={{
-                backgroundColor: colors.error50,
-                border: `1px solid ${colors.error200}`,
-                borderRadius: "8px",
-                padding: "10px 12px",
-              }}
-            >
-              {errorMessage}
-            </Text>
-          ) : (
+      {modalErrorMessage ? (
+        <DialogContent sx={{ px: "24px", pt: 0, pb: "24px" }}>
+          <Text
+            size="small"
+            weight="medium"
+            color={colors.error700}
+            sx={{
+              backgroundColor: colors.error50,
+              border: `1px solid ${colors.error200}`,
+              borderRadius: "8px",
+              padding: "10px 12px",
+            }}
+          >
+            {modalErrorMessage}
+          </Text>
+        </DialogContent>
+      ) : isConfigLoading || !stripePromise || createSetupIntentMutation.isPending || !clientSecret ? (
+        <DialogContent sx={{ px: "24px", py: 0 }}>
+          <Stack alignItems="center" justifyContent="center" minHeight={180}>
             <LoadingSpinner />
-          )}
+          </Stack>
         </DialogContent>
       ) : (
         <Elements
