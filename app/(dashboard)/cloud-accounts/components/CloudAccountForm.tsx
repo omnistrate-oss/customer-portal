@@ -220,7 +220,7 @@ const CloudAccountForm = ({
     }
   );
 
-  const formData = useFormik({
+  const formData = useFormik<ReturnType<typeof getInitialValues>>({
     initialValues: getInitialValues(
       initialFormValues,
       selectedInstance,
