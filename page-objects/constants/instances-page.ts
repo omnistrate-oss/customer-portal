@@ -20,7 +20,7 @@ export const dataTestIds = {
   gcpCard: "gcp-card",
   azureCard: "azure-card",
   ociCard: "oci-card",
-  cloudAccountSelect: "cloud_provider_account_config_id-select",
+  cloudAccountSelect: "cloud-provider-account-config-id-select",
   submitButton: "submit-button",
 
   // Launching Instance Dialog

@@ -98,7 +98,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
           </Button>
         </div>
       </div>
-      <div className="py-5 px-6 border-b border-[#EAECF0]">
+      <div className="py-5 px-6">
         <InstanceSnapshotsFilters snapshots={snapshots} setFilteredSnapshots={setFilteredSnapshots} />
       </div>
     </div>

@@ -3,7 +3,7 @@
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { StringSchema } from "yup";
 import * as yup from "yup";
 
@@ -15,6 +15,7 @@ import PreviewCard from "components/DynamicForm/PreviewCard";
 import Form from "components/FormElementsv2/Form/Form";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
+import useAccountConfig from "app/(dashboard)/cloud-accounts/hooks/useAccountConfig";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
@@ -121,12 +122,14 @@ const InstanceForm = ({
                     instance?.awsAccountID ||
                     instance?.gcpProjectID ||
                     instance?.azureSubscriptionID ||
-                    instance?.ociTenancyID;
+                    instance?.ociTenancyID ||
+                    instance?.nebiusTenantID;
                   const createdInstanceAccountId =
                     createdInstance?.awsAccountID ||
                     createdInstance?.gcpProjectID ||
                     createdInstance?.azureSubscriptionID ||
-                    createdInstance?.ociTenancyID;
+                    createdInstance?.ociTenancyID ||
+                    createdInstance?.nebiusTenantID;
 
                   const isFromSameAccount =
                     instanceAccountId && createdInstanceAccountId && instanceAccountId === createdInstanceAccountId;
@@ -167,22 +170,34 @@ const InstanceForm = ({
   );
 
   // Memoize initialValues so that subscriptions list changes (e.g. after subscribing)
-  // don't cause formik to reinitialize and wipe out requestParams defaults
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialValues = useMemo(
-    () =>
-      getInitialValues(
-        selectedInstance,
-        subscriptions,
-        serviceOfferingsObj,
-        serviceOfferings,
-        nonCloudAccountInstances,
-        [] // Will be updated later when customerVersionSets loads
-      ),
-    // Only recompute when the selected instance changes (modify mode) or on first mount
+  // don't cause formik to reinitialize and wipe out requestParams defaults.
+  // Exception: if the previous derivation produced an empty servicePlanId (auto-select
+  // failed because subscriptions/serviceOfferings hadn't loaded yet — e.g. after a 401
+  // refresh), allow re-derivation once real data arrives so auto-select can succeed.
+  const cachedInitialValuesRef = useRef<ReturnType<typeof getInitialValues> | null>(null);
+  const cachedInstanceIdRef = useRef<string | undefined>(undefined);
+
+  const initialValues = useMemo(() => {
+    const instanceId = selectedInstance?.id;
+    if (cachedInstanceIdRef.current !== instanceId) {
+      cachedInitialValuesRef.current = null;
+      cachedInstanceIdRef.current = instanceId;
+    }
+    if (cachedInitialValuesRef.current?.servicePlanId) {
+      return cachedInitialValuesRef.current;
+    }
+    const computed = getInitialValues(
+      selectedInstance,
+      subscriptions,
+      serviceOfferingsObj,
+      serviceOfferings,
+      nonCloudAccountInstances,
+      [] // Will be updated later when customerVersionSets loads
+    );
+    cachedInitialValuesRef.current = computed;
+    return computed;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedInstance?.id]
-  );
+  }, [selectedInstance?.id, subscriptions, serviceOfferings, serviceOfferingsObj, nonCloudAccountInstances]);
 
   const formData = useFormik({
     initialValues,
@@ -883,6 +898,8 @@ const InstanceForm = ({
             return values.cloudProvider === "azure";
           } else if (resultParams?.oci_tenancy_id) {
             return values.cloudProvider === "oci";
+          } else if (resultParams?.nebius_tenant_id) {
+            return values.cloudProvider === "nebius";
           }
         })
         .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
@@ -896,11 +913,35 @@ const InstanceForm = ({
                 ? `${instance.id} (Account ID - ${resultParams?.aws_account_id})`
                 : resultParams?.oci_tenancy_id
                   ? `${instance.id} (Tenancy ID - ${resultParams?.oci_tenancy_id})`
-                  : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
+                  : resultParams?.nebius_tenant_id
+                    ? `${instance.id} (Tenant ID - ${resultParams?.nebius_tenant_id})`
+                    : `${instance.id} (Subscription ID - ${resultParams?.azure_subscription_id})`,
           };
         }),
     [instances, values.cloudProvider]
   );
+
+  // The form value is a BYOA *instance* id; the AccountConfig (ac-…) lives in its result_params.
+  const selectedNebiusAccountConfigId = useMemo(() => {
+    if (values.cloudProvider !== "nebius") return "";
+    const instanceId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id as
+      | string
+      | undefined;
+    if (!instanceId) return "";
+    const matched = instances.find((i) => i?.id === instanceId);
+    return getResultParams(matched)?.cloud_provider_account_config_id ?? "";
+  }, [values.cloudProvider, values.requestParams, instances]);
+
+  const { data: nebiusAccountConfig } = useAccountConfig({
+    accountConfigId: selectedNebiusAccountConfigId,
+    enabled: Boolean(selectedNebiusAccountConfigId),
+  });
+
+  const nebiusBindingRegions = useMemo<string[]>(() => {
+    // useAccountConfig's wrapper doesn't propagate the response type — narrow it here.
+    const bindings = (nebiusAccountConfig as { nebiusBindings?: { region?: string }[] } | undefined)?.nebiusBindings;
+    return (bindings ?? []).map((b) => b?.region).filter((r): r is string => Boolean(r));
+  }, [nebiusAccountConfig]);
 
   const standardInformationFields = useMemo(() => {
     return getStandardInformationFields(
@@ -918,7 +959,10 @@ const InstanceForm = ({
       isFetchingCustomAvailabilityZones,
       nonCloudAccountInstances,
       customerVersionSets,
-      isFetchingVersionSets
+      isFetchingVersionSets,
+      cloudAccountInstances,
+      isFetchingResourceInstanceIds,
+      nebiusBindingRegions
     );
   }, [
     formMode,
@@ -929,6 +973,9 @@ const InstanceForm = ({
     nonCloudAccountInstances,
     customerVersionSets,
     isFetchingVersionSets,
+    cloudAccountInstances,
+    isFetchingResourceInstanceIds,
+    nebiusBindingRegions,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
@@ -958,17 +1005,9 @@ const InstanceForm = ({
       formData.values,
       resourceCreateSchema,
       resourceIdInstancesHashMap,
-      isFetchingResourceInstanceIds,
-      cloudAccountInstances
+      isFetchingResourceInstanceIds
     );
-  }, [
-    formMode,
-    formData.values,
-    resourceCreateSchema,
-    resourceIdInstancesHashMap,
-    isFetchingResourceInstanceIds,
-    cloudAccountInstances,
-  ]);
+  }, [formMode, formData.values, resourceCreateSchema, resourceIdInstancesHashMap, isFetchingResourceInstanceIds]);
 
   const sections = useMemo(
     () => [

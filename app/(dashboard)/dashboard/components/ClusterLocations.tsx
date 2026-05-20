@@ -1,6 +1,6 @@
-import { Box, Stack, styled } from "@mui/material";
-import dynamic from "next/dynamic";
 import { FC } from "react";
+import dynamic from "next/dynamic";
+import { Box, Stack, styled } from "@mui/material";
 
 import ClusterLocationsIcon from "src/components/Icons/Dashboard/ClusterLocations";
 import { Text } from "src/components/Typography/Typography";
@@ -52,20 +52,13 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
 
       const resultParams = getResultParams(curr);
 
-      //check if instance of type cloud provider account and set cloud provider
-      if (
-        resultParams &&
-        ((resultParams.gcp_project_id && resultParams.gcp_project_number) || resultParams.aws_account_id)
-      ) {
-        if (resultParams.gcp_project_id) {
-          cloudProvider = "gcp";
-        } else if (resultParams.azure_subscription_id) {
-          cloudProvider = "azure";
-        } else if (resultParams.aws_account_id) {
-          cloudProvider = "aws";
-        } else {
-          cloudProvider = "oci";
-        }
+      // BYOA cloud-account instances: derive provider from result_params.
+      if (resultParams) {
+        if (resultParams.gcp_project_id) cloudProvider = "gcp";
+        else if (resultParams.azure_subscription_id) cloudProvider = "azure";
+        else if (resultParams.aws_account_id) cloudProvider = "aws";
+        else if (resultParams.oci_tenancy_id) cloudProvider = "oci";
+        else if (resultParams.nebius_tenant_id) cloudProvider = "nebius";
       }
 
       const key = `${cloudProvider}-${region}`;
@@ -104,7 +97,17 @@ const ClusterLocations: FC<ClusterLocationsProps> = (props) => {
           Cluster Locations
         </Text>
       </Stack>
-      <Box marginTop="8px" sx={{ marginInline: "auto", maxWidth: "1200px" }}>
+      <Box
+        marginTop="8px"
+        sx={{
+          marginInline: "auto",
+          maxWidth: "1200px",
+          // Reserve space matching the SVG map's 230:137 aspect ratio so the
+          // dynamically-imported map doesn't cause a layout shift while loading.
+          aspectRatio: "230 / 137",
+          minHeight: { xs: "240px", sm: "360px", md: "500px" },
+        }}
+      >
         <DottedWorldMap regionsWithInstanceCount={regionsWithInstanceCount} />
       </Box>
     </ContainerCard>

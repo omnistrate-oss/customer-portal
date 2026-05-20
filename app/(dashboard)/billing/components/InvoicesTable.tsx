@@ -17,7 +17,7 @@ const columnHelper = createColumnHelper<Invoice>();
 
 const TableHeader = () => {
   return (
-    <div className=" py-5 px-6 border-b border-[#E4E7EC]">
+    <div className=" py-5 px-6">
       <Text size="large" weight="semibold" color="#101828">
         Invoices
       </Text>
