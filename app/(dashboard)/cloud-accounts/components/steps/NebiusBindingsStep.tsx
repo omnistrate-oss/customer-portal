@@ -85,6 +85,14 @@ const bindingFields: Array<{
 
 const toTestIdField = (field: string) => field.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
+const getBindingStatusMessage = (binding: NebiusBinding) => {
+  if (binding.status === "READY") {
+    return "Access verified. This binding can be used for deployments.";
+  }
+
+  return binding.statusMessage;
+};
+
 const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId, nebiusTenantId }) => {
   const snackbar = useSnackbar();
   const [bindings, setBindings] = useState<NebiusBinding[]>([]);
@@ -336,10 +344,10 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
                     ))}
                   </Stack>
 
-                  {binding.statusMessage && (
+                  {getBindingStatusMessage(binding) && (
                     <Box sx={{ px: "24px", pb: "20px" }}>
                       <Text size="small" weight="regular" color={binding.status === "FAILED" ? "#D92D20" : "#667085"}>
-                        {binding.statusMessage}
+                        {getBindingStatusMessage(binding)}
                       </Text>
                     </Box>
                   )}
