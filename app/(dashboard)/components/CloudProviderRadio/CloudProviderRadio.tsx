@@ -3,13 +3,12 @@
 import { cn } from "lib/utils";
 
 import { Text } from "components/Typography/Typography";
+import AwsLogo from "src/components/Logos/AwsLogo";
+import AzureLogo from "src/components/Logos/AzureLogo";
+import GcpLogo from "src/components/Logos/GcpLogo";
+import NebiusLogo from "src/components/Logos/NebiusLogo";
+import OciLogo from "src/components/Logos/OciLogo";
 import { colors } from "src/themeConfig";
-
-import AwsLogo from "../../../../src/components/Logos/AwsLogo";
-import AzureLogo from "../../../../src/components/Logos/AzureLogo";
-import GcpLogo from "../../../../src/components/Logos/GcpLogo";
-import NebiusLogo from "../../../../src/components/Logos/NebiusLogo";
-import OciLogo from "../../../../src/components/Logos/OciLogo";
 
 import OnPremIcon from "./OnPremIcon";
 import PrivateIcon from "./PrivateIcon";

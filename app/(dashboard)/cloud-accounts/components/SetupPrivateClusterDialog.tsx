@@ -12,7 +12,7 @@ import { Text } from "src/components/Typography/Typography";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getResultParams } from "src/utils/instance";
 
-import { TextContainerToCopy } from "../../../../src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 
 type SetupPrivateClusterDialogProps = {
   open: boolean;
