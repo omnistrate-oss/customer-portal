@@ -75,7 +75,7 @@ export type Overlay =
   | "disconnect-dialog"
   | "offboard-dialog"
   | "modify-vpcs"
-  | "private-cluster-setup"
+  | "byoc-onprem-cluster-setup"
   | "enable-deletion-protection-dialog"
   | "disable-deletion-protection-dialog";
 
@@ -362,7 +362,7 @@ const CloudAccountsPage = () => {
                       if (rp?.cluster_name) {
                         // Private/OnPrem – open the Kubernetes cluster setup dialog
                         setIsOverlayOpen(true);
-                        setOverlayType("private-cluster-setup");
+                        setOverlayType("byoc-onprem-cluster-setup");
                         return;
                       }
                       setIsOverlayOpen(true);
@@ -527,6 +527,7 @@ const CloudAccountsPage = () => {
           else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
           else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
           else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
+          else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
           return cloudProvider;
         },
         {
@@ -1166,7 +1167,7 @@ const CloudAccountsPage = () => {
       />
 
       <SetupPrivateClusterDialog
-        open={isOverlayOpen && overlayType === "private-cluster-setup"}
+        open={isOverlayOpen && overlayType === "byoc-onprem-cluster-setup"}
         onClose={() => {
           setIsOverlayOpen(false);
           setClickedInstance(undefined);
