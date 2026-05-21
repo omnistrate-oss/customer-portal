@@ -572,13 +572,18 @@ const InstanceForm = ({
     }
   );
 
-  const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
-    serviceId: values.serviceId,
-    resourceId: selectedInstance?.resourceID || values.resourceId,
-    instanceId: selectedInstance?.id,
-    productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
-    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
-  });
+  const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema(
+    {
+      serviceId: values.serviceId,
+      resourceId: selectedInstance?.resourceID || values.resourceId,
+      instanceId: selectedInstance?.id,
+      productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
+      productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
+    },
+    {
+      enabled: formMode === "modify" ? Boolean((values as any)?.id) : true, // Fetch resource schema only when serviceId and resourceId are available
+    }
+  );
 
   const { data: resources = [] } = useResources({
     serviceId: values.serviceId,
@@ -968,13 +973,7 @@ const InstanceForm = ({
       resourceIdInstancesHashMap,
       isFetchingResourceInstanceIds
     );
-  }, [
-    formMode,
-    formData.values,
-    resourceCreateSchema,
-    resourceIdInstancesHashMap,
-    isFetchingResourceInstanceIds,
-  ]);
+  }, [formMode, formData.values, resourceCreateSchema, resourceIdInstancesHashMap, isFetchingResourceInstanceIds]);
 
   const sections = useMemo(
     () => [
