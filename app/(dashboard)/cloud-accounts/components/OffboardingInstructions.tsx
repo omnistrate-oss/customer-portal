@@ -250,7 +250,10 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               </Text>
 
               {offboardingInstructionDetails?.byocOnpremUninstallCommand && (
-                <TextContainerToCopy text={offboardingInstructionDetails.byocOnpremUninstallCommand} marginTop="12px" />
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(offboardingInstructionDetails.byocOnpremUninstallCommand)}
+                  marginTop="12px"
+                />
               )}
             </Box>
           </ListItem>

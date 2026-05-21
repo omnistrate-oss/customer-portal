@@ -20,7 +20,7 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
   nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
   private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
-  "byoc-onprem": <OnPremIcon height="24px" width="auto" />,
+  "byoc-onprem": <OnPremIcon style={{ height: "24px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {

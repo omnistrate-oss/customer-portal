@@ -785,8 +785,7 @@ export const getDeploymentConfigurationFields = (
   values: any,
   resourceSchema: APIEntity,
   resourceIdInstancesHashMap,
-  isFetchingResourceInstanceIds: boolean,
-  cloudAccountInstances
+  isFetchingResourceInstanceIds: boolean
 ) => {
   const fields: Field[] = [];
   if (!resourceSchema?.inputParameters) return fields;
@@ -813,7 +812,7 @@ export const getDeploymentConfigurationFields = (
         previewValue: values.requestParams[param.key] ? "********" : "",
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
-    } else if (param.dependentResourceID && param.key !== "cloud_provider_account_config_id") {
+    } else if (param.dependentResourceID) {
       const dependentResourceId = param.dependentResourceID;
       const options = resourceIdInstancesHashMap[dependentResourceId]
         ? resourceIdInstancesHashMap[dependentResourceId]
@@ -890,33 +889,6 @@ export const getDeploymentConfigurationFields = (
         previewValue: values.requestParams[param.key],
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
-    } else if (param.key === "cloud_provider_account_config_id") {
-      fields.push({
-        dataTestId: `${param.key}-select`,
-        label: param.displayName || param.key,
-        subLabel: param.description,
-        name: `requestParams.${param.key}`,
-        description: (
-          <AccountConfigDescription
-            serviceId={values.serviceId}
-            servicePlanId={values.servicePlanId}
-            subscriptionId={values.subscriptionId}
-          />
-        ),
-        value: values.requestParams[param.key] || "",
-        type: "select",
-        menuItems: cloudAccountInstances
-          // Filter cloud accounts based on the selected subscription
-          ?.filter((el) => el.subscriptionId === values.subscriptionId)
-          .map((config) => ({
-            label: config.label,
-            value: config.id,
-          })),
-        required: param.required,
-        disabled: formMode !== "create",
-        previewValue: cloudAccountInstances.find((config) => config.id === values.requestParams[param.key])?.label,
-        emptyMenuText: "No cloud accounts available",
-      });
     } else if (param.type?.toUpperCase() === "ANY") {
       // Handle JSON type fields
       fields.push({
@@ -932,10 +904,6 @@ export const getDeploymentConfigurationFields = (
         previewValue: getJsonValue(values.requestParams[param.key]),
       });
     } else {
-      if (param.key === "cloud_provider_account_config_id") {
-        return;
-      }
-
       if (param.type?.toLowerCase() === "float64" || param.type?.toLowerCase() === "number") {
         fields.push({
           dataTestId: `${param.key}-input`,

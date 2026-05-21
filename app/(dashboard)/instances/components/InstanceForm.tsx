@@ -966,7 +966,6 @@ const InstanceForm = ({
       formData.values,
       resourceCreateSchema,
       resourceIdInstancesHashMap,
-      cloudAccountInstances,
       isFetchingResourceInstanceIds
     );
   }, [
@@ -975,7 +974,6 @@ const InstanceForm = ({
     resourceCreateSchema,
     resourceIdInstancesHashMap,
     isFetchingResourceInstanceIds,
-    cloudAccountInstances,
   ]);
 
   const sections = useMemo(

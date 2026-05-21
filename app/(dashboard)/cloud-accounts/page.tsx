@@ -250,6 +250,7 @@ const CloudAccountsPage = () => {
             resultParams?.azure_subscription_id ||
             resultParams?.oci_tenancy_id ||
             resultParams?.nebius_tenant_id ||
+            resultParams?.cluster_name ||
             "-"
           );
         },

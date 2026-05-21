@@ -1,4 +1,5 @@
 import OCIIcon from "app/(dashboard)/components/CloudProviderRadio/OCIIcon";
+import OnPremIcon from "app/(dashboard)/components/CloudProviderRadio/OnPremIcon";
 import PrivateLogo from "app/(dashboard)/components/CloudProviderRadio/PrivateIcon";
 
 import AWSIcon from "src/components/Icons/CloudProviders/AWSLogo";
@@ -10,8 +11,6 @@ import AzureLogo from "src/components/Logos/AzureLogo";
 import GcpLogo from "src/components/Logos/GcpLogo";
 import NebiusLogo from "src/components/Logos/NebiusLogo";
 import OciLogo from "src/components/Logos/OciLogo";
-
-import OnPremIcon from "../../app/(dashboard)/components/CloudProviderRadio/OnPremIcon";
 
 export const cloudProviderLabels = {
   gcp: "Google Cloud Platform",

@@ -27,6 +27,14 @@ type SetupPrivateClusterDialogProps = {
   subscriptionId?: string;
 };
 
+type PrivateClusterResultParams = {
+  cluster_name?: string;
+  byoc_onprem_install_command?: string;
+};
+
+const POLLING_INTERVAL_MS = 5000;
+const MAX_POLLING_ATTEMPTS = 24;
+
 /**
  * SetupPrivateClusterDialog
  *
@@ -44,8 +52,17 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   subscriptionId,
 }) => {
   const [isPolling, setIsPolling] = useState(true);
-  const [resultParams, setResultParams] = useState<Record<string, any> | null>(null);
+  const [pollingError, setPollingError] = useState<string | null>(null);
+  const [resultParams, setResultParams] = useState<PrivateClusterResultParams | null>(null);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingAttemptsRef = useRef(0);
+
+  const stopPolling = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  }, []);
 
   const pollForResultParams = useCallback(async () => {
     if (!instanceId || !offering) return;
@@ -53,7 +70,14 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
     const selectedResource = offering.resourceParameters?.find((r) =>
       r.resourceId.startsWith("r-injectedaccountconfig")
     );
-    if (!selectedResource) return;
+    if (!selectedResource) {
+      setPollingError("Unable to find the account configuration resource for this cluster.");
+      setIsPolling(false);
+      stopPolling();
+      return;
+    }
+
+    pollingAttemptsRef.current += 1;
 
     try {
       const response = await getResourceInstanceDetails(
@@ -74,43 +98,51 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       if (params?.byoc_onprem_install_command) {
         setResultParams(params);
         setIsPolling(false);
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
+        stopPolling();
+        return;
       }
     } catch {
       // Continue polling on error
     }
-  }, [instanceId, offering, subscriptionId]);
+
+    if (pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS) {
+      setPollingError("The cluster setup command is not ready yet. Close this dialog and try again in a few minutes.");
+      setIsPolling(false);
+      stopPolling();
+    }
+  }, [instanceId, offering, subscriptionId, stopPolling]);
 
   useEffect(() => {
-    if (open && instanceId) {
-      setIsPolling(true);
-      setResultParams(null);
+    stopPolling();
 
-      // Initial fetch
-      pollForResultParams();
-
-      // Poll every 5 seconds
-      pollingIntervalRef.current = setInterval(pollForResultParams, 5000);
+    if (!open || !instanceId || !offering) {
+      return;
     }
 
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
-  }, [open, instanceId, pollForResultParams]);
+    setIsPolling(true);
+    setPollingError(null);
+    setResultParams(null);
+    pollingAttemptsRef.current = 0;
+
+    // Initial fetch
+    pollForResultParams();
+
+    // Poll every 5 seconds
+    pollingIntervalRef.current = setInterval(pollForResultParams, POLLING_INTERVAL_MS);
+
+    return stopPolling;
+  }, [open, instanceId, offering, pollForResultParams, stopPolling]);
 
   // Reset state when dialog closes
   useEffect(() => {
     if (!open) {
       setResultParams(null);
+      setPollingError(null);
       setIsPolling(true);
+      pollingAttemptsRef.current = 0;
+      stopPolling();
     }
-  }, [open]);
+  }, [open, stopPolling]);
 
   const displayClusterName = resultParams?.cluster_name || clusterName || "";
   const installCommand = resultParams?.byoc_onprem_install_command || "";
@@ -163,7 +195,16 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       </Stack>
 
       {/* Content */}
-      {isPolling ? (
+      {pollingError ? (
+        <Stack alignItems="center" justifyContent="center" sx={{ py: "60px" }} gap="12px">
+          <Text size="small" weight="semibold" color="#B42318">
+            Setup command unavailable
+          </Text>
+          <Text size="small" weight="regular" color="#535862" sx={{ textAlign: "center" }}>
+            {pollingError}
+          </Text>
+        </Stack>
+      ) : isPolling ? (
         <Stack alignItems="center" justifyContent="center" sx={{ py: "60px" }} gap="16px">
           <CircularProgress size={32} />
           <Text size="small" weight="medium" color="#535862">
