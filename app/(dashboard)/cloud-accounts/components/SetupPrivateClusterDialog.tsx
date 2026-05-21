@@ -6,13 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import Button from "src/components/Button/Button";
+import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import InstructionsModalIcon from "src/components/Icons/AccountConfig/InstructionsModalIcon";
 import { Text } from "src/components/Typography/Typography";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getResultParams } from "src/utils/instance";
-
-import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 
 type SetupPrivateClusterDialogProps = {
   open: boolean;
@@ -132,7 +131,9 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       }
     } catch (error) {
       if (getHttpStatus(error) === 404) {
-        setPollingError("Unable to find the cluster setup resource. The instance may have been deleted or is unavailable.");
+        setPollingError(
+          "Unable to find the cluster setup resource. The instance may have been deleted or is unavailable."
+        );
         setIsPolling(false);
         stopPolling();
         return;
@@ -290,7 +291,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
           {/* Deploy this chart */}
           <Box>
             <Text size="small" weight="semibold" color="#414651" sx={{ mb: "4px" }}>
-              Deploy this chart
+              Run this command
             </Text>
             <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
               Run the command below from a terminal that has kubectl access to the Kubernetes cluster you want to
@@ -341,7 +342,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
               }}
             >
               <Text size="small" weight="semibold" color="#414651" sx={{ mb: "12px" }}>
-                Installation Instructions
+                What happens next
               </Text>
               <Stack gap="10px">
                 <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
