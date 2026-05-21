@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -21,9 +24,6 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -39,6 +39,7 @@ const CloudAccountForm = ({
   setOverlayType,
   setClickedInstance,
   instances,
+  setIsOverlayOpen,
 }) => {
   const queryClient = useQueryClient();
   const environmentType = useEnvironmentType();
@@ -130,7 +131,7 @@ const CloudAccountForm = ({
           ],
           (oldData: any) => {
             const instanceResultParams = getResultParams(resourceInstance);
-            const resultParams: Record<string, any> = {
+            let resultParams: Record<string, any> = {
               ...instanceResultParams,
               cloud_provider: values.cloudProvider,
               account_configuration_method: values.accountConfigurationMethod,
@@ -152,6 +153,13 @@ const CloudAccountForm = ({
             } else if (values.cloudProvider === "oci") {
               resultParams.oci_tenancy_id = values.ociTenancyId;
               resultParams.oci_domain_id = values.ociDomainId;
+            } else if (values.cloudProvider === "byoc-onprem") {
+              resultParams = {
+                cloud_provider: values.cloudProvider,
+                cluster_name: values.clusterName?.trim(),
+                cluster_description: values.clusterDescription?.trim() || undefined,
+                account_configuration_method: values.accountConfigurationMethod || "OnPremScript",
+              };
             }
 
             return {
@@ -167,7 +175,6 @@ const CloudAccountForm = ({
           }
         );
 
-        setIsAccountCreation(true);
         setClickedInstance({
           ...resourceInstance,
           result_params: {
@@ -193,16 +200,27 @@ const CloudAccountForm = ({
                         oci_tenancy_id: values.ociTenancyId,
                         oci_domain_id: values.ociDomainId,
                       }
-                    : {}),
+                    : values.cloudProvider === CLOUD_PROVIDERS["byoc-onprem"]
+                      ? {
+                          cluster_name: values.clusterName?.trim(),
+                          cluster_description: values.clusterDescription?.trim() || undefined,
+                        }
+                      : {}),
           },
         });
-        setOverlayType("view-instructions-dialog");
+        if (values.cloudProvider === CLOUD_PROVIDERS["byoc-onprem"]) {
+          setIsOverlayOpen(true);
+          setOverlayType("byoc-onprem-cluster-setup");
+        } else {
+          setIsAccountCreation(true);
+          setOverlayType("view-instructions-dialog");
+        }
         snackbar.showSuccess("Cloud Account created successfully");
       },
     }
   );
 
-  const formData = useFormik({
+  const formData = useFormik<ReturnType<typeof getInitialValues>>({
     initialValues: getInitialValues(
       initialFormValues,
       selectedInstance,
@@ -246,6 +264,13 @@ const CloudAccountForm = ({
           oci_tenancy_id: values.ociTenancyId.trim(),
           oci_domain_id: values.ociDomainId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
+        };
+      } else if (values.cloudProvider === "byoc-onprem") {
+        requestParams = {
+          cloud_provider: values.cloudProvider,
+          cluster_name: values.clusterName.trim(),
+          cluster_description: values.clusterDescription?.trim() || undefined,
+          account_configuration_method: values.accountConfigurationMethod || "OnPremScript",
         };
       }
 
@@ -523,6 +548,28 @@ const CloudAccountForm = ({
               disabled: formMode !== "create",
               isHidden: values.cloudProvider !== "oci",
               previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
+            },
+            {
+              dataTestId: "cluster-name-input",
+              label: "Kubernetes Cluster Name",
+              subLabel: "Name of the Kubernetes cluster to connect",
+              name: "clusterName",
+              type: "text",
+              required: true,
+              disabled: formMode !== "create",
+              isHidden: values.cloudProvider !== "byoc-onprem",
+              previewValue: cloudProvider === "byoc-onprem" ? values.clusterName : null,
+            },
+            {
+              dataTestId: "cluster-description-input",
+              label: "Kubernetes Cluster Description",
+              subLabel: "Description for the Kubernetes cluster",
+              name: "clusterDescription",
+              type: "text",
+              required: false,
+              disabled: formMode !== "create",
+              isHidden: values.cloudProvider !== "byoc-onprem",
+              previewValue: cloudProvider === "byoc-onprem" ? values.clusterDescription : null,
             },
           ],
         },
