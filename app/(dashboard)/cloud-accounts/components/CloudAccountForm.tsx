@@ -158,7 +158,7 @@ const CloudAccountForm = ({
                 cloud_provider: values.cloudProvider,
                 cluster_name: values.clusterName?.trim(),
                 cluster_description: values.clusterDescription?.trim() || undefined,
-                account_configuration_method: values.accountConfigurationMethod || "Terraform",
+                account_configuration_method: values.accountConfigurationMethod || "OnPremScript",
               };
             }
 
@@ -270,7 +270,7 @@ const CloudAccountForm = ({
           cloud_provider: values.cloudProvider,
           cluster_name: values.clusterName.trim(),
           cluster_description: values.clusterDescription?.trim() || undefined,
-          account_configuration_method: values.accountConfigurationMethod || "Terraform",
+          account_configuration_method: values.accountConfigurationMethod || "OnPremScript",
         };
       }
 
