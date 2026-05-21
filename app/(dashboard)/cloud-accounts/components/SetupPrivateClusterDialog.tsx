@@ -35,6 +35,19 @@ type PrivateClusterResultParams = {
 const POLLING_INTERVAL_MS = 5000;
 const MAX_POLLING_ATTEMPTS = 24;
 
+const getHttpStatus = (error: unknown) => {
+  if (!error || typeof error !== "object" || !("response" in error)) {
+    return undefined;
+  }
+
+  const response = error.response;
+  if (!response || typeof response !== "object" || !("status" in response)) {
+    return undefined;
+  }
+
+  return typeof response.status === "number" ? response.status : undefined;
+};
+
 /**
  * SetupPrivateClusterDialog
  *
@@ -56,6 +69,15 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   const [resultParams, setResultParams] = useState<PrivateClusterResultParams | null>(null);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollingAttemptsRef = useRef(0);
+  const serviceProviderId = offering?.serviceProviderId;
+  const serviceURLKey = offering?.serviceURLKey;
+  const serviceAPIVersion = offering?.serviceAPIVersion;
+  const serviceEnvironmentURLKey = offering?.serviceEnvironmentURLKey;
+  const serviceModelURLKey = offering?.serviceModelURLKey;
+  const productTierURLKey = offering?.productTierURLKey;
+  const selectedResourceURLKey = offering?.resourceParameters?.find((r) =>
+    r.resourceId.startsWith("r-injectedaccountconfig")
+  )?.urlKey;
 
   const stopPolling = useCallback(() => {
     if (pollingIntervalRef.current) {
@@ -65,12 +87,19 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   }, []);
 
   const pollForResultParams = useCallback(async () => {
-    if (!instanceId || !offering) return;
+    if (
+      !instanceId ||
+      !serviceProviderId ||
+      !serviceURLKey ||
+      !serviceAPIVersion ||
+      !serviceEnvironmentURLKey ||
+      !serviceModelURLKey ||
+      !productTierURLKey
+    ) {
+      return;
+    }
 
-    const selectedResource = offering.resourceParameters?.find((r) =>
-      r.resourceId.startsWith("r-injectedaccountconfig")
-    );
-    if (!selectedResource) {
+    if (!selectedResourceURLKey) {
       setPollingError("Unable to find the account configuration resource for this cluster.");
       setIsPolling(false);
       stopPolling();
@@ -81,13 +110,13 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
 
     try {
       const response = await getResourceInstanceDetails(
-        offering.serviceProviderId,
-        offering.serviceURLKey,
-        offering.serviceAPIVersion,
-        offering.serviceEnvironmentURLKey,
-        offering.serviceModelURLKey,
-        offering.productTierURLKey,
-        selectedResource.urlKey,
+        serviceProviderId,
+        serviceURLKey,
+        serviceAPIVersion,
+        serviceEnvironmentURLKey,
+        serviceModelURLKey,
+        productTierURLKey,
+        selectedResourceURLKey,
         instanceId,
         subscriptionId
       );
@@ -101,8 +130,13 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
         stopPolling();
         return;
       }
-    } catch {
-      // Continue polling on error
+    } catch (error) {
+      if (getHttpStatus(error) === 404) {
+        setPollingError("Unable to find the cluster setup resource. The instance may have been deleted or is unavailable.");
+        setIsPolling(false);
+        stopPolling();
+        return;
+      }
     }
 
     if (pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS) {
@@ -110,12 +144,32 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       setIsPolling(false);
       stopPolling();
     }
-  }, [instanceId, offering, subscriptionId, stopPolling]);
+  }, [
+    instanceId,
+    serviceProviderId,
+    serviceURLKey,
+    serviceAPIVersion,
+    serviceEnvironmentURLKey,
+    serviceModelURLKey,
+    productTierURLKey,
+    selectedResourceURLKey,
+    subscriptionId,
+    stopPolling,
+  ]);
 
   useEffect(() => {
     stopPolling();
 
-    if (!open || !instanceId || !offering) {
+    if (
+      !open ||
+      !instanceId ||
+      !serviceProviderId ||
+      !serviceURLKey ||
+      !serviceAPIVersion ||
+      !serviceEnvironmentURLKey ||
+      !serviceModelURLKey ||
+      !productTierURLKey
+    ) {
       return;
     }
 
@@ -131,7 +185,18 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
     pollingIntervalRef.current = setInterval(pollForResultParams, POLLING_INTERVAL_MS);
 
     return stopPolling;
-  }, [open, instanceId, offering, pollForResultParams, stopPolling]);
+  }, [
+    open,
+    instanceId,
+    serviceProviderId,
+    serviceURLKey,
+    serviceAPIVersion,
+    serviceEnvironmentURLKey,
+    serviceModelURLKey,
+    productTierURLKey,
+    pollForResultParams,
+    stopPolling,
+  ]);
 
   // Reset state when dialog closes
   useEffect(() => {
