@@ -416,6 +416,10 @@ const InstancesPage = () => {
         id: "region",
         header: "Region",
         cell: (data) => {
+          const cloudprovider = data.row.original.cloud_provider;
+          if (cloudprovider === "byoc-onprem" || data.row.original.region === "onprem") {
+            return "-";
+          }
           return <GridCellExpand value={data.row.original.region || "Global"} startIcon={<RegionIcon />} />;
         },
       }),
