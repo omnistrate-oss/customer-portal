@@ -27,14 +27,9 @@ type PaymentMethodSectionProps = {
   enabled: boolean;
   onPaymentMethodsChanged: () => Promise<void> | void;
   isRefetchingBillingDetails?: boolean;
-  hasUnpaidInvoicesOrUsage?: boolean;
 };
 
-const PaymentMethodSection = ({
-  enabled,
-  onPaymentMethodsChanged,
-  hasUnpaidInvoicesOrUsage,
-}: PaymentMethodSectionProps) => {
+const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMethodSectionProps) => {
   const snackbar = useSnackbar();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [methodToRemove, setMethodToRemove] = useState<ConsumptionPaymentMethod | null>(null);
@@ -176,7 +171,6 @@ const PaymentMethodSection = ({
               key={method.id}
               method={method}
               disableActions={isMutating}
-              disableRemove={paymentMethods.length === 1 && hasUnpaidInvoicesOrUsage}
               isSettingDefault={settingDefaultId === method.id}
               onRemove={(selectedMethod) => {
                 setMethodToRemove(selectedMethod);
@@ -202,7 +196,7 @@ const PaymentMethodSection = ({
         title="Remove Payment Method"
         subtitle={
           methodToRemove
-            ? `Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?`
+            ? `Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?${paymentMethods.length === 1 ? "\n\nRemoval is blocked when unpaid invoices, current usage, or active subscriptions still require a payment method." : ""}`
             : "Remove this payment method from this billing account?"
         }
         message="To confirm removal, please enter <b>remove</b>, in the field below:"

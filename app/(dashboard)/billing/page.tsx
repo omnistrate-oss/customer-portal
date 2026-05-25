@@ -295,9 +295,6 @@ const BillingPage = () => {
                         await refetchBillingDetails();
                         refetchSubscriptions();
                       }}
-                      hasUnpaidInvoicesOrUsage={
-                        invoicesTotalAmount > 0 || (consumptionUsageData?.usage || []).some((u) => (u.total ?? 0) > 0)
-                      }
                     />
                   ) : (
                     <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">

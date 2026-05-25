@@ -18,7 +18,6 @@ import { getPaymentMethodPrimaryLabel, getPaymentMethodSecondaryLabel } from "./
 type PaymentMethodItemProps = {
   method: ConsumptionPaymentMethod;
   disableActions?: boolean;
-  disableRemove?: boolean;
   isSettingDefault?: boolean;
   onRemove: (method: ConsumptionPaymentMethod) => void;
   onSetDefault: (method: ConsumptionPaymentMethod) => void;
@@ -29,7 +28,6 @@ const bankMethodTypes = new Set(["us_bank_account", "sepa_debit", "bacs_debit", 
 const PaymentMethodItem = ({
   method,
   disableActions,
-  disableRemove,
   isSettingDefault,
   onRemove,
   onSetDefault,
@@ -89,11 +87,11 @@ const PaymentMethodItem = ({
               Set Default
             </Button>
           )}
-          <Tooltip title={disableRemove ? "Cannot remove the only payment method while there are unpaid invoices or active usage" : "Remove payment method"}>
+          <Tooltip title="Remove payment method">
             <span>
               <IconButton
                 size="small"
-                disabled={disableActions || disableRemove}
+                disabled={disableActions}
                 aria-label={`Remove ${primaryLabel}`}
                 onClick={() => onRemove(method)}
                 sx={{
@@ -103,7 +101,7 @@ const PaymentMethodItem = ({
                   height: 36,
                 }}
               >
-                <DeleteIcon disabled={disableActions || disableRemove} />
+                <DeleteIcon disabled={disableActions} />
               </IconButton>
             </span>
           </Tooltip>
