@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Skeleton, Stack } from "@mui/material";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
+import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
 import { ConsumptionPaymentMethod, ConsumptionStripeConfigResponse } from "src/types/consumption";
 import Button from "components/Button/Button";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
 import useCreateSetupIntent from "../hooks/useCreateSetupIntent";
@@ -31,13 +31,13 @@ type AddPaymentMethodFormProps = {
   existingMethods: ConsumptionPaymentMethod[];
   onCancel: () => void;
   onSuccess: (options?: { defaultFailed?: boolean }) => Promise<void> | void;
-  setErrorMessage: (message: string) => void;
 };
 
-const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMessage }: AddPaymentMethodFormProps) => {
+const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess }: AddPaymentMethodFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const setDefaultMutation = useSetDefaultPaymentMethod();
+  const snackbar = useSnackbar();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -46,7 +46,6 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
     }
 
     setIsSubmitting(true);
-    setErrorMessage("");
 
     const result = await stripe.confirmSetup({
       elements,
@@ -57,7 +56,7 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
     });
 
     if (result.error) {
-      setErrorMessage(result.error.message || "Payment method setup failed. Please try again.");
+      snackbar.showError(result.error.message || "Payment method setup failed. Please try again.");
       setIsSubmitting(false);
       return;
     }
@@ -78,7 +77,7 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
     try {
       await onSuccess({ defaultFailed });
     } catch (error) {
-      setErrorMessage(
+      snackbar.showError(
         getErrorMessage(error, "Payment method was saved, but the payment methods list could not refresh.")
       );
       setIsSubmitting(false);
@@ -102,12 +101,11 @@ const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess, setErrorMe
         />
       </DialogContent>
       <DialogActions sx={{ p: "24px", gap: "12px" }}>
-        <Button variant="outlined" size="large" disabled={isSubmitting} onClick={onCancel}>
+        <Button variant="outlined" disabled={isSubmitting} onClick={onCancel}>
           Cancel
         </Button>
         <Button
           variant="contained"
-          size="large"
           disabled={!stripe || !elements || isSubmitting}
           isLoading={isSubmitting}
           onClick={handleSubmit}
@@ -130,9 +128,10 @@ const AddPaymentMethodModal = ({
 }: AddPaymentMethodModalProps) => {
   const createSetupIntentMutation = useCreateSetupIntent();
   const [clientSecret, setClientSecret] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [setupErrorMessage, setSetupErrorMessage] = useState("");
 
   const configErrorMessage = configError ? getErrorMessage(configError, "Unable to load Stripe configuration.") : "";
+  const modalErrorMessage = configErrorMessage || setupErrorMessage;
 
   const stripePromise = useMemo(() => {
     if (!config?.publishableKey) {
@@ -153,7 +152,7 @@ const AddPaymentMethodModal = ({
       }
 
       setClientSecret("");
-      setErrorMessage("");
+      setSetupErrorMessage("");
 
       try {
         const result = await createSetupIntentMutation.mutateAsync();
@@ -162,7 +161,7 @@ const AddPaymentMethodModal = ({
         }
       } catch (error) {
         if (!cancelled) {
-          setErrorMessage(getErrorMessage(error, "Failed to initialize payment setup. Please try again."));
+          setSetupErrorMessage(getErrorMessage(error, "Failed to initialize payment setup. Please try again."));
         }
       }
     };
@@ -182,8 +181,6 @@ const AddPaymentMethodModal = ({
     }
     onClose();
   };
-
-  const modalErrorMessage = configErrorMessage || errorMessage;
 
   return (
     <Dialog
@@ -224,7 +221,7 @@ const AddPaymentMethodModal = ({
       </DialogTitle>
 
       {modalErrorMessage ? (
-        <DialogContent sx={{ px: "24px", pt: 0, pb: "24px" }}>
+        <DialogContent sx={{ px: "24px", pt: "48px", pb: "24px" }}>
           <Text
             size="small"
             weight="medium"
@@ -240,49 +237,40 @@ const AddPaymentMethodModal = ({
           </Text>
         </DialogContent>
       ) : isConfigLoading || !stripePromise || createSetupIntentMutation.isPending || !clientSecret ? (
-        <DialogContent sx={{ px: "24px", py: 0 }}>
-          <Stack alignItems="center" justifyContent="center" minHeight={180}>
-            <LoadingSpinner />
-          </Stack>
-        </DialogContent>
+        <>
+          <DialogContent sx={{ px: "24px", py: 0 }}>
+            <Stack gap="16px">
+              <Skeleton variant="rounded" height={44} />
+              <Stack direction="row" gap="12px">
+                <Skeleton variant="rounded" height={44} sx={{ flex: 1 }} />
+                <Skeleton variant="rounded" height={44} sx={{ flex: 1 }} />
+              </Stack>
+              <Skeleton variant="rounded" height={44} />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: "24px", gap: "12px" }}>
+            <Skeleton variant="rounded" width={90} height={40} />
+            <Skeleton variant="rounded" width={180} height={40} />
+          </DialogActions>
+        </>
       ) : (
-        <Elements
-          stripe={stripePromise}
-          options={{
-            clientSecret,
-            appearance: {
-              theme: "stripe",
-              variables: {
-                borderRadius: "8px",
-                colorPrimary: "#079455",
+        <Stack sx={{ minHeight: "200px" }}>
+          <Elements
+            stripe={stripePromise}
+            options={{
+              clientSecret,
+              appearance: {
+                theme: "stripe",
+                variables: {
+                  borderRadius: "8px",
+                  colorPrimary: "#079455",
+                },
               },
-            },
-          }}
-        >
-          <AddPaymentMethodForm
-            existingMethods={existingMethods}
-            onCancel={handleClose}
-            onSuccess={onSuccess}
-            setErrorMessage={setErrorMessage}
-          />
-        </Elements>
-      )}
-
-      {errorMessage && clientSecret && (
-        <Text
-          size="small"
-          weight="medium"
-          color={colors.error700}
-          mt={2}
-          sx={{
-            backgroundColor: colors.error50,
-            border: `1px solid ${colors.error200}`,
-            borderRadius: "8px",
-            padding: "10px 12px",
-          }}
-        >
-          {errorMessage}
-        </Text>
+            }}
+          >
+            <AddPaymentMethodForm existingMethods={existingMethods} onCancel={handleClose} onSuccess={onSuccess} />
+          </Elements>
+        </Stack>
       )}
     </Dialog>
   );

@@ -2,11 +2,12 @@
 
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Box, IconButton, Stack, Tooltip } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 
+import DeleteIcon from "src/components/Icons/Delete/Delete";
 import StatusChip from "src/components/StatusChip/StatusChip";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { colors } from "src/themeConfig";
 import { ConsumptionPaymentMethod } from "src/types/consumption";
 import Button from "components/Button/Button";
@@ -17,13 +18,22 @@ import { getPaymentMethodPrimaryLabel, getPaymentMethodSecondaryLabel } from "./
 type PaymentMethodItemProps = {
   method: ConsumptionPaymentMethod;
   disableActions?: boolean;
+  disableRemove?: boolean;
+  isSettingDefault?: boolean;
   onRemove: (method: ConsumptionPaymentMethod) => void;
   onSetDefault: (method: ConsumptionPaymentMethod) => void;
 };
 
 const bankMethodTypes = new Set(["us_bank_account", "sepa_debit", "bacs_debit", "au_becs_debit"]);
 
-const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: PaymentMethodItemProps) => {
+const PaymentMethodItem = ({
+  method,
+  disableActions,
+  disableRemove,
+  isSettingDefault,
+  onRemove,
+  onSetDefault,
+}: PaymentMethodItemProps) => {
   const Icon = bankMethodTypes.has(method.type) ? AccountBalanceIcon : CreditCardIcon;
   const primaryLabel = getPaymentMethodPrimaryLabel(method);
 
@@ -60,7 +70,7 @@ const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: P
               </Text>
               {method.isDefault && <StatusChip label="Default" category="success" />}
             </Stack>
-            <Text size="xsmall" weight="regular" color={colors.gray500} mt={0.25}>
+            <Text size="xsmall" weight="regular" color={colors.gray500} sx={{ mt: "4px" }}>
               {getPaymentMethodSecondaryLabel(method)}
             </Text>
           </Box>
@@ -72,17 +82,18 @@ const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: P
               variant="outlined"
               size="small"
               disabled={disableActions}
+              isLoading={isSettingDefault}
               startIcon={<StarBorderIcon sx={{ fontSize: 18 }} />}
               onClick={() => onSetDefault(method)}
             >
               Set Default
             </Button>
           )}
-          <Tooltip title="Remove payment method">
+          <Tooltip title={disableRemove ? "Cannot remove the only payment method while there are unpaid invoices or active usage" : "Remove payment method"}>
             <span>
               <IconButton
                 size="small"
-                disabled={disableActions}
+                disabled={disableActions || disableRemove}
                 aria-label={`Remove ${primaryLabel}`}
                 onClick={() => onRemove(method)}
                 sx={{
@@ -92,7 +103,7 @@ const PaymentMethodItem = ({ method, disableActions, onRemove, onSetDefault }: P
                   height: 36,
                 }}
               >
-                <DeleteOutlineIcon sx={{ fontSize: 18, color: disableActions ? colors.gray400 : colors.gray600 }} />
+                <DeleteIcon disabled={disableActions || disableRemove} />
               </IconButton>
             </span>
           </Tooltip>

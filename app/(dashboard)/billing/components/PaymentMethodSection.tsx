@@ -3,8 +3,10 @@
 import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Alert, Box, IconButton, Stack, Tooltip } from "@mui/material";
+import { Alert, Box, IconButton, Stack } from "@mui/material";
 
+import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
 import { ConsumptionPaymentMethod } from "src/types/consumption";
@@ -19,24 +21,29 @@ import useStripeBillingConfig from "../hooks/useStripeBillingConfig";
 
 import AddPaymentMethodModal from "./AddPaymentMethodModal";
 import PaymentMethodItem from "./PaymentMethodItem";
-import { getErrorMessage } from "./paymentMethodUtils";
-import RemovePaymentMethodModal from "./RemovePaymentMethodModal";
+import { getErrorMessage, getPaymentMethodPrimaryLabel } from "./paymentMethodUtils";
 
 type PaymentMethodSectionProps = {
   enabled: boolean;
   onPaymentMethodsChanged: () => Promise<void> | void;
+  isRefetchingBillingDetails?: boolean;
+  hasUnpaidInvoicesOrUsage?: boolean;
 };
 
-const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMethodSectionProps) => {
+const PaymentMethodSection = ({
+  enabled,
+  onPaymentMethodsChanged,
+  hasUnpaidInvoicesOrUsage,
+}: PaymentMethodSectionProps) => {
   const snackbar = useSnackbar();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [methodToRemove, setMethodToRemove] = useState<ConsumptionPaymentMethod | null>(null);
-  const [removeError, setRemoveError] = useState("");
 
   const configQuery = useStripeBillingConfig(enabled && isAddOpen);
   const paymentMethodsQuery = usePaymentMethods(enabled);
   const removeMutation = useRemovePaymentMethod();
   const setDefaultMutation = useSetDefaultPaymentMethod();
+  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
   const paymentMethods = paymentMethodsQuery.data || [];
   const isLoading = paymentMethodsQuery.isPending;
@@ -65,27 +72,30 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
   };
 
   const handleSetDefault = async (method: ConsumptionPaymentMethod) => {
+    setSettingDefaultId(method.id);
     try {
       await setDefaultMutation.mutateAsync(method.id);
       snackbar.showSuccess("Default payment method updated");
     } catch (error) {
       snackbar.showError(getErrorMessage(error, "Failed to update default payment method"));
+    } finally {
+      setSettingDefaultId(null);
     }
   };
 
   const handleConfirmRemove = async () => {
     if (!methodToRemove) {
-      return;
+      return false;
     }
 
-    setRemoveError("");
     try {
       await removeMutation.mutateAsync(methodToRemove.id);
       setMethodToRemove(null);
       await refreshBillingState();
       snackbar.showSuccess("Payment method removed successfully");
     } catch (error) {
-      setRemoveError(getErrorMessage(error, "Failed to remove payment method"));
+      snackbar.showError(getErrorMessage(error, "Failed to remove payment method"));
+      return false;
     }
   };
 
@@ -96,7 +106,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
           <Text size="medium" weight="semibold" color={colors.gray900}>
             Saved Payment Methods
           </Text>
-          <Text size="small" weight="regular" color={colors.gray500} mt={0.25}>
+          <Text size="small" weight="regular" color={colors.gray500} mt="4px">
             Manage the methods used for automatic invoice collection.
           </Text>
         </Box>
@@ -140,7 +150,9 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
           <LoadingSpinnerSmall />
         </Stack>
       ) : errorMessage ? (
-        <Alert severity="error">{errorMessage}</Alert>
+        <Box sx={{ my: "16px" }}>
+          <Alert severity="error">{errorMessage}</Alert>
+        </Box>
       ) : paymentMethods.length === 0 ? (
         <Box
           sx={{
@@ -164,8 +176,9 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
               key={method.id}
               method={method}
               disableActions={isMutating}
+              disableRemove={paymentMethods.length === 1 && hasUnpaidInvoicesOrUsage}
+              isSettingDefault={settingDefaultId === method.id}
               onRemove={(selectedMethod) => {
-                setRemoveError("");
                 setMethodToRemove(selectedMethod);
               }}
               onSetDefault={handleSetDefault}
@@ -183,12 +196,19 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
         onClose={() => setIsAddOpen(false)}
         onSuccess={handleAddSuccess}
       />
-      <RemovePaymentMethodModal
+      <TextConfirmationDialog
         open={Boolean(methodToRemove)}
-        method={methodToRemove}
+        handleClose={() => setMethodToRemove(null)}
+        title="Remove Payment Method"
+        subtitle={
+          methodToRemove
+            ? `Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?`
+            : "Remove this payment method from this billing account?"
+        }
+        message="To confirm removal, please enter <b>remove</b>, in the field below:"
+        confirmationText="remove"
+        buttonLabel="Remove"
         isLoading={removeMutation.isPending}
-        errorMessage={removeError}
-        onClose={() => setMethodToRemove(null)}
         onConfirm={handleConfirmRemove}
       />
     </Box>
