@@ -49,7 +49,6 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
-import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
@@ -57,7 +56,6 @@ import {
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
-import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
@@ -992,11 +990,6 @@ const CloudAccountsPage = () => {
               setIsOverlayOpen(true);
               setOverlayType("disconnect-dialog");
             },
-            onModifyVpcsClick: () => {
-              setClickedInstance(selectedInstance);
-              setIsOverlayOpen(true);
-              setOverlayType("modify-vpcs");
-            },
             selectedInstance,
             refetchInstances: refetchInstances,
             isFetchingInstances: isFetchingInstances,
@@ -1015,33 +1008,10 @@ const CloudAccountsPage = () => {
         />
       </div>
 
-      {/* Create flow – 3-step wizard */}
       <FullScreenDrawer
         title="Cloud Account"
         description="Create a new cloud account"
-        open={isOverlayOpen && overlayType === "create-instance-form"}
-        closeDrawer={() => {
-          setIsOverlayOpen(false);
-          setClickedInstance(undefined);
-        }}
-        RenderUI={
-          <CloudAccountWizard
-            initialFormValues={initialFormValues}
-            selectedInstance={selectedInstance}
-            onClose={() => {
-              setIsOverlayOpen(false);
-              setClickedInstance(undefined);
-            }}
-            instances={instances}
-          />
-        }
-      />
-
-      {/* View form – existing read-only form */}
-      <FullScreenDrawer
-        title="Cloud Account"
-        description="View cloud account details"
-        open={isOverlayOpen && overlayType === "view-instance-form"}
+        open={isOverlayOpen && (overlayType === "create-instance-form" || overlayType === "view-instance-form")}
         closeDrawer={() => {
           setIsOverlayOpen(false);
           setClickedInstance(undefined);
@@ -1053,34 +1023,13 @@ const CloudAccountsPage = () => {
             onClose={() => {
               setIsOverlayOpen(false);
             }}
-            formMode="view"
+            formMode={overlayType === "view-instance-form" ? "view" : "create"}
             setIsAccountCreation={setIsAccountCreation}
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            setIsOverlayOpen={setIsOverlayOpen}
           />
-        }
-      />
-
-      {/* Modify VPCs flow */}
-      <FullScreenDrawer
-        title="Modify VPCs"
-        description="Update how deployments use VPCs in this cloud account — enable VPC creation, bring your own, and adjust which regions and VPCs are available."
-        open={isOverlayOpen && overlayType === "modify-vpcs"}
-        closeDrawer={() => {
-          setIsOverlayOpen(false);
-          setClickedInstance(undefined);
-        }}
-        RenderUI={
-          selectedInstance ? (
-            <ModifyVPCsDrawer
-              selectedInstance={selectedInstance}
-              onClose={() => {
-                setIsOverlayOpen(false);
-                setClickedInstance(undefined);
-              }}
-            />
-          ) : null
         }
       />
 

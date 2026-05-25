@@ -225,6 +225,29 @@ const InstanceForm = ({
         ...cloneDeep(values),
       };
 
+      // Trim string values in requestParams (excluding password-type fields)
+      if (data.requestParams && typeof data.requestParams === "object") {
+        // eslint-disable-next-line no-use-before-define
+        const allSchemaParams = resourceSchemaData?.apis?.flatMap((api) => api.inputParameters || []) || [];
+        for (const key in data.requestParams) {
+          if (typeof data.requestParams[key] === "string") {
+            const schemaParam = allSchemaParams.find((p) => p.key === key);
+            if (!schemaParam || schemaParam.type?.toLowerCase() !== "password") {
+              data.requestParams[key] = data.requestParams[key].trim();
+            }
+          }
+        }
+      }
+
+      // Trim customTags key/value
+      if (Array.isArray(data.customTags)) {
+        data.customTags = data.customTags.map((tag: { key: string; value: string }) => ({
+          ...tag,
+          key: typeof tag.key === "string" ? tag.key.trim() : tag.key,
+          value: typeof tag.value === "string" ? tag.value.trim() : tag.value,
+        }));
+      }
+
       // Remove productTierVersion if allowCustomerVersionOverride is false or if we're not creating
       if (!allowCustomerVersionOverride || formMode !== "create") {
         delete data.productTierVersion;
@@ -347,11 +370,7 @@ const InstanceForm = ({
         if (!data.cloudProvider && inputParametersObj["cloud_provider"]) {
           return snackbar.showError("Cloud Provider is required");
         } else if (!data.region && inputParametersObj["region"]) {
-          if (data.cloudProvider === "byoc-onprem") {
-            data.region = "on-prem";
-          } else {
-            return snackbar.showError("Region is required");
-          }
+          return snackbar.showError("Region is required");
         } else if (!data.network_type && networkTypeFieldExists) {
           return snackbar.showError("Network Type is required");
         }
@@ -566,13 +585,18 @@ const InstanceForm = ({
     }
   );
 
-  const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema({
-    serviceId: values.serviceId,
-    resourceId: selectedInstance?.resourceID || values.resourceId,
-    instanceId: selectedInstance?.id,
-    productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
-    productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
-  });
+  const { data: resourceSchemaData, isFetching: isFetchingResourceSchema } = useResourceSchema(
+    {
+      serviceId: values.serviceId,
+      resourceId: selectedInstance?.resourceID || values.resourceId,
+      instanceId: selectedInstance?.id,
+      productTierId: allowCustomerVersionOverride ? values.servicePlanId : "",
+      productTierVersion: allowCustomerVersionOverride ? values.productTierVersion : "",
+    },
+    {
+      enabled: formMode === "modify" ? Boolean((values as any)?.id) : true, // Fetch resource schema only when serviceId and resourceId are available
+    }
+  );
 
   const { data: resources = [] } = useResources({
     serviceId: values.serviceId,
@@ -869,9 +893,7 @@ const InstanceForm = ({
         .filter((instance) => isCloudAccountInstance(instance))
         .filter((instance) => {
           const resultParams = getResultParams(instance);
-          if (resultParams?.cluster_name) {
-            return values.cloudProvider === "byoc-onprem";
-          } else if (resultParams?.gcp_project_id) {
+          if (resultParams?.gcp_project_id) {
             return values.cloudProvider === "gcp";
           } else if (resultParams?.aws_account_id) {
             return values.cloudProvider === "aws";
@@ -902,38 +924,6 @@ const InstanceForm = ({
     [instances, values.cloudProvider]
   );
 
-  // Fetch cloud native networks (VPCs) for the selected account config
-  const selectedCloudAccountInstanceId = (values.requestParams as Record<string, any>)
-    ?.cloud_provider_account_config_id;
-  const selectedAccountConfigId = useMemo(() => {
-    if (!selectedCloudAccountInstanceId) return undefined;
-    const selectedCloudAccount = cloudAccountInstances.find((i) => i.id === selectedCloudAccountInstanceId);
-    if (!selectedCloudAccount) return undefined;
-    const rp = getResultParams(selectedCloudAccount);
-    return rp?.cloud_provider_account_config_id as string | undefined;
-  }, [selectedCloudAccountInstanceId, cloudAccountInstances]);
-
-  const isBYOCOnprem = values.cloudProvider === "byoc-onprem";
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: { id: selectedAccountConfigId || "" },
-      },
-      headers: { "x-ignore-global-error": true },
-    },
-    {
-      enabled: Boolean(selectedAccountConfigId && !isBYOCOnprem),
-      retry: 2,
-    }
-  );
-
-  const cloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
-  );
-
   const standardInformationFields = useMemo(() => {
     return getStandardInformationFields(
       servicesObj,
@@ -951,10 +941,10 @@ const InstanceForm = ({
       nonCloudAccountInstances,
       customerVersionSets,
       isFetchingVersionSets,
-      cloudAccountInstances,
       isFetchingResourceInstanceIds,
-      cloudNativeNetworks,
-      cloudNativeNetworksQuery.isFetching
+      cloudAccountInstances,
+      customNetworks,
+      isFetchingCustomNetworks
     );
   }, [
     formMode,
@@ -967,8 +957,6 @@ const InstanceForm = ({
     isFetchingVersionSets,
     cloudAccountInstances,
     isFetchingResourceInstanceIds,
-    cloudNativeNetworks,
-    cloudNativeNetworksQuery.isFetching,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
@@ -998,17 +986,9 @@ const InstanceForm = ({
       formData.values,
       resourceCreateSchema,
       resourceIdInstancesHashMap,
-      isFetchingResourceInstanceIds,
-      cloudAccountInstances
+      isFetchingResourceInstanceIds
     );
-  }, [
-    formMode,
-    formData.values,
-    resourceCreateSchema,
-    resourceIdInstancesHashMap,
-    isFetchingResourceInstanceIds,
-    cloudAccountInstances,
-  ]);
+  }, [formMode, formData.values, resourceCreateSchema, resourceIdInstancesHashMap, isFetchingResourceInstanceIds]);
 
   const sections = useMemo(
     () => [

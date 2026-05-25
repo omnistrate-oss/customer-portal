@@ -78,10 +78,10 @@ const CustomNetworkForm = ({
     validationSchema: CustomNetworkValidationSchema,
     onSubmit: (values) => {
       const data: Record<string, unknown> = {
-        name: values.name,
+        name: values.name.trim(),
         cloudProviderName: values.cloudProviderName,
         cloudProviderRegion: values.cloudProviderRegion,
-        cidr: values.cidr,
+        cidr: values.cidr.trim(),
       };
 
       if (formMode === "create") {
@@ -100,7 +100,7 @@ const CustomNetworkForm = ({
             },
           },
           body: {
-            name: values.name,
+            name: values.name.trim(),
           },
         });
       }

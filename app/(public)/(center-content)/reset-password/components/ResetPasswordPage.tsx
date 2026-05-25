@@ -66,7 +66,7 @@ const ResetPasswordPage = (props) => {
 
     for (const key in values) {
       if (values[key]) {
-        data[key] = values[key];
+        data[key] = typeof values[key] === "string" ? values[key].trim() : values[key];
       }
     }
     resetPasswordMutation.mutate(data);

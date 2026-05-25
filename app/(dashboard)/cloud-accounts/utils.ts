@@ -4,6 +4,24 @@ import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
 
+export type CloudAccountFormValues = {
+  serviceId: string;
+  servicePlanId: string;
+  subscriptionId: string;
+  cloudProvider: string;
+  accountConfigurationMethod: string;
+  awsAccountId: string;
+  gcpProjectId: string;
+  gcpProjectNumber: string;
+  azureSubscriptionId: string;
+  azureTenantId: string;
+  ociTenancyId: string;
+  ociDomainId: string;
+  nebiusTenantId: string;
+  clusterName: string;
+  clusterDescription: string;
+};
+
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   subscriptions: Subscription[],
@@ -81,7 +99,7 @@ export const getInitialValues = (
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   byoaServiceOfferings: ServiceOffering[],
   instances: ResourceInstance[]
-) => {
+): CloudAccountFormValues => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
     const resultParams = getResultParams(selectedInstance);
@@ -136,6 +154,16 @@ export const getInitialValues = (
       ...initialFormValues,
       cloudProvider,
       accountConfigurationMethod: CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cloudProvider],
+      awsAccountId: "",
+      gcpProjectId: "",
+      gcpProjectNumber: "",
+      azureSubscriptionId: "",
+      azureTenantId: "",
+      ociTenancyId: "",
+      ociDomainId: "",
+      nebiusTenantId: "",
+      clusterName: "",
+      clusterDescription: "",
     };
   }
 
@@ -167,6 +195,8 @@ export const getInitialValues = (
     awsAccountId: "",
     gcpProjectId: "",
     gcpProjectNumber: "",
+    azureSubscriptionId: "",
+    azureTenantId: "",
     ociTenancyId: "",
     ociDomainId: "",
     nebiusTenantId: "",

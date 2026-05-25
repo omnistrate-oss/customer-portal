@@ -3,13 +3,12 @@
 import { cn } from "lib/utils";
 
 import { Text } from "components/Typography/Typography";
+import AwsLogo from "src/components/Logos/AwsLogo";
+import AzureLogo from "src/components/Logos/AzureLogo";
+import GcpLogo from "src/components/Logos/GcpLogo";
+import NebiusLogo from "src/components/Logos/NebiusLogo";
+import OciLogo from "src/components/Logos/OciLogo";
 import { colors } from "src/themeConfig";
-
-import AwsLogo from "../../../../src/components/Logos/AwsLogo";
-import AzureLogo from "../../../../src/components/Logos/AzureLogo";
-import GcpLogo from "../../../../src/components/Logos/GcpLogo";
-import NebiusLogo from "../../../../src/components/Logos/NebiusLogo";
-import OciLogo from "../../../../src/components/Logos/OciLogo";
 
 import OnPremIcon from "./OnPremIcon";
 import PrivateIcon from "./PrivateIcon";
@@ -21,7 +20,7 @@ export const cloudProviderLongLogoMap = {
   oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
   nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
   private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
-  "byoc-onprem": <OnPremIcon height="24px" width="auto" />,
+  "byoc-onprem": <OnPremIcon style={{ height: "24px", width: "auto" }} />,
 };
 
 const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {

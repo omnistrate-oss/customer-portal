@@ -6,13 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import Button from "src/components/Button/Button";
+import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import InstructionsModalIcon from "src/components/Icons/AccountConfig/InstructionsModalIcon";
 import { Text } from "src/components/Typography/Typography";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getResultParams } from "src/utils/instance";
-
-import { TextContainerToCopy } from "../../../../src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 
 type SetupPrivateClusterDialogProps = {
   open: boolean;
@@ -25,6 +24,27 @@ type SetupPrivateClusterDialogProps = {
   offering?: ServiceOffering;
   /** Subscription ID */
   subscriptionId?: string;
+};
+
+type PrivateClusterResultParams = {
+  cluster_name?: string;
+  byoc_onprem_install_command?: string;
+};
+
+const POLLING_INTERVAL_MS = 5000;
+const MAX_POLLING_ATTEMPTS = 24;
+
+const getHttpStatus = (error: unknown) => {
+  if (!error || typeof error !== "object" || !("response" in error)) {
+    return undefined;
+  }
+
+  const response = error.response;
+  if (!response || typeof response !== "object" || !("status" in response)) {
+    return undefined;
+  }
+
+  return typeof response.status === "number" ? response.status : undefined;
 };
 
 /**
@@ -44,26 +64,58 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   subscriptionId,
 }) => {
   const [isPolling, setIsPolling] = useState(true);
-  const [resultParams, setResultParams] = useState<Record<string, any> | null>(null);
+  const [pollingError, setPollingError] = useState<string | null>(null);
+  const [resultParams, setResultParams] = useState<PrivateClusterResultParams | null>(null);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingAttemptsRef = useRef(0);
+  const serviceProviderId = offering?.serviceProviderId;
+  const serviceURLKey = offering?.serviceURLKey;
+  const serviceAPIVersion = offering?.serviceAPIVersion;
+  const serviceEnvironmentURLKey = offering?.serviceEnvironmentURLKey;
+  const serviceModelURLKey = offering?.serviceModelURLKey;
+  const productTierURLKey = offering?.productTierURLKey;
+  const selectedResourceURLKey = offering?.resourceParameters?.find((r) =>
+    r.resourceId.startsWith("r-injectedaccountconfig")
+  )?.urlKey;
+
+  const stopPolling = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  }, []);
 
   const pollForResultParams = useCallback(async () => {
-    if (!instanceId || !offering) return;
+    if (
+      !instanceId ||
+      !serviceProviderId ||
+      !serviceURLKey ||
+      !serviceAPIVersion ||
+      !serviceEnvironmentURLKey ||
+      !serviceModelURLKey ||
+      !productTierURLKey
+    ) {
+      return;
+    }
 
-    const selectedResource = offering.resourceParameters?.find((r) =>
-      r.resourceId.startsWith("r-injectedaccountconfig")
-    );
-    if (!selectedResource) return;
+    if (!selectedResourceURLKey) {
+      setPollingError("Unable to find the account configuration resource for this cluster.");
+      setIsPolling(false);
+      stopPolling();
+      return;
+    }
+
+    pollingAttemptsRef.current += 1;
 
     try {
       const response = await getResourceInstanceDetails(
-        offering.serviceProviderId,
-        offering.serviceURLKey,
-        offering.serviceAPIVersion,
-        offering.serviceEnvironmentURLKey,
-        offering.serviceModelURLKey,
-        offering.productTierURLKey,
-        selectedResource.urlKey,
+        serviceProviderId,
+        serviceURLKey,
+        serviceAPIVersion,
+        serviceEnvironmentURLKey,
+        serviceModelURLKey,
+        productTierURLKey,
+        selectedResourceURLKey,
         instanceId,
         subscriptionId
       );
@@ -74,43 +126,89 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       if (params?.byoc_onprem_install_command) {
         setResultParams(params);
         setIsPolling(false);
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
+        stopPolling();
+        return;
       }
-    } catch {
-      // Continue polling on error
+    } catch (error) {
+      if (getHttpStatus(error) === 404) {
+        setPollingError(
+          "Unable to find the cluster setup resource. The instance may have been deleted or is unavailable."
+        );
+        setIsPolling(false);
+        stopPolling();
+        return;
+      }
     }
-  }, [instanceId, offering, subscriptionId]);
+
+    if (pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS) {
+      setPollingError("The cluster setup command is not ready yet. Close this dialog and try again in a few minutes.");
+      setIsPolling(false);
+      stopPolling();
+    }
+  }, [
+    instanceId,
+    serviceProviderId,
+    serviceURLKey,
+    serviceAPIVersion,
+    serviceEnvironmentURLKey,
+    serviceModelURLKey,
+    productTierURLKey,
+    selectedResourceURLKey,
+    subscriptionId,
+    stopPolling,
+  ]);
 
   useEffect(() => {
-    if (open && instanceId) {
-      setIsPolling(true);
-      setResultParams(null);
+    stopPolling();
 
-      // Initial fetch
-      pollForResultParams();
-
-      // Poll every 5 seconds
-      pollingIntervalRef.current = setInterval(pollForResultParams, 5000);
+    if (
+      !open ||
+      !instanceId ||
+      !serviceProviderId ||
+      !serviceURLKey ||
+      !serviceAPIVersion ||
+      !serviceEnvironmentURLKey ||
+      !serviceModelURLKey ||
+      !productTierURLKey
+    ) {
+      return;
     }
 
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
-  }, [open, instanceId, pollForResultParams]);
+    setIsPolling(true);
+    setPollingError(null);
+    setResultParams(null);
+    pollingAttemptsRef.current = 0;
+
+    // Initial fetch
+    pollForResultParams();
+
+    // Poll every 5 seconds
+    pollingIntervalRef.current = setInterval(pollForResultParams, POLLING_INTERVAL_MS);
+
+    return stopPolling;
+  }, [
+    open,
+    instanceId,
+    serviceProviderId,
+    serviceURLKey,
+    serviceAPIVersion,
+    serviceEnvironmentURLKey,
+    serviceModelURLKey,
+    productTierURLKey,
+    pollForResultParams,
+    stopPolling,
+  ]);
 
   // Reset state when dialog closes
   useEffect(() => {
     if (!open) {
       setResultParams(null);
+      setPollingError(null);
       setIsPolling(true);
+      pollingAttemptsRef.current = 0;
+      stopPolling();
     }
-  }, [open]);
+  }, [open, stopPolling]);
 
   const displayClusterName = resultParams?.cluster_name || clusterName || "";
   const installCommand = resultParams?.byoc_onprem_install_command || "";
@@ -163,7 +261,16 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
       </Stack>
 
       {/* Content */}
-      {isPolling ? (
+      {pollingError ? (
+        <Stack alignItems="center" justifyContent="center" sx={{ py: "60px" }} gap="12px">
+          <Text size="small" weight="semibold" color="#B42318">
+            Setup command unavailable
+          </Text>
+          <Text size="small" weight="regular" color="#535862" sx={{ textAlign: "center" }}>
+            {pollingError}
+          </Text>
+        </Stack>
+      ) : isPolling ? (
         <Stack alignItems="center" justifyContent="center" sx={{ py: "60px" }} gap="16px">
           <CircularProgress size={32} />
           <Text size="small" weight="medium" color="#535862">
@@ -184,7 +291,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
           {/* Deploy this chart */}
           <Box>
             <Text size="small" weight="semibold" color="#414651" sx={{ mb: "4px" }}>
-              Deploy this chart
+              Run this command
             </Text>
             <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
               Run the command below from a terminal that has kubectl access to the Kubernetes cluster you want to
@@ -235,7 +342,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
               }}
             >
               <Text size="small" weight="semibold" color="#414651" sx={{ mb: "12px" }}>
-                Installation Instructions
+                What happens next
               </Text>
               <Stack gap="10px">
                 <Text size="small" weight="regular" color="#535862" sx={{ mb: "12px" }}>
