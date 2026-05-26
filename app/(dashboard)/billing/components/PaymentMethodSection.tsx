@@ -26,7 +26,6 @@ import { getErrorMessage, getPaymentMethodPrimaryLabel } from "./paymentMethodUt
 type PaymentMethodSectionProps = {
   enabled: boolean;
   onPaymentMethodsChanged: () => Promise<void> | void;
-  isRefetchingBillingDetails?: boolean;
 };
 
 const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMethodSectionProps) => {
@@ -101,7 +100,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
           <Text size="medium" weight="semibold" color={colors.gray900}>
             Saved Payment Methods
           </Text>
-          <Text size="small" weight="regular" color={colors.gray500} mt="4px">
+          <Text size="small" weight="regular" color={colors.gray500} mt={0.5}>
             Manage the methods used for automatic invoice collection.
           </Text>
         </Box>
@@ -202,6 +201,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
         message="To confirm removal, please enter <b>remove</b>, in the field below:"
         confirmationText="remove"
         buttonLabel="Remove"
+        closeButtonAriaLabel="Close remove payment method dialog"
         isLoading={removeMutation.isPending}
         onConfirm={handleConfirmRemove}
       />

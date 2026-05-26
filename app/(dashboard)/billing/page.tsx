@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Stack, tabClasses } from "@mui/material";
 import { useSelector } from "react-redux";
 
+import { listConsumptionPaymentMethods, setDefaultConsumptionPaymentMethod } from "src/api/consumption";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Tab, Tabs } from "src/components/Tab/Tab";
+import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { colors } from "src/themeConfig";
@@ -47,12 +50,16 @@ const getSafeExternalURL = (url?: string) => {
 };
 
 const BillingPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const snackbar = useSnackbar();
   const { refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
   const selectUser = useSelector(selectUserrootData);
   // Track previous paymentConfigured state to detect changes
   const previousPaymentConfiguredRef = useRef<boolean | undefined>(undefined);
+  const handledSetupCompleteRef = useRef(false);
 
   const billingStatusQuery = useBillingStatus();
 
@@ -134,10 +141,44 @@ const BillingPage = () => {
   }
 
   const isLoading = isBillingDetailsPending || isConsumptionDataPending || isInvoicesPending;
-
-  if (isLoading) return <LoadingSpinner />;
   const isStripe = selectedBillingProvider === "STRIPE";
   const isCustomPaymentPortalEnabled = isStripe && !billingDetails?.paymentInfoPortalURL;
+
+  useEffect(() => {
+    if (
+      handledSetupCompleteRef.current ||
+      !isCustomPaymentPortalEnabled ||
+      searchParams?.get("setup_complete") !== "true"
+    ) {
+      return;
+    }
+
+    handledSetupCompleteRef.current = true;
+
+    const reconcileSetupRedirect = async () => {
+      try {
+        const paymentMethodsResponse = await listConsumptionPaymentMethods();
+        const paymentMethods = paymentMethodsResponse.data.paymentMethods || [];
+        const hasDefaultPaymentMethod = paymentMethods.some((method) => method.isDefault);
+
+        if (!hasDefaultPaymentMethod && paymentMethods[0]?.id) {
+          await setDefaultConsumptionPaymentMethod(paymentMethods[0].id);
+        }
+
+        await refetchBillingDetails();
+        refetchSubscriptions();
+        snackbar.showSuccess("Payment method added successfully");
+      } catch {
+        snackbar.showError("Payment method setup completed, but billing details could not refresh.");
+      } finally {
+        router.replace("/billing", { scroll: false });
+      }
+    };
+
+    void reconcileSetupRedirect();
+  }, [isCustomPaymentPortalEnabled, refetchBillingDetails, refetchSubscriptions, router, searchParams, snackbar]);
+
+  if (isLoading) return <LoadingSpinner />;
   const balanceDueLink =
     billingDetails?.billingProviders?.find((provider) => provider.type === selectedBillingProvider)?.balanceDueLink ||
     "#";
