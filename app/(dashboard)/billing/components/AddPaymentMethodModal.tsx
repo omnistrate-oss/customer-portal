@@ -29,16 +29,23 @@ type AddPaymentMethodModalProps = {
 
 type AddPaymentMethodFormProps = {
   existingMethods: ConsumptionPaymentMethod[];
+  isSubmitting: boolean;
   onCancel: () => void;
+  setIsSubmitting: (isSubmitting: boolean) => void;
   onSuccess: (options?: { defaultFailed?: boolean }) => Promise<void> | void;
 };
 
-const AddPaymentMethodForm = ({ existingMethods, onCancel, onSuccess }: AddPaymentMethodFormProps) => {
+const AddPaymentMethodForm = ({
+  existingMethods,
+  isSubmitting,
+  onCancel,
+  setIsSubmitting,
+  onSuccess,
+}: AddPaymentMethodFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const setDefaultMutation = useSetDefaultPaymentMethod();
   const snackbar = useSnackbar();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!stripe || !elements) {
@@ -129,9 +136,11 @@ const AddPaymentMethodModal = ({
   const createSetupIntentMutation = useCreateSetupIntent();
   const [clientSecret, setClientSecret] = useState("");
   const [setupErrorMessage, setSetupErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const configErrorMessage = configError ? getErrorMessage(configError, "Unable to load Stripe configuration.") : "";
   const modalErrorMessage = configErrorMessage || setupErrorMessage;
+  const isInitializing = createSetupIntentMutation.isPending || isConfigLoading;
 
   const stripePromise = useMemo(() => {
     if (!config?.publishableKey) {
@@ -176,7 +185,7 @@ const AddPaymentMethodModal = ({
   }, [config?.publishableKey, configErrorMessage, open]);
 
   const handleClose = () => {
-    if (createSetupIntentMutation.isPending || isConfigLoading) {
+    if (isInitializing || isSubmitting) {
       return;
     }
     onClose();
@@ -210,6 +219,7 @@ const AddPaymentMethodModal = ({
         <IconButton
           onClick={handleClose}
           aria-label="Close add payment method dialog"
+          disabled={isInitializing || isSubmitting}
           sx={{
             position: "absolute",
             right: "16px",
@@ -268,7 +278,13 @@ const AddPaymentMethodModal = ({
               },
             }}
           >
-            <AddPaymentMethodForm existingMethods={existingMethods} onCancel={handleClose} onSuccess={onSuccess} />
+            <AddPaymentMethodForm
+              existingMethods={existingMethods}
+              isSubmitting={isSubmitting}
+              onCancel={handleClose}
+              setIsSubmitting={setIsSubmitting}
+              onSuccess={onSuccess}
+            />
           </Elements>
         </Stack>
       )}

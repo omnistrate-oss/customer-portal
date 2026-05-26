@@ -34,15 +34,26 @@ import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
 import useConsumptionUsage from "./hooks/useConsumptionUsage";
 
 const getSafeExternalURL = (url?: string) => {
-  if (!url) {
+  if (!url || url === "#") {
     return "";
   }
 
   try {
-    const parsedURL = new URL(url);
-    if (parsedURL.protocol !== "https:") {
+    const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://example.com";
+    const parsedURL = new URL(url, baseOrigin);
+    const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url);
+    const isSameOriginRelativeURL = !hasExplicitScheme && parsedURL.origin === baseOrigin;
+    const isAllowedProtocol =
+      parsedURL.protocol === "https:" || (process.env.NODE_ENV !== "production" && parsedURL.protocol === "http:");
+
+    if (!isSameOriginRelativeURL && !isAllowedProtocol) {
       return "";
     }
+
+    if (isSameOriginRelativeURL) {
+      return `${parsedURL.pathname}${parsedURL.search}${parsedURL.hash}`;
+    }
+
     return parsedURL.toString();
   } catch {
     return "";

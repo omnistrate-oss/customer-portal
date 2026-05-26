@@ -198,7 +198,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
             ? `Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?${paymentMethods.length === 1 ? "\n\nRemoval is blocked when unpaid invoices, current usage, or active subscriptions still require a payment method." : ""}`
             : "Remove this payment method from this billing account?"
         }
-        message="To confirm removal, please enter <b>remove</b>, in the field below:"
+        message="To confirm removal, please enter <b>remove</b> in the field below:"
         confirmationText="remove"
         buttonLabel="Remove"
         closeButtonAriaLabel="Close remove payment method dialog"
