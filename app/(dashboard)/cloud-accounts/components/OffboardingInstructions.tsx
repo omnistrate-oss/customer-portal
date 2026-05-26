@@ -1,10 +1,10 @@
-import { FC } from "react";
-import Link from "next/link";
 import { Box, Stack, styled } from "@mui/material";
+import Link from "next/link";
+import { FC } from "react";
 
+import { Text } from "components/Typography/Typography";
 import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
-import { Text } from "components/Typography/Typography";
 
 const StyledLink = styled(Link)({
   textDecoration: "underline",
@@ -53,6 +53,8 @@ export type OffboardInstructionDetails = {
   ociTenancyID?: string;
   ociDomainID?: string;
   ociOffboardCommand?: string;
+  byocOnpremClusterName?: string;
+  byocOnpremUninstallCommand?: string;
 };
 
 export const OffboardingInstructions: FC<{ offboardingInstructionDetails: OffboardInstructionDetails }> = ({
@@ -119,7 +121,14 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
           </Box>
         </Stack>
       )}
-
+      {offboardingInstructionDetails?.byocOnpremClusterName && (
+        <Box marginBottom={"20px"}>
+          <Text size="small" weight="semibold" color="#374151">
+            Kubernetes Cluster Name
+          </Text>
+          <TextContainerToCopy text={offboardingInstructionDetails?.byocOnpremClusterName} marginTop="6px" />
+        </Box>
+      )}
       <Text size="small" weight="medium" color="#414651">
         This cloud account instance is marked for deletion
       </Text>
@@ -221,6 +230,28 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               {offboardingInstructionDetails?.ociOffboardCommand && (
                 <TextContainerToCopy
                   text={addQuotesToShellCommand(offboardingInstructionDetails?.ociOffboardCommand)}
+                  marginTop="12px"
+                />
+              )}
+            </Box>
+          </ListItem>
+        )}
+
+        {offboardingInstructionDetails?.byocOnpremClusterName && (
+          <ListItem>
+            <ListItemIcon>
+              <ArrowBullet />
+            </ListItemIcon>
+
+            <Box overflow={"hidden"} flex={1}>
+              <Text size="small" weight="regular" color="#414651">
+                Run the following Helm uninstall command in the target Kubernetes cluster to complete the off-boarding
+                process and remove the agent from your cluster.
+              </Text>
+
+              {offboardingInstructionDetails?.byocOnpremUninstallCommand && (
+                <TextContainerToCopy
+                  text={addQuotesToShellCommand(offboardingInstructionDetails.byocOnpremUninstallCommand)}
                   marginTop="12px"
                 />
               )}

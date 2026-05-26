@@ -100,10 +100,16 @@ function ResourceInstanceOverview(props) {
       </div>
 
       <div style={{ padding: "14px" }} className="flex items-center justify-center gap-1.5">
-        <RegionIcon style={{ flexShrink: "0" }} />
-        <Text size="small" weight="regular" color="#475467" ellipsis>
-          {region ?? "Global"}
-        </Text>
+        {cloudProvider === "byoc-onprem" || region === "onprem" ? (
+          "-"
+        ) : (
+          <>
+            <RegionIcon style={{ flexShrink: "0" }} />
+            <Text size="small" weight="regular" color="#475467" ellipsis>
+              {region ?? "Global"}
+            </Text>
+          </>
+        )}
       </div>
 
       <div style={{ padding: "14px" }} className="flex items-center justify-center">

@@ -2,24 +2,39 @@
 
 import { cn } from "lib/utils";
 
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import { colors } from "src/themeConfig";
-import Tooltip from "components/Tooltip/Tooltip";
 import { Text } from "components/Typography/Typography";
+import AwsLogo from "src/components/Logos/AwsLogo";
+import AzureLogo from "src/components/Logos/AzureLogo";
+import GcpLogo from "src/components/Logos/GcpLogo";
+import NebiusLogo from "src/components/Logos/NebiusLogo";
+import OciLogo from "src/components/Logos/OciLogo";
+import { colors } from "src/themeConfig";
 
-const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled, disabledMessage }) => {
-  const card = (
+import OnPremIcon from "./OnPremIcon";
+import PrivateIcon from "./PrivateIcon";
+
+export const cloudProviderLongLogoMap = {
+  aws: <AwsLogo style={{ height: "24px", width: "auto" }} />,
+  gcp: <GcpLogo style={{ height: "24px", width: "auto" }} />,
+  azure: <AzureLogo style={{ height: "24px", width: "auto" }} />,
+  oci: <OciLogo style={{ height: "24px", width: "auto" }} />,
+  nebius: <NebiusLogo style={{ height: "24px", width: "auto" }} />,
+  private: <PrivateIcon style={{ height: "24px", width: "auto" }} />,
+  "byoc-onprem": <OnPremIcon style={{ height: "24px", width: "auto" }} />,
+};
+
+const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled }) => {
+  return (
     <div
       data-testid={`${cloudProvider}-card`}
       className={cn(
         "px-4 py-4 rounded-xl text-center flex flex-col justify-center items-center",
-        disabled ? "cursor-not-allowed bg-gray-50" : "cursor-pointer"
+        disabled ? "cursor-default bg-gray-50" : "cursor-pointer"
       )}
       style={{
         outline: isSelected ? `2px solid ${colors.success500}` : `1px solid ${colors.gray200}`,
-        minWidth: "120px",
+        width: "120px",
         minHeight: "60px",
-        opacity: disabled ? 0.5 : 1,
       }}
       onClick={() => {
         if (!disabled) {
@@ -32,16 +47,6 @@ const CloudProviderCard = ({ cloudProvider, isSelected, onClick, disabled, disab
       </div>
     </div>
   );
-
-  if (disabled && disabledMessage) {
-    return (
-      <Tooltip title={disabledMessage} placement="top" arrow>
-        <span>{card}</span>
-      </Tooltip>
-    );
-  }
-
-  return card;
 };
 
 type CloudProviderRadioProps = {
@@ -50,7 +55,6 @@ type CloudProviderRadioProps = {
   name: string;
   onChange?: () => void;
   disabled?: boolean;
-  disabledProviders?: Record<string, string>;
 };
 
 const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
@@ -59,7 +63,6 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   name,
   onChange = () => {},
   disabled,
-  disabledProviders,
 }) => {
   // Filter out cloud providers that don't have a logo/icon defined
   const validCloudProviders = cloudProviders.filter((cp) => cp && cloudProviderLongLogoMap[cp]);
@@ -77,14 +80,10 @@ const CloudProviderRadio: React.FC<CloudProviderRadioProps> = ({
   return (
     <div className="flex flex-wrap gap-4">
       {validCloudProviders.map((cloudProvider, index) => {
-        const providerDisabledMessage = disabledProviders?.[cloudProvider];
-        const isProviderDisabled = Boolean(disabled || providerDisabledMessage);
-
         return (
           <CloudProviderCard
             key={index}
-            disabled={isProviderDisabled}
-            disabledMessage={providerDisabledMessage}
+            disabled={disabled}
             cloudProvider={cloudProvider}
             isSelected={formData.values[name]?.toLowerCase() === cloudProvider.toLowerCase()}
             onClick={() => {

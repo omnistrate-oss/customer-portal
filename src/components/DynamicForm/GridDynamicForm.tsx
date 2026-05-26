@@ -21,8 +21,6 @@ type GridDynamicFormProps = {
   onClose: () => void;
   disableSubmit?: boolean;
   previewCardTitle?: string;
-  /** Optional content rendered after the form sections (left column). */
-  afterSections?: React.ReactNode;
 };
 
 const GridDynamicForm: React.FC<GridDynamicFormProps> = ({
@@ -33,7 +31,6 @@ const GridDynamicForm: React.FC<GridDynamicFormProps> = ({
   onClose,
   disableSubmit,
   previewCardTitle,
-  afterSections,
 }) => {
   const sections = formConfiguration.sections || [];
   const footer = formConfiguration.footer;
@@ -45,22 +42,18 @@ const GridDynamicForm: React.FC<GridDynamicFormProps> = ({
       className="grid grid-cols-7 items-start gap-8"
       onSubmit={formData.handleSubmit}
     >
-      <div className="col-span-5 space-y-6">
-        {sections.map((section, index) => (
-          <CardWithTitle
-            key={index}
-            title={section.title}
-            actionButton={section.actionButton}
-            actionButtonPosition={section.actionButtonPosition}
-          >
-            <div className="space-y-6">
-              {section.fields.map((field, fieldIndex) => (
-                <GridDynamicField key={fieldIndex} field={field} formData={formData} />
-              ))}
-            </div>
-          </CardWithTitle>
-        ))}
-        {afterSections}
+      <div className="col-span-5">
+        {sections.map((section, index) => {
+          return (
+            <CardWithTitle key={index} title={section.title}>
+              <div className="space-y-6">
+                {section.fields.map((field, index) => {
+                  return <GridDynamicField key={index} field={field} formData={formData} />;
+                })}
+              </div>
+            </CardWithTitle>
+          );
+        })}
       </div>
 
       <div className="col-span-2">
