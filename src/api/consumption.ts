@@ -44,7 +44,10 @@ export const getConsumptionBillingStatus = (): Promise<AxiosResponse<DescribeCon
   });
 };
 
-export type GetBillingDetailsQueryParams = { returnUrl: string };
+export type GetBillingDetailsQueryParams = {
+  returnUrl: string;
+  supportsCustomPaymentPortal?: boolean;
+};
 
 export const getBillingDetails = (
   queryParams: GetBillingDetailsQueryParams

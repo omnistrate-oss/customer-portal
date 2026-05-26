@@ -153,7 +153,7 @@ const BillingPage = () => {
 
   const isLoading = isBillingDetailsPending || isConsumptionDataPending || isInvoicesPending;
   const isStripe = selectedBillingProvider === "STRIPE";
-  const isCustomPaymentPortalEnabled = isStripe && !billingDetails?.paymentInfoPortalURL;
+  const isCustomPaymentPortalEnabled = isStripe && Boolean(billingDetails?.customPaymentPortalEnabled);
 
   useEffect(() => {
     if (
