@@ -1,16 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
-import DataGridText from "components/DataGrid/DataGridText";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import RegionIcon from "components/Region/RegionIcon";
-import StatusChip from "components/StatusChip/StatusChip";
-import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
 import { deleteCustomNetwork } from "src/api/customNetworks";
 import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSubscriptions from "src/hooks/query/useSubscriptions";
@@ -18,6 +12,12 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { CustomNetwork } from "src/types/customNetwork";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getCustomNetworksRoute } from "src/utils/routes";
+import DataGridText from "components/DataGrid/DataGridText";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import RegionIcon from "components/Region/RegionIcon";
+import StatusChip from "components/StatusChip/StatusChip";
+import TextConfirmationDialog from "components/TextConfirmationDialog/TextConfirmationDialog";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CustomNetworksIcon from "../components/Icons/CustomNetworksIcon";
