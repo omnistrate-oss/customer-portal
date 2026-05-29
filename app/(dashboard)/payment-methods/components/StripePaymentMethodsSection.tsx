@@ -1,43 +1,63 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Alert, Box, IconButton, Stack } from "@mui/material";
+import { Alert, Box, Stack } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 
+import { removeConsumptionPaymentMethod } from "src/api/consumption";
+import StatusChip from "src/components/StatusChip/StatusChip";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
-import Tooltip from "src/components/Tooltip/Tooltip";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
 import { ConsumptionPaymentMethod } from "src/types/consumption";
+import getSafeExternalURL from "src/utils/getSafeExternalURL";
 import Button from "components/Button/Button";
+import Card from "components/Card/Card";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import { Text } from "components/Typography/Typography";
 
 import usePaymentMethods from "../hooks/usePaymentMethods";
-import useRemovePaymentMethod from "../hooks/useRemovePaymentMethod";
 import useSetDefaultPaymentMethod from "../hooks/useSetDefaultPaymentMethod";
 import useStripeBillingConfig from "../hooks/useStripeBillingConfig";
+import { getErrorMessage, getPaymentMethodPrimaryLabel } from "../utils/paymentMethodUtils";
 
 import AddPaymentMethodModal from "./AddPaymentMethodModal";
 import PaymentMethodItem from "./PaymentMethodItem";
-import { getErrorMessage, getPaymentMethodPrimaryLabel } from "./paymentMethodUtils";
 
-type PaymentMethodSectionProps = {
+type StripePaymentMethodsSectionProps = {
   enabled: boolean;
+  isCustomPaymentPortalEnabled: boolean;
+  paymentConfigured?: boolean;
+  paymentInfoPortalURL?: string;
   onPaymentMethodsChanged: () => Promise<void> | void;
 };
 
-const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMethodSectionProps) => {
+const StripePaymentMethodsSection = ({
+  enabled,
+  isCustomPaymentPortalEnabled,
+  paymentConfigured,
+  paymentInfoPortalURL,
+  onPaymentMethodsChanged,
+}: StripePaymentMethodsSectionProps) => {
   const snackbar = useSnackbar();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [methodToRemove, setMethodToRemove] = useState<ConsumptionPaymentMethod | null>(null);
+  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
   const configQuery = useStripeBillingConfig(enabled && isAddOpen);
   const paymentMethodsQuery = usePaymentMethods(enabled);
-  const removeMutation = useRemovePaymentMethod();
   const setDefaultMutation = useSetDefaultPaymentMethod();
-  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
+
+  const removeMutation = useMutation({
+    mutationFn: removeConsumptionPaymentMethod,
+    onSuccess: async () => {
+      await paymentMethodsQuery.refetch();
+    },
+  });
 
   const paymentMethods = paymentMethodsQuery.data || [];
   const isLoading = paymentMethodsQuery.isPending;
@@ -51,22 +71,19 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
     await onPaymentMethodsChanged();
   };
 
-  const refreshBillingState = async () => {
-    await onPaymentMethodsChanged();
-  };
-
   const handleAddSuccess = async (options?: { defaultFailed?: boolean }) => {
     setIsAddOpen(false);
-    await refreshAll();
     if (options?.defaultFailed) {
       snackbar.showError("Payment method added, but it could not be set as default. Choose Set Default from the list.");
     } else {
       snackbar.showSuccess("Payment method added successfully");
     }
+    await refreshAll();
   };
 
   const handleSetDefault = async (method: ConsumptionPaymentMethod) => {
     setSettingDefaultId(method.id);
+
     try {
       await setDefaultMutation.mutateAsync(method.id);
       snackbar.showSuccess("Default payment method updated");
@@ -85,7 +102,7 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
     try {
       await removeMutation.mutateAsync(methodToRemove.id);
       setMethodToRemove(null);
-      await refreshBillingState();
+      await onPaymentMethodsChanged();
       snackbar.showSuccess("Payment method removed successfully");
     } catch (error) {
       snackbar.showError(getErrorMessage(error, "Failed to remove payment method"));
@@ -93,40 +110,106 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
     }
   };
 
+  if (!isCustomPaymentPortalEnabled) {
+    const safePaymentInfoPortalURL = getSafeExternalURL(paymentInfoPortalURL);
+
+    return (
+      <Card
+        sx={{
+          mt: "12px",
+          boxShadow: "0px 1px 2px 0px #0A0D120D",
+        }}
+      >
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          gap="16px"
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", md: "center" }}
+        >
+          <Box>
+            <Text size="medium" weight="semibold" color={colors.gray900}>
+              Payment Method
+            </Text>
+            <Text size="small" weight="regular" color={colors.gray500} sx={{ mt: "2px" }}>
+              Configure payment methods using the Stripe billing portal.
+            </Text>
+          </Box>
+
+          <Stack direction="row" gap="12px" alignItems="center" flexWrap="wrap">
+            <StatusChip
+              label={paymentConfigured ? "Configured" : "Not Configured"}
+              category={paymentConfigured ? "success" : "failed"}
+            />
+            {safePaymentInfoPortalURL ? (
+              <Link href={safePaymentInfoPortalURL} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="contained"
+                  size="small"
+                  endIcon={
+                    <ArrowOutwardIcon
+                      sx={{
+                        fontSize: "18px",
+                      }}
+                    />
+                  }
+                >
+                  Configure
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                endIcon={
+                  <ArrowOutwardIcon
+                    sx={{
+                      fontSize: "18px",
+                    }}
+                  />
+                }
+                disabled
+              >
+                Configure
+              </Button>
+            )}
+          </Stack>
+        </Stack>
+      </Card>
+    );
+  }
+
   return (
-    <Box marginTop="18px">
+    <Card
+      sx={{
+        mt: "12px",
+        boxShadow: "0px 1px 2px 0px #0A0D120D",
+      }}
+    >
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="16px" marginBottom="14px">
         <Box>
           <Text size="medium" weight="semibold" color={colors.gray900}>
-            Saved Payment Methods
+            Saved payment methods
           </Text>
-          <Text size="small" weight="regular" color={colors.gray500} mt={0.5}>
-            Manage the methods used for automatic invoice collection.
+          <Text size="small" weight="regular" color={colors.gray500} sx={{ mt: "2px" }}>
+            Methods used for automatic invoice collection. Default is charged first.
           </Text>
         </Box>
-        <Stack direction="row" alignItems="center" gap="8px" flexShrink={0}>
-          <Tooltip title="Refresh payment methods">
-            <span>
-              <IconButton
-                size="small"
-                disabled={isLoading || paymentMethodsQuery.isFetching}
-                aria-label="Refresh payment methods"
-                onClick={() => refreshAll()}
-                sx={{
-                  border: `1px solid ${colors.gray300}`,
-                  borderRadius: "8px",
-                  width: 36,
-                  height: 36,
-                }}
-              >
-                {paymentMethodsQuery.isFetching ? (
-                  <LoadingSpinnerSmall sx={{ marginLeft: 0 }} />
-                ) : (
-                  <RefreshIcon sx={{ fontSize: 18 }} />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
+        <Stack direction="row" alignItems="center" gap="12px" flexShrink={0}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={
+              paymentMethodsQuery.isFetching ? (
+                <LoadingSpinnerSmall sx={{ marginLeft: 0 }} />
+              ) : (
+                <RefreshIcon sx={{ fontSize: 18 }} />
+              )
+            }
+            disabled={isLoading || paymentMethodsQuery.isFetching}
+            onClick={() => refreshAll()}
+          >
+            Refresh
+          </Button>
           <Button
             variant="contained"
             size="small"
@@ -134,13 +217,13 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
             disabled={isLoading || Boolean(errorMessage)}
             onClick={() => setIsAddOpen(true)}
           >
-            Add
+            Add method
           </Button>
         </Stack>
       </Stack>
 
       {isLoading ? (
-        <Stack alignItems="center" justifyContent="center" minHeight="140px">
+        <Stack alignItems="center" justifyContent="center" minHeight="180px">
           <LoadingSpinnerSmall />
         </Stack>
       ) : errorMessage ? (
@@ -148,21 +231,11 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
           <Alert severity="error">{errorMessage}</Alert>
         </Box>
       ) : paymentMethods.length === 0 ? (
-        <Box
-          sx={{
-            border: `1px dashed ${colors.gray300}`,
-            borderRadius: "8px",
-            padding: "20px",
-            backgroundColor: colors.gray50,
-          }}
-        >
-          <Text size="small" weight="semibold" color={colors.gray900}>
+        <Stack alignItems="center" justifyContent="center" minHeight="180px">
+          <Text size="medium" weight="medium" color={colors.gray500}>
             No payment methods configured.
           </Text>
-          <Text size="small" weight="regular" color={colors.gray500} mt={0.5}>
-            Add a payment method to continue.
-          </Text>
-        </Box>
+        </Stack>
       ) : (
         <Stack gap="10px">
           {paymentMethods.map((method) => (
@@ -205,8 +278,8 @@ const PaymentMethodSection = ({ enabled, onPaymentMethodsChanged }: PaymentMetho
         isLoading={removeMutation.isPending}
         onConfirm={handleConfirmRemove}
       />
-    </Box>
+    </Card>
   );
 };
 
-export default PaymentMethodSection;
+export default StripePaymentMethodsSection;

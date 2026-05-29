@@ -12,6 +12,8 @@ function usePaymentMethods(enabled = false) {
       return response.data.paymentMethods || [];
     },
     enabled,
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
   });
 }
 

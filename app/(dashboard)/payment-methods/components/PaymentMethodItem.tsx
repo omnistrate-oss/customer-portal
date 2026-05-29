@@ -2,7 +2,6 @@
 
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Box, IconButton, Stack } from "@mui/material";
 
 import DeleteIcon from "src/components/Icons/Delete/Delete";
@@ -13,7 +12,7 @@ import { ConsumptionPaymentMethod } from "src/types/consumption";
 import Button from "components/Button/Button";
 import { Text } from "components/Typography/Typography";
 
-import { getPaymentMethodPrimaryLabel, getPaymentMethodSecondaryLabel } from "./paymentMethodUtils";
+import { getPaymentMethodPrimaryLabel, getPaymentMethodSecondaryLabel } from "../utils/paymentMethodUtils";
 
 type PaymentMethodItemProps = {
   method: ConsumptionPaymentMethod;
@@ -77,14 +76,15 @@ const PaymentMethodItem = ({
         <Stack direction="row" alignItems="center" gap="8px" flexShrink={0}>
           {!method.isDefault && (
             <Button
-              variant="outlined"
+              variant="text"
               size="small"
+              fontColor={colors.success700}
               disabled={disableActions}
               isLoading={isSettingDefault}
-              startIcon={<StarBorderIcon sx={{ fontSize: 18 }} />}
               onClick={() => onSetDefault(method)}
+              sx={{ px: "8px" }}
             >
-              Set Default
+              Set default
             </Button>
           )}
           <Tooltip title="Remove payment method">
@@ -95,13 +95,13 @@ const PaymentMethodItem = ({
                 aria-label={`Remove ${primaryLabel}`}
                 onClick={() => onRemove(method)}
                 sx={{
-                  border: `1px solid ${colors.gray300}`,
+                  border: `1px solid ${disableActions ? colors.gray200 : colors.error300}`,
                   borderRadius: "8px",
                   width: 36,
                   height: 36,
                 }}
               >
-                <DeleteIcon disabled={disableActions} />
+                <DeleteIcon color={colors.error700} disabled={disableActions} />
               </IconButton>
             </span>
           </Tooltip>

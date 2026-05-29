@@ -14,8 +14,7 @@ import { Text } from "components/Typography/Typography";
 
 import useCreateSetupIntent from "../hooks/useCreateSetupIntent";
 import useSetDefaultPaymentMethod from "../hooks/useSetDefaultPaymentMethod";
-
-import { getErrorMessage } from "./paymentMethodUtils";
+import { getErrorMessage } from "../utils/paymentMethodUtils";
 
 type AddPaymentMethodModalProps = {
   open: boolean;
@@ -57,7 +56,7 @@ const AddPaymentMethodForm = ({
     const result = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/billing?setup_complete=true`,
+        return_url: `${window.location.origin}/payment-methods?setup_complete=true`,
       },
       redirect: "if_required",
     });
@@ -103,6 +102,9 @@ const AddPaymentMethodForm = ({
               billingDetails: {
                 address: "auto",
               },
+            },
+            wallets: {
+              link: "never",
             },
           }}
         />

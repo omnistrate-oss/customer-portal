@@ -137,7 +137,6 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
       rows={rows}
       noRowsText="No subscriptions"
       tableStyles={{
-        marginTop: "12px",
         boxShadow: "none",
         border: "none",
         borderRadius: "0px",

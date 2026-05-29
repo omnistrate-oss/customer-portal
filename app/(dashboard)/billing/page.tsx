@@ -2,18 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
-import { Box, Stack, tabClasses } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useSelector } from "react-redux";
 
-import { listConsumptionPaymentMethods, setDefaultConsumptionPaymentMethod } from "src/api/consumption";
 import StatusChip from "src/components/StatusChip/StatusChip";
-import { Tab, Tabs } from "src/components/Tab/Tab";
-import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
-import { colors } from "src/themeConfig";
+import getSafeExternalURL from "src/utils/getSafeExternalURL";
 import Button from "components/Button/Button";
 import Card from "components/Card/Card";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -24,53 +20,22 @@ import BillingIcon from "../components/Icons/BillingIcon";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 
+import BillingProviderTabs from "./components/BillingProviderTabs";
 import ConsumptionUsage from "./components/ConsumptionUsage";
-import { StripeIcon } from "./components/Icons";
 import InvoicesTable from "./components/InvoicesTable";
-import PaymentMethodSection from "./components/PaymentMethodSection";
+import StripeDefaultPaymentMethodSummary from "./components/StripeDefaultPaymentMethodSummary";
 import useBillingDetails from "./hooks/useBillingDetails";
 import useBillingStatus from "./hooks/useBillingStatus";
 import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
 import useConsumptionUsage from "./hooks/useConsumptionUsage";
 
-const getSafeExternalURL = (url?: string) => {
-  if (!url || url === "#") {
-    return "";
-  }
-
-  try {
-    const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://example.com";
-    const parsedURL = new URL(url, baseOrigin);
-    const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url);
-    const isSameOriginRelativeURL = !hasExplicitScheme && parsedURL.origin === baseOrigin;
-    const isAllowedProtocol =
-      parsedURL.protocol === "https:" || (process.env.NODE_ENV !== "production" && parsedURL.protocol === "http:");
-
-    if (!isSameOriginRelativeURL && !isAllowedProtocol) {
-      return "";
-    }
-
-    if (isSameOriginRelativeURL) {
-      return `${parsedURL.pathname}${parsedURL.search}${parsedURL.hash}`;
-    }
-
-    return parsedURL.toString();
-  } catch {
-    return "";
-  }
-};
-
 const BillingPage = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const snackbar = useSnackbar();
   const { refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
   const selectUser = useSelector(selectUserrootData);
   // Track previous paymentConfigured state to detect changes
   const previousPaymentConfiguredRef = useRef<boolean | undefined>(undefined);
-  const handledSetupCompleteRef = useRef(false);
 
   const billingStatusQuery = useBillingStatus();
 
@@ -155,40 +120,6 @@ const BillingPage = () => {
   const isStripe = selectedBillingProvider === "STRIPE";
   const isCustomPaymentPortalEnabled = isStripe && Boolean(billingDetails?.customPaymentPortalEnabled);
 
-  useEffect(() => {
-    if (
-      handledSetupCompleteRef.current ||
-      !isCustomPaymentPortalEnabled ||
-      searchParams?.get("setup_complete") !== "true"
-    ) {
-      return;
-    }
-
-    handledSetupCompleteRef.current = true;
-
-    const reconcileSetupRedirect = async () => {
-      try {
-        const paymentMethodsResponse = await listConsumptionPaymentMethods();
-        const paymentMethods = paymentMethodsResponse.data.paymentMethods || [];
-        const hasDefaultPaymentMethod = paymentMethods.some((method) => method.isDefault);
-
-        if (!hasDefaultPaymentMethod && paymentMethods[0]?.id) {
-          await setDefaultConsumptionPaymentMethod(paymentMethods[0].id);
-        }
-
-        await refetchBillingDetails();
-        refetchSubscriptions();
-        snackbar.showSuccess("Payment method added successfully");
-      } catch {
-        snackbar.showError("Payment method setup completed, but billing details could not refresh.");
-      } finally {
-        router.replace("/billing", { scroll: false });
-      }
-    };
-
-    void reconcileSetupRedirect();
-  }, [isCustomPaymentPortalEnabled, refetchBillingDetails, refetchSubscriptions, router, searchParams, snackbar]);
-
   if (isLoading) return <LoadingSpinner />;
   const balanceDueLink =
     billingDetails?.billingProviders?.find((provider) => provider.type === selectedBillingProvider)?.balanceDueLink ||
@@ -203,7 +134,7 @@ const BillingPage = () => {
       <AccountManagementHeader userName={selectUser?.name} userEmail={selectUser?.email} />
       <PageContainer>
         <PageTitle icon={BillingIcon} className="mb-6">
-          Billing
+          Billing & Invoices
         </PageTitle>
 
         {isLoading ? (
@@ -226,71 +157,31 @@ const BillingPage = () => {
           <>
             <ConsumptionUsage consumptionUsageData={consumptionUsageData} />
 
-            {selectedBillingProvider && (
-              <Tabs value={selectedBillingProvider} className="mt-3">
-                {billingDetails?.billingProviders?.map((provider) => {
-                  const styles =
-                    provider.type === "STRIPE"
-                      ? {
-                          borderBottom: "1px solid #635BFF",
-                          backgroundColor: "#EAE9FF",
-                          color: colors.gray600,
-                        }
-                      : {
-                          borderBottom: "1px solid #D79640",
-                          backgroundColor: "#FFF4ED",
-                          color: colors.gray600,
-                        };
+            <div className="mt-6 pb-2 border-b border-[#E9EAEB]">
+              <Text size="medium" weight="semibold" color="#181D27">
+                Payment Summary
+              </Text>
+              <Text size="xsmall" weight="regular" color="#535862" sx={{ marginTop: "2px" }}>
+                Review your outstanding balance and default payment method for upcoming invoices.
+              </Text>
+            </div>
 
-                  return (
-                    <Tab
-                      key={provider.type}
-                      label={
-                        provider.type === "STRIPE" ? (
-                          <Stack direction="row" alignItems="center" gap="8px">
-                            <StripeIcon
-                              style={{
-                                width: "24px",
-                                height: "24px",
-                              }}
-                            />
-                            <div>OmniBilling (Stripe)</div>
-                          </Stack>
-                        ) : (
-                          <Stack direction="row" alignItems="center" gap="8px">
-                            <div className="w-6 h-6 flex items-center justify-center rounded-sm overflow-hidden">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={provider.logoURL} width="24" height="24" alt="Img" className="object-cover" />
-                            </div>
-                            <div>{provider.name || "Billing Provider"}</div>
-                          </Stack>
-                        )
-                      }
-                      value={provider.type}
-                      onClick={() => setSelectedBillingProvider(provider.type)}
-                      sx={{
-                        padding: "8px 18px !important",
-                        fontWeight: "500",
-                        marginRight: "0px",
-                        borderWidth: "1px",
-                        "&:hover": styles,
-                        [`&.${tabClasses.selected}`]: styles,
-                      }}
-                    />
-                  );
-                })}
-              </Tabs>
-            )}
+            <BillingProviderTabs
+              billingProviders={billingDetails?.billingProviders}
+              selectedBillingProvider={selectedBillingProvider}
+              onBillingProviderChange={setSelectedBillingProvider}
+              className="mt-3"
+            />
 
             {selectedBillingProvider && (
-              <div className="grid grid-cols-2 gap-6 mt-3">
+              <div className="grid grid-cols-2 gap-6 mt-5">
                 <Card sx={{ boxShadow: "0px 1px 2px 0px #0A0D120D" }}>
                   <Box>
                     <Text size="large" weight="semibold" color="#181D27">
-                      Balance
+                      Outstanding Balance
                     </Text>
                     <Text size="small" weight="regular" color="#535862" marginTop="2px">
-                      Pay open invoices amount
+                      Amount currently due across open and past-due invoices.{" "}
                     </Text>
                   </Box>
                   <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">
@@ -310,7 +201,7 @@ const BillingPage = () => {
                             />
                           }
                         >
-                          Pay Now
+                          Pay outstanding balance
                         </Button>
                       </Link>
                     ) : (
@@ -325,7 +216,7 @@ const BillingPage = () => {
                         }
                         disabled={!payNowLink}
                       >
-                        Pay Now
+                        Pay outstanding balance
                       </Button>
                     )}
                   </Stack>
@@ -333,17 +224,19 @@ const BillingPage = () => {
                 <Card sx={{ boxShadow: "0px 1px 2px 0px #0A0D120D", backgroundColor: isStripe ? "#FFF" : "#FAFAFA" }}>
                   <Box>
                     <Text size="large" weight="semibold" color="#181D27">
-                      Payment Method
+                      {isCustomPaymentPortalEnabled ? "Default Payment Method" : "Payment Method"}
                     </Text>
                     <Text size="small" weight="regular" color="#535862" marginTop="2px">
-                      Change how you pay for your plan
+                      {isCustomPaymentPortalEnabled
+                        ? "This payment method will be charged when you pay your balance."
+                        : "Change how you pay for your plan"}
                     </Text>
                   </Box>
 
                   {isCustomPaymentPortalEnabled ? (
-                    <PaymentMethodSection
+                    <StripeDefaultPaymentMethodSummary
                       enabled={isCustomPaymentPortalEnabled}
-                      onPaymentMethodsChanged={async () => {
+                      onDefaultPaymentMethodChanged={async () => {
                         await refetchBillingDetails();
                         refetchSubscriptions();
                       }}
