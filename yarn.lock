@@ -3802,18 +3802,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.15.2":
-  version: 1.15.2
-  resolution: "axios@npm:1.15.2"
-  dependencies:
-    follow-redirects: "npm:^1.15.11"
-    form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^2.1.0"
-  checksum: 10c0/4eeae0feeaa7fdc1ef24f81f8b378fdadedf4aebdd6bf224484675160f8744cf17b9b0d1c215279979940f7e8ce463beffa2f713099612e428eac238515c81d5
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.12.2, axios@npm:^1.13.5":
+"axios@npm:1.16.0, axios@npm:^1.12.2, axios@npm:^1.13.5":
   version: 1.16.0
   resolution: "axios@npm:1.16.0"
   dependencies:
@@ -6357,7 +6346,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.11, follow-redirects@npm:^1.16.0":
+"follow-redirects@npm:^1.16.0":
   version: 1.16.0
   resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
@@ -8872,7 +8861,7 @@ __metadata:
     "@types/react-google-recaptcha": "npm:^2.1.9"
     ansi-to-react: "npm:^6.1.6"
     autoprefixer: "npm:^10.4.20"
-    axios: "npm:1.15.2"
+    axios: "npm:1.16.0"
     buffer: "npm:^6.0.3"
     clipboardy: "npm:^3.0.0"
     clsx: "npm:^2.1.1"
