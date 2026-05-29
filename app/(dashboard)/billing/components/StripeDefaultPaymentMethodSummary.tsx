@@ -11,10 +11,13 @@ import { colors } from "src/themeConfig";
 // import type { ConsumptionPaymentMethod } from "src/types/consumption";
 import { getPaymentMethodsRoute } from "src/utils/routes";
 
-import usePaymentMethods from "../hooks/usePaymentMethods";
-import useSetDefaultPaymentMethod from "../hooks/useSetDefaultPaymentMethod";
-
-import { getErrorMessage, getPaymentMethodPrimaryLabel, getPaymentMethodSecondaryLabel } from "./paymentMethodUtils";
+import usePaymentMethods from "../../payment-methods/hooks/usePaymentMethods";
+import useSetDefaultPaymentMethod from "../../payment-methods/hooks/useSetDefaultPaymentMethod";
+import {
+  getErrorMessage,
+  getPaymentMethodPrimaryLabel,
+  getPaymentMethodSecondaryLabel,
+} from "../../payment-methods/utils/paymentMethodUtils";
 
 const PaymentMethodBadge = () => {
   return (
