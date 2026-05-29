@@ -414,8 +414,8 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (!resultParams?.cloud_provider_account_config_id) return "NA";
-          return resultParams?.allow_new_vpcs === false ? "No" : "Yes";
+          if (!resultParams?.allow_new_cloud_native_network_creation) return "NA";
+          return resultParams?.allow_new_cloud_native_network_creation ? "Yes" : "No";
         },
         {
           id: "allowNewVPCs",
@@ -466,8 +466,8 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (!resultParams?.cloud_provider_account_config_id) return "NA";
-          return resultParams?.network_type === "INTERNAL" ? "Enabled" : "Disabled";
+          if (!resultParams?.private_link) return "NA";
+          return resultParams?.private_link ? "Enabled" : "Disabled";
         },
         {
           id: "privateLink",
