@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { Box, Stack } from "@mui/material";
 
 import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import { Text } from "src/components/Typography/Typography";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
-// import type { ConsumptionPaymentMethod } from "src/types/consumption";
 import { getPaymentMethodsRoute } from "src/utils/routes";
 
+import { PaymentMethodIcon } from "../../payment-methods/components/Icons";
 import usePaymentMethods from "../../payment-methods/hooks/usePaymentMethods";
 import useSetDefaultPaymentMethod from "../../payment-methods/hooks/useSetDefaultPaymentMethod";
 import {
@@ -19,33 +19,15 @@ import {
   getPaymentMethodSecondaryLabel,
 } from "../../payment-methods/utils/paymentMethodUtils";
 
-const PaymentMethodBadge = () => {
-  return (
-    <Box
-      sx={{
-        width: 46,
-        height: 36,
-        borderRadius: "8px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: colors.gray50,
-        border: `1px solid ${colors.gray200}`,
-        flexShrink: 0,
-      }}
-    >
-      <CreditCardIcon sx={{ fontSize: 20, color: colors.gray600 }} />
-    </Box>
-  );
-};
-
 type StripeDefaultPaymentMethodSummaryProps = {
   enabled: boolean;
+  onPaymentMethodsEmptyChange?: (isEmpty: boolean) => void;
   onDefaultPaymentMethodChanged: () => Promise<void> | void;
 };
 
 const StripeDefaultPaymentMethodSummary = ({
   enabled,
+  onPaymentMethodsEmptyChange,
   onDefaultPaymentMethodChanged,
 }: StripeDefaultPaymentMethodSummaryProps) => {
   const snackbar = useSnackbar();
@@ -60,6 +42,19 @@ const StripeDefaultPaymentMethodSummary = ({
   const errorMessage = paymentMethodsQuery.error
     ? getErrorMessage(paymentMethodsQuery.error, "Unable to load default payment method.")
     : "";
+
+  useEffect(() => {
+    if (!onPaymentMethodsEmptyChange) {
+      return;
+    }
+
+    if (!enabled || paymentMethodsQuery.isPending || errorMessage) {
+      onPaymentMethodsEmptyChange(false);
+      return;
+    }
+
+    onPaymentMethodsEmptyChange(paymentMethods.length === 0);
+  }, [enabled, errorMessage, onPaymentMethodsEmptyChange, paymentMethods.length, paymentMethodsQuery.isPending]);
 
   useEffect(() => {
     if (
@@ -122,11 +117,37 @@ const StripeDefaultPaymentMethodSummary = ({
     );
   }
 
+  if (paymentMethods.length === 0) {
+    return (
+      <Stack alignItems="center" justifyContent="center" gap="14px" minHeight="88px" marginTop="20px">
+        <Text size="small" weight="medium" color={"#DC6803"} sx={{ maxWidth: "360px", textAlign: "center" }}>
+          <Box
+            component="span"
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              mr: "8px",
+              verticalAlign: "text-bottom",
+            }}
+          >
+            <AlertTriangle color={"#DC6803"} height={18} width={18} />
+          </Box>
+          Add a payment method to pay invoices and outstanding balances.
+        </Text>
+        <Link href={getPaymentMethodsRoute()}>
+          <Button variant="outlined" size="small">
+            Add payment method
+          </Button>
+        </Link>
+      </Stack>
+    );
+  }
+
   if (!defaultPaymentMethod) {
     return (
       <Stack direction="row" gap="24px" justifyContent="space-between" alignItems="center" marginTop="16px">
         <Text size="small" weight="medium" color={colors.gray500}>
-          Payment methods are not configured.
+          No default payment method selected.
         </Text>
         <Link href={getPaymentMethodsRoute()}>
           <Button variant="contained" size="small">
@@ -138,15 +159,31 @@ const StripeDefaultPaymentMethodSummary = ({
   }
 
   return (
-    <Stack direction="row" alignItems="center" gap="14px" marginTop="18px" minWidth={0}>
-      <PaymentMethodBadge />
-      <Box minWidth={0}>
-        <Text size="medium" weight="semibold" color={colors.gray700} ellipsis maxWidth="320px">
-          {getPaymentMethodPrimaryLabel(defaultPaymentMethod)}
-        </Text>
-        <Text size="small" weight="regular" color={colors.gray500} sx={{ mt: "4px" }}>
-          {getPaymentMethodSecondaryLabel(defaultPaymentMethod)}
-        </Text>
+    <Stack
+      direction={{ xs: "column", md: "row" }}
+      alignItems={{ xs: "flex-start", md: "center" }}
+      justifyContent="space-between"
+      gap="16px"
+      marginTop="18px"
+      minWidth={0}
+    >
+      <Stack direction="row" alignItems="center" gap="16px" minWidth={0}>
+        <PaymentMethodIcon method={defaultPaymentMethod} />
+        <Box minWidth={0}>
+          <Text size="small" weight="medium" color={colors.gray700} ellipsis maxWidth="180px">
+            {getPaymentMethodPrimaryLabel(defaultPaymentMethod)}
+          </Text>
+          <Text size="small" weight="regular" color={colors.gray700}>
+            {getPaymentMethodSecondaryLabel(defaultPaymentMethod)}
+          </Text>
+        </Box>
+      </Stack>
+      <Box flexShrink={0}>
+        <Link href={getPaymentMethodsRoute()}>
+          <Button variant="outlined" size="small" sx={{ whiteSpace: "nowrap" }}>
+            Change default payment method
+          </Button>
+        </Link>
       </Box>
     </Stack>
   );

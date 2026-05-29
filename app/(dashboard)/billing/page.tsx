@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Stack } from "@mui/material";
@@ -33,6 +33,7 @@ const BillingPage = () => {
   const { refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
+  const [isStripePaymentMethodsEmpty, setIsStripePaymentMethodsEmpty] = useState(false);
   const selectUser = useSelector(selectUserrootData);
   // Track previous paymentConfigured state to detect changes
   const previousPaymentConfiguredRef = useRef<boolean | undefined>(undefined);
@@ -119,6 +120,17 @@ const BillingPage = () => {
   const isLoading = isBillingDetailsPending || isConsumptionDataPending || isInvoicesPending;
   const isStripe = selectedBillingProvider === "STRIPE";
   const isCustomPaymentPortalEnabled = isStripe && Boolean(billingDetails?.customPaymentPortalEnabled);
+  const showStripePaymentMethodEmptyState = isCustomPaymentPortalEnabled && isStripePaymentMethodsEmpty;
+
+  const handleStripePaymentMethodsEmptyChange = useCallback((isEmpty: boolean) => {
+    setIsStripePaymentMethodsEmpty(isEmpty);
+  }, []);
+
+  useEffect(() => {
+    if (!isCustomPaymentPortalEnabled) {
+      setIsStripePaymentMethodsEmpty(false);
+    }
+  }, [isCustomPaymentPortalEnabled]);
 
   if (isLoading) return <LoadingSpinner />;
   const balanceDueLink =
@@ -157,14 +169,16 @@ const BillingPage = () => {
           <>
             <ConsumptionUsage consumptionUsageData={consumptionUsageData} />
 
-            <div className="mt-6 pb-2 border-b border-[#E9EAEB]">
-              <Text size="medium" weight="semibold" color="#181D27">
-                Payment Summary
-              </Text>
-              <Text size="xsmall" weight="regular" color="#535862" sx={{ marginTop: "2px" }}>
-                Review your outstanding balance and default payment method for upcoming invoices.
-              </Text>
-            </div>
+            {billingDetails && billingDetails?.billingProviders && billingDetails?.billingProviders?.length > 0 && (
+              <div className="mt-6 pb-2 border-b border-[#E9EAEB]">
+                <Text size="medium" weight="semibold" color="#181D27">
+                  Payment Summary
+                </Text>
+                <Text size="xsmall" weight="regular" color="#535862" sx={{ marginTop: "2px" }}>
+                  Review your outstanding balance and default payment method for upcoming invoices.
+                </Text>
+              </div>
+            )}
 
             <BillingProviderTabs
               billingProviders={billingDetails?.billingProviders}
@@ -175,7 +189,14 @@ const BillingPage = () => {
 
             {selectedBillingProvider && (
               <div className="grid grid-cols-2 gap-6 mt-5">
-                <Card sx={{ boxShadow: "0px 1px 2px 0px #0A0D120D" }}>
+                <Card
+                  sx={{
+                    boxShadow: "0px 1px 2px 0px #0A0D120D",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <Box>
                     <Text size="large" weight="semibold" color="#181D27">
                       Outstanding Balance
@@ -184,7 +205,13 @@ const BillingPage = () => {
                       Amount currently due across open and past-due invoices.{" "}
                     </Text>
                   </Box>
-                  <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">
+                  <Stack
+                    direction="row"
+                    gap="24px"
+                    justifyContent="space-between"
+                    alignItems="flex-end"
+                    marginTop="48px"
+                  >
                     {/*@ts-ignore */}
                     <DisplayText size="small" weight="semibold">
                       {selectedBillingProvider === "STRIPE" ? `$${invoicesTotalAmount}` : "NA"}
@@ -221,21 +248,36 @@ const BillingPage = () => {
                     )}
                   </Stack>
                 </Card>
-                <Card sx={{ boxShadow: "0px 1px 2px 0px #0A0D120D", backgroundColor: isStripe ? "#FFF" : "#FAFAFA" }}>
+                <Card
+                  sx={{
+                    boxShadow: "0px 1px 2px 0px #0A0D120D",
+                    backgroundColor: isStripe ? "#FFF" : "#FAFAFA",
+                    ...(isCustomPaymentPortalEnabled && !showStripePaymentMethodEmptyState
+                      ? {
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                        }
+                      : {}),
+                  }}
+                >
                   <Box>
                     <Text size="large" weight="semibold" color="#181D27">
                       {isCustomPaymentPortalEnabled ? "Default Payment Method" : "Payment Method"}
                     </Text>
                     <Text size="small" weight="regular" color="#535862" marginTop="2px">
-                      {isCustomPaymentPortalEnabled
-                        ? "This payment method will be charged when you pay your balance."
-                        : "Change how you pay for your plan"}
+                      {showStripePaymentMethodEmptyState
+                        ? "No payment method added yet."
+                        : isCustomPaymentPortalEnabled
+                          ? "This payment method will be charged when you pay your balance."
+                          : "Change how you pay for your plan"}
                     </Text>
                   </Box>
 
                   {isCustomPaymentPortalEnabled ? (
                     <StripeDefaultPaymentMethodSummary
                       enabled={isCustomPaymentPortalEnabled}
+                      onPaymentMethodsEmptyChange={handleStripePaymentMethodsEmptyChange}
                       onDefaultPaymentMethodChanged={async () => {
                         await refetchBillingDetails();
                         refetchSubscriptions();

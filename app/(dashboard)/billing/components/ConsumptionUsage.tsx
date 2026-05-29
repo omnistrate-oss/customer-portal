@@ -117,11 +117,8 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
   }, [isSubscriptionUsageFetched, subscriptionUsageHashmap, rootSubscriptions]);
 
   return (
-    <div
-      className="mt-[20px] border border-[#E9EAEB] rounded-[12px] bg-[#FFF]"
-      style={{ boxShadow: "0px 1px 2px 0px var(#0A0D120D)" }}
-    >
-      <div className="py-[20px] px-[24px]">
+    <div className="mt-[20px]">
+      <div className="pb-2 pt-4 border-b border-[#E9EAEB]">
         <div className="flex flex-row items-center justify-between">
           <div>
             <Text size="medium" weight="semibold" color="#181D27">
@@ -145,7 +142,7 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
           </Button>
         </div>
       </div>
-      <div className="border-t border-[#E9EAEB] px-4 py-3">
+      <div className=" py-3">
         <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <UsageDimensionCard
             title="Memory"
