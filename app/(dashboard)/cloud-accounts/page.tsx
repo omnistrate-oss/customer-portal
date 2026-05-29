@@ -48,6 +48,7 @@ import useInstancesDescribe from "../instances/hooks/useInstancesDescribe";
 import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWithDescribe";
 
 import CloudAccountForm from "./components/CloudAccountForm";
+import CloudAccountWizard from "./components/CloudAccountWizard";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
@@ -1017,19 +1018,31 @@ const CloudAccountsPage = () => {
           setClickedInstance(undefined);
         }}
         RenderUI={
-          <CloudAccountForm
-            initialFormValues={initialFormValues}
-            selectedInstance={selectedInstance}
-            onClose={() => {
-              setIsOverlayOpen(false);
-            }}
-            formMode={overlayType === "view-instance-form" ? "view" : "create"}
-            setIsAccountCreation={setIsAccountCreation}
-            setOverlayType={setOverlayType}
-            setClickedInstance={setClickedInstance}
-            instances={instances}
-            setIsOverlayOpen={setIsOverlayOpen}
-          />
+          overlayType === "create-instance-form" ? (
+            <CloudAccountWizard
+              initialFormValues={initialFormValues}
+              selectedInstance={selectedInstance}
+              onClose={async () => {
+                setIsOverlayOpen(false);
+                await refetchInstances();
+              }}
+              instances={instances}
+            />
+          ) : (
+            <CloudAccountForm
+              initialFormValues={initialFormValues}
+              selectedInstance={selectedInstance}
+              onClose={() => {
+                setIsOverlayOpen(false);
+              }}
+              formMode="view"
+              setIsAccountCreation={setIsAccountCreation}
+              setOverlayType={setOverlayType}
+              setClickedInstance={setClickedInstance}
+              instances={instances}
+              setIsOverlayOpen={setIsOverlayOpen}
+            />
+          )
         }
       />
 
