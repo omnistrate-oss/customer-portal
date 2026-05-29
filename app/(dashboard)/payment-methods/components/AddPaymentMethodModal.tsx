@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Skeleton, Stack } from "@mui/material";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, type SetupIntentResult } from "@stripe/stripe-js";
 
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
@@ -53,13 +53,20 @@ const AddPaymentMethodForm = ({
 
     setIsSubmitting(true);
 
-    const result = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/payment-methods?setup_complete=true`,
-      },
-      redirect: "if_required",
-    });
+    let result: SetupIntentResult;
+    try {
+      result = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-methods?setup_complete=true`,
+        },
+        redirect: "if_required",
+      });
+    } catch {
+      snackbar.showError("Payment method setup failed. Please try again.");
+      setIsSubmitting(false);
+      return;
+    }
 
     if (result.error) {
       snackbar.showError(result.error.message || "Payment method setup failed. Please try again.");

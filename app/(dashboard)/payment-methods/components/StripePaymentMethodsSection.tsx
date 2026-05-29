@@ -65,6 +65,21 @@ const StripePaymentMethodsSection = ({
   const errorMessage = paymentMethodsQuery.error
     ? getErrorMessage(paymentMethodsQuery.error, "Unable to load payment methods.")
     : "";
+  const removeDialogSubtitle = methodToRemove ? (
+    <>
+      {`Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?`}
+      {paymentMethods.length === 1 && (
+        <>
+          <br />
+          <br />
+          Removal is blocked when unpaid invoices, current usage, or active subscriptions still require a payment
+          method.
+        </>
+      )}
+    </>
+  ) : (
+    "Remove this payment method from this billing account?"
+  );
 
   const refreshAll = async () => {
     await paymentMethodsQuery.refetch();
@@ -104,6 +119,7 @@ const StripePaymentMethodsSection = ({
       setMethodToRemove(null);
       await onPaymentMethodsChanged();
       snackbar.showSuccess("Payment method removed successfully");
+      return true;
     } catch (error) {
       snackbar.showError(getErrorMessage(error, "Failed to remove payment method"));
       return false;
@@ -266,11 +282,7 @@ const StripePaymentMethodsSection = ({
         open={Boolean(methodToRemove)}
         handleClose={() => setMethodToRemove(null)}
         title="Remove Payment Method"
-        subtitle={
-          methodToRemove
-            ? `Remove ${getPaymentMethodPrimaryLabel(methodToRemove)} from this billing account?${paymentMethods.length === 1 ? "\n\nRemoval is blocked when unpaid invoices, current usage, or active subscriptions still require a payment method." : ""}`
-            : "Remove this payment method from this billing account?"
-        }
+        subtitle={removeDialogSubtitle}
         message="To confirm removal, please enter <b>remove</b> in the field below:"
         confirmationText="remove"
         buttonLabel="Remove"
