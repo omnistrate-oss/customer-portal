@@ -12,11 +12,16 @@ function useSetDefaultPaymentMethod() {
     mutationFn: setDefaultConsumptionPaymentMethod,
     onSuccess: (_response, paymentMethodId) => {
       queryClient.setQueryData<ConsumptionPaymentMethod[]>(paymentMethodsQueryKey, (paymentMethods) => {
+        if (!paymentMethods?.some((method) => method.id === paymentMethodId)) {
+          return paymentMethods;
+        }
+
         return paymentMethods?.map((method) => ({
           ...method,
           isDefault: method.id === paymentMethodId,
         }));
       });
+      queryClient.invalidateQueries({ queryKey: paymentMethodsQueryKey });
     },
   });
 }
