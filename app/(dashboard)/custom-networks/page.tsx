@@ -16,6 +16,7 @@ import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cl
 import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useSnackbar from "src/hooks/useSnackbar";
 import { CustomNetwork } from "src/types/customNetwork";
+import formatDateUTC from "src/utils/formatDateUTC";
 import { getCustomNetworksRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -127,6 +128,22 @@ const CustomNetworksPage = () => {
         cell: (data) => <StatusChip status={data.row.original.status} />,
         meta: {
           minWidth: 120,
+        },
+      }),
+      columnHelper.accessor("created_at", {
+        id: "created_at",
+        header: "Created On",
+        cell: (data) => (data.row.original.created_at ? formatDateUTC(data.row.original.created_at) : "-"),
+        meta: {
+          minWidth: 180,
+        },
+      }),
+      columnHelper.accessor("last_modified_at", {
+        id: "last_modified_at",
+        header: "Modified On",
+        cell: (data) => (data.row.original.last_modified_at ? formatDateUTC(data.row.original.last_modified_at) : "-"),
+        meta: {
+          minWidth: 180,
         },
       }),
     ];
