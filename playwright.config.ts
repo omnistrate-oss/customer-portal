@@ -25,7 +25,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: isReplayMode() ? 0 : process.env.CI ? 2 : 1,
   workers: getWorkers(),
-  reporter: process.env.CI ? [["html"], ["github"]] : [["html"]],
+  // `list` prints a live pass/fail line per test so CI logs show progress as
+  // the suite runs (html/github alone emit nothing until the very end, which
+  // makes a slow run indistinguishable from a hung one).
+  reporter: process.env.CI ? [["list"], ["html"], ["github"]] : [["html"]],
 
   timeout: isReplayMode() ? 60 * 1000 : 12 * 60 * 1000,
 

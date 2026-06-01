@@ -19,7 +19,10 @@ jobs:
   test:
     name: Playwright Tests - SaaSBuilder
     if: github.event.pull_request.draft == false
-    timeout-minutes: 30
+    # Suite is serial (fullyParallel:false, 1 worker in replay) and historically
+    # runs ~25-28 min; 30 was cutting it close. Headroom so a slow-but-green run
+    # finishes and uploads its html report instead of racing the timeout.
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     # Run inside the official Playwright image: Chromium and all of its OS
     # dependencies are pre-baked, so nothing is downloaded from the Playwright
