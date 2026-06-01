@@ -67,16 +67,28 @@ jobs:
           key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.version }}
 
       # Every project in playwright.config.ts uses Desktop Chrome, so install
-      # only Chromium instead of all three engines. Browser binaries land in
-      # ~/.cache/ms-playwright (cached above); the apt-level system libraries
-      # are NOT part of that cache, so install them on both code paths.
-      - name: Install Playwright Chromium + OS deps
+      # only Chromium. We deliberately DON'T pass `--with-deps`: that runs
+      # `apt-get`, which hangs on the GitHub runner's boot-time dpkg lock
+      # (unattended-upgrades) and was timing the job out. The ubuntu-latest
+      # runner already ships Chromium's shared libraries (google-chrome is
+      # preinstalled), so the bundled browser launches without the apt step.
+      # The download is wrapped in a timeout+retry so a stalled CDN transfer is
+      # killed and retried in seconds instead of hanging until the job timeout.
+      - name: Install Playwright Chromium
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: yarn playwright install --with-deps chromium
-
-      - name: Install Playwright OS deps (cached browser)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: yarn playwright install-deps chromium
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::playwright install chromium (attempt $attempt)"
+            if timeout 300 yarn playwright install chromium; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "attempt $attempt stalled or failed; retrying in 10s"
+            sleep 10
+          done
+          echo "::error::Playwright chromium install failed after 3 attempts"
+          exit 1
 
       - name: Build and start saasbuilder server
         run: |
