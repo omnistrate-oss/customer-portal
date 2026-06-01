@@ -81,6 +81,11 @@ export const CloudAccountValidationSchema = yup.object({
       ),
     otherwise: yup.string(),
   }),
+  clusterName: yup.string().when("cloudProvider", {
+    is: "byoc-onprem",
+    then: yup.string().trim().required("Kubernetes Cluster Name is required"),
+    otherwise: yup.string(),
+  }),
 });
 
 export const cloudAccountOffboardingSteps = [

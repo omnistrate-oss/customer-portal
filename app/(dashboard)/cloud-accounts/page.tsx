@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -32,13 +39,6 @@ import {
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
 import { getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -57,8 +57,9 @@ import {
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
-import useAccountConfig from "./hooks/useAccountConfig";
+import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
+import useAccountConfig from "./hooks/useAccountConfig";
 import { getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -71,6 +72,7 @@ export type Overlay =
   | "connect-dialog"
   | "disconnect-dialog"
   | "offboard-dialog"
+  | "byoc-onprem-cluster-setup"
   | "enable-deletion-protection-dialog"
   | "disable-deletion-protection-dialog";
 
@@ -248,6 +250,7 @@ const CloudAccountsPage = () => {
             resultParams?.azure_subscription_id ||
             resultParams?.oci_tenancy_id ||
             resultParams?.nebius_tenant_id ||
+            resultParams?.cluster_name ||
             "-"
           );
         },
@@ -262,6 +265,7 @@ const CloudAccountsPage = () => {
               resultParams?.azure_subscription_id ||
               resultParams?.oci_tenancy_id ||
               resultParams?.nebius_tenant_id ||
+              resultParams?.cluster_name ||
               "-";
 
             return <GridCellExpand value={value} copyButton={value !== "-"} />;
@@ -351,6 +355,13 @@ const CloudAccountsPage = () => {
                     }}
                     onClick={() => {
                       setClickedInstance(data.row.original);
+                      const rp = getResultParams(data.row.original);
+                      if (rp?.cluster_name) {
+                        // Private/OnPrem – open the Kubernetes cluster setup dialog
+                        setIsOverlayOpen(true);
+                        setOverlayType("byoc-onprem-cluster-setup");
+                        return;
+                      }
                       setIsOverlayOpen(true);
                       setOverlayType("view-instructions-dialog");
                     }}
@@ -437,6 +448,7 @@ const CloudAccountsPage = () => {
           else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
           else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
           else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
+          else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
           return cloudProvider;
         },
         {
@@ -450,6 +462,7 @@ const CloudAccountsPage = () => {
             else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
             else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
             else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
+            else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
           },
@@ -545,6 +558,11 @@ const CloudAccountsPage = () => {
           selectedAccountConfig?.ociOffboardShellCommand ||
           getOciShellScriptOffboardCommand(resultParams?.cloud_provider_account_config_id);
       }
+    } else if (resultParams?.cluster_name) {
+      details = {
+        byocOnpremClusterName: resultParams.cluster_name,
+        byocOnpremUninstallCommand: resultParams.byoc_onprem_uninstall_command || "",
+      };
     }
     return details;
   }, [selectedInstance, clickedInstance, selectedAccountConfig]);
@@ -923,6 +941,7 @@ const CloudAccountsPage = () => {
             setOverlayType={setOverlayType}
             setClickedInstance={setClickedInstance}
             instances={instances}
+            setIsOverlayOpen={setIsOverlayOpen}
           />
         }
       />
@@ -1007,6 +1026,18 @@ const CloudAccountsPage = () => {
         accountConfigMethod={getResultParams(clickedInstance)?.account_configuration_method}
         fetchClickedInstanceDetails={fetchClickedInstanceDetails}
         setClickedInstance={setClickedInstance}
+      />
+
+      <SetupPrivateClusterDialog
+        open={isOverlayOpen && overlayType === "byoc-onprem-cluster-setup"}
+        onClose={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        instanceId={(clickedInstance?.id as string) || ""}
+        clusterName={getResultParams(clickedInstance)?.cluster_name || ""}
+        offering={clickedInstanceOffering || undefined}
+        subscriptionId={clickedInstance?.subscriptionId as string}
       />
 
       <TextConfirmationDialog
