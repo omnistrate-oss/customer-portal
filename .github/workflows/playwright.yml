@@ -21,18 +21,23 @@ jobs:
     if: github.event.pull_request.draft == false
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    # Run inside the official Playwright image: Chromium and all of its OS
+    # dependencies are pre-baked, so nothing is downloaded from the Playwright
+    # CDN at runtime. This sidesteps the cdn.playwright.dev transfer that
+    # consistently hangs at 100% on GitHub runners. Keep this tag in lockstep
+    # with the @playwright/test version in package.json (currently 1.56.1).
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Checkout HAR submodule
         run: |
+          # Running as root inside the container trips git's dubious-ownership
+          # guard on the checkout dir; trust the workspace before any git ops.
+          git config --global --add safe.directory '*'
           git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
           git submodule update --init --recursive
-
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: lts/*
-          cache: 'yarn'
 
       - name: Enable Corepack and activate Yarn
         run: |
@@ -41,8 +46,9 @@ jobs:
 
       - name: Install dependencies
         # Scripts are disabled by default to prevent supply-chain attacks; only
-        # the security-reviewed allowlist is rebuilt. Browsers are provisioned
-        # explicitly by the `Install Playwright Browsers` step below.
+        # the security-reviewed allowlist is rebuilt (these fetch prebuilt native
+        # binaries, no compiler needed). Browsers ship with the container image,
+        # so there is no separate Playwright browser-install step.
         run: |
           YARN_ENABLE_SCRIPTS=false yarn install --immutable
           yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
@@ -52,43 +58,6 @@ jobs:
           echo "::group::Installed dependency versions"
           yarn info --name-only
           echo "::endgroup::"
-
-      - name: Resolve Playwright version
-        id: playwright-version
-        # Key the browser cache on the exact Playwright version so a version
-        # bump invalidates stale binaries automatically.
-        run: echo "version=$(yarn playwright --version | sed 's/^Version //')" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.version }}
-
-      # Every project in playwright.config.ts uses Desktop Chrome, so install
-      # only Chromium. We deliberately DON'T pass `--with-deps`: that runs
-      # `apt-get`, which hangs on the GitHub runner's boot-time dpkg lock
-      # (unattended-upgrades) and was timing the job out. The ubuntu-latest
-      # runner already ships Chromium's shared libraries (google-chrome is
-      # preinstalled), so the bundled browser launches without the apt step.
-      # The download is wrapped in a timeout+retry so a stalled CDN transfer is
-      # killed and retried in seconds instead of hanging until the job timeout.
-      - name: Install Playwright Chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: |
-          for attempt in 1 2 3; do
-            echo "::group::playwright install chromium (attempt $attempt)"
-            if timeout 300 yarn playwright install chromium; then
-              echo "::endgroup::"
-              exit 0
-            fi
-            echo "::endgroup::"
-            echo "attempt $attempt stalled or failed; retrying in 10s"
-            sleep 10
-          done
-          echo "::error::Playwright chromium install failed after 3 attempts"
-          exit 1
 
       - name: Build and start saasbuilder server
         run: |
