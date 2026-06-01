@@ -218,7 +218,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
 
   // ─── Summary ──────────────────────────────────────────────────────────────
   const summarySections = useMemo((): SummarySection[] => {
-    const privateConnectivityFlag = resultParams?.enable_private_connectivity ?? resultParams?.PrivateLink;
+    const privateConnectivityFlag = resultParams?.private_link;
     const privateConnectivityEnabled = typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : false;
 
     const accountIdentityItems =

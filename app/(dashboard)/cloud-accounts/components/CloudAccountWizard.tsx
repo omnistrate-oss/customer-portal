@@ -154,8 +154,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ...instanceResultParams,
           cloud_provider: values.cloudProvider,
           account_configuration_method: values.accountConfigurationMethod,
-          enable_private_connectivity: enablePrivateConnectivity,
-          PrivateLink: enablePrivateConnectivity,
+          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
 
@@ -234,8 +233,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_account_id: values.awsAccountId,
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
-          enable_private_connectivity: enablePrivateConnectivity,
-          PrivateLink: enablePrivateConnectivity,
+          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "gcp") {
@@ -245,8 +243,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           gcp_project_number: values.gcpProjectNumber,
           account_configuration_method: values.accountConfigurationMethod,
           gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
-          enable_private_connectivity: enablePrivateConnectivity,
-          PrivateLink: enablePrivateConnectivity,
+          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "azure") {
@@ -255,8 +252,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           azure_subscription_id: values.azureSubscriptionId,
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
-          enable_private_connectivity: enablePrivateConnectivity,
-          PrivateLink: enablePrivateConnectivity,
+          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "oci") {
@@ -265,8 +261,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           oci_tenancy_id: values.ociTenancyId,
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
-          enable_private_connectivity: enablePrivateConnectivity,
-          PrivateLink: enablePrivateConnectivity,
+          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "byoc-onprem") {
@@ -863,7 +858,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
     const privateConnectivityFlag =
-      getResultParams(clickedInstance)?.enable_private_connectivity ?? getResultParams(clickedInstance)?.PrivateLink;
+      rp?.private_link ?? rp?.enable_private_connectivity ?? rp?.PrivateLink;
     const privateConnectivityEnabled =
       typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : enablePrivateConnectivity;
     const accountIdentityItems =
