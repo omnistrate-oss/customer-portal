@@ -19,7 +19,7 @@ const usageDimensionIconMap = {
 };
 
 const usageDimensionUnitMap: Record<UsageDimension, string> = {
-  "Memory GiB hours": "GiB",
+  "Memory GiB hours": "GiB-hr",
   "Storage GiB hours": "GiB-hr",
   "CPU core hours": "Core-hr",
   "Replica hours": "hr",
