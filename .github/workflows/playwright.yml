@@ -19,18 +19,21 @@ jobs:
   test:
     name: Playwright Tests - SaaSBuilder
     if: github.event.pull_request.draft == false
-    # Suite is serial (fullyParallel:false, 1 worker in replay) and historically
-    # runs ~25-28 min; 30 was cutting it close. Headroom so a slow-but-green run
-    # finishes and uploads its html report instead of racing the timeout.
-    timeout-minutes: 45
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     # Run inside the official Playwright image: Chromium and all of its OS
     # dependencies are pre-baked, so nothing is downloaded from the Playwright
     # CDN at runtime. This sidesteps the cdn.playwright.dev transfer that
-    # consistently hangs at 100% on GitHub runners. Keep this tag in lockstep
-    # with the @playwright/test version in package.json (currently 1.56.1).
+    # started hanging at 100% on GitHub runners this week. Keep this tag in
+    # lockstep with the @playwright/test version in package.json (currently
+    # 1.56.1).
+    #
+    # --ipc=host is required: Docker's default 64 MB /dev/shm is too small for
+    # Chromium, which exhausts it after the first test and then hangs every
+    # subsequent page load (the first test passes, the rest time out at 60s).
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
+      options: --ipc=host
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
