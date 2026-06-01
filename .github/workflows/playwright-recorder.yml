@@ -52,8 +52,30 @@ jobs:
         yarn info --name-only
         echo "::endgroup::"
 
-    - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+    - name: Resolve Playwright version
+      id: playwright-version
+      # Key the browser cache on the exact Playwright version so a version
+      # bump invalidates stale binaries automatically.
+      run: echo "version=$(yarn playwright --version | sed 's/^Version //')" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Playwright browsers
+      id: playwright-cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.version }}
+
+    # Every project in playwright.config.ts uses Desktop Chrome, so install
+    # only Chromium instead of all three engines. Browser binaries land in
+    # ~/.cache/ms-playwright (cached above); the apt-level system libraries
+    # are NOT part of that cache, so install them on both code paths.
+    - name: Install Playwright Chromium + OS deps
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: yarn playwright install --with-deps chromium
+
+    - name: Install Playwright OS deps (cached browser)
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: yarn playwright install-deps chromium
 
     - name: Build Project
       run: yarn build
