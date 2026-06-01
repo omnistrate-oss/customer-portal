@@ -1,12 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
 import { setDefaultConsumptionPaymentMethod } from "src/api/consumption";
+import { selectUserrootData } from "src/slices/userDataSlice";
 import { ConsumptionPaymentMethod } from "src/types/consumption";
 
-import { paymentMethodsQueryKey } from "./usePaymentMethods";
+import { getPaymentMethodsQueryKey } from "./usePaymentMethods";
 
 function useSetDefaultPaymentMethod() {
   const queryClient = useQueryClient();
+  const selectUser = useSelector(selectUserrootData);
+  const userId = selectUser?.id;
+  const paymentMethodsQueryKey = getPaymentMethodsQueryKey(userId);
 
   return useMutation({
     mutationFn: setDefaultConsumptionPaymentMethod,

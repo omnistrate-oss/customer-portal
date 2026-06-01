@@ -12,6 +12,7 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import type { DescribeConsumptionBillingDetailsSuccessResponse } from "src/types/consumption";
+import { getPaymentMethodsRoute } from "src/utils/routes";
 import Button from "components/Button/Button";
 import Card from "components/Card/Card";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -20,41 +21,13 @@ import { DisplayText, Text } from "components/Typography/Typography";
 import BillingProviderTabs from "../billing/components/BillingProviderTabs";
 import useBillingDetails from "../billing/hooks/useBillingDetails";
 import useBillingStatus from "../billing/hooks/useBillingStatus";
+import getBillingDetailsErrorMessage from "../billing/utils/getBillingDetailsErrorMessage";
 import AccountManagementHeader from "../components/AccountManagement/AccountManagementHeader";
 import SlidersIcon from "../components/Icons/Sliders";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 
 import StripePaymentMethodsSection from "./components/StripePaymentMethodsSection";
-
-const getBillingDetailsErrorMessage = (error: unknown) => {
-  const errorDisplayText =
-    "Something went wrong. Try refreshing the page. If the issue persists please contact support for assistance";
-
-  // @ts-ignore
-  const errorMessage = error?.response?.data?.message;
-
-  if (!errorMessage) {
-    return errorDisplayText;
-  }
-
-  if (
-    errorMessage === "Your provider has not enabled billing for the user." ||
-    errorMessage === "Your provider has not enabled billing for the services."
-  ) {
-    return "Billing has not been configured. Please contact support for assistance";
-  }
-
-  if (errorMessage === "You have not been subscribed to a service yet.") {
-    return "Please subscribe to a Product to start using billing";
-  }
-
-  if (errorMessage === "You have not been enrolled in a service plan with a billing plan yet.") {
-    return "You have not been enrolled in a plan with a billing plan. Please contact support for assistance";
-  }
-
-  return errorMessage;
-};
 
 type BillingProvider = NonNullable<DescribeConsumptionBillingDetailsSuccessResponse["billingProviders"]>[number];
 
@@ -166,7 +139,7 @@ const PaymentMethodsPage = () => {
       } catch {
         snackbar.showError("Payment method setup completed, but billing details could not refresh.");
       } finally {
-        router.replace("/payment-methods", { scroll: false });
+        router.replace(getPaymentMethodsRoute(), { scroll: false });
       }
     };
 

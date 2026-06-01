@@ -28,6 +28,7 @@ import useBillingDetails from "./hooks/useBillingDetails";
 import useBillingStatus from "./hooks/useBillingStatus";
 import useConsumptionInvoices from "./hooks/useConsumptionInvoices";
 import useConsumptionUsage from "./hooks/useConsumptionUsage";
+import getBillingDetailsErrorMessage from "./utils/getBillingDetailsErrorMessage";
 
 const BillingPage = () => {
   const { refetchSubscriptions } = useGlobalData();
@@ -88,34 +89,7 @@ const BillingPage = () => {
   }, 0);
 
   const paymentConfigured = billingDetails?.paymentConfigured;
-  let errorDisplayText = "";
-
-  if (error) {
-    // @ts-ignore
-    const errorMessage = error?.response?.data?.message;
-    errorDisplayText =
-      "Something went wrong. Try refreshing the page. If the issue persists please contact support for assistance";
-
-    if (errorMessage) {
-      if (
-        errorMessage === "Your provider has not enabled billing for the user." ||
-        errorMessage === "Your provider has not enabled billing for the services."
-      ) {
-        errorDisplayText = "Billing has not been configured. Please contact support for assistance";
-      }
-
-      if (errorMessage === "You have not been subscribed to a service yet.") {
-        errorDisplayText = "Please subscribe to a Product to start using billing";
-      }
-
-      if (errorMessage === "You have not been enrolled in a service plan with a billing plan yet.") {
-        errorDisplayText =
-          "You have not been enrolled in a plan with a billing plan. Please contact support for assistance";
-      } else {
-        errorDisplayText = errorMessage;
-      }
-    }
-  }
+  const errorDisplayText = error ? getBillingDetailsErrorMessage(error) : "";
 
   const isLoading = isBillingDetailsPending || isConsumptionDataPending || isInvoicesPending;
   const isStripe = selectedBillingProvider === "STRIPE";
