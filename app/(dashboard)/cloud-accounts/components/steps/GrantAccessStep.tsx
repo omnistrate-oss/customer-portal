@@ -58,6 +58,9 @@ const TextContainerToCopy = ({ text, marginTop = "20px" }: { text: string; margi
   </Box>
 );
 
+const POLL_INTERVAL_MS = 5_000;
+const POLL_MAX_DURATION_MS = 2 * 60 * 1000;
+
 type ChecklistItemProps = {
   label: string;
   isComplete: boolean;
@@ -126,8 +129,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const queryClient = useQueryClient();
   const [isPolling, setIsPolling] = useState(false);
   const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pollCountRef = useRef(0);
-  const pollInterval = 2000;
+  const pollStartTimeRef = useRef(0);
   const isMounted = useRef(true);
 
   const hasAwsAccount = !!accountInstructionDetails?.awsAccountID;
@@ -171,9 +173,8 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         })
       );
       setIsPolling(false);
-    } else if (pollCountRef.current < 3) {
-      pollCountRef.current += 1;
-      timeoutId.current = setTimeout(startPolling, pollInterval);
+    } else if (Date.now() - pollStartTimeRef.current < POLL_MAX_DURATION_MS) {
+      timeoutId.current = setTimeout(startPolling, POLL_INTERVAL_MS);
     } else {
       setIsPolling(false);
     }
@@ -183,6 +184,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     isMounted.current = true;
     if (needsCloudFormation || needsGcpScript || needsAzureScript || needsOciScript) {
       setIsPolling(true);
+      pollStartTimeRef.current = Date.now();
       startPolling();
     }
     return () => {
@@ -195,9 +197,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Status polling: poll every 10s, max 5 min, until READY or FAILED ───
-  const STATUS_POLL_INTERVAL = 10_000; // 10 seconds
-  const STATUS_POLL_MAX_DURATION = 5 * 60 * 1000; // 5 minutes
+  // ─── Status polling: poll every 5s, max 2 min, until READY or FAILED ───
   const [isStatusPolling, setIsStatusPolling] = useState(false);
   const statusPollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const statusPollStart = useRef<number>(0);
@@ -223,7 +223,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       if (!isMounted.current) return;
 
       // Check if max duration exceeded
-      if (Date.now() - statusPollStart.current >= STATUS_POLL_MAX_DURATION) {
+      if (Date.now() - statusPollStart.current >= POLL_MAX_DURATION_MS) {
         setIsStatusPolling(false);
         return;
       }
@@ -254,7 +254,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       }
 
       if (isMounted.current) {
-        statusPollTimer.current = setTimeout(pollStatus, STATUS_POLL_INTERVAL);
+        statusPollTimer.current = setTimeout(pollStatus, POLL_INTERVAL_MS);
       }
     };
 
