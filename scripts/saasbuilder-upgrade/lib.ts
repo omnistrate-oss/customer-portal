@@ -166,6 +166,18 @@ export async function withBackoffRetry<T>(fn: () => Promise<T>, label: string): 
   throw new Error("unreachable");
 }
 
+// Repo is public — `ApiError` messages contain the full request URL and the
+// response body, so reduce those to the HTTP status only before they reach
+// logs/artifacts/step-summaries. Every other error here is a local
+// config/validation failure (missing env var, malformed JSON, etc.) with no
+// backend secrets in it, so surface its message to keep failures debuggable —
+// collapsing everything to `err.name` would hide actionable "fail fast" detail.
+export function sanitizeError(err: unknown): string {
+  if (err instanceof ApiError) return `HTTP ${err.status}`;
+  if (err instanceof Error) return err.message;
+  return String(err);
+}
+
 export async function signIn(apiBase: string, email: string, pw: string): Promise<string> {
   const res = await fetch(`${apiBase}/signin`, {
     method: "POST",
@@ -176,7 +188,10 @@ export async function signIn(apiBase: string, email: string, pw: string): Promis
     const text = await res.text().catch(function () {
       return "";
     });
-    throw new Error(`Signin failed: ${res.status} ${text}`);
+    // Throw ApiError (not plain Error) so callers can wrap signIn in
+    // withBackoffRetry and have transient 429/5xx auth failures retried.
+    const retryAfterMs = parseRetryAfter(res.headers.get("retry-after"));
+    throw new ApiError(`Signin failed: ${res.status} ${res.statusText}\n${text}`, res.status, retryAfterMs);
   }
   const data = (await res.json()) as { jwtToken?: string; token?: string };
   const token = data.jwtToken || data.token;

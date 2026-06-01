@@ -1,11 +1,9 @@
 import { appendFileSync, writeFileSync } from "node:fs";
 
 import {
-  ApiError,
   ENV_CONFIG,
   envFlag,
   fetchImageParam,
-  getInstanceImageName,
   groupByImage,
   IMAGE_PREFIX,
   listAllInstances,
@@ -14,17 +12,10 @@ import {
   patchImageParam,
   releaseVersion,
   requireEnv,
+  sanitizeError,
   signIn,
   withBackoffRetry,
 } from "./lib";
-
-// Repo is public — never put full API URLs/response bodies in messages that
-// reach the public Actions log. Reduce errors to status/name only.
-function sanitizeError(err: unknown): string {
-  if (err instanceof ApiError) return `HTTP ${err.status}`;
-  if (err instanceof Error) return err.name || "Error";
-  return "Error";
-}
 
 // Repo is public — keep this summary count-only. Operator can re-query the API
 // with their fleet-admin credentials to get specific instance IDs.
@@ -78,7 +69,9 @@ async function main(): Promise<void> {
   console.log(`  skip step 2:   ${skipRelease}`);
 
   console.log(`\nSigning in to ${cfg.apiBase}`);
-  const token = await signIn(cfg.apiBase, email, pwd);
+  const token = await withBackoffRetry(function () {
+    return signIn(cfg.apiBase, email, pwd);
+  }, "signIn");
   console.log(`  signed in`);
 
   const summary: PrepareSummary = {
@@ -125,10 +118,13 @@ async function main(): Promise<void> {
       }, "releaseVersion");
       console.log(`  released`);
     } catch (err) {
+      // Inspect (but never log) the full message to classify the error; the
+      // raw ApiError message carries the request URL + response body and the
+      // repo is public, so only the sanitized status is safe to print.
       const msg = err instanceof Error ? err.message : String(err);
       // Treat "already exists" as benign — the version set was released previously.
       if (/already exists|duplicate|conflict/i.test(msg)) {
-        console.log(`  already released (${msg.split("\n")[0]})`);
+        console.log(`  already released (${sanitizeError(err)})`);
       } else {
         throw err;
       }

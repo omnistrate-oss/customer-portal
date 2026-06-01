@@ -1,7 +1,6 @@
 import { appendFileSync, writeFileSync } from "node:fs";
 
 import {
-  ApiError,
   ENV_CONFIG,
   IMAGE_PREFIX,
   MODIFY_DELAY_MS,
@@ -14,20 +13,12 @@ import {
   modifyInstance,
   parseEnvKey,
   requireEnv,
+  sanitizeError,
   signIn,
   sleep,
   waitForUpgrade,
   withBackoffRetry,
 } from "./lib";
-
-// Repo is public — never put customer instance IDs or full API URLs/bodies in
-// strings that end up in logs, artifacts, or step summaries. Sanitize errors
-// down to the HTTP status only.
-function sanitizeError(err: unknown): string {
-  if (err instanceof ApiError) return `HTTP ${err.status}`;
-  if (err instanceof Error) return err.name || "Error";
-  return "Error";
-}
 
 type ExecuteSummary = {
   env: "dev" | "prod";
@@ -111,7 +102,9 @@ async function main(): Promise<void> {
   console.log(`  continue on upgrade failure: ${continueOnUpgradeFailure}`);
 
   console.log(`\nSigning in to ${cfg.apiBase}`);
-  const token = await signIn(cfg.apiBase, email, pwd);
+  const token = await withBackoffRetry(function () {
+    return signIn(cfg.apiBase, email, pwd);
+  }, "signIn");
   console.log(`  signed in`);
 
   const summary: ExecuteSummary = {
