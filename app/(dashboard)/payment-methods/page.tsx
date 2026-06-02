@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Stack } from "@mui/material";
 import { useSelector } from "react-redux";
 
@@ -13,7 +12,6 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import type { DescribeConsumptionBillingDetailsSuccessResponse } from "src/types/consumption";
 import { getPaymentMethodsRoute } from "src/utils/routes";
-import Button from "components/Button/Button";
 import Card from "components/Card/Card";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { DisplayText, Text } from "components/Typography/Typography";
@@ -57,20 +55,6 @@ const ProviderManagedPaymentMethodPanel = ({ provider }: { provider: BillingProv
 
         <Stack direction="row" gap="12px" alignItems="center" flexWrap="wrap">
           <StatusChip label="Non Configurable" category="failed" />
-          <Button
-            variant="contained"
-            size="small"
-            endIcon={
-              <ArrowOutwardIcon
-                sx={{
-                  fontSize: "18px",
-                }}
-              />
-            }
-            disabled
-          >
-            Configure
-          </Button>
         </Stack>
       </Stack>
     </Card>

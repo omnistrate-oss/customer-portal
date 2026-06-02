@@ -276,21 +276,7 @@ const BillingPage = () => {
                             Configure
                           </Button>
                         </Link>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          endIcon={
-                            <ArrowOutwardIcon
-                              sx={{
-                                fontSize: "18px",
-                              }}
-                            />
-                          }
-                          disabled
-                        >
-                          Configure
-                        </Button>
-                      )}
+                      ) : null}
                     </Stack>
                   )}
                 </Card>

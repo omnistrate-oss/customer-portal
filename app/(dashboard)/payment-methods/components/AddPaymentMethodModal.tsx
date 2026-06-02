@@ -103,7 +103,7 @@ const AddPaymentMethodForm = ({
 
   return (
     <>
-      <DialogContent sx={{ px: "24px", py: 0 }}>
+      <DialogContent sx={{ px: "24px", py: 0, flex: "0 0 auto", overflowY: "visible" }}>
         <PaymentElement
           options={{
             fields: {
@@ -210,6 +210,8 @@ const AddPaymentMethodModal = ({
           borderRadius: "12px",
           minWidth: "620px",
           maxWidth: "620px",
+          minHeight: "200px",
+          maxHeight: "calc(100vh - 48px)",
         },
       }}
     >
