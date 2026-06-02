@@ -90,7 +90,7 @@
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.2",
     "@inquirer/prompts": "^8.3.0",
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "20.14.11",
     "@types/react-date-range": "1.4.0",
