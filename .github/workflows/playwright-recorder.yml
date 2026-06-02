@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright-chromium
 
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -46,6 +48,17 @@ jobs:
     - name: Install dependencies
       run: yarn install --immutable
 
+    - name: Resolve Playwright version
+      id: playwright-version
+      run: |
+        echo "playwright-version=$(node -e 'process.stdout.write(require(\"./package.json\").devDependencies[\"@playwright/test\"] ?? \"\")')" >> "$GITHUB_OUTPUT"
+
+    - name: Restore Chromium Playwright browser cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+        key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.playwright-version }}
+
     - name: Log Resolved Dependency Versions
       run: |
         echo "::group::Installed dependency versions"
@@ -53,7 +66,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+      run: yarn playwright install --with-deps chromium
 
     - name: Build Project
       run: yarn build
