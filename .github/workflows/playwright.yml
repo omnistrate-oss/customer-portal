@@ -21,29 +21,18 @@ jobs:
     if: github.event.pull_request.draft == false
     timeout-minutes: 30
     runs-on: ubuntu-latest
-    # Run inside the official Playwright image: Chromium and all of its OS
-    # dependencies are pre-baked, so nothing is downloaded from the Playwright
-    # CDN at runtime. This sidesteps the cdn.playwright.dev transfer that
-    # started hanging at 100% on GitHub runners this week. Keep this tag in
-    # lockstep with the @playwright/test version in package.json (currently
-    # 1.56.1).
-    #
-    # --ipc=host is required: Docker's default 64 MB /dev/shm is too small for
-    # Chromium, which exhausts it after the first test and then hangs every
-    # subsequent page load (the first test passes, the rest time out at 60s).
-    container:
-      image: mcr.microsoft.com/playwright:v1.56.1-noble
-      options: --ipc=host
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Checkout HAR submodule
         run: |
-          # Running as root inside the container trips git's dubious-ownership
-          # guard on the checkout dir; trust the workspace before any git ops.
-          git config --global --add safe.directory '*'
           git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
           git submodule update --init --recursive
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: lts/*
+          cache: 'yarn'
 
       - name: Enable Corepack and activate Yarn
         run: |
@@ -52,9 +41,8 @@ jobs:
 
       - name: Install dependencies
         # Scripts are disabled by default to prevent supply-chain attacks; only
-        # the security-reviewed allowlist is rebuilt (these fetch prebuilt native
-        # binaries, no compiler needed). Browsers ship with the container image,
-        # so there is no separate Playwright browser-install step.
+        # the security-reviewed allowlist is rebuilt. Browsers are provisioned
+        # explicitly by the `Install Playwright Browsers` step below.
         run: |
           YARN_ENABLE_SCRIPTS=false yarn install --immutable
           yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
@@ -64,6 +52,9 @@ jobs:
           echo "::group::Installed dependency versions"
           yarn info --name-only
           echo "::endgroup::"
+
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
 
       - name: Build and start saasbuilder server
         run: |

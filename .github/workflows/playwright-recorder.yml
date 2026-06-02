@@ -24,30 +24,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # Run inside the official Playwright image: Chromium and all of its OS
-    # dependencies are pre-baked, so nothing is downloaded from the Playwright
-    # CDN at runtime. This sidesteps the cdn.playwright.dev transfer that
-    # started hanging at 100% on GitHub runners this week. Keep this tag in
-    # lockstep with the @playwright/test version in package.json (currently
-    # 1.56.1).
-    #
-    # --ipc=host is required: Docker's default 64 MB /dev/shm is too small for
-    # Chromium, which exhausts it after the first test and then hangs every
-    # subsequent page load.
-    container:
-      image: mcr.microsoft.com/playwright:v1.56.1-noble
-      options: --ipc=host
 
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Checkout HAR submodule
       run: |
-        # Running as root inside the container trips git's dubious-ownership
-        # guard on the checkout dir; trust the workspace before any git ops.
-        git config --global --add safe.directory '*'
         git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
         git submodule update --init --recursive
+
+    - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      with:
+        node-version: lts/*
+        cache: 'yarn'
 
     - name: Enable Corepack and activate Yarn
       run: |
@@ -62,6 +51,9 @@ jobs:
         echo "::group::Installed dependency versions"
         yarn info --name-only
         echo "::endgroup::"
+
+    - name: Install Playwright Browsers
+      run: yarn playwright install --with-deps
 
     - name: Build Project
       run: yarn build
