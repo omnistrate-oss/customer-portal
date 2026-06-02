@@ -57,20 +57,6 @@ const ProviderManagedPaymentMethodPanel = ({ provider }: { provider: BillingProv
 
         <Stack direction="row" gap="12px" alignItems="center" flexWrap="wrap">
           <StatusChip label="Non Configurable" category="failed" />
-          <Button
-            variant="contained"
-            size="small"
-            endIcon={
-              <ArrowOutwardIcon
-                sx={{
-                  fontSize: "18px",
-                }}
-              />
-            }
-            disabled
-          >
-            Configure
-          </Button>
         </Stack>
       </Stack>
     </Card>
