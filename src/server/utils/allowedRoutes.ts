@@ -36,20 +36,17 @@ const allowedRoutes: AllowedRoute[] = [
   { method: "GET", pattern: "/2022-09-01-00/service-offering/:serviceId" },
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/service-offering/:serviceId/resource/:resourceId/instance/:instanceId",
+    pattern: "/2022-09-01-00/service-offering/:serviceId/resource/:resourceId/instance/:instanceId",
   },
 
   // ─── Service / Product Tier ─────────────────────────────────────────
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/service/:serviceId/service-api/:serviceApiId/swagger_spec",
+    pattern: "/2022-09-01-00/service/:serviceId/service-api/:serviceApiId/swagger_spec",
   },
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/service/:serviceId/productTier/:productTierId/customer-version-set",
+    pattern: "/2022-09-01-00/service/:serviceId/productTier/:productTierId/customer-version-set",
   },
 
   // ─── Regions & Availability Zones ───────────────────────────────────
@@ -60,8 +57,7 @@ const allowedRoutes: AllowedRoute[] = [
   { method: "GET", pattern: "/2022-09-01-00/region/:regionId" },
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/availability-zone/region/code/:regionCode/cloud-provider/:cloudProviderName",
+    pattern: "/2022-09-01-00/availability-zone/region/code/:regionCode/cloud-provider/:cloudProviderName",
   },
 
   // ─── User & Auth ───────────────────────────────────────────────────
@@ -90,6 +86,26 @@ const allowedRoutes: AllowedRoute[] = [
   {
     method: "GET",
     pattern: "/2022-09-01-00/resource-instance/billing-details",
+  },
+  {
+    method: "GET",
+    pattern: "/2022-09-01-00/resource-instance/billing/stripe/config",
+  },
+  {
+    method: "GET",
+    pattern: "/2022-09-01-00/resource-instance/billing/stripe/payment-methods",
+  },
+  {
+    method: "POST",
+    pattern: "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/setup-intent",
+  },
+  {
+    method: "DELETE",
+    pattern: "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/:id",
+  },
+  {
+    method: "POST",
+    pattern: "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/:id/default",
   },
   { method: "GET", pattern: "/2022-09-01-00/resource-instance/health" },
   {
@@ -168,13 +184,11 @@ const allowedRoutes: AllowedRoute[] = [
   // ─── Resource Instance — subscription users ─────────────────────────
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/subscription/:subscriptionId/invite-user",
+    pattern: "/2022-09-01-00/resource-instance/subscription/:subscriptionId/invite-user",
   },
   {
     method: "DELETE",
-    pattern:
-      "/2022-09-01-00/resource-instance/subscription/:subscriptionId/revoke-user-role",
+    pattern: "/2022-09-01-00/resource-instance/subscription/:subscriptionId/revoke-user-role",
   },
 
   // ─── Resource Instance — version upgrade ────────────────────────────
@@ -186,8 +200,7 @@ const allowedRoutes: AllowedRoute[] = [
   // ─── Resource Instance — deployment cell dashboard ──────────────────
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:id/deployment-cell-dashboard/token",
+    pattern: "/2022-09-01-00/resource-instance/:id/deployment-cell-dashboard/token",
   },
 
   // ─── Resource Instance — fully-qualified (7-segment) paths ──────────
@@ -197,114 +210,93 @@ const allowedRoutes: AllowedRoute[] = [
   // List / Create
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk",
   },
   // Describe / Update / Delete
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
   },
   {
     method: "PUT",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
   },
   {
     method: "PATCH",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
   },
   {
     method: "DELETE",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id",
   },
   // Instance actions
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/start",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/start",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/stop",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/stop",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/restart",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/restart",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/failover",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/failover",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/restore",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/restore",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/custom-dns",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/custom-dns",
   },
   {
     method: "DELETE",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/custom-dns",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/custom-dns",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/add-capacity",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/add-capacity",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/remove-capacity",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/remove-capacity",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/copy-snapshot",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/copy-snapshot",
   },
   // Instance metadata
   {
     method: "PATCH",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/metadata",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/metadata",
   },
   // Instance snapshots (per-instance)
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/snapshot",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/snapshot",
   },
   {
     method: "POST",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/snapshot/:snapshotId/restore",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/snapshot/:snapshotId/restore",
   },
   // Terraform / setup kit
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/setup-kit/:cloudProvider",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/setup-kit/:cloudProvider",
   },
   // Audit events (per product-tier)
   {
     method: "GET",
-    pattern:
-      "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/audit-events",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/audit-events",
   },
 ];
 
@@ -342,9 +334,7 @@ export function normalizeEndpoint(endpoint: string): string {
   const pathOnly = endpoint.split("?")[0];
 
   // Remove trailing slash for consistency
-  const normalized = pathOnly.endsWith("/") && pathOnly.length > 1
-    ? pathOnly.slice(0, -1)
-    : pathOnly;
+  const normalized = pathOnly.endsWith("/") && pathOnly.length > 1 ? pathOnly.slice(0, -1) : pathOnly;
 
   return normalized;
 }
