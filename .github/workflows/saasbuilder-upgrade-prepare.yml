@@ -55,7 +55,13 @@ jobs:
           corepack prepare yarn@4.5.0 --activate
 
       - name: Install dependencies
-        run: yarn install --immutable
+        # This job runs with fleet-admin credentials, so disable lifecycle
+        # scripts by default to reduce supply-chain risk (matching
+        # playwright.yml). Only esbuild — which `tsx` needs to run the upgrade
+        # scripts — is rebuilt from the reviewed allowlist.
+        run: |
+          YARN_ENABLE_SCRIPTS=false yarn install --immutable
+          yarn rebuild esbuild
 
       # Guard against the `A && B || C` ternary silently falling back to the
       # other env's secret when the chosen env's secret is unset (empty string

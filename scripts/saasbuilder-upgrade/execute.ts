@@ -66,12 +66,21 @@ function parseImageGroups(raw: string): string[] {
   if (!Array.isArray(parsed)) {
     throw new Error(`IMAGE_GROUPS_JSON must be a JSON array of strings, got: ${typeof parsed}`);
   }
+  const result: string[] = [];
   for (const v of parsed) {
     if (typeof v !== "string") {
       throw new Error(`IMAGE_GROUPS_JSON entries must be strings, got: ${typeof v}`);
     }
+    // Trim each entry — a stray leading/trailing space pasted from the Prepare
+    // summary would never match the exact image-group keys from groupByImage(),
+    // so Step 5 would silently treat it as a missing group and skip it.
+    const trimmed = v.trim();
+    if (!trimmed) {
+      throw new Error(`IMAGE_GROUPS_JSON entries must be non-empty strings`);
+    }
+    result.push(trimmed);
   }
-  return parsed as string[];
+  return result;
 }
 
 async function main(): Promise<void> {

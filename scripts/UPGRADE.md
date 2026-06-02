@@ -78,7 +78,7 @@ The `dev` / `prod` choice is the operator's `workflow_dispatch` input — pickin
 
 **What it does:** runs Steps 4 and 5. Posts a "starting" Mattermost ping, then a final ping with success/failure status and the modified/failed counts. Uploads `upgrade-execute-summary.json` as an artifact.
 
-**Timeout:** 4 hours (`timeout-minutes: 240`). The only expected failure mode is hitting this timeout; if a regular rollout starts to approach it, raise to 360 (the GitHub-hosted runner maximum).
+**Timeout:** 4 hours (`timeout-minutes: 240`). Hitting this timeout is the most common failure mode (see [Failure handling](#failure-handling) for the others); if a regular rollout starts to approach it, raise to 360 (the GitHub-hosted runner maximum).
 
 ### Public-repo data hygiene
 
@@ -93,12 +93,17 @@ When investigating a failed rollout, use the credentials directly to re-query th
 
 ### Failure handling
 
-The script is engineered so that **only timeouts and hard configuration errors fail the workflow**:
+The script is engineered so that **transient problems are absorbed and only a few conditions fail the workflow**:
 
 - Transient API errors (429 / 5xx) → exponential-backoff retry, up to 6 attempts honoring `Retry-After`.
 - Per-instance modify failure → counted in the summary, does not abort the rest.
 - Upgrade-path ending `FAILED`/`CANCELLED` → reported in the summary; Step 5 is skipped unless `continue_on_upgrade_failure=true`.
-- Bad credentials, malformed inputs, missing image parameter → hard fail (the operator must fix and re-run).
+
+The workflow **does** fail (non-zero exit) when:
+
+- The job hits its timeout.
+- Bad credentials, malformed inputs, or a missing image parameter — hard fail (the operator must fix and re-run).
+- API requests keep returning 429 / 5xx past the retry budget — `withBackoffRetry` re-throws on the final attempt, so a sustained outage (not just a timeout) will fail the run.
 
 ## Notes
 
