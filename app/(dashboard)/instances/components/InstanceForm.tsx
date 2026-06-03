@@ -935,6 +935,43 @@ const InstanceForm = ({
     [instances, values.cloudProvider]
   );
 
+  const selectedCloudAccountInstanceId = (values.requestParams as Record<string, any>)
+    ?.cloud_provider_account_config_id;
+  const selectedCloudAccountInstance = cloudAccountInstances.find(
+    (config) => config.id === selectedCloudAccountInstanceId
+  );
+  const selectedAccountConfigId = getResultParams(selectedCloudAccountInstance)?.cloud_provider_account_config_id;
+  const shouldFetchCloudNativeNetworks = Boolean(
+    formMode === "create" &&
+      selectedAccountConfigId &&
+      (values.cloudProvider === "aws" || values.cloudProvider === "gcp")
+  );
+
+  const cloudNativeNetworksQuery = $api.useQuery(
+    "get",
+    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
+    {
+      params: {
+        path: {
+          id: selectedAccountConfigId || "",
+        },
+      },
+      headers: {
+        "x-ignore-global-error": true,
+      },
+    },
+    {
+      enabled: shouldFetchCloudNativeNetworks,
+      retry: 2,
+      retryDelay: 3000,
+    }
+  );
+
+  const cloudNativeNetworks = useMemo(
+    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
+    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
+  );
+
   useEffect(() => {
     const accountConfigFieldExists = resourceCreateSchema?.inputParameters?.some(
       (param) => param.key === "cloud_provider_account_config_id"
@@ -1008,8 +1045,8 @@ const InstanceForm = ({
       isFetchingVersionSets,
       isFetchingResourceInstanceIds,
       cloudAccountInstances,
-      customNetworks,
-      isFetchingCustomNetworks
+      cloudNativeNetworks,
+      cloudNativeNetworksQuery.isFetching
     );
   }, [
     formMode,
@@ -1022,6 +1059,8 @@ const InstanceForm = ({
     isFetchingVersionSets,
     cloudAccountInstances,
     isFetchingResourceInstanceIds,
+    cloudNativeNetworks,
+    cloudNativeNetworksQuery.isFetching,
   ]);
 
   const networkConfigurationFields = useMemo(() => {

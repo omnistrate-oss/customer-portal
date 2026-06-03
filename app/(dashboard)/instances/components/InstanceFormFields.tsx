@@ -60,7 +60,13 @@ export const getStandardInformationFields = (
   isFetchingVersionSets: boolean,
   isFetchingResourceInstanceIds: boolean,
   cloudAccountInstances: CloudAccountInstanceOption[],
-  cloudNativeNetworks: Array<{ id: string; cloudNativeNetworkId?: string; name?: string; region?: string }>,
+  cloudNativeNetworks: Array<{
+    id: string;
+    cloudNativeNetworkId?: string;
+    name?: string;
+    region?: string;
+    status?: string;
+  }>,
   isFetchingCloudNativeNetworks: boolean
 ) => {
   if (isFetchingServiceOfferings) return [];
@@ -520,6 +526,9 @@ export const getStandardInformationFields = (
           : "No regions available",
       menuItems: getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider),
       disabled: formMode !== "create",
+      onChange: () => {
+        setFieldValue("requestParams.cloudNativeNetworkId", "");
+      },
     });
   }
 
@@ -569,7 +578,9 @@ export const getStandardInformationFields = (
     }
 
     if (selectedCloudAccountConfigId && vpcType === "choose_existing" && isExistingVpcSupported) {
-      const filteredNetworks = cloudNativeNetworks.filter((n) => !region || n.region === region);
+      const filteredNetworks = region
+        ? cloudNativeNetworks.filter((n) => n.region === region && n.status?.toUpperCase() !== "FAILED")
+        : [];
       fields.push({
         dataTestId: "existing-vpc-select",
         label: "Select VPC",
