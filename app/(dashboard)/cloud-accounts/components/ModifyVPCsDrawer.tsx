@@ -42,6 +42,10 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   // ─── Derive account config data from the selected instance ────────────────
   const resultParams = useMemo(() => getResultParams(selectedInstance), [selectedInstance]);
   const cloudProvider = resultParams?.cloud_provider || "";
+  const privateConnectivityFlag =
+    resultParams?.private_link ?? resultParams?.enable_private_connectivity ?? resultParams?.PrivateLink;
+  const privateConnectivityEnabled =
+    typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : Boolean(privateConnectivityFlag);
 
   const subscription = subscriptionsObj[selectedInstance.subscriptionId as string];
   const offering = subscription ? serviceOfferingsObj[subscription.serviceId]?.[subscription.productTierId] : undefined;
@@ -319,6 +323,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             onResync={handleResyncVpcs}
             lastSyncedAt={lastSyncedAt}
             cloudProvider={cloudProvider}
+            privateConnectivityEnabled={privateConnectivityEnabled}
           />
         </div>
 

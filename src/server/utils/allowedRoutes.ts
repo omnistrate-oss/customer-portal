@@ -75,6 +75,28 @@ const allowedRoutes: AllowedRoute[] = [
 
   // ─── Account Config ─────────────────────────────────────────────────
   { method: "GET", pattern: "/2022-09-01-00/accountconfig/:id" },
+  {
+    method: "GET",
+    pattern: "/2022-09-01-00/accountconfig/:id/cloud-native-networks",
+  },
+  {
+    method: "POST",
+    pattern: "/2022-09-01-00/accountconfig/:id/cloud-native-networks/sync",
+  },
+  {
+    method: "POST",
+    pattern: "/2022-09-01-00/accountconfig/:id/cloud-native-networks/import",
+  },
+  {
+    method: "POST",
+    pattern:
+      "/2022-09-01-00/accountconfig/:id/cloud-native-networks/:cloudNativeNetworkId/import",
+  },
+  {
+    method: "POST",
+    pattern:
+      "/2022-09-01-00/accountconfig/:id/cloud-native-networks/:cloudNativeNetworkId/unimport",
+  },
 
   // ─── Resource Instance — top-level ──────────────────────────────────
   { method: "GET", pattern: "/2022-09-01-00/resource-instance" },

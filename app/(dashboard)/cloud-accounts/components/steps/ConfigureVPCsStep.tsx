@@ -39,6 +39,7 @@ type ConfigureVPCsStepProps = {
   isImporting?: boolean;
   lastSyncedAt?: string;
   cloudProvider?: string;
+  privateConnectivityEnabled?: boolean;
 };
 
 // Map backend VPC status to StatusChip category
@@ -56,15 +57,21 @@ const InstructionItem = ({
   title,
   description,
   expandLabel,
+  children,
+  forceOpen = false,
 }: {
   number: number;
   title: string;
   description: string;
   expandLabel: string;
+  children: React.ReactNode;
+  forceOpen?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
+  const isOpen = forceOpen || open;
+
   return (
-    <Stack gap="6px">
+    <Stack gap="10px">
       <Stack direction="row" alignItems="flex-start" gap="12px">
         <Box
           sx={{
@@ -94,16 +101,16 @@ const InstructionItem = ({
       </Stack>
       <Box sx={{ ml: "36px" }}>
         <Stack direction="row" alignItems="center" gap="4px" sx={{ cursor: "pointer" }} onClick={() => setOpen(!open)}>
-          <Text size="small" weight="medium" color="#6941C6">
-            {expandLabel}
+          <Text size="small" weight="medium" color="#667085">
+            {isOpen ? expandLabel.replace(/^Show|^View|^Check/, "Hide") : expandLabel}
           </Text>
-          {open ? (
-            <KeyboardArrowUpIcon sx={{ color: "#6941C6", fontSize: 18 }} />
+          {isOpen ? (
+            <KeyboardArrowUpIcon sx={{ color: "#344054", fontSize: 18 }} />
           ) : (
-            <KeyboardArrowDownIcon sx={{ color: "#6941C6", fontSize: 18 }} />
+            <KeyboardArrowDownIcon sx={{ color: "#344054", fontSize: 18 }} />
           )}
         </Stack>
-        {open && (
+        {isOpen && (
           <Box
             sx={{
               mt: "8px",
@@ -113,15 +120,54 @@ const InstructionItem = ({
               bgcolor: "#F9FAFB",
             }}
           >
-            <Text size="small" weight="regular" color="#344054">
-              Detailed instructions for this step will appear here.
-            </Text>
+            {children}
           </Box>
         )}
       </Box>
     </Stack>
   );
 };
+
+const InstructionPanel = ({ children }: { children: React.ReactNode }) => (
+  <Stack
+    gap="8px"
+    sx={{
+      p: "12px",
+      border: "1px solid #E9EAEB",
+      borderRadius: "8px",
+      bgcolor: "#F9FAFB",
+    }}
+  >
+    {children}
+  </Stack>
+);
+
+const CodeBlock = ({ label, children }: { label?: string; children: React.ReactNode }) => (
+  <Box>
+    {label && (
+      <Text size="xsmall" weight="medium" color="#667085" sx={{ mb: "6px" }}>
+        {label}
+      </Text>
+    )}
+    <Box
+      component="pre"
+      sx={{
+        m: 0,
+        p: "12px 24px",
+        border: "1px solid #E9EAEB",
+        borderRadius: "8px",
+        bgcolor: "#F5F5F5",
+        color: "#344054",
+        fontFamily: "monospace",
+        fontSize: "13px",
+        lineHeight: 1.45,
+        whiteSpace: "pre-wrap",
+      }}
+    >
+      {children}
+    </Box>
+  </Box>
+);
 
 const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   values,
@@ -135,45 +181,85 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   isImporting = false,
   lastSyncedAt,
   cloudProvider = "aws",
+  privateConnectivityEnabled = false,
 }) => {
   const [showAllInstructions, setShowAllInstructions] = useState(false);
   const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
   const selectedVpcs = availableVpcs.filter((v) => values.selectedVpcIds.includes(v.id));
 
-  const isAwsWithPrivateConnect = cloudProvider === "aws";
+  const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
 
   const privateConnectInstructions = [
     {
       title: "Enable VPC DNS",
       description: "Required for private endpoint name resolution.",
       expandLabel: "Show DNS settings",
+      content: (
+        <InstructionPanel>
+          <CodeBlock label="VPC settings">{`enableDnsHostnames = true
+enableDnsSupport   = true`}</CodeBlock>
+        </InstructionPanel>
+      ),
     },
     {
       title: "Tag VPC and workload subnets",
       description: "Used to identify where private workloads run.",
       expandLabel: "Show instructions",
+      content: (
+        <InstructionPanel>
+          <CodeBlock label="Tag">{`{managed-by-tag-key} = {managed-by-tag-value}`}</CodeBlock>
+          <CodeBlock>Only tag the subnets where workloads should be deployed.</CodeBlock>
+        </InstructionPanel>
+      ),
     },
     {
       title: "Confirm outbound access",
       description: "Choose NAT, Transit Gateway, VPN, or Direct Connect",
       expandLabel: "View outbound access options",
+      content: (
+        <InstructionPanel>
+          <CodeBlock>{`Required for
+* Container image pulls
+* Helm chart downloads
+* Deployment bootstrap dependencies`}</CodeBlock>
+          <CodeBlock>{`Choose one
+* NAT Gateway
+* Transit Gateway
+* VPN
+* Direct Connect`}</CodeBlock>
+        </InstructionPanel>
+      ),
     },
     {
       title: "Create the Interface VPC Endpoint",
       description: "Use the provided PrivateLink service name.",
       expandLabel: "Show instructions",
+      content: (
+        <InstructionPanel>
+          <Text size="small" weight="semibold" color="#344054">
+            Create an Interface VPC Endpoint for the provided PrivateLink service.
+          </Text>
+          <CodeBlock label="Required endpoint tag">Name = {"{private-endpoint-name}"}</CodeBlock>
+          <CodeBlock label="Allow inbound from your VPC CIDR">TCP 8443-8506 from your VPC CIDR</CodeBlock>
+        </InstructionPanel>
+      ),
     },
     {
       title: "Review cross-region setup (if applicable)",
       description: "Only shown when regions differ.",
       expandLabel: "Check cross-region requirements",
+      content: (
+        <Stack gap="10px">
+          <InstructionPanel>
+            <CodeBlock label="AWS CLI">--service-region &lt;region&gt;</CodeBlock>
+            <CodeBlock label="Terraform">service_region = "&lt;region&gt;"</CodeBlock>
+          </InstructionPanel>
+          <CodeBlock>Do not enable private DNS for cross-region Interface VPC Endpoints.</CodeBlock>
+        </Stack>
+      ),
     },
   ];
-
-  const displayedInstructions = showAllInstructions
-    ? privateConnectInstructions
-    : privateConnectInstructions.slice(0, 3);
 
   return (
     <Stack gap="20px">
@@ -525,76 +611,69 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
           }
         >
           <Stack gap="16px">
-            {displayedInstructions.map((inst, idx) => (
+            {privateConnectInstructions.map((inst, idx) => (
               <InstructionItem
                 key={idx}
                 number={idx + 1}
                 title={inst.title}
                 description={inst.description}
                 expandLabel={inst.expandLabel}
-              />
+                forceOpen={showAllInstructions}
+              >
+                {inst.content}
+              </InstructionItem>
             ))}
-          </Stack>
-        </CardWithTitle>
-      )}
-
-      {/* Optional add-on */}
-      {isAwsWithPrivateConnect && values.bringOwnVpcs && (
-        <CardWithTitle title="Optional add-on">
-          <Stack gap="8px">
-            <Stack direction="row" alignItems="center" gap="4px">
-              <Text size="small" weight="semibold" color="#101828">
-                Add Kubernetes subnet tags
+            <Stack direction="row" alignItems="center" sx={{ pt: "4px" }}>
+              <Text size="small" weight="semibold" color="#344054" sx={{ pr: "10px" }}>
+                Optional add-on
               </Text>
-              <Box
-                sx={{
-                  bgcolor: "#F2F4F7",
-                  borderRadius: "16px",
-                  px: "8px",
-                  py: "2px",
-                  ml: "4px",
-                }}
-              >
-                <Text size="xsmall" weight="medium" color="#344054">
-                  Optional
-                </Text>
-              </Box>
-              <Text size="small" weight="regular" color="#344054" sx={{ ml: "4px" }}>
-                - Add this tag if you plan to use internal load balancers.
-              </Text>
+              <Box sx={{ height: "1px", bgcolor: "#E9EAEB", flex: 1 }} />
             </Stack>
-            <Stack
-              direction="row"
-              alignItems="center"
-              gap="4px"
-              sx={{ cursor: "pointer" }}
-              onClick={() => setShowKubernetesInstructions((prev) => !prev)}
-            >
-              <Text size="small" weight="medium" color="#6941C6">
-                Show me how
-              </Text>
-              {showKubernetesInstructions ? (
-                <KeyboardArrowUpIcon sx={{ color: "#6941C6", fontSize: 18 }} />
-              ) : (
-                <KeyboardArrowDownIcon sx={{ color: "#6941C6", fontSize: 18 }} />
-              )}
-            </Stack>
-            {showKubernetesInstructions && (
-              <Box
-                sx={{
-                  mt: "8px",
-                  p: "12px",
-                  border: "1px solid #E9EAEB",
-                  borderRadius: "8px",
-                  bgcolor: "#F9FAFB",
-                }}
-              >
-                <Text size="small" weight="regular" color="#344054">
-                  Add the Kubernetes subnet tag to your subnets to enable internal load balancers. Tag key:{" "}
-                  <strong>kubernetes.io/role/internal-elb</strong>, Tag value: <strong>1</strong>
-                </Text>
-              </Box>
-            )}
+            <Box sx={{ pl: "28px" }}>
+              <Stack gap="10px">
+                <Stack direction="row" alignItems="center" gap="4px" flexWrap="wrap">
+                  <Text size="small" weight="semibold" color="#101828">
+                    Add Kubernetes subnet tags
+                  </Text>
+                  <Chip
+                    label="Optional"
+                    size="small"
+                    sx={{
+                      height: 22,
+                      bgcolor: "#F2F4F7",
+                      color: "#344054",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                    }}
+                  />
+                  <Text size="small" weight="regular" color="#344054">
+                    - Add this tag if you plan to use internal load balancers.
+                  </Text>
+                </Stack>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  gap="4px"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setShowKubernetesInstructions((prev) => !prev)}
+                >
+                  <Text size="small" weight="medium" color="#667085">
+                    {showKubernetesInstructions ? "Hide how to" : "Show me how"}
+                  </Text>
+                  {showKubernetesInstructions ? (
+                    <KeyboardArrowUpIcon sx={{ color: "#344054", fontSize: 18 }} />
+                  ) : (
+                    <KeyboardArrowDownIcon sx={{ color: "#344054", fontSize: 18 }} />
+                  )}
+                </Stack>
+                {showKubernetesInstructions && (
+                  <InstructionPanel>
+                    <CodeBlock label="For private subnets">kubernetes.io/role/internal-elb = 1</CodeBlock>
+                    <CodeBlock label="For public subnets">kubernetes.io/role/elb = 1</CodeBlock>
+                  </InstructionPanel>
+                )}
+              </Stack>
+            </Box>
           </Stack>
         </CardWithTitle>
       )}

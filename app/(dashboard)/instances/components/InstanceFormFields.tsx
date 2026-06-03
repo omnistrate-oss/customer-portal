@@ -13,6 +13,7 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
+import { getResultParams } from "src/utils/instance";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistributionsMultiSelect/KubernetesDistributionsMultiSelect";
@@ -457,6 +458,8 @@ export const getStandardInformationFields = (
   const accountConfigParam = (resourceSchema?.inputParameters || []).find(
     (p) => p.key === "cloud_provider_account_config_id"
   );
+  const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+
   if (accountConfigParam) {
     fields.push({
       dataTestId: `${accountConfigParam.key}-select`,
@@ -483,6 +486,18 @@ export const getStandardInformationFields = (
       previewValue: cloudAccountInstances.find((config) => config.id === requestParams[accountConfigParam.key])?.label,
       emptyMenuText: "No cloud accounts available",
       isLoading: isFetchingResourceInstanceIds,
+      onChange: (e) => {
+        const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === e.target.value);
+        const isCreateNewVpcAllowed =
+          !selectedCloudAccountConfig ||
+          getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation !== false;
+
+        setFieldValue("requestParams.cloudNativeNetworkId", "");
+
+        if (isExistingVpcSupported && !isCreateNewVpcAllowed) {
+          setFieldValue("requestParams._vpcType", "choose_existing");
+        }
+      },
     });
   }
 
@@ -505,8 +520,14 @@ export const getStandardInformationFields = (
   }
 
   if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
-    const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+    const selectedCloudAccountConfig = cloudAccountInstances.find(
+      (config) => config.id === requestParams[accountConfigParam.key]
+    );
+    const selectedCloudAccountResultParams = getResultParams(selectedCloudAccountConfig);
+    const isCreateNewVpcAllowed =
+      !selectedCloudAccountConfig || selectedCloudAccountResultParams.allow_new_cloud_native_network_creation !== false;
     const vpcType = requestParams._vpcType || "create_new";
+    const createNewVpcDisabledMessage = "Creating new VPCs is not allowed for the selected cloud account config";
 
     fields.push({
       label: "VPCs",
@@ -520,6 +541,8 @@ export const getStandardInformationFields = (
           dataTestId: "create-new-vpc-radio",
           label: "Create new VPC",
           value: "create_new",
+          disabled: !isCreateNewVpcAllowed,
+          disabledMessage: createNewVpcDisabledMessage,
         },
         {
           dataTestId: "choose-existing-vpc-radio",

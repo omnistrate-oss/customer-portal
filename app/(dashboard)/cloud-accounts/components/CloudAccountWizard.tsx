@@ -857,8 +857,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const summarySections = useMemo((): SummarySection[] => {
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
-    const privateConnectivityFlag =
-      rp?.private_link ?? rp?.enable_private_connectivity ?? rp?.PrivateLink;
+    const privateConnectivityFlag = rp?.private_link ?? rp?.enable_private_connectivity ?? rp?.PrivateLink;
     const privateConnectivityEnabled =
       typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : enablePrivateConnectivity;
     const accountIdentityItems =
@@ -1098,6 +1097,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               isImporting={importCloudNativeNetworksMutation.isPending}
               lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
+              privateConnectivityEnabled={enablePrivateConnectivity}
             />
           )}
         </div>
