@@ -407,16 +407,22 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     });
   }, [allCloudNativeNetworks, vpcValues.selectedRegions]);
 
-  const lastSyncedAt = useMemo(() => {
-    if (!allCloudNativeNetworks.length) return undefined;
-    const latest = allCloudNativeNetworks.reduce<string | undefined>((maxDate, network) => {
-      if (!network.updatedAt) return maxDate;
-      if (!maxDate) return network.updatedAt;
-      return new Date(network.updatedAt) > new Date(maxDate) ? network.updatedAt : maxDate;
-    }, undefined);
+  const [lastSyncedAt, setLastSyncedAt] = useState("");
+  useEffect(() => {
+    if (!cloudNativeNetworksQuery.dataUpdatedAt) {
+      setLastSyncedAt("");
+      return;
+    }
 
-    return latest ? new Date(latest).toLocaleString() : undefined;
-  }, [allCloudNativeNetworks]);
+    const update = () => {
+      const diff = Math.round((Date.now() - cloudNativeNetworksQuery.dataUpdatedAt) / 60000);
+      setLastSyncedAt(diff < 1 ? "Just now" : `${diff} min ago`);
+    };
+
+    update();
+    const interval = setInterval(update, 60000);
+    return () => clearInterval(interval);
+  }, [cloudNativeNetworksQuery.dataUpdatedAt]);
 
   const isLoadingVpcs = cloudNativeNetworksQuery.isFetching || syncCloudNativeNetworksMutation.isPending;
 

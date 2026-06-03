@@ -4,11 +4,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { Autocomplete, Box, Checkbox, Chip, Stack, TextField } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
+import DataGrid from "src/components/DataGrid/DataGrid";
+import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
@@ -169,6 +171,56 @@ const CodeBlock = ({ label, children }: { label?: string; children: React.ReactN
   </Box>
 );
 
+const VpcsDataGridHeader = ({
+  totalCount,
+  lastSyncedAt,
+  isLoadingVpcs,
+  onResync,
+}: {
+  totalCount: number;
+  lastSyncedAt?: string;
+  isLoadingVpcs: boolean;
+  onResync?: () => void;
+}) => {
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      gap="16px"
+      sx={{ px: "24px", py: "20px", borderBottom: "1px solid #E9EAEB" }}
+    >
+      <DataGridHeaderTitle
+        title="Choose VPCs"
+        desc="Choose among the available VPCs in the selected regions"
+        count={totalCount}
+        units={{ singular: "VPC", plural: "VPCs" }}
+      />
+      <Stack direction="row" alignItems="center" gap="12px">
+        {lastSyncedAt && (
+          <Text size="xsmall" weight="regular" color="#535862">
+            Last synced: {lastSyncedAt}
+          </Text>
+        )}
+        <Button
+          variant="outlined"
+          sx={{
+            height: "32px !important",
+            padding: "6px 12px !important",
+            minWidth: "unset",
+          }}
+          onClick={onResync}
+          disabled={isLoadingVpcs}
+          startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+          data-testid="resync-vpcs-button"
+        >
+          Resync
+        </Button>
+      </Stack>
+    </Stack>
+  );
+};
+
 const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   values,
   onChange,
@@ -186,9 +238,97 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   const [showAllInstructions, setShowAllInstructions] = useState(false);
   const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
-  const selectedVpcs = availableVpcs.filter((v) => values.selectedVpcIds.includes(v.id));
-
   const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
+  const selectableVpcIds = useMemo(
+    () => new Set(availableVpcs.filter((vpc) => vpc.status?.toUpperCase() !== "FAILED").map((vpc) => vpc.id)),
+    [availableVpcs]
+  );
+
+  const vpcColumns = useMemo(
+    () => [
+      {
+        field: "name",
+        headerName: "Name",
+        flex: 1,
+        minWidth: 180,
+        renderCell: (params) => (
+          <Text
+            size="small"
+            weight="medium"
+            color="#101828"
+            sx={{
+              width: "100%",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={params.row.name}
+          >
+            {params.row.name}
+          </Text>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 0.6,
+        minWidth: 140,
+        renderCell: (params) => (
+          <StatusChip status={params.row.status} category={vpcStatusCategoryMap[params.row.status] || "unknown"} />
+        ),
+      },
+      {
+        field: "statusMessage",
+        headerName: "Status Message",
+        flex: 1.2,
+        minWidth: 220,
+        renderCell: (params) => (
+          <Text
+            size="small"
+            weight="regular"
+            color="#344054"
+            sx={{
+              width: "100%",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={params.row.statusMessage}
+          >
+            {params.row.statusMessage || "Available for deployments"}
+          </Text>
+        ),
+      },
+      {
+        field: "networkId",
+        headerName: "Network ID",
+        flex: 1,
+        minWidth: 180,
+        renderCell: (params) => (
+          <Text
+            size="small"
+            weight="regular"
+            color="#344054"
+            sx={{
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={params.row.networkId}
+          >
+            {params.row.networkId || "-"}
+          </Text>
+        ),
+      },
+    ],
+    []
+  );
 
   const privateConnectInstructions = [
     {
@@ -386,180 +526,61 @@ enableDnsSupport   = true`}</CodeBlock>
 
               {/* VPCs table */}
               {values.selectedRegions.length > 0 && (
-                <Box
-                  sx={{
-                    border: "1px solid #E9EAEB",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    mt: "8px",
+                <DataGrid
+                  checkboxSelection
+                  disableSelectionOnClick
+                  getRowId={(row) => row.id}
+                  columns={vpcColumns}
+                  rows={availableVpcs}
+                  selectionModel={values.selectedVpcIds}
+                  onSelectionModelChange={(newSelection) => {
+                    onChange({ selectedVpcIds: (newSelection as string[]).filter((id) => selectableVpcIds.has(id)) });
                   }}
-                >
-                  {/* Table header */}
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{ px: "16px", py: "12px", borderBottom: "1px solid #E9EAEB" }}
-                  >
-                    <Stack direction="row" alignItems="center" gap="8px">
-                      <Text size="small" weight="semibold" color="#101828">
-                        Choose VPCs
-                      </Text>
-                      {selectedVpcs.length > 0 && (
-                        <Box
-                          sx={{
-                            bgcolor: "#F9F5FF",
-                            borderRadius: "16px",
-                            px: "8px",
-                            py: "2px",
-                          }}
-                        >
-                          <Text size="xsmall" weight="medium" color="#6941C6">
-                            {selectedVpcs.length} VPC{selectedVpcs.length !== 1 ? "s" : ""}
-                          </Text>
-                        </Box>
-                      )}
-                    </Stack>
-                    <Stack direction="row" alignItems="center" gap="12px">
-                      {lastSyncedAt && (
-                        <Text size="xsmall" weight="regular" color="#535862">
-                          Last synced: {lastSyncedAt}
-                        </Text>
-                      )}
-                      <Button
-                        variant="outlined"
-                        sx={{
-                          height: "32px !important",
-                          padding: "6px 12px !important",
-                          minWidth: "unset",
-                        }}
-                        onClick={onResync}
-                        disabled={isLoadingVpcs}
-                        startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-                        data-testid="resync-vpcs-button"
-                      >
-                        Resync
-                      </Button>
-                    </Stack>
-                  </Stack>
-
-                  <Text size="xsmall" weight="regular" color="#535862" sx={{ px: "16px", py: "8px", display: "block" }}>
-                    Choose among the available VPCs in the selected regions
-                  </Text>
-
-                  {/* Table */}
-                  <Box sx={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ borderBottom: "1px solid #E9EAEB" }}>
-                          <th style={{ width: 40, padding: "8px 16px" }} />
-                          {["Name", "Status", "Status Message", "Network ID"].map((col) => (
-                            <th
-                              key={col}
-                              style={{
-                                padding: "8px 16px",
-                                textAlign: "left",
-                                fontSize: 12,
-                                fontWeight: 500,
-                                color: "#535862",
-                              }}
-                            >
-                              {col}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {isLoadingVpcs ? (
-                          <tr>
-                            <td colSpan={5} style={{ padding: "24px", textAlign: "center" }}>
-                              <Text size="small" weight="regular" color="#535862">
-                                Loading VPCs…
-                              </Text>
-                            </td>
-                          </tr>
-                        ) : availableVpcs.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} style={{ padding: "24px", textAlign: "center" }}>
-                              <Text size="small" weight="regular" color="#535862">
-                                No VPCs found for the selected regions. Click Resync to fetch.
-                              </Text>
-                            </td>
-                          </tr>
-                        ) : (
-                          availableVpcs.map((vpc) => {
-                            const isSelected = values.selectedVpcIds.includes(vpc.id);
-                            return (
-                              <tr
-                                key={vpc.id}
-                                style={{
-                                  borderBottom: "1px solid #E9EAEB",
-                                  background: isSelected ? "#FAFAFA" : "white",
-                                }}
-                              >
-                                <td style={{ padding: "8px 16px" }}>
-                                  <Checkbox
-                                    data-testid={`vpc-checkbox-${vpc.id}`}
-                                    checked={isSelected}
-                                    onChange={(e) => {
-                                      const newIds = e.target.checked
-                                        ? [...values.selectedVpcIds, vpc.id]
-                                        : values.selectedVpcIds.filter((id) => id !== vpc.id);
-                                      onChange({ selectedVpcIds: newIds });
-                                    }}
-                                    sx={{
-                                      p: 0,
-                                      color: "#D0D5DD",
-                                      "&.Mui-checked": { color: "#7F56D9" },
-                                    }}
-                                  />
-                                </td>
-                                <td style={{ padding: "8px 16px" }}>
-                                  <Text size="small" weight="medium" color="#101828">
-                                    {vpc.name}
-                                  </Text>
-                                </td>
-                                <td style={{ padding: "8px 16px" }}>
-                                  <StatusChip
-                                    status={vpc.status}
-                                    category={vpcStatusCategoryMap[vpc.status] || "unknown"}
-                                  />
-                                </td>
-                                <td style={{ padding: "8px 16px" }}>
-                                  <Text size="small" weight="regular" color="#344054">
-                                    {vpc.statusMessage || "Available for deployments"}
-                                  </Text>
-                                </td>
-                                <td style={{ padding: "8px 16px" }}>
-                                  <Text
-                                    size="small"
-                                    weight="regular"
-                                    color="#344054"
-                                    sx={{
-                                      maxWidth: "160px",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                      display: "block",
-                                    }}
-                                    title={vpc.networkId}
-                                  >
-                                    {vpc.networkId || "-"}
-                                  </Text>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
-                  </Box>
-                </Box>
+                  enableSelectAll
+                  isRowSelectable={(params) => params.row.status?.toUpperCase() !== "FAILED"}
+                  components={{
+                    Header: VpcsDataGridHeader,
+                  }}
+                  componentsProps={{
+                    header: {
+                      totalCount: availableVpcs.length,
+                      lastSyncedAt,
+                      isLoadingVpcs,
+                      onResync,
+                    },
+                  }}
+                  loading={isLoadingVpcs}
+                  noRowsText="No VPCs found for the selected regions. Click Resync to fetch."
+                  hideFooter
+                  sx={{
+                    mt: "8px",
+                    borderRadius: "8px",
+                    boxShadow: "none",
+                    "& .MuiDataGrid-main": {
+                      minHeight: "260px",
+                    },
+                    "& .MuiDataGrid-columnHeaderCheckbox": {
+                      paddingLeft: "24px !important",
+                    },
+                    "& .MuiDataGrid-cellCheckbox": {
+                      paddingLeft: "24px !important",
+                    },
+                  }}
+                />
               )}
 
               {/* Import / Unimport buttons */}
               {values.selectedVpcIds.length > 0 && (
-                <Stack direction="row" gap="12px" sx={{ mt: "12px" }}>
+                <Stack direction="row" justifyContent="flex-end" gap="12px" sx={{ mt: "16px" }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => onUnimport?.(values.selectedVpcIds)}
+                    disabled
+                    data-testid="unimport-vpcs-button"
+                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
+                  >
+                    Unimport ({values.selectedVpcIds.length})
+                  </Button>
                   <Button
                     variant="contained"
                     onClick={() => onImport?.(values.selectedVpcIds)}
@@ -567,16 +588,7 @@ enableDnsSupport   = true`}</CodeBlock>
                     data-testid="import-vpcs-button"
                     sx={{ height: "36px !important", padding: "8px 16px !important" }}
                   >
-                    Import {values.selectedVpcIds.length} VPC{values.selectedVpcIds.length !== 1 ? "s" : ""}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => onUnimport?.(values.selectedVpcIds)}
-                    disabled={isImporting}
-                    data-testid="unimport-vpcs-button"
-                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
-                  >
-                    Unimport
+                    Import ({values.selectedVpcIds.length})
                   </Button>
                 </Stack>
               )}

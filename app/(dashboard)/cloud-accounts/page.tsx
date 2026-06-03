@@ -51,6 +51,7 @@ import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
+import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
   MAX_POLL_COUNT,
@@ -1087,6 +1088,27 @@ const CloudAccountsPage = () => {
         instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
+      />
+
+      <FullScreenDrawer
+        title="Modify VPCs"
+        description="Update cloud-native VPC settings"
+        open={isOverlayOpen && overlayType === "modify-vpcs"}
+        closeDrawer={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        RenderUI={
+          selectedInstance ? (
+            <ModifyVPCsDrawer
+              selectedInstance={selectedInstance}
+              onClose={async () => {
+                setIsOverlayOpen(false);
+                await refetchInstances();
+              }}
+            />
+          ) : null
+        }
       />
 
       <ConnectAccountConfigDialog
