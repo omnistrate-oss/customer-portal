@@ -48,8 +48,8 @@ import useInstancesDescribe from "../instances/hooks/useInstancesDescribe";
 import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWithDescribe";
 
 import CloudAccountForm from "./components/CloudAccountForm";
-import CloudAccountWizard from "./components/CloudAccountWizard";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
+import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
@@ -415,7 +415,13 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (!resultParams?.allow_new_cloud_native_network_creation) return "NA";
+          if (
+            resultParams?.allow_new_cloud_native_network_creation === undefined ||
+            resultParams?.allow_new_cloud_native_network_creation === null ||
+            !!resultParams?.cluster_name
+          ) {
+            return "NA";
+          }
           return resultParams?.allow_new_cloud_native_network_creation ? "Yes" : "No";
         },
         {
@@ -467,7 +473,9 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (!resultParams?.private_link) return "NA";
+          if (resultParams?.private_link === undefined || resultParams?.private_link === null) {
+            return "NA";
+          }
           return resultParams?.private_link ? "Enabled" : "Disabled";
         },
         {
