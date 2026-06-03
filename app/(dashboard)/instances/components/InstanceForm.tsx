@@ -949,17 +949,36 @@ const InstanceForm = ({
     const createNewVpcDisallowed =
       selectedCloudAccountConfig &&
       getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation === false;
+    const currentVpcType = (values.requestParams as Record<string, any>)?._vpcType;
 
     if (
       formMode === "create" &&
       accountConfigFieldExists &&
       cloudProviderFieldExists &&
       regionFieldExists &&
+      !accountConfigId &&
+      currentVpcType
+    ) {
+      formData.setFieldValue("requestParams._vpcType", "");
+    } else if (
+      formMode === "create" &&
+      accountConfigFieldExists &&
+      cloudProviderFieldExists &&
+      regionFieldExists &&
       isExistingVpcSupported &&
       createNewVpcDisallowed &&
-      (values.requestParams as Record<string, any>)?._vpcType !== "choose_existing"
+      currentVpcType !== "choose_existing"
     ) {
       formData.setFieldValue("requestParams._vpcType", "choose_existing");
+    } else if (
+      formMode === "create" &&
+      accountConfigFieldExists &&
+      cloudProviderFieldExists &&
+      regionFieldExists &&
+      accountConfigId &&
+      !currentVpcType
+    ) {
+      formData.setFieldValue("requestParams._vpcType", "create_new");
     }
   }, [
     cloudAccountInstances,

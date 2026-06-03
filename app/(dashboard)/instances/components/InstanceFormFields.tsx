@@ -489,13 +489,17 @@ export const getStandardInformationFields = (
       onChange: (e) => {
         const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === e.target.value);
         const isCreateNewVpcAllowed =
-          !selectedCloudAccountConfig ||
+          Boolean(selectedCloudAccountConfig) &&
           getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation !== false;
 
         setFieldValue("requestParams.cloudNativeNetworkId", "");
 
-        if (isExistingVpcSupported && !isCreateNewVpcAllowed) {
+        if (!selectedCloudAccountConfig) {
+          setFieldValue("requestParams._vpcType", "");
+        } else if (isExistingVpcSupported && !isCreateNewVpcAllowed) {
           setFieldValue("requestParams._vpcType", "choose_existing");
+        } else {
+          setFieldValue("requestParams._vpcType", "create_new");
         }
       },
     });
@@ -520,43 +524,51 @@ export const getStandardInformationFields = (
   }
 
   if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
+    const selectedCloudAccountConfigId = requestParams[accountConfigParam.key];
     const selectedCloudAccountConfig = cloudAccountInstances.find(
-      (config) => config.id === requestParams[accountConfigParam.key]
+      (config) => config.id === selectedCloudAccountConfigId
     );
     const selectedCloudAccountResultParams = getResultParams(selectedCloudAccountConfig);
     const isCreateNewVpcAllowed =
-      !selectedCloudAccountConfig || selectedCloudAccountResultParams.allow_new_cloud_native_network_creation !== false;
-    const vpcType = requestParams._vpcType || "create_new";
+      Boolean(selectedCloudAccountConfig) &&
+      selectedCloudAccountResultParams.allow_new_cloud_native_network_creation !== false;
+    const shouldShowVpcTypeRadio = Boolean(
+      selectedCloudAccountConfigId && isCreateNewVpcAllowed && isExistingVpcSupported
+    );
+    const vpcType = shouldShowVpcTypeRadio
+      ? requestParams._vpcType || "create_new"
+      : isCreateNewVpcAllowed
+        ? "create_new"
+        : "choose_existing";
     const createNewVpcDisabledMessage = "Creating new VPCs is not allowed for the selected cloud account config";
 
-    fields.push({
-      label: "VPCs",
-      subLabel: "",
-      name: "requestParams._vpcType",
-      value: vpcType,
-      type: "radio",
-      required: true,
-      options: [
-        {
-          dataTestId: "create-new-vpc-radio",
-          label: "Create new VPC",
-          value: "create_new",
-          disabled: !isCreateNewVpcAllowed,
-          disabledMessage: createNewVpcDisabledMessage,
-        },
-        {
-          dataTestId: "choose-existing-vpc-radio",
-          label: isExistingVpcSupported
-            ? "Choose from Existing VPCs"
-            : "Choose from Existing VPCs (available for AWS / GCP)",
-          value: "choose_existing",
-          disabled: !isExistingVpcSupported,
-        },
-      ],
-      previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
-    });
+    if (shouldShowVpcTypeRadio) {
+      fields.push({
+        label: "VPCs",
+        subLabel: "",
+        name: "requestParams._vpcType",
+        value: vpcType,
+        type: "radio",
+        required: true,
+        options: [
+          {
+            dataTestId: "create-new-vpc-radio",
+            label: "Create new VPC",
+            value: "create_new",
+            disabled: !isCreateNewVpcAllowed,
+            disabledMessage: createNewVpcDisabledMessage,
+          },
+          {
+            dataTestId: "choose-existing-vpc-radio",
+            label: "Choose from Existing VPCs",
+            value: "choose_existing",
+          },
+        ],
+        previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
+      });
+    }
 
-    if (vpcType === "choose_existing" && isExistingVpcSupported) {
+    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && isExistingVpcSupported) {
       const filteredNetworks = cloudNativeNetworks.filter((n) => !region || n.region === region);
       fields.push({
         dataTestId: "existing-vpc-select",
