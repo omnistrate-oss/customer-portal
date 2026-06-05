@@ -15,6 +15,8 @@ import {
 
 import { Overlay } from "../page";
 
+const NON_MODIFIABLE_VPC_STATUSES = new Set(["FAILED", "DELETING", "DELETED"]);
+
 type CloudAccountsActionMenuProps = {
   instance?: ResourceInstance;
   subscription?: Subscription;
@@ -54,6 +56,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
+    const isModifyVpcStatusBlocked = NON_MODIFIABLE_VPC_STATUSES.has(instance?.status || "");
     const resultParams = getResultParams(instance);
     const isNebius = !!resultParams?.nebius_tenant_id;
     const cloudProvider =
@@ -154,11 +157,15 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     });
 
     const isModifyVpcsDisabled =
-      !instance || isDeleting || !isUpdateAllowedByRBAC || !isModifyVpcsSupportedProvider || !hasLinkedAccountConfig;
+      !instance ||
+      isModifyVpcStatusBlocked ||
+      !isUpdateAllowedByRBAC ||
+      !isModifyVpcsSupportedProvider ||
+      !hasLinkedAccountConfig;
     const modifyVpcsDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isDeleting
-        ? "Cloud account is being deleted"
+      : isModifyVpcStatusBlocked
+        ? "Modify VPCs is not allowed for failed or deleted cloud accounts"
         : !isUpdateAllowedByRBAC
           ? "Unauthorized to modify VPCs"
           : !isModifyVpcsSupportedProvider
