@@ -57,6 +57,7 @@ const TextConfirmationDialog = (props) => {
     isLoading,
     IconComponent = DeleteCircleIcon,
     maxWidth = 521,
+    closeButtonAriaLabel = "Close confirmation dialog",
     ...rest
   } = props;
 
@@ -97,7 +98,7 @@ const TextConfirmationDialog = (props) => {
                 {title}
               </Text>
             </Stack>
-            <IconButton onClick={onClose} sx={{ alignSelf: "flex-start" }}>
+            <IconButton onClick={onClose} aria-label={closeButtonAriaLabel} sx={{ alignSelf: "flex-start" }}>
               <CloseIcon />
             </IconButton>
           </Stack>
