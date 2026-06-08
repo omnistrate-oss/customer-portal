@@ -37,7 +37,7 @@ export const getErrorMessage = (error: unknown, fallback: string) => {
   }
 
   if (message.includes("unpaid usage") || message.includes("pending invoice") || message.includes("draft invoice")) {
-    return "This payment method cannot be removed because pending billing items require a payment method. Contact customer support for assistance.";
+    return "This payment method cannot be removed because pending billing items require a payment method. Please contact support for assistance.";
   }
 
   if (message.includes("unpaid invoice") || message.includes("open invoice")) {
