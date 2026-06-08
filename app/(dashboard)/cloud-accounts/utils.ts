@@ -88,11 +88,13 @@ export const getValidSubscriptionForInstanceCreation = (
 };
 
 export const getInitialValues = (
-  initialFormValues: {
-    serviceId: string;
-    servicePlanId: string;
-    subscriptionId: string;
-  },
+  initialFormValues:
+    | {
+        serviceId: string;
+        servicePlanId: string;
+        subscriptionId: string;
+      }
+    | undefined,
   selectedInstance: ResourceInstance | undefined,
   byoaSubscriptions: Subscription[],
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
@@ -118,32 +120,33 @@ export const getInitialValues = (
               : resultParams?.cluster_name
                 ? "byoc-onprem"
                 : "",
-      accountConfigurationMethod: resultParams?.account_configuration_method,
-      awsAccountId: resultParams?.aws_account_id,
-      gcpProjectId: resultParams?.gcp_project_id,
-      gcpProjectNumber: resultParams?.gcp_project_number,
-      azureSubscriptionId: resultParams?.azure_subscription_id,
-      azureTenantId: resultParams?.azure_tenant_id,
-      ociTenancyId: resultParams?.oci_tenancy_id,
-      ociDomainId: resultParams?.oci_domain_id,
+      accountConfigurationMethod: resultParams?.account_configuration_method ?? "",
+      awsAccountId: resultParams?.aws_account_id ?? "",
+      gcpProjectId: resultParams?.gcp_project_id ?? "",
+      gcpProjectNumber: resultParams?.gcp_project_number ?? "",
+      azureSubscriptionId: resultParams?.azure_subscription_id ?? "",
+      azureTenantId: resultParams?.azure_tenant_id ?? "",
+      ociTenancyId: resultParams?.oci_tenancy_id ?? "",
+      ociDomainId: resultParams?.oci_domain_id ?? "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
     };
   }
 
   const isValidFormValues = Boolean(
-    byoaSubscriptions.find(
-      (sub) =>
-        sub.serviceId === initialFormValues?.serviceId &&
-        sub.productTierId === initialFormValues?.servicePlanId &&
-        sub.id === initialFormValues?.subscriptionId &&
-        sub.roleType === "root"
-    )
+    initialFormValues &&
+      byoaSubscriptions.find(
+        (sub) =>
+          sub.serviceId === initialFormValues.serviceId &&
+          sub.productTierId === initialFormValues.servicePlanId &&
+          sub.id === initialFormValues.subscriptionId &&
+          sub.roleType === "root"
+      )
   );
 
-  if (isValidFormValues) {
+  if (isValidFormValues && initialFormValues) {
     const cloudProvider =
-      byoaServiceOfferingsObj[initialFormValues?.serviceId]?.[initialFormValues?.servicePlanId]?.cloudProviders?.[0] ||
+      byoaServiceOfferingsObj[initialFormValues.serviceId]?.[initialFormValues.servicePlanId]?.cloudProviders?.[0] ||
       "";
 
     return {

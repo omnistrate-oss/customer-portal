@@ -7,14 +7,13 @@ import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/Subscr
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { FormConfiguration } from "components/DynamicForm/types";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
-import StatusChip from "src/components/StatusChip/StatusChip";
 import { cloudProviderLongLogoMap, SUPPORTED_CLOUD_PROVIDER_VALUES } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -41,8 +40,14 @@ import AddNewAccountStep from "./steps/AddNewAccountStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
+type InitialFormValues = {
+  serviceId: string;
+  servicePlanId: string;
+  subscriptionId: string;
+};
+
 type CloudAccountWizardProps = {
-  initialFormValues?: any;
+  initialFormValues?: InitialFormValues;
   selectedInstance?: ResourceInstance;
   onClose: () => void;
   instances: ResourceInstance[];
@@ -88,7 +93,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         .filter((o) => o.serviceModelType === "BYOA" || o.serviceModelType === "ON_PREM_COPILOT")
         .map((offering) => ({
           ...offering,
-          cloudProviders: offering.cloudProviders?.filter((provider) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)),
+          cloudProviders: offering.cloudProviders?.filter((provider) =>
+            SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)
+          ),
         }))
         .filter((offering) => offering.cloudProviders?.length || offering.serviceModelType === "ON_PREM_COPILOT"),
     [serviceOfferings]
@@ -278,11 +285,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   });
 
   const { values, setFieldValue } = formData;
-
-  const accountConfigId = useMemo(() => {
-    const rp = getResultParams(clickedInstance || selectedInstance);
-    return typeof rp?.cloud_provider_account_config_id === "string" ? rp.cloud_provider_account_config_id : undefined;
-  }, [clickedInstance, selectedInstance]);
 
   // ─── Grant Access derived data ─────────────────────────────────────────────
   const cloudFormationTemplateUrl = useMemo(() => {
@@ -716,11 +718,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         <div className="col-span-5">
           {currentStep === 0 && (
             <form onSubmit={formData.handleSubmit} data-testid="add-new-account-form">
-              <AddNewAccountStep
-                formData={formData}
-                formConfiguration={formConfiguration}
-                formMode="create"
-              />
+              <AddNewAccountStep formData={formData} formConfiguration={formConfiguration} formMode="create" />
             </form>
           )}
 

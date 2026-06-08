@@ -167,7 +167,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         (oldData: any) => ({
           resourceInstances: (oldData?.resourceInstances || []).map((inst: any) =>
             inst?.id === resourceInstance?.id
-              ? { ...(resourceInstance || {}), result_params: { ...oldData?.result_params, ...resultParams } }
+              ? { ...(resourceInstance || {}), result_params: { ...getResultParams(inst), ...resultParams } }
               : inst
           ),
         })

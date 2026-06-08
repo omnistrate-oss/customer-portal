@@ -323,7 +323,6 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        delete data.requestParams.cloud_provider_native_network_id;
         delete data.requestParams.cloudNativeNetworkId;
         delete data.requestParams._vpcType;
 
