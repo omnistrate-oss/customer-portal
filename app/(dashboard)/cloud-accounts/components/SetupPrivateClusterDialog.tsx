@@ -2,7 +2,7 @@
 
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, CircularProgress, Dialog, IconButton, Stack } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import Button from "src/components/Button/Button";
@@ -10,6 +10,7 @@ import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdMod
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import InstructionsModalIcon from "src/components/Icons/AccountConfig/InstructionsModalIcon";
 import { Text } from "src/components/Typography/Typography";
+import useInstallCommand from "src/hooks/useInstallCommand";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { getResultParams } from "src/utils/instance";
 
@@ -63,6 +64,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   offering,
   subscriptionId,
 }) => {
+  const { getActionProxyUrl } = useInstallCommand();
   const [isPolling, setIsPolling] = useState(true);
   const [pollingError, setPollingError] = useState<string | null>(null);
   const [resultParams, setResultParams] = useState<PrivateClusterResultParams | null>(null);
@@ -212,6 +214,19 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
 
   const displayClusterName = resultParams?.cluster_name || clusterName || "";
   const installCommand = resultParams?.byoc_onprem_install_command || "";
+  const installCommandWithProxy = useMemo(() => {
+    if (!installCommand) return "";
+
+    const urlRegex = /https?:\/\/[^\s"']+/g;
+
+    return installCommand.replace(urlRegex, (rawUrl) => {
+      if (!rawUrl.includes("/account-setup/")) {
+        return rawUrl;
+      }
+      const proxied = getActionProxyUrl(rawUrl, true);
+      return proxied || rawUrl;
+    });
+  }, [installCommand, getActionProxyUrl]);
 
   return (
     <Dialog
@@ -317,7 +332,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
                   pr: "40px",
                 }}
               >
-                {installCommand}
+                {installCommandWithProxy}
               </Text>
               <Box
                 sx={{
@@ -327,7 +342,7 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
                 }}
               >
                 <CopyToClipboardButton
-                  text={installCommand}
+                  text={installCommandWithProxy}
                   iconProps={{ color: "#CECFD2", width: "20px", height: "20px" }}
                 />
               </Box>
