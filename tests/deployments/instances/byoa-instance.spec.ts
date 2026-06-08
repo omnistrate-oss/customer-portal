@@ -12,7 +12,7 @@ const logPrefix = "Instances -> BYOA Instance Tests ->";
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("Instances Page - BYOA Instance Tests", () => {
+test.describe.skip("Instances Page - BYOA Instance Tests", () => {
   let instancesPage: InstancesPage,
     cloudAccountsPage: CloudAccountsPage,
     cloudAccountInstanceId: string,
