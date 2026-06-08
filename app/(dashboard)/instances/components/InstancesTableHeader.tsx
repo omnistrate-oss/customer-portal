@@ -133,7 +133,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       disabledMessage: !selectedInstance
         ? "Please select an instance"
         : installer
-          ? "Not applicable for on-prem deployment instances"
+          ? "Not applicable for air-gapped deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
             : status !== "RUNNING"
@@ -167,7 +167,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       disabledMessage: !selectedInstance
         ? "Please select an instance"
         : installer
-          ? "Not applicable for on-prem deployment instances"
+          ? "Not applicable for air-gapped deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
             : status !== "STOPPED"

@@ -1,24 +1,13 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { Collapse } from "@mui/material";
 import useBillingStatus from "app/(dashboard)/billing/hooks/useBillingStatus";
 import clsx from "clsx";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
-import APIDocsIcon from "components/Icons/SideNavbar/APIDocs/APIDocsIcon";
-import DashboardNavIcon from "components/Icons/SideNavbar/Dashboard/Dashboard";
-import DeveloperDocsIcon from "components/Icons/SideNavbar/DeveloperDocs/DeveloperDocsIcon";
-import DownloadCLIIcon from "components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
-import FileLockIcon from "components/Icons/SideNavbar/FileLock/FileLockIcon";
-import PricingIcon from "components/Icons/SideNavbar/Pricing/PricingIcon";
-import ReleaseHistoryIcon from "components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
-import ResourcesIcon from "components/Icons/SideNavbar/Resources/Resources";
-import ShieldIcon from "components/Icons/SideNavbar/Shield/Shield";
-import SupportIcon from "components/Icons/SideNavbar/Support/SupportIcon";
-import { Text } from "components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
 import {
@@ -31,11 +20,23 @@ import {
   getInstanceSnapshotsRoute,
   getInstancesRoute,
   getNotificationsRoute,
+  getPaymentMethodsRoute,
   getReleaseHistoryRoute,
   getSettingsRoute,
   getSnapshotDetailsRoute,
   getSubscriptionsRoute,
 } from "src/utils/routes";
+import APIDocsIcon from "components/Icons/SideNavbar/APIDocs/APIDocsIcon";
+import DashboardNavIcon from "components/Icons/SideNavbar/Dashboard/Dashboard";
+import DeveloperDocsIcon from "components/Icons/SideNavbar/DeveloperDocs/DeveloperDocsIcon";
+import DownloadCLIIcon from "components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
+import FileLockIcon from "components/Icons/SideNavbar/FileLock/FileLockIcon";
+import PricingIcon from "components/Icons/SideNavbar/Pricing/PricingIcon";
+import ReleaseHistoryIcon from "components/Icons/SideNavbar/ReleaseHistory/ReleaseHistoryIcon";
+import ResourcesIcon from "components/Icons/SideNavbar/Resources/Resources";
+import ShieldIcon from "components/Icons/SideNavbar/Shield/Shield";
+import SupportIcon from "components/Icons/SideNavbar/Support/SupportIcon";
+import { Text } from "components/Typography/Typography";
 
 import FullScreenDrawer from "../FullScreenDrawer/FullScreenDrawer";
 
@@ -167,6 +168,7 @@ const Sidebar = () => {
         "Account Management": [
           getSettingsRoute(),
           getBillingRoute(),
+          getPaymentMethodsRoute(),
           getCostExplorerRoute(),
           getSubscriptionsRoute({}),
         ].includes(currentPath),
@@ -295,6 +297,11 @@ const Sidebar = () => {
           {
             name: "Billing",
             href: getBillingRoute(),
+            isHidden: !isBillingEnabled,
+          },
+          {
+            name: "Payment Methods",
+            href: getPaymentMethodsRoute(),
             isHidden: !isBillingEnabled,
           },
           {

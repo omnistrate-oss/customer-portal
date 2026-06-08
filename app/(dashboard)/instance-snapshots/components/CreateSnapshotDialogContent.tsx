@@ -64,7 +64,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
               ),
               disabled: isDisabled || installer,
               disabledMessage: installer
-                ? "Snapshots are not applicable for on-prem deployment instances"
+                ? "Snapshots are not applicable for air-gapped deployment instances"
                 : isDisabled
                   ? "Cannot create snapshot for Deleting or Deploying instances"
                   : "",
