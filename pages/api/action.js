@@ -23,6 +23,47 @@ const defaultErrorMessage = "";
 const appVersion = process.env.APP_VERSION || "dev";
 
 export default async function handleAction(nextRequest, nextResponse) {
+  if (nextRequest.method === "GET") {
+    const endpointParam = nextRequest.query?.endpoint;
+    const endpoint = Array.isArray(endpointParam) ? endpointParam[0] : endpointParam;
+
+    if (!endpoint || typeof endpoint !== "string" || !endpoint.startsWith("/")) {
+      return nextResponse.status(400).json({ message: "endpoint is required" });
+    }
+
+    // Dedicated GET proxy path for account-setup shell/tar installers used by
+    // local terminal commands shown in the UI.
+    const normalizedEndpoint = normalizeEndpoint(endpoint);
+    if (!normalizedEndpoint.startsWith("/2022-09-01-00/account-setup/")) {
+      return nextResponse.status(405).json({ message: "Method not allowed" });
+    }
+
+    try {
+      const response = await fetch(baseDomain + endpoint, {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        return nextResponse.status(response.status).send({ message: text || defaultErrorMessage });
+      }
+
+      const contentType = response.headers.get("content-type") || "application/octet-stream";
+      const contentDisposition = response.headers.get("content-disposition");
+
+      nextResponse.setHeader("Content-Type", contentType);
+      if (contentDisposition) {
+        nextResponse.setHeader("Content-Disposition", contentDisposition);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      return nextResponse.status(200).send(Buffer.from(arrayBuffer));
+    } catch (error) {
+      console.error("Action Route GET proxy error", error);
+      return nextResponse.status(500).send({ message: defaultErrorMessage });
+    }
+  }
+
   if (nextRequest.method === "POST") {
     const { endpoint, method, data = {}, queryParams = {} } = nextRequest.body;
 
