@@ -7,9 +7,9 @@ import StepperInProgressIcon from "src/components/Stepper/StepperInProgressIcon"
 import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
 import { Text } from "src/components/Typography/Typography";
 
-export const WIZARD_STEPS = ["Add New Account", "Grant Access", "Configure VPCs"] as const;
+export const WIZARD_STEPS = ["Add New Account", "Grant Access"] as const;
 
-export type WizardStep = 0 | 1 | 2;
+export type WizardStep = 0 | 1;
 
 type WizardStepperProps = {
   currentStep: WizardStep;
@@ -26,7 +26,7 @@ const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: "680px",
+        maxWidth: "420px",
         mx: "auto",
         position: "relative",
         px: "32px",
@@ -43,24 +43,13 @@ const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
           zIndex: 1,
         }}
       >
-        {/* First connector (Step 1 → Step 2) */}
         <Box
           sx={{
             position: "absolute",
             left: 0,
-            width: "50%",
+            right: 0,
             height: "100%",
             bgcolor: currentStep > 0 ? "#079455" : "#E9EAEB",
-          }}
-        />
-        {/* Second connector (Step 2 → Step 3) */}
-        <Box
-          sx={{
-            position: "absolute",
-            right: 0,
-            width: "50%",
-            height: "100%",
-            bgcolor: currentStep > 1 ? "#079455" : "#E9EAEB",
           }}
         />
       </Box>

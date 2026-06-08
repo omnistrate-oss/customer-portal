@@ -323,28 +323,8 @@ const InstanceForm = ({
           delete data.requestParams.cloud_provider_native_network_id;
         }
 
-        const selectedCloudAccountInstance = instances.find(
-          (instance) => instance.id === data.requestParams.cloud_provider_account_config_id
-        );
-        const allowNewCloudNativeNetworkCreation =
-          !selectedCloudAccountInstance ||
-          getResultParams(selectedCloudAccountInstance).allow_new_cloud_native_network_creation !== false;
-
-        if (data.requestParams._vpcType !== "choose_existing" && !allowNewCloudNativeNetworkCreation) {
-          return snackbar.showError("Creating new VPCs is not allowed for the selected cloud account config");
-        }
-
-        // Remove internal _vpcType field and only send cloudNativeNetworkId for existing VPC selections.
-        if (data.requestParams._vpcType === "choose_existing") {
-          delete data.requestParams.cloud_provider_native_network_id;
-
-          if (!data.requestParams.cloudNativeNetworkId) {
-            return snackbar.showError("VPC is required");
-          }
-        } else {
-          delete data.requestParams.cloud_provider_native_network_id;
-          delete data.requestParams.cloudNativeNetworkId;
-        }
+        delete data.requestParams.cloud_provider_native_network_id;
+        delete data.requestParams.cloudNativeNetworkId;
         delete data.requestParams._vpcType;
 
         // Check for Required Fields
@@ -935,97 +915,6 @@ const InstanceForm = ({
     [instances, values.cloudProvider]
   );
 
-  const selectedCloudAccountInstanceId = (values.requestParams as Record<string, any>)
-    ?.cloud_provider_account_config_id;
-  const selectedCloudAccountInstance = cloudAccountInstances.find(
-    (config) => config.id === selectedCloudAccountInstanceId
-  );
-  const selectedAccountConfigId = getResultParams(selectedCloudAccountInstance)?.cloud_provider_account_config_id;
-  const shouldFetchCloudNativeNetworks = Boolean(
-    formMode === "create" &&
-      selectedAccountConfigId &&
-      (values.cloudProvider === "aws" || values.cloudProvider === "gcp")
-  );
-
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: {
-          id: selectedAccountConfigId || "",
-        },
-      },
-      headers: {
-        "x-ignore-global-error": true,
-      },
-    },
-    {
-      enabled: shouldFetchCloudNativeNetworks,
-      retry: 2,
-      retryDelay: 3000,
-    }
-  );
-
-  const cloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
-  );
-
-  useEffect(() => {
-    const accountConfigFieldExists = resourceCreateSchema?.inputParameters?.some(
-      (param) => param.key === "cloud_provider_account_config_id"
-    );
-    const cloudProviderFieldExists = resourceCreateSchema?.inputParameters?.some(
-      (param) => param.key === "cloud_provider"
-    );
-    const regionFieldExists = resourceCreateSchema?.inputParameters?.some((param) => param.key === "region");
-    const isExistingVpcSupported = values.cloudProvider === "aws" || values.cloudProvider === "gcp";
-    const accountConfigId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id;
-    const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === accountConfigId);
-    const createNewVpcDisallowed =
-      selectedCloudAccountConfig &&
-      getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation === false;
-    const currentVpcType = (values.requestParams as Record<string, any>)?._vpcType;
-
-    if (
-      formMode === "create" &&
-      accountConfigFieldExists &&
-      cloudProviderFieldExists &&
-      regionFieldExists &&
-      !accountConfigId &&
-      currentVpcType
-    ) {
-      formData.setFieldValue("requestParams._vpcType", "");
-    } else if (
-      formMode === "create" &&
-      accountConfigFieldExists &&
-      cloudProviderFieldExists &&
-      regionFieldExists &&
-      isExistingVpcSupported &&
-      createNewVpcDisallowed &&
-      currentVpcType !== "choose_existing"
-    ) {
-      formData.setFieldValue("requestParams._vpcType", "choose_existing");
-    } else if (
-      formMode === "create" &&
-      accountConfigFieldExists &&
-      cloudProviderFieldExists &&
-      regionFieldExists &&
-      accountConfigId &&
-      !currentVpcType
-    ) {
-      formData.setFieldValue("requestParams._vpcType", "create_new");
-    }
-  }, [
-    cloudAccountInstances,
-    formData.setFieldValue,
-    formMode,
-    resourceCreateSchema?.inputParameters,
-    values.cloudProvider,
-    values.requestParams,
-  ]);
-
   const standardInformationFields = useMemo(() => {
     return getStandardInformationFields(
       servicesObj,
@@ -1044,9 +933,7 @@ const InstanceForm = ({
       customerVersionSets,
       isFetchingVersionSets,
       isFetchingResourceInstanceIds,
-      cloudAccountInstances,
-      cloudNativeNetworks,
-      cloudNativeNetworksQuery.isFetching
+      cloudAccountInstances
     );
   }, [
     formMode,
@@ -1059,8 +946,6 @@ const InstanceForm = ({
     isFetchingVersionSets,
     cloudAccountInstances,
     isFetchingResourceInstanceIds,
-    cloudNativeNetworks,
-    cloudNativeNetworksQuery.isFetching,
   ]);
 
   const networkConfigurationFields = useMemo(() => {

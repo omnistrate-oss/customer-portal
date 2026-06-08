@@ -59,15 +59,7 @@ export const getStandardInformationFields = (
   versionSets: TierVersionSet[],
   isFetchingVersionSets: boolean,
   isFetchingResourceInstanceIds: boolean,
-  cloudAccountInstances: CloudAccountInstanceOption[],
-  cloudNativeNetworks: Array<{
-    id: string;
-    cloudNativeNetworkId?: string;
-    name?: string;
-    region?: string;
-    status?: string;
-  }>,
-  isFetchingCloudNativeNetworks: boolean
+  cloudAccountInstances: CloudAccountInstanceOption[]
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -464,7 +456,6 @@ export const getStandardInformationFields = (
   const accountConfigParam = (resourceSchema?.inputParameters || []).find(
     (p) => p.key === "cloud_provider_account_config_id"
   );
-  const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
 
   if (accountConfigParam) {
     fields.push({
@@ -492,22 +483,6 @@ export const getStandardInformationFields = (
       previewValue: cloudAccountInstances.find((config) => config.id === requestParams[accountConfigParam.key])?.label,
       emptyMenuText: "No cloud accounts available",
       isLoading: isFetchingResourceInstanceIds,
-      onChange: (e) => {
-        const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === e.target.value);
-        const isCreateNewVpcAllowed =
-          Boolean(selectedCloudAccountConfig) &&
-          getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation !== false;
-
-        setFieldValue("requestParams.cloudNativeNetworkId", "");
-
-        if (!selectedCloudAccountConfig) {
-          setFieldValue("requestParams._vpcType", "");
-        } else if (isExistingVpcSupported && !isCreateNewVpcAllowed) {
-          setFieldValue("requestParams._vpcType", "choose_existing");
-        } else {
-          setFieldValue("requestParams._vpcType", "create_new");
-        }
-      },
     });
   }
 
@@ -526,84 +501,7 @@ export const getStandardInformationFields = (
           : "No regions available",
       menuItems: getRegionMenuItems(serviceOfferingsObj[serviceId]?.[servicePlanId], cloudProvider),
       disabled: formMode !== "create",
-      onChange: () => {
-        setFieldValue("requestParams.cloudNativeNetworkId", "");
-      },
     });
-  }
-
-  if (accountConfigParam && regionFieldExists && cloudProviderFieldExists && !isBYOCOnprem) {
-    const selectedCloudAccountConfigId = requestParams[accountConfigParam.key];
-    const selectedCloudAccountConfig = cloudAccountInstances.find(
-      (config) => config.id === selectedCloudAccountConfigId
-    );
-    const selectedCloudAccountResultParams = getResultParams(selectedCloudAccountConfig);
-    const isCreateNewVpcAllowed =
-      Boolean(selectedCloudAccountConfig) &&
-      selectedCloudAccountResultParams.allow_new_cloud_native_network_creation !== false;
-    const shouldShowVpcTypeRadio = Boolean(
-      selectedCloudAccountConfigId && isCreateNewVpcAllowed && isExistingVpcSupported
-    );
-    const vpcType = shouldShowVpcTypeRadio
-      ? requestParams._vpcType || "create_new"
-      : isCreateNewVpcAllowed
-        ? "create_new"
-        : "choose_existing";
-    const createNewVpcDisabledMessage = "Creating new VPCs is not allowed for the selected cloud account config";
-
-    if (shouldShowVpcTypeRadio) {
-      fields.push({
-        label: "VPCs",
-        subLabel: "",
-        name: "requestParams._vpcType",
-        value: vpcType,
-        type: "radio",
-        required: true,
-        options: [
-          {
-            dataTestId: "create-new-vpc-radio",
-            label: "Create new VPC",
-            value: "create_new",
-            disabled: !isCreateNewVpcAllowed,
-            disabledMessage: createNewVpcDisabledMessage,
-          },
-          {
-            dataTestId: "choose-existing-vpc-radio",
-            label: "Choose from Existing VPCs",
-            value: "choose_existing",
-          },
-        ],
-        previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
-      });
-    }
-
-    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && isExistingVpcSupported) {
-      const filteredNetworks = region
-        ? cloudNativeNetworks.filter((n) => n.region === region && n.status?.toUpperCase() !== "FAILED")
-        : [];
-      fields.push({
-        dataTestId: "existing-vpc-select",
-        label: "Select VPC",
-        subLabel: "Choose an existing VPC from your cloud account",
-        name: "requestParams.cloudNativeNetworkId",
-        value: requestParams["cloudNativeNetworkId"] || "",
-        type: "select",
-        menuItems: filteredNetworks.map((n) => ({
-          label: n.name || n.cloudNativeNetworkId || n.id,
-          value: n.cloudNativeNetworkId || n.id,
-        })),
-        required: true,
-        disabled: formMode !== "create",
-        isLoading: isFetchingCloudNativeNetworks,
-        emptyMenuText: region ? "No VPCs found in this region" : "Select a region first",
-        previewValue: (() => {
-          const selected = filteredNetworks.find(
-            (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]
-          );
-          return selected?.name || requestParams["cloudNativeNetworkId"];
-        })(),
-      });
-    }
   }
 
   if (isOnPrem) {

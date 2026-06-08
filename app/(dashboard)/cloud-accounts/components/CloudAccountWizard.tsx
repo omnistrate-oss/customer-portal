@@ -7,7 +7,7 @@ import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/Subscr
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { FormConfiguration } from "components/DynamicForm/types";
@@ -38,7 +38,6 @@ import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCa
 import CustomLabelDescription from "./CustomLabelDescription";
 import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
-import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
 import NebiusBindingsStep from "./steps/NebiusBindingsStep";
 import WizardStepper, { WizardStep } from "./WizardStepper";
@@ -49,9 +48,6 @@ type CloudAccountWizardProps = {
   onClose: () => void;
   instances: ResourceInstance[];
 };
-
-const ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION = true;
-const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
 
 const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   initialFormValues,
@@ -77,18 +73,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Step state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState<WizardStep>(0);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
-  const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
-  const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
-
-  // ─── VPC step state ───────────────────────────────────────────────────────
-  const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
-    enableNewVpcs: true,
-    bringOwnVpcs: false,
-    selectedRegions: [],
-    selectedVpcIds: [],
-  });
   // ─── Service/plan/subscription data ──────────────────────────────────────
   const allInstances: ResourceInstance[] = instances;
   const subscriptionInstanceCountHash: Record<string, number> = {};
@@ -154,8 +140,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ...instanceResultParams,
           cloud_provider: values.cloudProvider,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
 
         if (values.cloudProvider === "aws") {
@@ -197,7 +181,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         setClickedInstance(instanceWithParams);
 
         if (values.cloudProvider === "byoc-onprem") {
-          // Private/OnPrem accounts don't need Grant Access or Configure VPCs steps
+          // Private/OnPrem accounts don't need the Grant Access step.
           snackbar.showSuccess("Cloud Account created successfully");
           setCreatedInstanceId(instanceId as string);
           setShowPrivateClusterDialog(true);
@@ -233,8 +217,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_account_id: values.awsAccountId,
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
-          private_link: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -243,8 +225,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           gcp_project_number: values.gcpProjectNumber,
           account_configuration_method: values.accountConfigurationMethod,
           gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
-          private_link: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "azure") {
         requestParams = {
@@ -252,8 +232,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           azure_subscription_id: values.azureSubscriptionId,
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "oci") {
         requestParams = {
@@ -261,8 +239,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           oci_tenancy_id: values.ociTenancyId,
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
-          allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "byoc-onprem") {
         requestParams = {
@@ -309,170 +285,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     const rp = getResultParams(clickedInstance || selectedInstance);
     return typeof rp?.cloud_provider_account_config_id === "string" ? rp.cloud_provider_account_config_id : undefined;
   }, [clickedInstance, selectedInstance]);
-
-  const accountConfigStatus = useMemo(() => {
-    const instance = clickedInstance || selectedInstance;
-    const rp = getResultParams(instance);
-    // Check result_params first, then fall back to the instance status
-    if (typeof rp?.account_config_status === "string") return rp.account_config_status;
-    if (typeof instance?.status === "string") return instance.status;
-    return undefined;
-  }, [clickedInstance, selectedInstance]);
-
-  const isAccountConfigReady = Boolean(accountConfigStatus && READY_STATUSES.includes(accountConfigStatus));
-
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: {
-          id: accountConfigId || "",
-        },
-      },
-      headers: {
-        "x-ignore-global-error": true,
-      },
-    },
-    {
-      enabled: Boolean(currentStep === 2 && vpcValues.bringOwnVpcs && accountConfigId && isAccountConfigReady),
-      retry: 2,
-      retryDelay: 3000,
-    }
-  );
-
-  const syncCloudNativeNetworksMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/sync",
-    {
-      onSuccess: () => {
-        cloudNativeNetworksQuery.refetch();
-      },
-      onError: () => {
-        snackbar.showError("Failed to sync networks. Please try again.");
-      },
-    }
-  );
-
-  const importCloudNativeNetworksMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/import",
-    {
-      onSuccess: () => {
-        snackbar.showSuccess("VPCs updated successfully");
-        cloudNativeNetworksQuery.refetch();
-        setVpcValues((prev) => ({ ...prev, selectedVpcIds: [] }));
-      },
-      onError: () => {
-        snackbar.showError("Failed to update VPCs. Please try again.");
-      },
-    }
-  );
-
-  const allCloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
-  );
-
-  // Regions from the selected service offering, filtered by cloud provider
-  const availableRegions = useMemo(() => {
-    const { serviceId, servicePlanId, cloudProvider } = formData.values;
-    const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
-    if (!offering || !cloudProvider) return [];
-
-    const regionMap: Record<string, string[] | undefined> = {
-      aws: offering.awsRegions,
-      gcp: offering.gcpRegions,
-      azure: offering.azureRegions,
-      oci: offering.ociRegions,
-    };
-
-    return (regionMap[cloudProvider] ?? []).slice().sort((a, b) => a.localeCompare(b));
-  }, [formData.values, byoaServiceOfferingsObj]);
-
-  const availableVpcs = useMemo<VpcRecord[]>(() => {
-    const filteredNetworks =
-      vpcValues.selectedRegions.length > 0
-        ? allCloudNativeNetworks.filter((network) => vpcValues.selectedRegions.includes(network.region))
-        : allCloudNativeNetworks;
-
-    return filteredNetworks.map((network) => {
-      return {
-        id: network.cloudNativeNetworkId || network.id,
-        name: network.name || network.cloudNativeNetworkId || network.id,
-        status: network.status || "PENDING",
-        statusMessage: network.statusMessage,
-        networkId: network.cloudNativeNetworkId,
-      };
-    });
-  }, [allCloudNativeNetworks, vpcValues.selectedRegions]);
-
-  const [lastSyncedAt, setLastSyncedAt] = useState("");
-  useEffect(() => {
-    if (!cloudNativeNetworksQuery.dataUpdatedAt) {
-      setLastSyncedAt("");
-      return;
-    }
-
-    const update = () => {
-      const diff = Math.round((Date.now() - cloudNativeNetworksQuery.dataUpdatedAt) / 60000);
-      setLastSyncedAt(diff < 1 ? "Just now" : `${diff} min ago`);
-    };
-
-    update();
-    const interval = setInterval(update, 60000);
-    return () => clearInterval(interval);
-  }, [cloudNativeNetworksQuery.dataUpdatedAt]);
-
-  const isLoadingVpcs = cloudNativeNetworksQuery.isFetching || syncCloudNativeNetworksMutation.isPending;
-
-  // Auto-sync when Existing VPCs is enabled and list comes back empty
-  const hasSyncedOnEmpty = useRef(false);
-  useEffect(() => {
-    if (
-      currentStep === 2 &&
-      vpcValues.bringOwnVpcs &&
-      accountConfigId &&
-      isAccountConfigReady &&
-      !cloudNativeNetworksQuery.isFetching &&
-      cloudNativeNetworksQuery.isSuccess &&
-      allCloudNativeNetworks.length === 0 &&
-      !syncCloudNativeNetworksMutation.isPending &&
-      !hasSyncedOnEmpty.current
-    ) {
-      hasSyncedOnEmpty.current = true;
-      syncCloudNativeNetworksMutation.mutate({
-        params: { path: { id: accountConfigId } },
-        body: {},
-      });
-    }
-    // Reset flag when bringOwnVpcs is toggled off or account changes
-    if (!vpcValues.bringOwnVpcs || !accountConfigId) {
-      hasSyncedOnEmpty.current = false;
-    }
-  }, [
-    currentStep,
-    vpcValues.bringOwnVpcs,
-    accountConfigId,
-    isAccountConfigReady,
-    cloudNativeNetworksQuery.isFetching,
-    cloudNativeNetworksQuery.isSuccess,
-    allCloudNativeNetworks.length,
-    syncCloudNativeNetworksMutation,
-  ]);
-
-  const handleResyncVpcs = () => {
-    if (!accountConfigId) return;
-
-    syncCloudNativeNetworksMutation.mutate({
-      params: {
-        path: {
-          id: accountConfigId,
-        },
-      },
-      body: {},
-    });
-  };
 
   // ─── Grant Access derived data ─────────────────────────────────────────────
   const cloudFormationTemplateUrl = useMemo(() => {
@@ -535,67 +347,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       instance.subscriptionId
     );
   }, [clickedInstance, selectedInstance, serviceOfferingsObj, subscriptionsObj]);
-
-  useEffect(() => {
-    // Poll until we have a valid account config ID and the account is READY
-    const needsAccountConfigId = !accountConfigId;
-    const needsReadyStatus = accountConfigId && !isAccountConfigReady;
-    if (
-      currentStep !== 2 ||
-      !vpcValues.bringOwnVpcs ||
-      !clickedInstance ||
-      (!needsAccountConfigId && !needsReadyStatus)
-    )
-      return;
-
-    let cancelled = false;
-    let retryTimer: ReturnType<typeof setTimeout>;
-
-    const refreshAccountConfigId = async () => {
-      try {
-        const response = await fetchClickedInstanceDetails();
-        const resourceInstance = response?.data;
-        const refreshedParams = getResultParams(resourceInstance);
-        if (!cancelled && refreshedParams) {
-          setClickedInstance((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  status: resourceInstance?.status || prev?.status,
-                  result_params: { ...getResultParams(prev), ...refreshedParams },
-                }
-              : prev
-          );
-          // If still not ready, retry after a delay
-          const status = refreshedParams.account_config_status || resourceInstance?.status;
-          if (!(status && READY_STATUSES.includes(status)) && !cancelled) {
-            retryTimer = setTimeout(refreshAccountConfigId, 5000);
-          }
-        }
-      } catch {
-        if (!cancelled && !hasShownVpcRefreshError.current) {
-          hasShownVpcRefreshError.current = true;
-          snackbar.showError(
-            "Unable to refresh account configuration. Wait a moment and try again. If this continues, verify setup in Grant Access."
-          );
-        }
-      }
-    };
-
-    void refreshAccountConfigId();
-    return () => {
-      cancelled = true;
-      clearTimeout(retryTimer);
-    };
-  }, [
-    accountConfigId,
-    isAccountConfigReady,
-    clickedInstance,
-    currentStep,
-    fetchClickedInstanceDetails,
-    snackbar,
-    vpcValues.bringOwnVpcs,
-  ]);
 
   // ─── Form configuration for Step 1 ────────────────────────────────────────
   const { serviceId, servicePlanId, cloudProvider } = values;
@@ -863,9 +614,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const summarySections = useMemo((): SummarySection[] => {
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
-    const privateConnectivityFlag = rp?.private_link ?? rp?.enable_private_connectivity ?? rp?.PrivateLink;
-    const privateConnectivityEnabled =
-      typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : enablePrivateConnectivity;
     const accountIdentityItems =
       selectedProvider === "gcp"
         ? [
@@ -949,75 +697,22 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           : undefined,
       },
       ...accountIdentityItems,
-      ...(selectedProvider !== "byoc-onprem"
-        ? [
-            {
-              label: "Private Connectivity",
-              value: privateConnectivityEnabled ? (
-                <StatusChip label="Enabled" category="success" />
-              ) : (
-                <StatusChip label="Disabled" category="unknown" />
-              ),
-            },
-          ]
-        : []),
     ];
 
-    const sections: SummarySection[] = [{ title: "Standard Information", items: standardItems }];
-
-    // Add VPC configuration section on step 3
-    if (currentStep === 2) {
-      const vpcItems = [
-        {
-          label: "Creating new VPCs",
-          value: vpcValues.enableNewVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
-        },
-        {
-          label: "Enable existing VPCs",
-          value: vpcValues.bringOwnVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
-        },
-        {
-          label: "Regions",
-          value: vpcValues.selectedRegions.length > 0 ? `${vpcValues.selectedRegions.length} selected` : undefined,
-        },
-        {
-          label: "Networks",
-          value: vpcValues.selectedVpcIds.length > 0 ? `${vpcValues.selectedVpcIds.length} selected` : undefined,
-        },
-      ];
-      sections.push({ title: "VPC Configuration", items: vpcItems });
-    }
-
-    return sections;
-  }, [
-    currentStep,
-    values,
-    clickedInstance,
-    enablePrivateConnectivity,
-    servicesObj,
-    serviceOfferingsObj,
-    subscriptionsObj,
-    vpcValues,
-  ]);
+    return [{ title: "Standard Information", items: standardItems }];
+  }, [values, clickedInstance, servicesObj, serviceOfferingsObj, subscriptionsObj]);
 
   const isBYOCOnpremCloud = values.cloudProvider === "byoc-onprem";
-  const cancelLabel =
-    currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
-  const nextLabel =
-    currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
-  const isNextLoading =
-    (currentStep === 0 && createCloudAccountMutation.isPending) ||
-    (currentStep === 2 && importCloudNativeNetworksMutation.isPending);
+  const cancelLabel = currentStep === 0 && isBYOCOnpremCloud ? "Cancel" : "Do it later";
+  const nextLabel = currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : "Done";
+  const isNextLoading = currentStep === 0 && createCloudAccountMutation.isPending;
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   const handleNext = () => {
     if (currentStep === 0 || isBYOCOnpremCloud) {
       // Submit form to create account
       formData.handleSubmit();
-    } else if (currentStep === 1) {
-      setCurrentStep(2);
     } else {
-      // Step 3 – "Configure" button: close the wizard
       onClose();
     }
   };
@@ -1046,8 +741,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 formData={formData}
                 formConfiguration={formConfiguration}
                 formMode="create"
-                enablePrivateConnectivity={enablePrivateConnectivity}
-                onTogglePrivateConnectivity={setEnablePrivateConnectivity}
               />
             </form>
           )}
@@ -1071,39 +764,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               setClickedInstance={(updater) =>
                 setClickedInstance((prev) => updater(prev) as ResourceInstance | undefined)
               }
-            />
-          )}
-
-          {currentStep === 2 && (
-            <ConfigureVPCsStep
-              values={vpcValues}
-              onChange={(patch) => setVpcValues((prev) => ({ ...prev, ...patch }))}
-              availableRegions={availableRegions}
-              availableVpcs={availableVpcs}
-              isLoadingVpcs={isLoadingVpcs}
-              onResync={handleResyncVpcs}
-              onImport={(vpcIds) => {
-                if (!accountConfigId) return;
-                importCloudNativeNetworksMutation.mutate({
-                  params: { path: { id: accountConfigId } },
-                  body: {
-                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: true })),
-                  },
-                });
-              }}
-              onUnimport={(vpcIds) => {
-                if (!accountConfigId) return;
-                importCloudNativeNetworksMutation.mutate({
-                  params: { path: { id: accountConfigId } },
-                  body: {
-                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: false })),
-                  },
-                });
-              }}
-              isImporting={importCloudNativeNetworksMutation.isPending}
-              lastSyncedAt={lastSyncedAt}
-              cloudProvider={values.cloudProvider}
-              privateConnectivityEnabled={enablePrivateConnectivity}
             />
           )}
         </div>
