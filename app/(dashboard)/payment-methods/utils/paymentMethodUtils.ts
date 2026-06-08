@@ -36,15 +36,11 @@ export const getErrorMessage = (error: unknown, fallback: string) => {
     return "You do not have permission to manage payment methods.";
   }
 
-  if (message.includes("unpaid invoice") && message.includes("unpaid usage")) {
-    return "Add another payment method before removing this one because unpaid invoices and unpaid usage require a payment method.";
+  if (message.includes("unpaid usage") || message.includes("pending invoice") || message.includes("draft invoice")) {
+    return "This payment method cannot be removed because pending billing items require a payment method. Contact customer support for assistance.";
   }
 
-  if (message.includes("unpaid usage")) {
-    return "Add another payment method before removing this one because this billing account has unpaid usage.";
-  }
-
-  if (message.includes("unpaid invoice") || message.includes("open invoice") || message.includes("pending invoice")) {
+  if (message.includes("unpaid invoice") || message.includes("open invoice")) {
     return "Add another payment method before removing this one because unpaid invoices require a payment method.";
   }
 
