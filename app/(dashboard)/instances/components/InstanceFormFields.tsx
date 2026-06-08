@@ -13,7 +13,6 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
-import { getResultParams } from "src/utils/instance";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistributionsMultiSelect/KubernetesDistributionsMultiSelect";
