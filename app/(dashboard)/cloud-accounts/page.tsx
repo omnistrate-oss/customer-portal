@@ -194,8 +194,7 @@ const CloudAccountsPage = () => {
           resultParams?.gcp_project_id?.toLowerCase().includes(searchText.toLowerCase()) ||
           resultParams?.aws_account_id?.toLowerCase().includes(searchText.toLowerCase()) ||
           resultParams?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.nebius_tenant_id?.toLowerCase().includes(searchText.toLowerCase())
+          resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase())
         );
       });
     }
@@ -250,7 +249,6 @@ const CloudAccountsPage = () => {
             resultParams?.aws_account_id ||
             resultParams?.azure_subscription_id ||
             resultParams?.oci_tenancy_id ||
-            resultParams?.nebius_tenant_id ||
             resultParams?.cluster_name ||
             "-"
           );
@@ -265,7 +263,6 @@ const CloudAccountsPage = () => {
               resultParams?.aws_account_id ||
               resultParams?.azure_subscription_id ||
               resultParams?.oci_tenancy_id ||
-              resultParams?.nebius_tenant_id ||
               resultParams?.cluster_name ||
               "-";
 
@@ -283,10 +280,8 @@ const CloudAccountsPage = () => {
           const status = data.row.original.status;
           let statusStylesAndLabel = getResourceInstanceStatusStylesAndLabel(status as string);
           const resultParams = getResultParams(data.row.original);
-          const isNebius = !!resultParams?.nebius_tenant_id;
 
           const showInstructions =
-            !isNebius &&
             ["VERIFYING", "PENDING", "PENDING_DEPENDENCY", "UNKNOWN", "DEPLOYING", "READY", "FAILED"].includes(
               status as string
             );
@@ -448,7 +443,6 @@ const CloudAccountsPage = () => {
           else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
           else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
           else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
-          else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
           else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
           return cloudProvider;
         },
@@ -462,7 +456,6 @@ const CloudAccountsPage = () => {
             else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
             else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
             else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
-            else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
             else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
 
             return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
@@ -504,8 +497,6 @@ const CloudAccountsPage = () => {
       }
     }
   }, [selectedInstance, accountConfigsHash]);
-
-  const isSelectedInstanceNebius = Boolean(getResultParams(selectedInstance)?.nebius_tenant_id);
 
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
@@ -609,14 +600,6 @@ const CloudAccountsPage = () => {
       return deleteResourceInstance(requestPayload);
     },
     onSuccess: async () => {
-      if (isSelectedInstanceNebius) {
-        setSelectedRows([]);
-        setIsOverlayOpen(false);
-        snackbar.showSuccess("Deleting cloud account...");
-        await refetchInstances();
-        return;
-      }
-
       const isLastInstance =
         !selectedAccountConfig?.byoaInstanceIDs || selectedAccountConfig?.byoaInstanceIDs?.length === 1;
       if (!isLastInstance) {
@@ -984,7 +967,7 @@ const CloudAccountsPage = () => {
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
-        accountConfig={isSelectedInstanceNebius ? undefined : deleteDialogAccountConfig}
+        accountConfig={deleteDialogAccountConfig}
         isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");

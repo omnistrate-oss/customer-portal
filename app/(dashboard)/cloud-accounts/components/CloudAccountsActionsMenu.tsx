@@ -5,7 +5,6 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { Subscription } from "src/types/subscription";
-import { getResultParams } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -54,8 +53,6 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
-    const resultParams = getResultParams(instance);
-    const isNebius = !!resultParams?.nebius_tenant_id;
 
     // const isDeploying = instance?.status === "DEPLOYING";
     // const isFailed = instance?.status === "FAILED";
@@ -118,15 +115,13 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     });
 
     // Offboard action
-    const isOffboardDisabled = !isSelectedInstanceReadyToOffboard || isNebius;
+    const isOffboardDisabled = !isSelectedInstanceReadyToOffboard;
 
     const offboardingDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isNebius
-        ? "Offboard is not supported for Nebius cloud accounts"
-        : isOffboardDisabled
-          ? "Cloud account is not ready to offboard"
-          : "";
+      : isOffboardDisabled
+        ? "Cloud account is not ready to offboard"
+        : "";
 
     res.push({
       dataTestId: "offboard-action-button",

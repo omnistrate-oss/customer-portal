@@ -15,7 +15,7 @@ import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import StatusChip from "src/components/StatusChip/StatusChip";
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLongLogoMap, SUPPORTED_CLOUD_PROVIDER_VALUES } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -39,7 +39,6 @@ import CustomLabelDescription from "./CustomLabelDescription";
 import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
-import NebiusBindingsStep from "./steps/NebiusBindingsStep";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
 type CloudAccountWizardProps = {
@@ -84,7 +83,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   });
 
   const byoaServiceOfferings = useMemo(
-    () => serviceOfferings.filter((o) => o.serviceModelType === "BYOA" || o.serviceModelType === "ON_PREM_COPILOT"),
+    () =>
+      serviceOfferings
+        .filter((o) => o.serviceModelType === "BYOA" || o.serviceModelType === "ON_PREM_COPILOT")
+        .map((offering) => ({
+          ...offering,
+          cloudProviders: offering.cloudProviders?.filter((provider) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)),
+        }))
+        .filter((offering) => offering.cloudProviders?.length || offering.serviceModelType === "ON_PREM_COPILOT"),
     [serviceOfferings]
   );
 
@@ -158,8 +164,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         } else if (values.cloudProvider === "oci") {
           resultParams.oci_tenancy_id = values.ociTenancyId;
           resultParams.oci_domain_id = values.ociDomainId;
-        } else if (values.cloudProvider === "nebius") {
-          resultParams.nebius_tenant_id = values.nebiusTenantId;
         }
 
         // Update query cache
@@ -247,12 +251,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           cluster_description: values.clusterDescription || undefined,
           account_configuration_method: values.accountConfigurationMethod || "Terraform",
         };
-      } else if (values.cloudProvider === "nebius") {
-        requestParams = {
-          cloud_provider: values.cloudProvider,
-          nebius_tenant_id: values.nebiusTenantId,
-          account_configuration_method: values.accountConfigurationMethod || "Terraform",
-        };
       }
 
       const resource = offering?.resourceParameters.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
@@ -324,7 +322,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         ociDomainID: rp.oci_domain_id,
         ociBootstrapShellCommand: rp.oci_bootstrap_shell_script,
       };
-    if (rp?.nebius_tenant_id) return { nebiusTenantID: rp.nebius_tenant_id };
     return {};
   }, [clickedInstance]);
 
@@ -567,17 +564,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               previewValue: cloudProvider === "oci" ? values.ociDomainId : null,
             },
             {
-              dataTestId: "nebius-tenant-id-input",
-              label: "Nebius Tenant ID",
-              subLabel: "The Nebius tenant that will be verified against",
-              name: "nebiusTenantId",
-              type: "text",
-              required: true,
-              disabled: false,
-              isHidden: values.cloudProvider !== "nebius",
-              previewValue: cloudProvider === "nebius" ? values.nebiusTenantId : null,
-            },
-            {
               dataTestId: "cluster-name-input",
               label: "Kubernetes Cluster Name",
               subLabel: "Name of the Kubernetes cluster to connect",
@@ -663,19 +649,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                       ]
                     : []),
                 ]
-              : selectedProvider === "nebius"
-                ? [
-                    {
-                      label: "Nebius Tenant ID",
-                      value: rp?.nebius_tenant_id || values.nebiusTenantId || undefined,
-                    },
-                  ]
-                : [
-                    {
-                      label: "AWS Account ID",
-                      value: rp?.aws_account_id || values.awsAccountId || undefined,
-                    },
-                  ];
+              : [
+                  {
+                    label: "AWS Account ID",
+                    value: rp?.aws_account_id || values.awsAccountId || undefined,
+                  },
+                ];
 
     const standardItems = [
       {
@@ -745,14 +724,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             </form>
           )}
 
-          {currentStep === 1 && accountInstructionDetails.nebiusTenantID && (
-            <NebiusBindingsStep
-              accountConfigId={accountConfigId}
-              nebiusTenantId={accountInstructionDetails.nebiusTenantID}
-            />
-          )}
-
-          {currentStep === 1 && !accountInstructionDetails.nebiusTenantID && (
+          {currentStep === 1 && (
             <GrantAccessStep
               selectedAccountConfig={clickedInstance}
               cloudFormationTemplateUrl={cloudFormationTemplateUrl}

@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
 import { DateRange, initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
+import { SUPPORTED_CLOUD_PROVIDER_VALUES } from "src/constants/cloudProviders";
 import { resourceInstanceStatusMap } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import { CloudProvider } from "src/types/common/enums";
 import { MenuItem } from "src/types/common/generalTypes";
@@ -182,13 +183,6 @@ export const getRegionMenuItems = (offering?: ServiceOffering, cloudProvider?: C
     });
   } else if (cloudProvider === "oci") {
     offering.ociRegions?.forEach((region: string) => {
-      menuItems.push({
-        label: region,
-        value: region,
-      });
-    });
-  } else if (cloudProvider === "nebius") {
-    offering.nebiusRegions?.forEach((region: string) => {
       menuItems.push({
         label: region,
         value: region,
@@ -398,7 +392,7 @@ export const getInitialValues = (
   // For on-prem, derive cloudProvider from the first onPremPlatform
   const cloudProvider = isOnPrem
     ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
-    : offering?.cloudProviders?.[0] || "";
+    : offering?.cloudProviders?.find((provider: string) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)) || "";
 
   let region;
   if (cloudProvider === "aws") {
@@ -409,8 +403,6 @@ export const getInitialValues = (
     region = offering.azureRegions?.[0];
   } else if (cloudProvider === "oci") {
     region = offering.ociRegions?.[0];
-  } else if (cloudProvider === "nebius") {
-    region = offering.nebiusRegions?.[0];
   }
 
   const resources = getResourceMenuItems(offering);

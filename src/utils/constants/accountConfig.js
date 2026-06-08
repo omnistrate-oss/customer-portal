@@ -3,7 +3,6 @@ export const CLOUD_PROVIDER_DEFAULT_CREATION_METHOD = {
   gcp: "GCPScript",
   azure: "AzureScript",
   oci: "OCIScript",
-  nebius: "NebiusScript",
   "byoc-onprem": "OnPremScript",
 };
 

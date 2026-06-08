@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLongLogoMap, SUPPORTED_CLOUD_PROVIDER_VALUES } from "src/constants/cloudProviders";
 import { productTierTypes } from "src/constants/servicePlan";
 import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyles/versionSet";
 import { AvailabilityZone } from "src/types/availabilityZone";
@@ -180,7 +180,7 @@ export const getStandardInformationFields = (
         const isOfferingOnPrem = offering?.serviceModelType === "ON_PREM";
         const cloudProvider = isOfferingOnPrem
           ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
-          : offering?.cloudProviders?.[0] || "";
+          : offering?.cloudProviders?.find((provider) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)) || "";
 
         setFieldValue("cloudProvider", cloudProvider);
         if (cloudProvider === "aws") {
@@ -191,8 +191,6 @@ export const getStandardInformationFields = (
           setFieldValue("region", offering.azureRegions?.[0] || "");
         } else if (cloudProvider === "oci") {
           setFieldValue("region", offering.ociRegions?.[0] || "");
-        } else if (cloudProvider === "nebius") {
-          setFieldValue("region", offering.nebiusRegions?.[0] || "");
         } else if (cloudProvider === "byoc-onprem") {
           setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
         }
@@ -238,7 +236,7 @@ export const getStandardInformationFields = (
             const isOfferingOnPrem = offering?.serviceModelType === "ON_PREM";
             const cloudProvider = isOfferingOnPrem
               ? platformToCloudProviderMap[offering?.onPremPlatforms?.[0] || ""] || ""
-              : offering?.cloudProviders?.[0] || "";
+              : offering?.cloudProviders?.find((provider) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)) || "";
 
             setFieldValue("cloudProvider", cloudProvider);
             if (cloudProvider === "aws") {
@@ -249,8 +247,6 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.azureRegions?.[0] || "");
             } else if (cloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
-            } else if (cloudProvider === "nebius") {
-              setFieldValue("region", offering.nebiusRegions?.[0] || "");
             } else if (cloudProvider === "byoc-onprem") {
               setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
@@ -422,7 +418,9 @@ export const getStandardInformationFields = (
       required: true,
       customComponent: (
         <CloudProviderRadio
-          cloudProviders={offering?.cloudProviders || []}
+          cloudProviders={
+            offering?.cloudProviders?.filter((provider) => SUPPORTED_CLOUD_PROVIDER_VALUES.includes(provider)) || []
+          }
           name="cloudProvider"
           formData={formData}
           // @ts-ignore
@@ -435,8 +433,6 @@ export const getStandardInformationFields = (
               setFieldValue("region", offering.azureRegions?.[0] || "");
             } else if (newCloudProvider === "oci") {
               setFieldValue("region", offering.ociRegions?.[0] || "");
-            } else if (newCloudProvider === "nebius") {
-              setFieldValue("region", offering.nebiusRegions?.[0] || "");
             } else if (newCloudProvider === "byoc-onprem") {
               setFieldValue("region", offering?.byocOnpremRegions?.[0] || "on-prem");
             }
@@ -693,9 +689,7 @@ export const getNetworkConfigurationFields = (
             ? offering.gcpRegions || []
             : values.cloudProvider === "azure"
               ? offering.azureRegions || []
-              : values.cloudProvider === "nebius"
-                ? offering.nebiusRegions || []
-                : offering.ociRegions || [],
+              : offering.ociRegions || [],
         values.region
       ),
       emptyMenuText: "No customer networks available",
