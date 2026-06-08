@@ -30,6 +30,7 @@ import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstan
 import { DisplayText } from "components/Typography/Typography";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
+import LogsDashboard from "src/components/ResourceInstance/Logs/LogsDashboard";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useResourceInstance from "src/hooks/useResourceInstance";
@@ -352,7 +353,7 @@ const InstanceDetailsPage = ({
           instanceStatus={resourceInstanceData.status}
         />
       )}
-      {currentTab === tabs.logs && (
+      {currentTab === tabs.logs && resourceInstanceData?.cloudProvider !== "byoc-onprem" && (
         <Logs
           resourceInstanceId={instanceId}
           nodes={resourceInstanceData.nodes}
@@ -362,6 +363,15 @@ const InstanceDetailsPage = ({
           mainResourceHasCompute={resourceInstanceData.mainResourceHasCompute}
         />
       )}
+      {currentTab === tabs.logs &&
+        offering?.serviceModelType === "BYOA" &&
+        resourceInstanceData?.cloudProvider === "byoc-onprem" && (
+          <LogsDashboard
+            dashboardEndpoint={resourceInstanceData?.unprocessedData?.kubernetesDashboardEndpoint?.dashboardEndpoint}
+            id={instanceId}
+            subscriptionId={subscriptionId}
+          />
+        )}
 
       {currentTab === tabs.auditLogs && <AuditLogs instanceId={instanceId} subscriptionId={subscriptionId} />}
       {currentTab === tabs.backups && (

@@ -12,7 +12,7 @@ export const shouldPollInstanceStatus = ({
 }) => {
   // Offboard is ready when account config is READY_TO_OFFBOARD and instance has FAILED or instance is DELETING. In both cases, we can skip polling and show the offboard step immediately.
 
-  const isOffboardReady = getOffboardReadiness(accountConfigStatus, instanceStatus);
+  const isOffboardReady = getOffboardReadiness(instanceStatus, accountConfigStatus);
 
   const isWaitingForOffboardTransition = hasRequestedDeletion && !isOffboardReady;
 
