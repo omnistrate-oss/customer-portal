@@ -22,6 +22,7 @@ import Select from "../FormElementsv2/Select/Select";
 import CopySnapshotIcon from "../Icons/RestoreInstance/CopySnapshotIcon";
 import { SnapshotCreationType } from "../ResourceInstance/Backup/Backup";
 import { copySnapshotValidationSchema } from "../ResourceInstance/Backup/utils";
+import Tooltip from "../Tooltip/Tooltip";
 import { Text } from "../Typography/Typography";
 
 type CopySnapshotModalProps = {
@@ -29,6 +30,7 @@ type CopySnapshotModalProps = {
   handleClose: () => void;
   offering: ServiceOffering;
   cloudProvider?: string;
+  targetRegion?: string;
   copySnapshotMutation: UseMutationResult<unknown, Error, { targetRegion: string }, unknown>;
   snapshotCreationType: SnapshotCreationType | null;
   tab?: "backups" | "snapshots";
@@ -39,13 +41,14 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
   handleClose,
   offering,
   cloudProvider,
+  targetRegion,
   copySnapshotMutation,
   snapshotCreationType,
   tab,
 }) => {
   const copySnapshotFormik = useFormik({
     initialValues: {
-      targetRegion: "",
+      targetRegion: targetRegion || "",
     },
     enableReinitialize: true,
     validationSchema: copySnapshotValidationSchema,
@@ -54,10 +57,22 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
     },
   });
 
-  const regions = useMemo(
-    () => getRegionMenuItems(offering, cloudProvider as CloudProvider),
-    [offering, cloudProvider]
-  );
+  const regions = useMemo(() => {
+    const regionMenuItems = getRegionMenuItems(offering, cloudProvider as CloudProvider);
+
+    if (!targetRegion || regionMenuItems.some((option) => option.value === targetRegion)) {
+      return regionMenuItems;
+    }
+
+    return [
+      {
+        label: targetRegion,
+        value: targetRegion,
+      },
+      ...regionMenuItems,
+    ];
+  }, [offering, cloudProvider, targetRegion]);
+  const targetRegionDisabledMessage = "OperatorCRD snapshots can only use the same region as the source";
 
   useEffect(() => {
     if (!open) {
@@ -65,6 +80,46 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  useEffect(() => {
+    if (open && targetRegion && copySnapshotFormik.values.targetRegion !== targetRegion) {
+      copySnapshotFormik.setFieldValue("targetRegion", targetRegion, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, targetRegion]);
+
+  const targetRegionSelect = (
+    <Box component="span" sx={{ display: "block" }}>
+      <Select
+        displayEmpty
+        renderValue={() => {
+          return (
+            regions?.find((option) => option.value === copySnapshotFormik.values.targetRegion)?.label ??
+            "Select target region"
+          );
+        }}
+        name="targetRegion"
+        options={regions}
+        value={copySnapshotFormik.values.targetRegion}
+        onChange={copySnapshotFormik.handleChange}
+        onBlur={copySnapshotFormik.handleBlur}
+        disabled={Boolean(targetRegion)}
+        error={copySnapshotFormik.touched.targetRegion && Boolean(copySnapshotFormik.errors.targetRegion)}
+      >
+        {regions?.length > 0 ? (
+          regions.map((option) => {
+            return (
+              <MenuItem key={option.value as string} value={option.value as string} disabled={option.disabled}>
+                {option.label}
+              </MenuItem>
+            );
+          })
+        ) : (
+          <MenuItem disabled>No regions available</MenuItem>
+        )}
+      </Select>
+    </Box>
+  );
 
   return (
     <InformationDialogTopCenter open={open} handleClose={handleClose} maxWidth={"550px"}>
@@ -99,33 +154,11 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
           <FieldTitle required sx={{ marginBottom: "6px" }}>
             Target Region
           </FieldTitle>
-          <Select
-            displayEmpty
-            renderValue={() => {
-              return (
-                regions?.find((option) => option.value === copySnapshotFormik.values.targetRegion)?.label ??
-                "Select target region"
-              );
-            }}
-            name="targetRegion"
-            options={regions}
-            value={copySnapshotFormik.values.targetRegion}
-            onChange={copySnapshotFormik.handleChange}
-            onBlur={copySnapshotFormik.handleBlur}
-            error={copySnapshotFormik.touched.targetRegion && Boolean(copySnapshotFormik.errors.targetRegion)}
-          >
-            {regions?.length > 0 ? (
-              regions.map((option) => {
-                return (
-                  <MenuItem key={option.value as string} value={option.value as string} disabled={option.disabled}>
-                    {option.label}
-                  </MenuItem>
-                );
-              })
-            ) : (
-              <MenuItem disabled>No regions available</MenuItem>
-            )}
-          </Select>
+          {targetRegion ? (
+            <Tooltip title={targetRegionDisabledMessage}>{targetRegionSelect}</Tooltip>
+          ) : (
+            targetRegionSelect
+          )}
 
           <FieldError sx={{ marginTop: "6px", height: "20px" }}>
             {copySnapshotFormik.touched.targetRegion && copySnapshotFormik.errors.targetRegion}

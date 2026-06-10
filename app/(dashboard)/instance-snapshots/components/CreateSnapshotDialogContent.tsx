@@ -1,6 +1,6 @@
+import { useEffect, useMemo } from "react";
 import { Stack } from "@mui/material";
-import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
-import { useMemo } from "react";
+import { getMainResourceFromInstance, getRegionMenuItems } from "app/(dashboard)/instances/utils";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -8,6 +8,8 @@ import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChi
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
+
+import { isOperatorCRDResourceType } from "../utils";
 
 type CreateSnapshotDialogContentProps = {
   formData: any;
@@ -22,21 +24,65 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
 }) => {
   const { subscriptionsObj, serviceOfferingsObj, isFetchingServiceOfferings } = useGlobalData();
 
-  const menuItems = useMemo(() => {
-    if (formData.values.createSnapshotInstanceId) {
-      const instance = instances.find((inst) => inst.id === formData.values.createSnapshotInstanceId);
-      if (instance) {
-        const subscription = subscriptionsObj[instance.subscriptionId as string];
-        const { serviceId, productTierId } = subscription || {};
-        const instanceServiceOffering = serviceOfferingsObj[serviceId as string]?.[productTierId as string];
-        const cloudProvider = instance.cloud_provider;
+  const selectedInstance = useMemo(() => {
+    return instances.find((inst) => inst.id === formData.values.createSnapshotInstanceId);
+  }, [formData.values.createSnapshotInstanceId, instances]);
 
-        return getRegionMenuItems(instanceServiceOffering, cloudProvider as CloudProvider);
-      }
+  const selectedInstanceServiceOffering = useMemo(() => {
+    if (!selectedInstance) {
+      return undefined;
+    }
+
+    const subscription = subscriptionsObj[selectedInstance.subscriptionId as string];
+    const { serviceId, productTierId } = subscription || {};
+
+    return serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+  }, [selectedInstance, serviceOfferingsObj, subscriptionsObj]);
+
+  const selectedInstanceResource = useMemo(() => {
+    return getMainResourceFromInstance(selectedInstance, selectedInstanceServiceOffering);
+  }, [selectedInstance, selectedInstanceServiceOffering]);
+
+  const targetRegion = isOperatorCRDResourceType(selectedInstanceResource?.resourceType)
+    ? selectedInstance?.region
+    : undefined;
+
+  const regionMenuItems = useMemo(() => {
+    if (formData.values.createSnapshotInstanceId && selectedInstance) {
+      return getRegionMenuItems(selectedInstanceServiceOffering, selectedInstance.cloud_provider as CloudProvider);
     }
 
     return [];
-  }, [formData.values.createSnapshotInstanceId, instances, subscriptionsObj, serviceOfferingsObj]);
+  }, [formData.values.createSnapshotInstanceId, selectedInstance, selectedInstanceServiceOffering]);
+
+  const menuItems = useMemo(() => {
+    if (!targetRegion || regionMenuItems.some((option) => option.value === targetRegion)) {
+      return regionMenuItems;
+    }
+
+    return [
+      {
+        label: targetRegion,
+        value: targetRegion,
+      },
+      ...regionMenuItems,
+    ];
+  }, [regionMenuItems, targetRegion]);
+
+  useEffect(() => {
+    if (targetRegion && formData.values.createSnapshotRegion !== targetRegion) {
+      formData.setFieldValue("createSnapshotRegion", targetRegion, false);
+      return;
+    }
+
+    const currentRegion = formData.values.createSnapshotRegion;
+    if (currentRegion && !menuItems.some((item) => item.value === currentRegion)) {
+      formData.setFieldValue("createSnapshotRegion", "", false);
+    }
+  }, [formData, menuItems, targetRegion]);
+
+  const targetRegionDisabledMessage =
+    "OperatorCRD snapshots can only be created in the same region as the selected instance";
 
   return (
     <Stack maxWidth="500px" mx="auto">
@@ -86,6 +132,8 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           type: "select",
           menuItems: menuItems,
           required: true,
+          disabled: Boolean(targetRegion),
+          disabledMessage: targetRegion ? targetRegionDisabledMessage : "",
           isLoading: isFetchingServiceOfferings,
           emptyMenuText: !formData.values.createSnapshotInstanceId
             ? "Please select an instance"
