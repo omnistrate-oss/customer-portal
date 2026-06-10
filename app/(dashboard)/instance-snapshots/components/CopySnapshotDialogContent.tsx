@@ -54,7 +54,7 @@ const CopySnapshotDialogContent: React.FC<CopySnapshotDialogContentProps> = ({
           menuItems: menuItems,
           required: true,
           disabled: Boolean(targetRegion),
-          disabledMessage: "OperatorCRD snapshots can only be copied in the same region as the source snapshot",
+          disabledMessage: "Snapshots can only be copied in the same region as the source snapshot",
           isLoading: isFetchingServiceOfferings,
         }}
         formData={formData}

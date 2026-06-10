@@ -1,9 +1,9 @@
-import { FC, useEffect, useMemo } from "react";
 import { CircularProgress } from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import { UseMutationResult } from "@tanstack/react-query";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
+import { FC, useEffect, useMemo } from "react";
 
 import { CloudProvider } from "src/types/common/enums";
 import { ServiceOffering } from "src/types/serviceOffering";
@@ -72,7 +72,7 @@ const CopySnapshotModal: FC<CopySnapshotModalProps> = ({
       ...regionMenuItems,
     ];
   }, [offering, cloudProvider, targetRegion]);
-  const targetRegionDisabledMessage = "OperatorCRD snapshots can only use the same region as the source";
+  const targetRegionDisabledMessage = "Snapshots can only use the same region as the source";
 
   useEffect(() => {
     if (!open) {

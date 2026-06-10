@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
 import { Stack } from "@mui/material";
 import { getMainResourceFromInstance, getRegionMenuItems } from "app/(dashboard)/instances/utils";
+import { useEffect, useMemo } from "react";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -81,8 +81,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
     }
   }, [formData, menuItems, targetRegion]);
 
-  const targetRegionDisabledMessage =
-    "OperatorCRD snapshots can only be created in the same region as the selected instance";
+  const targetRegionDisabledMessage = "Snapshots can only be created in the same region as the selected instance";
 
   return (
     <Stack maxWidth="500px" mx="auto">
