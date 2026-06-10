@@ -21,6 +21,7 @@ import CustomNetworkSelectionStep from "src/components/RestoreInstance/CustomNet
 import RestoreInstanceSuccessStep from "src/components/RestoreInstance/RestoreInstanceSuccessStep";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
+import { RESOURCE_TYPES } from "src/constants/resource";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
@@ -65,6 +66,8 @@ const Backup: FC<{
   networkType: NetworkType;
   offering: ServiceOffering;
   cloudProvider?: string;
+  instanceRegion?: string;
+  resourceType?: string;
   tab?: "backups" | "snapshots";
   setCurrentTab: SetState<CurrentTab>;
   customNetworkExists?: boolean;
@@ -76,6 +79,8 @@ const Backup: FC<{
   networkType,
   offering,
   cloudProvider,
+  instanceRegion,
+  resourceType,
   tab,
   setCurrentTab,
   customNetworkExists,
@@ -164,6 +169,14 @@ const Backup: FC<{
     return null;
   }, [selectionModel, restoreData]);
 
+  const restrictedTargetRegion = useMemo(() => {
+    if ((resourceType || "").toLowerCase() !== RESOURCE_TYPES.OperatorCRD.toLowerCase()) {
+      return undefined;
+    }
+
+    return selectedSnapshot?.region || instanceRegion;
+  }, [instanceRegion, resourceType, selectedSnapshot?.region]);
+
   const filteredsnapshots = useMemo(() => {
     let filtered = restoreData;
     if (searchText) {
@@ -247,9 +260,10 @@ const Backup: FC<{
         resourceKey,
         subscriptionId,
       } = accessQueryParams ?? {};
+      const resolvedTargetRegion = restrictedTargetRegion || targetRegion;
 
       const payload: { targetRegion: string; sourceSnapshotId?: string } = {
-        targetRegion,
+        targetRegion: resolvedTargetRegion,
       };
 
       if (snapshotCreationType === "copyFromExisting") {
@@ -507,6 +521,7 @@ const Backup: FC<{
         handleClose={handleCloseCopySnapshotModal}
         offering={offering}
         cloudProvider={cloudProvider}
+        targetRegion={restrictedTargetRegion}
         copySnapshotMutation={copySnapshotMutation}
         snapshotCreationType={snapshotCreationType}
         tab={tab}

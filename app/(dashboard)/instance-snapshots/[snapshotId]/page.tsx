@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CircularProgress, Stack } from "@mui/material";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
@@ -16,14 +16,23 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import PageContainer from "../../components/Layout/PageContainer";
 import SnapshotDeploymentParametersTab from "../components/SnapshotDeploymentParametersTab";
 import SnapshotDetailsTab from "../components/SnapshotDetailsTab";
+import SnapshotMetadataTab from "../components/SnapshotMetadataTab";
 import useSnapshotDetail from "../hooks/useSnapshotDetail";
 
-export type CurrentTab = "Snapshot Details" | "Deployment Parameters";
+export type CurrentTab = "Snapshot Details" | "Deployment Parameters" | "Snapshot Metadata";
 
 const tabs = {
   snapshotDetails: "Snapshot Details",
   deploymentParameters: "Deployment Parameters",
-};
+  snapshotMetadata: "Snapshot Metadata",
+} as const;
+
+const baseTabs = [
+  { key: "snapshotDetails", value: tabs.snapshotDetails },
+  { key: "deploymentParameters", value: tabs.deploymentParameters },
+];
+
+const metadataTab = { key: "snapshotMetadata", value: tabs.snapshotMetadata };
 
 const SnapshotDetailPage = ({
   params,
@@ -47,6 +56,20 @@ const SnapshotDetailPage = ({
   const snapshotQuery = useSnapshotDetail({ snapshotId });
 
   const { data: snapshotData, refetch: refetchSnapshot } = snapshotQuery;
+
+  const snapshotMetadata = (snapshotData as { snapshotMetadata?: Record<string, unknown> } | undefined)
+    ?.snapshotMetadata;
+  const hasSnapshotMetadata = Boolean(snapshotMetadata && Object.keys(snapshotMetadata).length > 0);
+  const availableTabs = useMemo(
+    () => (hasSnapshotMetadata ? [...baseTabs, metadataTab] : baseTabs),
+    [hasSnapshotMetadata]
+  );
+
+  useEffect(() => {
+    if (currentTab === tabs.snapshotMetadata && !hasSnapshotMetadata) {
+      setCurrentTab(tabs.snapshotDetails);
+    }
+  }, [currentTab, hasSnapshotMetadata]);
 
   if (snapshotQuery.isLoading || isFetchingSubscriptions) {
     return (
@@ -81,9 +104,9 @@ const SnapshotDetailPage = ({
       {/* Tabs */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
         <Tabs value={currentTab} variant="scrollable" scrollButtons="auto">
-          {Object.entries(tabs).map(([key, value]) => (
+          {availableTabs.map(({ key, value }) => (
             <Tab
-              data-testid={`${value.replace(" ", "-").toLowerCase()}-tab`}
+              data-testid={`${value.replace(/\s+/g, "-").toLowerCase()}-tab`}
               key={key}
               label={value}
               value={value}
@@ -105,6 +128,7 @@ const SnapshotDetailPage = ({
         <SnapshotDetailsTab snapshot={snapshotData} instances={instances} subscriptionsObj={subscriptionsObj} />
       )}
       {currentTab === tabs.deploymentParameters && <SnapshotDeploymentParametersTab snapshot={snapshotData} />}
+      {currentTab === tabs.snapshotMetadata && hasSnapshotMetadata && <SnapshotMetadataTab snapshot={snapshotData} />}
     </PageContainer>
   );
 };

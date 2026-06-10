@@ -388,6 +388,8 @@ const InstanceDetailsPage = ({
           }
           offering={offering}
           cloudProvider={cloudProvider}
+          instanceRegion={resourceInstanceData.region}
+          resourceType={resourceType}
           tab={"backups"}
           setCurrentTab={setCurrentTab}
           customNetworkExists={customNetworkExists}
@@ -407,6 +409,8 @@ const InstanceDetailsPage = ({
           }
           offering={offering}
           cloudProvider={cloudProvider}
+          instanceRegion={resourceInstanceData.region}
+          resourceType={resourceType}
           tab="snapshots"
           setCurrentTab={setCurrentTab}
           customNetworkExists={customNetworkExists}
