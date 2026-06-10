@@ -27,6 +27,40 @@ const ListItem = styled("li")({
   color: "#535862",
 });
 
+const getDeleteAccountErrorMessage = (error: unknown) => {
+  const maybeError = error as {
+    response?: {
+      data?: {
+        message?: string;
+      };
+    };
+    message?: string;
+  };
+
+  const backendMessage = maybeError?.response?.data?.message || maybeError?.message || "";
+  const message = backendMessage.toLowerCase();
+
+  if (
+    message.includes("unpaid usage") ||
+    message.includes("pending invoice") ||
+    message.includes("draft invoice") ||
+    message.includes("current month usage") ||
+    message.includes("current-month usage")
+  ) {
+    return "This account cannot be deleted while pending billing items exist. Please contact support for assistance.";
+  }
+
+  if (message.includes("unpaid invoice") || message.includes("open invoice")) {
+    return "Please resolve unpaid invoices before deleting your account. Please contact support if you need help.";
+  }
+
+  if (message.includes("active instance")) {
+    return "Please delete all active instances before deleting your account.";
+  }
+
+  return "Failed to delete your account. Please try again or contact support.";
+};
+
 function DeleteAccount() {
   const { orgName } = useProviderOrgDetails();
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
@@ -50,8 +84,8 @@ function DeleteAccount() {
       snackbar.showSuccess("Your account has been successfully deleted");
       handleLogout();
     },
-    onError: () => {
-      snackbar.showError("Failed to delete your account. Please try again or contact support");
+    onError: (error) => {
+      snackbar.showError(getDeleteAccountErrorMessage(error));
     },
   });
 
