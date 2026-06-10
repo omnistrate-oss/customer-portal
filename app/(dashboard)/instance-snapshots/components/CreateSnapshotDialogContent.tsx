@@ -9,7 +9,12 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 
-import { isOperatorCRDResourceType } from "../utils";
+import {
+  getResourceTypeFromHints,
+  hasOperatorCRDResource,
+  isOperatorCRDResourceType,
+  ResourceTypeHints,
+} from "../utils";
 
 type CreateSnapshotDialogContentProps = {
   formData: any;
@@ -43,9 +48,18 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
     return getMainResourceFromInstance(selectedInstance, selectedInstanceServiceOffering);
   }, [selectedInstance, selectedInstanceServiceOffering]);
 
-  const targetRegion = isOperatorCRDResourceType(selectedInstanceResource?.resourceType)
-    ? selectedInstance?.region
-    : undefined;
+  const selectedInstanceResourceType = useMemo(() => {
+    return (
+      getResourceTypeFromHints(selectedInstance as ResourceTypeHints | undefined, selectedInstanceServiceOffering) ||
+      selectedInstanceResource?.resourceType
+    );
+  }, [selectedInstance, selectedInstanceResource?.resourceType, selectedInstanceServiceOffering]);
+
+  const isSelectedInstanceOperatorCRDResource =
+    isOperatorCRDResourceType(selectedInstanceResourceType) ||
+    (!selectedInstanceResourceType && hasOperatorCRDResource(selectedInstanceServiceOffering));
+
+  const targetRegion = isSelectedInstanceOperatorCRDResource ? selectedInstance?.region : undefined;
 
   const regionMenuItems = useMemo(() => {
     if (formData.values.createSnapshotInstanceId && selectedInstance) {

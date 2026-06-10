@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
 import { Box } from "@mui/material";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
+import { useEffect, useMemo } from "react";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import { CloudProvider } from "src/types/common/enums";

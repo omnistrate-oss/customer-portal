@@ -40,7 +40,12 @@ import InstanceSnapshotsTableHeader from "./components/InstanceSnapshotsTableHea
 import RestoreSnapshotDialogContent from "./components/RestoreSnapshotDialogContent";
 import RestoreSnapshotSuccessContent from "./components/RestoreSnapshotSuccessContent";
 import useInstanceSnapshots from "./hooks/useInstanceSnapshots";
-import { isOperatorCRDResourceType } from "./utils";
+import {
+  getResourceTypeFromHints,
+  hasOperatorCRDResource,
+  isOperatorCRDResourceType,
+  ResourceTypeHints,
+} from "./utils";
 
 const columnHelper = createColumnHelper<InstanceSnapshot>();
 type Overlay =
@@ -229,8 +234,29 @@ const InstanceSnapshotsPage = () => {
   const serviceOffering = useMemo(() => {
     if (!selectedSnapshot) return undefined;
 
+    const snapshotServiceOffering =
+      selectedSnapshot.serviceId && selectedSnapshot.productTierId
+        ? serviceOfferingsObj[selectedSnapshot.serviceId]?.[selectedSnapshot.productTierId]
+        : undefined;
+
+    if (snapshotServiceOffering) {
+      return snapshotServiceOffering;
+    }
+
+    const snapshotSubscription = selectedSnapshot.subscriptionId
+      ? subscriptionsObj[selectedSnapshot.subscriptionId]
+      : undefined;
+    const subscriptionServiceOffering =
+      snapshotSubscription?.serviceId && snapshotSubscription?.productTierId
+        ? serviceOfferingsObj[snapshotSubscription.serviceId]?.[snapshotSubscription.productTierId]
+        : undefined;
+
+    if (subscriptionServiceOffering) {
+      return subscriptionServiceOffering;
+    }
+
     return serviceOfferings.find((offering) => offering.productTierID === selectedSnapshot.productTierId);
-  }, [selectedSnapshot, serviceOfferings]);
+  }, [selectedSnapshot, serviceOfferings, serviceOfferingsObj, subscriptionsObj]);
 
   const selectedSnapshotSourceInstance = useMemo(() => {
     if (!selectedSnapshot?.sourceInstanceId) return undefined;
@@ -242,9 +268,19 @@ const InstanceSnapshotsPage = () => {
     return getMainResourceFromInstance(selectedSnapshotSourceInstance, serviceOffering);
   }, [selectedSnapshotSourceInstance, serviceOffering]);
 
-  const copySnapshotTargetRegion = isOperatorCRDResourceType(selectedSnapshotResource?.resourceType)
-    ? selectedSnapshot?.region
-    : undefined;
+  const selectedSnapshotResourceType = useMemo(() => {
+    return (
+      getResourceTypeFromHints(selectedSnapshot as ResourceTypeHints | undefined, serviceOffering) ||
+      selectedSnapshotResource?.resourceType ||
+      getResourceTypeFromHints(selectedSnapshotSourceInstance as ResourceTypeHints | undefined, serviceOffering)
+    );
+  }, [selectedSnapshot, selectedSnapshotResource?.resourceType, selectedSnapshotSourceInstance, serviceOffering]);
+
+  const isSelectedSnapshotOperatorCRDResource =
+    isOperatorCRDResourceType(selectedSnapshotResourceType) ||
+    (!selectedSnapshotResourceType && hasOperatorCRDResource(serviceOffering));
+
+  const copySnapshotTargetRegion = isSelectedSnapshotOperatorCRDResource ? selectedSnapshot?.region : undefined;
 
   const formData = useFormik<FormValues>({
     initialValues: {
@@ -300,9 +336,20 @@ const InstanceSnapshotsPage = () => {
     return getMainResourceFromInstance(createSnapshotInstance, createSnapshotServiceOffering);
   }, [createSnapshotInstance, createSnapshotServiceOffering]);
 
-  const createSnapshotTargetRegion = isOperatorCRDResourceType(createSnapshotResource?.resourceType)
-    ? createSnapshotInstance?.region
-    : undefined;
+  const createSnapshotResourceType = useMemo(() => {
+    return (
+      getResourceTypeFromHints(
+        createSnapshotInstance as ResourceTypeHints | undefined,
+        createSnapshotServiceOffering
+      ) || createSnapshotResource?.resourceType
+    );
+  }, [createSnapshotInstance, createSnapshotResource?.resourceType, createSnapshotServiceOffering]);
+
+  const isCreateSnapshotOperatorCRDResource =
+    isOperatorCRDResourceType(createSnapshotResourceType) ||
+    (!createSnapshotResourceType && hasOperatorCRDResource(createSnapshotServiceOffering));
+
+  const createSnapshotTargetRegion = isCreateSnapshotOperatorCRDResource ? createSnapshotInstance?.region : undefined;
 
   const createSnapshotMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/snapshot", {
     onSuccess: () => {
