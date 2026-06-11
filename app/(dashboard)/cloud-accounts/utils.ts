@@ -17,6 +17,7 @@ export type CloudAccountFormValues = {
   azureTenantId: string;
   ociTenancyId: string;
   ociDomainId: string;
+  nebiusTenantId: string;
   clusterName: string;
   clusterDescription: string;
 };
@@ -120,14 +121,15 @@ export const getInitialValues = (
                 : resultParams?.cluster_name
                   ? "byoc-onprem"
                   : "",
-      accountConfigurationMethod: resultParams?.account_configuration_method || "",
-      awsAccountId: resultParams?.aws_account_id || "",
-      gcpProjectId: resultParams?.gcp_project_id || "",
-      gcpProjectNumber: resultParams?.gcp_project_number || "",
-      azureSubscriptionId: resultParams?.azure_subscription_id || "",
-      azureTenantId: resultParams?.azure_tenant_id || "",
-      ociTenancyId: resultParams?.oci_tenancy_id || "",
-      ociDomainId: resultParams?.oci_domain_id || "",
+      accountConfigurationMethod: resultParams?.account_configuration_method,
+      awsAccountId: resultParams?.aws_account_id,
+      gcpProjectId: resultParams?.gcp_project_id,
+      gcpProjectNumber: resultParams?.gcp_project_number,
+      azureSubscriptionId: resultParams?.azure_subscription_id,
+      azureTenantId: resultParams?.azure_tenant_id,
+      ociTenancyId: resultParams?.oci_tenancy_id,
+      ociDomainId: resultParams?.oci_domain_id,
+      nebiusTenantId: resultParams?.nebius_tenant_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
     };
@@ -159,6 +161,7 @@ export const getInitialValues = (
       azureTenantId: "",
       ociTenancyId: "",
       ociDomainId: "",
+      nebiusTenantId: "",
       clusterName: "",
       clusterDescription: "",
     };
@@ -196,6 +199,7 @@ export const getInitialValues = (
     azureTenantId: "",
     ociTenancyId: "",
     ociDomainId: "",
+    nebiusTenantId: "",
     clusterName: "",
     clusterDescription: "",
   };

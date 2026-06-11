@@ -121,6 +121,7 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
           </Box>
         </Stack>
       )}
+
       {offboardingInstructionDetails?.byocOnpremClusterName && (
         <Box marginBottom={"20px"}>
           <Text size="small" weight="semibold" color="#374151">
@@ -129,6 +130,7 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
           <TextContainerToCopy text={offboardingInstructionDetails?.byocOnpremClusterName} marginTop="6px" />
         </Box>
       )}
+
       <Text size="small" weight="medium" color="#414651">
         This cloud account instance is marked for deletion
       </Text>

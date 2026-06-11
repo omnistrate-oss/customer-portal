@@ -15,6 +15,8 @@ import {
 
 import { Overlay } from "../page";
 
+const NON_MODIFIABLE_VPC_STATUSES = new Set(["FAILED", "DELETING", "DELETED"]);
+
 type CloudAccountsActionMenuProps = {
   instance?: ResourceInstance;
   subscription?: Subscription;
@@ -54,7 +56,26 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
     const isDeleting = instance?.status === "DELETING";
-    const isNebius = !!getResultParams(instance)?.nebius_tenant_id;
+    const isModifyVpcStatusBlocked = NON_MODIFIABLE_VPC_STATUSES.has(instance?.status || "");
+    const resultParams = getResultParams(instance);
+    const isNebius = !!resultParams?.nebius_tenant_id;
+    const cloudProvider =
+      resultParams?.cloud_provider ||
+      (resultParams?.aws_account_id
+        ? "aws"
+        : resultParams?.gcp_project_id
+          ? "gcp"
+          : resultParams?.azure_subscription_id
+            ? "azure"
+            : resultParams?.oci_tenancy_id
+              ? "oci"
+              : resultParams?.nebius_tenant_id
+                ? "nebius"
+                : resultParams?.cluster_name
+                  ? "byoc-onprem"
+                  : "");
+    const isModifyVpcsSupportedProvider = cloudProvider === "aws" || cloudProvider === "gcp";
+    const hasLinkedAccountConfig = Boolean(resultParams?.cloud_provider_account_config_id);
 
     // const isDeploying = instance?.status === "DEPLOYING";
     // const isFailed = instance?.status === "FAILED";
@@ -98,17 +119,15 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     //           : "";
 
     // Delete action
-    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard || isNebius;
+    const isDeleteDisabled = !instance || isDeleting || isSelectedInstanceReadyToOffboard;
 
     const isDeleteDisabledMessage = !instance
       ? "Please select a cloud account"
-      : isNebius
-        ? "Delete is not supported for Nebius cloud accounts"
-        : isDeleting
-          ? "Cloud account deletion is already in progress"
-          : isDeleteProtected && deletionProtectionFeatureEnabled
-            ? "Cloud account has delete protection enabled"
-            : "";
+      : isDeleting
+        ? "Cloud account deletion is already in progress"
+        : isDeleteProtected && deletionProtectionFeatureEnabled
+          ? "Cloud account has delete protection enabled"
+          : "";
 
     res.push({
       dataTestId: "delete-action-button",
@@ -135,6 +154,36 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
       isDisabled: isOffboardDisabled,
       onClick: onOffboardClick,
       disabledMessage: offboardingDisabledMessage,
+    });
+
+    const isModifyVpcsDisabled =
+      !instance ||
+      isModifyVpcStatusBlocked ||
+      !isUpdateAllowedByRBAC ||
+      !isModifyVpcsSupportedProvider ||
+      !hasLinkedAccountConfig;
+    const modifyVpcsDisabledMessage = !instance
+      ? "Please select a cloud account"
+      : isModifyVpcStatusBlocked
+        ? "Modify VPCs is not allowed for failed or deleted cloud accounts"
+        : !isUpdateAllowedByRBAC
+          ? "Unauthorized to modify VPCs"
+          : !isModifyVpcsSupportedProvider
+            ? "Modify VPCs is available for AWS and GCP cloud accounts only"
+            : !hasLinkedAccountConfig
+              ? "Modify VPCs requires a linked cloud provider account config"
+              : "";
+
+    res.push({
+      dataTestId: "modify-vpcs-action-button",
+      label: "Modify VPCs",
+      isDisabled: isModifyVpcsDisabled,
+      onClick: () => {
+        if (isModifyVpcsDisabled) return;
+        setIsOverlayOpen(true);
+        setOverlayType("modify-vpcs");
+      },
+      disabledMessage: modifyVpcsDisabledMessage,
     });
 
     // if (isOnPremCopilot) {
