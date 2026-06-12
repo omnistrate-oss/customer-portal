@@ -1,11 +1,8 @@
 # SaaSBuilder Upgrade Tool
 
-Rolls a new `customer-portal` image across SaaSBuilder fleet instances on Omnistrate Dev or Prod. Two run modes:
+Rolls a new `customer-portal` image across SaaSBuilder fleet instances on Omnistrate Dev or Prod. It runs as a two-stage GitHub Actions pipeline — `SaaSBuilder Upgrade — Prepare` and `SaaSBuilder Upgrade — Execute` — a non-interactive run with credentials from secrets, Mattermost notifications, and a 4 h timeout. There is no local run mode; the rollout is triggered only from GitHub Actions.
 
-- **Local interactive** (`yarn upgrade:instances`) — original prompt-driven CLI for a single operator at a terminal.
-- **GitHub Actions** (`SaaSBuilder Upgrade — Prepare` and `SaaSBuilder Upgrade — Execute` workflows) — two-stage non-interactive run with credentials from secrets, Mattermost notifications, and a 4 h timeout.
-
-Both modes call the same underlying library (`scripts/saasbuilder-upgrade/lib.ts`) for every API operation; only the I/O shells differ. There are a few small mode-specific behaviors — most notably, the CI Prepare flow treats an already-released version set as a no-op so re-runs are idempotent, while the local interactive flow surfaces the API error.
+Both stages call the same underlying library (`scripts/saasbuilder-upgrade/lib.ts`) for every API operation. Note that the Prepare stage treats an already-released version set as a no-op, so re-runs are idempotent.
 
 ## What it does
 
@@ -13,9 +10,9 @@ For the chosen environment (Dev or Prod), the tool walks five steps:
 
 1. **Update default image** — `PATCH`es the `imageName` input-parameter so new instances launch on the new tag.
 2. **Release a new version set** — `POST /service-api/{saId}/release` with `versionSetName = "Image v<tag>"`, type `Major`, marked preferred.
-3. **Pick source + target versions** — Lists all version sets and asks which version to upgrade FROM and TO. Defaults the target to the version set just released.
+3. **Pick source + target versions** — The Prepare stage lists all version sets; the operator passes the chosen FROM/TO versions as Execute inputs (`source_version`, `target_version`).
 4. **Upgrade running instances** — Lists instances on the source version, filters to `RUNNING`, creates an upgrade-path, polls every 20 s until the upgrade reaches `COMPLETE` / `FAILED` / `CANCELLED`. Each poll is wrapped in exponential-backoff retry so a single 429/5xx during the multi-hour wait does not abort the run.
-5. **Modify instances** — Lists every fleet instance, groups by current `imageName`, lets the operator pick which groups to update, then `PATCH`es each selected instance to the new image with a 1.5 s delay. Per-instance failures are reported but do not abort the rest of the run.
+5. **Modify instances** — Lists every fleet instance, groups by current `imageName`; the operator selects which groups to update via the `image_groups_json` Execute input, then each selected instance is `PATCH`ed to the new image with a 1.5 s delay. Per-instance failures are reported but do not abort the rest of the run.
 
 ## Prerequisites
 
@@ -23,22 +20,7 @@ For the chosen environment (Dev or Prod), the tool walks five steps:
 - The credentials in use have **fleet-admin** permissions on the target Omnistrate environment — Steps 4 and 5 hit internal `/fleet/...` endpoints (`inventory-api`).
 - Dependencies installed: `yarn install`.
 
-## Mode 1: Local interactive
-
-```bash
-yarn upgrade:instances
-```
-
-You will be asked, in order:
-
-1. `Dev` or `Prod`
-2. Omnistrate email + password (password masked, held in memory only)
-3. New image tag (e.g. `0.3.116`)
-4. Confirm each step
-
-If login fails, the prompt retries up to 3 times.
-
-## Mode 2: GitHub Actions (recommended for production rollouts)
+## Running it (GitHub Actions)
 
 Two `workflow_dispatch` workflows run as a chain. The pause between them is the operator clicking "Run workflow" on the second one — that's the mid-flow input.
 
@@ -89,7 +71,7 @@ This repo is public, which means **Actions logs, uploaded artifacts, and step su
 - `upgrade-execute-summary.json` reports `failureReasons` as `{ reason, count }` aggregations and omits the upgrade-path ID.
 - API errors are sanitized to the HTTP status (e.g. `HTTP 503`) before they hit logs or artifacts; the full URL (which contains the instance ID) and response body are dropped.
 
-When investigating a failed rollout, use the credentials directly to re-query the API for specific instance IDs — the counts in the summary tell you what to look for. The local `yarn upgrade:instances` flow is unchanged and still prints full IDs (only your terminal sees them).
+When investigating a failed rollout, use the credentials directly to re-query the API for specific instance IDs — the counts in the summary tell you what to look for.
 
 ### Failure handling
 

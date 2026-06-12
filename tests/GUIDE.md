@@ -4,10 +4,10 @@
 
 Tests run **live against the real backend** on every non-draft PR. There is no HAR record/replay — each run exercises the actual Omnistrate API.
 
-| Environment | Command | Workers | Retries |
-|-------------|---------|---------|---------|
-| **Local** | `yarn playwright test` | 3 | 0 |
-| **CI** | `yarn playwright test` (via `playwright.yml`) | 1 | 2 |
+| Environment | Command                                       | Workers | Retries |
+| ----------- | --------------------------------------------- | ------- | ------- |
+| **Local**   | `yarn playwright test`                        | 3       | 0       |
+| **CI**      | `yarn playwright test` (via `playwright.yml`) | 1       | 2       |
 
 ## Directory Structure
 
@@ -36,6 +36,7 @@ page-objects/              # Page object models
 ### Prerequisites
 
 1. Copy `.env.local.example` to `.env.local` and fill in credentials:
+
    ```
    PROVIDER_EMAIL=...
    PROVIDER_PASSWORD=...
@@ -167,8 +168,8 @@ Use `GlobalStateManager` to share state across test files:
 ```ts
 import { GlobalStateManager } from "test-utils/global-state-manager";
 
-const date = GlobalStateManager.getDate();              // Timestamp from global setup
-const token = GlobalStateManager.getToken("provider");  // or "user"
+const date = GlobalStateManager.getDate(); // Timestamp from global setup
+const token = GlobalStateManager.getToken("provider"); // or "user"
 const offerings = GlobalStateManager.getServiceOfferings();
 const subscriptions = GlobalStateManager.getSubscriptions();
 ```
@@ -216,6 +217,7 @@ test.describe("My Infra Test", () => {
 ### CI behavior
 
 When backend soft failures occur:
+
 1. Failures are recorded to `tests/backend-failures.json`
 2. A summary is added to the GitHub Actions job summary
 3. The failure report is uploaded as an artifact

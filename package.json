@@ -12,7 +12,6 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
-    "upgrade:instances": "tsx scripts/saasbuilder-upgrade/interactive.ts",
     "upgrade:prepare": "tsx scripts/saasbuilder-upgrade/prepare.ts",
     "upgrade:execute": "tsx scripts/saasbuilder-upgrade/execute.ts",
     "typecheck:scripts": "tsc -p scripts/tsconfig.json",
