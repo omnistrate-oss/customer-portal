@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Box } from "@mui/material";
 import { getRegionMenuItems } from "app/(dashboard)/instances/utils";
 
@@ -11,6 +11,7 @@ type CopySnapshotDialogContentProps = {
   serviceOffering?: ServiceOffering;
   isFetchingServiceOfferings?: boolean;
   cloudProvider?: string;
+  targetRegion?: string;
 };
 
 const CopySnapshotDialogContent: React.FC<CopySnapshotDialogContentProps> = ({
@@ -18,11 +19,29 @@ const CopySnapshotDialogContent: React.FC<CopySnapshotDialogContentProps> = ({
   serviceOffering,
   isFetchingServiceOfferings,
   cloudProvider,
+  targetRegion,
 }) => {
-  const menuItems = useMemo(
-    () => getRegionMenuItems(serviceOffering, cloudProvider as CloudProvider),
-    [serviceOffering, cloudProvider]
-  );
+  const menuItems = useMemo(() => {
+    const regionMenuItems = getRegionMenuItems(serviceOffering, cloudProvider as CloudProvider);
+
+    if (!targetRegion || regionMenuItems.some((option) => option.value === targetRegion)) {
+      return regionMenuItems;
+    }
+
+    return [
+      {
+        label: targetRegion,
+        value: targetRegion,
+      },
+      ...regionMenuItems,
+    ];
+  }, [serviceOffering, cloudProvider, targetRegion]);
+
+  useEffect(() => {
+    if (targetRegion && formData.values.copySnapshotRegion !== targetRegion) {
+      formData.setFieldValue("copySnapshotRegion", targetRegion, false);
+    }
+  }, [formData, targetRegion]);
 
   return (
     <Box maxWidth="500px" mx="auto">
@@ -34,6 +53,8 @@ const CopySnapshotDialogContent: React.FC<CopySnapshotDialogContentProps> = ({
           type: "select",
           menuItems: menuItems,
           required: true,
+          disabled: Boolean(targetRegion),
+          disabledMessage: "Snapshots can only be copied in the same region as the source snapshot",
           isLoading: isFetchingServiceOfferings,
         }}
         formData={formData}

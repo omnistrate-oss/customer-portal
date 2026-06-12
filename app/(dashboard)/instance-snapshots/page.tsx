@@ -31,6 +31,7 @@ import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 import useCustomNetworks from "../custom-networks/hooks/useCustomNetworks";
 import useInstances from "../instances/hooks/useInstances";
+import { getMainResourceFromInstance } from "../instances/utils";
 
 import CopySnapshotDialogContent from "./components/CopySnapshotDialogContent";
 import CreateSnapshotDialogContent from "./components/CreateSnapshotDialogContent";
@@ -39,6 +40,7 @@ import InstanceSnapshotsTableHeader from "./components/InstanceSnapshotsTableHea
 import RestoreSnapshotDialogContent from "./components/RestoreSnapshotDialogContent";
 import RestoreSnapshotSuccessContent from "./components/RestoreSnapshotSuccessContent";
 import useInstanceSnapshots from "./hooks/useInstanceSnapshots";
+import { isOperatorCRDResourceType } from "./utils";
 
 const columnHelper = createColumnHelper<InstanceSnapshot>();
 type Overlay =
@@ -62,7 +64,7 @@ const InstanceSnapshotsPage = () => {
   const [restoredInstanceId, setRestoredInstanceId] = useState<string>("");
   const [filteredSnapshots, setFilteredSnapshots] = useState<InstanceSnapshot[]>([]);
 
-  const { serviceOfferings, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
+  const { serviceOfferings, serviceOfferingsObj, isFetchingServiceOfferings, subscriptionsObj } = useGlobalData();
 
   const {
     data: snapshots = [],
@@ -85,11 +87,6 @@ const InstanceSnapshotsPage = () => {
   const openOverlay = (type: Overlay) => {
     setOverlayType(type);
     setIsOverlayOpen(true);
-  };
-
-  const closeOverlay = () => {
-    setIsOverlayOpen(false);
-    formData.resetForm();
   };
 
   const dataTableColumns = useMemo(() => {
@@ -235,6 +232,20 @@ const InstanceSnapshotsPage = () => {
     return serviceOfferings.find((offering) => offering.productTierID === selectedSnapshot.productTierId);
   }, [selectedSnapshot, serviceOfferings]);
 
+  const selectedSnapshotSourceInstance = useMemo(() => {
+    if (!selectedSnapshot?.sourceInstanceId) return undefined;
+
+    return instances.find((instance) => instance.id === selectedSnapshot.sourceInstanceId);
+  }, [instances, selectedSnapshot?.sourceInstanceId]);
+
+  const selectedSnapshotResource = useMemo(() => {
+    return getMainResourceFromInstance(selectedSnapshotSourceInstance, serviceOffering);
+  }, [selectedSnapshotSourceInstance, serviceOffering]);
+
+  const copySnapshotTargetRegion = isOperatorCRDResourceType(selectedSnapshotResource?.resourceType)
+    ? selectedSnapshot?.region
+    : undefined;
+
   const formData = useFormik<FormValues>({
     initialValues: {
       restoreSnapshotCustomNetworkId: "",
@@ -266,6 +277,32 @@ const InstanceSnapshotsPage = () => {
       // Submission is handled in the Confirmation Dialog
     },
   });
+
+  const closeOverlay = () => {
+    setIsOverlayOpen(false);
+    formData.resetForm();
+  };
+
+  const createSnapshotInstance = useMemo(() => {
+    return instances.find((instance) => instance.id === formData.values.createSnapshotInstanceId);
+  }, [instances, formData.values.createSnapshotInstanceId]);
+
+  const createSnapshotServiceOffering = useMemo(() => {
+    if (!createSnapshotInstance) return undefined;
+
+    const subscription = subscriptionsObj[createSnapshotInstance.subscriptionId as string];
+    const { serviceId, productTierId } = subscription || {};
+
+    return serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+  }, [createSnapshotInstance, serviceOfferingsObj, subscriptionsObj]);
+
+  const createSnapshotResource = useMemo(() => {
+    return getMainResourceFromInstance(createSnapshotInstance, createSnapshotServiceOffering);
+  }, [createSnapshotInstance, createSnapshotServiceOffering]);
+
+  const createSnapshotTargetRegion = isOperatorCRDResourceType(createSnapshotResource?.resourceType)
+    ? createSnapshotInstance?.region
+    : undefined;
 
   const createSnapshotMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/snapshot", {
     onSuccess: () => {
@@ -452,6 +489,7 @@ const InstanceSnapshotsPage = () => {
                       isFetchingServiceOfferings={isFetchingServiceOfferings}
                       serviceOffering={serviceOffering}
                       cloudProvider={selectedSnapshot?.cloudProvider}
+                      targetRegion={copySnapshotTargetRegion}
                     />
                   )
                 : () => (
@@ -490,7 +528,12 @@ const InstanceSnapshotsPage = () => {
             return true;
           }
 
-          const errors = await formData.validateForm();
+          const formValues = {
+            ...formData.values,
+            copySnapshotRegion: copySnapshotTargetRegion || formData.values.copySnapshotRegion,
+            createSnapshotRegion: createSnapshotTargetRegion || formData.values.createSnapshotRegion,
+          };
+          const errors = await formData.validateForm(formValues);
           if (Object.keys(errors).length > 0) {
             // Mark fields with errors as touched so error messages are displayed
             const touched = Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {});
@@ -502,7 +545,7 @@ const InstanceSnapshotsPage = () => {
             await createSnapshotMutation.mutateAsync({
               body: {
                 instanceId: formData.values.createSnapshotInstanceId,
-                targetRegion: formData.values.createSnapshotRegion,
+                targetRegion: createSnapshotTargetRegion || formData.values.createSnapshotRegion,
               },
             });
             formData.resetForm();
@@ -521,7 +564,7 @@ const InstanceSnapshotsPage = () => {
                 query: { subscriptionId: selectedSnapshot.subscriptionId },
               },
               body: {
-                targetRegion: formData.values.copySnapshotRegion,
+                targetRegion: copySnapshotTargetRegion || formData.values.copySnapshotRegion,
               },
             });
           } else if (overlayType === "restore-snapshot-dialog") {
