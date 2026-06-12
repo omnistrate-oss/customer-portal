@@ -9,6 +9,16 @@ import { Text } from "src/components/Typography/Typography";
 
 dayjs.extend(utc);
 
+const TableHeader = () => {
+  return (
+    <div className=" py-5 px-6 border-b border-[#E4E7EC]">
+      <Text size="large" weight="semibold" color="#101828">
+        Usage Breakdown
+      </Text>
+    </div>
+  );
+};
+
 export type SubscriptionUsageRow = {
   subscriptionId: string;
   serviceId: string;
@@ -135,16 +145,8 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
     <DataTable
       columns={columns}
       rows={rows}
+      HeaderComponent={TableHeader}
       noRowsText="No subscriptions"
-      tableStyles={{
-        marginTop: "12px",
-        boxShadow: "none",
-        border: "none",
-        borderRadius: "0px",
-        borderBottomRightRadius: "12px",
-        borderBottomLeftRadius: "12px",
-        borderTop: "1px solid #E4E7EC",
-      }}
       isLoading={isSubscriptionsUsagePending}
       hidePagination={rows.length < 11}
     />

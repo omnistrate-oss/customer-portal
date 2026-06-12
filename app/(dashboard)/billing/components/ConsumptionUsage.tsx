@@ -1,6 +1,4 @@
 import { FC, useMemo, useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import { Collapse } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -119,17 +117,14 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
   }, [isSubscriptionUsageFetched, subscriptionUsageHashmap, rootSubscriptions]);
 
   return (
-    <div
-      className="mt-[20px] border border-[#E9EAEB] rounded-[12px] bg-[#FFF]"
-      style={{ boxShadow: "0px 1px 2px 0px var(#0A0D120D)" }}
-    >
-      <div className="py-[20px] px-[24px]">
+    <div className="mt-[20px]">
+      <div className="pb-2 pt-4 border-b border-[#E9EAEB]">
         <div className="flex flex-row items-center justify-between">
           <div>
-            <Text size="large" weight="semibold" color="#181D27">
+            <Text size="medium" weight="semibold" color="#181D27">
               Current Usage
             </Text>
-            <Text size="xsmall" weight="medium" color="#414651">
+            <Text size="xsmall" weight="regular" color="#535862">
               Usage This Month{" "}
               {consumptionUsageData?.endTime &&
                 `(Until ${dayjs.utc(consumptionUsageData?.endTime).format("MMM DD, YYYY, HH:mm:ss")} UTC)`}
@@ -137,34 +132,35 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
           </div>
           <Button
             variant="outlined"
-            startIcon={showUsageBreakdown ? <RemoveIcon /> : <AddIcon />}
             onClick={() => {
               setShowUsageBreakdown((prev) => !prev);
             }}
+            fontColor={"#5925DC"}
+            outlineColor={"#5925DC"}
           >
             {showUsageBreakdown ? "Hide" : "Show"} Usage Breakdown
           </Button>
         </div>
       </div>
-      <div className="border-t border-[#E9EAEB] py-3 px-6">
-        <div className="flex gap-x-3 justify-center max-w-[900px] mx-auto">
+      <div className=" py-3">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <UsageDimensionCard
-            title="Memory Usage"
+            title="Memory"
             dimensionName="Memory GiB hours"
             value={aggregatedConsumptionDataHash["Memory GiB hours"].total}
           />
           <UsageDimensionCard
-            title="Storage Usage"
+            title="Storage"
             dimensionName="Storage GiB hours"
             value={aggregatedConsumptionDataHash["Storage GiB hours"].total}
           />
           <UsageDimensionCard
-            title="CPU Usage"
+            title="CPU"
             dimensionName="CPU core hours"
             value={aggregatedConsumptionDataHash["CPU core hours"].total}
           />
           <UsageDimensionCard
-            title="Replicas Usage"
+            title="Replicas"
             dimensionName="Replica hours"
             value={aggregatedConsumptionDataHash["Replica hours"].total}
           />

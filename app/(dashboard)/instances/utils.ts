@@ -239,6 +239,34 @@ export const getMainResourceFromInstance = (instance?: ResourceInstance, offerin
 
   return mainResource;
 };
+
+/**
+ * Returns true when an operation verb is supported by the instance.
+ * If supportedOperations is absent/empty, default to true to preserve
+ * backward compatibility with older payloads.
+ */
+export const hasSupportedOperation = (
+  instance: ResourceInstance | undefined,
+  verb: string,
+  resourceType?: string
+): boolean => {
+  // Enforce supportedOperations checks only for OperatorCRD main resources.
+  // For all other resource types, keep existing behavior and allow actions
+  // to be controlled by status/RBAC/feature flags.
+  if ((resourceType || "").toLowerCase() !== "operatorcrd") {
+    return true;
+  }
+
+  const operations = instance?.supportedOperations as Array<{ verb?: string }> | undefined;
+
+  if (!operations || operations.length === 0) {
+    return true;
+  }
+
+  const normalizedVerb = verb.toUpperCase();
+  return operations.some((operation) => (operation?.verb || "").toUpperCase() === normalizedVerb);
+};
+
 // Helper function to check if subscription is valid for creation
 export const isSubscriptionValid = (
   subscription: Subscription,
