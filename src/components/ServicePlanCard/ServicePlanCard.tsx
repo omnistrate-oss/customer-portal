@@ -2,10 +2,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { Box } from "@mui/material";
 
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { colors } from "src/themeConfig";
 import { SetState } from "src/types/common/reactGenerics";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
+import { isManageableSubscriptionRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 
 import Button from "../Button/Button";
 import CircleCheckIcon from "../Icons/ServicePlanCard/CircleCheckIcon";
@@ -37,7 +39,10 @@ const ServicePlanCard: React.FC<ServicePlanCardProps> = ({
   onUnsubscribeClick,
 }) => {
   const isAutoApprove = servicePlan.AutoApproveSubscription;
-  const isUnsubscribeAllowed = !rootSubscription?.defaultSubscription && rootSubscription?.roleType === "root";
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
+  const isUnsubscribeAllowed =
+    !rootSubscription?.defaultSubscription &&
+    isManageableSubscriptionRole(rootSubscription?.roleType, consumptionSubscriptionAdminRBAC);
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   return (
@@ -147,8 +152,11 @@ const ServicePlanCard: React.FC<ServicePlanCardProps> = ({
           disabledMessage={
             rootSubscription?.defaultSubscription
               ? "Cannot unsubscribe from Default subscription"
-              : rootSubscription && rootSubscription?.roleType !== "root"
-                ? "Cannot unsubscribe without Root access"
+              : rootSubscription &&
+                  !isManageableSubscriptionRole(rootSubscription?.roleType, consumptionSubscriptionAdminRBAC)
+                ? consumptionSubscriptionAdminRBAC
+                  ? "Cannot unsubscribe without Root or Admin access"
+                  : "Cannot unsubscribe without Root access"
                 : ""
           }
         >

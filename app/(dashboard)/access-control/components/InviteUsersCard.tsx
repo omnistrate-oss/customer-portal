@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Add } from "@mui/icons-material";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { InputAdornment } from "@mui/material";
@@ -9,10 +10,17 @@ import { cn } from "lib/utils";
 
 import { inviteSubscriptionUser } from "src/api/users";
 import FieldError from "src/components/FormElementsv2/FieldError/FieldError";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
 import { Subscription } from "src/types/subscription";
+import {
+  getHighestPermissionSubscription,
+  getSubscriptionUserInviteRoleOptions,
+  isManageableSubscriptionRole,
+  toSubscriptionUserRoleType,
+} from "src/utils/consumptionSubscriptionAdminRBAC";
 import Button from "components/Button/Button";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import Form from "components/FormElementsv2/Form/Form";
@@ -23,7 +31,7 @@ import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import DeleteIcon from "components/Icons/Delete/Delete";
 import { Text } from "components/Typography/Typography";
 
-import { inviteUsersValidationSchema } from "../utils";
+import { getInviteUsersValidationSchema } from "../utils";
 
 const getNewEnvVariable = () => {
   return {
@@ -34,11 +42,11 @@ const getNewEnvVariable = () => {
   };
 };
 
-const getServiceMenuItems = (subscriptions: Subscription[]) => {
+const getServiceMenuItems = (subscriptions: Subscription[], consumptionSubscriptionAdminRBAC: boolean) => {
   const serviceIdSet = new Set();
 
   const serviceMenuItems = subscriptions
-    .filter((sub) => sub.roleType === "root")
+    .filter((sub) => isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC))
     .map((sub) => {
       if (!serviceIdSet.has(sub.serviceId)) {
         serviceIdSet.add(sub.serviceId);
@@ -61,17 +69,49 @@ const getServiceMenuItems = (subscriptions: Subscription[]) => {
   );
 };
 
-const getServicePlanMenuItems = (subscriptions: Subscription[], serviceId: string) => {
+const getServicePlanMenuItems = (
+  subscriptions: Subscription[],
+  serviceId: string,
+  consumptionSubscriptionAdminRBAC: boolean
+) => {
+  const servicePlanIdSet = new Set();
+
   const servicePlanMenuItems = subscriptions
-    ?.filter((sub) => sub.serviceId === serviceId && sub.roleType === "root")
+    ?.filter(
+      (sub) =>
+        sub.serviceId === serviceId && isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+    )
     .map((sub) => {
+      if (servicePlanIdSet.has(sub.productTierId)) {
+        return null;
+      }
+      servicePlanIdSet.add(sub.productTierId);
       return {
         label: sub.productTierName,
         value: sub.productTierId,
       };
     })
+    .filter((item) => item !== null)
+    // @ts-ignore
     .sort((a, b) => a.label.localeCompare(b.label));
   return servicePlanMenuItems;
+};
+
+const getManageableSubscriptionForInvite = (
+  subscriptions: Subscription[],
+  serviceId: string,
+  servicePlanId: string,
+  consumptionSubscriptionAdminRBAC: boolean
+) => {
+  return getHighestPermissionSubscription(
+    subscriptions.filter(
+      (sub) =>
+        sub.serviceId === serviceId &&
+        sub.productTierId === servicePlanId &&
+        isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+    ),
+    consumptionSubscriptionAdminRBAC
+  );
 };
 
 type InviteUsersCardProps = {
@@ -94,6 +134,12 @@ interface InviteUsersFormValues {
 const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetchingUsers }) => {
   const snackbar = useSnackbar();
   const { subscriptions, isSubscriptionsPending } = useGlobalData();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
+  const roleOptions = useMemo(
+    () => getSubscriptionUserInviteRoleOptions(consumptionSubscriptionAdminRBAC),
+    [consumptionSubscriptionAdminRBAC]
+  );
+  const validationSchema = useMemo(() => getInviteUsersValidationSchema(roleOptions), [roleOptions]);
 
   const createUserInvitesMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -105,10 +151,13 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               roleType: d.roleType,
             };
 
-            const rootSubscription = subscriptions.find(
-              (sub) => sub.serviceId === d.serviceId && sub.productTierId === d.servicePlanId && sub.roleType === "root"
+            const subscription = getManageableSubscriptionForInvite(
+              subscriptions,
+              d.serviceId,
+              d.servicePlanId,
+              consumptionSubscriptionAdminRBAC
             );
-            return inviteSubscriptionUser(rootSubscription?.id, payload);
+            return inviteSubscriptionUser(subscription?.id, payload);
           })
         );
         snackbar.showSuccess("Invites Sent");
@@ -137,16 +186,15 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
       const valuesToBeSubmitted = structuredClone(values);
 
       for (let i = 0; i < valuesToBeSubmitted?.userInvite?.length; i++) {
-        if (valuesToBeSubmitted.userInvite[i]["roleType"] === "Editor") {
-          valuesToBeSubmitted.userInvite[i]["roleType"] = "editor";
-        }
-        if (valuesToBeSubmitted.userInvite[i]["roleType"] === "Reader") {
-          valuesToBeSubmitted.userInvite[i]["roleType"] = "reader";
+        if (valuesToBeSubmitted.userInvite[i]["roleType"]) {
+          valuesToBeSubmitted.userInvite[i]["roleType"] = toSubscriptionUserRoleType(
+            valuesToBeSubmitted.userInvite[i]["roleType"]
+          );
         }
       }
       createUserInvitesMutation.mutate(valuesToBeSubmitted);
     },
-    validationSchema: inviteUsersValidationSchema,
+    validationSchema,
   });
 
   const { values, handleChange, handleBlur, setFieldValue } = formData;
@@ -181,11 +229,12 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                   return (
                     <>
                       {values.userInvite.map((invite, index) => {
-                        const serivceMenuItems = getServiceMenuItems(subscriptions);
+                        const serivceMenuItems = getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC);
 
                         const servicePlanMenuItems = getServicePlanMenuItems(
                           subscriptions,
-                          values.userInvite[index].serviceId
+                          values.userInvite[index].serviceId,
+                          consumptionSubscriptionAdminRBAC
                         );
 
                         return (
@@ -233,6 +282,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                 onChange={(e) => {
                                   handleChange(e);
                                   setFieldValue(`userInvite[${index}].servicePlanId`, "");
+                                  setFieldValue(`userInvite[${index}].roleType`, "");
                                 }}
                                 sx={{ mt: 0 }}
                                 displayEmpty
@@ -250,7 +300,11 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                   ))
                                 ) : (
                                   <MenuItem value="" disabled>
-                                    <i>No Products With Root Access</i>
+                                    <i>
+                                      {consumptionSubscriptionAdminRBAC
+                                        ? "No Products With Member Management Access"
+                                        : "No Products With Root Access"}
+                                    </i>
                                   </MenuItem>
                                 )}
                               </Select>
@@ -268,7 +322,10 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                 name={`userInvite[${index}].servicePlanId`}
                                 value={invite.servicePlanId}
                                 onBlur={handleBlur}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                  handleChange(e);
+                                  setFieldValue(`userInvite[${index}].roleType`, "");
+                                }}
                                 disabled={createUserInvitesMutation.isPending || isFetchingUsers}
                                 sx={{ mt: 0 }}
                                 displayEmpty
@@ -312,7 +369,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                 }}
                                 maxWidth="400px"
                               >
-                                {["Editor", "Reader"].map((option) => (
+                                {roleOptions.map((option) => (
                                   <MenuItem key={option} value={option}>
                                     {option}
                                   </MenuItem>
