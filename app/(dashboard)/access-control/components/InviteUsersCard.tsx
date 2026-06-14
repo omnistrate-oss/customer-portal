@@ -42,8 +42,15 @@ const getNewEnvVariable = () => {
   };
 };
 
+type SelectMenuItem = {
+  label: string;
+  value: string;
+};
+
+const isSelectMenuItem = (item: SelectMenuItem | null): item is SelectMenuItem => item !== null;
+
 const getServiceMenuItems = (subscriptions: Subscription[], consumptionSubscriptionAdminRBAC: boolean) => {
-  const serviceIdSet = new Set();
+  const serviceIdSet = new Set<string>();
 
   const serviceMenuItems = subscriptions
     .filter((sub) => isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC))
@@ -58,15 +65,7 @@ const getServiceMenuItems = (subscriptions: Subscription[], consumptionSubscript
       return null;
     });
 
-  return (
-    serviceMenuItems
-      .filter((item) => item !== null)
-      // @ts-ignore
-      .sort((a, b) => a?.label.localeCompare(b?.label)) as {
-      label: string;
-      value: string;
-    }[]
-  );
+  return serviceMenuItems.filter(isSelectMenuItem).sort((a, b) => a.label.localeCompare(b.label));
 };
 
 const getServicePlanMenuItems = (
@@ -74,10 +73,10 @@ const getServicePlanMenuItems = (
   serviceId: string,
   consumptionSubscriptionAdminRBAC: boolean
 ) => {
-  const servicePlanIdSet = new Set();
+  const servicePlanIdSet = new Set<string>();
 
   const servicePlanMenuItems = subscriptions
-    ?.filter(
+    .filter(
       (sub) =>
         sub.serviceId === serviceId && isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
     )
@@ -91,8 +90,7 @@ const getServicePlanMenuItems = (
         value: sub.productTierId,
       };
     })
-    .filter((item) => item !== null)
-    // @ts-ignore
+    .filter(isSelectMenuItem)
     .sort((a, b) => a.label.localeCompare(b.label));
   return servicePlanMenuItems;
 };
@@ -142,7 +140,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
   const validationSchema = useMemo(() => getInviteUsersValidationSchema(roleOptions), [roleOptions]);
 
   const createUserInvitesMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: InviteUsersFormValues) => {
       try {
         await Promise.all(
           data.userInvite.map((d) => {
@@ -157,7 +155,11 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               d.servicePlanId,
               consumptionSubscriptionAdminRBAC
             );
-            return inviteSubscriptionUser(subscription?.id, payload);
+            if (!subscription?.id) {
+              throw new Error("No manageable subscription found for invite");
+            }
+
+            return inviteSubscriptionUser(subscription.id, payload);
           })
         );
         snackbar.showSuccess("Invites Sent");
@@ -229,7 +231,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                   return (
                     <>
                       {values.userInvite.map((invite, index) => {
-                        const serivceMenuItems = getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC);
+                        const serviceMenuItems = getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC);
 
                         const servicePlanMenuItems = getServicePlanMenuItems(
                           subscriptions,
@@ -288,12 +290,12 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                 displayEmpty
                                 renderValue={(value) => {
                                   if (!value) return "Product";
-                                  return serivceMenuItems.find((item) => item.value === value)?.label;
+                                  return serviceMenuItems.find((item) => item.value === value)?.label;
                                 }}
                                 maxWidth="400px"
                               >
-                                {serivceMenuItems?.length > 0 ? (
-                                  serivceMenuItems.map((option) => (
+                                {serviceMenuItems?.length > 0 ? (
+                                  serviceMenuItems.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
                                       {option.label}
                                     </MenuItem>

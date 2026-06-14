@@ -34,7 +34,11 @@ export const getSubscriptionRolePriority = (roleType?: string, consumptionSubscr
 export const getHighestPermissionSubscription = <T extends Pick<Subscription, "roleType" | "serviceName">>(
   subscriptions: T[],
   consumptionSubscriptionAdminRBAC = false
-) => {
+): T | undefined => {
+  if (!subscriptions.length) {
+    return undefined;
+  }
+
   return [...subscriptions].sort((a, b) => {
     const priorityDiff =
       getSubscriptionRolePriority(b.roleType, consumptionSubscriptionAdminRBAC) -

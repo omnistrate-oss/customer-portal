@@ -6,7 +6,7 @@ const ROLE_TYPES = {
 };
 
 // If a user has multiple subscriptions this function finds the subscription by priority.
-// Priority order is default subscription, root, admin, editor, then reader.
+// Priority order is default subscription, root, admin when admin RBAC is enabled, editor, then reader.
 
 export const findSubscriptionByPriority = (
   subscriptions,
