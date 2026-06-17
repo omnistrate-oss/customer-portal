@@ -16,7 +16,7 @@ export const isSubscriptionWriteRole = (roleType?: string, consumptionSubscripti
   return roleType === "root" || roleType === "editor" || (consumptionSubscriptionAdminRBAC && roleType === "admin");
 };
 
-export const getSubscriptionRolePriority = (roleType?: string, consumptionSubscriptionAdminRBAC = false) => {
+const getSubscriptionRolePriority = (roleType?: string, consumptionSubscriptionAdminRBAC = false) => {
   switch (roleType) {
     case "root":
       return 4;

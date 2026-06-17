@@ -138,6 +138,10 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
     [consumptionSubscriptionAdminRBAC]
   );
   const validationSchema = useMemo(() => getInviteUsersValidationSchema(roleOptions), [roleOptions]);
+  const serviceMenuItems = useMemo(
+    () => getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC),
+    [subscriptions, consumptionSubscriptionAdminRBAC]
+  );
 
   const createUserInvitesMutation = useMutation({
     mutationFn: async (data: InviteUsersFormValues) => {
@@ -156,7 +160,9 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               consumptionSubscriptionAdminRBAC
             );
             if (!subscription?.id) {
-              throw new Error("No manageable subscription found for invite");
+              // Return a rejected promise (instead of throwing synchronously) so the
+              // remaining invites in the batch still start; Promise.all still rejects overall.
+              return Promise.reject(new Error("No manageable subscription found for invite"));
             }
 
             return inviteSubscriptionUser(subscription.id, payload);
@@ -231,8 +237,6 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                   return (
                     <>
                       {values.userInvite.map((invite, index) => {
-                        const serviceMenuItems = getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC);
-
                         const servicePlanMenuItems = getServicePlanMenuItems(
                           subscriptions,
                           values.userInvite[index].serviceId,

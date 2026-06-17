@@ -16,5 +16,3 @@ export const getInviteUsersValidationSchema = (roleOptions = getSubscriptionUser
       )
       .min(1, "At least one user invite is required"),
   });
-
-export const inviteUsersValidationSchema = getInviteUsersValidationSchema();

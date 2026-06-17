@@ -169,7 +169,6 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
   const environmentType = useEnvironmentType();
   const snackbar = useSnackbar();
   const queryClient = useQueryClient();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const { subscriptions, subscriptionRequests, serviceOfferingsObj } = useGlobalData();
 
