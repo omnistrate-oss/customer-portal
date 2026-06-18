@@ -24,6 +24,7 @@ export type CloudAccountFormValues = {
   ociDomainId: string;
   clusterName: string;
   clusterDescription: string;
+  enablePrivateConnectivity: boolean;
 };
 
 export const getValidSubscriptionForInstanceCreation = (
@@ -130,6 +131,7 @@ export const getInitialValues = (
       ociDomainId: resultParams?.oci_domain_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
+      enablePrivateConnectivity: resultParams?.private_link === true || resultParams?.private_link === "true",
     };
   }
 
@@ -161,6 +163,7 @@ export const getInitialValues = (
       ociDomainId: "",
       clusterName: "",
       clusterDescription: "",
+      enablePrivateConnectivity: false,
     };
   }
 
@@ -199,6 +202,7 @@ export const getInitialValues = (
     ociDomainId: "",
     clusterName: "",
     clusterDescription: "",
+    enablePrivateConnectivity: false,
   };
 };
 

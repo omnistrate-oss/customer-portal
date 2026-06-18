@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
+import Switch from "src/components/Switch/Switch";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useFeatureFlags from "src/hooks/useFeatureFlags";
@@ -30,6 +31,7 @@ import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
 import CustomLabelDescription from "./CustomLabelDescription";
+import PrivateConnectivityDescription from "./PrivateConnectivityDescription";
 
 const CloudAccountForm = ({
   initialFormValues, // These are from URL Params
@@ -142,6 +144,7 @@ const CloudAccountForm = ({
             if (values.cloudProvider === "aws") {
               resultParams.aws_account_id = values.awsAccountId;
               resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
+              resultParams.private_link = values.enablePrivateConnectivity;
             } else if (values.cloudProvider === "gcp") {
               resultParams.gcp_project_id = values.gcpProjectId;
               resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -186,6 +189,7 @@ const CloudAccountForm = ({
             ...(values.cloudProvider === CLOUD_PROVIDERS.aws
               ? {
                   aws_account_id: values.awsAccountId,
+                  private_link: values.enablePrivateConnectivity,
                 }
               : values.cloudProvider === CLOUD_PROVIDERS.gcp
                 ? {
@@ -245,6 +249,7 @@ const CloudAccountForm = ({
           aws_account_id: values.awsAccountId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId.trim()),
+          private_link: values.enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -482,6 +487,28 @@ const CloudAccountForm = ({
               disabled: formMode !== "create",
               isHidden: values.cloudProvider !== "aws",
               previewValue: cloudProvider === "aws" ? values.awsAccountId : null,
+            },
+            {
+              dataTestId: "enable-private-connectivity-toggle",
+              label: "Enable Private Connectivity",
+              subLabel: (
+                <>
+                  Route all control-plane ↔ app-plane communication over provider-native private connectivity (AWS
+                  PrivateLink).
+                  <PrivateConnectivityDescription />
+                </>
+              ),
+              name: "enablePrivateConnectivity",
+              isHidden: values.cloudProvider !== "aws",
+              customComponent: (
+                <Switch
+                  checked={values.enablePrivateConnectivity}
+                  disabled={formMode !== "create"}
+                  onChange={(e) => setFieldValue("enablePrivateConnectivity", e.target.checked)}
+                />
+              ),
+              previewValue:
+                cloudProvider === "aws" ? (values.enablePrivateConnectivity ? "Enabled" : "Disabled") : null,
             },
             {
               dataTestId: "gcp-project-id-input",
