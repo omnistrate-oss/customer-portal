@@ -1,4 +1,6 @@
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
+import { isManageableSubscriptionRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 import Button from "components/Button/Button";
 import SearchInput from "components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
@@ -15,6 +17,8 @@ const SubscriptionsTableHeader = ({
   refetchSubscriptions,
   selectedSubscription,
 }) => {
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
+
   return (
     <div className="py-5 px-6 flex items-center justify-between gap-8">
       <DataGridHeaderTitle
@@ -43,15 +47,18 @@ const SubscriptionsTableHeader = ({
             selectedSubscription?.defaultSubscription || // Cannot Unsubscribe From Default Subscription
             isUnsubscribing ||
             isFetchingSubscriptions ||
-            selectedSubscription?.roleType !== "root"
+            !isManageableSubscriptionRole(selectedSubscription?.roleType, consumptionSubscriptionAdminRBAC)
           }
           disabledMessage={
             selectedRows.length !== 1
               ? "Please select a subscription to unsubscribe"
               : selectedSubscription?.defaultSubscription
                 ? "Cannot unsubscribe from Default subscription"
-                : selectedSubscription && selectedSubscription?.roleType !== "root"
-                  ? "Cannot unsubscribe without Root access"
+                : selectedSubscription &&
+                    !isManageableSubscriptionRole(selectedSubscription?.roleType, consumptionSubscriptionAdminRBAC)
+                  ? consumptionSubscriptionAdminRBAC
+                    ? "Cannot unsubscribe without Root or Admin access"
+                    : "Cannot unsubscribe without Root access"
                   : ""
           }
         >

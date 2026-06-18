@@ -1,21 +1,19 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -24,6 +22,9 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
@@ -54,6 +55,7 @@ const CloudAccountForm = ({
     subscriptionsObj,
     isSubscriptionsPending,
   } = useGlobalData();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const allInstances: ResourceInstance[] = instances;
   //subscriptionID -> key, number of instances -> value
@@ -227,7 +229,8 @@ const CloudAccountForm = ({
       byoaSubscriptions,
       byoaServiceOfferingsObj,
       byoaServiceOfferings,
-      allInstances
+      allInstances,
+      consumptionSubscriptionAdminRBAC
     ),
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
@@ -348,7 +351,9 @@ const CloudAccountForm = ({
                   byoaServiceOfferingsObj,
                   byoaSubscriptions,
                   allInstances,
-                  serviceId
+                  serviceId,
+                  undefined,
+                  consumptionSubscriptionAdminRBAC
                 );
 
                 const servicePlanId = subscription?.productTierId || "";
@@ -399,7 +404,8 @@ const CloudAccountForm = ({
                       byoaSubscriptions,
                       allInstances,
                       serviceId,
-                      servicePlanId
+                      servicePlanId,
+                      consumptionSubscriptionAdminRBAC
                     );
 
                     setFieldValue("subscriptionId", subscriptionId || subscription?.id || "");
@@ -575,7 +581,7 @@ const CloudAccountForm = ({
         },
       ],
     };
-  }, [formMode, subscriptions, byoaServiceOfferings, values]);
+  }, [consumptionSubscriptionAdminRBAC, formMode, subscriptions, byoaServiceOfferings, values]);
 
   if (isFetchingServiceOfferings) {
     return <LoadingSpinner />;

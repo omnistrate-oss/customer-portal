@@ -3,10 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { selectUserrootData } from "src/slices/userDataSlice";
 import { SubscriptionUser } from "src/types/consumptionUser";
 import {
   getEnumFromUserRoleString,
@@ -43,6 +46,8 @@ const AccessControlPage = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<SubscriptionUser | null>(null);
   const { subscriptions, isSubscriptionsPending } = useGlobalData();
+  const currentUser = useSelector(selectUserrootData);
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   useEffect(() => {
     if (searchUserId) {
@@ -140,8 +145,20 @@ const AccessControlPage = () => {
           const isDeleteAllowed = isOperationAllowedByRBAC(
             operationEnum.UnInvite,
             getEnumFromUserRoleString(subscription?.roleType),
-            viewEnum.Access_AccessControl
+            viewEnum.Access_AccessControl,
+            {
+              consumptionSubscriptionAdminRBAC,
+            }
           );
+          const isSubscriptionOwner = data.row.original.roleType === "root";
+          const isCurrentAdmin =
+            consumptionSubscriptionAdminRBAC &&
+            data.row.original.roleType === "admin" &&
+            data.row.original.userId === currentUser?.id;
+
+          if (isCurrentAdmin) {
+            return null;
+          }
 
           return (
             <Button
@@ -152,18 +169,18 @@ const AccessControlPage = () => {
                 setOverlayType("delete-dialog");
                 setSelectedUser(data.row.original);
               }}
-              startIcon={<DeleteIcon color="#B42318" disabled={data.row.original.roleType === "root"} />}
+              startIcon={<DeleteIcon color="#B42318" disabled={isSubscriptionOwner} />}
               sx={{
                 border: "none !important",
                 padding: "4px !important",
                 boxShadow: "none !important",
               }}
               disableRipple
-              disabled={data.row.original.roleType === "root" || !isDeleteAllowed}
+              disabled={isSubscriptionOwner || !isDeleteAllowed}
               disabledMessage={
                 !isDeleteAllowed
                   ? "You do not have permission to remove access of this user"
-                  : data.row.original.roleType === "root"
+                  : isSubscriptionOwner
                     ? "Cannot remove access of the subscription owner"
                     : ""
               }
@@ -177,7 +194,7 @@ const AccessControlPage = () => {
         },
       }),
     ];
-  }, [subscriptionsObj]);
+  }, [consumptionSubscriptionAdminRBAC, currentUser?.id, subscriptionsObj]);
 
   const deleteUserMutation = $api.useMutation(
     "delete",

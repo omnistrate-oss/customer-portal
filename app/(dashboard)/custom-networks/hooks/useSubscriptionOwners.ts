@@ -2,9 +2,12 @@ import { useMemo } from "react";
 
 import { $api } from "src/api/query";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
+import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 
 const useSubscriptionOwners = () => {
   const environmentType = useEnvironmentType();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const query = $api.useQuery("get", "/2022-09-01-00/subscription", {
     params: {
@@ -19,7 +22,12 @@ const useSubscriptionOwners = () => {
 
     const seen = new Set<string>();
     return query.data.subscriptions
-      .filter((sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader")
+      .filter(
+        (sub) =>
+          sub.status === "ACTIVE" &&
+          sub.rootUserOrgId &&
+          isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+      )
       .reduce<{ name: string; email: string; orgId: string }[]>((acc, sub) => {
         const orgId = sub.rootUserOrgId!;
         if (!seen.has(orgId)) {
@@ -32,7 +40,7 @@ const useSubscriptionOwners = () => {
         }
         return acc;
       }, []);
-  }, [query.data]);
+  }, [consumptionSubscriptionAdminRBAC, query.data]);
 
   return { ...query, data: subscriptionOwners };
 };

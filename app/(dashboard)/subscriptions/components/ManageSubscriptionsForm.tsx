@@ -7,10 +7,15 @@ import { useSelector } from "react-redux";
 import { $api } from "src/api/query";
 import { deleteSubscription } from "src/api/subscriptions";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { Subscription } from "src/types/subscription";
+import {
+  getHighestPermissionSubscription,
+  isManageableSubscriptionRole,
+} from "src/utils/consumptionSubscriptionAdminRBAC";
 import CardWithTitle from "components/Card/CardWithTitle";
 import FieldDescription from "components/FormElementsv2/FieldDescription/FieldDescription";
 import FieldTitle from "components/FormElementsv2/FieldTitle/FieldTitle";
@@ -35,6 +40,7 @@ const ManageSubscriptionsForm = ({ defaultServiceId, defaultServicePlanId, isFet
   const snackbar = useSnackbar();
   const queryClient = useQueryClient();
   const selectUser = useSelector(selectUserrootData);
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
   const [isUnsubscribeDialogOpen, setIsUnsubscribeDialogOpen] = useState(false);
   const [subscriptionIdToDelete, setSubscriptionIdToDelete] = useState<string | undefined>("");
 
@@ -66,13 +72,23 @@ const ManageSubscriptionsForm = ({ defaultServiceId, defaultServicePlanId, isFet
     defaultServicePlanId || services[0]?.productTierID || ""
   );
 
-  // Object of Root Subscriptions and Subscription Requests
+  // Object of manageable subscriptions and subscription requests
   const subscriptionsObj = useMemo(() => {
-    return subscriptions?.reduce((acc, subscription) => {
-      if (subscription.roleType === "root") acc[subscription.productTierId] = subscription;
+    const subscriptionsByProductTier = subscriptions?.reduce((acc, subscription) => {
+      if (isManageableSubscriptionRole(subscription.roleType, consumptionSubscriptionAdminRBAC)) {
+        acc[subscription.productTierId] = [...(acc[subscription.productTierId] || []), subscription];
+      }
       return acc;
     }, {});
-  }, [subscriptions]);
+
+    return Object.entries(subscriptionsByProductTier || {}).reduce((acc, [productTierId, subscriptions]) => {
+      acc[productTierId] = getHighestPermissionSubscription(
+        subscriptions as Subscription[],
+        consumptionSubscriptionAdminRBAC
+      );
+      return acc;
+    }, {});
+  }, [consumptionSubscriptionAdminRBAC, subscriptions]);
 
   const subscriptionRequestsObj = useMemo(() => {
     return subscriptionRequests
