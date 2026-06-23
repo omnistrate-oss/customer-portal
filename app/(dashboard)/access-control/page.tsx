@@ -151,14 +151,16 @@ const AccessControlPage = () => {
             }
           );
           const isSubscriptionOwner = data.row.original.roleType === "root";
-          const isCurrentAdmin =
-            consumptionSubscriptionAdminRBAC &&
-            data.row.original.roleType === "admin" &&
-            data.row.original.userId === currentUser?.id;
+          const isCurrentUser = data.row.original.userId === currentUser?.id;
 
-          if (isCurrentAdmin) {
-            return null;
-          }
+          const disabled = isCurrentUser || isSubscriptionOwner || !isDeleteAllowed;
+          const disabledMessage = isCurrentUser
+            ? "You cannot remove your own access"
+            : isSubscriptionOwner
+              ? "Cannot remove the subscription owner's access"
+              : !isDeleteAllowed
+                ? "You do not have permission to remove this user's access"
+                : "";
 
           return (
             <Button
@@ -169,21 +171,15 @@ const AccessControlPage = () => {
                 setOverlayType("delete-dialog");
                 setSelectedUser(data.row.original);
               }}
-              startIcon={<DeleteIcon color="#B42318" disabled={isSubscriptionOwner} />}
+              startIcon={<DeleteIcon color="#B42318" disabled={disabled} />}
               sx={{
                 border: "none !important",
                 padding: "4px !important",
                 boxShadow: "none !important",
               }}
               disableRipple
-              disabled={isSubscriptionOwner || !isDeleteAllowed}
-              disabledMessage={
-                !isDeleteAllowed
-                  ? "You do not have permission to remove access of this user"
-                  : isSubscriptionOwner
-                    ? "Cannot remove access of the subscription owner"
-                    : ""
-              }
+              disabled={disabled}
+              disabledMessage={disabledMessage}
             >
               Remove Access
             </Button>
