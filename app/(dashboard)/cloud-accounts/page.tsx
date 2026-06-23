@@ -37,7 +37,7 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import { getCloudAccountsRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -414,7 +414,7 @@ const CloudAccountsPage = () => {
         (row) => {
           const resultParams = getResultParams(row);
           if (!resultParams?.aws_account_id) return "-";
-          const isEnabled = resultParams?.private_link === true || resultParams?.private_link === "true";
+          const isEnabled = isPrivateLinkEnabled(resultParams);
           return isEnabled ? "Enabled" : "Disabled";
         },
         {
@@ -423,7 +423,7 @@ const CloudAccountsPage = () => {
           cell: (data) => {
             const resultParams = getResultParams(data.row.original);
             if (!resultParams?.aws_account_id) return "-";
-            const isEnabled = resultParams?.private_link === true || resultParams?.private_link === "true";
+            const isEnabled = isPrivateLinkEnabled(resultParams);
             return <StatusChip category={isEnabled ? "success" : "failed"} label={isEnabled ? "Enabled" : "Disabled"} />;
           },
           meta: {
