@@ -159,7 +159,7 @@ const AccessControlPage = () => {
             : isSubscriptionOwner
               ? "Cannot remove access of the subscription owner"
               : !isDeleteAllowed
-                ? "You do not have permission to remove access of this user"
+                ? "You do not have permission to remove this user's access"
                 : "";
 
           return (
