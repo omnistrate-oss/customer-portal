@@ -157,7 +157,7 @@ const AccessControlPage = () => {
           const disabledMessage = isCurrentUser
             ? "You cannot remove your own access"
             : isSubscriptionOwner
-              ? "Cannot remove access of the subscription owner"
+              ? "Cannot remove the subscription owner's access"
               : !isDeleteAllowed
                 ? "You do not have permission to remove this user's access"
                 : "";
