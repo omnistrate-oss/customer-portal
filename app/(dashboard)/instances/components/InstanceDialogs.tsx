@@ -25,10 +25,12 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { getInstancesRoute } from "src/utils/routes";
 
+import { getSupportedOperation, SWITCH_PRIMARY_OPERATION_VERB } from "../customWorkflow";
 import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
+import CustomWorkflowForm from "./CustomWorkflowForm";
 import InstanceForm from "./InstanceForm";
 import SnapshotBeforeDeletionConfirmation from "./SnapshotBeforeDeletionConfirmation";
 
@@ -135,6 +137,32 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
   }) as { data?: DescribeResourceInstanceResponse };
 
+  const selectedWorkflowInstance = selectedInstance || instance;
+  const isInstanceFormOverlay = ["create-instance-form", "modify-instance-form"].includes(overlayType);
+  const isSwitchPrimaryFormOverlay = overlayType === "force-switch-primary-form";
+
+  const switchPrimaryOperation = useMemo(
+    () =>
+      getSupportedOperation(
+        selectedWorkflowInstance,
+        SWITCH_PRIMARY_OPERATION_VERB,
+        selectedResource?.resourceType as string
+      ),
+    [selectedWorkflowInstance, selectedResource]
+  );
+
+  const fullScreenDrawerTitle = isSwitchPrimaryFormOverlay
+    ? "Force Switch Primary"
+    : overlayType === "create-instance-form"
+      ? "Create Deployment Instance"
+      : "Modify Deployment Instance";
+
+  const fullScreenDrawerDescription = isSwitchPrimaryFormOverlay
+    ? switchPrimaryOperation?.description || "Delete the current primary pod and promote a replica"
+    : overlayType === "create-instance-form"
+      ? "Create new Deployment Instance"
+      : "Modify Deployment Instance";
+
   const deleteInstanceMutation = $api.useMutation(
     "delete",
     "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
@@ -203,23 +231,34 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       />
 
       <FullScreenDrawer
-        title={overlayType === "create-instance-form" ? "Create Deployment Instance" : "Modify Deployment Instance"}
-        description={
-          overlayType === "create-instance-form" ? "Create new Deployment Instance" : "Modify Deployment Instance"
-        }
-        open={isOverlayOpen && ["create-instance-form", "modify-instance-form"].includes(overlayType)}
+        title={fullScreenDrawerTitle}
+        description={fullScreenDrawerDescription}
+        open={isOverlayOpen && (isInstanceFormOverlay || isSwitchPrimaryFormOverlay)}
         closeDrawer={() => setIsOverlayOpen(false)}
         RenderUI={
-          <InstanceForm
-            instances={instances}
-            formMode={overlayType === "create-instance-form" ? "create" : "modify"}
-            selectedInstance={selectedInstance}
-            refetchInstances={refetchData}
-            setCreateInstanceModalData={setCreateInstanceModalData}
-            setIsOverlayOpen={setIsOverlayOpen}
-            setOverlayType={setOverlayType}
-            setSelectedRows={setSelectedRows}
-          />
+          isSwitchPrimaryFormOverlay ? (
+            <CustomWorkflowForm
+              instance={selectedWorkflowInstance}
+              serviceOffering={serviceOffering}
+              selectedResource={selectedResource}
+              subscription={subscription}
+              workflowOperation={switchPrimaryOperation}
+              refetchInstances={refetchData}
+              setIsOverlayOpen={setIsOverlayOpen}
+              setSelectedRows={setSelectedRows}
+            />
+          ) : (
+            <InstanceForm
+              instances={instances}
+              formMode={overlayType === "create-instance-form" ? "create" : "modify"}
+              selectedInstance={selectedInstance}
+              refetchInstances={refetchData}
+              setCreateInstanceModalData={setCreateInstanceModalData}
+              setIsOverlayOpen={setIsOverlayOpen}
+              setOverlayType={setOverlayType}
+              setSelectedRows={setSelectedRows}
+            />
+          )
         }
       />
 

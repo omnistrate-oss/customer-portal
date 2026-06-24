@@ -1,0 +1,121 @@
+import type { ResourceInstance } from "src/types/resourceInstance";
+import type { components } from "src/types/schema";
+
+export const SWITCH_PRIMARY_OPERATION_VERB = "SWITCHPRIMARY";
+
+export type ResourceInstanceSupportedOperation = components["schemas"]["ResourceInstanceSupportedOperation"];
+export type InputParameterEntity = components["schemas"]["InputParameterEntity"];
+
+const isOperatorCRDResource = (resourceType?: string) => (resourceType || "").toLowerCase() === "operatorcrd";
+
+export const getSupportedOperation = (
+  instance: Pick<ResourceInstance, "supportedOperations"> | undefined,
+  verb: string,
+  resourceType?: string
+): ResourceInstanceSupportedOperation | undefined => {
+  if (!isOperatorCRDResource(resourceType)) {
+    return undefined;
+  }
+
+  const operations = instance?.supportedOperations as ResourceInstanceSupportedOperation[] | undefined;
+  if (!operations?.length) {
+    return undefined;
+  }
+
+  const normalizedVerb = verb.toUpperCase();
+  return operations.find((operation) => (operation?.verb || "").toUpperCase() === normalizedVerb);
+};
+
+export const getCustomWorkflowInitialRequestParams = (apiParameters: InputParameterEntity[] = []) => {
+  return apiParameters.reduce<Record<string, unknown>>((acc, param) => {
+    acc[param.key] = param.defaultValue ?? "";
+    return acc;
+  }, {});
+};
+
+const getParameterValue = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => {
+      if (item && typeof item === "object" && "value" in item) {
+        return (item as { value: unknown }).value;
+      }
+      return item;
+    });
+  }
+
+  return value;
+};
+
+const hasValue = (value: unknown) => {
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  if (typeof value === "string") {
+    return value.trim() !== "";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return true;
+};
+
+export const normalizeCustomWorkflowRequestParams = (
+  requestParams: Record<string, unknown>,
+  apiParameters: InputParameterEntity[] = []
+) => {
+  const normalizedRequestParams: Record<string, unknown> = {};
+
+  apiParameters.forEach((param) => {
+    const key = param.key;
+    const type = (param.type || "").toLowerCase();
+    let value = getParameterValue(requestParams[key]);
+
+    if (!hasValue(value)) {
+      return;
+    }
+
+    if (typeof value === "string" && !["password", "secret"].includes(type)) {
+      value = value.trim();
+    }
+
+    switch (type) {
+      case "number":
+      case "float64": {
+        const numberValue = Number(value);
+        if (Number.isNaN(numberValue)) {
+          throw new Error(`Invalid data in ${param.displayName || key}`);
+        }
+        normalizedRequestParams[key] = numberValue;
+        break;
+      }
+
+      case "boolean":
+        normalizedRequestParams[key] = typeof value === "boolean" ? value : value === "true";
+        break;
+
+      case "json":
+        if (typeof value === "string") {
+          try {
+            normalizedRequestParams[key] = JSON.parse(value);
+          } catch {
+            throw new Error(`Invalid JSON in ${param.displayName || key}`);
+          }
+        } else {
+          normalizedRequestParams[key] = value;
+        }
+        break;
+
+      case "any":
+        normalizedRequestParams[key] = typeof value === "string" ? value : JSON.stringify(value);
+        break;
+
+      default:
+        normalizedRequestParams[key] = value;
+    }
+  });
+
+  return normalizedRequestParams;
+};

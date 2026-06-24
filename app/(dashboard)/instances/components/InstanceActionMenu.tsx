@@ -15,6 +15,7 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 
+import { getSupportedOperation, SWITCH_PRIMARY_OPERATION_VERB } from "../customWorkflow";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance, hasSupportedOperation } from "../utils";
 
@@ -87,6 +88,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const supportsReboot = hasSupportedOperation(instance, "REBOOT", selectedResourceType);
     const supportsRestore = hasSupportedOperation(instance, "RESTORE", selectedResourceType);
     const supportsUpgrade = hasSupportedOperation(instance, "UPGRADE", selectedResourceType);
+    const switchPrimaryOperation = getSupportedOperation(instance, SWITCH_PRIMARY_OPERATION_VERB, selectedResourceType);
 
     const isOnPrem = serviceOffering?.serviceModelType === "ON_PREM";
 
@@ -208,6 +210,35 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
                     : "",
         });
       }
+    }
+
+    if (switchPrimaryOperation) {
+      res.push({
+        dataTestId: "switch-primary-button",
+        label: "Force Switch Primary",
+        isDisabled:
+          !instance ||
+          ["DELETING", "DELETED", "DISCONNECTED"].includes(status as string) ||
+          isProxyResource ||
+          !isUpdateAllowedByRBAC ||
+          !switchPrimaryOperation.id,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setOverlayType("force-switch-primary-form");
+          setIsOverlayOpen(true);
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : ["DELETING", "DELETED", "DISCONNECTED"].includes(status as string)
+            ? "Instance must be active to force switch primary"
+            : isProxyResource
+              ? "System managed instances cannot force switch primary"
+              : !isUpdateAllowedByRBAC
+                ? "Unauthorized to force switch primary"
+                : !switchPrimaryOperation.id
+                  ? "Switch primary workflow is not available"
+                  : "",
+      });
     }
 
     if (!blocksLifecycleActions && !isProxyResource) {
@@ -332,7 +363,17 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     }
 
     return res;
-  }, [variant, instance, serviceOffering, selectedResource, subscription]);
+  }, [
+    variant,
+    instance,
+    serviceOffering,
+    selectedResource,
+    subscription,
+    snackbar,
+    setIsOverlayOpen,
+    setOverlayType,
+    startInstanceMutation,
+  ]);
 
   return (
     <ActionMenu

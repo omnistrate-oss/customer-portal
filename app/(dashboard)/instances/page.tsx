@@ -1,14 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, IconButton, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import RegionIcon from "components/Region/RegionIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import LoadIndicatorHigh from "src/components/Icons/LoadIndicator/LoadIndicatorHigh";
@@ -29,6 +24,11 @@ import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/res
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute } from "src/utils/routes";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import RegionIcon from "components/Region/RegionIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
 
 import PageContainer from "../components/Layout/PageContainer";
 
@@ -39,8 +39,8 @@ import InstanceDialogs from "./components/InstanceDialogs";
 import InstancesOverview from "./components/InstancesOverview";
 import InstancesTableHeader from "./components/InstancesTableHeader";
 import StatusCell from "./components/StatusCell";
-import { loadStatusMap } from "./constants";
 import useInstances from "./hooks/useInstances";
+import { loadStatusMap } from "./constants";
 import { getMainResourceFromInstance, getRowBorderStyles, platformToCloudProviderMap } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
@@ -50,6 +50,7 @@ export type Overlay =
   | "delete-dialog"
   | "restore-dialog"
   | "upgrade-dialog"
+  | "force-switch-primary-form"
   | "generate-token-dialog"
   | "reboot-dialog"
   | "stop-dialog"
