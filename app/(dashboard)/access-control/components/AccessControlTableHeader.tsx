@@ -4,7 +4,7 @@ import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToo
 
 const AccessControlTableHeader = ({ searchText, setSearchText, refetchUsers, isFetchingUsers, count }) => {
   return (
-    <div className="flex items-center justify-between gap-4 py-5 px-6">
+    <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#EAECF0]">
       <DataGridHeaderTitle
         title="Access Permissions"
         desc="Manage user roles and permissions for your Product subscriptions"

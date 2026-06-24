@@ -7,7 +7,7 @@ import {
   isManageableSubscriptionRole,
   isSubscriptionWriteRole,
 } from "src/utils/consumptionSubscriptionAdminRBAC";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 
 export type CloudAccountFormValues = {
   serviceId: string;
@@ -24,6 +24,7 @@ export type CloudAccountFormValues = {
   ociDomainId: string;
   clusterName: string;
   clusterDescription: string;
+  enablePrivateConnectivity: boolean;
 };
 
 export const getValidSubscriptionForInstanceCreation = (
@@ -130,6 +131,7 @@ export const getInitialValues = (
       ociDomainId: resultParams?.oci_domain_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
+      enablePrivateConnectivity: isPrivateLinkEnabled(resultParams),
     };
   }
 
@@ -161,6 +163,7 @@ export const getInitialValues = (
       ociDomainId: "",
       clusterName: "",
       clusterDescription: "",
+      enablePrivateConnectivity: false,
     };
   }
 
@@ -199,6 +202,7 @@ export const getInitialValues = (
     ociDomainId: "",
     clusterName: "",
     clusterDescription: "",
+    enablePrivateConnectivity: false,
   };
 };
 

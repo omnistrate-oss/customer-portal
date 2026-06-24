@@ -20,7 +20,7 @@ const SubscriptionsTableHeader = ({
   const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   return (
-    <div className="py-5 px-6 flex items-center justify-between gap-8">
+    <div className="py-5 px-6 flex items-center justify-between gap-8 border-b border-[#EAECF0]">
       <DataGridHeaderTitle
         title="Detailed list of your Product subscriptions"
         desc="Explore your current Product subscriptions here"
