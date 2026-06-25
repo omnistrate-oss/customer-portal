@@ -195,7 +195,7 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
       }
 
       if (!workflowOperation?.id) {
-        return snackbar.showError("Switch primary workflow not found");
+        return snackbar.showError(`${workflowTitle} workflow not found`);
       }
 
       let requestParams: Record<string, unknown>;
