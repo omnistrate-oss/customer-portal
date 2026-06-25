@@ -282,6 +282,8 @@ const CloudAccountForm = ({
         };
       }
 
+      requestParams.allow_new_cloud_native_network_creation = true;
+
       const resource = offering?.resourceParameters.find((resource) =>
         resource.resourceId.startsWith("r-injectedaccountconfig")
       );
