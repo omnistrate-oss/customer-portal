@@ -15,7 +15,7 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 
-import { getSupportedOperation, SWITCH_PRIMARY_OPERATION_VERB } from "../customWorkflow";
+import { getCustomWorkflowOperations } from "../customWorkflow";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance, hasSupportedOperation } from "../utils";
 
@@ -28,6 +28,7 @@ type InstanceActionMenuProps = {
   variant: "instances-page" | "details-page";
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  setSelectedCustomWorkflowId: SetState<string>;
   refetchData: () => void;
   setSelectedRows?: SetState<ResourceInstance[]>; // Optional
 };
@@ -41,6 +42,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   variant,
   setOverlayType,
   setIsOverlayOpen,
+  setSelectedCustomWorkflowId,
   refetchData,
   setSelectedRows = () => {}, // Default If Not Provided
 }) => {
@@ -88,8 +90,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const supportsReboot = hasSupportedOperation(instance, "REBOOT", selectedResourceType);
     const supportsRestore = hasSupportedOperation(instance, "RESTORE", selectedResourceType);
     const supportsUpgrade = hasSupportedOperation(instance, "UPGRADE", selectedResourceType);
-    const switchPrimaryOperation = getSupportedOperation(instance, SWITCH_PRIMARY_OPERATION_VERB, selectedResourceType);
-    const isSwitchPrimaryStatusBlocked = ["DEPLOYING", "DELETING"].includes(status as string);
+    const customWorkflowOperations = getCustomWorkflowOperations(instance, selectedResourceType);
+    const isCustomWorkflowStatusBlocked = ["DEPLOYING", "DELETING"].includes(status as string);
 
     const isOnPrem = serviceOffering?.serviceModelType === "ON_PREM";
 
@@ -213,34 +215,28 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       }
     }
 
-    if (switchPrimaryOperation) {
+    customWorkflowOperations.forEach((customWorkflowOperation) => {
       res.push({
-        dataTestId: "switch-primary-button",
-        label: "Force Switch Primary",
-        isDisabled:
-          !instance ||
-          isSwitchPrimaryStatusBlocked ||
-          isProxyResource ||
-          !isUpdateAllowedByRBAC ||
-          !switchPrimaryOperation.id,
+        dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || customWorkflowOperation.id}-button`,
+        label: customWorkflowOperation.name || "Custom Workflow",
+        isDisabled: !instance || isCustomWorkflowStatusBlocked || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
-          setOverlayType("force-switch-primary-form");
+          setSelectedCustomWorkflowId(customWorkflowOperation.id as string);
+          setOverlayType("custom-workflow-form");
           setIsOverlayOpen(true);
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : isSwitchPrimaryStatusBlocked
-            ? "Instance must not be deploying or deleting to force switch primary"
+          : isCustomWorkflowStatusBlocked
+            ? `Instance must not be deploying or deleting to ${customWorkflowOperation.name}`
             : isProxyResource
-              ? "System managed instances cannot force switch primary"
+              ? `System managed instances cannot ${customWorkflowOperation.name}`
               : !isUpdateAllowedByRBAC
-                ? "Unauthorized to force switch primary"
-                : !switchPrimaryOperation.id
-                  ? "Switch primary workflow is not available"
-                  : "",
+                ? `Unauthorized to ${customWorkflowOperation.name}`
+                : "",
       });
-    }
+    });
 
     if (!blocksLifecycleActions && !isProxyResource) {
       if (!isOnPrem && supportsReboot) {
@@ -372,6 +368,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     subscription,
     snackbar,
     setIsOverlayOpen,
+    setSelectedCustomWorkflowId,
     setOverlayType,
     startInstanceMutation,
   ]);

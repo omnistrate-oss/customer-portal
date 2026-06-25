@@ -1,7 +1,7 @@
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Box } from "@mui/material";
 import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
 
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
@@ -25,7 +25,7 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { getInstancesRoute } from "src/utils/routes";
 
-import { getSupportedOperation, SWITCH_PRIMARY_OPERATION_VERB } from "../customWorkflow";
+import { getCustomWorkflowOperations } from "../customWorkflow";
 import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
@@ -40,6 +40,7 @@ type InstanceDialogsProps = {
   setIsOverlayOpen: SetState<boolean>;
   overlayType: Overlay;
   setOverlayType: SetState<Overlay>;
+  selectedCustomWorkflowId: string;
   serviceOffering?: ServiceOffering;
   subscription?: Subscription;
   instance?: DescribeResourceInstanceResponse;
@@ -99,6 +100,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   setIsOverlayOpen,
   overlayType,
   setOverlayType,
+  selectedCustomWorkflowId,
   serviceOffering,
   instance,
   instances,
@@ -139,26 +141,26 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
 
   const selectedWorkflowInstance = selectedInstance || instance;
   const isInstanceFormOverlay = ["create-instance-form", "modify-instance-form"].includes(overlayType);
-  const isSwitchPrimaryFormOverlay = overlayType === "force-switch-primary-form";
+  const isCustomWorkflowFormOverlay = overlayType === "custom-workflow-form";
 
-  const switchPrimaryOperation = useMemo(
+  const customWorkflowOperation = useMemo(
     () =>
-      getSupportedOperation(
-        selectedWorkflowInstance,
-        SWITCH_PRIMARY_OPERATION_VERB,
-        selectedResource?.resourceType as string
+      getCustomWorkflowOperations(selectedWorkflowInstance, selectedResource?.resourceType as string).find(
+        (operation) => operation.id === selectedCustomWorkflowId
       ),
-    [selectedWorkflowInstance, selectedResource]
+    [selectedWorkflowInstance, selectedResource, selectedCustomWorkflowId]
   );
 
-  const fullScreenDrawerTitle = isSwitchPrimaryFormOverlay
-    ? "Force Switch Primary"
+  const customWorkflowName = customWorkflowOperation?.name || "Custom Workflow";
+
+  const fullScreenDrawerTitle = isCustomWorkflowFormOverlay
+    ? customWorkflowName
     : overlayType === "create-instance-form"
       ? "Create Deployment Instance"
       : "Modify Deployment Instance";
 
-  const fullScreenDrawerDescription = isSwitchPrimaryFormOverlay
-    ? switchPrimaryOperation?.description || "Delete the current primary pod and promote a replica"
+  const fullScreenDrawerDescription = isCustomWorkflowFormOverlay
+    ? customWorkflowOperation?.description || customWorkflowName
     : overlayType === "create-instance-form"
       ? "Create new Deployment Instance"
       : "Modify Deployment Instance";
@@ -233,16 +235,16 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       <FullScreenDrawer
         title={fullScreenDrawerTitle}
         description={fullScreenDrawerDescription}
-        open={isOverlayOpen && (isInstanceFormOverlay || isSwitchPrimaryFormOverlay)}
+        open={isOverlayOpen && (isInstanceFormOverlay || isCustomWorkflowFormOverlay)}
         closeDrawer={() => setIsOverlayOpen(false)}
         RenderUI={
-          isSwitchPrimaryFormOverlay ? (
+          isCustomWorkflowFormOverlay ? (
             <CustomWorkflowForm
               instance={selectedWorkflowInstance}
               serviceOffering={serviceOffering}
               selectedResource={selectedResource}
               subscription={subscription}
-              workflowOperation={switchPrimaryOperation}
+              workflowOperation={customWorkflowOperation}
               refetchInstances={refetchData}
               setIsOverlayOpen={setIsOverlayOpen}
               setSelectedRows={setSelectedRows}

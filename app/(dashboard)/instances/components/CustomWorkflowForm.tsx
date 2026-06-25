@@ -146,7 +146,7 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
 }) => {
   const snackbar = useSnackbar();
   const apiParameters = useMemo(() => workflowOperation?.apiParameters || [], [workflowOperation?.apiParameters]);
-  const workflowTitle = "Force Switch Primary";
+  const workflowTitle = workflowOperation?.name || "Custom Workflow";
 
   const initialValues = useMemo(
     () => ({
@@ -165,7 +165,7 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
       onSuccess: async () => {
         refetchInstances();
         setSelectedRows([]);
-        snackbar.showSuccess("Force Switch Primary requested");
+        snackbar.showSuccess(`${workflowTitle} requested`);
         setIsOverlayOpen(false);
       },
     }

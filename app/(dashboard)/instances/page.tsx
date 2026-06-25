@@ -50,7 +50,7 @@ export type Overlay =
   | "delete-dialog"
   | "restore-dialog"
   | "upgrade-dialog"
-  | "force-switch-primary-form"
+  | "custom-workflow-form"
   | "generate-token-dialog"
   | "reboot-dialog"
   | "stop-dialog"
@@ -61,6 +61,7 @@ export type Overlay =
 const InstancesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
+  const [selectedCustomWorkflowId, setSelectedCustomWorkflowId] = useState("");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [filteredInstances, setFilteredInstances] = useState<ResourceInstance[]>([]);
   const [instanceId, setInstanceId] = useState("");
@@ -530,6 +531,7 @@ const InstancesPage = () => {
             setSelectedRows,
             setOverlayType,
             setIsOverlayOpen,
+            setSelectedCustomWorkflowId,
             selectedInstanceOffering,
             selectedInstanceSubscription,
             refetchInstances,
@@ -561,6 +563,7 @@ const InstancesPage = () => {
         setIsOverlayOpen={setIsOverlayOpen}
         overlayType={overlayType}
         setOverlayType={setOverlayType}
+        selectedCustomWorkflowId={selectedCustomWorkflowId}
         instances={instances}
         instance={selectedInstance}
         serviceOffering={selectedInstanceOffering}

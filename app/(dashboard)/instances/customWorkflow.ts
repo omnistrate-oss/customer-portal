@@ -2,11 +2,21 @@ import type { ResourceInstance } from "src/types/resourceInstance";
 import type { components } from "src/types/schema";
 
 export const SWITCH_PRIMARY_OPERATION_VERB = "SWITCHPRIMARY";
+const CUSTOM_WORKFLOW_SOURCE = "CUSTOM_WORKFLOW";
 
 export type ResourceInstanceSupportedOperation = components["schemas"]["ResourceInstanceSupportedOperation"];
 export type InputParameterEntity = components["schemas"]["InputParameterEntity"];
 
 const isOperatorCRDResource = (resourceType?: string) => (resourceType || "").toLowerCase() === "operatorcrd";
+
+const formatWorkflowName = (name?: string) => {
+  const normalizedName = (name || "Custom Workflow").replace(/[-_]+/g, " ").trim();
+  return normalizedName.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+};
+
+const getResourceOperations = (instance: Pick<ResourceInstance, "supportedOperations"> | undefined) => {
+  return (instance?.supportedOperations as ResourceInstanceSupportedOperation[] | undefined) || [];
+};
 
 export const getSupportedOperation = (
   instance: Pick<ResourceInstance, "supportedOperations"> | undefined,
@@ -17,13 +27,29 @@ export const getSupportedOperation = (
     return undefined;
   }
 
-  const operations = instance?.supportedOperations as ResourceInstanceSupportedOperation[] | undefined;
+  const operations = getResourceOperations(instance);
   if (!operations?.length) {
     return undefined;
   }
 
   const normalizedVerb = verb.toUpperCase();
   return operations.find((operation) => (operation?.verb || "").toUpperCase() === normalizedVerb);
+};
+
+export const getCustomWorkflowOperations = (
+  instance: Pick<ResourceInstance, "supportedOperations"> | undefined,
+  resourceType?: string
+): ResourceInstanceSupportedOperation[] => {
+  if (!isOperatorCRDResource(resourceType)) {
+    return [];
+  }
+
+  return getResourceOperations(instance)
+    .filter((operation) => operation?.source?.toUpperCase() === CUSTOM_WORKFLOW_SOURCE && operation?.id)
+    .map((operation) => ({
+      ...operation,
+      name: formatWorkflowName(operation.name),
+    }));
 };
 
 export const getCustomWorkflowInitialRequestParams = (apiParameters: InputParameterEntity[] = []) => {
