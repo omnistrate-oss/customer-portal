@@ -46,6 +46,17 @@ jobs:
     - name: Install dependencies
       run: yarn install --immutable
 
+    - name: Resolve Playwright version
+      id: playwright-version
+      run: |
+        echo "playwright-version=$(node -e 'process.stdout.write(require(\"@playwright/test/package.json\").version)')" >> "$GITHUB_OUTPUT"
+
+    - name: Restore Chromium Playwright browser cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.playwright-version }}
+
     - name: Log Resolved Dependency Versions
       run: |
         echo "::group::Installed dependency versions"
@@ -53,7 +64,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+      run: yarn playwright install --with-deps chromium
 
     - name: Build Project
       run: yarn build
