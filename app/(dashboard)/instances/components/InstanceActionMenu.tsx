@@ -216,9 +216,11 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     }
 
     customWorkflowOperations.forEach((customWorkflowOperation) => {
+      const workflowName = customWorkflowOperation.name || "Custom Workflow";
+
       res.push({
         dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || customWorkflowOperation.id}-button`,
-        label: customWorkflowOperation.name || "Custom Workflow",
+        label: workflowName,
         isDisabled: !instance || isCustomWorkflowStatusBlocked || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {
           if (!instance) return snackbar.showError("Please select an instance");
@@ -229,11 +231,11 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         disabledMessage: !instance
           ? "Please select an instance"
           : isCustomWorkflowStatusBlocked
-            ? `Instance must not be deploying or deleting to ${customWorkflowOperation.name}`
+            ? `Instance must not be deploying or deleting to ${workflowName}`
             : isProxyResource
-              ? `System managed instances cannot ${customWorkflowOperation.name}`
+              ? `System managed instances cannot ${workflowName}`
               : !isUpdateAllowedByRBAC
-                ? `Unauthorized to ${customWorkflowOperation.name}`
+                ? `Unauthorized to ${workflowName}`
                 : "",
       });
     });
