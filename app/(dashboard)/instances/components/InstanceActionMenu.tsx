@@ -89,6 +89,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const supportsRestore = hasSupportedOperation(instance, "RESTORE", selectedResourceType);
     const supportsUpgrade = hasSupportedOperation(instance, "UPGRADE", selectedResourceType);
     const switchPrimaryOperation = getSupportedOperation(instance, SWITCH_PRIMARY_OPERATION_VERB, selectedResourceType);
+    const isSwitchPrimaryStatusBlocked = ["DEPLOYING", "DELETING"].includes(status as string);
 
     const isOnPrem = serviceOffering?.serviceModelType === "ON_PREM";
 
@@ -218,7 +219,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         label: "Force Switch Primary",
         isDisabled:
           !instance ||
-          ["DELETING", "DELETED", "DISCONNECTED"].includes(status as string) ||
+          isSwitchPrimaryStatusBlocked ||
           isProxyResource ||
           !isUpdateAllowedByRBAC ||
           !switchPrimaryOperation.id,
@@ -229,8 +230,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         },
         disabledMessage: !instance
           ? "Please select an instance"
-          : ["DELETING", "DELETED", "DISCONNECTED"].includes(status as string)
-            ? "Instance must be active to force switch primary"
+          : isSwitchPrimaryStatusBlocked
+            ? "Instance must not be deploying or deleting to force switch primary"
             : isProxyResource
               ? "System managed instances cannot force switch primary"
               : !isUpdateAllowedByRBAC
