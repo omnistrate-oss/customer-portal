@@ -219,7 +219,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       const workflowName = customWorkflowOperation.name || "Custom Workflow";
 
       res.push({
-        dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || customWorkflowOperation.id}-button`,
+        dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || "custom-workflow"}-${customWorkflowOperation.id}-button`,
         label: workflowName,
         isDisabled: !instance || isCustomWorkflowStatusBlocked || isProxyResource || !isUpdateAllowedByRBAC,
         onClick: () => {

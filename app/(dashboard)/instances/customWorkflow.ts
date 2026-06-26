@@ -123,6 +123,7 @@ export const normalizeCustomWorkflowRequestParams = (
         break;
 
       case "json":
+      case "any":
         if (typeof value === "string") {
           try {
             normalizedRequestParams[key] = JSON.parse(value);
@@ -132,10 +133,6 @@ export const normalizeCustomWorkflowRequestParams = (
         } else {
           normalizedRequestParams[key] = value;
         }
-        break;
-
-      case "any":
-        normalizedRequestParams[key] = typeof value === "string" ? value : JSON.stringify(value);
         break;
 
       default:

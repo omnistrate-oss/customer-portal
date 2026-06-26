@@ -27,6 +27,7 @@ import {
   normalizeCustomWorkflowRequestParams,
   ResourceInstanceSupportedOperation,
 } from "../customWorkflow";
+import { filterSchemaByCloudProvider } from "../utils";
 
 import { getDeploymentConfigurationFields } from "./InstanceFormFields";
 
@@ -145,17 +146,22 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
   setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
+  const instanceCloudProvider = useMemo(() => getInstanceCloudProvider(instance), [instance]);
   const apiParameters = useMemo(() => workflowOperation?.apiParameters || [], [workflowOperation?.apiParameters]);
+  const visibleApiParameters = useMemo(
+    () => filterSchemaByCloudProvider(apiParameters as any, instanceCloudProvider) as InputParameterEntity[],
+    [apiParameters, instanceCloudProvider]
+  );
   const workflowTitle = workflowOperation?.name || "Custom Workflow";
 
   const initialValues = useMemo(
     () => ({
       id: instance?.id || "",
-      cloudProvider: getInstanceCloudProvider(instance),
+      cloudProvider: instanceCloudProvider,
       region: instance?.region || "",
-      requestParams: getCustomWorkflowInitialRequestParams(apiParameters),
+      requestParams: getCustomWorkflowInitialRequestParams(visibleApiParameters),
     }),
-    [apiParameters, instance]
+    [visibleApiParameters, instance, instanceCloudProvider]
   );
 
   const customWorkflowMutation = $api.useMutation(
@@ -174,7 +180,7 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
   const formData = useFormik({
     initialValues,
     enableReinitialize: true,
-    validationSchema: buildRequestParamsValidationSchema(apiParameters),
+    validationSchema: buildRequestParamsValidationSchema(visibleApiParameters),
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: (values) => {
@@ -200,7 +206,7 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
 
       let requestParams: Record<string, unknown>;
       try {
-        requestParams = normalizeCustomWorkflowRequestParams(values.requestParams, apiParameters);
+        requestParams = normalizeCustomWorkflowRequestParams(values.requestParams, visibleApiParameters);
       } catch (error) {
         return snackbar.showError(error instanceof Error ? error.message : "Invalid request parameters");
       }
@@ -268,15 +274,16 @@ const CustomWorkflowForm: React.FC<CustomWorkflowFormProps> = ({
       getDeploymentConfigurationFields(
         "create",
         formData.values,
-        { inputParameters: apiParameters } as any,
+        { inputParameters: visibleApiParameters } as any,
         {},
         false,
         {
           filteredParameterKeys: [],
           includeCloudProviderAccountConfig: true,
+          renderJsonAsCodeEditor: true,
         }
       ),
-    [apiParameters, formData.values]
+    [visibleApiParameters, formData.values]
   );
 
   const sections = [
