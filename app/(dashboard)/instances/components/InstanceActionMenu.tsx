@@ -15,6 +15,7 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 
+import { getCustomWorkflowOperations } from "../customWorkflow";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance, hasSupportedOperation } from "../utils";
 
@@ -27,6 +28,7 @@ type InstanceActionMenuProps = {
   variant: "instances-page" | "details-page";
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  setSelectedCustomWorkflowId: SetState<string>;
   refetchData: () => void;
   setSelectedRows?: SetState<ResourceInstance[]>; // Optional
 };
@@ -40,6 +42,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   variant,
   setOverlayType,
   setIsOverlayOpen,
+  setSelectedCustomWorkflowId,
   refetchData,
   setSelectedRows = () => {}, // Default If Not Provided
 }) => {
@@ -87,6 +90,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const supportsReboot = hasSupportedOperation(instance, "REBOOT", selectedResourceType);
     const supportsRestore = hasSupportedOperation(instance, "RESTORE", selectedResourceType);
     const supportsUpgrade = hasSupportedOperation(instance, "UPGRADE", selectedResourceType);
+    const customWorkflowOperations = getCustomWorkflowOperations(instance, selectedResourceType);
+    const isCustomWorkflowStatusBlocked = ["DEPLOYING", "DELETING"].includes(status as string);
 
     const isOnPrem = serviceOffering?.serviceModelType === "ON_PREM";
 
@@ -210,6 +215,31 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       }
     }
 
+    customWorkflowOperations.forEach((customWorkflowOperation) => {
+      const workflowName = customWorkflowOperation.name || "Custom Workflow";
+
+      res.push({
+        dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || "custom-workflow"}-${customWorkflowOperation.id}-button`,
+        label: workflowName,
+        isDisabled: !instance || isCustomWorkflowStatusBlocked || isProxyResource || !isUpdateAllowedByRBAC,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setSelectedCustomWorkflowId(customWorkflowOperation.id as string);
+          setOverlayType("custom-workflow-form");
+          setIsOverlayOpen(true);
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : isCustomWorkflowStatusBlocked
+            ? `Instance must not be deploying or deleting to ${workflowName}`
+            : isProxyResource
+              ? `System managed instances cannot ${workflowName}`
+              : !isUpdateAllowedByRBAC
+                ? `Unauthorized to ${workflowName}`
+                : "",
+      });
+    });
+
     if (!blocksLifecycleActions && !isProxyResource) {
       if (!isOnPrem && supportsReboot) {
         res.push({
@@ -332,7 +362,18 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     }
 
     return res;
-  }, [variant, instance, serviceOffering, selectedResource, subscription]);
+  }, [
+    variant,
+    instance,
+    serviceOffering,
+    selectedResource,
+    subscription,
+    snackbar,
+    setIsOverlayOpen,
+    setSelectedCustomWorkflowId,
+    setOverlayType,
+    startInstanceMutation,
+  ]);
 
   return (
     <ActionMenu

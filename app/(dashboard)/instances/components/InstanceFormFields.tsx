@@ -789,13 +789,21 @@ export const getDeploymentConfigurationFields = (
   values: any,
   resourceSchema: APIEntity,
   resourceIdInstancesHashMap,
-  isFetchingResourceInstanceIds: boolean
+  isFetchingResourceInstanceIds: boolean,
+  options: {
+    filteredParameterKeys?: string[];
+    includeCloudProviderAccountConfig?: boolean;
+    renderJsonAsCodeEditor?: boolean;
+  } = {}
 ) => {
   const fields: Field[] = [];
   if (!resourceSchema?.inputParameters) return fields;
+  const filteredParameterKeys = options.filteredParameterKeys ?? REQUEST_PARAMS_FIELDS_TO_FILTER;
+  const includeCloudProviderAccountConfig = options.includeCloudProviderAccountConfig ?? false;
+  const renderJsonAsCodeEditor = options.renderJsonAsCodeEditor ?? false;
   const filteredSchema = filterSchemaByCloudProvider(resourceSchema?.inputParameters || [], values.cloudProvider)
-    .filter((param) => !REQUEST_PARAMS_FIELDS_TO_FILTER.includes(param.key))
-    .filter((param) => param.key !== "cloud_provider_account_config_id")
+    .filter((param) => !filteredParameterKeys.includes(param.key))
+    .filter((param) => includeCloudProviderAccountConfig || param.key !== "cloud_provider_account_config_id")
     .sort((a, b) => {
       if (a.tabIndex === undefined || b.tabIndex === undefined) {
         return 0;
@@ -893,7 +901,10 @@ export const getDeploymentConfigurationFields = (
         previewValue: values.requestParams[param.key],
         disabled: formMode !== "create" && param.custom && !param.modifiable,
       });
-    } else if (param.type?.toUpperCase() === "ANY") {
+    } else if (
+      param.type?.toUpperCase() === "ANY" ||
+      (renderJsonAsCodeEditor && param.type?.toUpperCase() === "JSON")
+    ) {
       // Handle JSON type fields
       fields.push({
         dataTestId: `${param.key}-input`,
