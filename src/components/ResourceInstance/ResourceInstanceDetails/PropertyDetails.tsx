@@ -236,7 +236,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
           } else if (isJSONData) {
             value = (
               <>
-                {valueType === "array" || Array.isArray(jsonData) ? <ArrayIcon /> : <JsonIcon />}
+                {valueType === "array" || Array.isArray(row.value) ? <ArrayIcon /> : <JsonIcon />}
 
                 <Box
                   sx={{
