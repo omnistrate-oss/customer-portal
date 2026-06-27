@@ -286,6 +286,14 @@ function ResourceInstanceDetails(props) {
           },
         });
       }
+      if (param.key === "private_link") {
+        return res.push({
+          label: param.displayName || param.key,
+          description: param.description,
+          value: param.value ? "Enabled" : "Disabled",
+          valueType: "boolean",
+        });
+      }
       if (param.key === "cloudformation_url_no_lb" || param.key === "cloudformation_url") {
         return res.push({
           label: param.displayName || param.key,
@@ -307,6 +315,19 @@ function ResourceInstanceDetails(props) {
       }
     });
 
+    // For AWS cloud accounts, always surface Private Link status, defaulting to Disabled when the field is absent.
+    if (
+      resultParameters.cloud_provider === "aws" &&
+      resultParameters.account_configuration_method &&
+      resultParameters.private_link === undefined
+    ) {
+      res.push({
+        label: "private_link",
+        value: "Disabled",
+        valueType: "boolean",
+      });
+    }
+
     return res;
   }, [
     resultParametersWithDescription,
@@ -317,6 +338,8 @@ function ResourceInstanceDetails(props) {
     cloudProviderAccountInstanceURL,
     resultParameters?.account_configuration_method,
     resultParameters.aws_account_id,
+    resultParameters.cloud_provider,
+    resultParameters.private_link,
   ]);
 
   const CloudPRoviderInstance = useMemo(() => {
