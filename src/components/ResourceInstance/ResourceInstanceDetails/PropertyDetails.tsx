@@ -154,7 +154,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
 
           if (value !== null && value !== undefined && typeof value === "object" && valueType !== "custom") {
             try {
-              if (value.constructor === {}.constructor) {
+              if (Array.isArray(value) || value.constructor === {}.constructor) {
                 jsonData = value;
                 isJSONData = true;
               }
@@ -174,7 +174,14 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
             } catch (error) {}
           }
 
-          if (!row.value) {
+          if (typeof row.value === "boolean") {
+            // Handle booleans before the `!row.value` check so `false` isn't treated as missing.
+            // Explicit boolean valueType (e.g. private_link) renders Enabled/Disabled; plain booleans render True/False.
+            const isExplicitBooleanType = valueType === "boolean" || valueType === "Boolean";
+            const statusValue = isExplicitBooleanType ? (row.value ? "Enabled" : "Disabled") : String(row.value);
+            const statusStylesAndMap = getResourceInstanceDetailsStatusStylesAndLabel(statusValue);
+            value = <StatusChip {...statusStylesAndMap} />;
+          } else if (!row.value) {
             value = null;
           } else if (valueType === "download") {
             value = (
@@ -229,7 +236,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
           } else if (isJSONData) {
             value = (
               <>
-                {valueType === "array" ? <ArrayIcon /> : <JsonIcon />}
+                {valueType === "array" || Array.isArray(row.value) ? <ArrayIcon /> : <JsonIcon />}
 
                 <Box
                   sx={{
