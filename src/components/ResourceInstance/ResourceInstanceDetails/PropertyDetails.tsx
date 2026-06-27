@@ -154,7 +154,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
 
           if (value !== null && value !== undefined && typeof value === "object" && valueType !== "custom") {
             try {
-              if (value.constructor === {}.constructor) {
+              if (Array.isArray(value) || value.constructor === {}.constructor) {
                 jsonData = value;
                 isJSONData = true;
               }
@@ -229,7 +229,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
           } else if (isJSONData) {
             value = (
               <>
-                {valueType === "array" ? <ArrayIcon /> : <JsonIcon />}
+                {valueType === "array" || Array.isArray(jsonData) ? <ArrayIcon /> : <JsonIcon />}
 
                 <Box
                   sx={{
