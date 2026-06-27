@@ -7,6 +7,7 @@ import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import InstanceLicenseStatusChip from "src/components/InstanceLicenseStatusChip/InstanceLicenseStatusChip";
 import { INTEGRATION_TYPE_LABEL_MAP } from "src/constants/productTierFeatures";
 import formatDateUTC from "src/utils/formatDateUTC";
+import { isPrivateLinkEnabled } from "src/utils/instance";
 
 import NonOmnistrateIntegrationRow from "./NonOmnistrateIntegrationRow";
 import PropertyDetails from "./PropertyDetails";
@@ -290,7 +291,7 @@ function ResourceInstanceDetails(props) {
         return res.push({
           label: param.displayName || param.key,
           description: param.description,
-          value: param.value ? "Enabled" : "Disabled",
+          value: isPrivateLinkEnabled(resultParameters) ? "Enabled" : "Disabled",
           valueType: "boolean",
         });
       }

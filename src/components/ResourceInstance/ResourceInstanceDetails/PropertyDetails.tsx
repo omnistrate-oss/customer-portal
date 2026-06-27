@@ -175,23 +175,12 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
           }
 
           if (typeof row.value === "boolean") {
-            const boolText = String(row.value);
-            value = (
-              <>
-                <Tooltip title={boolText}>
-                  <Box maxWidth="calc(100% - 36px)">
-                    <Text ellipsis size="small" weight="medium" color="#535862">
-                      {boolText}
-                    </Text>
-                  </Box>
-                </Tooltip>
-                <CopyButton
-                  text={boolText}
-                  iconProps={{ color: "#6941C6", width: 20, height: 20 }}
-                  iconStyle={{ flexShrink: 0 }}
-                />
-              </>
-            );
+            // Handle booleans before the `!row.value` check so `false` isn't treated as missing.
+            // Explicit boolean valueType (e.g. private_link) renders Enabled/Disabled; plain booleans render True/False.
+            const isExplicitBooleanType = valueType === "boolean" || valueType === "Boolean";
+            const statusValue = isExplicitBooleanType ? (row.value ? "Enabled" : "Disabled") : String(row.value);
+            const statusStylesAndMap = getResourceInstanceDetailsStatusStylesAndLabel(statusValue);
+            value = <StatusChip {...statusStylesAndMap} />;
           } else if (!row.value) {
             value = null;
           } else if (valueType === "download") {
