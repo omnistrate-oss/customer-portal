@@ -174,7 +174,25 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
             } catch (error) {}
           }
 
-          if (!row.value) {
+          if (typeof row.value === "boolean") {
+            const boolText = String(row.value);
+            value = (
+              <>
+                <Tooltip title={boolText}>
+                  <Box maxWidth="calc(100% - 36px)">
+                    <Text ellipsis size="small" weight="medium" color="#535862">
+                      {boolText}
+                    </Text>
+                  </Box>
+                </Tooltip>
+                <CopyButton
+                  text={boolText}
+                  iconProps={{ color: "#6941C6", width: 20, height: 20 }}
+                  iconStyle={{ flexShrink: 0 }}
+                />
+              </>
+            );
+          } else if (!row.value) {
             value = null;
           } else if (valueType === "download") {
             value = (
