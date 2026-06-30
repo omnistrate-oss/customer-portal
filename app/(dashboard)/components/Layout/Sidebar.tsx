@@ -20,7 +20,7 @@ import {
   getInstanceSnapshotsRoute,
   getInstancesRoute,
   getNotificationsRoute,
-  getPaymentMethodsRoute,
+  getPaymentSettingsRoute,
   getReleaseHistoryRoute,
   getSettingsRoute,
   getSnapshotDetailsRoute,
@@ -168,7 +168,7 @@ const Sidebar = () => {
         "Account Management": [
           getSettingsRoute(),
           getBillingRoute(),
-          getPaymentMethodsRoute(),
+          getPaymentSettingsRoute(),
           getCostExplorerRoute(),
           getSubscriptionsRoute({}),
         ].includes(currentPath),
@@ -300,8 +300,8 @@ const Sidebar = () => {
             isHidden: !isBillingEnabled,
           },
           {
-            name: "Payment Methods",
-            href: getPaymentMethodsRoute(),
+            name: "Payment Settings",
+            href: getPaymentSettingsRoute(),
             isHidden: !isBillingEnabled,
           },
           {
