@@ -233,7 +233,7 @@ const StripePaymentMethodsSection = ({
             disabled={isLoading || Boolean(errorMessage)}
             onClick={() => setIsAddOpen(true)}
           >
-            Add method
+            Add payment method
           </Button>
         </Stack>
       </Stack>

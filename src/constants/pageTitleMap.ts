@@ -6,7 +6,7 @@ import {
   getCustomNetworksRoute,
   getEventsRoute,
   getInstanceSnapshotsRoute,
-  getPaymentMethodsRoute,
+  getPaymentSettingsRoute,
   getReleaseHistoryRoute,
   getSettingsRoute,
 } from "src/utils/routes";
@@ -31,7 +31,7 @@ export const PAGE_TITLE_MAP = {
   [getNotificationsRoute()]: "Alerts",
   [getSettingsRoute()]: "Profile Settings",
   [getBillingRoute()]: "Billing",
-  [getPaymentMethodsRoute()]: "Payment Methods",
+  [getPaymentSettingsRoute()]: "Payment Settings",
   "/subscriptions": "Subscriptions",
   "/cost-explorer": "Cost Explorer",
   [getReleaseHistoryRoute()]: "Release History",
