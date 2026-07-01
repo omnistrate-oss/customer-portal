@@ -62,7 +62,7 @@ import { OffboardInstructionDetails } from "./components/OffboardingInstructions
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
-import { getOffboardReadiness } from "./utils";
+import { getExistingVpcCount, getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -446,7 +446,7 @@ const CloudAccountsPage = () => {
         (row) => {
           const resultParams = getResultParams(row);
           if (!resultParams?.cloud_provider_account_config_id) return "NA";
-          const count = resultParams?.num_cloud_native_networks;
+          const count = getExistingVpcCount(row);
           if (count === undefined || count === null) return "Not configured";
           return String(count);
         },

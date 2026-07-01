@@ -213,3 +213,20 @@ export const getOffboardReadiness = (cloudAccountInstanceStatus?: string, accoun
     return true;
   else return false;
 };
+
+export const getExistingVpcCount = (instance: {
+  result_params?: Record<string, any> | unknown;
+  launch_input_params?: Record<string, any> | unknown;
+}): number | undefined => {
+  const resultParams = getResultParams(instance);
+  if (Array.isArray(resultParams?.cloudNativeNetworks)) {
+    return resultParams.cloudNativeNetworks.length;
+  }
+
+  const count = resultParams?.num_cloud_native_networks;
+  if (typeof count === "number") {
+    return count;
+  }
+
+  return undefined;
+};
