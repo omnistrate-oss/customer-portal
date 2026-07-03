@@ -22,6 +22,13 @@ export type CloudAccountFormValues = {
   clusterDescription: string;
 };
 
+export const BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS = ["aws", "gcp", "azure"] as const;
+
+export const isBringOwnVpcsSupported = (cloudProvider?: string): boolean =>
+  BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS.includes(
+    cloudProvider as (typeof BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS)[number]
+  );
+
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   subscriptions: Subscription[],

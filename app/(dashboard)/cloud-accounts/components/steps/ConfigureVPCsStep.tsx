@@ -14,6 +14,8 @@ import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
+import { isBringOwnVpcsSupported } from "../../utils";
+
 export type VpcRecord = {
   id: string;
   name: string;
@@ -436,14 +438,14 @@ enableDnsSupport   = true`}</CodeBlock>
             );
           })()}
 
-          {/* Bring own VPCs – only available for AWS and GCP */}
+          {/* Bring own VPCs – only available for supported cloud providers */}
           {(() => {
-            const isBringOwnVpcsSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+            const isBringOwnVpcsEnabledForProvider = isBringOwnVpcsSupported(cloudProvider);
             return (
               <Tooltip
                 title={
-                  !isBringOwnVpcsSupported
-                    ? "Bring your own VPCs is currently available for AWS and GCP only"
+                  !isBringOwnVpcsEnabledForProvider
+                    ? "Bring your own VPCs is currently available for AWS, GCP, and Azure only"
                     : !values.enableNewVpcs && values.bringOwnVpcs
                       ? "At least one VPC option must be enabled"
                       : ""
@@ -454,19 +456,19 @@ enableDnsSupport   = true`}</CodeBlock>
                 <Stack direction="row" alignItems="center" gap="12px">
                   <Checkbox
                     data-testid="bring-own-vpcs-checkbox"
-                    checked={isBringOwnVpcsSupported && values.bringOwnVpcs}
+                    checked={isBringOwnVpcsEnabledForProvider && values.bringOwnVpcs}
                     onChange={(e) => {
                       if (!e.target.checked && !values.enableNewVpcs) return;
                       onChange({ bringOwnVpcs: e.target.checked });
                     }}
-                    disabled={!isBringOwnVpcsSupported}
+                    disabled={!isBringOwnVpcsEnabledForProvider}
                     sx={{
                       p: 0,
                       color: "#D0D5DD",
                       "&.Mui-checked": { color: "#7F56D9" },
                     }}
                   />
-                  <Text size="small" weight="medium" color={isBringOwnVpcsSupported ? "#344054" : "#98A2B3"}>
+                  <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
                     Bring your own VPCs for deployments
                   </Text>
                 </Stack>
