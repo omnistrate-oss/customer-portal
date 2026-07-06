@@ -40,7 +40,7 @@ import InstanceSnapshotsTableHeader from "./components/InstanceSnapshotsTableHea
 import RestoreSnapshotDialogContent from "./components/RestoreSnapshotDialogContent";
 import RestoreSnapshotSuccessContent from "./components/RestoreSnapshotSuccessContent";
 import useInstanceSnapshots from "./hooks/useInstanceSnapshots";
-import { isOperatorCRDResourceType } from "./utils";
+import { getCopySnapshotTargetRegion, isOperatorCRDResourceType } from "./utils";
 
 const columnHelper = createColumnHelper<InstanceSnapshot>();
 type Overlay =
@@ -242,9 +242,10 @@ const InstanceSnapshotsPage = () => {
     return getMainResourceFromInstance(selectedSnapshotSourceInstance, serviceOffering);
   }, [selectedSnapshotSourceInstance, serviceOffering]);
 
-  const copySnapshotTargetRegion = isOperatorCRDResourceType(selectedSnapshotResource?.resourceType)
-    ? selectedSnapshot?.region
-    : undefined;
+  const copySnapshotTargetRegion = getCopySnapshotTargetRegion({
+    snapshot: selectedSnapshot,
+    sourceResourceType: selectedSnapshotResource?.resourceType,
+  });
 
   const formData = useFormik<FormValues>({
     initialValues: {
