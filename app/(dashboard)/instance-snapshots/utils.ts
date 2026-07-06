@@ -1,14 +1,12 @@
 import { RESOURCE_TYPES } from "src/constants/resource";
+import { InstanceSnapshotListItem } from "src/types/instance-snapshot";
 
 export const isOperatorCRDResourceType = (resourceType?: string) => {
   return resourceType?.toLowerCase() === RESOURCE_TYPES.OperatorCRD.toLowerCase();
 };
 
 type SnapshotCopyTargetRegionInput = {
-  snapshot?: {
-    instanceResourceType?: string;
-    region?: string;
-  };
+  snapshot?: Pick<InstanceSnapshotListItem, "instanceResourceType" | "region">;
   sourceResourceType?: string;
 };
 
