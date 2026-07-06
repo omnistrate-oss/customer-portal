@@ -26,3 +26,6 @@ export const getResultParams = (instance?: {
   const launchParams = (instance?.launch_input_params as Record<string, any>) ?? {};
   return { ...launchParams };
 };
+
+export const isPrivateLinkEnabled = (resultParams?: Record<string, any> | null): boolean =>
+  resultParams?.private_link === true || resultParams?.private_link === "true";

@@ -1,9 +1,6 @@
-import { CircularProgress } from "@mui/material";
 import { useMemo } from "react";
+import { CircularProgress } from "@mui/material";
 
-import Button from "components/Button/Button";
-import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
-import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
@@ -18,6 +15,9 @@ import {
   operationEnum,
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
+import Button from "components/Button/Button";
+import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
+import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
 import { Overlay } from "../page";
 import { getMainResourceFromInstance, hasSupportedOperation, isOnpremInstaller } from "../utils";
@@ -41,6 +41,7 @@ type InstancesTableHeaderProps = {
   setSelectedRows: SetState<ResourceInstance[]>;
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  setSelectedCustomWorkflowId: SetState<string>;
   selectedInstanceOffering: ServiceOffering;
   selectedInstanceSubscription?: Subscription;
   refetchInstances: () => void;
@@ -56,6 +57,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   setSelectedRows,
   setOverlayType,
   setIsOverlayOpen,
+  setSelectedCustomWorkflowId,
   selectedInstanceOffering,
   selectedInstanceSubscription,
   refetchInstances,
@@ -279,6 +281,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
     selectedInstanceOffering,
     isComplexResource,
     isProxyResource,
+    isOperatorCRDResource,
     selectedResource,
     selectedInstanceSubscription?.roleType,
     isLoadingInstances,
@@ -324,6 +327,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
             subscription={selectedInstanceSubscription}
             setOverlayType={setOverlayType}
             setIsOverlayOpen={setIsOverlayOpen}
+            setSelectedCustomWorkflowId={setSelectedCustomWorkflowId}
             refetchData={refetchInstances}
             setSelectedRows={setSelectedRows}
           />

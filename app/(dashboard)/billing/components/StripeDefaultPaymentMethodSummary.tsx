@@ -8,7 +8,7 @@ import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import { Text } from "src/components/Typography/Typography";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
-import { getPaymentMethodsRoute } from "src/utils/routes";
+import { getPaymentSettingsRoute } from "src/utils/routes";
 
 import { PaymentMethodIcon } from "../../payment-methods/components/Icons";
 import usePaymentMethods from "../../payment-methods/hooks/usePaymentMethods";
@@ -108,7 +108,7 @@ const StripeDefaultPaymentMethodSummary = ({
         <Text size="small" weight="medium" color={colors.error700}>
           {errorMessage}
         </Text>
-        <Link href={getPaymentMethodsRoute()}>
+        <Link href={getPaymentSettingsRoute()}>
           <Button variant="contained" size="small">
             Configure
           </Button>
@@ -134,7 +134,7 @@ const StripeDefaultPaymentMethodSummary = ({
           </Box>
           Add a payment method to pay invoices and outstanding balances.
         </Text>
-        <Link href={getPaymentMethodsRoute()}>
+        <Link href={getPaymentSettingsRoute()}>
           <Button variant="outlined" size="small">
             Add payment method
           </Button>
@@ -149,7 +149,7 @@ const StripeDefaultPaymentMethodSummary = ({
         <Text size="small" weight="medium" color={colors.gray500}>
           No default payment method selected.
         </Text>
-        <Link href={getPaymentMethodsRoute()}>
+        <Link href={getPaymentSettingsRoute()}>
           <Button variant="contained" size="small">
             Configure
           </Button>
@@ -179,7 +179,7 @@ const StripeDefaultPaymentMethodSummary = ({
         </Box>
       </Stack>
       <Box flexShrink={0}>
-        <Link href={getPaymentMethodsRoute()}>
+        <Link href={getPaymentSettingsRoute()}>
           <Button variant="outlined" size="small" sx={{ whiteSpace: "nowrap" }}>
             Change default payment method
           </Button>

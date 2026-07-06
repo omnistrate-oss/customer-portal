@@ -1,21 +1,20 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
+import Switch from "src/components/Switch/Switch";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -24,11 +23,15 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { getAwsBootstrapArn, getGcpServiceEmail } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
 
 import CustomLabelDescription from "./CustomLabelDescription";
+import PrivateConnectivityDescription from "./PrivateConnectivityDescription";
 
 const CloudAccountForm = ({
   initialFormValues, // These are from URL Params
@@ -54,6 +57,7 @@ const CloudAccountForm = ({
     subscriptionsObj,
     isSubscriptionsPending,
   } = useGlobalData();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const allInstances: ResourceInstance[] = instances;
   //subscriptionID -> key, number of instances -> value
@@ -140,6 +144,7 @@ const CloudAccountForm = ({
             if (values.cloudProvider === "aws") {
               resultParams.aws_account_id = values.awsAccountId;
               resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
+              resultParams.private_link = values.enablePrivateConnectivity;
             } else if (values.cloudProvider === "gcp") {
               resultParams.gcp_project_id = values.gcpProjectId;
               resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -184,6 +189,7 @@ const CloudAccountForm = ({
             ...(values.cloudProvider === CLOUD_PROVIDERS.aws
               ? {
                   aws_account_id: values.awsAccountId,
+                  private_link: values.enablePrivateConnectivity,
                 }
               : values.cloudProvider === CLOUD_PROVIDERS.gcp
                 ? {
@@ -227,7 +233,8 @@ const CloudAccountForm = ({
       byoaSubscriptions,
       byoaServiceOfferingsObj,
       byoaServiceOfferings,
-      allInstances
+      allInstances,
+      consumptionSubscriptionAdminRBAC
     ),
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
@@ -242,6 +249,7 @@ const CloudAccountForm = ({
           aws_account_id: values.awsAccountId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId.trim()),
+          private_link: values.enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
@@ -273,6 +281,8 @@ const CloudAccountForm = ({
           account_configuration_method: values.accountConfigurationMethod || "OnPremScript",
         };
       }
+
+      requestParams.allow_new_cloud_native_network_creation = true;
 
       const resource = offering?.resourceParameters.find((resource) =>
         resource.resourceId.startsWith("r-injectedaccountconfig")
@@ -348,7 +358,9 @@ const CloudAccountForm = ({
                   byoaServiceOfferingsObj,
                   byoaSubscriptions,
                   allInstances,
-                  serviceId
+                  serviceId,
+                  undefined,
+                  consumptionSubscriptionAdminRBAC
                 );
 
                 const servicePlanId = subscription?.productTierId || "";
@@ -399,7 +411,8 @@ const CloudAccountForm = ({
                       byoaSubscriptions,
                       allInstances,
                       serviceId,
-                      servicePlanId
+                      servicePlanId,
+                      consumptionSubscriptionAdminRBAC
                     );
 
                     setFieldValue("subscriptionId", subscriptionId || subscription?.id || "");
@@ -476,6 +489,28 @@ const CloudAccountForm = ({
               disabled: formMode !== "create",
               isHidden: values.cloudProvider !== "aws",
               previewValue: cloudProvider === "aws" ? values.awsAccountId : null,
+            },
+            {
+              dataTestId: "enable-private-connectivity-toggle",
+              label: "Enable Private Connectivity",
+              subLabel: (
+                <>
+                  Route all control-plane ↔ app-plane communication over provider-native private connectivity (AWS
+                  PrivateLink).
+                  <PrivateConnectivityDescription />
+                </>
+              ),
+              name: "enablePrivateConnectivity",
+              isHidden: values.cloudProvider !== "aws",
+              customComponent: (
+                <Switch
+                  checked={values.enablePrivateConnectivity}
+                  disabled={formMode !== "create"}
+                  onChange={(e) => setFieldValue("enablePrivateConnectivity", e.target.checked)}
+                />
+              ),
+              previewValue:
+                cloudProvider === "aws" ? (values.enablePrivateConnectivity ? "Enabled" : "Disabled") : null,
             },
             {
               dataTestId: "gcp-project-id-input",
@@ -575,7 +610,7 @@ const CloudAccountForm = ({
         },
       ],
     };
-  }, [formMode, subscriptions, byoaServiceOfferings, values]);
+  }, [consumptionSubscriptionAdminRBAC, formMode, subscriptions, byoaServiceOfferings, values]);
 
   if (isFetchingServiceOfferings) {
     return <LoadingSpinner />;

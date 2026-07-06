@@ -1,17 +1,19 @@
 "use client";
 
+import { useMemo } from "react";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 
-import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
-import { FormConfiguration } from "components/DynamicForm/types";
 import { $api } from "src/api/query";
 import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
+import { FormConfiguration } from "components/DynamicForm/types";
 
 import { CustomNetworkValidationSchema } from "../constants";
 
@@ -25,12 +27,17 @@ const CustomNetworkForm = ({
 }) => {
   const snackbar = useSnackbar();
   const { subscriptions, isFetchingSubscriptions } = useGlobalData();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const subscriptionOwners = useMemo(() => {
     const seen = new Set<string>();
     return subscriptions
       .filter(
-        (sub) => sub.status === "ACTIVE" && sub.rootUserOrgId && sub.roleType !== "reader" && sub.roleType !== "root"
+        (sub) =>
+          sub.status === "ACTIVE" &&
+          sub.rootUserOrgId &&
+          isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC) &&
+          sub.roleType !== "root"
       )
       .reduce<{ name: string; orgIdentifier: string; orgId: string }[]>((acc, sub) => {
         const orgId = sub.rootUserOrgId!;
@@ -44,7 +51,7 @@ const CustomNetworkForm = ({
         }
         return acc;
       }, []);
-  }, [subscriptions]);
+  }, [consumptionSubscriptionAdminRBAC, subscriptions]);
 
   const createCustomNetworkMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/custom-network", {
     onSuccess: () => {

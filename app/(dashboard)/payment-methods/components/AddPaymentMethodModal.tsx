@@ -9,7 +9,7 @@ import { loadStripe, type SetupIntentResult } from "@stripe/stripe-js";
 import useSnackbar from "src/hooks/useSnackbar";
 import { colors } from "src/themeConfig";
 import { ConsumptionPaymentMethod, ConsumptionStripeConfigResponse } from "src/types/consumption";
-import { getPaymentMethodsRoute } from "src/utils/routes";
+import { getPaymentSettingsRoute } from "src/utils/routes";
 import Button from "components/Button/Button";
 import { Text } from "components/Typography/Typography";
 
@@ -59,7 +59,7 @@ const AddPaymentMethodForm = ({
       result = await stripe.confirmSetup({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}${getPaymentMethodsRoute()}?setup_complete=true`,
+          return_url: `${window.location.origin}${getPaymentSettingsRoute()}?setup_complete=true`,
         },
         redirect: "if_required",
       });

@@ -6,7 +6,7 @@ import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 
 const DashboardLogsTableHeader = () => {
   return (
-    <div className="flex items-center justify-between gap-4 py-5 px-6">
+    <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#EAECF0]">
       <DataGridHeaderTitle
         title="Recent Audit Logs"
         desc="Detail audit trail of users actions performed on deployment instances"

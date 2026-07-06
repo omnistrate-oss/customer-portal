@@ -1,7 +1,7 @@
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Box } from "@mui/material";
 import FullScreenDrawer from "app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
 
 import { $api } from "src/api/query";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
@@ -25,10 +25,12 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { getInstancesRoute } from "src/utils/routes";
 
+import { getCustomWorkflowOperations } from "../customWorkflow";
 import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import { Overlay } from "../page";
 import { getMainResourceFromInstance } from "../utils";
 
+import CustomWorkflowForm from "./CustomWorkflowForm";
 import InstanceForm from "./InstanceForm";
 import SnapshotBeforeDeletionConfirmation from "./SnapshotBeforeDeletionConfirmation";
 
@@ -38,6 +40,7 @@ type InstanceDialogsProps = {
   setIsOverlayOpen: SetState<boolean>;
   overlayType: Overlay;
   setOverlayType: SetState<Overlay>;
+  selectedCustomWorkflowId: string;
   serviceOffering?: ServiceOffering;
   subscription?: Subscription;
   instance?: DescribeResourceInstanceResponse;
@@ -97,6 +100,7 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
   setIsOverlayOpen,
   overlayType,
   setOverlayType,
+  selectedCustomWorkflowId,
   serviceOffering,
   instance,
   instances,
@@ -134,6 +138,32 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
     ...selectedInstanceData,
     enabled: Boolean(instance && serviceOffering && subscription && selectedResource),
   }) as { data?: DescribeResourceInstanceResponse };
+
+  const selectedWorkflowInstance = selectedInstance || instance;
+  const isInstanceFormOverlay = ["create-instance-form", "modify-instance-form"].includes(overlayType);
+  const isCustomWorkflowFormOverlay = overlayType === "custom-workflow-form";
+
+  const customWorkflowOperation = useMemo(
+    () =>
+      getCustomWorkflowOperations(selectedWorkflowInstance, selectedResource?.resourceType as string).find(
+        (operation) => operation.id === selectedCustomWorkflowId
+      ),
+    [selectedWorkflowInstance, selectedResource, selectedCustomWorkflowId]
+  );
+
+  const customWorkflowName = customWorkflowOperation?.name || "Custom Workflow";
+
+  const fullScreenDrawerTitle = isCustomWorkflowFormOverlay
+    ? customWorkflowName
+    : overlayType === "create-instance-form"
+      ? "Create Deployment Instance"
+      : "Modify Deployment Instance";
+
+  const fullScreenDrawerDescription = isCustomWorkflowFormOverlay
+    ? customWorkflowOperation?.description || customWorkflowName
+    : overlayType === "create-instance-form"
+      ? "Create new Deployment Instance"
+      : "Modify Deployment Instance";
 
   const deleteInstanceMutation = $api.useMutation(
     "delete",
@@ -203,23 +233,34 @@ const InstanceDialogs: React.FC<InstanceDialogsProps> = ({
       />
 
       <FullScreenDrawer
-        title={overlayType === "create-instance-form" ? "Create Deployment Instance" : "Modify Deployment Instance"}
-        description={
-          overlayType === "create-instance-form" ? "Create new Deployment Instance" : "Modify Deployment Instance"
-        }
-        open={isOverlayOpen && ["create-instance-form", "modify-instance-form"].includes(overlayType)}
+        title={fullScreenDrawerTitle}
+        description={fullScreenDrawerDescription}
+        open={isOverlayOpen && (isInstanceFormOverlay || isCustomWorkflowFormOverlay)}
         closeDrawer={() => setIsOverlayOpen(false)}
         RenderUI={
-          <InstanceForm
-            instances={instances}
-            formMode={overlayType === "create-instance-form" ? "create" : "modify"}
-            selectedInstance={selectedInstance}
-            refetchInstances={refetchData}
-            setCreateInstanceModalData={setCreateInstanceModalData}
-            setIsOverlayOpen={setIsOverlayOpen}
-            setOverlayType={setOverlayType}
-            setSelectedRows={setSelectedRows}
-          />
+          isCustomWorkflowFormOverlay ? (
+            <CustomWorkflowForm
+              instance={selectedWorkflowInstance}
+              serviceOffering={serviceOffering}
+              selectedResource={selectedResource}
+              subscription={subscription}
+              workflowOperation={customWorkflowOperation}
+              refetchInstances={refetchData}
+              setIsOverlayOpen={setIsOverlayOpen}
+              setSelectedRows={setSelectedRows}
+            />
+          ) : (
+            <InstanceForm
+              instances={instances}
+              formMode={overlayType === "create-instance-form" ? "create" : "modify"}
+              selectedInstance={selectedInstance}
+              refetchInstances={refetchData}
+              setCreateInstanceModalData={setCreateInstanceModalData}
+              setIsOverlayOpen={setIsOverlayOpen}
+              setOverlayType={setOverlayType}
+              setSelectedRows={setSelectedRows}
+            />
+          )
         }
       />
 

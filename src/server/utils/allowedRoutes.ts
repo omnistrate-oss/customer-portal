@@ -274,6 +274,10 @@ const allowedRoutes: AllowedRoute[] = [
     method: "POST",
     pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/copy-snapshot",
   },
+  {
+    method: "POST",
+    pattern: "/2022-09-01-00/resource-instance/:sp/:sk/:sav/:sek/:smk/:ptk/:rk/:id/custom-workflow/:workflowId/execute",
+  },
   // Instance metadata
   {
     method: "PATCH",

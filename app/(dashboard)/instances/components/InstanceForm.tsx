@@ -1,23 +1,16 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
-import { useEffect, useMemo, useState } from "react";
 import type { StringSchema } from "yup";
 import * as yup from "yup";
 
-import Button from "components/Button/Button";
-import CardWithTitle from "components/Card/CardWithTitle";
-import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
-import GridDynamicField from "components/DynamicForm/GridDynamicField";
-import PreviewCard from "components/DynamicForm/PreviewCard";
-import Form from "components/FormElementsv2/Form/Form";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import { Text } from "components/Typography/Typography";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useResourcesInstanceIds from "src/hooks/useResourcesInstanceIds";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -27,6 +20,14 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance";
+import Button from "components/Button/Button";
+import CardWithTitle from "components/Card/CardWithTitle";
+import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
+import GridDynamicField from "components/DynamicForm/GridDynamicField";
+import PreviewCard from "components/DynamicForm/PreviewCard";
+import Form from "components/FormElementsv2/Form/Form";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import { Text } from "components/Typography/Typography";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
@@ -83,6 +84,7 @@ const InstanceForm = ({
     subscriptionsObj,
     isFetchingSubscriptions,
   } = useGlobalData();
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const nonCloudAccountInstances = useMemo(() => {
     return instances.filter((instance) => !isCloudAccountInstance(instance));
@@ -177,11 +179,12 @@ const InstanceForm = ({
         serviceOfferingsObj,
         serviceOfferings,
         nonCloudAccountInstances,
-        [] // Will be updated later when customerVersionSets loads
+        [], // Will be updated later when customerVersionSets loads
+        consumptionSubscriptionAdminRBAC
       ),
     // Only recompute when the selected instance changes (modify mode) or on first mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedInstance?.id]
+    [consumptionSubscriptionAdminRBAC, selectedInstance?.id]
   );
 
   const formData = useFormik({
@@ -929,7 +932,8 @@ const InstanceForm = ({
       customerVersionSets,
       isFetchingVersionSets,
       isFetchingResourceInstanceIds,
-      cloudAccountInstances
+      cloudAccountInstances,
+      consumptionSubscriptionAdminRBAC
     );
   }, [
     formMode,
@@ -942,6 +946,7 @@ const InstanceForm = ({
     isFetchingVersionSets,
     cloudAccountInstances,
     isFetchingResourceInstanceIds,
+    consumptionSubscriptionAdminRBAC,
   ]);
 
   const networkConfigurationFields = useMemo(() => {

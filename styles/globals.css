@@ -6,6 +6,7 @@ body {
   color: #111827;
   background: white;
   height: 100%;
+  font-variant-ligatures: no-contextual;
 }
 
 /* Enable ligatures globally for code elements */

@@ -11,7 +11,7 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import type { DescribeConsumptionBillingDetailsSuccessResponse } from "src/types/consumption";
-import { getPaymentMethodsRoute } from "src/utils/routes";
+import { getPaymentSettingsRoute } from "src/utils/routes";
 import Card from "components/Card/Card";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { DisplayText, Text } from "components/Typography/Typography";
@@ -123,7 +123,7 @@ const PaymentMethodsPage = () => {
       } catch {
         snackbar.showError("Payment method setup completed, but billing details could not refresh.");
       } finally {
-        router.replace(getPaymentMethodsRoute(), { scroll: false });
+        router.replace(getPaymentSettingsRoute(), { scroll: false });
       }
     };
 
@@ -135,7 +135,7 @@ const PaymentMethodsPage = () => {
       <AccountManagementHeader userName={selectUser?.name} userEmail={selectUser?.email} />
       <PageContainer>
         <PageTitle icon={SlidersIcon} className="mb-6">
-          Payment Methods
+          Payment Settings
         </PageTitle>
 
         {isLoading ? (

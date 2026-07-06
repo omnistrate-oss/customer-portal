@@ -2,7 +2,12 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
-import { getResultParams } from "src/utils/instance";
+import {
+  getHighestPermissionSubscription,
+  isManageableSubscriptionRole,
+  isSubscriptionWriteRole,
+} from "src/utils/consumptionSubscriptionAdminRBAC";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 
 export type CloudAccountFormValues = {
   serviceId: string;
@@ -19,6 +24,7 @@ export type CloudAccountFormValues = {
   ociDomainId: string;
   clusterName: string;
   clusterDescription: string;
+  enablePrivateConnectivity: boolean;
 };
 
 export const getValidSubscriptionForInstanceCreation = (
@@ -26,7 +32,8 @@ export const getValidSubscriptionForInstanceCreation = (
   subscriptions: Subscription[],
   instances: ResourceInstance[],
   serviceId?: string,
-  servicePlanId?: string
+  servicePlanId?: string,
+  consumptionSubscriptionAdminRBAC = false
 ): Subscription | undefined => {
   // Build subscription instance count hash
   const subscriptionInstancesNumHash: Record<string, number> = {};
@@ -35,9 +42,11 @@ export const getValidSubscriptionForInstanceCreation = (
     subscriptionInstancesNumHash[subId] = (subscriptionInstancesNumHash[subId] || 0) + 1;
   });
 
-  // Filter subscriptions to editor/root roles and valid service offerings
+  // Filter subscriptions to write-capable roles and valid service offerings
   let filteredSubscriptions = subscriptions.filter(
-    (sub) => serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] && ["root", "editor"].includes(sub.roleType)
+    (sub) =>
+      serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] &&
+      isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
   );
 
   // Filter by serviceID if provided
@@ -73,18 +82,9 @@ export const getValidSubscriptionForInstanceCreation = (
     return !!hasValidPayment;
   };
 
-  // First try to find a valid root subscription
-  const rootSubscriptions = sortedSubscriptions.filter((sub) => sub.roleType === "root");
-  const validRootSubscription = rootSubscriptions.find((sub) => isSubscriptionValid(sub));
+  const validSubscriptions = sortedSubscriptions.filter((sub) => isSubscriptionValid(sub, true));
 
-  if (validRootSubscription) {
-    return validRootSubscription;
-  }
-
-  // If no valid root subscription, try editor subscriptions
-  // Note: Editor subscriptions always check quota
-  const editorSubscriptions = sortedSubscriptions.filter((sub) => sub.roleType === "editor");
-  return editorSubscriptions.find((sub) => isSubscriptionValid(sub, true));
+  return getHighestPermissionSubscription(validSubscriptions, consumptionSubscriptionAdminRBAC);
 };
 
 export const getInitialValues = (
@@ -97,7 +97,8 @@ export const getInitialValues = (
   byoaSubscriptions: Subscription[],
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   byoaServiceOfferings: ServiceOffering[],
-  instances: ResourceInstance[]
+  instances: ResourceInstance[],
+  consumptionSubscriptionAdminRBAC = false
 ): CloudAccountFormValues => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
@@ -130,6 +131,7 @@ export const getInitialValues = (
       ociDomainId: resultParams?.oci_domain_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
+      enablePrivateConnectivity: isPrivateLinkEnabled(resultParams),
     };
   }
 
@@ -139,7 +141,7 @@ export const getInitialValues = (
         sub.serviceId === initialFormValues?.serviceId &&
         sub.productTierId === initialFormValues?.servicePlanId &&
         sub.id === initialFormValues?.subscriptionId &&
-        sub.roleType === "root"
+        isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
     )
   );
 
@@ -161,6 +163,7 @@ export const getInitialValues = (
       ociDomainId: "",
       clusterName: "",
       clusterDescription: "",
+      enablePrivateConnectivity: false,
     };
   }
 
@@ -173,7 +176,8 @@ export const getInitialValues = (
     byoaSubscriptions,
     instances,
     "",
-    ""
+    "",
+    consumptionSubscriptionAdminRBAC
   );
 
   const serviceId =
@@ -198,6 +202,7 @@ export const getInitialValues = (
     ociDomainId: "",
     clusterName: "",
     clusterDescription: "",
+    enablePrivateConnectivity: false,
   };
 };
 
