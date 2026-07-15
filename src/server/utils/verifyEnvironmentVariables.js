@@ -81,9 +81,9 @@ async function verifyEnvrionmentVariables() {
   const mailUserPassword = process.env.MAIL_USER_PASSWORD;
 
   if (isUsingApiKey) {
-    //Verify the API key by making an authenticated provider call with it as the bearer token.
+    //The API key is attached as the X-API-Key header by the server axios interceptor;
+    //verify it by making an authenticated provider call.
     try {
-      setProviderToken(process.env.PROVIDER_API_KEY);
       await axios.get("/user");
       areProviderCredentialsVerified = true;
       envVariablesStatus["PROVIDER_API_KEY"] = environmentVariableStatuses.Verified;
