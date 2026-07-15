@@ -7,13 +7,6 @@ const { fetchProviderAuthToken } = require("./fetchProviderAuthToken");
 //this hof will fetch/refresh the provider auth token  and makes sure that a valid JWT token is available before the requests
 function withProviderTokenExpirationHanding(callbackFn) {
   return async (...args) => {
-    //In API-key mode the credential is a static X-API-Key header (see src/server/axios.js),
-    //so there is no JWT to fetch or refresh — just run the call. A 401 here means the key
-    //is invalid/revoked and should surface as-is.
-    if (process.env.PROVIDER_API_KEY) {
-      return callbackFn(...args);
-    }
-
     let response = null;
 
     const providerAuthToken = getProviderToken();

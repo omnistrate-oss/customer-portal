@@ -1,4 +1,3 @@
-const axios = require("../axios");
 const { getNodeMailerConfig } = require("../mail-service/mail-config");
 const { setProviderToken } = require("../providerToken");
 const { fetchProviderAuthToken } = require("./fetchProviderAuthToken");
@@ -26,18 +25,9 @@ async function verifyEnvrionmentVariables() {
   */
   let isUsingHashedPassword = false;
 
-  //When a provider API key is configured it replaces PROVIDER_EMAIL/PROVIDER_PASSWORD
-  //as the provider credential (see fetchProviderAuthToken.js), so require it instead.
-  //A blank value (e.g. an unset deploy param) is treated as "not configured".
-  const isUsingApiKey = Boolean(process.env.PROVIDER_API_KEY);
-
   const envVariablesStatus = {
-    ...(isUsingApiKey
-      ? { PROVIDER_API_KEY: environmentVariableStatuses.NotDefined }
-      : {
-          PROVIDER_EMAIL: environmentVariableStatuses.NotDefined,
-          PROVIDER_PASSWORD: environmentVariableStatuses.NotDefined,
-        }),
+    PROVIDER_EMAIL: environmentVariableStatuses.NotDefined,
+    PROVIDER_PASSWORD: environmentVariableStatuses.NotDefined,
     YOUR_SAAS_DOMAIN_URL: environmentVariableStatuses.NotDefined,
     MAIL_USER_EMAIL: environmentVariableStatuses.NotDefined,
     MAIL_USER_PASSWORD: environmentVariableStatuses.NotDefined,
@@ -54,7 +44,7 @@ async function verifyEnvrionmentVariables() {
     }
   });
 
-  if (!isUsingApiKey && undefinedEnvironmentVariables.includes("PROVIDER_PASSWORD")) {
+  if (undefinedEnvironmentVariables.includes("PROVIDER_PASSWORD")) {
     //Check if PROVIDER_HASHED_PASS is available instead
     //If available, replace PROVIDER_PASSWORD with PROVIDER_HASHED_PASS
     if (process.env.PROVIDER_HASHED_PASS !== undefined) {
@@ -80,21 +70,7 @@ async function verifyEnvrionmentVariables() {
   const mailUserEmail = process.env.MAIL_USER_EMAIL;
   const mailUserPassword = process.env.MAIL_USER_PASSWORD;
 
-  if (isUsingApiKey) {
-    //The API key is attached as the X-API-Key header by the server axios interceptor;
-    //verify it by making an authenticated provider call.
-    try {
-      await axios.get("/user");
-      areProviderCredentialsVerified = true;
-      envVariablesStatus["PROVIDER_API_KEY"] = environmentVariableStatuses.Verified;
-
-      console.log("Provider credentials verification success");
-    } catch {
-      envVariablesStatus["PROVIDER_API_KEY"] = environmentVariableStatuses.Invalid;
-
-      console.log("Provider credentials verification failure");
-    }
-  } else if (providerEmail && providerPassword) {
+  if (providerEmail && providerPassword) {
     try {
       const authTokenResponse = await fetchProviderAuthToken();
       const token = authTokenResponse.data.jwtToken;
