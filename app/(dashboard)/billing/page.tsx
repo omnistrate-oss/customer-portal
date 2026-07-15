@@ -226,7 +226,7 @@ const BillingPage = () => {
                   sx={{
                     boxShadow: "0px 1px 2px 0px #0A0D120D",
                     backgroundColor: isStripe ? "#FFF" : "#FAFAFA",
-                    ...(isCustomPaymentPortalEnabled && !showStripePaymentMethodEmptyState
+                    ...(!isCustomPaymentPortalEnabled || !showStripePaymentMethodEmptyState
                       ? {
                           display: "flex",
                           flexDirection: "column",
@@ -258,7 +258,13 @@ const BillingPage = () => {
                       }}
                     />
                   ) : (
-                    <Stack direction="row" gap="24px" justifyContent="space-between" marginTop="10px">
+                    <Stack
+                      direction="row"
+                      gap="24px"
+                      justifyContent="space-between"
+                      alignItems="flex-end"
+                      marginTop="48px"
+                    >
                       <StatusChip
                         label={
                           !isStripe ? "Non Configurable" : paymentConfigured === true ? "Configured" : "Not Configured"

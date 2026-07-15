@@ -3,7 +3,9 @@ import { FC } from "react";
 import { Text } from "src/components/Typography/Typography";
 import { UsageDimension } from "src/types/consumption";
 
-import { ComputeIcon, MemoryIcon, ReplicaIcon, StorageIcon } from "./Icons";
+import { getBillingUsageDimensionField } from "../utils/usageDimensions";
+
+import { ComputeIcon, DeploymentCellIcon, MemoryIcon, ReplicaIcon, StorageIcon } from "./Icons";
 
 type UsageDimensionCardProps = {
   dimensionName: UsageDimension;
@@ -16,19 +18,13 @@ const usageDimensionIconMap = {
   "Storage GiB hours": StorageIcon,
   "CPU core hours": ComputeIcon,
   "Replica hours": ReplicaIcon,
-};
-
-const usageDimensionUnitMap: Record<UsageDimension, string> = {
-  "Memory GiB hours": "GiB-hr",
-  "Storage GiB hours": "GiB-hr",
-  "CPU core hours": "Core-hr",
-  "Replica hours": "hr",
+  "Deployment cell hours": DeploymentCellIcon,
 };
 
 const UsageDimensionCard: FC<UsageDimensionCardProps> = (props) => {
   const { dimensionName, value, title } = props;
   const Icon = usageDimensionIconMap[dimensionName];
-  const unit = usageDimensionUnitMap[dimensionName];
+  const unit = getBillingUsageDimensionField(dimensionName)?.unit || "";
   const formattedValue = value.toLocaleString();
 
   return (
