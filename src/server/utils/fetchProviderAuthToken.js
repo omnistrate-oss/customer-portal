@@ -2,6 +2,13 @@ const axios = require("../axios");
 const ProviderAuthError = require("./ProviderAuthError");
 
 function fetchProviderAuthToken() {
+  //If a provider API key is configured, use it directly as the bearer credential.
+  //The API key takes precedence over PROVIDER_EMAIL/PROVIDER_PASSWORD and needs no
+  ///signin exchange, so return it in the same shape the callers expect.
+  if (process.env.PROVIDER_API_KEY) {
+    return Promise.resolve({ data: { jwtToken: process.env.PROVIDER_API_KEY } });
+  }
+
   const signInPayload = {
     email: process.env.PROVIDER_EMAIL,
     password: "",

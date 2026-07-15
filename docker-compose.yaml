@@ -10,6 +10,7 @@ services:
     environment:
       - PROVIDER_EMAIL=$var.providerEmail
       - PROVIDER_PASSWORD=$var.providerPassword
+      - PROVIDER_API_KEY=$var.providerApiKey
       - YOUR_SAAS_DOMAIN_URL=$sys.network.externalClusterEndpoint
       - MAIL_SMTP_HOST=$var.smtpHost
       - MAIL_SMTP_PORT=$var.smtpPort
@@ -58,6 +59,13 @@ services:
         type: Password
         modifiable: true
         required: true
+        export: false
+      - key: providerApiKey
+        description: Service provider Omnistrate API key. When set, it is used instead of the email/password to authenticate to Omnistrate. Must have at least Admin-level privileges.
+        name: Omnistrate API key
+        type: Password
+        modifiable: true
+        required: false
         export: false
       - key: smtpHost
         description: The SMTP host to be used for sending emails
