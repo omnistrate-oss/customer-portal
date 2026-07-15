@@ -60,7 +60,7 @@ export const billingUsageDimensionFields = [
     dimension: "Deployment cell hours",
     rowField: "deploymentCellHours",
     title: "Deployment cells",
-    unit: "hrs",
+    unit: "hr",
     tableHeader: "Deployment Cell (hrs)",
     chartColor: "#097A7A",
   },
