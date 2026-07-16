@@ -1,3 +1,5 @@
+"use client";
+
 import { CSSProperties } from "react";
 
 // Full-page error shown when the app cannot bootstrap — e.g. the root layout's
@@ -8,7 +10,7 @@ import { CSSProperties } from "react";
 // and Emotion cache that are unavailable when bootstrap fails). The cause detail
 // is shown only in development so it never leaks to end customers in production.
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 const styles: Record<string, CSSProperties> = {
   body: { margin: 0, height: "100%", backgroundColor: "white", fontFamily: '"Inter", sans-serif' },
@@ -47,14 +49,14 @@ const BackendConfigError = ({ detail }: { detail?: string }) => (
         <h2 style={styles.heading}>{isDevelopment ? "Portal configuration error" : "Something went wrong"}</h2>
         <p style={styles.subtext}>
           {isDevelopment
-            ? "The portal couldn't authenticate with Omnistrate."
+            ? "The portal couldn't authenticate with the backend."
             : "This portal is temporarily unavailable. Please try again in a few minutes."}
         </p>
         <div style={styles.card}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={isDevelopment ? "/assets/images/setup-error.png" : "/assets/images/error.png"}
-            alt="error"
+            alt=""
             style={styles.image}
           />
           {isDevelopment && detail ? <p style={styles.detail}>{detail}</p> : null}

@@ -22,7 +22,12 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
   let providerOrgDetails: { data: ProviderUser };
   try {
     providerOrgDetails = await getProviderOrgDetails();
-  } catch {
+  } catch (error) {
+    // Only the provider auth/bootstrap failure maps to the config error page.
+    // Let other runtime errors bubble to global-error so they aren't masked.
+    if ((error as { name?: string })?.name !== "ProviderAuthError") {
+      throw error;
+    }
     return (
       <BackendConfigError detail="Provider authentication failed. Ensure the provider account has password login enabled, or configure an API key." />
     );
