@@ -113,7 +113,7 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
               Cost and usage graph{" "}
             </Text>
             <Text size="xsmall" weight="medium" color="#414651">
-              Memory, storage, and CPU usage by Product or subscription plan.{" "}
+              Usage by Product or subscription plan.{" "}
             </Text>
           </div>
           <div className="flex items-center gap-3">

@@ -6,9 +6,14 @@ import utc from "dayjs/plugin/utc";
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
-import { ConsumptionUsage as ConsumptionUsageData, UsageDimension } from "src/types/consumption";
+import { ConsumptionUsage as ConsumptionUsageData } from "src/types/consumption";
 
 import useMultiSubscriptionUsage from "../hooks/useMultiSubscriptionUsage";
+import {
+  billingUsageDimensionFields,
+  getEmptyBillingUsageTotals,
+  getUsageDimensionTotals,
+} from "../utils/usageDimensions";
 
 import SubscriptionUsageTable, { SubscriptionUsageRow } from "./SubscriptionUsageTable";
 import UsageDimensionCard from "./UsageDimensionCard";
@@ -25,44 +30,7 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
   const [showUsageBreakdown, setShowUsageBreakdown] = useState(false);
 
   const aggregatedConsumptionDataHash = useMemo(() => {
-    const hash: Record<
-      UsageDimension,
-      {
-        total: number;
-      }
-    > = {
-      "Memory GiB hours": {
-        total: 0,
-      },
-      "Storage GiB hours": {
-        total: 0,
-      },
-      "CPU core hours": {
-        total: 0,
-      },
-      "Replica hours": {
-        total: 0,
-      },
-    };
-
-    const usage = consumptionUsageData?.usage || [];
-
-    usage.forEach((usageDatapoint) => {
-      const { dimension, total } = usageDatapoint;
-      if (dimension) {
-        if (hash[dimension]) {
-          hash[dimension] = {
-            total: hash[dimension].total + (total !== undefined ? total : 0),
-          };
-        } else {
-          hash[usageDatapoint.dimension as string] = {
-            total: total !== undefined ? total : 0,
-          };
-        }
-      }
-    });
-
-    return hash;
+    return getUsageDimensionTotals(consumptionUsageData?.usage || []);
   }, [consumptionUsageData]);
 
   const { subscriptions } = useGlobalData();
@@ -92,19 +60,11 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
     if (isSubscriptionUsageFetched && subscriptionUsageHashmap) {
       rows = rootSubscriptions.map((subscription) => {
         const { id, serviceName, serviceLogoURL, productTierName, serviceId } = subscription;
-        const usageData = subscriptionUsageHashmap[id] || {
-          cpuCoreHours: 0,
-          memoryGiBHours: 0,
-          storageGiBHours: 0,
-          podHours: 0,
-        };
+        const usageData = subscriptionUsageHashmap[id] || getEmptyBillingUsageTotals();
         const rowData: SubscriptionUsageRow = {
           subscriptionId: id,
           serviceId: serviceId,
-          cpuCoreHours: usageData.cpuCoreHours,
-          memoryGiBHours: usageData.memoryGiBHours,
-          storageGiBHours: usageData.storageGiBHours,
-          replicaHours: usageData.replicaHours,
+          ...usageData,
           serviceName: serviceName,
           subscriptionPlanName: productTierName,
           serviceLogoURL: serviceLogoURL,
@@ -143,27 +103,15 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
         </div>
       </div>
       <div className=" py-3">
-        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <UsageDimensionCard
-            title="Memory"
-            dimensionName="Memory GiB hours"
-            value={aggregatedConsumptionDataHash["Memory GiB hours"].total}
-          />
-          <UsageDimensionCard
-            title="Storage"
-            dimensionName="Storage GiB hours"
-            value={aggregatedConsumptionDataHash["Storage GiB hours"].total}
-          />
-          <UsageDimensionCard
-            title="CPU"
-            dimensionName="CPU core hours"
-            value={aggregatedConsumptionDataHash["CPU core hours"].total}
-          />
-          <UsageDimensionCard
-            title="Replicas"
-            dimensionName="Replica hours"
-            value={aggregatedConsumptionDataHash["Replica hours"].total}
-          />
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          {billingUsageDimensionFields.map((field) => (
+            <UsageDimensionCard
+              key={field.dimension}
+              title={field.title}
+              dimensionName={field.dimension}
+              value={aggregatedConsumptionDataHash[field.rowField]}
+            />
+          ))}
         </div>
       </div>
       <Collapse in={showUsageBreakdown}>
