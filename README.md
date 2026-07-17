@@ -238,7 +238,7 @@ Review the deployment steps outlined in the [deploy section](#deploy-on-omnistra
 
 #### Why does the portal show a configuration error instead of loading?
 
-The portal shows that page when it cannot authenticate to Omnistrate on startup. The usual causes are incorrect provider credentials, or an account that has password login disabled with no API key configured. Check `PROVIDER_EMAIL` and `PROVIDER_PASSWORD`, and if password login is disabled for your account, authenticate with an API key as described in the [environment variables](#build-and-run-locally) section. Running the app locally shows the underlying cause on the page itself; deployed portals show a generic message so that nothing leaks to your customers.
+The portal shows that page when it can't fully bootstrap due to missing/invalid configuration. Common causes are incorrect provider credentials (so the portal can't authenticate to Omnistrate) and missing/invalid mail configuration required at startup. Check `PROVIDER_EMAIL` and `PROVIDER_PASSWORD` first, and verify the other required environment variables; if password login is disabled for your provider account, authenticate with an API key as described in the [environment variables](#build-and-run-locally) section. Running the app locally shows which variables failed verification; deployed portals show a generic message so that nothing leaks to your customers.
 
 #### What to do if emails are not being sent to customers?
 
