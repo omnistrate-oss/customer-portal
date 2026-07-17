@@ -85,8 +85,8 @@ yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitte
 
 | Environment Variables       | Description                                                                                                                                                                                                                                                               |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PROVIDER_EMAIL              | Service provider's Omnistrate email address                                                                                                                                                                                                                               |
-| PROVIDER_PASSWORD           | Service provider's Omnistrate account password                                                                                                                                                                                                                            |
+| PROVIDER_EMAIL              | Service provider's Omnistrate email address. To authenticate with an API key instead of a password, set this to the literal value `apikey@apikeys.invalid`                                                                                                                |
+| PROVIDER_PASSWORD           | Service provider's Omnistrate account password, or an Omnistrate API key when `PROVIDER_EMAIL` is set to `apikey@apikeys.invalid`                                                                                                                                         |
 | ENVIRONMENT_TYPE            | The environment type for your application. Defaults to _PROD_. Learn more about environments [here](https://docs.omnistrate.com/operate-guides/pipelines/)                                                                                                                |
 | YOUR_SAAS_DOMAIN_URL        | The secure domain URL where this application will be deployed eg. <https://www.yourcloud.com>. When working locally, it should be <http://localhost:3000>                                                                                                                 |
 | YOUR_SAAS_DOMAIN_ALIAS      | The domain alias for your deployment                                                                                                                                                                                                                                      |
@@ -98,7 +98,9 @@ yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitte
 | GOOGLE_ANALYTICS_TAG_ID     | Google Analytics tag ID                                                                                                                                                                                                                                                   |
 | GOOGLE_RECAPTCHA_SITE_KEY   | Google reCAPTCHA v2 (Invisible) Site Key                                                                                                                                                                                                                                  |
 | GOOGLE_RECAPTCHA_SECRET_KEY | Google reCAPTCHA v2 (Invisible) Secret Key                                                                                                                                                                                                                                |
-| DISABLE_PASSWORD_LOGIN      | Set this environment variable to true to disable password login                                                                                                                                                                                                           |
+| DISABLE_PASSWORD_LOGIN      | Set this environment variable to true to disable password login for your customers on the portal's sign in and sign up pages. This does not affect how the portal itself authenticates to Omnistrate — see `PROVIDER_EMAIL` and `PROVIDER_PASSWORD`                       |
+
+> **Authenticating with an API key.** If your Omnistrate account has password login disabled, authenticate the portal with an Omnistrate API key instead of a password: set `PROVIDER_EMAIL` to the literal value `apikey@apikeys.invalid` and `PROVIDER_PASSWORD` to your API key (`om_...`). The portal signs in with these exactly as it does with a password, so nothing else needs to change. Two things to note: the key must have **Admin**-level privileges, and `apikey@apikeys.invalid` is a routing hint rather than a real address — use it verbatim, not your own email. If you deploy the portal through the Omnistrate platform, set the API key on the Customer Portal configuration page in the Omnistrate console instead of setting these variables yourself.
 
 6. Run the development server:
 
@@ -233,6 +235,10 @@ Double-check that you've correctly updated your Omnistrate profile with your org
 #### What should I do if I encounter issues deploying on the Omnistrate Platform?
 
 Review the deployment steps outlined in the [deploy section](#deploy-on-omnistrate-platform-and-configure-your-domain) to ensure all steps were followed correctly. If deploying with code customizations, ensure your forked repository is up to date and your Docker image is correctly built and pushed. For issues specific to the Omnistrate Platform, contact Omnistrate support for assistance.
+
+#### Why does the portal show a configuration error instead of loading?
+
+The portal shows that page when it can't fully bootstrap due to missing/invalid configuration. Common causes are incorrect provider credentials (so the portal can't authenticate to Omnistrate) and missing/invalid mail configuration required at startup. Check `PROVIDER_EMAIL` and `PROVIDER_PASSWORD` first, and verify the other required environment variables; if password login is disabled for your provider account, authenticate with an API key as described in the [environment variables](#build-and-run-locally) section. Running the app locally shows which variables failed verification; deployed portals show a generic message so that nothing leaks to your customers.
 
 #### What to do if emails are not being sent to customers?
 
