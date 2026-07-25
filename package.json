@@ -47,7 +47,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.11",
-    "dompurify": "3.4.11",
+    "dompurify": "3.4.12",
     "dotenv": "^16.4.5",
     "dotted-map": "^2.2.3",
     "ejs": "^3.1.10",
@@ -118,7 +118,7 @@
     "uuid": "14.0.0",
     "form-data": "^4.0.6",
     "shell-quote": "^1.8.4",
-    "dompurify": "3.4.11"
+    "dompurify": "3.4.12"
   },
   "packageManager": "yarn@4.5.0"
 }
