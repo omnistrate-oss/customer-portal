@@ -478,7 +478,7 @@ const CloudAccountsPage = () => {
         },
         {
           id: "privateLink",
-          header: "Private link",
+          header: "Private Link",
           cell: (data) => {
             const value = data.getValue();
             const resultParams = getResultParams(data.row.original);
