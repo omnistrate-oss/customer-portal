@@ -944,7 +944,7 @@ const InstanceForm = ({
   const shouldFetchCloudNativeNetworks = Boolean(
     formMode === "create" &&
       selectedAccountConfigId &&
-      (values.cloudProvider === "aws" || values.cloudProvider === "gcp")
+      (values.cloudProvider === "aws" || values.cloudProvider === "gcp" || values.cloudProvider === "azure")
   );
 
   const cloudNativeNetworksQuery = $api.useQuery(

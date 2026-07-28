@@ -24,6 +24,50 @@ export type CloudAccountFormValues = {
 
 export const BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS = ["aws", "gcp", "azure"] as const;
 
+export type CloudNativeNetworkState = {
+  id?: string;
+  cloudNativeNetworkId?: string;
+  region?: string;
+  status?: string;
+  imported?: boolean;
+  inUse?: boolean;
+};
+
+const isFailedCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.status?.toUpperCase() === "FAILED";
+
+export const getCloudNativeNetworkId = (network: CloudNativeNetworkState): string | undefined =>
+  network.cloudNativeNetworkId || network.id;
+
+export const canImportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.imported === false && network.inUse === false && !isFailedCloudNativeNetwork(network);
+
+export const canUnimportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.imported === true && network.inUse === false && !isFailedCloudNativeNetwork(network);
+
+export const getCloudNativeNetworkDisabledReason = (network: CloudNativeNetworkState): string | undefined => {
+  if (isFailedCloudNativeNetwork(network)) return "This VPC failed discovery and cannot be selected.";
+  if (network.inUse && network.imported) return "This VPC is already imported and in use, so it cannot be changed.";
+  if (network.inUse) return "This VPC is already in use, so it cannot be changed.";
+  return undefined;
+};
+
+export const getCloudNativeNetworkRegions = (networks: CloudNativeNetworkState[]): string[] =>
+  Array.from(
+    new Set(networks.map((network) => network.region).filter((region): region is string => Boolean(region)))
+  ).sort((a, b) => a.localeCompare(b));
+
+export const getDefaultSelectedRegions = (regions: string[]): string[] =>
+  Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
+
+export const getSelectableCloudNativeNetworkIds = (networks: CloudNativeNetworkState[]): Set<string> =>
+  new Set(
+    networks
+      .filter((network) => canImportCloudNativeNetwork(network) || canUnimportCloudNativeNetwork(network))
+      .map(getCloudNativeNetworkId)
+      .filter((id): id is string => Boolean(id))
+  );
+
 export const isBringOwnVpcsSupported = (cloudProvider?: string): boolean =>
   BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS.includes(
     cloudProvider as (typeof BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS)[number]
@@ -236,4 +280,13 @@ export const getExistingVpcCount = (instance: {
   }
 
   return undefined;
+};
+
+export const hasCloudNativeVpcConfiguration = (params?: Record<string, any>): boolean => {
+  if (!params) return false;
+  if (Array.isArray(params.cloudNativeNetworks) && params.cloudNativeNetworks.length > 0) return true;
+  if (Array.isArray(params.cloud_native_networks) && params.cloud_native_networks.length > 0) return true;
+  if (typeof params.cloudNativeNetworkId === "string" && params.cloudNativeNetworkId.length > 0) return true;
+  if (typeof params.cloud_native_network_id === "string" && params.cloud_native_network_id.length > 0) return true;
+  return Number(params.num_cloud_native_networks) > 0;
 };

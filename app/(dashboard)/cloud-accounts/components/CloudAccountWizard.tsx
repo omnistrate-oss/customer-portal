@@ -32,7 +32,13 @@ import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/acco
 import { getResultParams } from "src/utils/instance";
 
 import { CloudAccountValidationSchema } from "../constants";
-import { getInitialValues, getValidSubscriptionForInstanceCreation } from "../utils";
+import {
+  getCloudNativeNetworkRegions,
+  getDefaultSelectedRegions,
+  hasCloudNativeVpcConfiguration,
+  getInitialValues,
+  getValidSubscriptionForInstanceCreation,
+} from "../utils";
 
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 import CustomLabelDescription from "./CustomLabelDescription";
@@ -81,6 +87,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
+  const selectedInstanceParams = useMemo(() => getResultParams(selectedInstance), [selectedInstance]);
+  const hasSelectedInstanceCloudNativeVpc = hasCloudNativeVpcConfiguration(selectedInstanceParams);
 
   // ─── VPC step state ───────────────────────────────────────────────────────
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
@@ -319,7 +327,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     return undefined;
   }, [clickedInstance, selectedInstance]);
 
-  const isAccountConfigReady = Boolean(accountConfigStatus && READY_STATUSES.includes(accountConfigStatus));
+  const isAccountConfigReady = Boolean(
+    accountConfigStatus && READY_STATUSES.includes(accountConfigStatus.toUpperCase())
+  );
 
   const cloudNativeNetworksQuery = $api.useQuery(
     "get",
@@ -335,7 +345,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       },
     },
     {
-      enabled: Boolean(currentStep === 2 && vpcValues.bringOwnVpcs && accountConfigId && isAccountConfigReady),
+      enabled: Boolean(currentStep === 2 && accountConfigId && isAccountConfigReady),
       retry: 2,
       retryDelay: 3000,
     }
@@ -347,6 +357,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     {
       onSuccess: () => {
         cloudNativeNetworksQuery.refetch();
+        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
       },
       onError: () => {
         snackbar.showError("Failed to sync networks. Please try again.");
@@ -361,6 +372,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       onSuccess: () => {
         snackbar.showSuccess("VPCs updated successfully");
         cloudNativeNetworksQuery.refetch();
+        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
         setVpcValues((prev) => ({ ...prev, selectedVpcIds: [] }));
       },
       onError: () => {
@@ -374,21 +386,36 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
   );
 
-  // Regions from the selected service offering, filtered by cloud provider
-  const availableRegions = useMemo(() => {
-    const { serviceId, servicePlanId, cloudProvider } = formData.values;
-    const offering = byoaServiceOfferingsObj[serviceId]?.[servicePlanId];
-    if (!offering || !cloudProvider) return [];
+  const cloudNativeNetworkRegions = useMemo(
+    () => getCloudNativeNetworkRegions(allCloudNativeNetworks),
+    [allCloudNativeNetworks]
+  );
+  const bringOwnVpcsLocked = hasSelectedInstanceCloudNativeVpc || allCloudNativeNetworks.length > 0;
 
-    const regionMap: Record<string, string[] | undefined> = {
-      aws: offering.awsRegions,
-      gcp: offering.gcpRegions,
-      azure: offering.azureRegions,
-      oci: offering.ociRegions,
-    };
+  useEffect(() => {
+    if (!bringOwnVpcsLocked) return;
+    setVpcValues((previous) => (previous.bringOwnVpcs ? previous : { ...previous, bringOwnVpcs: true }));
+  }, [bringOwnVpcsLocked]);
 
-    return (regionMap[cloudProvider] ?? []).slice().sort((a, b) => a.localeCompare(b));
-  }, [formData.values, byoaServiceOfferingsObj]);
+  useEffect(() => {
+    if (cloudNativeNetworkRegions.length === 0) return;
+    setVpcValues((previous) => {
+      const selectedRegions = getDefaultSelectedRegions(cloudNativeNetworkRegions);
+      if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) {
+        return previous;
+      }
+      return { ...previous, bringOwnVpcs: true, selectedRegions, selectedVpcIds: [] };
+    });
+  }, [cloudNativeNetworkRegions]);
+
+  useEffect(() => {
+    if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {
+      void cloudNativeNetworksQuery.refetch();
+      void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
+    }
+  }, [accountConfigId, isAccountConfigReady, vpcValues.selectedRegions, cloudNativeNetworksQuery.refetch, queryClient]);
+
+  const availableRegions = cloudNativeNetworkRegions;
 
   const availableVpcs = useMemo<VpcRecord[]>(() => {
     const filteredNetworks =
@@ -403,6 +430,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         status: network.status || "PENDING",
         statusMessage: network.statusMessage,
         networkId: network.cloudNativeNetworkId,
+        imported: network.imported,
+        inUse: network.inUse,
       };
     });
   }, [allCloudNativeNetworks, vpcValues.selectedRegions]);
@@ -1032,7 +1061,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       {/* Stepper – hidden for private/OnPrem cloud accounts */}
       {!isBYOCOnpremCloud && (
         <Box sx={{ mb: "32px" }}>
-          <WizardStepper currentStep={currentStep} />
+          <WizardStepper
+            currentStep={currentStep}
+            failedStep={String(accountConfigStatus || "").toUpperCase() === "FAILED" ? 1 : undefined}
+          />
         </Box>
       )}
 
@@ -1104,6 +1136,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
               privateConnectivityEnabled={enablePrivateConnectivity}
+              bringOwnVpcsLocked={bringOwnVpcsLocked}
+              emptyStateMessage={
+                cloudNativeNetworksQuery.isError
+                  ? "Unable to load VPCs from the account configuration. Click Resync to try again."
+                  : availableRegions.length === 0
+                    ? "No cloud-native VPCs were returned for this account configuration. Click Resync to discover them."
+                    : "No VPCs found for the selected regions. Click Resync to fetch."
+              }
             />
           )}
         </div>

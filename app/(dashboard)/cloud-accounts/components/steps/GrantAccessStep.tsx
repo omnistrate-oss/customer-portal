@@ -10,6 +10,7 @@ import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
+import StepperErrorIcon from "src/components/Stepper/StepperErrorIcon";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
@@ -65,14 +66,17 @@ type ChecklistItemProps = {
   label: string;
   isComplete: boolean;
   isInProgress?: boolean;
+  isFailed?: boolean;
   children?: React.ReactNode;
 };
 
-const ChecklistItem = ({ label, isComplete, isInProgress, children }: ChecklistItemProps) => (
+const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, children }: ChecklistItemProps) => (
   <Stack direction="column" gap="12px">
     <Stack direction="row" alignItems="center" gap="12px">
       <Box sx={{ flexShrink: 0 }}>
-        {isComplete ? (
+        {isFailed ? (
+          <StepperErrorIcon />
+        ) : isComplete ? (
           <StepperSuccessIcon />
         ) : isInProgress ? (
           <Image src={sandClock} alt="in progress" width={24} height={24} />
@@ -203,8 +207,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const statusPollStart = useRef<number>(0);
 
   const accountConfigStatus = selectedAccountConfig?.status;
-  const isFailed = accountConfigStatus === "FAILED";
-  const isReady = accountConfigStatus === "READY";
+  const normalizedAccountConfigStatus = String(accountConfigStatus || "").toUpperCase();
+  const isFailed = normalizedAccountConfigStatus === "FAILED";
+  const isReady = ["READY", "RUNNING", "COMPLETE"].includes(normalizedAccountConfigStatus);
 
   const isVerificationComplete =
     (hasAwsAccount && !!cloudFormationTemplateUrl) ||
@@ -242,7 +247,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
             result_params: { ...getResultParams(prev), ...resultParams },
           }));
 
-          const status = resultParams.account_config_status || resourceInstance?.status;
+          const status = String(resultParams.account_config_status || resourceInstance?.status || "").toUpperCase();
           const TERMINAL_STATUSES = ["READY", "RUNNING", "COMPLETE", "FAILED"];
           if (status && TERMINAL_STATUSES.includes(status)) {
             setIsStatusPolling(false);
@@ -276,7 +281,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const isRequestOrDataPending =
     isPolling ||
     isStatusPolling ||
-    ["PENDING", "VERIFYING", "DEPLOYING", "ATTACHING", "CONNECTING"].includes(String(accountConfigStatus));
+    ["PENDING", "VERIFYING", "DEPLOYING", "ATTACHING", "CONNECTING"].includes(normalizedAccountConfigStatus);
 
   // Determine checklist states
   const isSetupComplete = true; // Account was just created
@@ -503,6 +508,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           label="This account configuration verification succeeded"
           isComplete={isVerificationComplete && !isFailed}
           isInProgress={isRequestOrDataPending && !isVerificationComplete && !isFailed}
+          isFailed={isFailed}
         >
           {renderVerificationInstructions()}
         </ChecklistItem>
@@ -520,6 +526,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           label={stackDeployedLabel}
           isComplete={isStackDeployed}
           isInProgress={isRequestOrDataPending && !isStackDeployed && !isFailed}
+          isFailed={isFailed}
         />
       </Stack>
     </CardWithTitle>

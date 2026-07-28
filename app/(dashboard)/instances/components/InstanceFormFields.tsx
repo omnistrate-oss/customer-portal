@@ -66,6 +66,8 @@ export const getStandardInformationFields = (
     name?: string;
     region?: string;
     status?: string;
+    imported?: boolean;
+    inUse?: boolean;
   }>,
   isFetchingCloudNativeNetworks: boolean
 ) => {
@@ -579,7 +581,9 @@ export const getStandardInformationFields = (
 
     if (selectedCloudAccountConfigId && vpcType === "choose_existing" && isExistingVpcSupported) {
       const filteredNetworks = region
-        ? cloudNativeNetworks.filter((n) => n.region === region && n.status?.toUpperCase() !== "FAILED")
+        ? cloudNativeNetworks.filter(
+            (n) => n.region === region && n.status?.toUpperCase() !== "FAILED" && n.imported === true
+          )
         : [];
       fields.push({
         dataTestId: "existing-vpc-select",

@@ -3,6 +3,7 @@
 import { Box, Stack } from "@mui/material";
 
 import StepperDefaultIcon from "src/components/Stepper/StepperDefaultIcon";
+import StepperErrorIcon from "src/components/Stepper/StepperErrorIcon";
 import StepperInProgressIcon from "src/components/Stepper/StepperInProgressIcon";
 import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
 import { Text } from "src/components/Typography/Typography";
@@ -13,15 +14,25 @@ export type WizardStep = 0 | 1 | 2;
 
 type WizardStepperProps = {
   currentStep: WizardStep;
+  failedStep?: WizardStep;
 };
 
-const StepIcon = ({ index, currentStep }: { index: number; currentStep: WizardStep }) => {
+const StepIcon = ({
+  index,
+  currentStep,
+  failedStep,
+}: {
+  index: number;
+  currentStep: WizardStep;
+  failedStep?: WizardStep;
+}) => {
+  if (index === failedStep) return <StepperErrorIcon />;
   if (index < currentStep) return <StepperSuccessIcon />;
   if (index === currentStep) return <StepperInProgressIcon />;
   return <StepperDefaultIcon />;
 };
 
-const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
+const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep, failedStep }) => {
   return (
     <Box
       sx={{
@@ -79,7 +90,7 @@ const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
                 justifyContent: "center",
               }}
             >
-              <StepIcon index={index} currentStep={currentStep} />
+              <StepIcon index={index} currentStep={currentStep} failedStep={failedStep} />
             </Box>
             <Text
               size="small"

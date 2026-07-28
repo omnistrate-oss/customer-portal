@@ -3,7 +3,7 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Autocomplete, Box, Checkbox, Chip, Stack, TextField } from "@mui/material";
+import { Autocomplete, Box, Checkbox, Chip, Stack, TextField, Tooltip as MuiTooltip } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
@@ -14,7 +14,7 @@ import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
-import { isBringOwnVpcsSupported } from "../../utils";
+import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
 export type VpcRecord = {
   id: string;
@@ -22,6 +22,8 @@ export type VpcRecord = {
   status: string;
   statusMessage?: string;
   networkId?: string;
+  imported?: boolean;
+  inUse?: boolean;
 };
 
 export type ConfigureVPCsFormValues = {
@@ -44,6 +46,8 @@ type ConfigureVPCsStepProps = {
   lastSyncedAt?: string;
   cloudProvider?: string;
   privateConnectivityEnabled?: boolean;
+  emptyStateMessage?: string;
+  bringOwnVpcsLocked?: boolean;
 };
 
 // Map backend VPC status to StatusChip category
@@ -146,6 +150,18 @@ const InstructionPanel = ({ children }: { children: React.ReactNode }) => (
   </Stack>
 );
 
+const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
+  <MuiTooltip
+    title={props.disabled ? "This VPC is failed or already in use and cannot be selected." : ""}
+    placement="top"
+    arrow
+  >
+    <span>
+      <Checkbox {...props} />
+    </span>
+  </MuiTooltip>
+);
+
 const CodeBlock = ({ label, children }: { label?: string; children: React.ReactNode }) => (
   <Box>
     {label && (
@@ -236,15 +252,30 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   lastSyncedAt,
   cloudProvider = "aws",
   privateConnectivityEnabled = false,
+  emptyStateMessage = "No VPCs found for the selected regions. Click Resync to fetch.",
+  bringOwnVpcsLocked = false,
 }) => {
   const [showAllInstructions, setShowAllInstructions] = useState(false);
   const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
   const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
   const selectableVpcIds = useMemo(
-    () => new Set(availableVpcs.filter((vpc) => vpc.status?.toUpperCase() !== "FAILED").map((vpc) => vpc.id)),
+    () =>
+      new Set(
+        availableVpcs
+          .filter((vpc) => canImportCloudNativeNetwork(vpc) || canUnimportCloudNativeNetwork(vpc))
+          .map((vpc) => vpc.id)
+      ),
     [availableVpcs]
   );
+  const selectedImportIds = values.selectedVpcIds.filter((id) => {
+    const vpc = availableVpcs.find((item) => item.id === id);
+    return vpc && canImportCloudNativeNetwork(vpc);
+  });
+  const selectedUnimportIds = values.selectedVpcIds.filter((id) => {
+    const vpc = availableVpcs.find((item) => item.id === id);
+    return vpc && canUnimportCloudNativeNetwork(vpc);
+  });
 
   const vpcColumns = useMemo(
     () => [
@@ -304,6 +335,20 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
             {params.row.statusMessage || "Available for deployments"}
           </Text>
         ),
+      },
+      {
+        field: "imported",
+        headerName: "Imported",
+        flex: 0.55,
+        minWidth: 110,
+        valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
+      },
+      {
+        field: "inUse",
+        headerName: "In use",
+        flex: 0.55,
+        minWidth: 100,
+        valueGetter: (params) => (params.row.inUse ? "Yes" : "No"),
       },
       {
         field: "networkId",
@@ -446,9 +491,11 @@ enableDnsSupport   = true`}</CodeBlock>
                 title={
                   !isBringOwnVpcsEnabledForProvider
                     ? "Bring your own VPCs is currently available for AWS, GCP, and Azure only"
-                    : !values.enableNewVpcs && values.bringOwnVpcs
-                      ? "At least one VPC option must be enabled"
-                      : ""
+                    : bringOwnVpcsLocked
+                      ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
+                      : !values.enableNewVpcs && values.bringOwnVpcs
+                        ? "At least one VPC option must be enabled"
+                        : ""
                 }
                 placement="top"
                 arrow
@@ -461,7 +508,7 @@ enableDnsSupport   = true`}</CodeBlock>
                       if (!e.target.checked && !values.enableNewVpcs) return;
                       onChange({ bringOwnVpcs: e.target.checked });
                     }}
-                    disabled={!isBringOwnVpcsEnabledForProvider}
+                    disabled={!isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
                     sx={{
                       p: 0,
                       color: "#D0D5DD",
@@ -527,7 +574,7 @@ enableDnsSupport   = true`}</CodeBlock>
               />
 
               {/* VPCs table */}
-              {values.selectedRegions.length > 0 && (
+              {values.selectedRegions.length > 0 ? (
                 <DataGrid
                   checkboxSelection
                   disableSelectionOnClick
@@ -539,9 +586,10 @@ enableDnsSupport   = true`}</CodeBlock>
                     onChange({ selectedVpcIds: (newSelection as string[]).filter((id) => selectableVpcIds.has(id)) });
                   }}
                   enableSelectAll
-                  isRowSelectable={(params) => params.row.status?.toUpperCase() !== "FAILED"}
+                  isRowSelectable={(params) => selectableVpcIds.has(params.row.id)}
                   components={{
                     Header: VpcsDataGridHeader,
+                    BaseCheckbox: VpcBaseCheckbox,
                   }}
                   componentsProps={{
                     header: {
@@ -552,12 +600,13 @@ enableDnsSupport   = true`}</CodeBlock>
                     },
                   }}
                   loading={isLoadingVpcs}
-                  noRowsText="No VPCs found for the selected regions. Click Resync to fetch."
-                  hideFooter
+                  noRowsText={isLoadingVpcs ? "Loading VPCs…" : emptyStateMessage}
                   sx={{
                     mt: "8px",
                     borderRadius: "8px",
                     boxShadow: "none",
+                    overflowX: "auto",
+                    "& .MuiDataGrid-virtualScroller": { overflowX: "auto" },
                     "& .MuiDataGrid-main": {
                       minHeight: "260px",
                     },
@@ -569,29 +618,50 @@ enableDnsSupport   = true`}</CodeBlock>
                     },
                   }}
                 />
+              ) : (
+                <Box
+                  sx={{
+                    mt: "8px",
+                    minHeight: "96px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #E9EAEB",
+                    borderRadius: "8px",
+                    bgcolor: "#F9FAFB",
+                  }}
+                >
+                  <Text size="small" weight="regular" color="#667085">
+                    {emptyStateMessage}
+                  </Text>
+                </Box>
               )}
 
               {/* Import / Unimport buttons */}
-              {values.selectedVpcIds.length > 0 && (
+              {values.selectedVpcIds.length > 0 && (selectedImportIds.length > 0 || selectedUnimportIds.length > 0) && (
                 <Stack direction="row" justifyContent="flex-end" gap="12px" sx={{ mt: "16px" }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => onUnimport?.(values.selectedVpcIds)}
-                    disabled
-                    data-testid="unimport-vpcs-button"
-                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
-                  >
-                    Unimport ({values.selectedVpcIds.length})
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => onImport?.(values.selectedVpcIds)}
-                    disabled={isImporting}
-                    data-testid="import-vpcs-button"
-                    sx={{ height: "36px !important", padding: "8px 16px !important" }}
-                  >
-                    Import ({values.selectedVpcIds.length})
-                  </Button>
+                  {selectedUnimportIds.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => onUnimport?.(selectedUnimportIds)}
+                      disabled={isImporting}
+                      data-testid="unimport-vpcs-button"
+                      sx={{ height: "36px !important", padding: "8px 16px !important" }}
+                    >
+                      Unimport ({selectedUnimportIds.length})
+                    </Button>
+                  )}
+                  {selectedImportIds.length > 0 && (
+                    <Button
+                      variant="contained"
+                      onClick={() => onImport?.(selectedImportIds)}
+                      disabled={isImporting}
+                      data-testid="import-vpcs-button"
+                      sx={{ height: "36px !important", padding: "8px 16px !important" }}
+                    >
+                      Import ({selectedImportIds.length})
+                    </Button>
+                  )}
                 </Stack>
               )}
             </Stack>
