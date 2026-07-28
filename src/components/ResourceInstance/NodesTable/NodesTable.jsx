@@ -82,7 +82,6 @@ export default function NodesTable(props) {
   const [selectionModel, setSelectionModel] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [isGenerateTokenDialogOpen, setIsGenerateTokenDialogOpen] = useState(false);
-  const [dashboardEndpoint, setDashboardEndpoint] = useState("");
 
   const selectUser = useSelector(selectUserrootData);
   const role = getEnumFromUserRoleString(isAccessSide ? subscriptionData?.roleType : selectUser.roleType);
@@ -98,6 +97,11 @@ export default function NodesTable(props) {
 
     return list ?? [];
   }, [searchText, nodes]);
+
+  const dashboardEndpoint = useMemo(() => {
+    return nodes.find((node) => node.kubernetesDashboardEndpoint?.dashboardEndpoint)?.kubernetesDashboardEndpoint
+      ?.dashboardEndpoint;
+  }, [nodes]);
 
   const customTenancyColumns = useMemo(() => {
     const res = [
@@ -147,7 +151,6 @@ export default function NodesTable(props) {
         renderCell: (params) => {
           const { row } = params;
           const dashboardEndpointRow = row.kubernetesDashboardEndpoint?.dashboardEndpoint;
-          setDashboardEndpoint(row.kubernetesDashboardEndpoint?.dashboardEndpoint);
           const isDisconnected = resourceInstancestatus === "DISCONNECTED";
           if (!dashboardEndpointRow) {
             return "-";

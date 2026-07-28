@@ -306,7 +306,7 @@ const SelectLoadingUI = () => {
 
 export const SelectField = ({ field, formData }) => {
   const { values, touched, errors, handleChange, handleBlur } = formData;
-  return (
+  const select = (
     <Select
       data-testid={field.dataTestId ?? ""}
       isLoading={field.isLoading}
@@ -353,6 +353,18 @@ export const SelectField = ({ field, formData }) => {
       )}
     </Select>
   );
+
+  if (field.disabled && field.disabledMessage) {
+    return (
+      <Tooltip title={field.disabledMessage}>
+        <Box component="span" sx={{ display: "block" }}>
+          {select}
+        </Box>
+      </Tooltip>
+    );
+  }
+
+  return select;
 };
 
 export const RadioField = ({ field, formData }) => {

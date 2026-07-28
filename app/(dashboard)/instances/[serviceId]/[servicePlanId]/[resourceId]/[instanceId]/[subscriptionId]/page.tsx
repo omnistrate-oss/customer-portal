@@ -1,5 +1,8 @@
 "use client";
 
+import { use, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, Collapse, Stack } from "@mui/material";
@@ -11,12 +14,22 @@ import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialog
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { Overlay } from "app/(dashboard)/instances/page";
 import { platformToCloudProviderMap } from "app/(dashboard)/instances/utils";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { use, useEffect, useMemo, useState } from "react";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
+import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
+import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
+import LogsDashboard from "src/components/ResourceInstance/Logs/LogsDashboard";
+import { Tab, Tabs } from "src/components/Tab/Tab";
+import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
+import useResourceInstance from "src/hooks/useResourceInstance";
+import useServiceOfferingResourceSchema from "src/hooks/useServiceOfferingResourceSchema";
+import { useGlobalData } from "src/providers/GlobalDataProvider";
+import {
+  selectInstanceDetailsSummaryVisibility,
+  toggleInstanceDetailsSummaryVisibility,
+} from "src/slices/genericSlice";
+import { NetworkType } from "src/types/common/enums";
 import Button from "components/Button/Button";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
@@ -29,18 +42,6 @@ import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
 import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
 import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
 import { DisplayText } from "components/Typography/Typography";
-import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
-import { Tab, Tabs } from "src/components/Tab/Tab";
-import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
-import useResourceInstance from "src/hooks/useResourceInstance";
-import useServiceOfferingResourceSchema from "src/hooks/useServiceOfferingResourceSchema";
-import { useGlobalData } from "src/providers/GlobalDataProvider";
-import {
-  selectInstanceDetailsSummaryVisibility,
-  toggleInstanceDetailsSummaryVisibility,
-} from "src/slices/genericSlice";
-import { NetworkType } from "src/types/common/enums";
 
 import { checkCustomDNSEndpoint, getTabs } from "./utils";
 
@@ -73,6 +74,7 @@ const InstanceDetailsPage = ({
   const view = searchParams?.get("view");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-dialog");
+  const [selectedCustomWorkflowId, setSelectedCustomWorkflowId] = useState("");
 
   const [currentTab, setCurrentTab] = useState<CurrentTab>("Instance Details");
 
@@ -146,12 +148,12 @@ const InstanceDetailsPage = ({
         ),
         serviceModelType: offering?.serviceModelType,
       }),
-    [resourceInstanceData, isCliManagedResource, resourceType, offering]
+    [resourceInstanceData, resourceType, offering]
   );
 
   const disabledTabs = useMemo(
     () => (resourceInstanceData?.status === "DISCONNECTED" ? ["backups"] : []),
-    [resourceInstanceData, tabs]
+    [resourceInstanceData]
   );
 
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
@@ -277,6 +279,7 @@ const InstanceDetailsPage = ({
             subscription={subscription}
             setOverlayType={setOverlayType}
             setIsOverlayOpen={setIsOverlayOpen}
+            setSelectedCustomWorkflowId={setSelectedCustomWorkflowId}
             refetchData={refetchInstance}
           />
         </Stack>
@@ -388,6 +391,8 @@ const InstanceDetailsPage = ({
           }
           offering={offering}
           cloudProvider={cloudProvider}
+          instanceRegion={resourceInstanceData.region}
+          resourceType={resourceType}
           tab={"backups"}
           setCurrentTab={setCurrentTab}
           customNetworkExists={customNetworkExists}
@@ -407,6 +412,8 @@ const InstanceDetailsPage = ({
           }
           offering={offering}
           cloudProvider={cloudProvider}
+          instanceRegion={resourceInstanceData.region}
+          resourceType={resourceType}
           tab="snapshots"
           setCurrentTab={setCurrentTab}
           customNetworkExists={customNetworkExists}
@@ -426,6 +433,7 @@ const InstanceDetailsPage = ({
         setIsOverlayOpen={setIsOverlayOpen}
         overlayType={overlayType}
         setOverlayType={setOverlayType}
+        selectedCustomWorkflowId={selectedCustomWorkflowId}
         instance={resourceInstanceData?.unprocessedData}
         instances={instances}
         serviceOffering={offering}

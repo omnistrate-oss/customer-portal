@@ -10,6 +10,7 @@ function useBillingDetails(isBillingEnabled = false) {
     queryFn: async () => {
       const response = await getBillingDetails({
         returnUrl: baseURL,
+        supportsCustomPaymentPortal: true,
       });
 
       return response.data;

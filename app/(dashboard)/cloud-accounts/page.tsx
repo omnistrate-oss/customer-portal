@@ -51,13 +51,13 @@ import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
-import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
   MAX_POLL_COUNT,
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
+import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
@@ -466,9 +466,6 @@ const CloudAccountsPage = () => {
             const count = Number(value);
             return <StatusChip label={`${count} ${count === 1 ? "VPC" : "VPCs"}`} category="info" />;
           },
-          meta: {
-            minWidth: 140,
-          },
         }
       ),
       columnHelper.accessor(
@@ -500,6 +497,40 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const subscription = subscriptionsObj[row.subscriptionId as string];
+          return subscription?.subscriptionOwnerName;
+        },
+        {
+          id: "subscriptionOwner",
+          header: "Subscription Owner",
+
+          meta: {
+            minWidth: 225,
+          },
+        }
+      ),
+      columnHelper.accessor((row) => formatDateUTC(row.created_at), {
+        id: "created_at",
+        header: "Created On",
+        cell: (data) => {
+          return data.row.original.created_at ? formatDateUTC(data.row.original.created_at) : "-";
+        },
+        meta: {
+          minWidth: 225,
+        },
+      }),
+      columnHelper.accessor(
+        (row) => {
+          const subscription = subscriptionsObj[row.subscriptionId as string];
+          return subscription?.productTierName || "-";
+        },
+        {
+          id: "servicePlanName",
+          header: "Subscription Plan",
+        }
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const subscription = subscriptionsObj[row.subscriptionId as string];
           return subscription?.serviceName;
         },
         {
@@ -514,17 +545,6 @@ const CloudAccountsPage = () => {
           },
         }
       ),
-      columnHelper.accessor(
-        (row) => {
-          const subscription = subscriptionsObj[row.subscriptionId as string];
-          return subscription?.productTierName || "-";
-        },
-        {
-          id: "servicePlanName",
-          header: "Subscription Plan",
-        }
-      ),
-
       columnHelper.accessor(
         // @ts-ignore
         (row) => {
@@ -555,26 +575,6 @@ const CloudAccountsPage = () => {
           },
         }
       ),
-      columnHelper.accessor(
-        (row) => {
-          const subscription = subscriptionsObj[row.subscriptionId as string];
-          return subscription?.subscriptionOwnerName;
-        },
-        {
-          id: "subscriptionOwner",
-          header: "Subscription Owner",
-        }
-      ),
-      columnHelper.accessor((row) => formatDateUTC(row.created_at), {
-        id: "created_at",
-        header: "Created On",
-        cell: (data) => {
-          return data.row.original.created_at ? formatDateUTC(data.row.original.created_at) : "-";
-        },
-        meta: {
-          minWidth: 225,
-        },
-      }),
     ];
   }, [subscriptionsObj, accountConfigsHash]);
 

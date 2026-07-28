@@ -21,4 +21,20 @@ export type ConsumptionUsagePerDay = components["schemas"]["GetConsumptionUsageR
 
 export type ConsumptionUsage = components["schemas"]["GetConsumptionUsageResult"];
 
-export type UsageDimension = "Memory GiB hours" | "Storage GiB hours" | "CPU core hours" | "Replica hours";
+export type UsageDimension =
+  | "Memory GiB hours"
+  | "Storage GiB hours"
+  | "CPU core hours"
+  | "Replica hours"
+  | "Deployment cell hours";
+
+export type ConsumptionPaymentMethod = components["schemas"]["PaymentMethod"];
+
+export type ListConsumptionPaymentMethodsSuccessResponse =
+  paths["/2022-09-01-00/resource-instance/billing/stripe/payment-methods"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type CreateConsumptionSetupIntentSuccessResponse =
+  paths["/2022-09-01-00/resource-instance/billing/stripe/payment-methods/setup-intent"]["post"]["responses"]["200"]["content"]["application/json"];
+
+export type ConsumptionStripeConfigResponse =
+  paths["/2022-09-01-00/resource-instance/billing/stripe/config"]["get"]["responses"]["200"]["content"]["application/json"];

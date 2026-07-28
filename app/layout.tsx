@@ -6,6 +6,7 @@ import { EnvironmentType } from "src/types/common/enums";
 import { ProviderUser } from "src/types/users";
 
 // import Script from "next/script";
+import BackendConfigError from "./BackendConfigError";
 import RootProviders from "./RootProviders";
 
 import "./globals.css";
@@ -18,7 +19,19 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
-  const providerOrgDetails: { data: ProviderUser } = await getProviderOrgDetails();
+  let providerOrgDetails: { data: ProviderUser };
+  try {
+    providerOrgDetails = await getProviderOrgDetails();
+  } catch (error) {
+    // Only the provider auth/bootstrap failure maps to the config error page.
+    // Let other runtime errors bubble to global-error so they aren't masked.
+    if ((error as { name?: string })?.name !== "ProviderAuthError") {
+      throw error;
+    }
+    return (
+      <BackendConfigError detail="Provider authentication failed. Ensure the provider account has password login enabled, or configure an API key." />
+    );
+  }
 
   return (
     <html lang="en">

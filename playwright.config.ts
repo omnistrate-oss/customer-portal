@@ -25,7 +25,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: isReplayMode() ? 0 : process.env.CI ? 2 : 1,
   workers: getWorkers(),
-  reporter: process.env.CI ? [["html"], ["github"]] : [["html"]],
+  reporter: process.env.CI ? [["list"], ["html"], ["github"]] : [["html"]],
 
   timeout: isReplayMode() ? 60 * 1000 : 12 * 60 * 1000,
 

@@ -52,8 +52,44 @@ jobs:
         yarn info --name-only
         echo "::endgroup::"
 
-    - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+    - name: Get Playwright Version
+      id: playwright-version
+      run: echo "version=$(node -e 'console.log(require("./node_modules/@playwright/test/package.json").version)')" >> $GITHUB_OUTPUT
+
+    - name: Cache Playwright Browsers
+      id: playwright-cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-chromium-${{ steps.playwright-version.outputs.version }}
+
+    - name: Install Playwright Browser Bundle (cache miss)
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      timeout-minutes: 20
+      run: |
+        for attempt in 1 2 3; do
+          if yarn playwright install chromium --with-deps; then
+            echo "Playwright browser install succeeded on attempt ${attempt}"
+            break
+          fi
+          if [ "${attempt}" -eq 3 ]; then
+            echo "Playwright browser install failed after ${attempt} attempts"
+            exit 1
+          fi
+          echo "Playwright browser install failed on attempt ${attempt}; retrying in 20s..."
+          sleep 20
+        done
+
+    - name: Install Playwright OS dependencies (cache hit)
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: yarn playwright install-deps chromium
+
+    - name: Log Playwright cache/install status
+      if: always()
+      run: |
+        echo "playwright_cache_hit=${{ steps.playwright-cache.outputs.cache-hit }}"
+        echo "playwright_version=${{ steps.playwright-version.outputs.version }}"
+        du -sh ~/.cache/ms-playwright || true
 
     - name: Build Project
       run: yarn build

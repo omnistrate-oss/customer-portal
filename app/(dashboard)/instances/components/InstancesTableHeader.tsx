@@ -1,9 +1,6 @@
-import { CircularProgress } from "@mui/material";
 import { useMemo } from "react";
+import { CircularProgress } from "@mui/material";
 
-import Button from "components/Button/Button";
-import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
-import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
@@ -18,9 +15,12 @@ import {
   operationEnum,
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
+import Button from "components/Button/Button";
+import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
+import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
 
 import { Overlay } from "../page";
-import { getMainResourceFromInstance, isOnpremInstaller } from "../utils";
+import { getMainResourceFromInstance, hasSupportedOperation, isOnpremInstaller } from "../utils";
 
 import InstanceActionMenu from "./InstanceActionMenu";
 import InstancesFilters from "./InstancesFilters";
@@ -41,6 +41,7 @@ type InstancesTableHeaderProps = {
   setSelectedRows: SetState<ResourceInstance[]>;
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  setSelectedCustomWorkflowId: SetState<string>;
   selectedInstanceOffering: ServiceOffering;
   selectedInstanceSubscription?: Subscription;
   refetchInstances: () => void;
@@ -56,6 +57,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   setSelectedRows,
   setOverlayType,
   setIsOverlayOpen,
+  setSelectedCustomWorkflowId,
   selectedInstanceOffering,
   selectedInstanceSubscription,
   refetchInstances,
@@ -96,7 +98,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
 
   const isComplexResource = CLI_MANAGED_RESOURCES.includes(selectedResource?.resourceType as string);
   const isProxyResource = selectedResource?.resourceType === "PortsBasedProxy";
-
+  const isOperatorCRDResource = selectedResource?.resourceType?.toLowerCase() === "operatorcrd";
   const mainActions = useMemo(() => {
     const actions: Action[] = [];
     const status = selectedInstance?.status;
@@ -106,6 +108,9 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
     const role = getEnumFromUserRoleString(selectedInstanceSubscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
     const isDeleteAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Delete, role, viewEnum.Access_Resources);
+    const blocksLifecycleActions = isComplexResource && !isOperatorCRDResource;
+    const supportsStart = hasSupportedOperation(selectedInstance, "START", selectedResource?.resourceType as string);
+    const supportsStop = hasSupportedOperation(selectedInstance, "STOP", selectedResource?.resourceType as string);
 
     const pathData = {
       serviceProviderId: selectedInstanceOffering?.serviceProviderId,
@@ -124,7 +129,12 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isLoading: stopInstanceMutation.isPending,
       isDisabled:
-        !selectedInstance || status !== "RUNNING" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
+        !selectedInstance ||
+        status !== "RUNNING" ||
+        blocksLifecycleActions ||
+        isProxyResource ||
+        !isUpdateAllowedByRBAC ||
+        !supportsStop,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         setOverlayType("stop-dialog");
@@ -133,16 +143,18 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       disabledMessage: !selectedInstance
         ? "Please select an instance"
         : installer
-          ? "Not applicable for on-prem deployment instances"
+          ? "Not applicable for air-gapped deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
             : status !== "RUNNING"
               ? "Instance must be running to stop it"
-              : isComplexResource || isProxyResource
-                ? "System managed instances cannot be stopped"
-                : !isUpdateAllowedByRBAC
-                  ? "Unauthorized to stop instances"
-                  : "",
+              : !supportsStop
+                ? "Instance does not support stop operation"
+                : blocksLifecycleActions || isProxyResource
+                  ? "System managed instances cannot be stopped"
+                  : !isUpdateAllowedByRBAC
+                    ? "Unauthorized to stop instances"
+                    : "",
     });
 
     actions.push({
@@ -151,7 +163,12 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isLoading: startInstanceMutation.isPending,
       isDisabled:
-        !selectedInstance || status !== "STOPPED" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
+        !selectedInstance ||
+        status !== "STOPPED" ||
+        blocksLifecycleActions ||
+        isProxyResource ||
+        !isUpdateAllowedByRBAC ||
+        !supportsStart,
       onClick: () => {
         if (!selectedInstance) return snackbar.showError("Please select an instance");
         if (!selectedInstanceOffering) return snackbar.showError("Product not found");
@@ -167,16 +184,18 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       disabledMessage: !selectedInstance
         ? "Please select an instance"
         : installer
-          ? "Not applicable for on-prem deployment instances"
+          ? "Not applicable for air-gapped deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
             : status !== "STOPPED"
               ? "Instances must be stopped before starting"
-              : isComplexResource || isProxyResource
-                ? "System managed instances cannot be started"
-                : !isUpdateAllowedByRBAC
-                  ? "Unauthorized to start instances"
-                  : "",
+              : !supportsStart
+                ? "Instance does not support start operation"
+                : blocksLifecycleActions || isProxyResource
+                  ? "System managed instances cannot be started"
+                  : !isUpdateAllowedByRBAC
+                    ? "Unauthorized to start instances"
+                    : "",
     });
 
     actions.push({
@@ -262,8 +281,10 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
     selectedInstanceOffering,
     isComplexResource,
     isProxyResource,
+    isOperatorCRDResource,
     selectedResource,
     selectedInstanceSubscription?.roleType,
+    isLoadingInstances,
   ]);
 
   return (
@@ -306,6 +327,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
             subscription={selectedInstanceSubscription}
             setOverlayType={setOverlayType}
             setIsOverlayOpen={setIsOverlayOpen}
+            setSelectedCustomWorkflowId={setSelectedCustomWorkflowId}
             refetchData={refetchInstances}
             setSelectedRows={setSelectedRows}
           />

@@ -5,9 +5,11 @@ import Button from "src/components/Button/Button";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { CustomNetwork } from "src/types/customNetwork";
 import { Subscription } from "src/types/subscription";
+import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 
 const CustomNetworksTableHeader = ({
   count,
@@ -37,6 +39,7 @@ const CustomNetworksTableHeader = ({
   subscriptions?: Subscription[];
 }) => {
   const currentUser = useSelector(selectUserrootData);
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   /**
    * Determines whether the currently selected network's actions should be blocked
@@ -46,13 +49,8 @@ const CustomNetworksTableHeader = ({
    * - Exactly one row is selected
    * - The selected network has an `owningUserId`
    * - The logged-in user is NOT the owner
-   * - The logged-in user does NOT have an "editor" or "root" role on any subscription
-   *   whose `rootUserOrgId` matches the network's `owningUserId`
-   *
-   * @remarks
-   * ⚠️ Potential bug: `rootUserOrgId` is an Org ID while `owningUserId` is a User ID.
-   * These two values represent different entity types and are unlikely to ever be equal,
-   * meaning the `hasAccess` check may always evaluate to `false`.
+   * - The logged-in user does NOT have write-capable access on any subscription
+   *   whose owner matches the network's `owningUserId`
    */
   const isOwnershipBlocked = useMemo(() => {
     if (selectedRows.length !== 1) return false;
@@ -65,13 +63,14 @@ const CustomNetworksTableHeader = ({
     // If the logged-in user is the owner, allow
     if (networkOwnerId === currentUser?.id) return false;
 
-    // Check if the user has editor or root role on any subscription belonging to the network owner's org
+    // Check if the user has write access on any subscription belonging to the network owner's org
     const hasAccess = subscriptions.some(
-      (sub) => sub.rootUserId === networkOwnerId && (sub.roleType === "editor" || sub.roleType === "root")
+      (sub) =>
+        sub.rootUserId === networkOwnerId && isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
     );
 
     return !hasAccess;
-  }, [selectedRows, customNetworks, currentUser?.id, subscriptions]);
+  }, [consumptionSubscriptionAdminRBAC, selectedRows, customNetworks, currentUser?.id, subscriptions]);
 
   const getModifyDeleteDisabledMessage = () => {
     if (selectedRows.length !== 1) return "Please select a customer network";

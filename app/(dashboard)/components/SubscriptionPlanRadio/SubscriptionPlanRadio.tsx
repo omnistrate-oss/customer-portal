@@ -13,12 +13,14 @@ import { getSubscriptionRequest } from "src/api/subscriptionRequests";
 import { getSubscription } from "src/api/subscriptions";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
+import { getHighestPermissionSubscription, isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 import { getSubscriptionsRoute } from "src/utils/routes";
 import Button from "components/Button/Button";
 import CircleCheckIcon from "components/Icons/ServicePlanCard/CircleCheckIcon";
@@ -38,7 +40,11 @@ const SubscriptionPlanCard = ({
   disabledMessage,
   isPlanSelectionDisabled,
 }) => {
-  const rootSubscription = subscriptions.find((sub) => sub.roleType === "root");
+  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
+  const currentSubscription = getHighestPermissionSubscription(subscriptions, consumptionSubscriptionAdminRBAC);
+  const writeSubscriptions = subscriptions.filter((subscription) =>
+    isSubscriptionWriteRole(subscription.roleType, consumptionSubscriptionAdminRBAC)
+  );
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   const card = (
@@ -47,13 +53,13 @@ const SubscriptionPlanCard = ({
       className={clsx(
         "gap-3 px-4 pt-4 pb-3 rounded-xl outline outline-[2px]",
         isSelected ? "outline-success-500" : "outline-gray-300",
-        (!subscriptions.length || disabled || isPlanSelectionDisabled) && "bg-gray-50"
+        (!writeSubscriptions.length || disabled || isPlanSelectionDisabled) && "bg-gray-50"
       )}
       style={{
-        cursor: subscriptions.length && !isPlanSelectionDisabled ? "pointer" : "default",
+        cursor: writeSubscriptions.length && !isPlanSelectionDisabled ? "pointer" : "default",
       }}
       onClick={() => {
-        if (subscriptions.length && !isPlanSelectionDisabled) {
+        if (writeSubscriptions.length && !isPlanSelectionDisabled) {
           onClick();
         }
       }}
@@ -77,7 +83,7 @@ const SubscriptionPlanCard = ({
             Click here to view plan details <ArrowOutward />
           </Link>
         </div>
-        {!rootSubscription && !subscriptionRequest && (
+        {!currentSubscription && !subscriptionRequest && (
           <Button
             data-testid="subscribe-button"
             variant="contained"
@@ -99,7 +105,7 @@ const SubscriptionPlanCard = ({
           </Button>
         )}
 
-        {rootSubscription && (
+        {currentSubscription && (
           <Button
             variant="contained"
             disabled
@@ -112,7 +118,7 @@ const SubscriptionPlanCard = ({
           </Button>
         )}
 
-        {subscriptionRequest && !rootSubscription && (
+        {subscriptionRequest && !currentSubscription && (
           <Button
             variant="contained"
             disabled
@@ -132,11 +138,11 @@ const SubscriptionPlanCard = ({
     return <Tooltip title={disabledMessage}>{card}</Tooltip>;
   }
 
-  if (!subscriptions.length && !subscriptionRequest) {
+  if (!writeSubscriptions.length && !currentSubscription && !subscriptionRequest) {
     return <Tooltip title="Subscribe to this plan before you can use it">{card}</Tooltip>;
   }
 
-  if (!subscriptions.length && subscriptionRequest) {
+  if (!writeSubscriptions.length && !currentSubscription && subscriptionRequest) {
     return <Tooltip title="Subscription request is pending approval">{card}</Tooltip>;
   }
 
@@ -201,9 +207,7 @@ const SubscriptionPlanRadio: React.FC<SubscriptionPlanRadioProps> = ({
               <SubscriptionPlanCard
                 key={plan.productTierID}
                 plan={plan}
-                subscriptions={subscriptions.filter(
-                  (sub) => sub.productTierId === plan.productTierID && ["root", "editor"].includes(sub.roleType)
-                )}
+                subscriptions={subscriptions.filter((sub) => sub.productTierId === plan.productTierID)}
                 subscriptionRequest={subscriptionRequestsObj[plan.productTierID]}
                 onSubscribeClick={async () => {
                   try {

@@ -15,8 +15,9 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 
+import { getCustomWorkflowOperations } from "../customWorkflow";
 import { Overlay } from "../page";
-import { getMainResourceFromInstance } from "../utils";
+import { getMainResourceFromInstance, hasSupportedOperation } from "../utils";
 
 type InstanceActionMenuProps = {
   instance?: ResourceInstance;
@@ -27,6 +28,7 @@ type InstanceActionMenuProps = {
   variant: "instances-page" | "details-page";
   setOverlayType: SetState<Overlay>;
   setIsOverlayOpen: SetState<boolean>;
+  setSelectedCustomWorkflowId: SetState<string>;
   refetchData: () => void;
   setSelectedRows?: SetState<ResourceInstance[]>; // Optional
 };
@@ -40,6 +42,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
   variant,
   setOverlayType,
   setIsOverlayOpen,
+  setSelectedCustomWorkflowId,
   refetchData,
   setSelectedRows = () => {}, // Default If Not Provided
 }) => {
@@ -66,7 +69,8 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const { status } = instance || {};
     const isComplexResource = CLI_MANAGED_RESOURCES.includes(selectedResource?.resourceType as string);
     const isProxyResource = selectedResource?.resourceType === "PortsBasedProxy";
-
+    const isOperatorCRDResource = selectedResource?.resourceType?.toLowerCase() === "operatorcrd";
+    const blocksLifecycleActions = isComplexResource && !isOperatorCRDResource;
     const role = getEnumFromUserRoleString(subscription?.roleType);
     const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
     const isDeleteAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Delete, role, viewEnum.Access_Resources);
@@ -78,6 +82,16 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     const isDeleting = instance?.status === "DELETING";
     const deletionProtectionFeatureEnabled = instance?.resourceInstanceMetadata?.deletionProtection !== undefined;
     const isDeleteProtected = instance?.resourceInstanceMetadata?.deletionProtection === true;
+    const selectedResourceType = selectedResource?.resourceType as string;
+    const supportsStart = hasSupportedOperation(instance, "START", selectedResourceType);
+    const supportsStop = hasSupportedOperation(instance, "STOP", selectedResourceType);
+    const supportsModify = hasSupportedOperation(instance, "MODIFY", selectedResourceType);
+    const supportsDelete = hasSupportedOperation(instance, "DELETE", selectedResourceType);
+    const supportsReboot = hasSupportedOperation(instance, "REBOOT", selectedResourceType);
+    const supportsRestore = hasSupportedOperation(instance, "RESTORE", selectedResourceType);
+    const supportsUpgrade = hasSupportedOperation(instance, "UPGRADE", selectedResourceType);
+    const customWorkflowOperations = getCustomWorkflowOperations(instance, selectedResourceType);
+    const isCustomWorkflowStatusBlocked = ["DEPLOYING", "DELETING"].includes(status as string);
 
     const isOnPrem = serviceOffering?.serviceModelType === "ON_PREM";
 
@@ -94,107 +108,140 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
 
     if (variant === "details-page") {
       if (!isOnPrem) {
+        if (supportsStop) {
+          res.push({
+            dataTestId: "stop-button",
+            label: "Stop",
+            isDisabled:
+              !instance || status !== "RUNNING" || blocksLifecycleActions || isProxyResource || !isUpdateAllowedByRBAC,
+            onClick: () => {
+              if (!instance) return snackbar.showError("Please select an instance");
+              setOverlayType("stop-dialog");
+              setIsOverlayOpen(true);
+            },
+            disabledMessage: !instance
+              ? "Please select an instance"
+              : status !== "RUNNING"
+                ? "Instance must be running to stop it"
+                : blocksLifecycleActions || isProxyResource
+                  ? "System manages instances cannot be stopped"
+                  : !isUpdateAllowedByRBAC
+                    ? "Unauthorized to stop instances"
+                    : "",
+          });
+        }
+
+        if (supportsStart) {
+          res.push({
+            dataTestId: "start-button",
+            label: "Start",
+            isLoading: startInstanceMutation.isPending,
+            isDisabled:
+              !instance || status !== "STOPPED" || blocksLifecycleActions || isProxyResource || !isUpdateAllowedByRBAC,
+            onClick: () => {
+              if (!instance) return snackbar.showError("Please select an instance");
+              if (!serviceOffering) return snackbar.showError("Product not found");
+              startInstanceMutation.mutate({
+                params: {
+                  path: pathData,
+                  query: {
+                    subscriptionId: subscription?.id,
+                  },
+                },
+              });
+            },
+            disabledMessage: !instance
+              ? "Please select an instance"
+              : status !== "STOPPED"
+                ? "Instances must be stopped before starting"
+                : blocksLifecycleActions || isProxyResource
+                  ? "System managed instances cannot be started"
+                  : !isUpdateAllowedByRBAC
+                    ? "Unauthorized to start instances"
+                    : "",
+          });
+        }
+      }
+
+      if (supportsModify) {
         res.push({
-          dataTestId: "stop-button",
-          label: "Stop",
+          dataTestId: "modify-button",
+          label: "Modify",
           isDisabled:
-            !instance || status !== "RUNNING" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
+            !instance ||
+            (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
+            isProxyResource ||
+            !isUpdateAllowedByRBAC,
           onClick: () => {
             if (!instance) return snackbar.showError("Please select an instance");
-            setOverlayType("stop-dialog");
+            setOverlayType("modify-instance-form");
             setIsOverlayOpen(true);
           },
           disabledMessage: !instance
             ? "Please select an instance"
-            : status !== "RUNNING"
-              ? "Instance must be running to stop it"
-              : isComplexResource || isProxyResource
-                ? "System manages instances cannot be stopped"
+            : status !== "RUNNING" && status !== "FAILED" && status !== "INSTALLER_READY" && status !== "COMPLETE"
+              ? "Instance must be running or failed to modify"
+              : isProxyResource
+                ? "System managed instances cannot be modified"
                 : !isUpdateAllowedByRBAC
-                  ? "Unauthorized to stop instances"
-                  : "",
-        });
-
-        res.push({
-          dataTestId: "start-button",
-          label: "Start",
-          isLoading: startInstanceMutation.isPending,
-          isDisabled:
-            !instance || status !== "STOPPED" || isComplexResource || isProxyResource || !isUpdateAllowedByRBAC,
-          onClick: () => {
-            if (!instance) return snackbar.showError("Please select an instance");
-            if (!serviceOffering) return snackbar.showError("Product not found");
-            startInstanceMutation.mutate({
-              params: {
-                path: pathData,
-                query: {
-                  subscriptionId: subscription?.id,
-                },
-              },
-            });
-          },
-          disabledMessage: !instance
-            ? "Please select an instance"
-            : status !== "STOPPED"
-              ? "Instances must be stopped before starting"
-              : isComplexResource || isProxyResource
-                ? "System managed instances cannot be started"
-                : !isUpdateAllowedByRBAC
-                  ? "Unauthorized to start instances"
+                  ? "Unauthorized to modify instances"
                   : "",
         });
       }
 
-      res.push({
-        dataTestId: "modify-button",
-        label: "Modify",
-        isDisabled:
-          !instance ||
-          (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
-          isProxyResource ||
-          !isUpdateAllowedByRBAC,
-        onClick: () => {
-          if (!instance) return snackbar.showError("Please select an instance");
-          setOverlayType("modify-instance-form");
-          setIsOverlayOpen(true);
-        },
-        disabledMessage: !instance
-          ? "Please select an instance"
-          : status !== "RUNNING" && status !== "FAILED" && status !== "INSTALLER_READY" && status !== "COMPLETE"
-            ? "Instance must be running or failed to modify"
-            : isProxyResource
-              ? "System managed instances cannot be modified"
-              : !isUpdateAllowedByRBAC
-                ? "Unauthorized to modify instances"
-                : "",
-      });
-
-      res.push({
-        dataTestId: "delete-button",
-        label: "Delete",
-        isDisabled:
-          !instance || status === "DELETING" || isProxyResource || !isDeleteAllowedByRBAC || isDeleteProtected,
-        onClick: () => {
-          if (!instance) return snackbar.showError("Please select an instance");
-          setOverlayType("delete-dialog");
-          setIsOverlayOpen(true);
-        },
-        disabledMessage: !instance
-          ? "Please select an instance"
-          : status === "DELETING"
-            ? "Instance deletion is already in progress"
-            : isProxyResource
-              ? "System managed instances cannot be deleted"
-              : isDeleteProtected
-                ? "Instance is delete protected"
-                : !isDeleteAllowedByRBAC
-                  ? "Unauthorized to delete instances"
-                  : "",
-      });
+      if (supportsDelete) {
+        res.push({
+          dataTestId: "delete-button",
+          label: "Delete",
+          isDisabled:
+            !instance || status === "DELETING" || isProxyResource || !isDeleteAllowedByRBAC || isDeleteProtected,
+          onClick: () => {
+            if (!instance) return snackbar.showError("Please select an instance");
+            setOverlayType("delete-dialog");
+            setIsOverlayOpen(true);
+          },
+          disabledMessage: !instance
+            ? "Please select an instance"
+            : status === "DELETING"
+              ? "Instance deletion is already in progress"
+              : isProxyResource
+                ? "System managed instances cannot be deleted"
+                : isDeleteProtected
+                  ? "Instance is delete protected"
+                  : !isDeleteAllowedByRBAC
+                    ? "Unauthorized to delete instances"
+                    : "",
+        });
+      }
     }
 
-    if (!isComplexResource && !isProxyResource) {
-      if (!isOnPrem) {
+    customWorkflowOperations.forEach((customWorkflowOperation) => {
+      const workflowName = customWorkflowOperation.name || "Custom Workflow";
+
+      res.push({
+        dataTestId: `${customWorkflowOperation.verb?.toLowerCase() || "custom-workflow"}-${customWorkflowOperation.id}-button`,
+        label: workflowName,
+        isDisabled: !instance || isCustomWorkflowStatusBlocked || isProxyResource || !isUpdateAllowedByRBAC,
+        onClick: () => {
+          if (!instance) return snackbar.showError("Please select an instance");
+          setSelectedCustomWorkflowId(customWorkflowOperation.id as string);
+          setOverlayType("custom-workflow-form");
+          setIsOverlayOpen(true);
+        },
+        disabledMessage: !instance
+          ? "Please select an instance"
+          : isCustomWorkflowStatusBlocked
+            ? `Instance must not be deploying or deleting to ${workflowName}`
+            : isProxyResource
+              ? `System managed instances cannot ${workflowName}`
+              : !isUpdateAllowedByRBAC
+                ? `Unauthorized to ${workflowName}`
+                : "",
+      });
+    });
+
+    if (!blocksLifecycleActions && !isProxyResource) {
+      if (!isOnPrem && supportsReboot) {
         res.push({
           dataTestId: "reboot-button",
           label: "Reboot",
@@ -216,7 +263,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
                 : "",
         });
       }
-      if (instance?.backupStatus) {
+      if (instance?.backupStatus && supportsRestore) {
         res.push({
           dataTestId: "restore-button",
           label: "Restore",
@@ -237,7 +284,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
       }
     }
 
-    if (allowUpgrades) {
+    if (allowUpgrades && supportsUpgrade) {
       res.push({
         dataTestId: "upgrade-button",
         label: "Upgrade",
@@ -315,7 +362,18 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
     }
 
     return res;
-  }, [variant, instance, serviceOffering, selectedResource, subscription]);
+  }, [
+    variant,
+    instance,
+    serviceOffering,
+    selectedResource,
+    subscription,
+    snackbar,
+    setIsOverlayOpen,
+    setSelectedCustomWorkflowId,
+    setOverlayType,
+    startInstanceMutation,
+  ]);
 
   return (
     <ActionMenu

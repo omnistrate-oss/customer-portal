@@ -8,6 +8,13 @@ import ReChartContainer from "src/components/ReChartContainer/ReChartContainer";
 import { Text } from "src/components/Typography/Typography";
 import { ConsumptionUsagePerDay } from "src/types/consumption";
 
+import {
+  billingUsageDimensionFields,
+  type BillingUsageTotals,
+  getEmptyBillingUsageTotals,
+  getUsageDimensionChartOffset,
+} from "../utils/usageDimensions";
+
 function formatDate(inputDate) {
   return dayjs.utc(inputDate).format("MMM DD");
 }
@@ -25,11 +32,10 @@ const LegendItem = ({ title = "", bgColor }) => {
 
 const Legend = () => {
   return (
-    <Box display={"flex"} justifyContent={"space-between"} gap={"17px"} mt="16px">
-      <LegendItem bgColor="#3E97FF" title="Memory GiB hours" />
-      <LegendItem bgColor="#10AA50" title="Storage GiB hours" />
-      <LegendItem bgColor="#7239EA" title="CPU core hours" />
-      <LegendItem bgColor="#E25300" title="Replica hours" />
+    <Box display={"flex"} justifyContent={"flex-end"} flexWrap="wrap" gap={"17px"} mt="16px">
+      {billingUsageDimensionFields.map((field) => (
+        <LegendItem key={field.dimension} bgColor={field.chartColor} title={field.dimension} />
+      ))}
     </Box>
   );
 };
@@ -98,46 +104,31 @@ type ConsumptionUsageChartProps = {
   isFetchingUsagePerDay: boolean;
 };
 
+type BillingUsagePerDay = BillingUsageTotals & { date: string };
+
 const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
   const { usagePerDayData, isFetchingUsagePerDay } = props;
 
-  const billingUsagePerDay: {
-    "Memory GiB hours": number;
-    "Storage GiB hours": number;
-    "CPU core hours": number;
-    "Replica hours": number;
-    date: string;
-  }[] = useMemo(() => {
+  const billingUsagePerDay: BillingUsagePerDay[] = useMemo(() => {
     const usage = usagePerDayData?.usage || [];
-    const dataHashByDate: Record<
-      string,
-      {
-        "Memory GiB hours": number;
-        "Storage GiB hours": number;
-        "CPU core hours": number;
-        "Replica hours": number;
-        date: string;
-      }
-    > = {};
+    const dataHashByDate: Record<string, BillingUsagePerDay> = {};
 
     usage.forEach((usageDimensionData) => {
       const { startTime: date, dimension, total: value } = usageDimensionData;
+      const field = billingUsageDimensionFields.find((field) => field.dimension === dimension);
 
-      if (dataHashByDate[date as string]) {
-        dataHashByDate[date as string] = {
-          ...dataHashByDate[date as string],
-          [dimension as string]: value,
-        };
-      } else {
-        dataHashByDate[date as string] = {
-          "Memory GiB hours": 0,
-          "Storage GiB hours": 0,
-          "CPU core hours": 0,
-          "Replica hours": 0,
-          [dimension as string]: value,
-          date: date as string,
+      if (!date || !field) {
+        return;
+      }
+
+      if (!dataHashByDate[date]) {
+        dataHashByDate[date] = {
+          ...getEmptyBillingUsageTotals(),
+          date,
         };
       }
+
+      dataHashByDate[date][field.rowField] += typeof value === "number" ? value : 0;
     });
     return Object.values(dataHashByDate).sort((itemA, itemB) => (itemA.date < itemB.date ? -1 : 1));
   }, [usagePerDayData]);
@@ -147,10 +138,6 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
     (billingUsagePerDay.length + 1) * barCategoryGap +
     chartMargins.left +
     chartMargins.right;
-
-  const keys = ["Memory GiB hours", "Storage GiB hours", "CPU core hours", "Replica hours"];
-  const COLORS = ["#3E97FF", "#10AA50", "#7239EA", "#E25300"];
-  const translateX = [-17, -6, 5, 16];
 
   return isFetchingUsagePerDay ? (
     <LoadingSpinner />
@@ -256,37 +243,43 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
               />
 
               {/* Dynamically Render Bars */}
-              {keys.map((key, index) => (
+              {billingUsageDimensionFields.map((field) => (
                 <Bar
-                  key={`bar-${key}`}
-                  dataKey={key}
+                  key={`bar-${field.rowField}`}
+                  dataKey={field.rowField}
+                  name={field.dimension}
                   barSize={10}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={field.chartColor}
                   radius={[4, 4, 4, 4]}
                 />
               ))}
 
               {/* Dynamically Render Lines with Active Dots */}
-              {keys.map((key, index) => (
-                <Line
-                  id={`line-${key}`}
-                  key={`line-${key}`}
-                  type="monotone"
-                  dataKey={key}
-                  stroke={COLORS[index % COLORS.length]}
-                  strokeDasharray="3 3"
-                  dot={false}
-                  activeDot={(props) => (
-                    <circle
-                      {...props}
-                      transform={`translate(${translateX[index]}, 0)`}
-                      r={4}
-                      fill={COLORS[index % COLORS.length]}
+              {billingUsageDimensionFields.map((field, index) => {
+                const offset = getUsageDimensionChartOffset(index);
+
+                return (
+                  <Line
+                    id={`line-${field.rowField}`}
+                    key={`line-${field.rowField}`}
+                    type="monotone"
+                    dataKey={field.rowField}
+                    name={field.dimension}
+                    stroke={field.chartColor}
+                    strokeDasharray="3 3"
+                    dot={false}
+                    activeDot={(props) => (
+                      <circle
+                        {...props}
+                        transform={`translate(${offset}, 0)`}
+                        r={4}
+                        fill={field.chartColor}
+                      />
+                    )}
+                    transform={`translate(${offset}, 0)`}
                     />
-                  )}
-                  transform={`translate(${translateX[index]}, 0)`}
-                />
-              ))}
+                );
+              })}
               <YAxis
                 tickFormatter={(value) => `${value}`}
                 domain={([, datamax]) => [0, datamax > 0 ? Math.round(datamax + 1) : 1]}

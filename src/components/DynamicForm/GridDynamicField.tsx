@@ -55,7 +55,13 @@ const GridDynamicField: React.FC<GridDynamicFieldProps> = ({ field, formData }) 
         <FieldLabel required={field.required} sx={{ color: "#414651", fontWeight: "600" }}>
           {field.label}
         </FieldLabel>
-        <FieldDescription sx={{ mt: 0, color: "#535862" }}>{field.subLabel}</FieldDescription>
+        {typeof field.subLabel === "string" ? (
+          <FieldDescription sx={{ mt: 0, color: "#535862" }}>{field.subLabel}</FieldDescription>
+        ) : (
+          <FieldDescription component="div" sx={{ mt: 0, color: "#535862" }}>
+            {field.subLabel}
+          </FieldDescription>
+        )}
       </div>
 
       <div className="col-span-4">

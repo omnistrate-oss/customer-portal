@@ -7,17 +7,25 @@ import DataTable from "src/components/DataTable/DataTable";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import { Text } from "src/components/Typography/Typography";
 
+import { billingUsageDimensionFields, BillingUsageTotals } from "../utils/usageDimensions";
+
 dayjs.extend(utc);
 
-export type SubscriptionUsageRow = {
+const TableHeader = () => {
+  return (
+    <div className=" py-5 px-6 border-b border-[#E4E7EC]">
+      <Text size="large" weight="semibold" color="#101828">
+        Usage Breakdown
+      </Text>
+    </div>
+  );
+};
+
+export type SubscriptionUsageRow = BillingUsageTotals & {
   subscriptionId: string;
   serviceId: string;
   serviceName: string;
   subscriptionPlanName: string;
-  storageGiBHours: number;
-  memoryGiBHours: number;
-  cpuCoreHours: number;
-  replicaHours: number;
   serviceLogoURL?: string;
 };
 
@@ -68,66 +76,22 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
           );
         },
       }),
-      columnHelper.accessor("memoryGiBHours", {
-        id: "memoryGiBHours",
-        header: "Memory (GiB hrs)",
-        meta: {
-          minWidth: 150,
-        },
-        cell: (data) => {
-          const memoryGiBHours = data.row.original.memoryGiBHours;
-          return (
-            <Text size="small" weight="regular" color="#475467" ellipsis>
-              {memoryGiBHours}
-            </Text>
-          );
-        },
-      }),
-      columnHelper.accessor("storageGiBHours", {
-        id: "storageGiBHours",
-        header: "Storage (GiB hrs)",
-        meta: {
-          minWidth: 150,
-        },
-        cell: (data) => {
-          const storageGiBHours = data.row.original.storageGiBHours;
-          return (
-            <Text size="small" weight="regular" color="#475467" ellipsis>
-              {storageGiBHours}
-            </Text>
-          );
-        },
-      }),
-      columnHelper.accessor("cpuCoreHours", {
-        id: "cpuCoreHours",
-        header: "CPU (core hrs)",
-        meta: {
-          minWidth: 150,
-        },
-        cell: (data) => {
-          const cpuCoreHours = data.row.original.cpuCoreHours;
-          return (
-            <Text size="small" weight="regular" color="#475467" ellipsis>
-              {cpuCoreHours}
-            </Text>
-          );
-        },
-      }),
-      columnHelper.accessor("replicaHours", {
-        id: "replicaHours",
-        header: "Replica (hrs)",
-        meta: {
-          minWidth: 150,
-        },
-        cell: (data) => {
-          const replicaHours = data.row.original.replicaHours;
-          return (
-            <Text size="small" weight="regular" color="#475467" ellipsis>
-              {replicaHours}
-            </Text>
-          );
-        },
-      }),
+      ...billingUsageDimensionFields.map((field) =>
+        columnHelper.accessor(field.rowField, {
+          id: field.rowField,
+          header: field.tableHeader,
+          meta: {
+            minWidth: field.rowField === "deploymentCellHours" ? 190 : 150,
+          },
+          cell: (data) => {
+            return (
+              <Text size="small" weight="regular" color="#475467" ellipsis>
+                {data.row.original[field.rowField]}
+              </Text>
+            );
+          },
+        })
+      ),
     ];
   }, []);
 
@@ -135,16 +99,8 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
     <DataTable
       columns={columns}
       rows={rows}
+      HeaderComponent={TableHeader}
       noRowsText="No subscriptions"
-      tableStyles={{
-        marginTop: "12px",
-        boxShadow: "none",
-        border: "none",
-        borderRadius: "0px",
-        borderBottomRightRadius: "12px",
-        borderBottomLeftRadius: "12px",
-        borderTop: "1px solid #E4E7EC",
-      }}
       isLoading={isSubscriptionsUsagePending}
       hidePagination={rows.length < 11}
     />
