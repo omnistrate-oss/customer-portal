@@ -161,8 +161,9 @@ const Sidebar = () => {
       setExpandedMenus((prev) => ({
         ...prev,
         Deployments:
-          [getCustomNetworksRoute({}), getCloudAccountsRoute({}), getInstanceSnapshotsRoute()].includes(currentPath) ||
+          [getCustomNetworksRoute({}), getInstanceSnapshotsRoute()].includes(currentPath) ||
           currentPath.startsWith("/instances") ||
+          currentPath.startsWith(getCloudAccountsRoute({})) ||
           currentPath.startsWith(getSnapshotDetailsRoute("")),
         "Governance Hub": [getAccessControlRoute(), getEventsRoute(), getNotificationsRoute()].includes(currentPath),
         "Account Management": [

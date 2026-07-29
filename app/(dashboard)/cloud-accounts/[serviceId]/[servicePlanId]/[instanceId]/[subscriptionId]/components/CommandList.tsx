@@ -1,4 +1,4 @@
-import { FC, Fragment, ReactNode } from "react";
+import { FC, Fragment } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 
 import CopyButton from "components/Button/CopyButton";
@@ -6,8 +6,8 @@ import { Text } from "components/Typography/Typography";
 
 export type CommandListItem = {
   title: string;
-  description: ReactNode;
-  command: ReactNode;
+  description: string;
+  command: string;
   copyValue?: string;
 };
 
@@ -22,7 +22,7 @@ const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = 
     <Box display="grid" gridTemplateColumns="1fr 1fr">
       {commands.map((command, index) => {
         const isLast = index === commands.length - 1;
-        const copyText = command.copyValue ?? (typeof command.command === "string" ? command.command : "");
+        const copyText = command.copyValue ?? command.command;
 
         return (
           <Fragment key={command.title}>

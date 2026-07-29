@@ -212,24 +212,7 @@ const CloudAccountsPage = () => {
 
     return [
       columnHelper.display({
-        id: "governance_controls",
-        header: "",
-        cell: (data) => <GovernanceControlsCell href={getDetailsRoute(data.row.original, "Governance Controls")} />,
-        meta: {
-          width: 25,
-          minWidth: 25,
-          headerStyles: {
-            paddingLeft: "8px",
-            paddingRight: "4px",
-          },
-          styles: {
-            paddingLeft: "8px",
-            paddingRight: "4px",
-          },
-        },
-      }),
-      columnHelper.display({
-        id: "delete_protection",
+        id: "row_icons",
         header: "",
         cell: (data) => {
           const isDeleteProtectionSupported =
@@ -237,24 +220,27 @@ const CloudAccountsPage = () => {
           const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
 
           return (
-            <Tooltip
-              title={
-                !isDeleteProtectionSupported
-                  ? "Delete protection not supported"
-                  : isDeleteProtected
-                    ? "Delete protection enabled"
-                    : "Delete protection disabled"
-              }
-            >
-              <span>
-                <DeleteProtectionIcon disabled={!isDeleteProtected} />
-              </span>
-            </Tooltip>
+            <Stack direction="row" alignItems="center" gap="8px">
+              <GovernanceControlsCell href={getDetailsRoute(data.row.original, "Governance Controls")} />
+              <Tooltip
+                title={
+                  !isDeleteProtectionSupported
+                    ? "Delete protection not supported"
+                    : isDeleteProtected
+                      ? "Delete protection enabled"
+                      : "Delete protection disabled"
+                }
+              >
+                <span className="leading-none">
+                  <DeleteProtectionIcon disabled={!isDeleteProtected} />
+                </span>
+              </Tooltip>
+            </Stack>
           );
         },
         meta: {
-          width: 25,
-          minWidth: 25,
+          width: 50,
+          minWidth: 50,
           headerStyles: {
             paddingLeft: "8px",
             paddingRight: "4px",
