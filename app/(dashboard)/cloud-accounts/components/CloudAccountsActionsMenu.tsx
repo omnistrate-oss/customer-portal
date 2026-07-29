@@ -58,6 +58,8 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const isDeleting = instance?.status === "DELETING";
     const isModifyVpcStatusBlocked = NON_MODIFIABLE_VPC_STATUSES.has(instance?.status || "");
     const resultParams = getResultParams(instance);
+    const instanceDescribeStatus = String(resultParams?.account_config_status || instance?.status || "").toUpperCase();
+    const isInstanceReadyForVpcModification = instanceDescribeStatus === "READY";
     const isNebius = !!resultParams?.nebius_tenant_id;
     const cloudProvider =
       resultParams?.cloud_provider ||
@@ -161,7 +163,8 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
       isModifyVpcStatusBlocked ||
       !isUpdateAllowedByRBAC ||
       !isModifyVpcsSupportedProvider ||
-      !hasLinkedAccountConfig;
+      !hasLinkedAccountConfig ||
+      !isInstanceReadyForVpcModification;
     const modifyVpcsDisabledMessage = !instance
       ? "Please select a cloud account"
       : isModifyVpcStatusBlocked
@@ -172,7 +175,9 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
             ? "Modify VPCs is available for AWS and GCP cloud accounts only"
             : !hasLinkedAccountConfig
               ? "Modify VPCs requires a linked cloud provider account config"
-              : "";
+              : !isInstanceReadyForVpcModification
+                ? `Modify VPCs is unavailable while the instance status is ${instanceDescribeStatus || "not ready"}. Wait until the instance is READY.`
+                : "";
 
     res.push({
       dataTestId: "modify-vpcs-action-button",

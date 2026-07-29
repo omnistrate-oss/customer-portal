@@ -4,6 +4,7 @@ import { Fragment } from "react";
 
 import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
 import { colors } from "src/themeConfig";
 
@@ -25,6 +26,7 @@ type CloudAccountSummaryCardProps = {
   nextLabel?: string;
   isNextDisabled?: boolean;
   isNextLoading?: boolean;
+  nextDisabledMessage?: string;
   hideNext?: boolean;
 };
 
@@ -36,6 +38,7 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
   nextLabel = "Next",
   isNextDisabled = false,
   isNextLoading = false,
+  nextDisabledMessage = "",
   hideNext = false,
 }) => {
   return (
@@ -129,16 +132,20 @@ const CloudAccountSummaryCard: React.FC<CloudAccountSummaryCardProps> = ({
           {cancelLabel}
         </Button>
         {!hideNext && (
-          <Button
-            data-testid="wizard-next-button"
-            variant="contained"
-            disabled={isNextDisabled || isNextLoading}
-            onClick={onNext}
-            sx={{ height: "40px !important", padding: "10px 14px !important" }}
-          >
-            {nextLabel}
-            {isNextLoading && <LoadingSpinnerSmall />}
-          </Button>
+          <Tooltip title={isNextDisabled ? nextDisabledMessage : ""} placement="top" arrow>
+            <span>
+              <Button
+                data-testid="wizard-next-button"
+                variant="contained"
+                disabled={isNextDisabled || isNextLoading}
+                onClick={onNext}
+                sx={{ height: "40px !important", padding: "10px 14px !important" }}
+              >
+                {nextLabel}
+                {isNextLoading && <LoadingSpinnerSmall />}
+              </Button>
+            </span>
+          </Tooltip>
         )}
       </div>
     </div>

@@ -1031,6 +1031,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   ]);
 
   const isBYOCOnpremCloud = values.cloudProvider === "byoc-onprem";
+  const normalizedAccountConfigStatus = String(accountConfigStatus || "").toUpperCase();
+  const isConfigureVpcsAllowed = normalizedAccountConfigStatus === "READY";
+  const configureVpcsDisabledMessage = "The instance is not ready. Configure VPCs is available when status is READY.";
   const cancelLabel =
     currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
   const nextLabel =
@@ -1045,6 +1048,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       // Submit form to create account
       formData.handleSubmit();
     } else if (currentStep === 1) {
+      if (!isConfigureVpcsAllowed) return;
       setCurrentStep(2);
     } else {
       // Step 3 – "Configure" button: close the wizard
@@ -1168,7 +1172,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             cancelLabel={cancelLabel}
             nextLabel={nextLabel}
             isNextLoading={isNextLoading}
-            isNextDisabled={false}
+            isNextDisabled={currentStep === 1 && !isConfigureVpcsAllowed}
+            nextDisabledMessage={configureVpcsDisabledMessage}
           />
         </div>
       </div>

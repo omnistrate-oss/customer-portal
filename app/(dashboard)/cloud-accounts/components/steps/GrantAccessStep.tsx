@@ -286,6 +286,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   // Determine checklist states
   const isSetupComplete = true; // Account was just created
   const isStackDeployed = isReady;
+  // Step 3 must not start until verification (step 2) has completed. While
+  // setup instructions are still being generated, only step 2 is in progress.
+  const isStackDeploymentInProgress = isVerificationComplete && isRequestOrDataPending && !isStackDeployed && !isFailed;
 
   const cloudFormationGuide = <StyledLink href="https://youtu.be/c3HNnM8UJBE">here</StyledLink>;
   const cloudformationlink = cloudFormationTemplateUrl ? (
@@ -525,7 +528,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         <ChecklistItem
           label={stackDeployedLabel}
           isComplete={isStackDeployed}
-          isInProgress={isRequestOrDataPending && !isStackDeployed && !isFailed}
+          isInProgress={isStackDeploymentInProgress}
           isFailed={isFailed}
         />
       </Stack>

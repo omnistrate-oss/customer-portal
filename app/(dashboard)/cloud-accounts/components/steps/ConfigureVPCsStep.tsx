@@ -514,6 +514,10 @@ enableDnsSupport   = true`}</CodeBlock>
                       p: 0,
                       color: "#D0D5DD",
                       "&.Mui-checked": { color: "#7F56D9" },
+                      // Keep the locked, automatically-selected state visually consistent
+                      // with the enabled selected state while preserving disabled behavior.
+                      "&.Mui-disabled": { color: "#7F56D9", opacity: 1 },
+                      "&.Mui-disabled.Mui-checked": { color: "#7F56D9", opacity: 1 },
                     }}
                   />
                   <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
