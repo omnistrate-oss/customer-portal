@@ -87,7 +87,7 @@ const Link = styled(NextLink)({
 
 type ConatainerCardProps = {
   title: string;
-  description?: string;
+  description?: ReactNode;
   children?: ReactNode;
   contentBoxProps?: BoxProps;
   statusChip?: ReactNode;

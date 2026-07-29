@@ -1,3 +1,4 @@
+import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
@@ -213,4 +214,29 @@ export const getOffboardReadiness = (cloudAccountInstanceStatus?: string, accoun
   )
     return true;
   else return false;
+};
+
+/**
+ * The account identifier shown to users for a cloud account instance. Providers are
+ * mutually exclusive, so the first match wins. Returns "" when none is present —
+ * callers decide their own empty-state text.
+ */
+export const getCloudAccountId = (resultParams: Record<string, any>): string =>
+  resultParams?.gcp_project_id ||
+  resultParams?.aws_account_id ||
+  resultParams?.azure_subscription_id ||
+  resultParams?.oci_tenancy_id ||
+  resultParams?.nebius_tenant_id ||
+  resultParams?.cluster_name ||
+  "";
+
+/** Infers the cloud provider of a cloud account instance from its result params. */
+export const getCloudAccountProvider = (resultParams: Record<string, any>): CloudProvider | undefined => {
+  if (resultParams?.aws_account_id) return "aws";
+  if (resultParams?.gcp_project_id) return "gcp";
+  if (resultParams?.azure_subscription_id) return "azure";
+  if (resultParams?.oci_tenancy_id) return "oci";
+  if (resultParams?.nebius_tenant_id) return "nebius";
+  if (resultParams?.cluster_name) return "byoc-onprem";
+  return undefined;
 };

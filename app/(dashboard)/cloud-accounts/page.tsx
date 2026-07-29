@@ -19,14 +19,13 @@ import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/Conne
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
-import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { chipCategoryColors } from "src/constants/statusChipStyles";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import useAccountConfigsByIds from "src/hooks/query/useAccountConfigByIds";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { AccountConfig } from "src/types/account-config";
-import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import {
@@ -38,7 +37,7 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
-import { getCloudAccountsRoute } from "src/utils/routes";
+import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -50,6 +49,7 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
+import GovernanceControlsCell from "./components/GovernanceControlsCell";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
   MAX_POLL_COUNT,
@@ -60,7 +60,7 @@ import { OffboardInstructionDetails } from "./components/OffboardingInstructions
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
-import { getOffboardReadiness } from "./utils";
+import { getCloudAccountId, getCloudAccountProvider, getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -187,23 +187,47 @@ const CloudAccountsPage = () => {
     const res = instances.filter((instance) => isCloudAccountInstance(instance));
 
     if (searchText) {
-      return res.filter((instance) => {
-        const resultParams = getResultParams(instance);
-        return (
-          resultParams?.gcp_project_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.aws_account_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.azure_subscription_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.oci_tenancy_id?.toLowerCase().includes(searchText.toLowerCase()) ||
-          resultParams?.nebius_tenant_id?.toLowerCase().includes(searchText.toLowerCase())
-        );
-      });
+      const search = searchText.toLowerCase();
+      return res.filter((instance) => getCloudAccountId(getResultParams(instance)).toLowerCase().includes(search));
     }
 
     return res;
   }, [instances, searchText]);
 
   const dataTableColumns = useMemo(() => {
+    // The details route is keyed by the subscription's service and plan, so rows whose
+    // subscription has not loaded yet render their cells unlinked rather than broken.
+    const getDetailsRoute = (instance: ResourceInstance, view?: CloudAccountTab) => {
+      const subscription = subscriptionsObj[instance.subscriptionId as string];
+      if (!subscription || !instance.id) return undefined;
+
+      return getCloudAccountDetailsRoute({
+        serviceId: subscription.serviceId,
+        servicePlanId: subscription.productTierId,
+        instanceId: instance.id,
+        subscriptionId: instance.subscriptionId as string,
+        view,
+      });
+    };
+
     return [
+      columnHelper.display({
+        id: "governance_controls",
+        header: "",
+        cell: (data) => <GovernanceControlsCell href={getDetailsRoute(data.row.original, "Governance Controls")} />,
+        meta: {
+          width: 25,
+          minWidth: 25,
+          headerStyles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+          styles: {
+            paddingLeft: "8px",
+            paddingRight: "4px",
+          },
+        },
+      }),
       columnHelper.display({
         id: "delete_protection",
         header: "",
@@ -241,40 +265,27 @@ const CloudAccountsPage = () => {
           },
         },
       }),
-      columnHelper.accessor(
-        (row) => {
-          const resultParams = getResultParams(row);
+      columnHelper.accessor((row) => getCloudAccountId(getResultParams(row)) || "-", {
+        id: "account_id",
+        header: "Account ID / Project ID",
+        cell: (data) => {
+          const resultParams = getResultParams(data.row.original);
+          const value = getCloudAccountId(resultParams) || "-";
+          const cloudProvider = getCloudAccountProvider(resultParams);
+
           return (
-            resultParams?.gcp_project_id ||
-            resultParams?.aws_account_id ||
-            resultParams?.azure_subscription_id ||
-            resultParams?.oci_tenancy_id ||
-            resultParams?.nebius_tenant_id ||
-            resultParams?.cluster_name ||
-            "-"
+            <GridCellExpand
+              value={value}
+              copyButton={value !== "-"}
+              href={value !== "-" ? getDetailsRoute(data.row.original) : undefined}
+              startIcon={cloudProvider ? cloudProviderLogoMap[cloudProvider] : undefined}
+            />
           );
         },
-        {
-          id: "account_id",
-          header: "Account ID / Project ID",
-          cell: (data) => {
-            const resultParams = getResultParams(data.row.original);
-            const value =
-              resultParams?.gcp_project_id ||
-              resultParams?.aws_account_id ||
-              resultParams?.azure_subscription_id ||
-              resultParams?.oci_tenancy_id ||
-              resultParams?.nebius_tenant_id ||
-              resultParams?.cluster_name ||
-              "-";
-
-            return <GridCellExpand value={value} copyButton={value !== "-"} />;
-          },
-          meta: {
-            minWidth: 200,
-          },
-        }
-      ),
+        meta: {
+          minWidth: 200,
+        },
+      }),
       columnHelper.accessor("status", {
         id: "status",
         header: "Lifecycle Status",
@@ -424,7 +435,9 @@ const CloudAccountsPage = () => {
             const resultParams = getResultParams(data.row.original);
             if (!resultParams?.aws_account_id) return "-";
             const isEnabled = isPrivateLinkEnabled(resultParams);
-            return <StatusChip category={isEnabled ? "success" : "failed"} label={isEnabled ? "Enabled" : "Disabled"} />;
+            return (
+              <StatusChip category={isEnabled ? "success" : "failed"} label={isEnabled ? "Enabled" : "Disabled"} />
+            );
           },
           meta: {
             minWidth: 140,
@@ -478,36 +491,14 @@ const CloudAccountsPage = () => {
           },
         }
       ),
-      columnHelper.accessor(
-        // @ts-ignore
-        (row) => {
-          let cloudProvider: CloudProvider | undefined;
-          const resultParams = getResultParams(row);
-          if (resultParams?.aws_account_id) cloudProvider = "aws";
-          else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
-          else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
-          else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
-          else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
-          else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
-          return cloudProvider;
+      columnHelper.accessor((row) => getCloudAccountProvider(getResultParams(row)), {
+        id: "cloud_provider",
+        header: "Cloud Provider",
+        cell: (data) => {
+          const cloudProvider = getCloudAccountProvider(getResultParams(data.row.original));
+          return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
         },
-        {
-          id: "cloud_provider",
-          header: "Cloud Provider",
-          cell: (data) => {
-            let cloudProvider: CloudProvider | undefined;
-            const resultParams = getResultParams(data.row.original);
-            if (resultParams?.aws_account_id) cloudProvider = "aws";
-            else if (resultParams?.gcp_project_id) cloudProvider = "gcp";
-            else if (resultParams?.azure_subscription_id) cloudProvider = "azure";
-            else if (resultParams?.oci_tenancy_id) cloudProvider = "oci";
-            else if (resultParams?.nebius_tenant_id) cloudProvider = "nebius";
-            else if (resultParams?.cluster_name) cloudProvider = "byoc-onprem";
-
-            return cloudProvider ? cloudProviderLongLogoMap[cloudProvider] : "-";
-          },
-        }
-      ),
+      }),
     ];
   }, [subscriptionsObj, accountConfigsHash]);
 
