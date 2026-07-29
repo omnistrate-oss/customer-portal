@@ -20,6 +20,7 @@ export type VpcRecord = {
   id: string;
   name: string;
   status: string;
+  region: string;
   statusMessage?: string;
   networkId?: string;
   imported?: boolean;

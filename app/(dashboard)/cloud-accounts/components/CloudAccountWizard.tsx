@@ -35,9 +35,9 @@ import { CloudAccountValidationSchema } from "../constants";
 import {
   getCloudNativeNetworkRegions,
   getDefaultSelectedRegions,
-  hasCloudNativeVpcConfiguration,
   getInitialValues,
   getValidSubscriptionForInstanceCreation,
+  hasCloudNativeVpcConfiguration,
 } from "../utils";
 
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
@@ -427,6 +427,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       return {
         id: network.cloudNativeNetworkId || network.id,
         name: network.name || network.cloudNativeNetworkId || network.id,
+        region: network.region,
         status: network.status || "PENDING",
         statusMessage: network.statusMessage,
         networkId: network.cloudNativeNetworkId,
@@ -1119,7 +1120,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 importCloudNativeNetworksMutation.mutate({
                   params: { path: { id: accountConfigId } },
                   body: {
-                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: true })),
+                    cloudNativeNetworks: vpcIds.flatMap((id) => {
+                      const network = availableVpcs.find((vpc) => vpc.id === id);
+                      return network?.region
+                        ? [{ cloudNativeNetworkId: id, import: true, region: network.region }]
+                        : [];
+                    }),
                   },
                 });
               }}
@@ -1128,7 +1134,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 importCloudNativeNetworksMutation.mutate({
                   params: { path: { id: accountConfigId } },
                   body: {
-                    cloudNativeNetworks: vpcIds.map((id) => ({ cloudNativeNetworkId: id, import: false })),
+                    cloudNativeNetworks: vpcIds.flatMap((id) => {
+                      const network = availableVpcs.find((vpc) => vpc.id === id);
+                      return network?.region
+                        ? [{ cloudNativeNetworkId: id, import: false, region: network.region }]
+                        : [];
+                    }),
                   },
                 });
               }}

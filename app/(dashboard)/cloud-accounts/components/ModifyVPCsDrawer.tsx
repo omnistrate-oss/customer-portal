@@ -143,6 +143,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
       return {
         id: network.cloudNativeNetworkId || network.id,
         name: network.name || network.cloudNativeNetworkId || network.id,
+        region: network.region,
         status: network.status || "PENDING",
         statusMessage: network.statusMessage,
         networkId: network.cloudNativeNetworkId,
@@ -190,7 +191,10 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     cloudNativeNetworksMutation.mutate({
       params: { path: { id: accountConfigId } },
       body: {
-        cloudNativeNetworks: networkIds.map((cloudNativeNetworkId) => ({ cloudNativeNetworkId, import: imported })),
+        cloudNativeNetworks: networkIds.flatMap((cloudNativeNetworkId) => {
+          const network = availableVpcs.find((vpc) => vpc.id === cloudNativeNetworkId);
+          return network?.region ? [{ cloudNativeNetworkId, import: imported, region: network.region }] : [];
+        }),
       },
     });
   };
