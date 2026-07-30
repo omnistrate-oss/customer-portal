@@ -25,7 +25,12 @@ function PaymentConfigWarningBanner() {
 
   const { isPending: isBillingDetailsPending, data: billingDetails } = useBillingDetails(isBillingEnabled);
 
-  const isPaymentMethodConfigured = Boolean(billingDetails?.paymentConfigured);
+  const billingProviders = billingDetails?.billingProviders;
+
+  //Top level paymentConfigured is deprecated and only reflects Stripe, so prefer billingProviders when present
+  const isPaymentMethodConfigured = billingProviders?.length
+    ? billingProviders.every((provider) => provider.paymentConfigured || !provider.paymentConfigurable)
+    : Boolean(billingDetails?.paymentConfigured);
 
   const { isPending: isInstancesPending, data: instances } = useInstances();
 

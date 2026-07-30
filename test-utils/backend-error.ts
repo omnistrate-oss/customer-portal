@@ -58,14 +58,14 @@ export class BackendSetupGuard {
     this.specFile = specFile;
   }
 
-  /** Call in beforeAll's catch block. Re-throws non-backend errors. */
-  handleError(error: unknown) {
+  /** Call in the setup hook's catch block. Re-throws non-backend errors. */
+  handleError(error: unknown, hookName = "beforeAll") {
     if (error instanceof BackendError) {
       this.error = error;
       console.warn(`[BackendSetupGuard] Setup failed due to backend issue: ${error.message}`);
       _recorder?.({
         specFile: this.specFile,
-        testName: "beforeAll",
+        testName: hookName,
         reason: error.message,
       });
     } else {

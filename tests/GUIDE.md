@@ -149,7 +149,7 @@ Tests within a suite depend on each other (e.g., create → verify → delete).
 
 ### Global setup / teardown
 
-- **`global-setup.ts`** authenticates provider + user and creates test services (`SaaSBuilder Postgres DT`, `SaaSBuilder Supabase DT BYOA`, `SaaSBuilder Redis Helm`).
+- **`global-setup.ts`** authenticates provider + user and creates test services (`SaaSBuilder Postgres DT`, `SaaSBuilder Postgres DT BYOA`, `SaaSBuilder Redis Helm`).
 - **`global-teardown.ts`** cleans up in order:
   1. Delete all regular instances (wait up to 10 min)
   2. Delete all cloud account instances (wait up to 10 min)

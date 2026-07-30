@@ -18,6 +18,10 @@ export class ProviderAPIClient {
       data: { email, password },
     });
 
+    if (!response.ok()) {
+      throw new Error(`Failed to login: ${response.status()} ${await response.text()}`);
+    }
+
     const data = await response.json();
     const token = data.jwtToken;
 
@@ -48,8 +52,7 @@ export class ProviderAPIClient {
     const response = await context.get(`/${this.apiVersion}/service`);
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to list services");
+      throw new Error(`Failed to list services: ${response.status()} ${await response.text()}`);
     }
 
     const services: Service[] = (await response.json()).services;
@@ -71,8 +74,7 @@ export class ProviderAPIClient {
     });
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to create service");
+      throw new Error(`Failed to create service ${name}: ${response.status()} ${await response.text()}`);
     }
   }
 
@@ -83,8 +85,7 @@ export class ProviderAPIClient {
     });
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to create service");
+      throw new Error(`Failed to create service ${name}: ${response.status()} ${await response.text()}`);
     }
   }
 
@@ -93,7 +94,7 @@ export class ProviderAPIClient {
     const response = await context.delete(`/${this.apiVersion}/service/${serviceId}`);
 
     if (!response.ok()) {
-      console.error(await response.json());
+      console.error(`Failed to delete service ${serviceId}: ${response.status()} ${await response.text()}`);
     }
   }
 
@@ -107,8 +108,7 @@ export class ProviderAPIClient {
     });
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to get identity providers");
+      throw new Error(`Failed to get identity providers: ${response.status()} ${await response.text()}`);
     }
 
     const identityProviders: IdentityProvider[] = (await response.json()).identityProviders || [];
@@ -122,8 +122,7 @@ export class ProviderAPIClient {
     );
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to list instances");
+      throw new Error(`Failed to list instances: ${response.status()} ${await response.text()}`);
     }
 
     const instances: { consumptionResourceInstanceResult: ResourceInstance }[] = (await response.json())
@@ -141,8 +140,7 @@ export class ProviderAPIClient {
     );
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to delete instance");
+      throw new Error(`Failed to delete instance ${instanceId}: ${response.status()} ${await response.text()}`);
     }
   }
 
@@ -153,8 +151,7 @@ export class ProviderAPIClient {
     );
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to describe instance");
+      throw new Error(`Failed to describe instance ${instanceId}: ${response.status()} ${await response.text()}`);
     }
 
     const instance: ResourceInstance = (await response.json()).consumptionResourceInstanceResult;
@@ -168,8 +165,7 @@ export class ProviderAPIClient {
     );
 
     if (!response.ok()) {
-      console.error(await response.json());
-      throw new Error("Failed to list subscriptions");
+      throw new Error(`Failed to list subscriptions: ${response.status()} ${await response.text()}`);
     }
 
     const subscriptionIds: string[] = (await response.json()).ids || [];

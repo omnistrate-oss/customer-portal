@@ -67,9 +67,9 @@ async function globalSetup() {
       yamlTemplates.postgresProviderHostedDT
     ),
     apiClient.createServiceFromComposeSpec(
-      `SaaSBuilder Supabase DT BYOA - ${date}`,
-      "SaaSBuilder Supabase DT Service + BYOA Hosted",
-      yamlTemplates.supabaseBYOAHostedDT
+      `SaaSBuilder Postgres DT BYOA - ${date}`,
+      "SaaSBuilder Postgres DT Service + BYOA Hosted",
+      yamlTemplates.postgresBYOADT
     ),
     apiClient.createServiceFromServicePlanSpec(
       `SaaSBuilder Redis Helm - ${date}`,

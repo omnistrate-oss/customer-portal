@@ -61,8 +61,7 @@ export class UserAPIClient {
     );
 
     if (!response.ok()) {
-      console.error("Failed to create resource instance", await response.json());
-      throw new Error("Failed to create resource instance");
+      throw new Error(`Failed to create resource instance: ${response.status()} ${await response.text()}`);
     }
 
     const instanceId = (await response.json()).id;
