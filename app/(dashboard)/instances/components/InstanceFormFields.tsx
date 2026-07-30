@@ -20,6 +20,7 @@ import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistr
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import { ResourceSummary } from "../hooks/useResources";
+import { isExistingVpcSupported } from "../vpcCapabilities";
 import {
   cloudProviderToPlatformMap,
   filterSchemaByCloudProvider,
@@ -470,7 +471,7 @@ export const getStandardInformationFields = (
   const accountConfigParam = (resourceSchema?.inputParameters || []).find(
     (p) => p.key === "cloud_provider_account_config_id"
   );
-  const isExistingVpcSupported = cloudProvider === "aws" || cloudProvider === "gcp";
+  const supportsExistingVpc = isExistingVpcSupported(cloudProvider);
 
   if (accountConfigParam) {
     fields.push({
@@ -508,7 +509,7 @@ export const getStandardInformationFields = (
 
         if (!selectedCloudAccountConfig) {
           setFieldValue("requestParams._vpcType", "");
-        } else if (isExistingVpcSupported && !isCreateNewVpcAllowed) {
+        } else if (supportsExistingVpc && !isCreateNewVpcAllowed) {
           setFieldValue("requestParams._vpcType", "choose_existing");
         } else {
           setFieldValue("requestParams._vpcType", "create_new");
@@ -548,7 +549,7 @@ export const getStandardInformationFields = (
       Boolean(selectedCloudAccountConfig) &&
       selectedCloudAccountResultParams.allow_new_cloud_native_network_creation !== false;
     const shouldShowVpcTypeRadio = Boolean(
-      selectedCloudAccountConfigId && isCreateNewVpcAllowed && isExistingVpcSupported
+      selectedCloudAccountConfigId && isCreateNewVpcAllowed && supportsExistingVpc
     );
     const vpcType = shouldShowVpcTypeRadio
       ? requestParams._vpcType || "create_new"
@@ -583,7 +584,7 @@ export const getStandardInformationFields = (
       });
     }
 
-    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && isExistingVpcSupported) {
+    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && supportsExistingVpc) {
       const filteredNetworks = region
         ? cloudNativeNetworks.filter(
             (n) => n.region === region && n.status?.toUpperCase() !== "FAILED" && n.imported === true

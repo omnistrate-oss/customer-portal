@@ -34,6 +34,7 @@ import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { applyCustomDnsNormalization, filterSchemaByCloudProvider, getInitialValues } from "../utils";
+import { isExistingVpcSupported } from "../vpcCapabilities";
 
 import {
   getDeploymentConfigurationFields,
@@ -983,7 +984,7 @@ const InstanceForm = ({
       (param) => param.key === "cloud_provider"
     );
     const regionFieldExists = resourceCreateSchema?.inputParameters?.some((param) => param.key === "region");
-    const isExistingVpcSupported = values.cloudProvider === "aws" || values.cloudProvider === "gcp";
+    const supportsExistingVpc = isExistingVpcSupported(values.cloudProvider);
     const accountConfigId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id;
     const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === accountConfigId);
     const createNewVpcDisallowed =
@@ -1005,7 +1006,7 @@ const InstanceForm = ({
       accountConfigFieldExists &&
       cloudProviderFieldExists &&
       regionFieldExists &&
-      isExistingVpcSupported &&
+      supportsExistingVpc &&
       createNewVpcDisallowed &&
       currentVpcType !== "choose_existing"
     ) {
