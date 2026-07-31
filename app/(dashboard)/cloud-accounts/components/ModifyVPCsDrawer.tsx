@@ -40,6 +40,16 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     selectedRegions: [],
     selectedVpcIds: [],
   });
+  const hasHydratedVpcRegions = useRef(false);
+  const previousVpcContextKey = useRef(selectedInstance.id);
+
+  useEffect(() => {
+    if (previousVpcContextKey.current === selectedInstance.id) return;
+
+    previousVpcContextKey.current = selectedInstance.id;
+    hasHydratedVpcRegions.current = false;
+    setVpcValues((previous) => ({ ...previous, selectedRegions: [], selectedVpcIds: [] }));
+  }, [selectedInstance.id]);
 
   // ─── Derive account config data from the selected instance ────────────────
   const resultParams = useMemo(() => getResultParams(selectedInstance), [selectedInstance]);
@@ -110,6 +120,19 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   }, [bringOwnVpcsLocked]);
 
   const networkRegions = useMemo(() => getCloudNativeNetworkRegions(allCloudNativeNetworks), [allCloudNativeNetworks]);
+
+  useEffect(() => {
+    if (!cloudNativeNetworksQuery.isSuccess || networkRegions.length === 0) return;
+    if (hasHydratedVpcRegions.current) return;
+
+    hasHydratedVpcRegions.current = true;
+    setVpcValues((previous) => ({
+      ...previous,
+      bringOwnVpcs: true,
+      selectedRegions: networkRegions,
+      selectedVpcIds: [],
+    }));
+  }, [cloudNativeNetworksQuery.isSuccess, networkRegions]);
 
   useEffect(() => {
     if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {

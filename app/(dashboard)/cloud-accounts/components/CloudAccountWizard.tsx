@@ -96,6 +96,18 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     selectedRegions: [],
     selectedVpcIds: [],
   });
+  const vpcContextKey = `${selectedInstance?.id || "new"}:${clickedInstance?.id || "none"}`;
+  const previousVpcContextKey = useRef(vpcContextKey);
+  const hasHydratedVpcRegions = useRef(false);
+
+  useEffect(() => {
+    if (previousVpcContextKey.current === vpcContextKey) return;
+
+    previousVpcContextKey.current = vpcContextKey;
+    hasHydratedVpcRegions.current = false;
+    setVpcValues((previous) => ({ ...previous, selectedRegions: [], selectedVpcIds: [] }));
+  }, [vpcContextKey]);
+
   // ─── Service/plan/subscription data ──────────────────────────────────────
   const allInstances: ResourceInstance[] = instances;
   const subscriptionInstanceCountHash: Record<string, number> = {};
@@ -396,6 +408,19 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     [allCloudNativeNetworks]
   );
   const bringOwnVpcsLocked = hasSelectedInstanceCloudNativeVpc || allCloudNativeNetworks.length > 0;
+
+  useEffect(() => {
+    if (!cloudNativeNetworksQuery.isSuccess || cloudNativeNetworkRegions.length === 0) return;
+    if (hasHydratedVpcRegions.current) return;
+
+    hasHydratedVpcRegions.current = true;
+    setVpcValues((previous) => ({
+      ...previous,
+      bringOwnVpcs: true,
+      selectedRegions: cloudNativeNetworkRegions,
+      selectedVpcIds: [],
+    }));
+  }, [cloudNativeNetworksQuery.isSuccess, cloudNativeNetworkRegions]);
 
   useEffect(() => {
     if (!bringOwnVpcsLocked) return;
