@@ -4,7 +4,7 @@ import { styled } from "@mui/material";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
-import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
 import { colors } from "src/themeConfig";
 import { CloudProvider } from "src/types/common/enums";
@@ -88,8 +88,8 @@ const CloudAccountOverview: FC<CloudAccountOverviewProps> = ({
           value={accountId || "-"}
           copyButton={Boolean(accountId)}
           justifyContent="center"
-          textStyles={{ color: "#6941C6", fontWeight: 500 }}
-          startIcon={cloudProvider ? cloudProviderLogoMap[cloudProvider] : undefined}
+          // Body text, not link styling: the cell is not clickable, and the provider has its own column.
+          textStyles={{ color: colors.gray600, fontSize: "14px", fontWeight: 400, lineHeight: "20px" }}
         />
       </Cell>
 

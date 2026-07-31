@@ -1,67 +1,53 @@
 import { FC, useMemo } from "react";
-import { Box } from "@mui/material";
-import { getCloudAccountId } from "app/(dashboard)/cloud-accounts/utils";
-import CustomTagsCell from "app/(dashboard)/instances/components/CustomTagsCell";
+import { Stack } from "@mui/material";
+import { getCloudAccountProvider } from "app/(dashboard)/cloud-accounts/utils";
 
-import PropertyDetails, { Row } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
+import PropertyDetails, {
+  ContainerCard,
+} from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { ResourceInstance } from "src/types/resourceInstance";
-import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
+import { getResultParams } from "src/utils/instance";
+
+import { getAccountDetailRows, getSetupCommands } from "./accountDetails";
+import CommandList from "./CommandList";
+import NebiusBindingsTable from "./NebiusBindingsTable";
 
 type AccountDetailsTabProps = {
   instance: ResourceInstance;
 };
 
 const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
-  const rows: Row[] = useMemo(() => {
-    const resultParams = getResultParams(instance);
+  const resultParams = getResultParams(instance);
+  const cloudProvider = getCloudAccountProvider(resultParams);
 
-    return [
-      {
-        dataTestId: "account-id",
-        label: "Account ID / Project ID",
-        value: getCloudAccountId(resultParams),
-        valueType: "text",
-      },
-      {
-        dataTestId: "instance-id",
-        label: "Instance ID",
-        value: instance?.id,
-        valueType: "text",
-      },
-      {
-        dataTestId: "created-on",
-        label: "Created on",
-        value: instance?.created_at ? formatDateUTC(instance.created_at) : "",
-        valueType: "text",
-      },
-      {
-        dataTestId: "private-link-status",
-        label: "PrivateLink status",
-        // PrivateLink is an AWS-only concept — other providers have nothing to report.
-        value: resultParams?.aws_account_id ? (isPrivateLinkEnabled(resultParams) ? "Enabled" : "Disabled") : "",
-        valueType: "boolean",
-      },
-      {
-        dataTestId: "custom-tags",
-        label: "Tags",
-        value: <CustomTagsCell customTags={instance?.customTags} displayNumber={2} sx={{ flexWrap: "wrap" }} />,
-        valueType: "custom",
-      },
-    ];
-  }, [instance]);
+  const rows = useMemo(() => getAccountDetailRows(instance, cloudProvider), [instance, cloudProvider]);
+  const commands = useMemo(() => getSetupCommands(instance, cloudProvider), [instance, cloudProvider]);
 
   return (
-    <Box sx={{ marginTop: "24px" }}>
+    <Stack gap="24px" mt="24px">
       <PropertyDetails
         rows={{
           title: "Account information",
-          desc: "View the configuration details for this cloud account.",
+          desc: "The identifiers and configuration for this cloud account.",
           rows,
           flexWrap: true,
         }}
       />
-    </Box>
+
+      {commands.length > 0 && (
+        <ContainerCard
+          data-testid="account-setup-commands-card"
+          title="Setup commands"
+          description="The commands used to connect and disconnect this account."
+        >
+          <CommandList commands={commands} titleTestId="account-command-title" />
+        </ContainerCard>
+      )}
+
+      {cloudProvider === "nebius" && (
+        <NebiusBindingsTable accountConfigId={resultParams?.cloud_provider_account_config_id} />
+      )}
+    </Stack>
   );
 };
 
