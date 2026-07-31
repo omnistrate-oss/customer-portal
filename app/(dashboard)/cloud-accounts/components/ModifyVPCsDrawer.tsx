@@ -115,7 +115,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     if (networkRegions.length === 0) return;
     setVpcValues((previous) => {
       const selectedRegions = getDefaultSelectedRegions(networkRegions);
-      if (previous.selectedRegions.join("|") === selectedRegions.join("|")) return previous;
+      if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) return previous;
       return { ...previous, bringOwnVpcs: true, selectedRegions, selectedVpcIds: [] };
     });
   }, [networkRegions]);

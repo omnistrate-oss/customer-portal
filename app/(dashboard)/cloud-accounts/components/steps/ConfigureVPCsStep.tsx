@@ -3,12 +3,13 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Autocomplete, Box, Checkbox, Chip, Tooltip as MuiTooltip, Stack, TextField } from "@mui/material";
+import { Autocomplete, Box, Chip, Tooltip as MuiTooltip, Stack, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
+import Checkbox from "src/components/Checkbox/Checkbox";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -223,11 +224,6 @@ const VpcsDataGridHeader = ({
         )}
         <Button
           variant="outlined"
-          sx={{
-            height: "32px !important",
-            padding: "6px 12px !important",
-            minWidth: "unset",
-          }}
           onClick={onResync}
           disabled={isLoadingVpcs}
           startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
@@ -471,22 +467,18 @@ enableDnsSupport   = true`}</CodeBlock>
                   placement="top"
                   arrow
                 >
-                  <Checkbox
-                    data-testid="enable-new-vpcs-checkbox"
-                    checked={values.enableNewVpcs}
-                    onChange={(e) => {
-                      if (!e.target.checked && !values.bringOwnVpcs) return;
-                      onChange({ enableNewVpcs: e.target.checked });
-                    }}
-                    disabled={!canUncheckNewVpcs}
-                    sx={{
-                      p: 0,
-                      color: "#D0D5DD",
-                      "&.Mui-checked": { color: "#7F56D9" },
-                      "&.Mui-disabled": { color: "#98A2B3" },
-                      "&.Mui-disabled.Mui-checked": { color: "#98A2B3" },
-                    }}
-                  />
+                  <span>
+                    <Checkbox
+                      data-testid="enable-new-vpcs-checkbox"
+                      checked={values.enableNewVpcs}
+                      onChange={(e) => {
+                        if (!e.target.checked && !values.bringOwnVpcs) return;
+                        onChange({ enableNewVpcs: e.target.checked });
+                      }}
+                      disabled={!canUncheckNewVpcs}
+                      sx={{ p: 0 }}
+                    />
+                  </span>
                 </Tooltip>
 
                 <Text size="small" weight="medium" color={!canUncheckNewVpcs ? "#98A2B3" : "#344054"}>
@@ -514,23 +506,18 @@ enableDnsSupport   = true`}</CodeBlock>
                   placement="top"
                   arrow
                 >
-                  {" "}
-                  <Checkbox
-                    data-testid="bring-own-vpcs-checkbox"
-                    checked={isBringOwnVpcsEnabledForProvider && values.bringOwnVpcs}
-                    onChange={(e) => {
-                      if (!e.target.checked && !values.enableNewVpcs) return;
-                      onChange({ bringOwnVpcs: e.target.checked });
-                    }}
-                    disabled={!isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
-                    sx={{
-                      p: 0,
-                      color: "#D0D5DD",
-                      "&.Mui-checked": { color: "#7F56D9" },
-                      "&.Mui-disabled": { color: "#98A2B3" },
-                      "&.Mui-disabled.Mui-checked": { color: "#98A2B3" },
-                    }}
-                  />
+                  <span>
+                    <Checkbox
+                      data-testid="bring-own-vpcs-checkbox"
+                      checked={isBringOwnVpcsEnabledForProvider && values.bringOwnVpcs}
+                      onChange={(e) => {
+                        if (!e.target.checked && !values.enableNewVpcs) return;
+                        onChange({ bringOwnVpcs: e.target.checked });
+                      }}
+                      disabled={!isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
+                      sx={{ p: 0 }}
+                    />
+                  </span>
                 </Tooltip>
 
                 <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
@@ -543,14 +530,9 @@ enableDnsSupport   = true`}</CodeBlock>
           {/* Regions selector – shown when bringOwnVpcs is checked */}
           {values.bringOwnVpcs && (
             <Stack gap="8px">
-              <Stack direction="row" alignItems="center" gap="4px">
-                <Text size="small" weight="medium" color="#344054">
-                  Regions
-                </Text>
-                <Text size="small" weight="regular" color="#B42318">
-                  *
-                </Text>
-              </Stack>
+              <Text size="small" weight="medium" color="#344054">
+                Regions
+              </Text>
               <Text size="xsmall" weight="regular" color="#535862">
                 Select regions
               </Text>
@@ -593,11 +575,12 @@ enableDnsSupport   = true`}</CodeBlock>
               {/* VPCs table */}
               {values.selectedRegions.length > 0 ? (
                 <DataGrid
+                  autoHeight
                   checkboxSelection
                   disableSelectionOnClick
                   getRowId={(row) => row.id}
                   columns={vpcColumns}
-                  rows={availableVpcs}
+                  rows={isLoadingVpcs ? [] : availableVpcs}
                   selectionModel={values.selectedVpcIds}
                   onSelectionModelChange={(newSelection) => {
                     onChange({ selectedVpcIds: (newSelection as string[]).filter((id) => selectableVpcIds.has(id)) });
@@ -623,9 +606,12 @@ enableDnsSupport   = true`}</CodeBlock>
                     borderRadius: "8px",
                     boxShadow: "none",
                     overflowX: "auto",
-                    "& .MuiDataGrid-virtualScroller": { overflowX: "auto" },
+                    "& .MuiDataGrid-virtualScroller": {
+                      overflowX: "auto",
+                      overflowY: "hidden",
+                    },
                     "& .MuiDataGrid-main": {
-                      minHeight: "260px",
+                      minHeight: 0,
                     },
                     "& .MuiDataGrid-columnHeaderCheckbox": {
                       paddingLeft: "24px !important",
@@ -671,7 +657,6 @@ enableDnsSupport   = true`}</CodeBlock>
                       onClick={() => onUnimport?.(selectedUnimportIds)}
                       disabled={isImporting || selectedUnimportIds.length === 0}
                       data-testid="unimport-vpcs-button"
-                      sx={{ height: "36px !important", padding: "8px 16px !important" }}
                     >
                       Unimport ({selectedUnimportIds.length})
                     </Button>
@@ -692,7 +677,6 @@ enableDnsSupport   = true`}</CodeBlock>
                       onClick={() => onImport?.(selectedImportIds)}
                       disabled={isImporting || selectedImportIds.length === 0}
                       data-testid="import-vpcs-button"
-                      sx={{ height: "36px !important", padding: "8px 16px !important" }}
                     >
                       Import ({selectedImportIds.length})
                     </Button>
@@ -711,11 +695,6 @@ enableDnsSupport   = true`}</CodeBlock>
           actionButton={
             <Button
               variant="outlined"
-              sx={{
-                height: "32px !important",
-                padding: "6px 12px !important",
-                fontSize: "13px !important",
-              }}
               endIcon={
                 showAllInstructions ? (
                   <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
