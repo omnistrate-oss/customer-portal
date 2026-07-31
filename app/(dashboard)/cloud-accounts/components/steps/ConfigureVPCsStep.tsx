@@ -464,7 +464,11 @@ enableDnsSupport   = true`}</CodeBlock>
             return (
               <Stack direction="row" alignItems="center" gap="12px">
                 <Tooltip
-                  title={!canUncheckNewVpcs && values.enableNewVpcs ? "At least one VPC option must be enabled" : ""}
+                  title={
+                    !canUncheckNewVpcs && values.enableNewVpcs
+                      ? "Keep Bring your own VPCs enabled before disabling new VPC creation"
+                      : ""
+                  }
                   placement="top"
                   arrow
                 >
@@ -524,7 +528,7 @@ enableDnsSupport   = true`}</CodeBlock>
                       : bringOwnVpcsLocked
                         ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
                         : !values.enableNewVpcs && values.bringOwnVpcs
-                          ? "At least one VPC option must be enabled"
+                          ? "Keep new VPC creation enabled before disabling Bring your own VPCs"
                           : ""
                   }
                   placement="top"
