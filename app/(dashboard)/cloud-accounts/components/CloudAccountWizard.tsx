@@ -1035,7 +1035,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const isConfigureVpcsAllowed = normalizedAccountConfigStatus === "READY";
   const configureVpcsDisabledMessage = "The instance is not ready. Configure VPCs is available when status is READY.";
   const cancelLabel =
-    currentStep === 0 ? (isAccountConfigFailed ? "Close" : "Cancel") : currentStep === 2 ? "Skip" : "Do it later";
+    currentStep === 0 ? "Cancel" : currentStep === 1 ? (isAccountConfigFailed ? "Close" : "Do it later") : "Skip";
   const nextLabel =
     currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
   const isNextLoading =
