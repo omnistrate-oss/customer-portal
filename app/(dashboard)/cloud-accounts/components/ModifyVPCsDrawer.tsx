@@ -93,9 +93,6 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
         cloudNativeNetworksQuery.refetch();
         void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
       },
-      onError: () => {
-        snackbar.showError("Failed to sync networks. Please try again.");
-      },
     }
   );
 
@@ -203,6 +200,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     if (!accountConfigId) return;
     syncCloudNativeNetworksMutation.mutate({
       params: { path: { id: accountConfigId } },
+      headers: { "x-ignore-global-error": "true" },
       body: {},
     });
   };

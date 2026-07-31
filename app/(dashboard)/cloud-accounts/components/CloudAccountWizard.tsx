@@ -359,9 +359,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         cloudNativeNetworksQuery.refetch();
         void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
       },
-      onError: () => {
-        snackbar.showError("Failed to sync networks. Please try again.");
-      },
     }
   );
 
@@ -473,6 +470,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       hasSyncedOnEmpty.current = true;
       syncCloudNativeNetworksMutation.mutate({
         params: { path: { id: accountConfigId } },
+        headers: { "x-ignore-global-error": "true" },
         body: {},
       });
     }
@@ -500,6 +498,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           id: accountConfigId,
         },
       },
+      headers: { "x-ignore-global-error": "true" },
       body: {},
     });
   };
@@ -1032,10 +1031,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const isBYOCOnpremCloud = values.cloudProvider === "byoc-onprem";
   const normalizedAccountConfigStatus = String(accountConfigStatus || "").toUpperCase();
+  const isAccountConfigFailed = normalizedAccountConfigStatus === "FAILED";
   const isConfigureVpcsAllowed = normalizedAccountConfigStatus === "READY";
   const configureVpcsDisabledMessage = "The instance is not ready. Configure VPCs is available when status is READY.";
   const cancelLabel =
-    currentStep === 0 ? (isBYOCOnpremCloud ? "Cancel" : "Do it later") : currentStep === 2 ? "Skip" : "Do it later";
+    currentStep === 0 ? (isAccountConfigFailed ? "Close" : "Cancel") : currentStep === 2 ? "Skip" : "Do it later";
   const nextLabel =
     currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
   const isNextLoading =

@@ -97,12 +97,14 @@ const InstanceForm = ({
     {
       onSuccess: async (response) => {
         const instanceId = response?.id;
+        const isBYOARequest = Boolean(
+          (formData.values.requestParams as Record<string, any>)?.cloud_provider_account_config_id
+        );
 
-        snackbar.showSuccess("Instance created successfully");
         setIsOverlayOpen(false);
         formData.resetForm();
 
-        let isBYOAInstance = false;
+        let isBYOAInstance = isBYOARequest;
         let isFirstInstanceInRegion = false;
         let lifecycleStatus = "DEPLOYING";
 
@@ -140,6 +142,10 @@ const InstanceForm = ({
             }
           }
         } catch {}
+
+        if (!isBYOAInstance) {
+          snackbar.showSuccess("Instance created successfully");
+        }
 
         setCreateInstanceModalData({
           isCustomDNS: (formData.values.requestParams as Record<string, any>)?.custom_dns_configuration,
