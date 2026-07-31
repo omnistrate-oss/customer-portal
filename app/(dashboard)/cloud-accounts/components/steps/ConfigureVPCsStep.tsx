@@ -1,5 +1,6 @@
 "use client";
 
+import CheckIcon from "@mui/icons-material/Check";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -476,12 +477,35 @@ enableDnsSupport   = true`}</CodeBlock>
                         onChange({ enableNewVpcs: e.target.checked });
                       }}
                       disabled={!canUncheckNewVpcs}
-                      sx={{ p: 0 }}
+                      checkedIcon={
+                        <Box
+                          className="bring-own-vpcs-checked-icon"
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#7F56D9",
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          <CheckIcon sx={{ fontSize: 16 }} />
+                        </Box>
+                      }
+                      sx={{
+                        p: 0,
+                        "&.Mui-disabled.Mui-checked .bring-own-vpcs-checked-icon": {
+                          backgroundColor: "#D6BBFB",
+                          border: "1px solid #D0D5DD",
+                        },
+                      }}
                     />
                   </span>
                 </Tooltip>
 
-                <Text size="small" weight="medium" color={!canUncheckNewVpcs ? "#98A2B3" : "#344054"}>
+                <Text size="small" weight="medium">
                   Enable creating new VPCs (enabled by default)
                 </Text>
               </Stack>
@@ -515,7 +539,30 @@ enableDnsSupport   = true`}</CodeBlock>
                         onChange({ bringOwnVpcs: e.target.checked });
                       }}
                       disabled={!isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
-                      sx={{ p: 0 }}
+                      checkedIcon={
+                        <Box
+                          className="bring-own-vpcs-checked-icon"
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#7F56D9",
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          <CheckIcon sx={{ fontSize: 16 }} />
+                        </Box>
+                      }
+                      sx={{
+                        p: 0,
+                        "&.Mui-disabled.Mui-checked .bring-own-vpcs-checked-icon": {
+                          backgroundColor: "#D6BBFB",
+                          border: "1px solid #D0D5DD",
+                        },
+                      }}
                     />
                   </span>
                 </Tooltip>
