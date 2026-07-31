@@ -517,6 +517,14 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         ? "Azure bootstrap script executed"
         : "Account bootstrap completed";
 
+  const stackInProgressLabel = hasAwsAccount
+    ? "Deploying CloudFormation stack..."
+    : hasGcpAccount
+      ? "Deploying GCP bootstrap script..."
+      : hasAzureAccount
+        ? "Deploying Azure bootstrap script..."
+        : "Deploying account bootstrap...";
+
   return (
     <CardWithTitle title="Grant Access">
       <Stack gap="20px">
@@ -532,7 +540,13 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         />
 
         <ChecklistItem
-          label="This account configuration verification succeeded"
+          label={
+            isFailed
+              ? "This account configuration verification failed"
+              : isRequestOrDataPending
+                ? "Verifying Account configuration"
+                : "This account configuration verification succeeded"
+          }
           isComplete={isVerificationComplete && !isFailed}
           isInProgress={isRequestOrDataPending && !isVerificationComplete && !isFailed}
           isFailed={isFailed}
@@ -550,7 +564,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
         />
 
         <ChecklistItem
-          label={stackDeployedLabel}
+          label={isVerificationComplete && !isStackDeployed && !isFailed ? stackInProgressLabel : stackDeployedLabel}
           isComplete={isStackDeployed}
           isInProgress={isStackDeploymentInProgress}
         />
