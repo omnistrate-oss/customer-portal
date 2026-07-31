@@ -9,14 +9,16 @@ import { useEffect, useRef, useState } from "react";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
-import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
 import StepperErrorIcon from "src/components/Stepper/StepperErrorIcon";
+import StepperSuccessIcon from "src/components/Stepper/StepperSuccessIcon";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import { getResultParams } from "src/utils/instance";
 
 import sandClock from "public/assets/images/cloud-account/sandclock.gif";
+
+import StepperDefaultIcon from "../../../../../src/components/Stepper/StepperDefaultIcon";
 
 const StyledLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Link
@@ -81,15 +83,7 @@ const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, children }: 
         ) : isInProgress ? (
           <Image src={sandClock} alt="in progress" width={24} height={24} />
         ) : (
-          <Box
-            sx={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              border: "2px solid #D0D5DD",
-              bgcolor: "#F9FAFB",
-            }}
-          />
+          <StepperDefaultIcon />
         )}
       </Box>
       <Text size="small" weight="semibold" color="#101828">
@@ -101,7 +95,12 @@ const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, children }: 
 );
 
 export type GrantAccessStepProps = {
-  selectedAccountConfig?: { status?: string; [key: string]: unknown };
+  selectedAccountConfig?: {
+    status?: string;
+    result_params?: unknown;
+    launch_input_params?: unknown;
+    [key: string]: unknown;
+  };
   cloudFormationTemplateUrl?: string;
   gcpBootstrapShellCommand?: string;
   azureBootstrapShellCommand?: string;
@@ -161,6 +160,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (!isMounted.current) return;
 
     const resultParams = getResultParams(resourceInstance);
+    const status = String(resultParams.account_config_status || resourceInstance?.status || "").toUpperCase();
     if (resultParams?.cloud_provider_account_config_id) {
       setClickedInstance((prev: any) => ({
         ...prev,
@@ -175,6 +175,17 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               : inst
           ),
         })
+      );
+      setIsPolling(false);
+    } else if (status === "FAILED") {
+      setClickedInstance((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              status: resourceInstance?.status || prev?.status,
+              result_params: { ...getResultParams(prev), ...resultParams, account_config_status: status },
+            }
+          : prev
       );
       setIsPolling(false);
     } else if (Date.now() - pollStartTimeRef.current < POLL_MAX_DURATION_MS) {
@@ -206,7 +217,8 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const statusPollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const statusPollStart = useRef<number>(0);
 
-  const accountConfigStatus = selectedAccountConfig?.status;
+  const accountConfigResultParams = getResultParams(selectedAccountConfig);
+  const accountConfigStatus = accountConfigResultParams.account_config_status || selectedAccountConfig?.status;
   const normalizedAccountConfigStatus = String(accountConfigStatus || "").toUpperCase();
   const isFailed = normalizedAccountConfigStatus === "FAILED";
   const isReady = ["READY", "RUNNING", "COMPLETE"].includes(normalizedAccountConfigStatus);
@@ -529,7 +541,6 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           label={stackDeployedLabel}
           isComplete={isStackDeployed}
           isInProgress={isStackDeploymentInProgress}
-          isFailed={isFailed}
         />
       </Stack>
     </CardWithTitle>

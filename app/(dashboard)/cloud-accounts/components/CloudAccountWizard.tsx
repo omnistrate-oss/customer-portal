@@ -596,8 +596,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               : prev
           );
           // If still not ready, retry after a delay
-          const status = refreshedParams.account_config_status || resourceInstance?.status;
-          if (!(status && READY_STATUSES.includes(status)) && !cancelled) {
+          const status = String(refreshedParams.account_config_status || resourceInstance?.status || "").toUpperCase();
+          if (!(status && (READY_STATUSES.includes(status) || status === "FAILED")) && !cancelled) {
             retryTimer = setTimeout(refreshAccountConfigId, 5000);
           }
         }
