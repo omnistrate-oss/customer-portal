@@ -63,6 +63,27 @@ export const getCloudAccountsRoute = ({
   return "/cloud-accounts";
 };
 
+export type CloudAccountTab = "Account Details" | "Governance Controls";
+
+type CloudAccountDetailsRouteParams = {
+  serviceId: string;
+  servicePlanId: string;
+  instanceId: string;
+  subscriptionId: string;
+  view?: CloudAccountTab;
+};
+
+export const getCloudAccountDetailsRoute = ({
+  serviceId,
+  servicePlanId,
+  instanceId,
+  subscriptionId,
+  view,
+}: CloudAccountDetailsRouteParams): string => {
+  const url = `/cloud-accounts/${serviceId}/${servicePlanId}/${instanceId}/${subscriptionId}`;
+  return view ? `${url}?view=${encodeURIComponent(view)}` : url;
+};
+
 export const getAccessControlRoute = (userId?: string) => {
   if (userId) {
     return `/access-control?userId=${userId}`;
