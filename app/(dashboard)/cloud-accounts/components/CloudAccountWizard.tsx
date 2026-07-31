@@ -34,7 +34,6 @@ import { getResultParams } from "src/utils/instance";
 import { CloudAccountValidationSchema } from "../constants";
 import {
   getCloudNativeNetworkRegions,
-  getDefaultSelectedRegions,
   getInitialValues,
   getValidSubscriptionForInstanceCreation,
   hasCloudNativeVpcConfiguration,
@@ -397,34 +396,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     [allCloudNativeNetworks]
   );
   const bringOwnVpcsLocked = hasSelectedInstanceCloudNativeVpc || allCloudNativeNetworks.length > 0;
-  const hasInitializedVpcRegions = useRef(false);
 
   useEffect(() => {
     if (!bringOwnVpcsLocked) return;
     setVpcValues((previous) => (previous.bringOwnVpcs ? previous : { ...previous, bringOwnVpcs: true }));
   }, [bringOwnVpcsLocked]);
-
-  useEffect(() => {
-    if (cloudNativeNetworkRegions.length === 0) return;
-    setVpcValues((previous) => {
-      const availableRegionSet = new Set(cloudNativeNetworkRegions);
-
-      if (previous.selectedRegions.length > 0) {
-        const selectedRegions = previous.selectedRegions.filter((region) => availableRegionSet.has(region));
-        if (selectedRegions.join("|") === previous.selectedRegions.join("|")) return previous;
-
-        return { ...previous, selectedRegions, selectedVpcIds: [] };
-      }
-
-      if (hasInitializedVpcRegions.current) return previous;
-      hasInitializedVpcRegions.current = true;
-      const selectedRegions = getDefaultSelectedRegions(cloudNativeNetworkRegions);
-      if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) {
-        return previous;
-      }
-      return { ...previous, bringOwnVpcs: true, selectedRegions, selectedVpcIds: [] };
-    });
-  }, [cloudNativeNetworkRegions]);
 
   useEffect(() => {
     if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {

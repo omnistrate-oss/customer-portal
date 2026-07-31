@@ -14,7 +14,7 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
 
-import { getCloudNativeNetworkRegions, getDefaultSelectedRegions, hasCloudNativeVpcConfiguration } from "../utils";
+import { getCloudNativeNetworkRegions, hasCloudNativeVpcConfiguration } from "../utils";
 
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
@@ -110,27 +110,6 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   }, [bringOwnVpcsLocked]);
 
   const networkRegions = useMemo(() => getCloudNativeNetworkRegions(allCloudNativeNetworks), [allCloudNativeNetworks]);
-  const hasInitializedVpcRegions = useRef(false);
-
-  useEffect(() => {
-    if (networkRegions.length === 0) return;
-    setVpcValues((previous) => {
-      const availableRegionSet = new Set(networkRegions);
-
-      if (previous.selectedRegions.length > 0) {
-        const selectedRegions = previous.selectedRegions.filter((region) => availableRegionSet.has(region));
-        if (selectedRegions.join("|") === previous.selectedRegions.join("|")) return previous;
-
-        return { ...previous, selectedRegions, selectedVpcIds: [] };
-      }
-
-      if (hasInitializedVpcRegions.current) return previous;
-      hasInitializedVpcRegions.current = true;
-      const selectedRegions = getDefaultSelectedRegions(networkRegions);
-      if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) return previous;
-      return { ...previous, bringOwnVpcs: true, selectedRegions, selectedVpcIds: [] };
-    });
-  }, [networkRegions]);
 
   useEffect(() => {
     if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {
