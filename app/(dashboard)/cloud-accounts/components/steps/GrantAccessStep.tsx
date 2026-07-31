@@ -514,7 +514,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           sx={{
             width: "2px",
             height: "20px",
-            bgcolor: "#E9EAEB",
+            bgcolor: isSetupComplete ? "#079455" : "#E9EAEB",
             ml: "11px",
           }}
         />
@@ -532,7 +532,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           sx={{
             width: "2px",
             height: "20px",
-            bgcolor: "#E9EAEB",
+            bgcolor: isVerificationComplete && !isFailed ? "#079455" : "#E9EAEB",
             ml: "11px",
           }}
         />
