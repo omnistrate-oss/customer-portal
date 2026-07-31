@@ -1,3 +1,4 @@
+import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
@@ -295,3 +296,46 @@ export const hasCloudNativeVpcConfiguration = (params?: Record<string, any>): bo
   if (typeof params.cloud_native_network_id === "string" && params.cloud_native_network_id.length > 0) return true;
   return Number(params.num_cloud_native_networks) > 0;
 };
+
+/** Infers the cloud provider of a cloud account instance from its result params. */
+export const getCloudAccountProvider = (resultParams: Record<string, any>): CloudProvider | undefined => {
+  if (resultParams?.aws_account_id) return "aws";
+  if (resultParams?.gcp_project_id) return "gcp";
+  if (resultParams?.azure_subscription_id) return "azure";
+  if (resultParams?.oci_tenancy_id) return "oci";
+  if (resultParams?.nebius_tenant_id) return "nebius";
+  if (resultParams?.cluster_name) return "byoc-onprem";
+  return undefined;
+};
+
+const CLOUDFORMATION_QUICKCREATE_PATH = "#/stacks/quickcreate";
+const CLOUDFORMATION_UPDATE_PATH = "#/stacks/update";
+
+/**
+ * Points a cloud account's CloudFormation URL at the existing stack's update form and sets
+ * one account-control parameter. The onboarding URL uses `quickcreate`, which would create a
+ * duplicate stack instead of changing the live one.
+ */
+export const getAccountControlUrl = (cloudFormationUrl: string, parameter: string, value: boolean): string => {
+  const updateUrl = cloudFormationUrl.replace(CLOUDFORMATION_QUICKCREATE_PATH, CLOUDFORMATION_UPDATE_PATH);
+  const existingParam = new RegExp(`([?&]${parameter}=)[^&]*`);
+
+  if (existingParam.test(updateUrl)) return updateUrl.replace(existingParam, `$1${value}`);
+
+  const fragment = updateUrl.slice(updateUrl.indexOf("#") + 1);
+  return `${updateUrl}${fragment.includes("?") ? "&" : "?"}${parameter}=${value}`;
+};
+
+/**
+ * The account identifier shown to users for a cloud account instance. Providers are
+ * mutually exclusive, so the first match wins. Returns "" when none is present —
+ * callers decide their own empty-state text.
+ */
+export const getCloudAccountId = (resultParams: Record<string, any>): string =>
+  resultParams?.gcp_project_id ||
+  resultParams?.aws_account_id ||
+  resultParams?.azure_subscription_id ||
+  resultParams?.oci_tenancy_id ||
+  resultParams?.nebius_tenant_id ||
+  resultParams?.cluster_name ||
+  "";

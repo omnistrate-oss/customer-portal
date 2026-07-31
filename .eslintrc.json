@@ -3,7 +3,16 @@
     "node": true,
     "es6": true
   },
-  "ignorePatterns": ["node_modules/*", "schema.ts"],
+  "ignorePatterns": [
+    "node_modules/*",
+    "schema.ts",
+    ".next/*",
+    "out/*",
+    "coverage/*",
+    "test-results/*",
+    "playwright-report/*",
+    "next-env.d.ts"
+  ],
   "plugins": ["react", "react-hooks", "import", "simple-import-sort"],
   "extends": [
     "next/core-web-vitals",
@@ -42,6 +51,21 @@
     "@typescript-eslint/no-wrapper-object-types": "off"
   },
   "overrides": [
+    {
+      // Playwright fixtures take a callback parameter named `use`, which
+      // react-hooks/rules-of-hooks misreads as React's `use` hook.
+      "files": [
+        "tests/**",
+        "test-fixtures/**",
+        "test-utils/**",
+        "page-objects/**",
+        "playwright/**",
+        "playwright.config.ts"
+      ],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    },
     {
       "files": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx"],
       "rules": {
