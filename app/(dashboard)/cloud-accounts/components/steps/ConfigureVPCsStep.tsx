@@ -441,7 +441,7 @@ enableDnsSupport   = true`}</CodeBlock>
         <Stack gap="10px">
           <InstructionPanel>
             <CodeBlock label="AWS CLI">--service-region &lt;region&gt;</CodeBlock>
-            <CodeBlock label="Terraform">service_region = "&lt;region&gt;"</CodeBlock>
+            <CodeBlock label="Terraform">service_region = &quot;&lt;region&gt;&quot;</CodeBlock>
           </InstructionPanel>
           <CodeBlock>Do not enable private DNS for cross-region Interface VPC Endpoints.</CodeBlock>
         </Stack>
@@ -643,32 +643,50 @@ enableDnsSupport   = true`}</CodeBlock>
               )}
 
               {/* Import / Unimport buttons */}
-              {values.selectedVpcIds.length > 0 && (selectedImportIds.length > 0 || selectedUnimportIds.length > 0) && (
-                <Stack direction="row" justifyContent="flex-end" gap="12px" sx={{ mt: "16px" }}>
-                  {selectedUnimportIds.length > 0 && (
+              <Stack direction="row" justifyContent="flex-end" gap="12px" sx={{ mt: "16px" }}>
+                <Tooltip
+                  title={
+                    isImporting
+                      ? "A VPC update is already in progress."
+                      : selectedUnimportIds.length === 0
+                        ? "Select an imported VPC that is not in use to unimport it."
+                        : ""
+                  }
+                >
+                  <span>
                     <Button
                       variant="outlined"
                       onClick={() => onUnimport?.(selectedUnimportIds)}
-                      disabled={isImporting}
+                      disabled={isImporting || selectedUnimportIds.length === 0}
                       data-testid="unimport-vpcs-button"
                       sx={{ height: "36px !important", padding: "8px 16px !important" }}
                     >
                       Unimport ({selectedUnimportIds.length})
                     </Button>
-                  )}
-                  {selectedImportIds.length > 0 && (
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    isImporting
+                      ? "A VPC update is already in progress."
+                      : selectedImportIds.length === 0
+                        ? "Select an available VPC to import it."
+                        : ""
+                  }
+                >
+                  <span>
                     <Button
                       variant="contained"
                       onClick={() => onImport?.(selectedImportIds)}
-                      disabled={isImporting}
+                      disabled={isImporting || selectedImportIds.length === 0}
                       data-testid="import-vpcs-button"
                       sx={{ height: "36px !important", padding: "8px 16px !important" }}
                     >
                       Import ({selectedImportIds.length})
                     </Button>
-                  )}
-                </Stack>
-              )}
+                  </span>
+                </Tooltip>
+              </Stack>
             </Stack>
           )}
         </Stack>
