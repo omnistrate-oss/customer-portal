@@ -38,6 +38,8 @@ const TextContainerToCopy = ({ text, marginTop = "20px" }: { text: string; margi
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      minWidth: 0,
+      maxWidth: "100%",
     }}
   >
     <Box
@@ -51,9 +53,19 @@ const TextContainerToCopy = ({ text, marginTop = "20px" }: { text: string; margi
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
+        minWidth: 0,
+        maxWidth: "100%",
+        overflow: "hidden",
       }}
     >
-      <Text size="medium" weight="regular" color="#667085" ellipsis title={text}>
+      <Text
+        size="medium"
+        weight="regular"
+        color="#667085"
+        ellipsis
+        title={text}
+        sx={{ minWidth: 0, flex: 1, overflow: "hidden" }}
+      >
         {text}
       </Text>
       <CopyToClipboardButton text={text} iconProps={{ color: "#98A2B3" }} />
@@ -388,14 +400,14 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (hasGcpAccount) {
       return (
         <Stack gap="12px">
-          <Stack direction="row" gap="12px">
-            <Box flex={1}>
+          <Stack direction="row" gap="12px" sx={{ minWidth: 0, width: "100%" }}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 GCP Project ID
               </Text>
               <TextContainerToCopy text={accountInstructionDetails.gcpProjectID!} marginTop="6px" />
             </Box>
-            <Box flex={1}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 GCP Project Number
               </Text>
@@ -424,14 +436,14 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (hasAzureAccount) {
       return (
         <Stack gap="12px">
-          <Stack direction="row" gap="12px">
-            <Box flex={1}>
+          <Stack direction="row" gap="12px" sx={{ minWidth: 0, width: "100%" }}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 Azure Subscription ID
               </Text>
               <TextContainerToCopy text={accountInstructionDetails.azureSubscriptionID!} marginTop="6px" />
             </Box>
-            <Box flex={1}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 Azure Tenant ID
               </Text>
@@ -460,14 +472,14 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (hasOciAccount) {
       return (
         <Stack gap="12px">
-          <Stack direction="row" gap="12px">
-            <Box flex={1}>
+          <Stack direction="row" gap="12px" sx={{ minWidth: 0, width: "100%" }}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 OCI Tenancy OCID
               </Text>
               <TextContainerToCopy text={accountInstructionDetails.ociTenancyID!} marginTop="6px" />
             </Box>
-            <Box flex={1}>
+            <Box flex={1} minWidth={0}>
               <Text size="small" weight="medium" color="#344054">
                 OCI Domain OCID
               </Text>
