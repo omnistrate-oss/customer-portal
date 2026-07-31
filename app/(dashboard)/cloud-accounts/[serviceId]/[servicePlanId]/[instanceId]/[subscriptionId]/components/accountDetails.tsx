@@ -3,11 +3,8 @@ import CustomTagsCell from "app/(dashboard)/instances/components/CustomTagsCell"
 import { Row } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
-import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
-
-import { CommandListItem } from "./CommandList";
 
 type ResultParams = Record<string, any>;
 
@@ -44,80 +41,6 @@ const IDENTITY_FIELDS: Record<CloudProvider, FieldDefinition[]> = {
   "byoc-onprem": [
     { key: "cluster_name", label: "Cluster Name" },
     { key: "cluster_description", label: "Cluster Description" },
-  ],
-};
-
-type CommandDefinition = FieldDefinition & {
-  description: string;
-  /** URLs get an open-in-new-tab button; shell commands get quoted before they're copied. */
-  kind: "shell" | "url";
-};
-
-const SETUP_COMMANDS: Record<CloudProvider, CommandDefinition[]> = {
-  aws: [
-    {
-      key: "cloudformation_url",
-      label: "Account setup stack",
-      description: "Creates the IAM roles and policies that let the service provider operate this account.",
-      kind: "url",
-    },
-  ],
-  gcp: [
-    {
-      key: "gcp_bootstrap_shell_script",
-      label: "Set up account",
-      description: "Run in Cloud Shell to grant the service provider access to this project.",
-      kind: "shell",
-    },
-    {
-      key: "gcp_disconnect_shell_script",
-      label: "Disconnect account",
-      description: "Run in Cloud Shell to revoke the service provider's access to this project.",
-      kind: "shell",
-    },
-  ],
-  azure: [
-    {
-      key: "azure_bootstrap_shell_script",
-      label: "Set up account",
-      description: "Run in Azure Cloud Shell to grant the service provider access to this subscription.",
-      kind: "shell",
-    },
-    {
-      key: "azure_disconnect_shell_script",
-      label: "Disconnect account",
-      description: "Run in Azure Cloud Shell to revoke the service provider's access to this subscription.",
-      kind: "shell",
-    },
-  ],
-  oci: [
-    {
-      key: "oci_bootstrap_shell_script",
-      label: "Set up account",
-      description: "Run in Cloud Shell to grant the service provider access to this tenancy.",
-      kind: "shell",
-    },
-    {
-      key: "oci_disconnect_shell_script",
-      label: "Disconnect account",
-      description: "Run in Cloud Shell to revoke the service provider's access to this tenancy.",
-      kind: "shell",
-    },
-  ],
-  nebius: [],
-  "byoc-onprem": [
-    {
-      key: "byoc_onprem_install_command",
-      label: "Install agent",
-      description: "Run against the cluster to install the Dataplane Agent.",
-      kind: "shell",
-    },
-    {
-      key: "byoc_onprem_uninstall_command",
-      label: "Uninstall agent",
-      description: "Run against the cluster to remove the Dataplane Agent.",
-      kind: "shell",
-    },
   ],
 };
 
@@ -189,23 +112,4 @@ export const getAccountDetailRows = (instance: ResourceInstance, cloudProvider?:
   });
 
   return rows;
-};
-
-export const getSetupCommands = (instance: ResourceInstance, cloudProvider?: CloudProvider): CommandListItem[] => {
-  const resultParams: ResultParams = getResultParams(instance);
-  const definitions = cloudProvider ? SETUP_COMMANDS[cloudProvider] : [];
-
-  return definitions.flatMap(({ key, label, description, kind }) => {
-    const value = resultParams?.[key];
-    if (!value) return [];
-
-    return [
-      {
-        title: label,
-        description,
-        command: value,
-        ...(kind === "url" ? { href: value } : { copyValue: addQuotesToShellCommand(value) }),
-      },
-    ];
-  });
 };
