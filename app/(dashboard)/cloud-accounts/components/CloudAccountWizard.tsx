@@ -397,6 +397,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     [allCloudNativeNetworks]
   );
   const bringOwnVpcsLocked = hasSelectedInstanceCloudNativeVpc || allCloudNativeNetworks.length > 0;
+  const hasInitializedVpcRegions = useRef(false);
 
   useEffect(() => {
     if (!bringOwnVpcsLocked) return;
@@ -406,6 +407,17 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   useEffect(() => {
     if (cloudNativeNetworkRegions.length === 0) return;
     setVpcValues((previous) => {
+      const availableRegionSet = new Set(cloudNativeNetworkRegions);
+
+      if (previous.selectedRegions.length > 0) {
+        const selectedRegions = previous.selectedRegions.filter((region) => availableRegionSet.has(region));
+        if (selectedRegions.join("|") === previous.selectedRegions.join("|")) return previous;
+
+        return { ...previous, selectedRegions, selectedVpcIds: [] };
+      }
+
+      if (hasInitializedVpcRegions.current) return previous;
+      hasInitializedVpcRegions.current = true;
       const selectedRegions = getDefaultSelectedRegions(cloudNativeNetworkRegions);
       if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) {
         return previous;
@@ -1194,7 +1206,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   },
                 });
               }}
-              isImporting={importCloudNativeNetworksMutation.isPending}
               lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
               privateConnectivityEnabled={enablePrivateConnectivity}

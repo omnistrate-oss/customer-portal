@@ -3,7 +3,7 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Autocomplete, Box, Chip, Tooltip as MuiTooltip, Stack, TextField } from "@mui/material";
+import { Autocomplete, Box, Chip, Tooltip as MuiTooltip, Skeleton, Stack, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
@@ -256,6 +256,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
   const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
+  const showVpcConfiguration = values.bringOwnVpcs || isLoadingVpcs;
   const selectableVpcIds = useMemo(
     () =>
       new Set(
@@ -528,7 +529,7 @@ enableDnsSupport   = true`}</CodeBlock>
           })()}
 
           {/* Regions selector – shown when bringOwnVpcs is checked */}
-          {values.bringOwnVpcs && (
+          {showVpcConfiguration && (
             <Stack gap="8px">
               <Text size="small" weight="medium" color="#344054">
                 Regions
@@ -536,44 +537,50 @@ enableDnsSupport   = true`}</CodeBlock>
               <Text size="xsmall" weight="regular" color="#535862">
                 Select regions
               </Text>
-              <Autocomplete
-                multiple
-                options={availableRegions}
-                value={values.selectedRegions}
-                onChange={(_, newValue) => onChange({ selectedRegions: newValue, selectedVpcIds: [] })}
-                disableCloseOnSelect
-                renderTags={(tagValue, getTagProps) =>
-                  tagValue.map((option, index) => (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option}
-                      label={option}
+              {isLoadingVpcs ? (
+                <Skeleton variant="rounded" height={40} />
+              ) : (
+                <Autocomplete
+                  multiple
+                  options={availableRegions}
+                  value={values.selectedRegions}
+                  onChange={(_, newValue) => onChange({ selectedRegions: newValue, selectedVpcIds: [] })}
+                  disableCloseOnSelect
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip
+                        {...getTagProps({ index })}
+                        key={option}
+                        label={option}
+                        size="small"
+                        sx={{
+                          borderRadius: "6px",
+                          border: "1px solid #D0D5DD",
+                          height: "24px",
+                        }}
+                      />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={values.selectedRegions.length === 0 ? "Select regions" : ""}
                       size="small"
                       sx={{
-                        borderRadius: "6px",
-                        border: "1px solid #D0D5DD",
-                        height: "24px",
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "8px",
+                        },
                       }}
                     />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={values.selectedRegions.length === 0 ? "Select regions" : ""}
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "8px",
-                      },
-                    }}
-                  />
-                )}
-                data-testid="regions-autocomplete"
-              />
+                  )}
+                  data-testid="regions-autocomplete"
+                />
+              )}
 
               {/* VPCs table */}
-              {values.selectedRegions.length > 0 ? (
+              {isLoadingVpcs ? (
+                <Skeleton variant="rounded" height={520} sx={{ mt: "8px" }} />
+              ) : values.selectedRegions.length > 0 ? (
                 <DataGrid
                   autoHeight
                   checkboxSelection
@@ -635,7 +642,7 @@ enableDnsSupport   = true`}</CodeBlock>
                   }}
                 >
                   <Text size="small" weight="regular" color="#667085">
-                    {emptyStateMessage}
+                    {values.selectedRegions.length === 0 ? "No regions selected." : emptyStateMessage}
                   </Text>
                 </Box>
               )}
@@ -658,7 +665,8 @@ enableDnsSupport   = true`}</CodeBlock>
                       disabled={isImporting || selectedUnimportIds.length === 0}
                       data-testid="unimport-vpcs-button"
                     >
-                      Unimport ({selectedUnimportIds.length})
+                      Unimport
+                      {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
                     </Button>
                   </span>
                 </Tooltip>
@@ -678,7 +686,7 @@ enableDnsSupport   = true`}</CodeBlock>
                       disabled={isImporting || selectedImportIds.length === 0}
                       data-testid="import-vpcs-button"
                     >
-                      Import ({selectedImportIds.length})
+                      Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
                     </Button>
                   </span>
                 </Tooltip>

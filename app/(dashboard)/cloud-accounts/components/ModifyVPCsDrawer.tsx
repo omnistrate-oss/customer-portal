@@ -110,10 +110,22 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   }, [bringOwnVpcsLocked]);
 
   const networkRegions = useMemo(() => getCloudNativeNetworkRegions(allCloudNativeNetworks), [allCloudNativeNetworks]);
+  const hasInitializedVpcRegions = useRef(false);
 
   useEffect(() => {
     if (networkRegions.length === 0) return;
     setVpcValues((previous) => {
+      const availableRegionSet = new Set(networkRegions);
+
+      if (previous.selectedRegions.length > 0) {
+        const selectedRegions = previous.selectedRegions.filter((region) => availableRegionSet.has(region));
+        if (selectedRegions.join("|") === previous.selectedRegions.join("|")) return previous;
+
+        return { ...previous, selectedRegions, selectedVpcIds: [] };
+      }
+
+      if (hasInitializedVpcRegions.current) return previous;
+      hasInitializedVpcRegions.current = true;
       const selectedRegions = getDefaultSelectedRegions(networkRegions);
       if (previous.bringOwnVpcs && previous.selectedRegions.join("|") === selectedRegions.join("|")) return previous;
       return { ...previous, bringOwnVpcs: true, selectedRegions, selectedVpcIds: [] };
