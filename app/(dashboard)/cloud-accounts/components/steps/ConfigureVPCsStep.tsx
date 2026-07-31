@@ -3,7 +3,7 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Autocomplete, Box, Checkbox, Chip, Stack, TextField, Tooltip as MuiTooltip } from "@mui/material";
+import { Autocomplete, Box, Checkbox, Chip, Tooltip as MuiTooltip, Stack, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
@@ -313,6 +313,22 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
           <StatusChip status={params.row.status} category={vpcStatusCategoryMap[params.row.status] || "unknown"} />
         ),
       },
+
+      {
+        field: "imported",
+        headerName: "Imported",
+        flex: 0.55,
+        minWidth: 110,
+        valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
+      },
+      {
+        field: "inUse",
+        headerName: "In use",
+        flex: 0.55,
+        minWidth: 100,
+        valueGetter: (params) => (params.row.inUse ? "Yes" : "No"),
+      },
+
       {
         field: "statusMessage",
         headerName: "Status Message",
@@ -338,20 +354,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         ),
       },
       {
-        field: "imported",
-        headerName: "Imported",
-        flex: 0.55,
-        minWidth: 110,
-        valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
-      },
-      {
-        field: "inUse",
-        headerName: "In use",
-        flex: 0.55,
-        minWidth: 100,
-        valueGetter: (params) => (params.row.inUse ? "Yes" : "No"),
-      },
-      {
         field: "networkId",
         headerName: "Network ID",
         flex: 1,
@@ -373,6 +375,12 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
             {params.row.networkId || "-"}
           </Text>
         ),
+      },
+      {
+        field: "cidr",
+        headerName: "CIDR",
+        flex: 1,
+        minWidth: 100,
       },
     ],
     []
