@@ -14,9 +14,10 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
 
+import { getCloudNativeNetworkRegions, getDefaultSelectedRegions, hasCloudNativeVpcConfiguration } from "../utils";
+
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
-import { getCloudNativeNetworkRegions, getDefaultSelectedRegions, hasCloudNativeVpcConfiguration } from "../utils";
 
 const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
 
@@ -205,6 +206,19 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     });
   };
 
+  const updateCloudAccountMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
+        snackbar.showSuccess("VPC configuration updated");
+        onClose();
+      },
+      onError: () => snackbar.showError("Failed to update VPC configuration. Please try again."),
+    }
+  );
+
   // ─── Polling for account config readiness ─────────────────────────────────
   const fetchInstanceDetails = useCallback(async () => {
     const resource = offering?.resourceParameters?.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
@@ -310,7 +324,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
               value: privateConnectivityEnabled ? (
                 <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
               ) : (
-                <Chip label="Disabled" fontColor="#B54708" bgColor="#FFFAEB" borderColor="#FEDF89" />
+                <Chip label="Disabled" fontColor="#667085" bgColor="#F2F4F7" borderColor="#D0D5DD" />
               ),
             },
           ]
@@ -322,15 +336,25 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     const vpcItems = [
       {
         label: "Creating new VPCs",
-        value: vpcValues.enableNewVpcs ? (
-          <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-        ) : undefined,
+        value: (
+          <Chip
+            label={vpcValues.enableNewVpcs ? "Enabled" : "Disabled"}
+            fontColor={vpcValues.enableNewVpcs ? "#067647" : "#667085"}
+            bgColor={vpcValues.enableNewVpcs ? "#ECFDF3" : "#F2F4F7"}
+            borderColor={vpcValues.enableNewVpcs ? "#ABEFC6" : "#D0D5DD"}
+          />
+        ),
       },
       {
         label: "Enable existing VPCs",
-        value: vpcValues.bringOwnVpcs ? (
-          <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-        ) : undefined,
+        value: (
+          <Chip
+            label={vpcValues.bringOwnVpcs ? "Enabled" : "Disabled"}
+            fontColor={vpcValues.bringOwnVpcs ? "#067647" : "#667085"}
+            bgColor={vpcValues.bringOwnVpcs ? "#ECFDF3" : "#F2F4F7"}
+            borderColor={vpcValues.bringOwnVpcs ? "#ABEFC6" : "#D0D5DD"}
+          />
+        ),
       },
       {
         label: "Regions",
@@ -348,9 +372,34 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
 
   // ─── Handle update ────────────────────────────────────────────────────────
   const handleUpdate = () => {
-    // TODO: API call to update VPC configuration
-    snackbar.showSuccess("VPC configuration updated");
-    onClose();
+    if (!offering || !selectedInstance.id) return;
+
+    const resource = offering.resourceParameters.find((item) => item.resourceId.startsWith("r-injectedaccountconfig"));
+    if (!resource) {
+      snackbar.showError("Account configuration resource not found.");
+      return;
+    }
+
+    updateCloudAccountMutation.mutate({
+      params: {
+        path: {
+          serviceProviderId: offering.serviceProviderId,
+          serviceKey: offering.serviceURLKey,
+          serviceAPIVersion: offering.serviceAPIVersion,
+          serviceEnvironmentKey: offering.serviceEnvironmentURLKey,
+          serviceModelKey: offering.serviceModelURLKey,
+          productTierKey: offering.productTierURLKey,
+          resourceKey: resource.urlKey,
+          id: selectedInstance.id,
+        },
+        query: { subscriptionId: selectedInstance.subscriptionId as string },
+      },
+      body: {
+        requestParams: {
+          allow_new_cloud_native_network_creation: vpcValues.enableNewVpcs,
+        },
+      },
+    });
   };
 
   if (!offering) {
@@ -391,8 +440,8 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             onDoItLater={onClose}
             onNext={handleUpdate}
             nextLabel="Update"
-            isNextLoading={false}
-            isNextDisabled={false}
+            isNextLoading={updateCloudAccountMutation.isPending}
+            isNextDisabled={updateCloudAccountMutation.isPending}
           />
         </div>
       </div>

@@ -465,12 +465,12 @@ enableDnsSupport   = true`}</CodeBlock>
           {(() => {
             const canUncheckNewVpcs = values.bringOwnVpcs;
             return (
-              <Tooltip
-                title={!canUncheckNewVpcs && values.enableNewVpcs ? "At least one VPC option must be enabled" : ""}
-                placement="top"
-                arrow
-              >
-                <Stack direction="row" alignItems="center" gap="12px">
+              <Stack direction="row" alignItems="center" gap="12px">
+                <Tooltip
+                  title={!canUncheckNewVpcs && values.enableNewVpcs ? "At least one VPC option must be enabled" : ""}
+                  placement="top"
+                  arrow
+                >
                   <Checkbox
                     data-testid="enable-new-vpcs-checkbox"
                     checked={values.enableNewVpcs}
@@ -478,17 +478,21 @@ enableDnsSupport   = true`}</CodeBlock>
                       if (!e.target.checked && !values.bringOwnVpcs) return;
                       onChange({ enableNewVpcs: e.target.checked });
                     }}
+                    disabled={!canUncheckNewVpcs}
                     sx={{
                       p: 0,
                       color: "#D0D5DD",
                       "&.Mui-checked": { color: "#7F56D9" },
+                      "&.Mui-disabled": { color: "#98A2B3" },
+                      "&.Mui-disabled.Mui-checked": { color: "#98A2B3" },
                     }}
                   />
-                  <Text size="small" weight="medium" color="#344054">
-                    Enable creating new VPCs (enabled by default)
-                  </Text>
-                </Stack>
-              </Tooltip>
+                </Tooltip>
+
+                <Text size="small" weight="medium" color={!canUncheckNewVpcs ? "#98A2B3" : "#344054"}>
+                  Enable creating new VPCs (enabled by default)
+                </Text>
+              </Stack>
             );
           })()}
 
@@ -496,20 +500,21 @@ enableDnsSupport   = true`}</CodeBlock>
           {(() => {
             const isBringOwnVpcsEnabledForProvider = isBringOwnVpcsSupported(cloudProvider);
             return (
-              <Tooltip
-                title={
-                  !isBringOwnVpcsEnabledForProvider
-                    ? "Bring your own VPCs is currently available for AWS, GCP, and Azure only"
-                    : bringOwnVpcsLocked
-                      ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
-                      : !values.enableNewVpcs && values.bringOwnVpcs
-                        ? "At least one VPC option must be enabled"
-                        : ""
-                }
-                placement="top"
-                arrow
-              >
-                <Stack direction="row" alignItems="center" gap="12px">
+              <Stack direction="row" alignItems="center" gap="12px">
+                <Tooltip
+                  title={
+                    !isBringOwnVpcsEnabledForProvider
+                      ? "Bring your own VPCs is currently available for AWS, GCP, and Azure only"
+                      : bringOwnVpcsLocked
+                        ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
+                        : !values.enableNewVpcs && values.bringOwnVpcs
+                          ? "At least one VPC option must be enabled"
+                          : ""
+                  }
+                  placement="top"
+                  arrow
+                >
+                  {" "}
                   <Checkbox
                     data-testid="bring-own-vpcs-checkbox"
                     checked={isBringOwnVpcsEnabledForProvider && values.bringOwnVpcs}
@@ -522,17 +527,16 @@ enableDnsSupport   = true`}</CodeBlock>
                       p: 0,
                       color: "#D0D5DD",
                       "&.Mui-checked": { color: "#7F56D9" },
-                      // Keep the locked, automatically-selected state visually consistent
-                      // with the enabled selected state while preserving disabled behavior.
-                      "&.Mui-disabled": { color: "#7F56D9", opacity: 1 },
-                      "&.Mui-disabled.Mui-checked": { color: "#7F56D9", opacity: 1 },
+                      "&.Mui-disabled": { color: "#98A2B3" },
+                      "&.Mui-disabled.Mui-checked": { color: "#98A2B3" },
                     }}
                   />
-                  <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
-                    Bring your own VPCs for deployments
-                  </Text>
-                </Stack>
-              </Tooltip>
+                </Tooltip>
+
+                <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
+                  Bring your own VPCs for deployments
+                </Text>
+              </Stack>
             );
           })()}
 

@@ -14,6 +14,7 @@ import {
 } from "src/utils/isAllowedByRBAC";
 
 import { Overlay } from "../page";
+import { isBringOwnVpcsSupported } from "../utils";
 
 const NON_MODIFIABLE_VPC_STATUSES = new Set(["FAILED", "DELETING", "DELETED"]);
 
@@ -76,7 +77,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
                 : resultParams?.cluster_name
                   ? "byoc-onprem"
                   : "");
-    const isModifyVpcsSupportedProvider = cloudProvider === "aws" || cloudProvider === "gcp";
+    const isModifyVpcsSupportedProvider = isBringOwnVpcsSupported(cloudProvider);
     const hasLinkedAccountConfig = Boolean(resultParams?.cloud_provider_account_config_id);
 
     // const isDeploying = instance?.status === "DEPLOYING";
@@ -172,7 +173,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
         : !isUpdateAllowedByRBAC
           ? "Unauthorized to modify VPCs"
           : !isModifyVpcsSupportedProvider
-            ? "Modify VPCs is available for AWS and GCP cloud accounts only"
+            ? "Modify VPCs is available for AWS, GCP, and Azure cloud accounts only"
             : !hasLinkedAccountConfig
               ? "Modify VPCs requires a linked cloud provider account config"
               : !isInstanceReadyForVpcModification

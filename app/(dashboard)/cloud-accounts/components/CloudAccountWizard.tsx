@@ -162,13 +162,13 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           ...instanceResultParams,
           cloud_provider: values.cloudProvider,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
 
         if (values.cloudProvider === "aws") {
           resultParams.aws_account_id = values.awsAccountId;
           resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
+          resultParams.private_link = enablePrivateConnectivity;
         } else if (values.cloudProvider === "gcp") {
           resultParams.gcp_project_id = values.gcpProjectId;
           resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -251,7 +251,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           gcp_project_number: values.gcpProjectNumber,
           account_configuration_method: values.accountConfigurationMethod,
           gcp_service_account_email: getGcpServiceEmail(values.gcpProjectId, selectUser?.orgId.toLowerCase()),
-          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "azure") {
@@ -260,7 +259,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           azure_subscription_id: values.azureSubscriptionId,
           azure_tenant_id: values.azureTenantId,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "oci") {
@@ -269,7 +267,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           oci_tenancy_id: values.ociTenancyId,
           oci_domain_id: values.ociDomainId,
           account_configuration_method: values.accountConfigurationMethod,
-          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "byoc-onprem") {
@@ -375,6 +372,18 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       onError: () => {
         snackbar.showError("Failed to update VPCs. Please try again.");
       },
+    }
+  );
+
+  const updateCloudAccountVpcMutation = $api.useMutation(
+    "patch",
+    "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}",
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
+        onClose();
+      },
+      onError: () => snackbar.showError("Failed to update VPC configuration. Please try again."),
     }
   );
 
@@ -999,11 +1008,21 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       const vpcItems = [
         {
           label: "Creating new VPCs",
-          value: vpcValues.enableNewVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
+          value: (
+            <StatusChip
+              label={vpcValues.enableNewVpcs ? "Enabled" : "Disabled"}
+              category={vpcValues.enableNewVpcs ? "success" : "unknown"}
+            />
+          ),
         },
         {
           label: "Enable existing VPCs",
-          value: vpcValues.bringOwnVpcs ? <StatusChip label="Enabled" category="success" /> : undefined,
+          value: (
+            <StatusChip
+              label={vpcValues.bringOwnVpcs ? "Enabled" : "Disabled"}
+              category={vpcValues.bringOwnVpcs ? "success" : "unknown"}
+            />
+          ),
         },
         {
           label: "Regions",
@@ -1040,7 +1059,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     currentStep === 0 ? (isBYOCOnpremCloud ? "Create" : "Next") : currentStep === 2 ? "Configure" : "Next";
   const isNextLoading =
     (currentStep === 0 && createCloudAccountMutation.isPending) ||
-    (currentStep === 2 && importCloudNativeNetworksMutation.isPending);
+    (currentStep === 2 && (importCloudNativeNetworksMutation.isPending || updateCloudAccountVpcMutation.isPending));
 
   // ─── Navigation ────────────────────────────────────────────────────────────
   const handleNext = () => {
@@ -1051,8 +1070,36 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       if (!isConfigureVpcsAllowed) return;
       setCurrentStep(2);
     } else {
-      // Step 3 – "Configure" button: close the wizard
-      onClose();
+      const offering = byoaServiceOfferingsObj[values.serviceId]?.[values.servicePlanId];
+      const resource = offering?.resourceParameters.find((item) =>
+        item.resourceId.startsWith("r-injectedaccountconfig")
+      );
+
+      if (!clickedInstance?.id || !offering || !resource) {
+        snackbar.showError("Account configuration resource not found.");
+        return;
+      }
+
+      updateCloudAccountVpcMutation.mutate({
+        params: {
+          path: {
+            serviceProviderId: offering.serviceProviderId,
+            serviceKey: offering.serviceURLKey,
+            serviceAPIVersion: offering.serviceAPIVersion,
+            serviceEnvironmentKey: offering.serviceEnvironmentURLKey,
+            serviceModelKey: offering.serviceModelURLKey,
+            productTierKey: offering.productTierURLKey,
+            resourceKey: resource.urlKey,
+            id: clickedInstance.id,
+          },
+          query: { subscriptionId: values.subscriptionId },
+        },
+        body: {
+          requestParams: {
+            allow_new_cloud_native_network_creation: vpcValues.enableNewVpcs,
+          },
+        },
+      });
     }
   };
 

@@ -67,22 +67,6 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
                         Route all control-plane and app-plane communication over provider-native private connectivity (
                         {privateConnectivityType}).
                       </Text>
-
-                      <Stack direction="row" alignItems="flex-start" gap="6px">
-                        <KeyboardArrowRightIcon sx={{ color: "#101828", fontSize: 22, mt: "-2px" }} />
-                        <Text size="small" weight="regular" color="#344054">
-                          No traffic traverses the public internet
-                        </Text>
-                      </Stack>
-
-                      <Stack direction="row" alignItems="flex-start" gap="8px">
-                        <Box sx={{ mt: "2px" }}>
-                          <AlertTriangle color="#F79009" />
-                        </Box>
-                        <Text size="small" weight="regular" color="#344054">
-                          Additional charges apply per endpoint-hour and GB processed
-                        </Text>
-                      </Stack>
                     </Stack>
                   </div>
                   <div className="col-span-4">
@@ -104,6 +88,21 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
                         />
                       </span>
                     </Tooltip>
+                    <Stack direction="row" alignItems="flex-start" gap="6px" marginTop={"10px"}>
+                      <KeyboardArrowRightIcon sx={{ color: "#101828", fontSize: 22, mt: "-2px" }} />
+                      <Text size="small" weight="regular" color="#344054">
+                        No traffic traverses the public internet
+                      </Text>
+                    </Stack>
+
+                    <Stack direction="row" alignItems="flex-start" gap="8px">
+                      <Box sx={{ mt: "2px" }}>
+                        <AlertTriangle color="#F79009" />
+                      </Box>
+                      <Text size="small" weight="regular" color="#344054">
+                        Additional charges apply per endpoint-hour and GB processed
+                      </Text>
+                    </Stack>
                   </div>
                 </div>
 
