@@ -7,21 +7,31 @@ import Tooltip from "src/components/Tooltip/Tooltip";
 
 const iconWrapperSx = { display: "flex", alignItems: "center" };
 
+const DISABLED_ICON_COLOR = "#D5D7DA";
+const UNSUPPORTED_PROVIDER_MESSAGE =
+  "Agent debug access and infrastructure permission controls are available only for AWS workload cloud accounts.";
+
 type GovernanceControlsCellProps = {
   /** Route to the instance's Governance Controls tab. Omitted when the row's subscription is unresolved. */
   href?: string;
+  /** Governance controls are AWS-only; other providers get an inert, greyed-out icon. */
+  disabled?: boolean;
 };
 
-const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href }) => {
+const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disabled }) => {
+  const linkHref = disabled ? undefined : href;
+
   return (
     <Tooltip
       placement="top"
       slotProps={{ tooltip: { sx: { maxWidth: "320px" } } }}
       title={
-        href ? (
+        disabled ? (
+          UNSUPPORTED_PROVIDER_MESSAGE
+        ) : linkHref ? (
           <>
             To enable or disable agent debug access and infrastructure permissions,{" "}
-            <Box component={Link} href={href} sx={{ color: "#D6BBFB", textDecoration: "underline" }}>
+            <Box component={Link} href={linkHref} sx={{ color: "#D6BBFB", textDecoration: "underline" }}>
               click here
             </Box>
           </>
@@ -30,13 +40,13 @@ const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href }) => {
         )
       }
     >
-      {href ? (
-        <Box component={Link} href={href} sx={iconWrapperSx}>
+      {linkHref ? (
+        <Box component={Link} href={linkHref} sx={iconWrapperSx}>
           <GovernanceControlsIcon />
         </Box>
       ) : (
         <Box sx={iconWrapperSx}>
-          <GovernanceControlsIcon />
+          <GovernanceControlsIcon color={disabled ? DISABLED_ICON_COLOR : undefined} />
         </Box>
       )}
     </Tooltip>

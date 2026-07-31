@@ -240,3 +240,21 @@ export const getCloudAccountProvider = (resultParams: Record<string, any>): Clou
   if (resultParams?.cluster_name) return "byoc-onprem";
   return undefined;
 };
+
+const CLOUDFORMATION_QUICKCREATE_PATH = "#/stacks/quickcreate";
+const CLOUDFORMATION_UPDATE_PATH = "#/stacks/update";
+
+/**
+ * Points a cloud account's CloudFormation URL at the existing stack's update form and sets
+ * one account-control parameter. The onboarding URL uses `quickcreate`, which would create a
+ * duplicate stack instead of changing the live one.
+ */
+export const getAccountControlUrl = (cloudFormationUrl: string, parameter: string, value: boolean): string => {
+  const updateUrl = cloudFormationUrl.replace(CLOUDFORMATION_QUICKCREATE_PATH, CLOUDFORMATION_UPDATE_PATH);
+  const existingParam = new RegExp(`([?&]${parameter}=)[^&]*`);
+
+  if (existingParam.test(updateUrl)) return updateUrl.replace(existingParam, `$1${value}`);
+
+  const fragment = updateUrl.slice(updateUrl.indexOf("#") + 1);
+  return `${updateUrl}${fragment.includes("?") ? "&" : "?"}${parameter}=${value}`;
+};

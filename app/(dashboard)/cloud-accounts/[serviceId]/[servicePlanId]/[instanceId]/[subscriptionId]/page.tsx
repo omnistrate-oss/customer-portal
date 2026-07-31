@@ -25,10 +25,10 @@ import AccountDetailsTab from "./components/AccountDetailsTab";
 import CloudAccountOverview from "./components/CloudAccountOverview";
 import GovernanceControlsTab from "./components/GovernanceControlsTab";
 
-const TABS: CloudAccountTab[] = ["Account Details", "Governance Controls"];
+const ALL_TABS: CloudAccountTab[] = ["Account Details", "Governance Controls"];
 
 const isCloudAccountTab = (value?: string | null): value is CloudAccountTab =>
-  Boolean(value) && (TABS as string[]).includes(value as string);
+  Boolean(value) && (ALL_TABS as string[]).includes(value as string);
 
 const CloudAccountDetailsPage = ({
   params,
@@ -89,6 +89,10 @@ const CloudAccountDetailsPage = ({
   const resultParams = getResultParams(instance);
   const cloudProvider = getCloudAccountProvider(resultParams);
 
+  // Governance controls are driven by CloudFormation, so the tab is AWS-only.
+  const tabs: CloudAccountTab[] = cloudProvider === "aws" ? ALL_TABS : ["Account Details"];
+  const activeTab = tabs.includes(currentTab) ? currentTab : "Account Details";
+
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
     return (
       <PageContainer>
@@ -147,8 +151,8 @@ const CloudAccountDetailsPage = ({
       </Collapse>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
-        <Tabs value={currentTab} variant="scrollable" scrollButtons="auto">
-          {TABS.map((tab) => (
+        <Tabs value={activeTab} variant="scrollable" scrollButtons="auto">
+          {tabs.map((tab) => (
             <Tab
               data-testid={`${tab.replace(/\s+/g, "-").toLowerCase()}-tab`}
               key={tab}
@@ -161,8 +165,10 @@ const CloudAccountDetailsPage = ({
         </Tabs>
       </Stack>
 
-      {currentTab === "Account Details" && <AccountDetailsTab instance={instance} />}
-      {currentTab === "Governance Controls" && <GovernanceControlsTab cloudProvider={cloudProvider} />}
+      {activeTab === "Account Details" && <AccountDetailsTab instance={instance} />}
+      {activeTab === "Governance Controls" && (
+        <GovernanceControlsTab cloudFormationUrl={resultParams?.cloudformation_url} />
+      )}
     </PageContainer>
   );
 };

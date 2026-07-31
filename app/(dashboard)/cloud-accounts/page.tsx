@@ -221,7 +221,10 @@ const CloudAccountsPage = () => {
 
           return (
             <Stack direction="row" alignItems="center" gap="8px">
-              <GovernanceControlsCell href={getDetailsRoute(data.row.original, "Governance Controls")} />
+              <GovernanceControlsCell
+                href={getDetailsRoute(data.row.original, "Governance Controls")}
+                disabled={getCloudAccountProvider(getResultParams(data.row.original)) !== "aws"}
+              />
               <Tooltip
                 title={
                   !isDeleteProtectionSupported
