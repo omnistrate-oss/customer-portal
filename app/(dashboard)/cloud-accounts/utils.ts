@@ -241,20 +241,22 @@ export const getCloudAccountProvider = (resultParams: Record<string, any>): Clou
   return undefined;
 };
 
-const CLOUDFORMATION_QUICKCREATE_PATH = "#/stacks/quickcreate";
-const CLOUDFORMATION_UPDATE_PATH = "#/stacks/update";
+const CLOUDFORMATION_STACKS_PATH = "#/stacks";
+const DEFAULT_STACK_NAME = "AccountConfigSetup";
+
+/** The stack the account controls live on, read off the onboarding URL's `stackName` param. */
+export const getAccountConfigStackName = (cloudFormationUrl: string): string =>
+  cloudFormationUrl.match(/[?&]stackName=([^&]+)/)?.[1] || DEFAULT_STACK_NAME;
 
 /**
- * Points a cloud account's CloudFormation URL at the existing stack's update form and sets
- * one account-control parameter. The onboarding URL uses `quickcreate`, which would create a
- * duplicate stack instead of changing the live one.
+ * Turns the account's CloudFormation onboarding URL into a console link listing that stack.
+ * The console ignores parameter values passed to its update form, so operators are sent to the
+ * filtered stack list and walked through the update by hand.
  */
-export const getAccountControlUrl = (cloudFormationUrl: string, parameter: string, value: boolean): string => {
-  const updateUrl = cloudFormationUrl.replace(CLOUDFORMATION_QUICKCREATE_PATH, CLOUDFORMATION_UPDATE_PATH);
-  const existingParam = new RegExp(`([?&]${parameter}=)[^&]*`);
+export const getAccountConfigStackUrl = (cloudFormationUrl: string): string => {
+  const stacksIndex = cloudFormationUrl.indexOf(CLOUDFORMATION_STACKS_PATH);
+  if (stacksIndex === -1) return cloudFormationUrl;
 
-  if (existingParam.test(updateUrl)) return updateUrl.replace(existingParam, `$1${value}`);
-
-  const fragment = updateUrl.slice(updateUrl.indexOf("#") + 1);
-  return `${updateUrl}${fragment.includes("?") ? "&" : "?"}${parameter}=${value}`;
+  const consoleUrl = cloudFormationUrl.slice(0, stacksIndex + CLOUDFORMATION_STACKS_PATH.length);
+  return `${consoleUrl}?filteringText=${getAccountConfigStackName(cloudFormationUrl)}`;
 };
