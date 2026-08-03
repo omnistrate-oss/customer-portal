@@ -2,11 +2,14 @@ import { FC, useMemo } from "react";
 import { Stack } from "@mui/material";
 import { getCloudAccountProvider } from "app/(dashboard)/cloud-accounts/utils";
 
-import PropertyDetails from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
+import PropertyDetails, {
+  ContainerCard,
+} from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
 
-import { getAccountDetailRows } from "./accountDetails";
+import { getAccountDetailRows, getOnboardingCommands } from "./accountDetails";
+import CommandList from "./CommandList";
 import NebiusBindingsTable from "./NebiusBindingsTable";
 
 type AccountDetailsTabProps = {
@@ -18,6 +21,7 @@ const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
   const cloudProvider = getCloudAccountProvider(resultParams);
 
   const rows = useMemo(() => getAccountDetailRows(instance, cloudProvider), [instance, cloudProvider]);
+  const commands = useMemo(() => getOnboardingCommands(instance, cloudProvider), [instance, cloudProvider]);
 
   return (
     <Stack gap="24px" mt="24px">
@@ -29,6 +33,16 @@ const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
           flexWrap: true,
         }}
       />
+
+      {commands.length > 0 && (
+        <ContainerCard
+          data-testid="account-onboarding-commands-card"
+          title="Cloud Account Onboarding"
+          description="Instructions to onboard this cloud account"
+        >
+          <CommandList commands={commands} titleTestId="account-command-title" />
+        </ContainerCard>
+      )}
 
       {cloudProvider === "nebius" && (
         <NebiusBindingsTable accountConfigId={resultParams?.cloud_provider_account_config_id} />
