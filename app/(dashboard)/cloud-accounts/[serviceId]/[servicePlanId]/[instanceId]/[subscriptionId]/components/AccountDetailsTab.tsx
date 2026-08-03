@@ -2,14 +2,13 @@ import { FC, useMemo } from "react";
 import { Stack } from "@mui/material";
 import { getCloudAccountProvider } from "app/(dashboard)/cloud-accounts/utils";
 
-import PropertyDetails, {
-  ContainerCard,
-} from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
+import PropertyDetails from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
+// import useInstallCommand from "src/hooks/useInstallCommand";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
 
-import { getAccountDetailRows, getOnboardingCommands } from "./accountDetails";
-import CommandList from "./CommandList";
+import { getAccountDetailRows } from "./accountDetails";
+// import CommandList from "./CommandList";
 import NebiusBindingsTable from "./NebiusBindingsTable";
 
 type AccountDetailsTabProps = {
@@ -20,8 +19,13 @@ const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
   const resultParams = getResultParams(instance);
   const cloudProvider = getCloudAccountProvider(resultParams);
 
+  // const { getActionProxyUrl } = useInstallCommand();
+
   const rows = useMemo(() => getAccountDetailRows(instance, cloudProvider), [instance, cloudProvider]);
-  const commands = useMemo(() => getOnboardingCommands(instance, cloudProvider), [instance, cloudProvider]);
+  // const commands = useMemo(
+  //   () => getOnboardingCommands(instance, cloudProvider, getActionProxyUrl),
+  //   [instance, cloudProvider, getActionProxyUrl]
+  // );
 
   return (
     <Stack gap="24px" mt="24px">
@@ -34,7 +38,7 @@ const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
         }}
       />
 
-      {commands.length > 0 && (
+      {/* {commands.length > 0 && (
         <ContainerCard
           data-testid="account-onboarding-commands-card"
           title="Cloud Account Onboarding"
@@ -42,7 +46,7 @@ const AccountDetailsTab: FC<AccountDetailsTabProps> = ({ instance }) => {
         >
           <CommandList commands={commands} titleTestId="account-command-title" />
         </ContainerCard>
-      )}
+      )} */}
 
       {cloudProvider === "nebius" && (
         <NebiusBindingsTable accountConfigId={resultParams?.cloud_provider_account_config_id} />

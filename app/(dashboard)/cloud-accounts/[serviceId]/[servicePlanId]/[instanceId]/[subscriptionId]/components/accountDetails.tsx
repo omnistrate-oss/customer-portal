@@ -49,6 +49,10 @@ const IDENTITY_FIELDS: Record<CloudProvider, FieldDefinition[]> = {
 
 type CommandDefinition = FieldDefinition & {
   description: string;
+  /** Quotes the fetched URL so the shell keeps its query string, as OffboardingInstructions does. */
+  quoteForShell?: boolean;
+  /** Commands that pull from the backend API must go through the portal proxy, as SetupPrivateClusterDialog does. */
+  proxyAccountSetupUrls?: boolean;
 };
 
 /**
@@ -62,11 +66,13 @@ const ONBOARDING_COMMANDS: Record<CloudProvider, CommandDefinition[]> = {
       key: "gcp_bootstrap_shell_script",
       label: "Set up account",
       description: "Run in Cloud Shell to grant the service provider access to this project.",
+      quoteForShell: true,
     },
     {
       key: "gcp_disconnect_shell_script",
       label: "Disconnect account",
       description: "Run in Cloud Shell to revoke the service provider's access to this project.",
+      quoteForShell: true,
     },
   ],
   azure: [],
@@ -77,11 +83,13 @@ const ONBOARDING_COMMANDS: Record<CloudProvider, CommandDefinition[]> = {
       key: "byoc_onprem_install_command",
       label: "Install agent",
       description: "Run against the cluster to install the Dataplane Agent.",
+      proxyAccountSetupUrls: true,
     },
     {
       key: "byoc_onprem_uninstall_command",
       label: "Uninstall agent",
       description: "Run against the cluster to remove the Dataplane Agent.",
+      quoteForShell: true,
     },
   ],
 };
@@ -156,14 +164,34 @@ export const getAccountDetailRows = (instance: ResourceInstance, cloudProvider?:
   return rows;
 };
 
-export const getOnboardingCommands = (instance: ResourceInstance, cloudProvider?: CloudProvider): CommandListItem[] => {
+const URL_REGEX = /https?:\/\/[^\s"']+/g;
+
+export const getOnboardingCommands = (
+  instance: ResourceInstance,
+  cloudProvider?: CloudProvider,
+  getActionProxyUrl?: (downloadURL: string, absolute?: boolean) => string
+): CommandListItem[] => {
   const resultParams: ResultParams = getResultParams(instance);
   const definitions = cloudProvider ? ONBOARDING_COMMANDS[cloudProvider] : [];
 
-  return definitions.flatMap(({ key, label, description }) => {
-    const value = resultParams?.[key];
+  return definitions.flatMap(({ key, label, description, quoteForShell, proxyAccountSetupUrls }) => {
+    const value: string = resultParams?.[key];
     if (!value) return [];
 
-    return [{ title: label, description, command: value, copyValue: addQuotesToShellCommand(value) }];
+    const command =
+      proxyAccountSetupUrls && getActionProxyUrl
+        ? value.replace(URL_REGEX, (rawUrl) =>
+            rawUrl.includes("/account-setup/") ? getActionProxyUrl(rawUrl, true) || rawUrl : rawUrl
+          )
+        : value;
+
+    return [
+      {
+        title: label,
+        description,
+        command,
+        copyValue: quoteForShell ? addQuotesToShellCommand(command) : command,
+      },
+    ];
   });
 };

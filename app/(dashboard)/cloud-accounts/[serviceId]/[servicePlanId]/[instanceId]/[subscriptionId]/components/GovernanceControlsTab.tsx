@@ -119,7 +119,7 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ cloudFormationU
                   {...option}
                   stackName={getAccountConfigStackName(cloudFormationUrl)}
                   stackUrl={getAccountConfigStackUrl(cloudFormationUrl)}
-                  titleTestId="governance-option-title"
+                  titleTestId={`governance-option-${option.parameter}-${option.value}`}
                 />
               </Box>
             ))
