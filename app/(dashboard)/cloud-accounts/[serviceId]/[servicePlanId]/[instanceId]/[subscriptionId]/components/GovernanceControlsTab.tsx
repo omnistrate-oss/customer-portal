@@ -1,51 +1,70 @@
 import { FC } from "react";
 import Link from "next/link";
 import { Box, Stack } from "@mui/material";
-import { getAccountControlUrl } from "app/(dashboard)/cloud-accounts/utils";
+import { getAccountConfigStackName, getAccountConfigStackUrl } from "app/(dashboard)/cloud-accounts/utils";
 
-import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
 import { ContainerCard } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { Text } from "src/components/Typography/Typography";
+import { ArrowUpRight } from "src/icons";
 
-import CommandList, { CommandListItem } from "./CommandList";
+import GovernanceControlOption, { GovernanceControlOptionData } from "./GovernanceControlOption";
 
 const SETUP_GUIDE_URL = "https://docs.omnistrate.com/operate-guides/aws-cloudformation-account-controls/";
-const CODE_COLOR = "#1ED88D";
 
-const DEBUG_ACCESS_PARAM = "param_K8sDebugAccessEnabled";
-const INFRA_MUTATION_PARAM = "param_AgentInfrastructureMutationEnabled";
+const DEBUG_ACCESS_PARAM = "K8sDebugAccessEnabled";
+const INFRA_MUTATION_PARAM = "AgentInfrastructureMutationEnabled";
 
-const toCommandItem = (title: string, description: string, url: string): CommandListItem => ({
-  title,
-  description,
-  command: url,
-  href: url,
-});
+type ControlSection = {
+  testId: string;
+  title: string;
+  description: string;
+  options: GovernanceControlOptionData[];
+};
 
-const getDebugAccessCommands = (cloudFormationUrl: string): CommandListItem[] => [
-  toCommandItem(
-    "Enable support debug access",
-    "Allows the service provider to proxy requests through the Dataplane Agent to access your Kubernetes API for support and troubleshooting.",
-    getAccountControlUrl(cloudFormationUrl, DEBUG_ACCESS_PARAM, true)
-  ),
-  toCommandItem(
-    "Disable support debug access",
-    "Blocks the service provider from accessing your Kubernetes API through the Dataplane Agent.",
-    getAccountControlUrl(cloudFormationUrl, DEBUG_ACCESS_PARAM, false)
-  ),
-];
-
-const getInfraPermissionCommands = (cloudFormationUrl: string): CommandListItem[] => [
-  toCommandItem(
-    "Allow AWS infrastructure changes",
-    "Allows the Dataplane Agent to create, update, and delete AWS resources (EC2, VPC, EBS) required to manage your workloads.",
-    getAccountControlUrl(cloudFormationUrl, INFRA_MUTATION_PARAM, true)
-  ),
-  toCommandItem(
-    "Restrict AWS permissions to read-only",
-    "Blocks AWS infrastructure modifications while preserving read-only inspection for monitoring and health status.",
-    getAccountControlUrl(cloudFormationUrl, INFRA_MUTATION_PARAM, false)
-  ),
+const CONTROL_SECTIONS: ControlSection[] = [
+  {
+    testId: "agent-debug-access-card",
+    title: "Agent debug access",
+    description: "Control whether the service provider can access your Kubernetes API for support and troubleshooting.",
+    options: [
+      {
+        title: "Enable support debug access",
+        description:
+          "Allows the service provider to proxy requests through the Dataplane Agent to access your Kubernetes API for support and troubleshooting.",
+        parameter: DEBUG_ACCESS_PARAM,
+        value: true,
+      },
+      {
+        title: "Disable support debug access",
+        description:
+          "Blocks the service provider from accessing your Kubernetes API through the Dataplane Agent. Support requests will need your manual access.",
+        parameter: DEBUG_ACCESS_PARAM,
+        value: false,
+      },
+    ],
+  },
+  {
+    testId: "agent-infra-permissions-card",
+    title: "Agent infrastructure permissions",
+    description:
+      "Control whether the Dataplane Agent can create, update, or delete AWS cloud resources in your account.",
+    options: [
+      {
+        title: "Allow AWS infrastructure changes",
+        description:
+          "Allows the Dataplane Agent to create, update, and delete AWS resources (EC2, VPC, EBS) required to manage your workloads.",
+        parameter: INFRA_MUTATION_PARAM,
+        value: true,
+      },
+      {
+        title: "Restrict AWS permissions to read only",
+        description:
+          "Blocks AWS infrastructure modifications while preserving read only inspection for monitoring and health status. New deployments will fail while restricted.",
+        parameter: INFRA_MUTATION_PARAM,
+        value: false,
+      },
+    ],
+  },
 ];
 
 const SetupGuideLink = () => (
@@ -62,7 +81,7 @@ const SetupGuideLink = () => (
     }}
   >
     View setup guide
-    <ExternalArrowIcon width={14} height={14} color="#6941C6" />
+    <ArrowUpRight size={14} color="#6941C6" />
   </Link>
 );
 
@@ -82,47 +101,33 @@ type GovernanceControlsTabProps = {
 const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ cloudFormationUrl }) => {
   return (
     <Stack gap="24px" mt="24px">
-      <ContainerCard
-        data-testid="agent-debug-access-card"
-        title="Agent debug access"
-        description={
-          <>
-            Control whether the service provider can access your Kubernetes API for support and troubleshooting.{" "}
-            <SetupGuideLink />
-          </>
-        }
-      >
-        {cloudFormationUrl ? (
-          <CommandList
-            commands={getDebugAccessCommands(cloudFormationUrl)}
-            codeColor={CODE_COLOR}
-            titleTestId="governance-command-title"
-          />
-        ) : (
-          <UnavailableNotice />
-        )}
-      </ContainerCard>
-
-      <ContainerCard
-        data-testid="agent-infra-permissions-card"
-        title="Agent infrastructure permissions"
-        description={
-          <>
-            Control whether the Dataplane Agent can create, update, or delete AWS cloud resources in your account.{" "}
-            <SetupGuideLink />
-          </>
-        }
-      >
-        {cloudFormationUrl ? (
-          <CommandList
-            commands={getInfraPermissionCommands(cloudFormationUrl)}
-            codeColor={CODE_COLOR}
-            titleTestId="governance-command-title"
-          />
-        ) : (
-          <UnavailableNotice />
-        )}
-      </ContainerCard>
+      {CONTROL_SECTIONS.map((section) => (
+        <ContainerCard
+          key={section.testId}
+          data-testid={section.testId}
+          title={section.title}
+          description={
+            <>
+              {section.description} <SetupGuideLink />
+            </>
+          }
+        >
+          {cloudFormationUrl ? (
+            section.options.map((option, index) => (
+              <Box key={option.title} borderTop={index > 0 ? "1px solid #E9EAEB" : undefined}>
+                <GovernanceControlOption
+                  {...option}
+                  stackName={getAccountConfigStackName(cloudFormationUrl)}
+                  stackUrl={getAccountConfigStackUrl(cloudFormationUrl)}
+                  titleTestId={`governance-option-${option.parameter}-${option.value}`}
+                />
+              </Box>
+            ))
+          ) : (
+            <UnavailableNotice />
+          )}
+        </ContainerCard>
+      ))}
     </Stack>
   );
 };
