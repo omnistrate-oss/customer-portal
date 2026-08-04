@@ -14,10 +14,10 @@ import Checkbox from "src/components/Checkbox/Checkbox";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
+import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
-import LoadingSpinner from "../../../../../src/components/LoadingSpinner/LoadingSpinner";
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
 export type VpcRecord = {
@@ -44,6 +44,7 @@ type ConfigureVPCsStepProps = {
   availableRegions?: string[];
   availableVpcs?: VpcRecord[];
   isLoadingVpcs?: boolean;
+  isFetchingVPCs?: boolean;
   onResync?: () => void;
   onImport?: (vpcIds: string[]) => void;
   onUnimport?: (vpcIds: string[]) => void;
@@ -198,11 +199,13 @@ const VpcsDataGridHeader = ({
   totalCount,
   lastSyncedAt,
   isLoadingVpcs,
+  isFetchingVPCs,
   onResync,
 }: {
   totalCount: number;
   lastSyncedAt?: string;
   isLoadingVpcs: boolean;
+  isFetchingVPCs: boolean;
   onResync?: () => void;
 }) => {
   return (
@@ -228,7 +231,7 @@ const VpcsDataGridHeader = ({
         <Button
           variant="outlined"
           onClick={onResync}
-          disabled={isLoadingVpcs}
+          disabled={isFetchingVPCs || isLoadingVpcs}
           startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
           data-testid="resync-vpcs-button"
         >
@@ -245,6 +248,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   availableRegions = [],
   availableVpcs = [],
   isLoadingVpcs = false,
+  isFetchingVPCs = false,
   onResync,
   onImport,
   onUnimport,
@@ -606,7 +610,7 @@ enableDnsSupport   = true`}</CodeBlock>
                   disableSelectionOnClick
                   getRowId={(row) => row.id}
                   columns={vpcColumns}
-                  rows={isLoadingVpcs ? [] : availableVpcs}
+                  rows={isFetchingVPCs || isLoadingVpcs ? [] : availableVpcs}
                   selectionModel={values.selectedVpcIds}
                   onSelectionModelChange={(newSelection) => {
                     onChange({ selectedVpcIds: (newSelection as string[]).filter((id) => selectableVpcIds.has(id)) });
@@ -622,11 +626,12 @@ enableDnsSupport   = true`}</CodeBlock>
                       totalCount: availableVpcs.length,
                       lastSyncedAt,
                       isLoadingVpcs,
+                      isFetchingVPCs,
                       onResync,
                     },
                   }}
-                  loading={isLoadingVpcs}
-                  noRowsText={isLoadingVpcs ? "Loading VPCs…" : emptyStateMessage}
+                  loading={isLoadingVpcs || isFetchingVPCs}
+                  noRowsText={isLoadingVpcs || isFetchingVPCs ? "Loading VPCs…" : emptyStateMessage}
                   sx={{
                     mt: "8px",
                     borderRadius: "8px",

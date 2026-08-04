@@ -73,6 +73,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     availableRegions,
     availableVpcs,
     isLoadingVpcs,
+    isFetchingVPCs,
     isImporting,
     lastSyncedAt,
     bringOwnVpcsLocked,
@@ -308,6 +309,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             availableRegions={availableRegions}
             availableVpcs={availableVpcs}
             isLoadingVpcs={isLoadingVpcs}
+            isFetchingVPCs={isFetchingVPCs}
             onResync={handleResync}
             lastSyncedAt={lastSyncedAt}
             cloudProvider={cloudProvider}

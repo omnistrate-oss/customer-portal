@@ -328,6 +328,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     availableRegions,
     availableVpcs,
     isLoadingVpcs,
+    isFetchingVPCs,
     isImporting,
     lastSyncedAt,
     bringOwnVpcsLocked,
@@ -1009,6 +1010,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               availableRegions={availableRegions}
               availableVpcs={availableVpcs}
               isLoadingVpcs={isLoadingVpcs}
+              isFetchingVPCs={isFetchingVPCs}
               onResync={handleResync}
               onImport={handleImport}
               onUnimport={handleUnimport}

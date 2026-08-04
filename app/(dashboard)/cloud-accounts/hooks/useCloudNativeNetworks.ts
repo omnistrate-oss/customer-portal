@@ -31,6 +31,7 @@ export type UseCloudNativeNetworksResult = {
   availableRegions: string[];
   availableVpcs: VpcRecord[];
   isLoadingVpcs: boolean;
+  isFetchingVPCs: boolean;
   isImporting: boolean;
   lastSyncedAt: string;
   bringOwnVpcsLocked: boolean;
@@ -133,13 +134,6 @@ const useCloudNativeNetworks = ({
     setVpcValues((previous) => (previous.bringOwnVpcs ? previous : { ...previous, bringOwnVpcs: true }));
   }, [bringOwnVpcsLocked]);
 
-  useEffect(() => {
-    if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {
-      void networksQuery.refetch();
-      void queryClient.invalidateQueries({ queryKey: RESOURCE_INSTANCE_QUERY_KEY });
-    }
-  }, [accountConfigId, isAccountConfigReady, vpcValues.selectedRegions, networksQuery.refetch, queryClient]);
-
   const availableVpcs = useMemo<VpcRecord[]>(() => {
     const filtered =
       vpcValues.selectedRegions.length > 0
@@ -175,7 +169,9 @@ const useCloudNativeNetworks = ({
     return () => clearInterval(interval);
   }, [networksQuery.dataUpdatedAt]);
 
-  const isLoadingVpcs = networksQuery.isPending || networksQuery.isFetching || syncMutation.isPending;
+  const isLoadingVpcs = networksQuery.isPending;
+
+  const isFetchingVPCs = networksQuery.isFetching || syncMutation.isPending;
 
   const hasSyncedOnEmpty = useRef(false);
   useEffect(() => {
@@ -250,6 +246,7 @@ const useCloudNativeNetworks = ({
     availableRegions,
     availableVpcs,
     isLoadingVpcs,
+    isFetchingVPCs,
     isImporting: importMutation.isPending,
     lastSyncedAt,
     bringOwnVpcsLocked,
