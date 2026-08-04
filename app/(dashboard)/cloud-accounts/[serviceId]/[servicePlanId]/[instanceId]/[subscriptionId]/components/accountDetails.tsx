@@ -49,74 +49,47 @@ const IDENTITY_FIELDS: Record<CloudProvider, FieldDefinition[]> = {
 
 type CommandDefinition = FieldDefinition & {
   description: string;
-  /** URLs get an open-in-new-tab button; shell commands get quoted before they're copied. */
-  kind: "shell" | "url";
+  /** Quotes the fetched URL so the shell keeps its query string, as OffboardingInstructions does. */
+  quoteForShell?: boolean;
+  /** Commands that pull from the backend API must go through the portal proxy, as SetupPrivateClusterDialog does. */
+  proxyAccountSetupUrls?: boolean;
 };
 
-const SETUP_COMMANDS: Record<CloudProvider, CommandDefinition[]> = {
-  aws: [
-    {
-      key: "cloudformation_url",
-      label: "Account setup stack",
-      description: "Creates the IAM roles and policies that let the service provider operate this account.",
-      kind: "url",
-    },
-  ],
+/**
+ * Onboarding commands worth surfacing after the fact. AWS, Azure, OCI and Nebius are onboarded
+ * through flows that leave nothing useful to re-run from here, so they show no commands.
+ */
+const ONBOARDING_COMMANDS: Record<CloudProvider, CommandDefinition[]> = {
+  aws: [],
   gcp: [
     {
       key: "gcp_bootstrap_shell_script",
       label: "Set up account",
       description: "Run in Cloud Shell to grant the service provider access to this project.",
-      kind: "shell",
+      quoteForShell: true,
     },
     {
       key: "gcp_disconnect_shell_script",
       label: "Disconnect account",
       description: "Run in Cloud Shell to revoke the service provider's access to this project.",
-      kind: "shell",
+      quoteForShell: true,
     },
   ],
-  azure: [
-    {
-      key: "azure_bootstrap_shell_script",
-      label: "Set up account",
-      description: "Run in Azure Cloud Shell to grant the service provider access to this subscription.",
-      kind: "shell",
-    },
-    {
-      key: "azure_disconnect_shell_script",
-      label: "Disconnect account",
-      description: "Run in Azure Cloud Shell to revoke the service provider's access to this subscription.",
-      kind: "shell",
-    },
-  ],
-  oci: [
-    {
-      key: "oci_bootstrap_shell_script",
-      label: "Set up account",
-      description: "Run in Cloud Shell to grant the service provider access to this tenancy.",
-      kind: "shell",
-    },
-    {
-      key: "oci_disconnect_shell_script",
-      label: "Disconnect account",
-      description: "Run in Cloud Shell to revoke the service provider's access to this tenancy.",
-      kind: "shell",
-    },
-  ],
+  azure: [],
+  oci: [],
   nebius: [],
   "byoc-onprem": [
     {
       key: "byoc_onprem_install_command",
       label: "Install agent",
       description: "Run against the cluster to install the Dataplane Agent.",
-      kind: "shell",
+      proxyAccountSetupUrls: true,
     },
     {
       key: "byoc_onprem_uninstall_command",
       label: "Uninstall agent",
       description: "Run against the cluster to remove the Dataplane Agent.",
-      kind: "shell",
+      quoteForShell: true,
     },
   ],
 };
@@ -191,20 +164,33 @@ export const getAccountDetailRows = (instance: ResourceInstance, cloudProvider?:
   return rows;
 };
 
-export const getSetupCommands = (instance: ResourceInstance, cloudProvider?: CloudProvider): CommandListItem[] => {
-  const resultParams: ResultParams = getResultParams(instance);
-  const definitions = cloudProvider ? SETUP_COMMANDS[cloudProvider] : [];
+const URL_REGEX = /https?:\/\/[^\s"']+/g;
 
-  return definitions.flatMap(({ key, label, description, kind }) => {
-    const value = resultParams?.[key];
+export const getOnboardingCommands = (
+  instance: ResourceInstance,
+  cloudProvider?: CloudProvider,
+  getActionProxyUrl?: (downloadURL: string, absolute?: boolean) => string
+): CommandListItem[] => {
+  const resultParams: ResultParams = getResultParams(instance);
+  const definitions = cloudProvider ? ONBOARDING_COMMANDS[cloudProvider] : [];
+
+  return definitions.flatMap(({ key, label, description, quoteForShell, proxyAccountSetupUrls }) => {
+    const value: string = resultParams?.[key];
     if (!value) return [];
+
+    const command =
+      proxyAccountSetupUrls && getActionProxyUrl
+        ? value.replace(URL_REGEX, (rawUrl) =>
+            rawUrl.includes("/account-setup/") ? getActionProxyUrl(rawUrl, true) || rawUrl : rawUrl
+          )
+        : value;
 
     return [
       {
         title: label,
         description,
-        command: value,
-        ...(kind === "url" ? { href: value } : { copyValue: addQuotesToShellCommand(value) }),
+        command,
+        copyValue: quoteForShell ? addQuotesToShellCommand(command) : command,
       },
     ];
   });

@@ -9,7 +9,7 @@ const iconWrapperSx = { display: "flex", alignItems: "center" };
 
 const DISABLED_ICON_COLOR = "#D5D7DA";
 const UNSUPPORTED_PROVIDER_MESSAGE =
-  "Agent debug access and infrastructure permission controls are available only for AWS workload cloud accounts.";
+  "Agent debug access and infrastructure permission controls are available only for AWS cloud accounts.";
 
 type GovernanceControlsCellProps = {
   /** Route to the instance's Governance Controls tab. Omitted when the row's subscription is unresolved. */
