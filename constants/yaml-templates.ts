@@ -19,8 +19,8 @@ export const yamlTemplates = {
   postgresProviderHostedDT: Buffer.from(
     replaceAccountCredentials(readFileSync(`${__dirname}/templates/postgres-provider-hosted-dt.yaml`, "utf8"))
   ).toString("base64"),
-  supabaseBYOAHostedDT: Buffer.from(
-    replaceAccountCredentials(readFileSync(`${__dirname}/templates/supabase-byoa-hosted-dt.yaml`, "utf8"))
+  postgresBYOADT: Buffer.from(
+    replaceAccountCredentials(readFileSync(`${__dirname}/templates/postgres-byoa-dt.yaml`, "utf8"))
   ).toString("base64"),
   redisHelmProviderHosted: Buffer.from(
     replaceAccountCredentials(readFileSync(`${__dirname}/templates/redis-helm-provider-hosted.yaml`, "utf8"))
