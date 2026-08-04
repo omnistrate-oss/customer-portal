@@ -12,7 +12,9 @@ import {
   billingUsageDimensionFields,
   type BillingUsageTotals,
   getEmptyBillingUsageTotals,
+  getUsageDimensionChartLabel,
   getUsageDimensionChartOffset,
+  getUsageDimensionChartValue,
 } from "../utils/usageDimensions";
 
 function formatDate(inputDate) {
@@ -34,11 +36,21 @@ const Legend = () => {
   return (
     <Box display={"flex"} justifyContent={"flex-end"} flexWrap="wrap" gap={"17px"} mt="16px">
       {billingUsageDimensionFields.map((field) => (
-        <LegendItem key={field.dimension} bgColor={field.chartColor} title={field.dimension} />
+        <LegendItem key={field.dimension} bgColor={field.chartColor} title={getUsageDimensionChartLabel(field)} />
       ))}
     </Box>
   );
 };
+
+function formatTooltipValue(value: unknown) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return String(value ?? "");
+  }
+
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: 2,
+  });
+}
 
 export function handleYAxisShift(chartID: string, e: React.UIEvent<HTMLDivElement>) {
   const allAxis = document.querySelectorAll(`#${chartID} .recharts-yAxis`);
@@ -128,7 +140,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
         };
       }
 
-      dataHashByDate[date][field.rowField] += typeof value === "number" ? value : 0;
+      dataHashByDate[date][field.rowField] += getUsageDimensionChartValue(field, typeof value === "number" ? value : 0);
     });
     return Object.values(dataHashByDate).sort((itemA, itemB) => (itemA.date < itemB.date ? -1 : 1));
   }, [usagePerDayData]);
@@ -234,7 +246,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                             fontWeight: 400,
                           }}
                         >
-                          {entry.name}: {entry.value}
+                          {entry.name}: {formatTooltipValue(entry.value)}
                         </p>
                       ))}
                     </div>
@@ -247,7 +259,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                 <Bar
                   key={`bar-${field.rowField}`}
                   dataKey={field.rowField}
-                  name={field.dimension}
+                  name={getUsageDimensionChartLabel(field)}
                   barSize={10}
                   fill={field.chartColor}
                   radius={[4, 4, 4, 4]}
@@ -264,20 +276,15 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                     key={`line-${field.rowField}`}
                     type="monotone"
                     dataKey={field.rowField}
-                    name={field.dimension}
+                    name={getUsageDimensionChartLabel(field)}
                     stroke={field.chartColor}
                     strokeDasharray="3 3"
                     dot={false}
                     activeDot={(props) => (
-                      <circle
-                        {...props}
-                        transform={`translate(${offset}, 0)`}
-                        r={4}
-                        fill={field.chartColor}
-                      />
+                      <circle {...props} transform={`translate(${offset}, 0)`} r={4} fill={field.chartColor} />
                     )}
                     transform={`translate(${offset}, 0)`}
-                    />
+                  />
                 );
               })}
               <YAxis

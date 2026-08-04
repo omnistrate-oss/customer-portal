@@ -81,7 +81,7 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
           id: field.rowField,
           header: field.tableHeader,
           meta: {
-            minWidth: field.rowField === "deploymentCellHours" ? 190 : 150,
+            minWidth: field.rowField === "deploymentCellHours" || field.rowField === "gpu" ? 190 : 150,
           },
           cell: (data) => {
             return (

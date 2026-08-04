@@ -19,6 +19,7 @@ const usageDimensionIconMap = {
   "CPU core hours": ComputeIcon,
   "Replica hours": ReplicaIcon,
   "Deployment cell hours": DeploymentCellIcon,
+  "GPU millicore hours": ComputeIcon,
 };
 
 const UsageDimensionCard: FC<UsageDimensionCardProps> = (props) => {
