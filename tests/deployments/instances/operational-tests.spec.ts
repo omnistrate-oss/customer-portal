@@ -76,7 +76,10 @@ test.describe("Instances Page - Operational Tests", () => {
 
         console.log("Instance created:", instance?.id);
       } catch (e) {
-        guard.handleError(e instanceof BackendError ? e : new BackendError(e instanceof Error ? e.message : String(e)));
+        guard.handleError(
+          e instanceof BackendError ? e : new BackendError(e instanceof Error ? e.message : String(e)),
+          "beforeEach"
+        );
       }
     }
   });
