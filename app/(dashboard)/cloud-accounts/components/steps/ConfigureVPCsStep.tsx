@@ -4,7 +4,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Autocomplete, Box, Chip, Tooltip as MuiTooltip, Stack, TextField } from "@mui/material";
+import { Box, Chip, Tooltip as MuiTooltip, Stack } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
@@ -12,6 +12,7 @@ import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
 import DataGrid from "src/components/DataGrid/DataGrid";
+import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
@@ -593,33 +594,7 @@ enableDnsSupport   = true`}</CodeBlock>
                 value={values.selectedRegions}
                 onChange={(_, newValue) => onChange({ selectedRegions: newValue, selectedVpcIds: [] })}
                 disableCloseOnSelect
-                renderTags={(tagValue, getTagProps) =>
-                  tagValue.map((option, index) => (
-                    <Chip
-                      {...getTagProps({ index })}
-                      key={option}
-                      label={option}
-                      size="small"
-                      sx={{
-                        borderRadius: "6px",
-                        border: "1px solid #D0D5DD",
-                        height: "24px",
-                      }}
-                    />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={values.selectedRegions.length === 0 ? "Select regions" : ""}
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "8px",
-                      },
-                    }}
-                  />
-                )}
+                placeholder="Select regions"
                 data-testid="regions-autocomplete"
               />
 
