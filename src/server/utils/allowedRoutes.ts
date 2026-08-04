@@ -71,6 +71,8 @@ const allowedRoutes: AllowedRoute[] = [
 
   // ─── Account Config ─────────────────────────────────────────────────
   { method: "GET", pattern: "/2022-09-01-00/accountconfig/:id" },
+  { method: "PUT", pattern: "/2022-09-01-00/accountconfig/:id" },
+  { method: "GET", pattern: "/2022-09-01-00/accountconfig/nebius/tenant/:nebiusTenantID" },
   {
     method: "GET",
     pattern: "/2022-09-01-00/accountconfig/:id/cloud-native-networks",
@@ -82,16 +84,6 @@ const allowedRoutes: AllowedRoute[] = [
   {
     method: "POST",
     pattern: "/2022-09-01-00/accountconfig/:id/cloud-native-networks/import",
-  },
-  {
-    method: "POST",
-    pattern:
-      "/2022-09-01-00/accountconfig/:id/cloud-native-networks/:cloudNativeNetworkId/import",
-  },
-  {
-    method: "POST",
-    pattern:
-      "/2022-09-01-00/accountconfig/:id/cloud-native-networks/:cloudNativeNetworkId/unimport",
   },
 
   // ─── Resource Instance — top-level ──────────────────────────────────

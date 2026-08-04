@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import Chip from "components/Chip/Chip";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -14,12 +14,16 @@ import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
 
-import { getCloudNativeNetworkRegions, hasCloudNativeVpcConfiguration } from "../utils";
+import useCloudNativeNetworks from "../hooks/useCloudNativeNetworks";
+import { hasCloudNativeVpcConfiguration } from "../utils";
 
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
-import ConfigureVPCsStep, { ConfigureVPCsFormValues, VpcRecord } from "./steps/ConfigureVPCsStep";
+import ConfigureVPCsStep from "./steps/ConfigureVPCsStep";
 
 const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
+const TERMINAL_STATUSES = [...READY_STATUSES, "FAILED"];
+const POLL_INTERVAL_MS = 5_000;
+const POLL_MAX_DURATION_MS = 2 * 60 * 1000;
 
 type ModifyVPCsDrawerProps = {
   selectedInstance: ResourceInstance;
@@ -33,23 +37,6 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   const hasShownRefreshError = useRef(false);
 
   const { subscriptionsObj, serviceOfferingsObj, servicesObj } = useGlobalData();
-
-  const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
-    enableNewVpcs: true,
-    bringOwnVpcs: false,
-    selectedRegions: [],
-    selectedVpcIds: [],
-  });
-  const hasHydratedVpcRegions = useRef(false);
-  const previousVpcContextKey = useRef(selectedInstance.id);
-
-  useEffect(() => {
-    if (previousVpcContextKey.current === selectedInstance.id) return;
-
-    previousVpcContextKey.current = selectedInstance.id;
-    hasHydratedVpcRegions.current = false;
-    setVpcValues((previous) => ({ ...previous, selectedRegions: [], selectedVpcIds: [] }));
-  }, [selectedInstance.id]);
 
   // ─── Derive account config data from the selected instance ────────────────
   const resultParams = useMemo(() => getResultParams(selectedInstance), [selectedInstance]);
@@ -79,146 +66,26 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     accountConfigStatus && READY_STATUSES.includes(accountConfigStatus.toUpperCase())
   );
 
-  // ─── Cloud native networks query ──────────────────────────────────────────
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: { id: accountConfigId || "" },
-      },
-      headers: { "x-ignore-global-error": true },
-    },
-    {
-      enabled: Boolean(accountConfigId && isAccountConfigReady),
-      retry: 2,
-      retryDelay: 3000,
-    }
-  );
-
-  const syncCloudNativeNetworksMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/sync",
-    {
-      onSuccess: () => {
-        cloudNativeNetworksQuery.refetch();
-        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
-      },
-    }
-  );
-
-  const allCloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
-  );
-
-  const bringOwnVpcsLocked = hasSelectedInstanceCloudNativeVpc || allCloudNativeNetworks.length > 0;
-
-  useEffect(() => {
-    if (!bringOwnVpcsLocked) return;
-    setVpcValues((previous) => (previous.bringOwnVpcs ? previous : { ...previous, bringOwnVpcs: true }));
-  }, [bringOwnVpcsLocked]);
-
-  const networkRegions = useMemo(() => getCloudNativeNetworkRegions(allCloudNativeNetworks), [allCloudNativeNetworks]);
-
-  useEffect(() => {
-    if (!cloudNativeNetworksQuery.isSuccess || networkRegions.length === 0) return;
-    if (hasHydratedVpcRegions.current) return;
-
-    hasHydratedVpcRegions.current = true;
-    setVpcValues((previous) => ({
-      ...previous,
-      bringOwnVpcs: true,
-      selectedRegions: networkRegions,
-      selectedVpcIds: [],
-    }));
-  }, [cloudNativeNetworksQuery.isSuccess, networkRegions]);
-
-  useEffect(() => {
-    if (accountConfigId && isAccountConfigReady && vpcValues.selectedRegions.length > 0) {
-      void cloudNativeNetworksQuery.refetch();
-      void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
-    }
-  }, [accountConfigId, isAccountConfigReady, vpcValues.selectedRegions, cloudNativeNetworksQuery.refetch, queryClient]);
-
-  // ─── Regions ──────────────────────────────────────────────────────────────
-  const availableRegions = networkRegions;
-
-  // ─── VPCs ─────────────────────────────────────────────────────────────────
-  const availableVpcs = useMemo<VpcRecord[]>(() => {
-    const filteredNetworks =
-      vpcValues.selectedRegions.length > 0
-        ? allCloudNativeNetworks.filter((network) => vpcValues.selectedRegions.includes(network.region))
-        : allCloudNativeNetworks;
-
-    return filteredNetworks.map((network) => {
-      return {
-        id: network.cloudNativeNetworkId || network.id,
-        name: network.name || network.cloudNativeNetworkId || network.id,
-        region: network.region,
-        status: network.status || "PENDING",
-        statusMessage: network.statusMessage,
-        networkId: network.cloudNativeNetworkId,
-        imported: network.imported,
-        inUse: network.inUse,
-      };
-    });
-  }, [allCloudNativeNetworks, vpcValues.selectedRegions]);
-
-  const [lastSyncedAt, setLastSyncedAt] = useState("");
-  useEffect(() => {
-    if (!cloudNativeNetworksQuery.dataUpdatedAt) {
-      setLastSyncedAt("");
-      return;
-    }
-
-    const update = () => {
-      const diff = Math.round((Date.now() - cloudNativeNetworksQuery.dataUpdatedAt) / 60000);
-      setLastSyncedAt(diff < 1 ? "Just now" : `${diff} min ago`);
-    };
-
-    update();
-    const interval = setInterval(update, 60000);
-    return () => clearInterval(interval);
-  }, [cloudNativeNetworksQuery.dataUpdatedAt]);
-
-  const isLoadingVpcs = cloudNativeNetworksQuery.isFetching || syncCloudNativeNetworksMutation.isPending;
-
-  const cloudNativeNetworksMutation = $api.useMutation(
-    "post",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/import",
-    {
-      onSuccess: () => {
-        void cloudNativeNetworksQuery.refetch();
-        void queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/resource-instance"] });
-        setVpcValues((previous) => ({ ...previous, selectedVpcIds: [] }));
-        snackbar.showSuccess("VPC configuration updated");
-      },
-      onError: () => snackbar.showError("Failed to update VPC configuration. Please try again."),
-    }
-  );
-
-  const handleNetworkAction = (networkIds: string[], imported: boolean) => {
-    if (!accountConfigId || networkIds.length === 0) return;
-    cloudNativeNetworksMutation.mutate({
-      params: { path: { id: accountConfigId } },
-      body: {
-        cloudNativeNetworks: networkIds.flatMap((cloudNativeNetworkId) => {
-          const network = availableVpcs.find((vpc) => vpc.id === cloudNativeNetworkId);
-          return network?.region ? [{ cloudNativeNetworkId, import: imported, region: network.region }] : [];
-        }),
-      },
-    });
-  };
-
-  const handleResyncVpcs = () => {
-    if (!accountConfigId) return;
-    syncCloudNativeNetworksMutation.mutate({
-      params: { path: { id: accountConfigId } },
-      headers: { "x-ignore-global-error": "true" },
-      body: {},
-    });
-  };
+  // ─── Cloud native networks ────────────────────────────────────────────────
+  const {
+    vpcValues,
+    setVpcValues,
+    availableRegions,
+    availableVpcs,
+    isLoadingVpcs,
+    isImporting,
+    lastSyncedAt,
+    bringOwnVpcsLocked,
+    emptyStateMessage,
+    handleResync,
+    handleImport,
+    handleUnimport,
+  } = useCloudNativeNetworks({
+    accountConfigId,
+    isAccountConfigReady,
+    hasExistingCloudNativeVpc: hasSelectedInstanceCloudNativeVpc,
+    contextKey: selectedInstance.id as string,
+  });
 
   const updateCloudAccountMutation = $api.useMutation(
     "patch",
@@ -234,6 +101,11 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   );
 
   // ─── Polling for account config readiness ─────────────────────────────────
+  // Depend on the instance id/subscription rather than the instance object: the object gets a
+  // fresh identity on every list refetch, which would restart the poll and defeat its backoff.
+  const instanceId = selectedInstance.id;
+  const instanceSubscriptionId = selectedInstance.subscriptionId;
+
   const fetchInstanceDetails = useCallback(async () => {
     const resource = offering?.resourceParameters?.find((r) => r.resourceId.startsWith("r-injectedaccountconfig"));
     if (!resource || !offering) return;
@@ -245,37 +117,43 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
       offering.serviceModelURLKey,
       offering.productTierURLKey,
       resource.urlKey,
-      selectedInstance.id,
-      selectedInstance.subscriptionId
+      instanceId,
+      instanceSubscriptionId
     );
-  }, [selectedInstance, offering]);
+  }, [instanceId, instanceSubscriptionId, offering]);
 
   useEffect(() => {
-    if (!vpcValues.bringOwnVpcs || !selectedInstance || (accountConfigId && isAccountConfigReady)) return;
+    if (!vpcValues.bringOwnVpcs || !instanceId || (accountConfigId && isAccountConfigReady)) return;
 
     let cancelled = false;
     let retryTimer: ReturnType<typeof setTimeout>;
+    const startedAt = Date.now();
 
     const poll = async () => {
       try {
         const response = await fetchInstanceDetails();
+        if (cancelled) return;
+
         const ri = response?.data;
         const refreshedParams = getResultParams(ri);
-        if (!cancelled && refreshedParams) {
-          // Invalidate the instances list so derived data updates
-          queryClient.invalidateQueries({
+        const status = String(refreshedParams.account_config_status || ri?.status || "").toUpperCase();
+
+        if (TERMINAL_STATUSES.includes(status)) {
+          // Refresh the instances list once we're done so derived data picks up the new status
+          void queryClient.invalidateQueries({
             queryKey: ["get", "/2022-09-01-00/resource-instance", { params: { query: { environmentType } } }],
           });
-          const status = refreshedParams.account_config_status || ri?.status;
-          if (!(status && READY_STATUSES.includes(status)) && !cancelled) {
-            retryTimer = setTimeout(poll, 5000);
-          }
+          return;
         }
       } catch {
         if (!cancelled && !hasShownRefreshError.current) {
           hasShownRefreshError.current = true;
           snackbar.showError("Unable to refresh account configuration. Please try again.");
         }
+      }
+
+      if (!cancelled && Date.now() - startedAt < POLL_MAX_DURATION_MS) {
+        retryTimer = setTimeout(poll, POLL_INTERVAL_MS);
       }
     };
 
@@ -287,7 +165,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   }, [
     accountConfigId,
     isAccountConfigReady,
-    selectedInstance,
+    instanceId,
     fetchInstanceDetails,
     vpcValues.bringOwnVpcs,
     queryClient,
@@ -430,21 +308,15 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             availableRegions={availableRegions}
             availableVpcs={availableVpcs}
             isLoadingVpcs={isLoadingVpcs}
-            onResync={handleResyncVpcs}
+            onResync={handleResync}
             lastSyncedAt={lastSyncedAt}
             cloudProvider={cloudProvider}
             privateConnectivityEnabled={privateConnectivityEnabled}
             bringOwnVpcsLocked={bringOwnVpcsLocked}
-            onImport={(ids) => handleNetworkAction(ids, true)}
-            onUnimport={(ids) => handleNetworkAction(ids, false)}
-            isImporting={cloudNativeNetworksMutation.isPending}
-            emptyStateMessage={
-              cloudNativeNetworksQuery.isError
-                ? "Unable to load VPCs from the account configuration. Click Resync to try again."
-                : availableRegions.length === 0
-                  ? "No cloud-native VPCs were returned for this account configuration. Click Resync to discover them."
-                  : "No VPCs found for the selected regions. Click Resync to fetch."
-            }
+            onImport={handleImport}
+            onUnimport={handleUnimport}
+            isImporting={isImporting}
+            emptyStateMessage={emptyStateMessage}
           />
         </div>
 

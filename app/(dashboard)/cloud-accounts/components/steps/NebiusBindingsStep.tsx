@@ -42,7 +42,6 @@ interface NebiusBinding {
 export interface NebiusBindingsStepProps {
   accountConfigId?: string;
   nebiusTenantId?: string;
-  fetchClickedInstanceDetails?: () => Promise<any>;
 }
 
 const emptyBinding = (): NebiusBinding => ({
@@ -52,6 +51,9 @@ const emptyBinding = (): NebiusBinding => ({
   privateKeyPEM: "",
   ownsArtifactBucket: false,
 });
+
+const isBindingComplete = (binding: NebiusBinding): boolean =>
+  Boolean(binding.projectID && binding.serviceAccountID && binding.publicKeyID && binding.privateKeyPEM);
 
 const bindingFields: Array<{
   field: keyof Pick<NebiusBinding, "projectID" | "serviceAccountID" | "publicKeyID" | "privateKeyPEM">;
@@ -70,7 +72,7 @@ const bindingFields: Array<{
     field: "serviceAccountID",
     label: "Service Account ID",
     description: "Service account with project-level permissions to create and manage required infrastructure.",
-    placeholder: "sa-omnistrate-staging",
+    placeholder: "sa-example-staging",
   },
   {
     field: "publicKeyID",
@@ -229,22 +231,25 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
       if (!accountConfigId) throw new Error("Account config ID not available");
       const res = await apiClient.PUT("/2022-09-01-00/accountconfig/{id}", {
         params: { path: { id: accountConfigId } },
+        // nebiusBindings is a full replacement set — send every binding, never a subset,
+        // or the omitted ones are deleted server-side. See isBindingComplete/assertBindingsComplete.
         body: {
-          nebiusBindings: updatedBindings
-            .filter((b) => b.projectID && b.serviceAccountID && b.publicKeyID && b.privateKeyPEM)
-            .map((b) => ({
-              projectID: b.projectID,
-              serviceAccountID: b.serviceAccountID,
-              publicKeyID: b.publicKeyID,
-              privateKeyPEM: b.privateKeyPEM,
-              ownsArtifactBucket: b.ownsArtifactBucket,
-            })),
+          nebiusBindings: updatedBindings.map((b) => ({
+            projectID: b.projectID,
+            serviceAccountID: b.serviceAccountID,
+            publicKeyID: b.publicKeyID,
+            privateKeyPEM: b.privateKeyPEM,
+            ownsArtifactBucket: b.ownsArtifactBucket,
+          })),
         },
       });
       return res;
     },
     onSuccess: () => {
       snackbar.showSuccess("Bindings updated successfully. Verifying...");
+      // Drop the private keys from memory now that they're persisted
+      setBindings((prev) => prev.map((b) => ({ ...b, privateKeyPEM: "" })));
+      setEditingIndexes([]);
       // Re-fetch after a short delay to get updated statuses
       setTimeout(() => {
         fetchBindings();
@@ -255,6 +260,22 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
     },
   });
 
+  // Every save rewrites the full binding set, and previously-saved bindings come back from the
+  // API with their private key redacted. So the whole list has to be complete before we can
+  // persist anything — otherwise the omitted bindings are deleted server-side.
+  const assertBindingsComplete = (candidates: NebiusBinding[]): boolean => {
+    const incomplete = candidates
+      .map((binding, index) => (isBindingComplete(binding) ? null : index + 1))
+      .filter((position): position is number => position !== null);
+
+    if (incomplete.length === 0) return true;
+
+    snackbar.showError(
+      `Saving replaces all bindings for this tenant, so every binding must include its Private Key PEM. Complete Binding ${incomplete.join(", ")} first.`
+    );
+    return false;
+  };
+
   const handleAddBinding = () => {
     const newBindings = [...bindings, emptyBinding()];
     setBindings(newBindings);
@@ -264,6 +285,11 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
 
   const handleDeleteBinding = (index: number) => {
     const newBindings = bindings.filter((_, i) => i !== index);
+    // If the binding had a status (was saved), we need to update the server
+    const wasPersisted = Boolean(bindings[index]?.status);
+
+    if (wasPersisted && !assertBindingsComplete(newBindings)) return;
+
     setBindings(newBindings);
     setExpandedIndex(false);
     setEditingIndexes((prev) =>
@@ -271,8 +297,8 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
         .filter((editingIndex) => editingIndex !== index)
         .map((editingIndex) => (editingIndex > index ? editingIndex - 1 : editingIndex))
     );
-    // If the binding had a status (was saved), we need to update the server
-    if (bindings[index]?.status) {
+
+    if (wasPersisted) {
       updateBindingsMutation.mutate(newBindings);
     }
   };
@@ -282,11 +308,11 @@ const NebiusBindingsStep: React.FC<NebiusBindingsStepProps> = ({ accountConfigId
   };
 
   const handleVerify = (index: number) => {
-    const binding = bindings[index];
-    if (!binding.projectID || !binding.serviceAccountID || !binding.publicKeyID || !binding.privateKeyPEM) {
+    if (!isBindingComplete(bindings[index])) {
       snackbar.showError("Please fill in all required fields before verifying.");
       return;
     }
+    if (!assertBindingsComplete(bindings)) return;
     updateBindingsMutation.mutate(bindings);
   };
 

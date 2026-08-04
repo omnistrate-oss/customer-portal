@@ -43,37 +43,16 @@ export type CloudNativeNetworkState = {
 const isFailedCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.status?.toUpperCase() === "FAILED";
 
-export const getCloudNativeNetworkId = (network: CloudNativeNetworkState): string | undefined =>
-  network.cloudNativeNetworkId || network.id;
-
 export const canImportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.imported === false && network.inUse === false && !isFailedCloudNativeNetwork(network);
 
 export const canUnimportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.imported === true && network.inUse === false && !isFailedCloudNativeNetwork(network);
 
-export const getCloudNativeNetworkDisabledReason = (network: CloudNativeNetworkState): string | undefined => {
-  if (isFailedCloudNativeNetwork(network)) return "This VPC failed discovery and cannot be selected.";
-  if (network.inUse && network.imported) return "This VPC is already imported and in use, so it cannot be changed.";
-  if (network.inUse) return "This VPC is already in use, so it cannot be changed.";
-  return undefined;
-};
-
 export const getCloudNativeNetworkRegions = (networks: CloudNativeNetworkState[]): string[] =>
   Array.from(
     new Set(networks.map((network) => network.region).filter((region): region is string => Boolean(region)))
   ).sort((a, b) => a.localeCompare(b));
-
-export const getDefaultSelectedRegions = (regions: string[]): string[] =>
-  Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
-
-export const getSelectableCloudNativeNetworkIds = (networks: CloudNativeNetworkState[]): Set<string> =>
-  new Set(
-    networks
-      .filter((network) => canImportCloudNativeNetwork(network) || canUnimportCloudNativeNetwork(network))
-      .map(getCloudNativeNetworkId)
-      .filter((id): id is string => Boolean(id))
-  );
 
 export const isBringOwnVpcsSupported = (cloudProvider?: string): boolean =>
   BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS.includes(
@@ -174,14 +153,14 @@ export const getInitialValues = (
                 : resultParams?.cluster_name
                   ? "byoc-onprem"
                   : "",
-      accountConfigurationMethod: resultParams?.account_configuration_method,
-      awsAccountId: resultParams?.aws_account_id,
-      gcpProjectId: resultParams?.gcp_project_id,
-      gcpProjectNumber: resultParams?.gcp_project_number,
-      azureSubscriptionId: resultParams?.azure_subscription_id,
-      azureTenantId: resultParams?.azure_tenant_id,
-      ociTenancyId: resultParams?.oci_tenancy_id,
-      ociDomainId: resultParams?.oci_domain_id,
+      accountConfigurationMethod: resultParams?.account_configuration_method || "",
+      awsAccountId: resultParams?.aws_account_id || "",
+      gcpProjectId: resultParams?.gcp_project_id || "",
+      gcpProjectNumber: resultParams?.gcp_project_number || "",
+      azureSubscriptionId: resultParams?.azure_subscription_id || "",
+      azureTenantId: resultParams?.azure_tenant_id || "",
+      ociTenancyId: resultParams?.oci_tenancy_id || "",
+      ociDomainId: resultParams?.oci_domain_id || "",
       nebiusTenantId: resultParams?.nebius_tenant_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",

@@ -36,7 +36,7 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -429,12 +429,9 @@ const CloudAccountsPage = () => {
           id: "allowNewVPCs",
           header: "Allow New VPCs",
           cell: (data) => {
-            const resultParams = getResultParams(data.row.original);
-            if (!resultParams?.aws_account_id) return "-";
-            const isEnabled = isPrivateLinkEnabled(resultParams);
-            return (
-              <StatusChip category={isEnabled ? "success" : "failed"} label={isEnabled ? "Enabled" : "Disabled"} />
-            );
+            const value = data.getValue();
+            if (value === "NA") return "-";
+            return <StatusChip label={value} category={value === "Yes" ? "success" : "unknown"} />;
           },
           meta: {
             minWidth: 100,
