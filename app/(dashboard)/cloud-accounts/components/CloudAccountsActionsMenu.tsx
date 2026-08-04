@@ -169,7 +169,7 @@ const CloudAccountsActionMenu: React.FC<CloudAccountsActionMenuProps> = ({
     const modifyVpcsDisabledMessage = !instance
       ? "Please select a cloud account"
       : isModifyVpcStatusBlocked
-        ? "Modify VPCs is not allowed for failed or deleted cloud accounts"
+        ? "Modify VPCs is not allowed for failed or deleting/deleted cloud accounts"
         : !isUpdateAllowedByRBAC
           ? "Unauthorized to modify VPCs"
           : !isModifyVpcsSupportedProvider

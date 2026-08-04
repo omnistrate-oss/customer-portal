@@ -57,7 +57,12 @@ const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = 
         return (
           <Fragment key={command.title}>
             <Stack p="0px 24px" borderRight="1px solid #E9EAEB" marginTop="25px" marginBottom={isLast ? "25px" : "0px"}>
-              <Text size="xsmall" weight="semibold" color="#414651" data-testid={titleTestId}>
+              <Text
+                size="xsmall"
+                weight="semibold"
+                color="#414651"
+                data-testid={titleTestId && `${titleTestId}-${index}`}
+              >
                 {command.title}
               </Text>
               <Text size="small" weight="regular" color="#535862" marginTop="2px">

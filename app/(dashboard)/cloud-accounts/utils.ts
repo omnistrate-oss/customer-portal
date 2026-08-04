@@ -43,37 +43,16 @@ export type CloudNativeNetworkState = {
 const isFailedCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.status?.toUpperCase() === "FAILED";
 
-export const getCloudNativeNetworkId = (network: CloudNativeNetworkState): string | undefined =>
-  network.cloudNativeNetworkId || network.id;
-
 export const canImportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.imported === false && network.inUse === false && !isFailedCloudNativeNetwork(network);
 
 export const canUnimportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
   network.imported === true && network.inUse === false && !isFailedCloudNativeNetwork(network);
 
-export const getCloudNativeNetworkDisabledReason = (network: CloudNativeNetworkState): string | undefined => {
-  if (isFailedCloudNativeNetwork(network)) return "This VPC failed discovery and cannot be selected.";
-  if (network.inUse && network.imported) return "This VPC is already imported and in use, so it cannot be changed.";
-  if (network.inUse) return "This VPC is already in use, so it cannot be changed.";
-  return undefined;
-};
-
 export const getCloudNativeNetworkRegions = (networks: CloudNativeNetworkState[]): string[] =>
   Array.from(
     new Set(networks.map((network) => network.region).filter((region): region is string => Boolean(region)))
   ).sort((a, b) => a.localeCompare(b));
-
-export const getDefaultSelectedRegions = (regions: string[]): string[] =>
-  Array.from(new Set(regions)).sort((a, b) => a.localeCompare(b));
-
-export const getSelectableCloudNativeNetworkIds = (networks: CloudNativeNetworkState[]): Set<string> =>
-  new Set(
-    networks
-      .filter((network) => canImportCloudNativeNetwork(network) || canUnimportCloudNativeNetwork(network))
-      .map(getCloudNativeNetworkId)
-      .filter((id): id is string => Boolean(id))
-  );
 
 export const isBringOwnVpcsSupported = (cloudProvider?: string): boolean =>
   BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS.includes(
@@ -174,14 +153,14 @@ export const getInitialValues = (
                 : resultParams?.cluster_name
                   ? "byoc-onprem"
                   : "",
-      accountConfigurationMethod: resultParams?.account_configuration_method,
-      awsAccountId: resultParams?.aws_account_id,
-      gcpProjectId: resultParams?.gcp_project_id,
-      gcpProjectNumber: resultParams?.gcp_project_number,
-      azureSubscriptionId: resultParams?.azure_subscription_id,
-      azureTenantId: resultParams?.azure_tenant_id,
-      ociTenancyId: resultParams?.oci_tenancy_id,
-      ociDomainId: resultParams?.oci_domain_id,
+      accountConfigurationMethod: resultParams?.account_configuration_method || "",
+      awsAccountId: resultParams?.aws_account_id || "",
+      gcpProjectId: resultParams?.gcp_project_id || "",
+      gcpProjectNumber: resultParams?.gcp_project_number || "",
+      azureSubscriptionId: resultParams?.azure_subscription_id || "",
+      azureTenantId: resultParams?.azure_tenant_id || "",
+      ociTenancyId: resultParams?.oci_tenancy_id || "",
+      ociDomainId: resultParams?.oci_domain_id || "",
       nebiusTenantId: resultParams?.nebius_tenant_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
@@ -308,22 +287,24 @@ export const getCloudAccountProvider = (resultParams: Record<string, any>): Clou
   return undefined;
 };
 
-const CLOUDFORMATION_QUICKCREATE_PATH = "#/stacks/quickcreate";
-const CLOUDFORMATION_UPDATE_PATH = "#/stacks/update";
+const CLOUDFORMATION_STACKS_PATH = "#/stacks";
+const DEFAULT_STACK_NAME = "AccountConfigSetup";
+
+/** The stack the account controls live on, read off the onboarding URL's `stackName` param. */
+export const getAccountConfigStackName = (cloudFormationUrl: string): string =>
+  cloudFormationUrl.match(/[?&]stackName=([^&]+)/)?.[1] || DEFAULT_STACK_NAME;
 
 /**
- * Points a cloud account's CloudFormation URL at the existing stack's update form and sets
- * one account-control parameter. The onboarding URL uses `quickcreate`, which would create a
- * duplicate stack instead of changing the live one.
+ * Turns the account's CloudFormation onboarding URL into a console link listing that stack.
+ * The console ignores parameter values passed to its update form, so operators are sent to the
+ * filtered stack list and walked through the update by hand.
  */
-export const getAccountControlUrl = (cloudFormationUrl: string, parameter: string, value: boolean): string => {
-  const updateUrl = cloudFormationUrl.replace(CLOUDFORMATION_QUICKCREATE_PATH, CLOUDFORMATION_UPDATE_PATH);
-  const existingParam = new RegExp(`([?&]${parameter}=)[^&]*`);
+export const getAccountConfigStackUrl = (cloudFormationUrl: string): string => {
+  const stacksIndex = cloudFormationUrl.indexOf(CLOUDFORMATION_STACKS_PATH);
+  if (stacksIndex === -1) return cloudFormationUrl;
 
-  if (existingParam.test(updateUrl)) return updateUrl.replace(existingParam, `$1${value}`);
-
-  const fragment = updateUrl.slice(updateUrl.indexOf("#") + 1);
-  return `${updateUrl}${fragment.includes("?") ? "&" : "?"}${parameter}=${value}`;
+  const consoleUrl = cloudFormationUrl.slice(0, stacksIndex + CLOUDFORMATION_STACKS_PATH.length);
+  return `${consoleUrl}?filteringText=${getAccountConfigStackName(cloudFormationUrl)}`;
 };
 
 /**

@@ -258,6 +258,9 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
 
   const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
+  // The checkbox renders unchecked on unsupported providers, so gate the panel on the same
+  // condition — otherwise the region/VPC picker stays visible under an unchecked box.
+  const showVpcSelection = isBringOwnVpcsSupported(cloudProvider) && values.bringOwnVpcs;
   const selectableVpcIds = useMemo(
     () =>
       new Set(
@@ -373,12 +376,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
             {params.row.networkId || "-"}
           </Text>
         ),
-      },
-      {
-        field: "cidr",
-        headerName: "CIDR",
-        flex: 1,
-        minWidth: 100,
       },
     ],
     []
@@ -580,7 +577,7 @@ enableDnsSupport   = true`}</CodeBlock>
           })()}
 
           {/* Regions selector – shown when bringOwnVpcs is checked */}
-          {values.bringOwnVpcs && (
+          {showVpcSelection && (
             <Stack gap="8px">
               <Text size="small" weight="medium" color="#344054">
                 Regions
@@ -716,7 +713,7 @@ enableDnsSupport   = true`}</CodeBlock>
       </CardWithTitle>
 
       {/* Private connectivity instructions – shown for AWS with private connectivity */}
-      {isAwsWithPrivateConnect && values.bringOwnVpcs && (
+      {isAwsWithPrivateConnect && showVpcSelection && (
         <CardWithTitle
           title="Instructions to configure VPCs for private connectivity"
           actionButton={

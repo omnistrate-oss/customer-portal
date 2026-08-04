@@ -345,14 +345,15 @@ const InstanceForm = ({
         }
 
         // Remove internal _vpcType field and only send cloudNativeNetworkId for existing VPC selections.
+        // Only applies when the VPC chooser is in play — otherwise the legacy
+        // cloud_provider_native_network_id input is the source of truth and must pass through.
         if (data.requestParams._vpcType === "choose_existing") {
           delete data.requestParams.cloud_provider_native_network_id;
 
           if (!data.requestParams.cloudNativeNetworkId) {
             return snackbar.showError("VPC is required");
           }
-        } else {
-          delete data.requestParams.cloud_provider_native_network_id;
+        } else if (data.requestParams._vpcType) {
           delete data.requestParams.cloudNativeNetworkId;
         }
         delete data.requestParams._vpcType;
