@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, ReactNode, useState } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 
 import { ArrowUpRight, Copy02 } from "src/icons";
@@ -24,8 +24,8 @@ const CopyCommandButton = ({ text }: { text: string }) => {
   };
 
   return (
-    <Tooltip title={copied ? "Copied" : "Copy URL"}>
-      <IconButton aria-label="Copy URL" onClick={handleCopy} sx={{ ...actionButtonSx, mt: "10px" }}>
+    <Tooltip title={copied ? "Copied" : "Copy"}>
+      <IconButton aria-label="Copy" onClick={handleCopy} sx={{ ...actionButtonSx, mt: "10px" }}>
         <Copy02 />
       </IconButton>
     </Tooltip>
@@ -34,7 +34,8 @@ const CopyCommandButton = ({ text }: { text: string }) => {
 
 export type CommandListItem = {
   title: string;
-  description: string;
+  /** Rich content is allowed so steps can link out to consoles and guides. */
+  description: ReactNode;
   command: string;
   copyValue?: string;
   /** When the command is a URL, renders an open-in-new-tab button alongside the copy button. */

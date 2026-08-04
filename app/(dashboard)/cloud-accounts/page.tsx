@@ -272,7 +272,8 @@ const CloudAccountsPage = () => {
           );
         },
         meta: {
-          minWidth: 200,
+          // Fits the longest ids (Nebius tenant, on-prem cluster names) alongside the logo and copy button.
+          minWidth: 280,
         },
       }),
       columnHelper.accessor("status", {
