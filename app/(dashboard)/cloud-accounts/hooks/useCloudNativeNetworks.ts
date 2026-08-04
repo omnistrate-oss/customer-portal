@@ -175,7 +175,7 @@ const useCloudNativeNetworks = ({
     return () => clearInterval(interval);
   }, [networksQuery.dataUpdatedAt]);
 
-  const isLoadingVpcs = networksQuery.isFetching || syncMutation.isPending;
+  const isLoadingVpcs = networksQuery.isPending || networksQuery.isFetching || syncMutation.isPending;
 
   const hasSyncedOnEmpty = useRef(false);
   useEffect(() => {

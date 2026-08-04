@@ -17,6 +17,7 @@ import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
+import LoadingSpinner from "../../../../../src/components/LoadingSpinner/LoadingSpinner";
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
 export type VpcRecord = {
@@ -577,7 +578,9 @@ enableDnsSupport   = true`}</CodeBlock>
           })()}
 
           {/* Regions selector – shown when bringOwnVpcs is checked */}
-          {showVpcSelection && (
+          {isLoadingVpcs ? (
+            <LoadingSpinner />
+          ) : showVpcSelection ? (
             <Stack gap="8px">
               <Text size="small" weight="medium" color="#344054">
                 Regions
@@ -708,7 +711,7 @@ enableDnsSupport   = true`}</CodeBlock>
                 </Tooltip>
               </Stack>
             </Stack>
-          )}
+          ) : null}
         </Stack>
       </CardWithTitle>
 
