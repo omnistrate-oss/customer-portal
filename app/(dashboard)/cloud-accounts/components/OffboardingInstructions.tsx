@@ -1,3 +1,4 @@
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { Box, Stack, styled } from "@mui/material";
 import Link from "next/link";
 import { FC } from "react";
@@ -7,9 +8,8 @@ import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdMod
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 
 const StyledLink = styled(Link)({
-  textDecoration: "underline",
   color: "#7F56D9",
-  fontWeight: 700,
+  fontWeight: 400,
   // fontStyle: "italic",
 });
 
@@ -41,6 +41,16 @@ const ArrowBullet = (props) => (
     />
   </svg>
 );
+
+const StepBullet = styled(Box)({
+  display: "block",
+  width: "5px",
+  height: "5px",
+  flexShrink: 0,
+  marginTop: "8px",
+  borderRadius: "50%",
+  backgroundColor: "#344054",
+});
 
 export type OffboardInstructionDetails = {
   awsAccountID?: string;
@@ -142,18 +152,62 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
               <ArrowBullet />
             </ListItemIcon>
 
-            <Text size="medium" weight="regular" color="#374151">
-              {/* <b>Using CloudFormation:</b>  */}
-              Follow the provided steps{" "}
-              <StyledLink
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://docs.omnistrate.com/getting-started/account-offboarding/"
-              >
-                here
-              </StyledLink>{" "}
-              to complete the off-boarding process and revoke remaining access from your cloud account
-            </Text>
+            <Box overflow="hidden" flex={1}>
+              <Text size="medium" weight="regular" color="#374151">
+                Delete the CloudFormation stack that was created during onboarding:
+              </Text>
+              <List sx={{ marginTop: "8px", gap: "6px" }}>
+                <ListItem sx={{ gap: "8px" }}>
+                  <ListItemIcon>
+                    <StepBullet />
+                  </ListItemIcon>
+                  <Text size="small" weight="regular" color="#374151">
+                    Open the{" "}
+                    <StyledLink
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://console.aws.amazon.com/cloudformation/"
+                    >
+                      AWS CloudFormation Console
+                      <ArrowOutwardIcon
+                        sx={{
+                          fontSize: "1.3em !important",
+                          flexShrink: 0,
+                          color: "inherit",
+                          verticalAlign: "middle",
+                          ml: "2px",
+                        }}
+                        aria-hidden="true"
+                      />
+                    </StyledLink>
+                  </Text>
+                </ListItem>
+                <ListItem sx={{ gap: "8px" }}>
+                  <ListItemIcon>
+                    <StepBullet />
+                  </ListItemIcon>
+                  <Text size="small" weight="regular" color="#374151">
+                    Locate the Omnistrate onboarding stack
+                  </Text>
+                </ListItem>
+                <ListItem sx={{ gap: "8px" }}>
+                  <ListItemIcon>
+                    <StepBullet />
+                  </ListItemIcon>
+                  <Text size="small" weight="regular" color="#374151">
+                    Select the stack and choose Delete
+                  </Text>
+                </ListItem>
+                <ListItem sx={{ gap: "8px" }}>
+                  <ListItemIcon>
+                    <StepBullet />
+                  </ListItemIcon>
+                  <Text size="small" weight="regular" color="#374151">
+                    Wait for the stack deletion to complete
+                  </Text>
+                </ListItem>
+              </List>
+            </Box>
           </ListItem>
         )}
 
