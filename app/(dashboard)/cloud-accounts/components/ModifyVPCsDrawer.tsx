@@ -81,11 +81,13 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     handleResync,
     handleImport,
     handleUnimport,
+    hasConfigurationChanges,
   } = useCloudNativeNetworks({
     accountConfigId,
     isAccountConfigReady,
     hasExistingCloudNativeVpc: hasSelectedInstanceCloudNativeVpc,
     contextKey: selectedInstance.id as string,
+    initialEnableNewVpcs: resultParams?.allow_new_cloud_native_network_creation !== false,
   });
 
   const updateCloudAccountMutation = $api.useMutation(
@@ -329,7 +331,12 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             onNext={handleUpdate}
             nextLabel="Update"
             isNextLoading={updateCloudAccountMutation.isPending}
-            isNextDisabled={updateCloudAccountMutation.isPending}
+            isNextDisabled={
+              updateCloudAccountMutation.isPending ||
+              isLoadingVpcs ||
+              availableVpcs.length === 0 ||
+              !hasConfigurationChanges
+            }
           />
         </div>
       </div>

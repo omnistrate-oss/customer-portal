@@ -23,6 +23,8 @@ type UseCloudNativeNetworksParams = {
   enabled?: boolean;
   /** Kick off a sync the first time the list comes back empty. Wizard-only behaviour. */
   autoSyncWhenEmpty?: boolean;
+  /** Persisted setting used to initialize the new-VPC checkbox. */
+  initialEnableNewVpcs?: boolean;
 };
 
 export type UseCloudNativeNetworksResult = {
@@ -39,6 +41,7 @@ export type UseCloudNativeNetworksResult = {
   handleResync: () => void;
   handleImport: (vpcIds: string[]) => void;
   handleUnimport: (vpcIds: string[]) => void;
+  hasConfigurationChanges: boolean;
 };
 
 /**
@@ -54,12 +57,13 @@ const useCloudNativeNetworks = ({
   contextKey,
   enabled = true,
   autoSyncWhenEmpty = false,
+  initialEnableNewVpcs = true,
 }: UseCloudNativeNetworksParams): UseCloudNativeNetworksResult => {
   const queryClient = useQueryClient();
   const snackbar = useSnackbar();
 
   const [vpcValues, setVpcValues] = useState<ConfigureVPCsFormValues>({
-    enableNewVpcs: true,
+    enableNewVpcs: initialEnableNewVpcs,
     bringOwnVpcs: false,
     selectedRegions: [],
     selectedVpcIds: [],
@@ -67,14 +71,16 @@ const useCloudNativeNetworks = ({
 
   const previousContextKey = useRef(contextKey);
   const hasHydratedRegions = useRef(false);
+  const initialEnableNewVpcsRef = useRef(initialEnableNewVpcs);
 
   useEffect(() => {
     if (previousContextKey.current === contextKey) return;
 
     previousContextKey.current = contextKey;
     hasHydratedRegions.current = false;
+    initialEnableNewVpcsRef.current = initialEnableNewVpcs;
     setVpcValues((previous) => ({ ...previous, selectedRegions: [], selectedVpcIds: [] }));
-  }, [contextKey]);
+  }, [contextKey, initialEnableNewVpcs]);
 
   const networksQuery = $api.useQuery(
     "get",
@@ -172,6 +178,7 @@ const useCloudNativeNetworks = ({
   const isLoadingVpcs = networksQuery.isPending;
 
   const isFetchingVPCs = networksQuery.isFetching || syncMutation.isPending;
+  const hasConfigurationChanges = vpcValues.enableNewVpcs !== initialEnableNewVpcsRef.current;
 
   const hasSyncedOnEmpty = useRef(false);
   useEffect(() => {
@@ -254,6 +261,7 @@ const useCloudNativeNetworks = ({
     handleResync,
     handleImport: (vpcIds) => mutateImport(vpcIds, true),
     handleUnimport: (vpcIds) => mutateImport(vpcIds, false),
+    hasConfigurationChanges,
   };
 };
 
