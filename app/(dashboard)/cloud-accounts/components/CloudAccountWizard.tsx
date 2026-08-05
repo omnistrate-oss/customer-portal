@@ -206,7 +206,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         }
 
         setCurrentStep(1); // Move to Grant Access step
-        snackbar.showSuccess("Cloud Account created successfully");
       },
     }
   );

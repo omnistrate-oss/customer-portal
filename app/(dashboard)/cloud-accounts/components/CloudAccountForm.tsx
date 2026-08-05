@@ -220,7 +220,6 @@ const CloudAccountForm = ({
           setIsAccountCreation(true);
           setOverlayType("view-instructions-dialog");
         }
-        snackbar.showSuccess("Cloud Account created successfully");
       },
     }
   );
