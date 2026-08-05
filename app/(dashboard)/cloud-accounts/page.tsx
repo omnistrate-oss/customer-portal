@@ -483,7 +483,7 @@ const CloudAccountsPage = () => {
             if (value === "NA" || isNebius || isBYOCOnprem) {
               return "-";
             }
-            return <StatusChip label={value} category={value === "Enabled" ? "success" : "failed"} />;
+            return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
           },
           meta: {
             minWidth: 120,
