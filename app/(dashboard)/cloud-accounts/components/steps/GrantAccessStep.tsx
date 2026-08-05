@@ -528,7 +528,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   return (
     <CardWithTitle title="Grant Access">
       <Stack gap="20px">
-        <ChecklistItem label="Account configuration setup completed" isComplete={isSetupComplete} />
+        <ChecklistItem label="Account configurations added" isComplete={isSetupComplete} />
 
         <Box
           sx={{
