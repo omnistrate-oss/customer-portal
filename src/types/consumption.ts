@@ -26,7 +26,8 @@ export type UsageDimension =
   | "Storage GiB hours"
   | "CPU core hours"
   | "Replica hours"
-  | "Deployment cell hours";
+  | "Deployment cell hours"
+  | "GPU millicore hours";
 
 export type ConsumptionPaymentMethod = components["schemas"]["PaymentMethod"];
 
