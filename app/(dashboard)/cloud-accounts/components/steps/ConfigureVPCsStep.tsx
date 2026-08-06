@@ -8,6 +8,7 @@ import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
+import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
@@ -102,6 +103,22 @@ const VpcsDataGridHeader = ({
   selectedImportIds: string[];
   selectedUnimportIds: string[];
 }) => {
+  const selectedVpcs = selectedImportIds.length + selectedUnimportIds.length;
+  const importDisabledMessage = isImporting
+    ? "A VPC update is already in progress."
+    : selectedVpcs === 0
+      ? "Select an available VPC to import it."
+      : selectedImportIds.length === 0
+        ? "Only available VPCs can be imported."
+        : "";
+  const unimportDisabledMessage = isImporting
+    ? "A VPC update is already in progress."
+    : selectedVpcs === 0
+      ? "Select an imported VPC that is not in use to unimport it."
+      : selectedUnimportIds.length === 0
+        ? "Only imported VPCs that are not in use can be unimported."
+        : "";
+
   return (
     <>
       <Stack
@@ -131,47 +148,29 @@ const VpcsDataGridHeader = ({
               }}
             />
 
-            <Tooltip
-              title={
-                isImporting
-                  ? "A VPC update is already in progress."
-                  : selectedUnimportIds.length === 0
-                    ? "Select an imported VPC that is not in use to unimport it."
-                    : ""
-              }
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => onUnimport?.(selectedUnimportIds)}
+              disabled={isImporting || selectedUnimportIds.length === 0}
+              disabledMessage={unimportDisabledMessage}
+              data-testid="unimport-vpcs-button"
             >
-              <span>
-                <Button
-                  variant="outlined"
-                  onClick={() => onUnimport?.(selectedUnimportIds)}
-                  disabled={isImporting || selectedUnimportIds.length === 0}
-                  data-testid="unimport-vpcs-button"
-                >
-                  Unimport
-                  {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
-                </Button>
-              </span>
-            </Tooltip>
-            <Tooltip
-              title={
-                isImporting
-                  ? "A VPC update is already in progress."
-                  : selectedImportIds.length === 0
-                    ? "Select an available VPC to import it."
-                    : ""
-              }
+              Unimport
+              {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
+              {selectedUnimportIds.length > 0 && isImporting && <LoadingSpinnerSmall />}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => onImport?.(selectedImportIds)}
+              disabled={isImporting || selectedImportIds.length === 0}
+              disabledMessage={importDisabledMessage}
+              data-testid="import-vpcs-button"
             >
-              <span>
-                <Button
-                  variant="contained"
-                  onClick={() => onImport?.(selectedImportIds)}
-                  disabled={isImporting || selectedImportIds.length === 0}
-                  data-testid="import-vpcs-button"
-                >
-                  Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
-                </Button>
-              </span>
-            </Tooltip>
+              Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
+              {selectedImportIds.length > 0 && isImporting && <LoadingSpinnerSmall />}
+            </Button>
           </Stack>
         </Stack>
       </Stack>
