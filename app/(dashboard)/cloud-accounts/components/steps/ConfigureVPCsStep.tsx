@@ -434,7 +434,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                 </Tooltip>
 
                 <Text size="small" weight="medium">
-                  Enable creating new VPCs (enabled by default)
+                  Enable creating new VPCs
                 </Text>
               </Stack>
             );
