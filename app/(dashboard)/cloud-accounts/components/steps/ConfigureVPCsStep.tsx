@@ -27,6 +27,7 @@ export type VpcRecord = {
   region: string;
   statusMessage?: string;
   networkId?: string;
+  cidr?: string;
   imported?: boolean;
   inUse?: boolean;
 };
@@ -292,6 +293,29 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
             title={params.row.networkId}
           >
             {params.row.networkId || "-"}
+          </Text>
+        ),
+      },
+      {
+        field: "cidr",
+        headerName: "CIDR",
+        minWidth: 130,
+        flex: 0.8,
+        renderCell: (params) => (
+          <Text
+            size="small"
+            weight="regular"
+            color="#344054"
+            sx={{
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={params.row.cidr}
+          >
+            {params.row.cidr || "-"}
           </Text>
         ),
       },

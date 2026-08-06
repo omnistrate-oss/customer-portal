@@ -194,10 +194,17 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (!isMounted.current) return;
 
     const resultParams = getResultParams(resourceInstance);
-    const status = String(resultParams.account_config_status || resourceInstance?.status || "").toUpperCase();
-    if (resultParams?.cloud_provider_account_config_id) {
+    const status = String(resourceInstance?.status || resultParams.account_config_status || "").toUpperCase();
+    const hasInstructions =
+      (hasAwsAccount && !!resultParams.cloudformation_url) ||
+      (hasGcpAccount && !!resultParams.gcp_bootstrap_shell_script) ||
+      (hasAzureAccount && !!resultParams.azure_bootstrap_shell_script) ||
+      (hasOciAccount && !!resultParams.oci_bootstrap_shell_script);
+
+    if (resourceInstance) {
       setClickedInstance((prev: any) => ({
         ...prev,
+        status: resourceInstance.status || prev?.status,
         result_params: { ...getResultParams(prev), ...resultParams },
       }));
       queryClient.setQueryData(
@@ -210,17 +217,9 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           ),
         })
       );
-      setIsPolling(false);
-    } else if (status === "FAILED") {
-      setClickedInstance((prev: any) =>
-        prev
-          ? {
-              ...prev,
-              status: resourceInstance?.status || prev?.status,
-              result_params: { ...getResultParams(prev), ...resultParams, account_config_status: status },
-            }
-          : prev
-      );
+    }
+
+    if (status === "FAILED" || (resultParams?.cloud_provider_account_config_id && hasInstructions)) {
       setIsPolling(false);
     } else if (Date.now() - pollStartTimeRef.current < POLL_MAX_DURATION_MS) {
       timeoutId.current = setTimeout(startPolling, POLL_INTERVAL_MS);
@@ -252,7 +251,8 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const statusPollStart = useRef<number>(0);
 
   const accountConfigResultParams = getResultParams(selectedAccountConfig);
-  const accountConfigStatus = accountConfigResultParams.account_config_status || selectedAccountConfig?.status;
+  const accountConfigId = accountConfigResultParams.cloud_provider_account_config_id;
+  const accountConfigStatus = selectedAccountConfig?.status || accountConfigResultParams.account_config_status;
   const normalizedAccountConfigStatus = String(accountConfigStatus || "").toUpperCase();
   const isFailed = normalizedAccountConfigStatus === "FAILED";
   const isReady = ["READY", "RUNNING", "COMPLETE"].includes(normalizedAccountConfigStatus);
@@ -264,8 +264,8 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     (hasOciAccount && !!accountInstructionDetails?.ociBootstrapShellCommand);
 
   useEffect(() => {
-    // Start status polling once verification instructions are available and status is not terminal
-    if (!isVerificationComplete || isReady || isFailed || !fetchClickedInstanceDetails || !setClickedInstance) return;
+    // Start status polling as soon as the account config exists, even if instructions arrive later.
+    if (!accountConfigId || isReady || isFailed || !fetchClickedInstanceDetails || !setClickedInstance) return;
 
     setIsStatusPolling(true);
     statusPollStart.current = Date.now();
@@ -315,7 +315,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       if (statusPollTimer.current) clearTimeout(statusPollTimer.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVerificationComplete, isReady, isFailed]);
+  }, [accountConfigId, isReady, isFailed]);
 
   // Clean up status polling on unmount
   useEffect(() => {

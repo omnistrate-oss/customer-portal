@@ -320,9 +320,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const accountConfigStatus = useMemo(() => {
     const instance = clickedInstance || selectedInstance;
     const rp = getResultParams(instance);
-    // Check result_params first, then fall back to the instance status
-    if (typeof rp?.account_config_status === "string") return rp.account_config_status;
+    // Prefer the latest top-level instance status, then fall back to result_params.
     if (typeof instance?.status === "string") return instance.status;
+    if (typeof rp?.account_config_status === "string") return rp.account_config_status;
     return undefined;
   }, [clickedInstance, selectedInstance]);
 
@@ -459,7 +459,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               : prev
           );
           // If still not ready, retry after a delay
-          const status = String(refreshedParams.account_config_status || resourceInstance?.status || "").toUpperCase();
+          const status = String(resourceInstance?.status || refreshedParams.account_config_status || "").toUpperCase();
           if (!(status && (READY_STATUSES.includes(status) || status === "FAILED")) && !cancelled) {
             retryTimer = setTimeout(refreshAccountConfigId, 5000);
           }
