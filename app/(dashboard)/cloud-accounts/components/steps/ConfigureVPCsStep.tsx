@@ -1,11 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Box, Tooltip as MuiTooltip, Stack } from "@mui/material";
-import { useMemo } from "react";
+import { Box, Stack, Tooltip as MuiTooltip } from "@mui/material";
 
-import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
@@ -15,6 +14,7 @@ import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
@@ -257,50 +257,32 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         field: "status",
         headerName: "Status",
         flex: 0.6,
-        minWidth: 140,
+        minWidth: 90,
         renderCell: (params) => (
           <StatusChip status={params.row.status} category={vpcStatusCategoryMap[params.row.status] || "unknown"} />
         ),
       },
 
       {
+        field: "region",
+        headerName: "Regions",
+        flex: 0.55,
+        minWidth: 110,
+        valueGetter: (params) => params.row.region || "-",
+      },
+      {
         field: "imported",
         headerName: "Imported",
         flex: 0.55,
-        minWidth: 110,
+        minWidth: 80,
         valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
       },
       {
         field: "inUse",
-        headerName: "In use",
+        headerName: "In Use",
         flex: 0.55,
-        minWidth: 100,
+        minWidth: 70,
         valueGetter: (params) => (params.row.inUse ? "Yes" : "No"),
-      },
-
-      {
-        field: "statusMessage",
-        headerName: "Status Message",
-        flex: 1.2,
-        minWidth: 220,
-        renderCell: (params) => (
-          <Text
-            size="small"
-            weight="regular"
-            color="#344054"
-            sx={{
-              width: "100%",
-              minWidth: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              display: "block",
-            }}
-            title={params.row.statusMessage}
-          >
-            {params.row.statusMessage || "Available for deployments"}
-          </Text>
-        ),
       },
       {
         field: "networkId",
@@ -322,6 +304,30 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
             title={params.row.networkId}
           >
             {params.row.networkId || "-"}
+          </Text>
+        ),
+      },
+      {
+        field: "statusMessage",
+        headerName: "Status Message",
+        flex: 1.2,
+        minWidth: 220,
+        renderCell: (params) => (
+          <Text
+            size="small"
+            weight="regular"
+            color="#344054"
+            sx={{
+              width: "100%",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={params.row.statusMessage}
+          >
+            {params.row.statusMessage || "Available for deployments"}
           </Text>
         ),
       },
