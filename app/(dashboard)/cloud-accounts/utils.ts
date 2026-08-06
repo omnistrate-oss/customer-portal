@@ -197,7 +197,7 @@ export const getInitialValues = (
       nebiusTenantId: "",
       clusterName: "",
       clusterDescription: "",
-      enablePrivateConnectivity: false,
+      enablePrivateConnectivity: cloudProvider === "aws",
     };
   }
 
@@ -237,7 +237,7 @@ export const getInitialValues = (
     nebiusTenantId: "",
     clusterName: "",
     clusterDescription: "",
-    enablePrivateConnectivity: false,
+    enablePrivateConnectivity: cloudProvider === "aws",
   };
 };
 

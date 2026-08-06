@@ -29,7 +29,7 @@ import {
   getGcpServiceEmail,
 } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 
 import { CloudAccountValidationSchema } from "../constants";
 import useCloudNativeNetworks from "../hooks/useCloudNativeNetworks";
@@ -78,7 +78,11 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Step state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState<WizardStep>(0);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
-  const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(false);
+  const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(() =>
+    selectedInstance
+      ? isPrivateLinkEnabled(getResultParams(selectedInstance))
+      : initialFormValues?.cloudProvider === "aws"
+  );
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
@@ -301,6 +305,12 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   });
 
   const { values, setFieldValue } = formData;
+
+  useEffect(() => {
+    if (!selectedInstance) {
+      setEnablePrivateConnectivity(values.cloudProvider === "aws");
+    }
+  }, [selectedInstance, values.cloudProvider]);
 
   const accountConfigId = useMemo(() => {
     const rp = getResultParams(clickedInstance || selectedInstance);
@@ -605,6 +615,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   // @ts-ignore – CloudProviderRadio onChange signature is broader than the typed prop
                   onChange={(cp: string) => {
                     setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]);
+                    setEnablePrivateConnectivity(cp === "aws");
                   }}
                   disabled={false}
                 />
