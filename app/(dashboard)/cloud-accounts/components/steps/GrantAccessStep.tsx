@@ -1,10 +1,10 @@
 "use client";
 
-import { Box, Stack } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { Box, Stack } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
@@ -81,11 +81,33 @@ type ChecklistItemProps = {
   isComplete: boolean;
   isInProgress?: boolean;
   isFailed?: boolean;
+  connectorColor?: string;
   children?: React.ReactNode;
 };
 
-const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, children }: ChecklistItemProps) => (
-  <Stack direction="column" gap="12px">
+const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, connectorColor, children }: ChecklistItemProps) => (
+  <Stack
+    direction="column"
+    gap="12px"
+    sx={
+      connectorColor
+        ? {
+            position: "relative",
+            zIndex: 1,
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              top: "12px",
+              bottom: "-20px",
+              left: "11px",
+              width: "2px",
+              bgcolor: connectorColor,
+              zIndex: -1,
+            },
+          }
+        : { position: "relative", zIndex: 1 }
+    }
+  >
     <Stack direction="row" alignItems="center" gap="12px">
       <Box sx={{ flexShrink: 0 }}>
         {isFailed ? (
@@ -527,16 +549,26 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
 
   return (
     <CardWithTitle title="Grant Access">
-      <Stack gap="20px">
-        <ChecklistItem label="Account configurations added" isComplete={isSetupComplete} />
-
-        <Box
-          sx={{
+      <Stack
+        gap="20px"
+        sx={{
+          position: "relative",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: "12px",
+            bottom: "12px",
+            left: "11px",
             width: "2px",
-            height: "20px",
-            bgcolor: isSetupComplete ? "#079455" : "#E9EAEB",
-            ml: "11px",
-          }}
+            bgcolor: "#E9EAEB",
+            zIndex: 0,
+          },
+        }}
+      >
+        <ChecklistItem
+          label="Account configurations added"
+          isComplete={isSetupComplete}
+          connectorColor={isSetupComplete ? "#079455" : "#E9EAEB"}
         />
 
         <ChecklistItem
@@ -550,18 +582,10 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
           isComplete={isVerificationComplete && !isFailed}
           isInProgress={isRequestOrDataPending && !isVerificationComplete && !isFailed}
           isFailed={isFailed}
+          connectorColor={isVerificationComplete && !isFailed ? "#079455" : "#E9EAEB"}
         >
           {renderVerificationInstructions()}
         </ChecklistItem>
-
-        <Box
-          sx={{
-            width: "2px",
-            height: "20px",
-            bgcolor: isVerificationComplete && !isFailed ? "#079455" : "#E9EAEB",
-            ml: "11px",
-          }}
-        />
 
         <ChecklistItem
           label={isVerificationComplete && !isStackDeployed && !isFailed ? stackInProgressLabel : stackDeployedLabel}
