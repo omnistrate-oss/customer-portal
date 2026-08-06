@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { Box, Stack } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
@@ -97,12 +97,12 @@ const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, connectorCol
             "&::after": {
               content: '""',
               position: "absolute",
-              top: "12px",
-              bottom: "-20px",
+              top: "26px",
+              bottom: "-18px",
               left: "11px",
               width: "2px",
               bgcolor: connectorColor,
-              zIndex: -1,
+              zIndex: 0,
             },
           }
         : { position: "relative", zIndex: 1 }
