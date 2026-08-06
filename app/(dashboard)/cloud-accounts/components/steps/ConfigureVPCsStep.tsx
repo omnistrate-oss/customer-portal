@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
 import CheckIcon from "@mui/icons-material/Check";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { Box, Stack, Tooltip as MuiTooltip } from "@mui/material";
+import { Box, Tooltip as MuiTooltip, Stack } from "@mui/material";
+import { useMemo } from "react";
 
+import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
+import RefreshIcon from "src/components/Icons/Refresh/Refresh";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
@@ -80,7 +80,6 @@ const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
 
 const VpcsDataGridHeader = ({
   totalCount,
-  lastSyncedAt,
   isLoadingVpcs,
   isFetchingVPCs,
   onResync,
@@ -116,31 +115,20 @@ const VpcsDataGridHeader = ({
           count={totalCount}
           units={{ singular: "VPC", plural: "VPCs" }}
         />
-      </Stack>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        gap="16px"
-        sx={{ px: "24px", py: "12px", borderBottom: "1px solid #E9EAEB" }}
-      >
-        {lastSyncedAt && (
-          <Text size="xsmall" weight="regular" color="#535862">
-            Last synced: {lastSyncedAt}
-          </Text>
-        )}
 
         <Stack alignItems="flex-end" gap="4px">
           <Stack direction="row" alignItems="center" gap="12px">
-            <Button
-              variant="outlined"
-              onClick={onResync}
+            <RefreshIcon
+              width={18}
+              height={18}
+              onClick={isFetchingVPCs || isLoadingVpcs ? undefined : onResync}
               disabled={isFetchingVPCs || isLoadingVpcs}
-              startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
               data-testid="resync-vpcs-button"
-            >
-              Resync
-            </Button>
+              style={{
+                cursor: isFetchingVPCs || isLoadingVpcs ? "not-allowed" : "pointer",
+              }}
+            />
+
             <Tooltip
               title={
                 isImporting
