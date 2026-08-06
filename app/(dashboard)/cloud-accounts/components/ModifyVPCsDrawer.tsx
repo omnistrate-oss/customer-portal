@@ -1,10 +1,8 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
-import Chip from "components/Chip/Chip";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -13,12 +11,14 @@ import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
+import Chip from "components/Chip/Chip";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import useCloudNativeNetworks from "../hooks/useCloudNativeNetworks";
 import { hasCloudNativeVpcConfiguration } from "../utils";
 
-import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 import ConfigureVPCsStep from "./steps/ConfigureVPCsStep";
+import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
 
 const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
 const TERMINAL_STATUSES = [...READY_STATUSES, "FAILED"];
@@ -267,6 +267,11 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
 
   // ─── Handle update ────────────────────────────────────────────────────────
   const handleUpdate = () => {
+    if (!hasConfigurationChanges) {
+      snackbar.showError("Nothing to update as no VPC configuration changes were detected");
+      return;
+    }
+
     if (!offering || !selectedInstance.id) return;
 
     const resource = offering.resourceParameters.find((item) => item.resourceId.startsWith("r-injectedaccountconfig"));
@@ -328,6 +333,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
           <CloudAccountSummaryCard
             sections={summarySections}
             onDoItLater={onClose}
+            cancelLabel="Close"
             onNext={handleUpdate}
             nextLabel="Update"
             isNextLoading={updateCloudAccountMutation.isPending}
@@ -337,6 +343,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
               availableVpcs.length === 0 ||
               !hasConfigurationChanges
             }
+            nextDisabledMessage="Nothing to update as no VPC configuration changes were detected"
           />
         </div>
       </div>

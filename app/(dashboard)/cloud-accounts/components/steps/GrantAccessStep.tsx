@@ -20,7 +20,7 @@ import sandClock from "public/assets/images/cloud-account/sandclock.gif";
 
 import StepperDefaultIcon from "../../../../../src/components/Stepper/StepperDefaultIcon";
 
-const StyledLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+export const StyledLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Link
     href={href}
     target="_blank"

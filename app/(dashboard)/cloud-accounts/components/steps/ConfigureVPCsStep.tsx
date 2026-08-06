@@ -1,11 +1,9 @@
 "use client";
 
 import CheckIcon from "@mui/icons-material/Check";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Box, Chip, Tooltip as MuiTooltip, Stack } from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Tooltip as MuiTooltip, Stack } from "@mui/material";
+import { useMemo } from "react";
 
 import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
@@ -19,6 +17,8 @@ import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
+
+import { StyledLink } from "./GrantAccessStep";
 
 export type VpcRecord = {
   id: string;
@@ -66,96 +66,6 @@ const vpcStatusCategoryMap = {
   FAILED: "failed",
 };
 
-const InstructionItem = ({
-  number,
-  title,
-  description,
-  expandLabel,
-  children,
-  forceOpen = false,
-}: {
-  number: number;
-  title: string;
-  description: string;
-  expandLabel: string;
-  children: React.ReactNode;
-  forceOpen?: boolean;
-}) => {
-  const [open, setOpen] = useState(false);
-  const isOpen = forceOpen || open;
-
-  return (
-    <Stack gap="10px">
-      <Stack direction="row" alignItems="flex-start" gap="12px">
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            border: "1px solid #D0D5DD",
-            bgcolor: "#F9FAFB",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Text size="xsmall" weight="semibold" color="#344054">
-            {number}
-          </Text>
-        </Box>
-        <Box flex={1}>
-          <Text size="small" weight="semibold" color="#101828">
-            {title}{" "}
-            <Text size="small" weight="regular" color="#344054" sx={{ display: "inline" }}>
-              - {description}
-            </Text>
-          </Text>
-        </Box>
-      </Stack>
-      <Box sx={{ ml: "36px" }}>
-        <Stack direction="row" alignItems="center" gap="4px" sx={{ cursor: "pointer" }} onClick={() => setOpen(!open)}>
-          <Text size="small" weight="medium" color="#667085">
-            {isOpen ? expandLabel.replace(/^Show|^View|^Check/, "Hide") : expandLabel}
-          </Text>
-          {isOpen ? (
-            <KeyboardArrowUpIcon sx={{ color: "#344054", fontSize: 18 }} />
-          ) : (
-            <KeyboardArrowDownIcon sx={{ color: "#344054", fontSize: 18 }} />
-          )}
-        </Stack>
-        {isOpen && (
-          <Box
-            sx={{
-              mt: "8px",
-              p: "12px",
-              border: "1px solid #E9EAEB",
-              borderRadius: "8px",
-              bgcolor: "#F9FAFB",
-            }}
-          >
-            {children}
-          </Box>
-        )}
-      </Box>
-    </Stack>
-  );
-};
-
-const InstructionPanel = ({ children }: { children: React.ReactNode }) => (
-  <Stack
-    gap="8px"
-    sx={{
-      p: "12px",
-      border: "1px solid #E9EAEB",
-      borderRadius: "8px",
-      bgcolor: "#F9FAFB",
-    }}
-  >
-    {children}
-  </Stack>
-);
-
 const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
   <MuiTooltip
     title={props.disabled ? "This VPC is failed or already in use and cannot be selected." : ""}
@@ -168,77 +78,114 @@ const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
   </MuiTooltip>
 );
 
-const CodeBlock = ({ label, children }: { label?: string; children: React.ReactNode }) => (
-  <Box>
-    {label && (
-      <Text size="xsmall" weight="medium" color="#667085" sx={{ mb: "6px" }}>
-        {label}
-      </Text>
-    )}
-    <Box
-      component="pre"
-      sx={{
-        m: 0,
-        p: "12px 24px",
-        border: "1px solid #E9EAEB",
-        borderRadius: "8px",
-        bgcolor: "#F5F5F5",
-        color: "#344054",
-        fontFamily: "monospace",
-        fontSize: "13px",
-        lineHeight: 1.45,
-        whiteSpace: "pre-wrap",
-      }}
-    >
-      {children}
-    </Box>
-  </Box>
-);
-
 const VpcsDataGridHeader = ({
   totalCount,
   lastSyncedAt,
   isLoadingVpcs,
   isFetchingVPCs,
   onResync,
+  onImport,
+  onUnimport,
+  isImporting,
+  selectedImportIds,
+  selectedUnimportIds,
 }: {
   totalCount: number;
   lastSyncedAt?: string;
   isLoadingVpcs: boolean;
   isFetchingVPCs: boolean;
   onResync?: () => void;
+  onImport?: (vpcIds: string[]) => void;
+  onUnimport?: (vpcIds: string[]) => void;
+  isImporting: boolean;
+  selectedImportIds: string[];
+  selectedUnimportIds: string[];
 }) => {
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      gap="16px"
-      sx={{ px: "24px", py: "20px", borderBottom: "1px solid #E9EAEB" }}
-    >
-      <DataGridHeaderTitle
-        title="Choose VPCs"
-        desc="Choose among the available VPCs in the selected regions"
-        count={totalCount}
-        units={{ singular: "VPC", plural: "VPCs" }}
-      />
-      <Stack direction="row" alignItems="center" gap="12px">
+    <>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        gap="16px"
+        sx={{ px: "24px", py: "16px", borderBottom: "1px solid #E9EAEB" }}
+      >
+        <DataGridHeaderTitle
+          title="Choose VPCs"
+          desc="Choose among the available VPCs in the selected regions"
+          count={totalCount}
+          units={{ singular: "VPC", plural: "VPCs" }}
+        />
+      </Stack>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        gap="16px"
+        sx={{ px: "24px", py: "12px", borderBottom: "1px solid #E9EAEB" }}
+      >
         {lastSyncedAt && (
           <Text size="xsmall" weight="regular" color="#535862">
             Last synced: {lastSyncedAt}
           </Text>
         )}
-        <Button
-          variant="outlined"
-          onClick={onResync}
-          disabled={isFetchingVPCs || isLoadingVpcs}
-          startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-          data-testid="resync-vpcs-button"
-        >
-          Resync
-        </Button>
+
+        <Stack alignItems="flex-end" gap="4px">
+          <Stack direction="row" alignItems="center" gap="12px">
+            <Button
+              variant="outlined"
+              onClick={onResync}
+              disabled={isFetchingVPCs || isLoadingVpcs}
+              startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+              data-testid="resync-vpcs-button"
+            >
+              Resync
+            </Button>
+            <Tooltip
+              title={
+                isImporting
+                  ? "A VPC update is already in progress."
+                  : selectedUnimportIds.length === 0
+                    ? "Select an imported VPC that is not in use to unimport it."
+                    : ""
+              }
+            >
+              <span>
+                <Button
+                  variant="outlined"
+                  onClick={() => onUnimport?.(selectedUnimportIds)}
+                  disabled={isImporting || selectedUnimportIds.length === 0}
+                  data-testid="unimport-vpcs-button"
+                >
+                  Unimport
+                  {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip
+              title={
+                isImporting
+                  ? "A VPC update is already in progress."
+                  : selectedImportIds.length === 0
+                    ? "Select an available VPC to import it."
+                    : ""
+              }
+            >
+              <span>
+                <Button
+                  variant="contained"
+                  onClick={() => onImport?.(selectedImportIds)}
+                  disabled={isImporting || selectedImportIds.length === 0}
+                  data-testid="import-vpcs-button"
+                >
+                  Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
+                </Button>
+              </span>
+            </Tooltip>
+          </Stack>
+        </Stack>
       </Stack>
-    </Stack>
+    </>
   );
 };
 
@@ -259,10 +206,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   emptyStateMessage = "No VPCs found for the selected regions. Click Resync to fetch.",
   bringOwnVpcsLocked = false,
 }) => {
-  const [showAllInstructions, setShowAllInstructions] = useState(false);
-  const [showKubernetesInstructions, setShowKubernetesInstructions] = useState(false);
-
-  const isAwsWithPrivateConnect = cloudProvider === "aws" && privateConnectivityEnabled;
   // The checkbox renders unchecked on unsupported providers, so gate the panel on the same
   // condition — otherwise the region/VPC picker stays visible under an unchecked box.
   const showVpcSelection = isBringOwnVpcsSupported(cloudProvider) && values.bringOwnVpcs;
@@ -386,80 +329,29 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
     []
   );
 
-  const privateConnectInstructions = [
-    {
-      title: "Enable VPC DNS",
-      description: "Required for private endpoint name resolution.",
-      expandLabel: "Show DNS settings",
-      content: (
-        <InstructionPanel>
-          <CodeBlock label="VPC settings">{`enableDnsHostnames = true
-enableDnsSupport   = true`}</CodeBlock>
-        </InstructionPanel>
-      ),
-    },
-    {
-      title: "Tag VPC and workload subnets",
-      description: "Used to identify where private workloads run.",
-      expandLabel: "Show instructions",
-      content: (
-        <InstructionPanel>
-          <CodeBlock label="Tag">{`{managed-by-tag-key} = {managed-by-tag-value}`}</CodeBlock>
-          <CodeBlock>Only tag the subnets where workloads should be deployed.</CodeBlock>
-        </InstructionPanel>
-      ),
-    },
-    {
-      title: "Confirm outbound access",
-      description: "Choose NAT, Transit Gateway, VPN, or Direct Connect",
-      expandLabel: "View outbound access options",
-      content: (
-        <InstructionPanel>
-          <CodeBlock>{`Required for
-* Container image pulls
-* Helm chart downloads
-* Deployment bootstrap dependencies`}</CodeBlock>
-          <CodeBlock>{`Choose one
-* NAT Gateway
-* Transit Gateway
-* VPN
-* Direct Connect`}</CodeBlock>
-        </InstructionPanel>
-      ),
-    },
-    {
-      title: "Create the Interface VPC Endpoint",
-      description: "Use the provided PrivateLink service name.",
-      expandLabel: "Show instructions",
-      content: (
-        <InstructionPanel>
-          <Text size="small" weight="semibold" color="#344054">
-            Create an Interface VPC Endpoint for the provided PrivateLink service.
-          </Text>
-          <CodeBlock label="Required endpoint tag">Name = {"{private-endpoint-name}"}</CodeBlock>
-          <CodeBlock label="Allow inbound from your VPC CIDR">TCP 8443-8506 from your VPC CIDR</CodeBlock>
-        </InstructionPanel>
-      ),
-    },
-    {
-      title: "Review cross-region setup (if applicable)",
-      description: "Only shown when regions differ.",
-      expandLabel: "Check cross-region requirements",
-      content: (
-        <Stack gap="10px">
-          <InstructionPanel>
-            <CodeBlock label="AWS CLI">--service-region &lt;region&gt;</CodeBlock>
-            <CodeBlock label="Terraform">service_region = &quot;&lt;region&gt;&quot;</CodeBlock>
-          </InstructionPanel>
-          <CodeBlock>Do not enable private DNS for cross-region Interface VPC Endpoints.</CodeBlock>
-        </Stack>
-      ),
-    },
-  ];
-
   return (
     <Stack gap="20px">
-      <CardWithTitle title="VPC Configuration">
+      <CardWithTitle
+        title="VPC Configuration"
+        description={
+          <>
+            <Text size="small" weight="regular" color="#535862">
+              Configure network settings for your workloads by allowing automatically managed VPCs or importing custom
+              VPCs across selected regions
+            </Text>
+            {privateConnectivityEnabled && (
+              <Text size="small" weight="regular" color="#535862">
+                <Text size="small" weight="semibold" color="#344054" sx={{ display: "inline" }}>
+                  Private Link is enabled -
+                </Text>{" "}
+                <StyledLink href="https://docs.omnistrate.com/operate-guides/byoc-cloud-accounts/#imported-vpc-requirements-for-byoc-privatelink">
+                  View VPC configuration instructions for Private Link
+                </StyledLink>
+              </Text>
+            )}
+          </>
+        }
+      >
         <Stack gap="16px">
           {/* Enable new VPCs */}
           {(() => {
@@ -628,6 +520,11 @@ enableDnsSupport   = true`}</CodeBlock>
                       isLoadingVpcs,
                       isFetchingVPCs,
                       onResync,
+                      onImport,
+                      onUnimport,
+                      isImporting,
+                      selectedImportIds,
+                      selectedUnimportIds,
                     },
                   }}
                   loading={isLoadingVpcs || isFetchingVPCs}
@@ -670,143 +567,10 @@ enableDnsSupport   = true`}</CodeBlock>
                   </Text>
                 </Box>
               )}
-
-              {/* Import / Unimport buttons */}
-              <Stack direction="row" justifyContent="flex-end" gap="12px" sx={{ mt: "16px" }}>
-                <Tooltip
-                  title={
-                    isImporting
-                      ? "A VPC update is already in progress."
-                      : selectedUnimportIds.length === 0
-                        ? "Select an imported VPC that is not in use to unimport it."
-                        : ""
-                  }
-                >
-                  <span>
-                    <Button
-                      variant="outlined"
-                      onClick={() => onUnimport?.(selectedUnimportIds)}
-                      disabled={isImporting || selectedUnimportIds.length === 0}
-                      data-testid="unimport-vpcs-button"
-                    >
-                      Unimport
-                      {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
-                    </Button>
-                  </span>
-                </Tooltip>
-                <Tooltip
-                  title={
-                    isImporting
-                      ? "A VPC update is already in progress."
-                      : selectedImportIds.length === 0
-                        ? "Select an available VPC to import it."
-                        : ""
-                  }
-                >
-                  <span>
-                    <Button
-                      variant="contained"
-                      onClick={() => onImport?.(selectedImportIds)}
-                      disabled={isImporting || selectedImportIds.length === 0}
-                      data-testid="import-vpcs-button"
-                    >
-                      Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
-                    </Button>
-                  </span>
-                </Tooltip>
-              </Stack>
             </Stack>
           ) : null}
         </Stack>
       </CardWithTitle>
-
-      {/* Private connectivity instructions – shown for AWS with private connectivity */}
-      {isAwsWithPrivateConnect && showVpcSelection && (
-        <CardWithTitle
-          title="Instructions to configure VPCs for private connectivity"
-          actionButton={
-            <Button
-              variant="outlined"
-              endIcon={
-                showAllInstructions ? (
-                  <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
-                ) : (
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
-                )
-              }
-              onClick={() => setShowAllInstructions(!showAllInstructions)}
-            >
-              {showAllInstructions ? "Hide all instructions" : "Show all instructions"}
-            </Button>
-          }
-        >
-          <Stack gap="16px">
-            {privateConnectInstructions.map((inst, idx) => (
-              <InstructionItem
-                key={idx}
-                number={idx + 1}
-                title={inst.title}
-                description={inst.description}
-                expandLabel={inst.expandLabel}
-                forceOpen={showAllInstructions}
-              >
-                {inst.content}
-              </InstructionItem>
-            ))}
-            <Stack direction="row" alignItems="center" sx={{ pt: "4px" }}>
-              <Text size="small" weight="semibold" color="#344054" sx={{ pr: "10px" }}>
-                Optional add-on
-              </Text>
-              <Box sx={{ height: "1px", bgcolor: "#E9EAEB", flex: 1 }} />
-            </Stack>
-            <Box sx={{ pl: "28px" }}>
-              <Stack gap="10px">
-                <Stack direction="row" alignItems="center" gap="4px" flexWrap="wrap">
-                  <Text size="small" weight="semibold" color="#101828">
-                    Add Kubernetes subnet tags
-                  </Text>
-                  <Chip
-                    label="Optional"
-                    size="small"
-                    sx={{
-                      height: 22,
-                      bgcolor: "#F2F4F7",
-                      color: "#344054",
-                      fontSize: "12px",
-                      fontWeight: 500,
-                    }}
-                  />
-                  <Text size="small" weight="regular" color="#344054">
-                    - Add this tag if you plan to use internal load balancers.
-                  </Text>
-                </Stack>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  gap="4px"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => setShowKubernetesInstructions((prev) => !prev)}
-                >
-                  <Text size="small" weight="medium" color="#667085">
-                    {showKubernetesInstructions ? "Hide how to" : "Show me how"}
-                  </Text>
-                  {showKubernetesInstructions ? (
-                    <KeyboardArrowUpIcon sx={{ color: "#344054", fontSize: 18 }} />
-                  ) : (
-                    <KeyboardArrowDownIcon sx={{ color: "#344054", fontSize: 18 }} />
-                  )}
-                </Stack>
-                {showKubernetesInstructions && (
-                  <InstructionPanel>
-                    <CodeBlock label="For private subnets">kubernetes.io/role/internal-elb = 1</CodeBlock>
-                    <CodeBlock label="For public subnets">kubernetes.io/role/elb = 1</CodeBlock>
-                  </InstructionPanel>
-                )}
-              </Stack>
-            </Box>
-          </Stack>
-        </CardWithTitle>
-      )}
     </Stack>
   );
 };
