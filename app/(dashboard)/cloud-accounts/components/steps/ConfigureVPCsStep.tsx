@@ -125,7 +125,7 @@ const VpcsDataGridHeader = ({
               disabled={isFetchingVPCs || isLoadingVpcs}
               data-testid="resync-vpcs-button"
               style={{
-                cursor: isFetchingVPCs || isLoadingVpcs ? "not-allowed" : "pointer",
+                cursor: isFetchingVPCs || isLoadingVpcs ? "default" : "pointer",
               }}
             />
 
