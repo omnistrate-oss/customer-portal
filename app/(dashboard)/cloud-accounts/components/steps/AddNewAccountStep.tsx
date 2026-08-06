@@ -1,6 +1,5 @@
 "use client";
 
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Box, Stack } from "@mui/material";
 import { FormikProps } from "formik";
 import { ChangeEvent } from "react";
@@ -10,6 +9,7 @@ import { FormConfiguration } from "components/DynamicForm/types";
 import Tooltip from "components/Tooltip/Tooltip";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
+import ChevronRightIcon from "src/components/Icons/ChevronRight/ChevronRightIcon";
 import Switch from "src/components/Switch/Switch";
 import { Text } from "src/components/Typography/Typography";
 
@@ -89,7 +89,7 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
                       </span>
                     </Tooltip>
                     <Stack direction="row" alignItems="flex-start" gap="6px" marginTop={"10px"}>
-                      <KeyboardArrowRightIcon sx={{ color: "#101828", fontSize: 22, mt: "-2px" }} />
+                      <ChevronRightIcon />
                       <Text size="small" weight="regular" color="#344054">
                         No traffic traverses the public internet
                       </Text>
