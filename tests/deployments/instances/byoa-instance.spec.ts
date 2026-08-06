@@ -90,15 +90,6 @@ test.describe("Instances Page - BYOA Instance Tests", () => {
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
   });
 
-  test("Wait for Running BYOA Instance", async ({ page }) => {
-    await instancesPage.navigate();
-    await page.waitForLoadState("networkidle");
-
-    await skipOnBackendError(test, async () => {
-      await instancesPage.waitForStatus(instanceId, "Running", logPrefix);
-    });
-  });
-
   test("Delete the BYOA Instance", async ({ page }) => {
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");

@@ -33,15 +33,19 @@ test.describe("Instances Page - Operational Tests", () => {
           const serviceOffering = serviceOfferings.find((offering) =>
             offering.serviceName.startsWith("SaaSBuilder Postgres DT - ")
           );
-          const subscriptions = GlobalStateManager.getSubscriptions();
-          const subscription = subscriptions.find(
-            (sub) =>
-              sub.serviceId === serviceOffering?.serviceId && sub.productTierId === serviceOffering?.productTierID
-          );
-
           if (!serviceOffering) {
             throw new Error("Service Offering not found");
           }
+
+          // The subscription list captured during user-setup predates the subscribe that the
+          // UI specs perform, so it never contains the freshly created service. Resolve it live
+          // and subscribe if it's still missing — an empty subscriptionId makes create return 428.
+          const subscriptions = await apiClient.listSubscriptions();
+          const subscriptionId =
+            subscriptions.find(
+              (sub) =>
+                sub.serviceId === serviceOffering.serviceId && sub.productTierId === serviceOffering.productTierID
+            )?.id ?? (await apiClient.createSubscription(serviceOffering.serviceId, serviceOffering.productTierID));
 
           const {
             serviceProviderId,
@@ -61,7 +65,7 @@ test.describe("Instances Page - Operational Tests", () => {
             serviceModelURLKey,
             productTierURLKey,
             resourceParameters?.[0].urlKey,
-            subscription?.id || "",
+            subscriptionId,
             {
               cloud_provider: "aws",
               network_type: "PUBLIC",
