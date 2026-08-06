@@ -1,7 +1,7 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { $api } from "src/api/query";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -153,6 +153,7 @@ const useCloudNativeNetworks = ({
       status: network.status || "PENDING",
       statusMessage: network.statusMessage,
       networkId: network.cloudNativeNetworkId,
+      cidr: network.cidr,
       imported: network.imported,
       inUse: network.inUse,
     }));
