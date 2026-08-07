@@ -24,7 +24,7 @@ import { StyledLink } from "./GrantAccessStep";
 
 export type VpcRecord = {
   id: string;
-  name: string;
+  name?: string;
   status: string;
   region: string;
   statusMessage?: string;
