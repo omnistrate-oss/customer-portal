@@ -23,10 +23,41 @@ export type CloudAccountFormValues = {
   azureTenantId: string;
   ociTenancyId: string;
   ociDomainId: string;
+  nebiusTenantId: string;
   clusterName: string;
   clusterDescription: string;
   enablePrivateConnectivity: boolean;
 };
+
+export const BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS = ["aws", "gcp", "azure"] as const;
+
+export type CloudNativeNetworkState = {
+  id?: string;
+  cloudNativeNetworkId?: string;
+  region?: string;
+  status?: string;
+  imported?: boolean;
+  inUse?: boolean;
+};
+
+const isFailedCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.status?.toUpperCase() === "FAILED";
+
+export const canImportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.imported === false && network.inUse === false && !isFailedCloudNativeNetwork(network);
+
+export const canUnimportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
+  network.imported === true && network.inUse === false && !isFailedCloudNativeNetwork(network);
+
+export const getCloudNativeNetworkRegions = (networks: CloudNativeNetworkState[]): string[] =>
+  Array.from(
+    new Set(networks.map((network) => network.region).filter((region): region is string => Boolean(region)))
+  ).sort((a, b) => a.localeCompare(b));
+
+export const isBringOwnVpcsSupported = (cloudProvider?: string): boolean =>
+  BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS.includes(
+    cloudProvider as (typeof BRING_OWN_VPCS_SUPPORTED_CLOUD_PROVIDERS)[number]
+  );
 
 export const getValidSubscriptionForInstanceCreation = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
@@ -130,6 +161,7 @@ export const getInitialValues = (
       azureTenantId: resultParams?.azure_tenant_id || "",
       ociTenancyId: resultParams?.oci_tenancy_id || "",
       ociDomainId: resultParams?.oci_domain_id || "",
+      nebiusTenantId: resultParams?.nebius_tenant_id || "",
       clusterName: resultParams?.cluster_name || "",
       clusterDescription: resultParams?.cluster_description || "",
       enablePrivateConnectivity: isPrivateLinkEnabled(resultParams),
@@ -162,9 +194,10 @@ export const getInitialValues = (
       azureTenantId: "",
       ociTenancyId: "",
       ociDomainId: "",
+      nebiusTenantId: "",
       clusterName: "",
       clusterDescription: "",
-      enablePrivateConnectivity: false,
+      enablePrivateConnectivity: cloudProvider === "aws",
     };
   }
 
@@ -201,9 +234,10 @@ export const getInitialValues = (
     azureTenantId: "",
     ociTenancyId: "",
     ociDomainId: "",
+    nebiusTenantId: "",
     clusterName: "",
     clusterDescription: "",
-    enablePrivateConnectivity: false,
+    enablePrivateConnectivity: cloudProvider === "aws",
   };
 };
 
@@ -216,19 +250,31 @@ export const getOffboardReadiness = (cloudAccountInstanceStatus?: string, accoun
   else return false;
 };
 
-/**
- * The account identifier shown to users for a cloud account instance. Providers are
- * mutually exclusive, so the first match wins. Returns "" when none is present —
- * callers decide their own empty-state text.
- */
-export const getCloudAccountId = (resultParams: Record<string, any>): string =>
-  resultParams?.gcp_project_id ||
-  resultParams?.aws_account_id ||
-  resultParams?.azure_subscription_id ||
-  resultParams?.oci_tenancy_id ||
-  resultParams?.nebius_tenant_id ||
-  resultParams?.cluster_name ||
-  "";
+export const getExistingVpcCount = (instance: {
+  result_params?: Record<string, any> | unknown;
+  launch_input_params?: Record<string, any> | unknown;
+}): number | undefined => {
+  const resultParams = getResultParams(instance);
+  if (Array.isArray(resultParams?.cloudNativeNetworks)) {
+    return resultParams.cloudNativeNetworks.length;
+  }
+
+  const count = resultParams?.num_cloud_native_networks;
+  if (typeof count === "number") {
+    return count;
+  }
+
+  return undefined;
+};
+
+export const hasCloudNativeVpcConfiguration = (params?: Record<string, any>): boolean => {
+  if (!params) return false;
+  if (Array.isArray(params.cloudNativeNetworks) && params.cloudNativeNetworks.length > 0) return true;
+  if (Array.isArray(params.cloud_native_networks) && params.cloud_native_networks.length > 0) return true;
+  if (typeof params.cloudNativeNetworkId === "string" && params.cloudNativeNetworkId.length > 0) return true;
+  if (typeof params.cloud_native_network_id === "string" && params.cloud_native_network_id.length > 0) return true;
+  return Number(params.num_cloud_native_networks) > 0;
+};
 
 /** Infers the cloud provider of a cloud account instance from its result params. */
 export const getCloudAccountProvider = (resultParams: Record<string, any>): CloudProvider | undefined => {
@@ -260,3 +306,17 @@ export const getAccountConfigStackUrl = (cloudFormationUrl: string): string => {
   const consoleUrl = cloudFormationUrl.slice(0, stacksIndex + CLOUDFORMATION_STACKS_PATH.length);
   return `${consoleUrl}?filteringText=${getAccountConfigStackName(cloudFormationUrl)}`;
 };
+
+/**
+ * The account identifier shown to users for a cloud account instance. Providers are
+ * mutually exclusive, so the first match wins. Returns "" when none is present —
+ * callers decide their own empty-state text.
+ */
+export const getCloudAccountId = (resultParams: Record<string, any>): string =>
+  resultParams?.gcp_project_id ||
+  resultParams?.aws_account_id ||
+  resultParams?.azure_subscription_id ||
+  resultParams?.oci_tenancy_id ||
+  resultParams?.nebius_tenant_id ||
+  resultParams?.cluster_name ||
+  "";

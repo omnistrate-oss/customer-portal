@@ -36,7 +36,7 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
+import { getResultParams } from "src/utils/instance";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -48,19 +48,21 @@ import useInstancesListWithDescribe from "../instances/hooks/useInstancesListWit
 
 import CloudAccountForm from "./components/CloudAccountForm";
 import CloudAccountsTableHeader from "./components/CloudAccountsTableHeader";
+import CloudAccountWizard from "./components/CloudAccountWizard";
 import DeleteAccountConfigConfirmationDialog from "./components/DeleteConfirmationDialog";
-import GovernanceControlsCell from "./components/GovernanceControlsCell";
 import {
   INSTANCE_STATUS_POLL_INTERVAL_MS,
   MAX_POLL_COUNT,
   shouldPollInstanceStatus,
   shouldResetDeleteMutationOnClose,
 } from "./components/deleteDialogState";
+import GovernanceControlsCell from "./components/GovernanceControlsCell";
+import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
-import { getCloudAccountId, getCloudAccountProvider, getOffboardReadiness } from "./utils";
+import { getCloudAccountId, getCloudAccountProvider, getExistingVpcCount, getOffboardReadiness } from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -72,6 +74,7 @@ export type Overlay =
   | "connect-dialog"
   | "disconnect-dialog"
   | "offboard-dialog"
+  | "modify-vpcs"
   | "byoc-onprem-cluster-setup"
   | "enable-deletion-protection-dialog"
   | "disable-deletion-protection-dialog";
@@ -414,23 +417,77 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (!resultParams?.aws_account_id) return "-";
-          const isEnabled = isPrivateLinkEnabled(resultParams);
-          return isEnabled ? "Enabled" : "Disabled";
+          if (
+            resultParams?.allow_new_cloud_native_network_creation === undefined ||
+            resultParams?.allow_new_cloud_native_network_creation === null ||
+            !!resultParams?.cluster_name
+          ) {
+            return "NA";
+          }
+          return resultParams?.allow_new_cloud_native_network_creation ? "Yes" : "No";
         },
         {
-          id: "private_link",
-          header: "Private Link",
+          id: "allowNewVPCs",
+          header: "Allow New VPCs",
           cell: (data) => {
-            const resultParams = getResultParams(data.row.original);
-            if (!resultParams?.aws_account_id) return "-";
-            const isEnabled = isPrivateLinkEnabled(resultParams);
-            return (
-              <StatusChip category={isEnabled ? "success" : "failed"} label={isEnabled ? "Enabled" : "Disabled"} />
-            );
+            const value = data.getValue();
+            if (value === "NA") return "-";
+            return <StatusChip label={value} category={value === "Yes" ? "success" : "unknown"} />;
           },
           meta: {
-            minWidth: 140,
+            minWidth: 100,
+          },
+        }
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const resultParams = getResultParams(row);
+          if (!resultParams?.cloud_provider_account_config_id) return "NA";
+          const count = getExistingVpcCount(row);
+          if (count === undefined || count === null) return "Not configured";
+          return String(count);
+        },
+        {
+          id: "existingVPCs",
+          header: "Existing VPCs",
+          cell: (data) => {
+            const value = data.getValue();
+            const resultParams = getResultParams(data.row.original);
+            const isBYOCOnprem = !!resultParams?.cluster_name;
+            if (value === "NA" || isBYOCOnprem) {
+              return "-";
+            }
+            if (value === "Not configured") {
+              return <StatusChip status="Not configured" category="unknown" />;
+            }
+            const count = Number(value);
+            return <StatusChip label={`${count} ${count === 1 ? "VPC" : "VPCs"}`} category="info" />;
+          },
+        }
+      ),
+      columnHelper.accessor(
+        (row) => {
+          const resultParams = getResultParams(row);
+          if (resultParams?.private_link === undefined || resultParams?.private_link === null) {
+            return "NA";
+          }
+          return resultParams?.private_link ? "Enabled" : "Disabled";
+        },
+        {
+          id: "privateLink",
+          header: "Private Link",
+          cell: (data) => {
+            const value = data.getValue();
+            const resultParams = getResultParams(data.row.original);
+            const isNebius = !!resultParams?.nebius_tenant_id;
+            const isBYOCOnprem = !!resultParams?.cluster_name;
+            if (value === "NA" || isNebius || isBYOCOnprem) {
+              return "-";
+            }
+            return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
+          },
+          meta: {
+            minWidth: 120,
           },
         }
       ),
@@ -442,6 +499,10 @@ const CloudAccountsPage = () => {
         {
           id: "subscriptionOwner",
           header: "Subscription Owner",
+
+          meta: {
+            minWidth: 225,
+          },
         }
       ),
       columnHelper.accessor((row) => formatDateUTC(row.created_at), {
@@ -504,6 +565,8 @@ const CloudAccountsPage = () => {
       }
     }
   }, [selectedInstance, accountConfigsHash]);
+
+  const isSelectedInstanceNebius = Boolean(getResultParams(selectedInstance)?.nebius_tenant_id);
 
   const isSelectedInstanceReadyToOffboard = getOffboardReadiness(
     selectedInstance?.status,
@@ -607,6 +670,14 @@ const CloudAccountsPage = () => {
       return deleteResourceInstance(requestPayload);
     },
     onSuccess: async () => {
+      if (isSelectedInstanceNebius) {
+        setSelectedRows([]);
+        setIsOverlayOpen(false);
+        snackbar.showSuccess("Deleting cloud account...");
+        await refetchInstances();
+        return;
+      }
+
       const isLastInstance =
         !selectedAccountConfig?.byoaInstanceIDs || selectedAccountConfig?.byoaInstanceIDs?.length === 1;
       if (!isLastInstance) {
@@ -931,19 +1002,31 @@ const CloudAccountsPage = () => {
           setClickedInstance(undefined);
         }}
         RenderUI={
-          <CloudAccountForm
-            initialFormValues={initialFormValues}
-            selectedInstance={selectedInstance}
-            onClose={() => {
-              setIsOverlayOpen(false);
-            }}
-            formMode={overlayType === "view-instance-form" ? "view" : "create"}
-            setIsAccountCreation={setIsAccountCreation}
-            setOverlayType={setOverlayType}
-            setClickedInstance={setClickedInstance}
-            instances={instances}
-            setIsOverlayOpen={setIsOverlayOpen}
-          />
+          overlayType === "create-instance-form" ? (
+            <CloudAccountWizard
+              initialFormValues={initialFormValues}
+              selectedInstance={selectedInstance}
+              onClose={async () => {
+                setIsOverlayOpen(false);
+                await refetchInstances();
+              }}
+              instances={instances}
+            />
+          ) : (
+            <CloudAccountForm
+              initialFormValues={initialFormValues}
+              selectedInstance={selectedInstance}
+              onClose={() => {
+                setIsOverlayOpen(false);
+              }}
+              formMode="view"
+              setIsAccountCreation={setIsAccountCreation}
+              setOverlayType={setOverlayType}
+              setClickedInstance={setClickedInstance}
+              instances={instances}
+              setIsOverlayOpen={setIsOverlayOpen}
+            />
+          )
         }
       />
 
@@ -962,7 +1045,7 @@ const CloudAccountsPage = () => {
         }}
         isDeleteInstanceMutationPending={deleteCloudAccountInstanceMutation.isPending}
         // isDeletingAccountConfig={deleteAccountConfigMutation.isPending}
-        accountConfig={deleteDialogAccountConfig}
+        accountConfig={isSelectedInstanceNebius ? undefined : deleteDialogAccountConfig}
         isPollingActive={hasRequestedDeleteForPolling}
         onInstanceDeleteClick={async () => {
           if (!selectedInstance) return snackbar.showError("No instance selected");
@@ -980,6 +1063,27 @@ const CloudAccountsPage = () => {
         instanceStatus={deleteDialogInstanceStatus}
         offboardingInstructionDetails={offboardingInstructionDetails}
         instanceId={selectedInstance?.id}
+      />
+
+      <FullScreenDrawer
+        title="Modify VPCs"
+        description="Update cloud-native VPC settings"
+        open={isOverlayOpen && overlayType === "modify-vpcs"}
+        closeDrawer={() => {
+          setIsOverlayOpen(false);
+          setClickedInstance(undefined);
+        }}
+        RenderUI={
+          selectedInstance ? (
+            <ModifyVPCsDrawer
+              selectedInstance={selectedInstance}
+              onClose={async () => {
+                setIsOverlayOpen(false);
+                await refetchInstances();
+              }}
+            />
+          ) : null
+        }
       />
 
       <ConnectAccountConfigDialog

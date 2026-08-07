@@ -1,9 +1,9 @@
-import { FC } from "react";
 import { Box, Stack } from "@mui/material";
+import { FC } from "react";
 
-import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import ChevronRightIcon from "components/Icons/ChevronRight/ChevronRightIcon";
 import { Text } from "components/Typography/Typography";
+import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 
 const PrivateConnectivityDescription: FC = () => {
   return (

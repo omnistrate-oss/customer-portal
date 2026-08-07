@@ -76,7 +76,6 @@ const CloudAccountForm = ({
       .filter((offering) => offering.serviceModelType === "BYOA" || offering.serviceModelType === "ON_PREM_COPILOT")
       .map((offering) => ({
         ...offering,
-        cloudProviders: offering.cloudProviders?.filter((p) => p !== "nebius"),
       }));
   }, [serviceOfferings]);
 
@@ -221,7 +220,6 @@ const CloudAccountForm = ({
           setIsAccountCreation(true);
           setOverlayType("view-instructions-dialog");
         }
-        snackbar.showSuccess("Cloud Account created successfully");
       },
     }
   );
@@ -467,6 +465,7 @@ const CloudAccountForm = ({
                   // @ts-ignore
                   onChange={(cloudProvider: string) => {
                     setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cloudProvider]);
+                    setFieldValue("enablePrivateConnectivity", cloudProvider === "aws");
                   }}
                   disabled={formMode !== "create"}
                 />
