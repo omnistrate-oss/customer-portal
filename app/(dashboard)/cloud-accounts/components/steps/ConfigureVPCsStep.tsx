@@ -146,16 +146,22 @@ const VpcsDataGridHeader = ({
             />
 
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={() => onUnimport?.(selectedUnimportIds)}
               disabled={isImporting || selectedUnimportIds.length === 0}
               disabledMessage={unimportDisabledMessage}
               data-testid="unimport-vpcs-button"
+              sx={{ minWidth: "120px" }}
             >
               Unimport
-              {selectedUnimportIds.length > 0 ? ` (${selectedUnimportIds.length})` : ""}
-              {selectedUnimportIds.length > 0 && isImporting && <LoadingSpinnerSmall />}
+              {selectedUnimportIds.length > 0 && isImporting ? (
+                <LoadingSpinnerSmall />
+              ) : selectedUnimportIds.length > 0 ? (
+                ` (${selectedUnimportIds.length})`
+              ) : (
+                ""
+              )}
             </Button>
             <Button
               variant="contained"
@@ -164,9 +170,16 @@ const VpcsDataGridHeader = ({
               disabled={isImporting || selectedImportIds.length === 0}
               disabledMessage={importDisabledMessage}
               data-testid="import-vpcs-button"
+              sx={{ minWidth: "120px" }}
             >
-              Import{selectedImportIds.length > 0 ? ` (${selectedImportIds.length})` : ""}
-              {selectedImportIds.length > 0 && isImporting && <LoadingSpinnerSmall />}
+              Import
+              {selectedImportIds.length > 0 && isImporting ? (
+                <LoadingSpinnerSmall />
+              ) : selectedImportIds.length > 0 ? (
+                ` (${selectedImportIds.length})`
+              ) : (
+                ""
+              )}
             </Button>
           </Stack>
         </Stack>
