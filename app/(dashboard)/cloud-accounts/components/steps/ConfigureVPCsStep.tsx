@@ -52,7 +52,6 @@ type ConfigureVPCsStepProps = {
   onImport?: (vpcIds: string[]) => void;
   onUnimport?: (vpcIds: string[]) => void;
   isImporting?: boolean;
-  lastSyncedAt?: string;
   cloudProvider?: string;
   privateConnectivityEnabled?: boolean;
   emptyStateMessage?: string;
@@ -93,7 +92,6 @@ const VpcsDataGridHeader = ({
   selectedUnimportIds,
 }: {
   totalCount: number;
-  lastSyncedAt?: string;
   isLoadingVpcs: boolean;
   isFetchingVPCs: boolean;
   onResync?: () => void;
@@ -189,7 +187,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   onImport,
   onUnimport,
   isImporting = false,
-  lastSyncedAt,
   cloudProvider = "aws",
   privateConnectivityEnabled = false,
   emptyStateMessage = "No VPCs found for the selected regions. Click Resync to fetch.",
@@ -544,7 +541,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   componentsProps={{
                     header: {
                       totalCount: availableVpcs.length,
-                      lastSyncedAt,
                       isLoadingVpcs,
                       isFetchingVPCs,
                       onResync,

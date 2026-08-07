@@ -339,7 +339,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     isLoadingVpcs,
     isFetchingVPCs,
     isImporting,
-    lastSyncedAt,
     bringOwnVpcsLocked,
     emptyStateMessage,
     handleResync,
@@ -1025,7 +1024,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               onImport={handleImport}
               onUnimport={handleUnimport}
               isImporting={isImporting}
-              lastSyncedAt={lastSyncedAt}
               cloudProvider={values.cloudProvider}
               privateConnectivityEnabled={enablePrivateConnectivity}
               bringOwnVpcsLocked={bringOwnVpcsLocked}

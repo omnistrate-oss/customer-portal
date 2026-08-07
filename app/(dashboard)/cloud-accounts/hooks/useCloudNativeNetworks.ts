@@ -35,7 +35,6 @@ export type UseCloudNativeNetworksResult = {
   isLoadingVpcs: boolean;
   isFetchingVPCs: boolean;
   isImporting: boolean;
-  lastSyncedAt: string;
   bringOwnVpcsLocked: boolean;
   emptyStateMessage: string;
   handleResync: () => void;
@@ -159,23 +158,6 @@ const useCloudNativeNetworks = ({
     }));
   }, [allNetworks, vpcValues.selectedRegions]);
 
-  const [lastSyncedAt, setLastSyncedAt] = useState("");
-  useEffect(() => {
-    if (!networksQuery.dataUpdatedAt) {
-      setLastSyncedAt("");
-      return;
-    }
-
-    const update = () => {
-      const diff = Math.round((Date.now() - networksQuery.dataUpdatedAt) / 60000);
-      setLastSyncedAt(diff < 1 ? "Just now" : `${diff} min ago`);
-    };
-
-    update();
-    const interval = setInterval(update, 60000);
-    return () => clearInterval(interval);
-  }, [networksQuery.dataUpdatedAt]);
-
   const isLoadingVpcs = networksQuery.isPending;
 
   const isFetchingVPCs = networksQuery.isFetching || syncMutation.isPending;
@@ -256,7 +238,6 @@ const useCloudNativeNetworks = ({
     isLoadingVpcs,
     isFetchingVPCs,
     isImporting: importMutation.isPending,
-    lastSyncedAt,
     bringOwnVpcsLocked,
     emptyStateMessage,
     handleResync,
