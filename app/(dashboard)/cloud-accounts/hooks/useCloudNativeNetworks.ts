@@ -147,7 +147,7 @@ const useCloudNativeNetworks = ({
 
     return filtered.map((network) => ({
       id: network.cloudNativeNetworkId,
-      name: network.name,
+      name: network.name || "-",
       region: network.region,
       status: network.status,
       statusMessage: network.statusMessage,
