@@ -9,7 +9,6 @@ import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
-import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
@@ -275,80 +274,21 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         headerName: "Network ID",
         flex: 1,
         minWidth: 180,
-        renderCell: (params) => (
-          <Stack direction="row" alignItems="center" sx={{ minWidth: 0, width: "100%" }}>
-            <Text
-              size="small"
-              weight="regular"
-              color="#344054"
-              sx={{
-                minWidth: 0,
-                flex: 1,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                display: "block",
-              }}
-              title={params.row.networkId}
-            >
-              {params.row.networkId || "-"}
-            </Text>
-            {params.row.networkId && (
-              <CopyToClipboardButton
-                text={params.row.networkId}
-                iconProps={{ color: "#667085" }}
-                buttonStyles={{ padding: "4px" }}
-              />
-            )}
-          </Stack>
-        ),
+        valueGetter: (params) => params.row.networkId || "-",
       },
       {
         field: "cidr",
         headerName: "CIDR",
         minWidth: 130,
         flex: 0.8,
-        renderCell: (params) => (
-          <Text
-            size="small"
-            weight="regular"
-            color="#344054"
-            sx={{
-              maxWidth: "100%",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              display: "block",
-            }}
-            title={params.row.cidr}
-          >
-            {params.row.cidr || "-"}
-          </Text>
-        ),
+        valueGetter: (params) => params.row.cidr || "-",
       },
       {
         field: "statusMessage",
         headerName: "Status Message",
         flex: 1.2,
         minWidth: 220,
-        renderCell: (params) => (
-          <Text
-            size="small"
-            weight="regular"
-            color="#344054"
-            sx={{
-              width: "100%",
-              minWidth: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              display: "block",
-            }}
-            title={params.row.statusMessage}
-          >
-            {params.row.statusMessage || "Available for deployments"}
-          </Text>
-        ),
+        valueGetter: (params) => params.row.statusMessage || "-",
       },
     ],
     []
