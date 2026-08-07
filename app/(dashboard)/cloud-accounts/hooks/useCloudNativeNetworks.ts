@@ -1,7 +1,7 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 
 import { $api } from "src/api/query";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -147,10 +147,10 @@ const useCloudNativeNetworks = ({
         : allNetworks;
 
     return filtered.map((network) => ({
-      id: network.cloudNativeNetworkId || network.id,
-      name: network.name || network.cloudNativeNetworkId || network.id,
+      id: network.cloudNativeNetworkId,
+      name: network.name,
       region: network.region,
-      status: network.status || "PENDING",
+      status: network.status,
       statusMessage: network.statusMessage,
       networkId: network.cloudNativeNetworkId,
       cidr: network.cidr,
