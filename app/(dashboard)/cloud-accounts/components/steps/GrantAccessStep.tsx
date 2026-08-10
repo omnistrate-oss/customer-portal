@@ -74,7 +74,8 @@ const TextContainerToCopy = ({ text, marginTop = "20px" }: { text: string; margi
 );
 
 const POLL_INTERVAL_MS = 5_000;
-const POLL_MAX_DURATION_MS = 2 * 60 * 1000;
+const INSTRUCTION_POLL_MAX_DURATION_MS = 2 * 60 * 1000;
+const STATUS_POLL_MAX_DURATION_MS = 60 * 60 * 1000;
 
 type ChecklistItemProps = {
   label: string;
@@ -221,7 +222,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
 
     if (status === "FAILED" || (resultParams?.cloud_provider_account_config_id && hasInstructions)) {
       setIsPolling(false);
-    } else if (Date.now() - pollStartTimeRef.current < POLL_MAX_DURATION_MS) {
+    } else if (Date.now() - pollStartTimeRef.current < INSTRUCTION_POLL_MAX_DURATION_MS) {
       timeoutId.current = setTimeout(startPolling, POLL_INTERVAL_MS);
     } else {
       setIsPolling(false);
@@ -245,7 +246,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Status polling: poll every 5s, max 2 min, until READY or FAILED ───
+  // ─── Status polling: poll every 5s, max 60 min, until READY or FAILED ───
   const [isStatusPolling, setIsStatusPolling] = useState(false);
   const statusPollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const statusPollStart = useRef<number>(0);
@@ -274,7 +275,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       if (!isMounted.current) return;
 
       // Check if max duration exceeded
-      if (Date.now() - statusPollStart.current >= POLL_MAX_DURATION_MS) {
+      if (Date.now() - statusPollStart.current >= STATUS_POLL_MAX_DURATION_MS) {
         setIsStatusPolling(false);
         return;
       }
