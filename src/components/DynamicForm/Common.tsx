@@ -379,21 +379,32 @@ export const RadioField = ({ field, formData }) => {
         handleChange(e);
       }}
     >
-      {field.options.map((option) => (
-        <FormControlLabel
-          data-testid={option.dataTestId ?? ""}
-          control={<Radio />}
-          key={option.value}
-          value={option.value}
-          label={
-            <Stack direction={"row"} alignItems={"center"} justifyContent={"flex-start"} gap="2px">
-              {option.label}
-              {option.labelChips?.map((item) => item)}
-            </Stack>
-          }
-          disabled={option.disabled}
-        />
-      ))}
+      {field.options.map((option) => {
+        const radioOption = (
+          <FormControlLabel
+            data-testid={option.dataTestId ?? ""}
+            control={<Radio />}
+            value={option.value}
+            label={
+              <Stack direction={"row"} alignItems={"center"} justifyContent={"flex-start"} gap="2px">
+                {option.label}
+                {option.labelChips?.map((item) => item)}
+              </Stack>
+            }
+            disabled={option.disabled}
+          />
+        );
+
+        if (option.disabled && option.disabledMessage) {
+          return (
+            <Tooltip title={option.disabledMessage} key={option.value}>
+              <span>{radioOption}</span>
+            </Tooltip>
+          );
+        }
+
+        return <Box key={option.value}>{radioOption}</Box>;
+      })}
     </RadioGroup>
   );
 };

@@ -1,8 +1,5 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, Collapse, Stack } from "@mui/material";
@@ -14,9 +11,23 @@ import InstanceDialogs from "app/(dashboard)/instances/components/InstanceDialog
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 import { Overlay } from "app/(dashboard)/instances/page";
 import { platformToCloudProviderMap } from "app/(dashboard)/instances/utils";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { use, useEffect, useMemo, useState } from "react";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
+import Button from "components/Button/Button";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
+import Backup from "components/ResourceInstance/Backup/Backup";
+import Connectivity from "components/ResourceInstance/Connectivity/Connectivity";
+import Logs from "components/ResourceInstance/Logs/Logs";
+import GrafanaMetrics, { type MetricsFeature } from "components/ResourceInstance/Metrics/GrafanaMetrics";
+import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
+import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
+import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
+import { DisplayText } from "components/Typography/Typography";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import ResourceCustomDNS from "src/components/ResourceInstance/Connectivity/ResourceCustomDNS";
 import LogsDashboard from "src/components/ResourceInstance/Logs/LogsDashboard";
@@ -30,17 +41,6 @@ import {
   toggleInstanceDetailsSummaryVisibility,
 } from "src/slices/genericSlice";
 import { NetworkType } from "src/types/common/enums";
-import Button from "components/Button/Button";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import AuditLogs from "components/ResourceInstance/AuditLogs/AuditLogs";
-import Backup from "components/ResourceInstance/Backup/Backup";
-import Connectivity from "components/ResourceInstance/Connectivity/Connectivity";
-import Logs from "components/ResourceInstance/Logs/Logs";
-import GrafanaMetrics, { type MetricsFeature } from "components/ResourceInstance/Metrics/GrafanaMetrics";
-import NodesTable from "components/ResourceInstance/NodesTable/NodesTable";
-import ResourceInstanceDetails from "components/ResourceInstance/ResourceInstanceDetails/ResourceInstanceDetails";
-import ResourceInstanceOverview from "components/ResourceInstance/ResourceInstanceOverview/ResourceInstanceOverview";
-import { DisplayText } from "components/Typography/Typography";
 
 import { checkCustomDNSEndpoint, getTabs } from "./utils";
 
