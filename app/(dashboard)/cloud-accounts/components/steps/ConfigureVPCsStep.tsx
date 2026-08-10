@@ -101,20 +101,25 @@ const VpcsDataGridHeader = ({
   selectedUnimportIds: string[];
 }) => {
   const selectedVpcs = selectedImportIds.length + selectedUnimportIds.length;
+  const hasMixedSelection = selectedImportIds.length > 0 && selectedUnimportIds.length > 0;
   const importDisabledMessage = isImporting
     ? "A VPC update is already in progress."
-    : selectedVpcs === 0
-      ? "Select an available VPC to import it."
-      : selectedImportIds.length === 0
-        ? "Only available VPCs can be imported."
-        : "";
+    : hasMixedSelection
+      ? "Select only import or unimport VPCs at a time."
+      : selectedVpcs === 0
+        ? "Select an available VPC to import it."
+        : selectedImportIds.length === 0
+          ? "Only available VPCs can be imported."
+          : "";
   const unimportDisabledMessage = isImporting
     ? "A VPC update is already in progress."
-    : selectedVpcs === 0
-      ? "Select an imported VPC that is not in use to unimport it."
-      : selectedUnimportIds.length === 0
-        ? "Only imported VPCs that are not in use can be unimported."
-        : "";
+    : hasMixedSelection
+      ? "Select only import or unimport VPCs at a time."
+      : selectedVpcs === 0
+        ? "Select an imported VPC that is not in use to unimport it."
+        : selectedUnimportIds.length === 0
+          ? "Only imported VPCs that are not in use can be unimported."
+          : "";
 
   return (
     <>
@@ -149,7 +154,7 @@ const VpcsDataGridHeader = ({
               variant="contained"
               size="small"
               onClick={() => onUnimport?.(selectedUnimportIds)}
-              disabled={isImporting || selectedUnimportIds.length === 0}
+              disabled={isImporting || hasMixedSelection || selectedUnimportIds.length === 0}
               disabledMessage={unimportDisabledMessage}
               data-testid="unimport-vpcs-button"
               sx={{ minWidth: "120px" }}
@@ -167,7 +172,7 @@ const VpcsDataGridHeader = ({
               variant="contained"
               size="small"
               onClick={() => onImport?.(selectedImportIds)}
-              disabled={isImporting || selectedImportIds.length === 0}
+              disabled={isImporting || hasMixedSelection || selectedImportIds.length === 0}
               disabledMessage={importDisabledMessage}
               data-testid="import-vpcs-button"
               sx={{ minWidth: "120px" }}
@@ -272,7 +277,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         field: "imported",
         headerName: "Imported",
         flex: 0.55,
-        minWidth: 80,
+        minWidth: 90,
         valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
       },
       {

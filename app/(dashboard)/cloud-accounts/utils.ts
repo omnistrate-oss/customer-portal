@@ -47,7 +47,7 @@ export const canImportCloudNativeNetwork = (network: CloudNativeNetworkState): b
   network.imported === false && network.inUse === false && !isFailedCloudNativeNetwork(network);
 
 export const canUnimportCloudNativeNetwork = (network: CloudNativeNetworkState): boolean =>
-  network.imported === true && network.inUse === false && !isFailedCloudNativeNetwork(network);
+  network.imported === true && network.inUse === false;
 
 export const getCloudNativeNetworkRegions = (networks: CloudNativeNetworkState[]): string[] =>
   Array.from(
