@@ -119,6 +119,10 @@ export const TextContainerToCopy = (props) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        // A flex item defaults to min-width:auto, so an unbroken value like an OCI OCID sets the
+        // floor for the whole column and pushes it past the dialog instead of ellipsing.
+        minWidth: 0,
+        maxWidth: "100%",
       }}
     >
       <Box
@@ -132,9 +136,18 @@ export const TextContainerToCopy = (props) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          minWidth: 0,
+          overflow: "hidden",
         }}
       >
-        <Text size="medium" weight="regular" color="#667085" ellipsis title={text}>
+        <Text
+          size="medium"
+          weight="regular"
+          color="#667085"
+          ellipsis
+          title={text}
+          sx={{ flex: 1, minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" }}
+        >
           {text}
         </Text>
 
@@ -314,11 +327,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">GCP Project ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.gcpProjectID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">GCP Project Number</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.gcpProjectNumber} marginTop="6px" />
           </Box>
@@ -348,11 +361,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">Azure Subscription ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.azureSubscriptionID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">Azure Tenant ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.azureTenantID} marginTop="6px" />
           </Box>
@@ -382,11 +395,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">OCI Tenancy OCID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">OCI Domain OCID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
           </Box>
@@ -465,11 +478,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.gcpProjectID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">GCP Project ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.gcpProjectID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">GCP Project Number</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.gcpProjectNumber} marginTop="6px" />
             </Box>
@@ -478,11 +491,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.azureSubscriptionID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">Azure Subscription ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.azureSubscriptionID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">Azure Tenant ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.azureTenantID} marginTop="6px" />
             </Box>
@@ -491,11 +504,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.ociTenancyID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">OCI Tenancy OCID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">OCI Domain OCID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
             </Box>

@@ -87,13 +87,13 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
 
       {offboardingInstructionDetails?.gcpProjectID && (
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px" marginBottom={"20px"}>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               GCP Project ID
             </Text>
             <TextContainerToCopy text={offboardingInstructionDetails?.gcpProjectID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               GCP Project Number
             </Text>
@@ -104,13 +104,13 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
 
       {offboardingInstructionDetails?.azureSubscriptionID && (
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px" marginBottom={"20px"}>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               Azure Subscription ID
             </Text>
             <TextContainerToCopy text={offboardingInstructionDetails?.azureSubscriptionID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               Azure Tenant ID
             </Text>
@@ -121,13 +121,13 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
 
       {offboardingInstructionDetails?.ociTenancyID && (
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px" marginBottom={"20px"}>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               OCI Tenancy OCID
             </Text>
             <TextContainerToCopy text={offboardingInstructionDetails?.ociTenancyID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <Text size="small" weight="semibold" color="#374151">
               OCI Domain OCID
             </Text>
