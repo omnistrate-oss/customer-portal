@@ -53,6 +53,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId }) => 
         </Text>
 
         <IconButton
+          aria-label={`Copy ${title.toLowerCase()} command`}
           sx={{ flexShrink: 0 }}
           onClick={() => {
             clipboard

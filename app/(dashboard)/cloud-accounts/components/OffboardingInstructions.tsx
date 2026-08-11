@@ -198,7 +198,7 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
                       <StepBullet />
                     </ListItemIcon>
                     <Text size="small" weight="regular" color="#374151">
-                      Locate the Omnistrate onboarding stack
+                      Locate the onboarding stack created during setup
                     </Text>
                   </ListItem>
                   <ListItem sx={{ gap: "8px" }}>

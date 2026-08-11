@@ -109,11 +109,16 @@ const quoteShellArg = (value: string): string =>
  * and quoted, otherwise the CLI reads it as the next key/value pair — `OIDCIssuerThumbprintList`
  * is a `CommaDelimitedList`, so a second thumbprint would silently truncate the parameter.
  *
+ * Backslashes are escaped first: the CLI unescapes `\\` before it looks for separators, so a value
+ * ending in a backslash would otherwise consume the `\` of the following `\,` and leave the comma
+ * live — truncating the value at exactly the point the escaping meant to protect.
+ *
  * @example formatStackParameter({ key: "OIDCIssuerThumbprintList", value: "aaa,bbb" })
  * // => "'ParameterKey=OIDCIssuerThumbprintList,ParameterValue=aaa\\,bbb'"
  */
 const formatStackParameter = ({ key, value }: AwsCloudFormationStackParameter): string => {
-  const entry = `ParameterKey=${key},ParameterValue=${value.replace(/,/g, "\\,")}`;
+  const escapedValue = value.replace(/\\/g, "\\\\").replace(/,/g, "\\,");
+  const entry = `ParameterKey=${key},ParameterValue=${escapedValue}`;
 
   return SHELL_SAFE_VALUE.test(value) ? entry : `'${entry.replace(/'/g, `'\\''`)}'`;
 };
