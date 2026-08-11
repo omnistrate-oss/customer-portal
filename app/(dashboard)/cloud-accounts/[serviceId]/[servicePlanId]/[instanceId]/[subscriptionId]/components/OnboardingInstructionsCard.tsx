@@ -1,10 +1,13 @@
 import { FC } from "react";
 import { Box, Stack } from "@mui/material";
 
+import AwsCloudFormationInstructions from "src/components/AwsCloudFormationInstructions/AwsCloudFormationInstructions";
 import { ContainerCard } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { Text } from "src/components/Typography/Typography";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { hasAwsCloudFormationCliCommands } from "src/utils/accountConfig/awsCloudFormation";
+import { getResultParams } from "src/utils/instance";
 
 import CommandList from "./CommandList";
 import { getOnboardingInstructions } from "./onboardingInstructions";
@@ -17,6 +20,8 @@ type OnboardingInstructionsCardProps = {
 const OnboardingInstructionsCard: FC<OnboardingInstructionsCardProps> = ({ instance, cloudProvider }) => {
   const instructions = getOnboardingInstructions(instance, cloudProvider);
   if (!instructions) return null;
+
+  const hasCliTab = hasAwsCloudFormationCliCommands(instructions.awsCloudFormationUrl);
 
   return (
     <ContainerCard
@@ -36,6 +41,16 @@ const OnboardingInstructionsCard: FC<OnboardingInstructionsCardProps> = ({ insta
             <Text size="small" weight="regular" color="#535862">
               {instructions.notice}
             </Text>
+          </Box>
+        ) : hasCliTab ? (
+          <Box padding="16px 24px 24px">
+            <AwsCloudFormationInstructions
+              cloudFormationUrl={instructions.awsCloudFormationUrl}
+              variant="onboarding"
+              awsAccountId={getResultParams(instance)?.aws_account_id}
+            >
+              <CommandList commands={instructions.steps} titleTestId="account-onboarding-step" disableGutters />
+            </AwsCloudFormationInstructions>
           </Box>
         ) : (
           <CommandList commands={instructions.steps} titleTestId="account-onboarding-step" />

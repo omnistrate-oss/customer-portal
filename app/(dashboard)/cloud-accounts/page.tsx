@@ -99,7 +99,7 @@ const CloudAccountsPage = () => {
 
   const awsCloudFormationTemplateUrl = useMemo(() => {
     const resultParams = getResultParams(clickedInstance);
-    return resultParams?.cloudformation_url;
+    return resultParams?.cloudformation_url || resultParams?.cloudformation_url_no_lb;
   }, [clickedInstance]);
 
   const gcpBootstrapShellCommand = useMemo(() => {
@@ -591,6 +591,7 @@ const CloudAccountsPage = () => {
     if (resultParams?.aws_account_id) {
       details = {
         awsAccountID: resultParams?.aws_account_id,
+        awsCloudFormationUrl: resultParams?.cloudformation_url || resultParams?.cloudformation_url_no_lb,
       };
     } else if (resultParams?.gcp_project_id) {
       details = {

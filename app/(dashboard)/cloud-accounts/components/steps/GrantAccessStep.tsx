@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Box, Stack } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 
+import AwsCloudFormationInstructions from "src/components/AwsCloudFormationInstructions/AwsCloudFormationInstructions";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
@@ -124,7 +125,7 @@ const ChecklistItem = ({ label, isComplete, isInProgress, isFailed, connectorCol
         {label}
       </Text>
     </Stack>
-    {children && <Box sx={{ ml: "36px" }}>{children}</Box>}
+    {children && <Box sx={{ ml: "36px", minWidth: 0 }}>{children}</Box>}
   </Stack>
 );
 
@@ -196,7 +197,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     const resultParams = getResultParams(resourceInstance);
     const status = String(resourceInstance?.status || resultParams.account_config_status || "").toUpperCase();
     const hasInstructions =
-      (hasAwsAccount && !!resultParams.cloudformation_url) ||
+      (hasAwsAccount && !!(resultParams.cloudformation_url || resultParams.cloudformation_url_no_lb)) ||
       (hasGcpAccount && !!resultParams.gcp_bootstrap_shell_script) ||
       (hasAzureAccount && !!resultParams.azure_bootstrap_shell_script) ||
       (hasOciAccount && !!resultParams.oci_bootstrap_shell_script);
@@ -395,20 +396,28 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
             <TextContainerToCopy text={accountInstructionDetails.awsAccountID!} marginTop="6px" />
           </Box>
           {cloudFormationTemplateUrl ? (
-            <Stack gap="8px">
+            <Stack gap="8px" minWidth={0}>
               <Text size="small" weight="semibold" color="#344054">
                 To complete the account configuration, the instructions are provided below:
               </Text>
-              <Text size="small" weight="regular" color="#344054">
-                Please create your CloudFormation Stack using the provided template {cloudformationlink}.
-              </Text>
-              <Text size="small" weight="regular" color="#344054">
-                If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
-                CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
-              </Text>
-              <Text size="small" weight="regular" color="#344054">
-                For guidance, our instructional video is available {cloudFormationGuide}.
-              </Text>
+              <AwsCloudFormationInstructions
+                cloudFormationUrl={cloudFormationTemplateUrl}
+                variant="onboarding"
+                awsAccountId={accountInstructionDetails.awsAccountID}
+              >
+                <Stack gap="8px">
+                  <Text size="small" weight="regular" color="#344054">
+                    Please create your CloudFormation Stack using the provided template {cloudformationlink}.
+                  </Text>
+                  <Text size="small" weight="regular" color="#344054">
+                    If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
+                    CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
+                  </Text>
+                  <Text size="small" weight="regular" color="#344054">
+                    For guidance, our instructional video is available {cloudFormationGuide}.
+                  </Text>
+                </Stack>
+              </AwsCloudFormationInstructions>
             </Stack>
           ) : (
             <Text size="small" weight="regular" color="#344054">
