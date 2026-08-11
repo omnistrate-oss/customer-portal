@@ -1,10 +1,10 @@
 "use client";
 
-import { Box, Stack } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { Box, Stack } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
@@ -15,6 +15,7 @@ import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import { getResultParams } from "src/utils/instance";
+import { getPollingInterval } from "src/utils/polling";
 
 import sandClock from "public/assets/images/cloud-account/sandclock.gif";
 
@@ -73,8 +74,7 @@ const TextContainerToCopy = ({ text, marginTop = "20px" }: { text: string; margi
   </Box>
 );
 
-const POLL_INTERVAL_MS = 5_000;
-const POLL_MAX_DURATION_MS = 2 * 60 * 1000;
+const POLL_MAX_DURATION_MS = 60 * 60 * 1000;
 
 type ChecklistItemProps = {
   label: string;
@@ -222,7 +222,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     if (status === "FAILED" || (resultParams?.cloud_provider_account_config_id && hasInstructions)) {
       setIsPolling(false);
     } else if (Date.now() - pollStartTimeRef.current < POLL_MAX_DURATION_MS) {
-      timeoutId.current = setTimeout(startPolling, POLL_INTERVAL_MS);
+      timeoutId.current = setTimeout(startPolling, getPollingInterval(Date.now() - pollStartTimeRef.current));
     } else {
       setIsPolling(false);
     }
@@ -245,7 +245,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Status polling: poll every 5s, max 2 min, until READY or FAILED ───
+  // ─── Status polling: poll every 5s, max 60 min, until READY or FAILED ───
   const [isStatusPolling, setIsStatusPolling] = useState(false);
   const statusPollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const statusPollStart = useRef<number>(0);
@@ -305,7 +305,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
       }
 
       if (isMounted.current) {
-        statusPollTimer.current = setTimeout(pollStatus, POLL_INTERVAL_MS);
+        statusPollTimer.current = setTimeout(pollStatus, getPollingInterval(Date.now() - statusPollStart.current));
       }
     };
 
