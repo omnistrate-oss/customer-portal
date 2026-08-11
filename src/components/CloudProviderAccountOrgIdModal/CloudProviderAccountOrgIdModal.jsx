@@ -9,12 +9,14 @@ import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
+import { hasAwsCloudFormationCliCommands } from "src/utils/accountConfig/awsCloudFormation";
 import {
   // ACCOUNT_CREATION_METHODS,
   getAccountConfigStatusBasedHeader,
 } from "src/utils/constants/accountConfig";
 import { getResultParams } from "src/utils/instance";
 
+import AwsCloudFormationInstructions from "../AwsCloudFormationInstructions/AwsCloudFormationInstructions";
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import CopyToClipboardButton from "../CopyClipboardButton/CopyClipboardButton";
 import InstructionsModalIcon from "../Icons/AccountConfig/InstructionsModalIcon";
@@ -39,7 +41,10 @@ const StyledContainer = styled(Box)({
   boxShadow: "0px 8px 8px -4px rgba(16, 24, 40, 0.03), 0px 20px 24px -4px rgba(16, 24, 40, 0.08)",
   padding: "24px",
   width: "100%",
-  maxWidth: "550px",
+  maxWidth: "680px",
+  // Without a bound, the fixed positioning lets tall content run past the viewport, taking the
+  // footer's Close button with it.
+  maxHeight: "calc(100vh - 48px)",
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
@@ -50,11 +55,17 @@ const Header = styled(Box)({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  flexShrink: 0,
 });
 
 const Content = styled(Box)({
   marginTop: "20px",
   width: "100%",
+  flex: 1,
+  minHeight: 0,
+  overflowY: "auto",
+  // Left `visible`, CSS promotes this to `auto` and stray overflow becomes a body-wide scrollbar.
+  overflowX: "hidden",
 });
 
 const Footer = styled(Box)({
@@ -64,6 +75,7 @@ const Footer = styled(Box)({
   justifyContent: "flex-end",
   alignItems: "center",
   gap: "16px",
+  flexShrink: 0,
 });
 
 const StyledLink = styled(Link)({
@@ -107,6 +119,10 @@ export const TextContainerToCopy = (props) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        // A flex item defaults to min-width:auto, so an unbroken value like an OCI OCID sets the
+        // floor for the whole column and pushes it past the dialog instead of ellipsing.
+        minWidth: 0,
+        maxWidth: "100%",
       }}
     >
       <Box
@@ -120,9 +136,18 @@ export const TextContainerToCopy = (props) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          minWidth: 0,
+          overflow: "hidden",
         }}
       >
-        <Text size="medium" weight="regular" color="#667085" ellipsis title={text}>
+        <Text
+          size="medium"
+          weight="regular"
+          color="#667085"
+          ellipsis
+          title={text}
+          sx={{ flex: 1, minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" }}
+        >
           {text}
         </Text>
 
@@ -270,21 +295,27 @@ const CreationTimeInstructions = (props) => {
         <TextContainerToCopy text={accountInstructionDetails?.awsAccountID} marginTop="6px" />
 
         {cloudFormationTemplateUrl ? (
-          <>
-            <BodyText sx={{ marginTop: "20px" }}>
-              Your account details have been saved. To complete the setup please create your CloudFormation Stack using
-              the provided template {cloudformationlink}.
-            </BodyText>
+          <Box marginTop="20px">
+            <AwsCloudFormationInstructions
+              cloudFormationUrl={cloudFormationTemplateUrl}
+              variant="onboarding"
+              awsAccountId={accountInstructionDetails?.awsAccountID}
+            >
+              <BodyText>
+                Your account details have been saved. To complete the setup please create your CloudFormation Stack
+                using the provided template {cloudformationlink}.
+              </BodyText>
 
-            <BodyText sx={{ marginTop: "20px" }}>
-              If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the CloudFormation
-              stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
-            </BodyText>
+              <BodyText sx={{ marginTop: "20px" }}>
+                If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
+                CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
+              </BodyText>
 
-            <BodyText sx={{ marginTop: "20px" }}>
-              For guidance, our instructional video is available {cloudFormationGuide}.
-            </BodyText>
-          </>
+              <BodyText sx={{ marginTop: "20px" }}>
+                For guidance, our instructional video is available {cloudFormationGuide}.
+              </BodyText>
+            </AwsCloudFormationInstructions>
+          </Box>
         ) : (
           <BodyText sx={{ marginTop: "20px" }}>
             Your CloudFormation Stack is being configured. Please check back shortly for detailed setup instructions.
@@ -296,11 +327,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">GCP Project ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.gcpProjectID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">GCP Project Number</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.gcpProjectNumber} marginTop="6px" />
           </Box>
@@ -330,11 +361,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">Azure Subscription ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.azureSubscriptionID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">Azure Tenant ID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.azureTenantID} marginTop="6px" />
           </Box>
@@ -364,11 +395,11 @@ const CreationTimeInstructions = (props) => {
     return (
       <>
         <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">OCI Tenancy OCID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
           </Box>
-          <Box flex={1} maxWidth={"50%"}>
+          <Box flex={1} minWidth={0}>
             <BodyText weight="medium">OCI Domain OCID</BodyText>
             <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
           </Box>
@@ -447,11 +478,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.gcpProjectID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">GCP Project ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.gcpProjectID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">GCP Project Number</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.gcpProjectNumber} marginTop="6px" />
             </Box>
@@ -460,11 +491,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.azureSubscriptionID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">Azure Subscription ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.azureSubscriptionID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">Azure Tenant ID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.azureTenantID} marginTop="6px" />
             </Box>
@@ -473,11 +504,11 @@ const NonCreationTimeInstructions = (props) => {
 
         {accountInstructionDetails?.ociTenancyID && (
           <Stack direction={"row"} alignItems={"flex-start"} gap="12px">
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">OCI Tenancy OCID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.ociTenancyID} marginTop="6px" />
             </Box>
-            <Box flex={1} maxWidth={"50%"}>
+            <Box flex={1} minWidth={0}>
               <BodyText weight="medium">OCI Domain OCID</BodyText>
               <TextContainerToCopy text={accountInstructionDetails?.ociDomainID} marginTop="6px" />
             </Box>
@@ -495,22 +526,30 @@ const NonCreationTimeInstructions = (props) => {
           <>
             {accountInstructionDetails?.awsAccountID && (
               <ListItem>
-                <ListItemIcon>
-                  <ArrowBulletSmall />
-                </ListItemIcon>
+                {!hasAwsCloudFormationCliCommands(cloudFormationTemplateUrl) && (
+                  <ListItemIcon>
+                    <ArrowBulletSmall />
+                  </ListItemIcon>
+                )}
                 {cloudFormationTemplateUrl ? (
-                  <>
-                    <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
-                      <BodyText>
-                        Please create your CloudFormation Stack using the provided template {cloudformationlink}.
-                      </BodyText>
-                      <BodyText>
-                        If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
-                        CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
-                      </BodyText>
-                      <BodyText>For guidance, our instructional video is available {cloudFormationGuide}.</BodyText>
-                    </Box>
-                  </>
+                  <Box flex={1} minWidth={0}>
+                    <AwsCloudFormationInstructions
+                      cloudFormationUrl={cloudFormationTemplateUrl}
+                      variant="onboarding"
+                      awsAccountId={accountInstructionDetails?.awsAccountID}
+                    >
+                      <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
+                        <BodyText>
+                          Please create your CloudFormation Stack using the provided template {cloudformationlink}.
+                        </BodyText>
+                        <BodyText>
+                          If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error while creating the
+                          CloudFormation stack, set the parameter CreateLoadBalancerPolicy to &quot;false&quot;.
+                        </BodyText>
+                        <BodyText>For guidance, our instructional video is available {cloudFormationGuide}.</BodyText>
+                      </Box>
+                    </AwsCloudFormationInstructions>
+                  </Box>
                 ) : selectedAccountConfig?.status === "FAILED" ? (
                   <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
                     <BodyText>

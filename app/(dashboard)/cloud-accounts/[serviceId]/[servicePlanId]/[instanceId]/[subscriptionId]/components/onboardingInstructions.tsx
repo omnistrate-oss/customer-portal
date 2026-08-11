@@ -65,7 +65,7 @@ const PROVIDER_INSTRUCTIONS: Record<CloudProvider, ProviderInstructions | null> 
         <ExternalLink href={CLOUDFORMATION_GUIDE_URL}>here</ExternalLink>.
       </>
     ),
-    getCommand: (resultParams) => resultParams?.cloudformation_url,
+    getCommand: (resultParams) => resultParams?.cloudformation_url || resultParams?.cloudformation_url_no_lb,
     isUrl: true,
     failedNotice:
       "You may delete this failed configuration and retry adding it after carefully verifying the AWS Account ID. If the issue persists, please contact Support for assistance.",
@@ -127,6 +127,8 @@ export type OnboardingInstructions = {
   steps: CommandListItem[];
   /** Shown in place of the step while the command is unavailable. */
   notice?: string;
+  /** Set for AWS only, so the card can offer the CLI equivalent of the quick-create link. */
+  awsCloudFormationUrl?: string;
 };
 
 export const getOnboardingInstructions = (
@@ -161,5 +163,6 @@ export const getOnboardingInstructions = (
         ...(instructions.isUrl ? { href: command } : { copyValue: addQuotesToShellCommand(command) }),
       },
     ],
+    ...(cloudProvider === "aws" ? { awsCloudFormationUrl: command } : {}),
   };
 };

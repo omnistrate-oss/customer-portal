@@ -368,7 +368,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Grant Access derived data ─────────────────────────────────────────────
   const cloudFormationTemplateUrl = useMemo(() => {
     const rp = getResultParams(clickedInstance);
-    return rp?.cloudformation_url;
+    return rp?.cloudformation_url || rp?.cloudformation_url_no_lb;
   }, [clickedInstance]);
 
   const gcpBootstrapShellCommand = useMemo(() => {

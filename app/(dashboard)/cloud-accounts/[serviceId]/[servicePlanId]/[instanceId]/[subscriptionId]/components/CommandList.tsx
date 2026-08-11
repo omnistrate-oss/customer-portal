@@ -46,9 +46,17 @@ type CommandListProps = {
   commands: CommandListItem[];
   titleTestId?: string;
   codeColor?: string;
+  /** Drops the card gutters and outer spacing so a parent — e.g. a tab panel — can own the layout. */
+  disableGutters?: boolean;
 };
 
-const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = "white" }) => {
+const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = "white", disableGutters }) => {
+  // The 24px between the two columns keeps the divider off the text either way; only the outer
+  // edges are dropped, since a wrapping tab panel already supplies them.
+  const descriptionGutter = disableGutters ? "0px 24px 0px 0px" : "0px 24px";
+  const commandGutter = disableGutters ? "0px 0px 0px 24px" : "0px 24px";
+  const outerSpacing = disableGutters ? "0px" : "25px";
+
   return (
     <Box display="grid" gridTemplateColumns="1fr 1fr">
       {commands.map((command, index) => {
@@ -57,7 +65,12 @@ const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = 
 
         return (
           <Fragment key={command.title}>
-            <Stack p="0px 24px" borderRight="1px solid #E9EAEB" marginTop="25px" marginBottom={isLast ? "25px" : "0px"}>
+            <Stack
+              p={descriptionGutter}
+              borderRight="1px solid #E9EAEB"
+              marginTop={outerSpacing}
+              marginBottom={isLast ? outerSpacing : "0px"}
+            >
               <Text
                 size="xsmall"
                 weight="semibold"
@@ -70,7 +83,7 @@ const CommandList: FC<CommandListProps> = ({ commands, titleTestId, codeColor = 
                 {command.description}
               </Text>
             </Stack>
-            <Stack p="0px 24px" marginTop="25px" marginBottom={isLast ? "25px" : "0px"}>
+            <Stack p={commandGutter} marginTop={outerSpacing} marginBottom={isLast ? outerSpacing : "0px"}>
               <Stack
                 direction="row"
                 alignItems="start"
