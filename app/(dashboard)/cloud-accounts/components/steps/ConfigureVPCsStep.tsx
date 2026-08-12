@@ -10,6 +10,7 @@ import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import DataGrid from "src/components/DataGrid/DataGrid";
+import DataGridText from "src/components/DataGrid/DataGridText";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshIcon from "src/components/Icons/Refresh/Refresh";
@@ -39,6 +40,11 @@ export type ConfigureVPCsFormValues = {
   selectedRegions: string[];
   selectedVpcIds: string[];
 };
+
+export const getVpcBooleanChipProps = (value: boolean) => ({
+  label: value ? "Yes" : "No",
+  category: value ? ("success" as const) : ("unknown" as const),
+});
 
 type ConfigureVPCsStepProps = {
   values: ConfigureVPCsFormValues;
@@ -278,21 +284,27 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         headerName: "Imported",
         flex: 0.55,
         minWidth: 90,
-        valueGetter: (params) => (params.row.imported ? "Yes" : "No"),
+        renderCell: (params) => (
+          <StatusChip {...getVpcBooleanChipProps(params.row.imported)} data-testid="vpc-imported-chip" />
+        ),
       },
       {
         field: "inUse",
         headerName: "In Use",
         flex: 0.55,
         minWidth: 70,
-        valueGetter: (params) => (params.row.inUse ? "Yes" : "No"),
+        renderCell: (params) => (
+          <StatusChip {...getVpcBooleanChipProps(params.row.inUse)} data-testid="vpc-in-use-chip" />
+        ),
       },
       {
         field: "networkId",
         headerName: "Network ID",
         flex: 1,
         minWidth: 180,
-        valueGetter: (params) => params.row.networkId || "-",
+        renderCell: (params) => (
+          <DataGridText showCopyButton={Boolean(params.row.networkId)}>{params.row.networkId || "-"}</DataGridText>
+        ),
       },
       {
         field: "cidr",
@@ -480,7 +492,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               {/* VPCs table */}
               {values.selectedRegions.length > 0 ? (
                 <DataGrid
-                  autoHeight
                   checkboxSelection
                   disableSelectionOnClick
                   getRowId={(row) => row.id}
@@ -511,25 +522,6 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   }}
                   loading={isLoadingVpcs || isFetchingVPCs}
                   noRowsText={isLoadingVpcs || isFetchingVPCs ? "Loading VPCs…" : emptyStateMessage}
-                  sx={{
-                    mt: "8px",
-                    borderRadius: "8px",
-                    boxShadow: "none",
-                    overflowX: "auto",
-                    "& .MuiDataGrid-virtualScroller": {
-                      overflowX: "auto",
-                      overflowY: "hidden",
-                    },
-                    "& .MuiDataGrid-main": {
-                      minHeight: 0,
-                    },
-                    "& .MuiDataGrid-columnHeaderCheckbox": {
-                      paddingLeft: "24px !important",
-                    },
-                    "& .MuiDataGrid-cellCheckbox": {
-                      paddingLeft: "24px !important",
-                    },
-                  }}
                 />
               ) : (
                 <Box
