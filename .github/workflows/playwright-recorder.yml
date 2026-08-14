@@ -20,7 +20,7 @@ on:
 jobs:
   record:
     name: Record HAR Files
-    timeout-minutes: 90
+    timeout-minutes: 120
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -286,11 +286,33 @@ jobs:
     name: Notify on Failure
     runs-on: ubuntu-latest
     needs: record
-    if: always() && needs.record.result == 'failure'
+    if: always() && (needs.record.result == 'failure' || needs.record.result == 'cancelled')
     steps:
       - name: Mattermost Notification
+        if: needs.record.result == 'failure'
         uses: tferreira/matterfy@5a3ff436559b90961d816fad08d4246a70c380ce  # v1.9
         with:
           type: failure
           job_name: '*SaaSBuilder Playwright HAR Recorder*'
           url: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+
+      - name: Notify Mattermost of timeout or cancellation
+        if: needs.record.result == 'cancelled'
+        env:
+          MATTERMOST_UI_TEAM_WEBHOOK: ${{ secrets.MATTERMOST_UI_TEAM_WEBHOOK }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          printf -v TEXT '#### :warning: SaaSBuilder Playwright HAR Recorder timed out or was cancelled (120-minute limit)\nHAR files were **not committed**.\n\n:link: [View full run](%s)' "$RUN_URL"
+
+          PAYLOAD=$(jq -n \
+            --arg text "$TEXT" \
+            '{
+              "username": "Playwright Recorder",
+              "icon_url": "https://playwright.dev/img/playwright-logo.svg",
+              "text": $text
+            }')
+
+          curl --fail-with-body -sS -X POST \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$MATTERMOST_UI_TEAM_WEBHOOK"
