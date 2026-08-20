@@ -32,16 +32,7 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
   const sections = formConfiguration.sections || [];
   const cloudProvider = typeof formData.values.cloudProvider === "string" ? formData.values.cloudProvider : undefined;
 
-  const privateConnectivityType =
-    cloudProvider === "aws"
-      ? "AWS PrivateLink"
-      : cloudProvider === "gcp"
-        ? "Google Cloud Private Service Connect"
-        : cloudProvider === "azure"
-          ? "Azure Private Link"
-          : cloudProvider === "oci"
-            ? "OCI private connectivity"
-            : "provider-native private connectivity";
+  const privateConnectivityDescription = cloudProvider === "aws" ? " (AWS PrivateLink)" : "";
 
   const isPrivateConnectivitySupported = cloudProvider === "aws";
 
@@ -64,8 +55,8 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
                     </Text>
                     <Stack gap="10px">
                       <Text size="small" weight="regular" color="#535862">
-                        Route all control-plane and app-plane communication over provider-native private connectivity (
-                        {privateConnectivityType}).
+                        Route all control-plane and app-plane communication over provider-native private connectivity
+                        {privateConnectivityDescription}.
                       </Text>
                     </Stack>
                   </div>
