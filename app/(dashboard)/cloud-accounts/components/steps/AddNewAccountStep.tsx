@@ -55,7 +55,7 @@ const AddNewAccountStep: React.FC<AddNewAccountStepProps> = ({
                     </Text>
                     <Stack gap="10px">
                       <Text size="small" weight="regular" color="#535862">
-                        Route all control-plane and app-plane communication over provider-native private connectivity
+                        Route all control-plane ↔ app-plane communication over provider-native private connectivity
                         {privateConnectivityDescription}.
                       </Text>
                     </Stack>
