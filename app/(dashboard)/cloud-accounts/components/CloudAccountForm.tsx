@@ -494,8 +494,8 @@ const CloudAccountForm = ({
               label: "Enable Private Connectivity",
               subLabel: (
                 <>
-                  Route all control-plane ↔ app-plane communication over provider-native private connectivity.(AWS
-                  PrivateLink).
+                  Route all control-plane ↔ app-plane communication over provider-native private connectivity{" "}
+                  {cloudProvider === "aws" ? "(AWS PrivateLink)." : "."}
                   <PrivateConnectivityDescription />
                 </>
               ),
