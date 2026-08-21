@@ -1,9 +1,7 @@
 import React, { CSSProperties, FC, ReactNode, useMemo, useState } from "react";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Box, CircularProgress, Stack, SxProps } from "@mui/material";
 import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import {
   ColumnDef,
   ExpandedState,
@@ -14,7 +12,6 @@ import {
   getSortedRowModel,
   Row,
   RowData,
-  SortDirection,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -30,37 +27,6 @@ import {
   TableHead,
   TableRow,
 } from "./components/styled";
-
-const sortIcon = {
-  asc: ArrowUpwardIcon,
-  desc: ArrowDownwardIcon,
-};
-
-type SortIconProps = {
-  sortDirection: SortDirection | false;
-};
-
-const SortIcon: React.FC<SortIconProps> = (props) => {
-  const { sortDirection } = props;
-
-  let Icon = ArrowUpwardIcon;
-
-  if (sortDirection) {
-    Icon = sortIcon[sortDirection];
-  }
-
-  //if sort direction is available, then icon needs to be shown with darker color
-  return (
-    <IconButton size="small">
-      <Icon
-        sx={{
-          fontSize: "18px",
-          color: sortDirection ? "rgba(0,0,0,0.54)" : "rgba(0,0,0,0.27)",
-        }}
-      />
-    </IconButton>
-  );
-};
 
 type SelectionMode = "single" | "multiple" | "none";
 
@@ -195,7 +161,7 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
     getRowId: (row, index) => (row[rowId] != null ? String(row[rowId]) : String(index)), // Use the specified rowId property or fallback to index if not available
   });
 
-  const rowData = table.getRowModel().rows;
+  const rowData = hidePagination ? table.getPrePaginationRowModel().rows : table.getRowModel().rows;
 
   const numsColumns = table.getHeaderGroups().reduce((acc, curr) => {
     if (curr.headers.length > acc) {
@@ -284,30 +250,30 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
                     const sortDirection = header.column.getIsSorted();
                     const columnAlignment = header.column.columnDef.meta?.align || "left";
                     const headerStyles = header.column.columnDef.meta?.headerStyles || {};
+                    const canSort = header.column.id !== "selection" && header.column.getCanSort();
                     return (
                       <TableCell
                         align={columnAlignment}
                         key={header.id}
-                        onClick={header.column.id === "selection" ? undefined : header.column.getToggleSortingHandler()}
+                        sortDirection={sortDirection || false}
                         sx={{
-                          cursor: header.column.id === "selection" || !header.column.getCanSort() ? "auto" : "pointer",
-                          "& .MuiIconButton-root": {
-                            display: sortDirection ? "inline-flex" : "none",
-                          },
-                          "&:hover": {
-                            "& .MuiIconButton-root": {
-                              display: "inline-flex",
-                            },
-                          },
                           ...(headerStyles as Record<string, unknown>),
                         }}
                       >
-                        <Stack display="inline-flex" direction="row" gap="8px" alignItems="center">
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.column.getCanSort() && header.column.id !== "selection" && (
-                            <SortIcon sortDirection={sortDirection} />
-                          )}
-                        </Stack>
+                        {canSort ? (
+                          <TableSortLabel
+                            active={Boolean(sortDirection)}
+                            direction={sortDirection || "asc"}
+                            onClick={header.column.getToggleSortingHandler()}
+                            sx={{ "& .MuiTableSortLabel-icon": { fontSize: "18px" } }}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableSortLabel>
+                        ) : (
+                          <Stack display="inline-flex" direction="row" gap="8px" alignItems="center">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </Stack>
+                        )}
                       </TableCell>
                     );
                   })}
