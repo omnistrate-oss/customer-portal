@@ -1,11 +1,11 @@
-import { FC, useMemo, useState } from "react";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import { Box, Stack, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { FC, useState } from "react";
+import { Box, Stack } from "@mui/material";
+import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
+import Button from "src/components/Button/Button";
 import CopyButton from "src/components/Button/CopyButton";
 import Card from "src/components/Card/Card";
+import DataTable from "src/components/DataTable/DataTable";
 import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
@@ -84,19 +84,24 @@ const CredentialColumn: FC<{
           {displayValue}
         </Text>
         {isPassword && (
-          <Text
-            size="small"
-            weight="semibold"
+          <Button
+            type="button"
+            variant="text"
+            aria-label={isVisible ? "Hide password value" : "Show password value"}
+            aria-pressed={isVisible}
             sx={{
               color: "#7F56D9",
-              cursor: "pointer",
-              userSelect: "none",
               flexShrink: 0,
+              fontSize: "14px",
+              fontWeight: 600,
+              lineHeight: "20px",
+              minWidth: 0,
+              padding: 0,
             }}
             onClick={() => setIsVisible((prev) => !prev)}
           >
             {isVisible ? "Hide" : "Show"}
-          </Text>
+          </Button>
         )}
         <CopyButton
           text={value}
@@ -116,39 +121,13 @@ type DashboardRow = {
   isAvailable: boolean;
 };
 
-type SortKey = "name" | "status";
-type SortState = { key: SortKey; direction: "asc" | "desc" } | null;
-
-const DASHBOARD_COLUMNS: {
-  key: SortKey | "action";
-  label: string;
-  width: string;
-  sortable: boolean;
-}[] = [
-  { key: "name", label: "Dashboard", width: "40%", sortable: true },
-  { key: "status", label: "Status", width: "30%", sortable: true },
-  { key: "action", label: "Action", width: "30%", sortable: false },
-];
-
-const headerCellSx = {
-  padding: "12px 24px",
-  backgroundColor: "#F9FAFB",
-  borderBottom: "1px solid #E9EAEB",
-  userSelect: "none",
-};
-
-const bodyCellSx = {
-  padding: "16px 24px",
-  borderBottom: "1px solid #E9EAEB",
-  verticalAlign: "middle",
-};
-
 const OpenDashboardLink: FC<{ link: string; disabled: boolean }> = ({ link, disabled }) => (
   <Box
     component="a"
     href={disabled ? undefined : link}
-    target="_blank"
-    rel="noopener noreferrer"
+    target={disabled ? undefined : "_blank"}
+    rel={disabled ? undefined : "noopener noreferrer"}
+    aria-disabled={disabled}
     sx={{
       display: "inline-flex",
       alignItems: "center",
@@ -168,92 +147,33 @@ const OpenDashboardLink: FC<{ link: string; disabled: boolean }> = ({ link, disa
   </Box>
 );
 
-const DashboardsTable: FC<{ rows: DashboardRow[] }> = ({ rows }) => {
-  const [sort, setSort] = useState<SortState>(null);
+const dashboardColumnHelper = createColumnHelper<DashboardRow>();
 
-  const sortedRows = useMemo(() => {
-    if (!sort) return rows;
-    const sorted = [...rows].sort((a, b) => {
-      const aValue = sort.key === "name" ? a.name : a.statusLabel;
-      const bValue = sort.key === "name" ? b.name : b.statusLabel;
-      return aValue.localeCompare(bValue);
-    });
-    return sort.direction === "asc" ? sorted : sorted.reverse();
-  }, [rows, sort]);
-
-  const handleSort = (key: SortKey) => {
-    setSort((prev) => {
-      if (prev?.key !== key) return { key, direction: "asc" };
-      return prev.direction === "asc" ? { key, direction: "desc" } : null;
-    });
-  };
-
-  return (
-    <Box sx={{ overflowX: "auto" }}>
-      <Table sx={{ tableLayout: "fixed", width: "100%", minWidth: "600px" }}>
-        <TableHead>
-          <TableRow>
-            {DASHBOARD_COLUMNS.map((column) => {
-              const isActive = sort?.key === column.key;
-              return (
-                <TableCell
-                  key={column.key}
-                  sx={{
-                    ...headerCellSx,
-                    width: column.width,
-                    cursor: column.sortable ? "pointer" : "default",
-                  }}
-                  onClick={column.sortable ? () => handleSort(column.key as SortKey) : undefined}
-                >
-                  <Stack direction="row" alignItems="center" gap="4px">
-                    <Text size="xsmall" weight="semibold" color="#717680">
-                      {column.label}
-                    </Text>
-                    {column.sortable &&
-                      (isActive ? (
-                        sort?.direction === "asc" ? (
-                          <ArrowUpwardIcon sx={{ fontSize: 14, color: "#717680" }} />
-                        ) : (
-                          <ArrowDownwardIcon sx={{ fontSize: 14, color: "#717680" }} />
-                        )
-                      ) : (
-                        <UnfoldMoreIcon sx={{ fontSize: 16, color: "#A4A7AE" }} />
-                      ))}
-                  </Stack>
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedRows.map((row, index) => {
-            const isLast = index === sortedRows.length - 1;
-            const cellSx = isLast ? { ...bodyCellSx, borderBottom: "none" } : bodyCellSx;
-            return (
-              <TableRow key={row.key}>
-                <TableCell sx={cellSx}>
-                  <Text size="small" weight="medium" color="#181D27">
-                    {row.name}
-                  </Text>
-                </TableCell>
-                <TableCell sx={cellSx}>
-                  <StatusChip
-                    label={row.statusLabel}
-                    category={row.isAvailable ? "success" : "unknown"}
-                    dot
-                  />
-                </TableCell>
-                <TableCell sx={cellSx}>
-                  <OpenDashboardLink link={row.link} disabled={!row.isAvailable} />
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </Box>
-  );
-};
+const DASHBOARD_COLUMNS: ColumnDef<DashboardRow>[] = [
+  dashboardColumnHelper.accessor("name", {
+    header: "Dashboard",
+    cell: ({ getValue }) => (
+      <Text size="small" weight="medium" color="#181D27">
+        {getValue()}
+      </Text>
+    ),
+    meta: { flex: 1.4, minWidth: 220 },
+  }),
+  dashboardColumnHelper.accessor("statusLabel", {
+    header: "Status",
+    cell: ({ getValue, row }) => (
+      <StatusChip label={getValue()} category={row.original.isAvailable ? "success" : "unknown"} dot />
+    ),
+    meta: { flex: 1, minWidth: 160 },
+  }),
+  dashboardColumnHelper.display({
+    id: "action",
+    header: "Action",
+    enableSorting: false,
+    cell: ({ row }) => <OpenDashboardLink link={row.original.link} disabled={!row.original.isAvailable} />,
+    meta: { flex: 1, minWidth: 200 },
+  }),
+];
 
 const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatus }) => {
   if (instanceStatus === "DISCONNECTED") {
@@ -310,13 +230,17 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     })
-    .map(([key, dashboard]) => ({
-      key,
-      name: getDashboardDisplayName(dashboard.description),
-      link: dashboard.dashboardLink,
-      statusLabel: isRunning ? "Available" : "Unavailable",
-      isAvailable: isRunning && isSafeDashboardUrl(dashboard.dashboardLink),
-    }));
+    .map(([key, dashboard]) => {
+      const isAvailable = isRunning && isSafeDashboardUrl(dashboard.dashboardLink);
+
+      return {
+        key,
+        name: getDashboardDisplayName(dashboard.description),
+        link: dashboard.dashboardLink,
+        statusLabel: isAvailable ? "Available" : "Unavailable",
+        isAvailable,
+      };
+    });
 
   return (
     <Stack gap="20px" mt="32px">
@@ -360,7 +284,15 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
         }
         contentBoxProps={{ padding: 0 }}
       >
-        <DashboardsTable rows={dashboardRows} />
+        <DataTable<DashboardRow>
+          rows={dashboardRows}
+          columns={DASHBOARD_COLUMNS}
+          rowId="key"
+          noRowsText="No dashboards available"
+          hidePagination
+          minHeight="auto"
+          tableStyles={{ border: "none", borderRadius: 0, boxShadow: "none" }}
+        />
       </ContainerCard>
     </Stack>
   );
