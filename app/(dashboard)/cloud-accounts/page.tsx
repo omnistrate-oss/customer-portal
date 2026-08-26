@@ -86,6 +86,8 @@ const CloudAccountsPage = () => {
   const serviceId = searchParams?.get("serviceId");
   const servicePlanId = searchParams?.get("servicePlanId");
   const subscriptionId = searchParams?.get("subscriptionId");
+  const modifyVpcsInstanceId = searchParams?.get("modifyVpcsInstanceId");
+  const openModifyVpcs = searchParams?.get("openModifyVpcs") === "true";
 
   const { subscriptionsObj, serviceOfferingsObj } = useGlobalData();
   const [initialFormValues, setInitialFormValues] = useState<any>();
@@ -173,6 +175,26 @@ const CloudAccountsPage = () => {
   } = useAccountConfigsByIds(accountConfigIds);
 
   // Open the Create Form Overlay when serviceId, servicePlanId and subscriptionId are present in the URL
+  useEffect(() => {
+    if (!openModifyVpcs || !modifyVpcsInstanceId || isFetchingInstances || isFetchingAccountConfigs) return;
+
+    const instanceToModify = instances.find((instance) => instance.id === modifyVpcsInstanceId);
+    if (!instanceToModify) return;
+
+    setSelectedRows([modifyVpcsInstanceId]);
+    setClickedInstance(instanceToModify);
+    setOverlayType("modify-vpcs");
+    setIsOverlayOpen(true);
+    router.replace("/cloud-accounts");
+  }, [
+    instances,
+    isFetchingInstances,
+    isFetchingAccountConfigs,
+    modifyVpcsInstanceId,
+    openModifyVpcs,
+    router,
+  ]);
+
   useEffect(() => {
     if (serviceId && servicePlanId && subscriptionId) {
       setOverlayType("create-instance-form");
