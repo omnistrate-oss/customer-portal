@@ -768,7 +768,6 @@ export const getNetworkConfigurationFields = (
   const isBYOCOnprem = values.cloudProvider === "byoc-onprem";
   const cloudProviderFieldExists = inputParametersObj["cloud_provider"];
   const customNetworkFieldExists = inputParametersObj["custom_network_id"];
-  const cloudProviderNativeNetworkIdFieldExists = inputParametersObj["cloud_provider_native_network_id"];
   const customDNSFieldExists = inputParametersObj["custom_dns_configuration"];
 
   const getCustomDnsInputValue = (resourceKey: string): string => {
@@ -858,44 +857,6 @@ export const getNetworkConfigurationFields = (
       emptyMenuText: "No customer networks available",
       isLoading: isFetchingCustomNetworks,
       previewValue: customNetworks.find((network) => network.id === values.requestParams.custom_network_id)?.name,
-    });
-  }
-
-  if (
-    cloudProviderNativeNetworkIdFieldExists &&
-    cloudProviderFieldExists &&
-    values.cloudProvider !== "gcp" &&
-    values.cloudProvider !== "azure" &&
-    !isBYOCOnprem
-  ) {
-    const param = inputParametersObj["cloud_provider_native_network_id"];
-    fields.push({
-      dataTestId: `${param.key}-input`,
-      label: param.displayName || param.key,
-      subLabel: (
-        <>
-          {param.description && <br />}
-          If you&apos;d like to deploy within your VPC, enter its ID. Please ensure your VPC meets the{" "}
-          <Link
-            style={{
-              textDecoration: "underline",
-              color: "blue",
-            }}
-            href="https://docs.omnistrate.com/usecases/byoc/?#bring-your-own-vpc-byo-vpc"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            prerequisites
-          </Link>
-          .
-        </>
-      ),
-      disabled: formMode !== "create",
-      name: `requestParams.${param.key}`,
-      value: values.requestParams[param.key] || "",
-      type: "text-multiline",
-      required: formMode !== "modify" && param.required,
-      previewValue: values.requestParams[param.key],
     });
   }
 
