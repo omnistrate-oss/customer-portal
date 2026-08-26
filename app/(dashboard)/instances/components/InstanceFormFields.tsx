@@ -563,7 +563,25 @@ export const getStandardInformationFields = (
         : "choose_existing";
     const createNewVpcDisabledMessage = "Creating new VPCs is not allowed for the selected cloud account config";
 
-    if (shouldShowVpcTypeRadio) {
+    if (selectedCloudAccountConfigId && isFetchingCloudNativeNetworks) {
+      fields.push({
+        label: "VPCs",
+        subLabel: "",
+        name: "requestParams._vpcType",
+        required: true,
+        customComponent: (
+          <Skeleton
+            variant="rounded"
+            animation="wave"
+            height={56}
+            sx={{ width: "100%", borderRadius: "8px", marginTop: "16px" }}
+          />
+        ),
+        previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
+      });
+    }
+
+    if (shouldShowVpcTypeRadio && !isFetchingCloudNativeNetworks) {
       fields.push({
         label: "VPCs",
         subLabel: "",
@@ -594,7 +612,12 @@ export const getStandardInformationFields = (
       });
     }
 
-    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && supportsExistingVpc) {
+    if (
+      selectedCloudAccountConfigId &&
+      vpcType === "choose_existing" &&
+      supportsExistingVpc &&
+      !isFetchingCloudNativeNetworks
+    ) {
       const filteredNetworks = region
         ? cloudNativeNetworks.filter(
             (n) => n.region === region && n.status?.toUpperCase() !== "FAILED" && n.imported === true
@@ -648,13 +671,9 @@ export const getStandardInformationFields = (
         })),
         required: true,
         disabled: formMode !== "create",
-        isLoading: isFetchingCloudNativeNetworks,
+        isLoading: false,
         emptyMenuText: region ? "No imported VPCs are available in this region" : "Select a region first",
-        customComponent: isFetchingCloudNativeNetworks ? (
-          <Skeleton variant="rounded" animation="wave" height={56} sx={{ width: "100%", borderRadius: "8px" }} />
-        ) : (
-          noImportedVpcsAlert || undefined
-        ),
+        customComponent: noImportedVpcsAlert || undefined,
         previewValue: (() => {
           const selected = filteredNetworks.find(
             (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]
