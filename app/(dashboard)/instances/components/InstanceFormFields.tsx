@@ -1,5 +1,5 @@
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
-import { Box, Stack } from "@mui/material";
+import { Box, Skeleton, Stack } from "@mui/material";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import Link from "next/link";
 
@@ -76,7 +76,7 @@ export const getStandardInformationFields = (
   }>,
   isFetchingCloudNativeNetworks: boolean,
   consumptionSubscriptionAdminRBAC = false,
-  orgName = "AWS"
+  orgName
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -650,7 +650,11 @@ export const getStandardInformationFields = (
         disabled: formMode !== "create",
         isLoading: isFetchingCloudNativeNetworks,
         emptyMenuText: region ? "No imported VPCs are available in this region" : "Select a region first",
-        customComponent: noImportedVpcsAlert || undefined,
+        customComponent: isFetchingCloudNativeNetworks ? (
+          <Skeleton variant="rounded" animation="wave" height={56} sx={{ width: "100%", borderRadius: "8px" }} />
+        ) : (
+          noImportedVpcsAlert || undefined
+        ),
         previewValue: (() => {
           const selected = filteredNetworks.find(
             (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]
