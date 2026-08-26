@@ -8,6 +8,7 @@ export type Field = {
   name: string;
   type?: string;
   description?: React.ReactNode;
+  additionalDescription?: React.ReactNode;
   required?: boolean;
   isHidden?: boolean;
   disabled?: boolean;
@@ -20,6 +21,7 @@ export type Field = {
 
   // Radio Buttons
   options?: any[];
+  radioLayout?: "row" | "column";
 
   // Text Field
   placeholder?: string;

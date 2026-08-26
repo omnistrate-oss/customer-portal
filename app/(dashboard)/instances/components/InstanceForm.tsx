@@ -22,6 +22,7 @@ import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useResourcesInstanceIds from "src/hooks/useResourcesInstanceIds";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
@@ -58,6 +59,7 @@ const InstanceForm = ({
   setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
+  const { orgName } = useProviderOrgDetails();
 
   // State for validation schema
   const [validationSchema, setValidationSchema] = useState(() =>
@@ -1058,7 +1060,8 @@ const InstanceForm = ({
       cloudAccountInstances,
       cloudNativeNetworks,
       cloudNativeNetworksQuery.isFetching,
-      consumptionSubscriptionAdminRBAC
+      consumptionSubscriptionAdminRBAC,
+      orgName
     );
   }, [
     formMode,
@@ -1074,6 +1077,7 @@ const InstanceForm = ({
     cloudNativeNetworks,
     cloudNativeNetworksQuery.isFetching,
     consumptionSubscriptionAdminRBAC,
+    orgName,
   ]);
 
   const networkConfigurationFields = useMemo(() => {

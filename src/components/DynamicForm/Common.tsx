@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { Box, InputAdornment, Stack } from "@mui/material";
 import { getJsonValue } from "app/(dashboard)/instances/utils";
 import Generator from "generate-password";
+import { useRef, useState } from "react";
 
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
 import Select from "components/FormElementsv2/Select/Select";
@@ -371,7 +371,7 @@ export const RadioField = ({ field, formData }) => {
   const { values, handleChange } = formData;
   return (
     <RadioGroup
-      row
+      row={field.radioLayout !== "column"}
       name={field.name}
       value={field.value !== undefined ? field.value : values[field.name]} // For the case when value might be 'false'
       onChange={(e) => {
@@ -385,10 +385,23 @@ export const RadioField = ({ field, formData }) => {
             data-testid={option.dataTestId ?? ""}
             control={<Radio />}
             value={option.value}
+            sx={field.radioLayout === "column" ? { alignItems: "flex-start" } : undefined}
             label={
-              <Stack direction={"row"} alignItems={"center"} justifyContent={"flex-start"} gap="2px">
-                {option.label}
-                {option.labelChips?.map((item) => item)}
+              <Stack
+                direction="column"
+                alignItems="flex-start"
+                gap="2px"
+                sx={field.radioLayout === "column" ? { marginTop: "7px" } : undefined}
+              >
+                <Stack direction="row" alignItems="center" justifyContent="flex-start" gap="2px">
+                  {option.label}
+                  {option.labelChips?.map((item) => item)}
+                </Stack>
+                {option.description && (
+                  <Text size="small" weight="regular" color="#535862">
+                    {option.description}
+                  </Text>
+                )}
               </Stack>
             }
             disabled={option.disabled}

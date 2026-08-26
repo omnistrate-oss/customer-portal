@@ -1,8 +1,11 @@
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import Link from "next/link";
+import { Box, Stack } from "@mui/material";
 
 import { Field } from "src/components/DynamicForm/types";
 import StatusChip from "src/components/StatusChip/StatusChip";
+import AlertTrianglePITR from "src/components/Icons/AlertTrianglePITR/AlertTrianglePITR";
+import { Text } from "src/components/Typography/Typography";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { productTierTypes } from "src/constants/servicePlan";
 import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyles/versionSet";
@@ -14,6 +17,7 @@ import { APIEntity, ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { TierVersionSet } from "src/types/tier-version-set";
 import { getResultParams } from "src/utils/instance";
+import { getCloudAccountsRoute } from "src/utils/routes";
 
 import CloudProviderRadio from "../../components/CloudProviderRadio/CloudProviderRadio";
 import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistributionsMultiSelect/KubernetesDistributionsMultiSelect";
@@ -71,7 +75,8 @@ export const getStandardInformationFields = (
     inUse?: boolean;
   }>,
   isFetchingCloudNativeNetworks: boolean,
-  consumptionSubscriptionAdminRBAC = false
+  consumptionSubscriptionAdminRBAC = false,
+  orgName = "AWS"
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -565,19 +570,24 @@ export const getStandardInformationFields = (
         name: "requestParams._vpcType",
         value: vpcType,
         type: "radio",
+        radioLayout: "column",
         required: true,
         options: [
           {
             dataTestId: "create-new-vpc-radio",
-            label: "Create new VPC",
+            label: `${orgName} Managed VPC`,
+            description: "Automatically create new VPCs for deployments when needed",
             value: "create_new",
             disabled: !isCreateNewVpcAllowed,
             disabledMessage: createNewVpcDisabledMessage,
           },
           {
             dataTestId: "choose-existing-vpc-radio",
-            label: "Choose from Existing VPCs",
+            label: "Use Existing VPC",
+            description: "Import VPCs from this cloud account for use in deployments",
             value: "choose_existing",
+            disabled: !region,
+            disabledMessage: "Select a region before choosing an existing VPC",
           },
         ],
         previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
@@ -604,13 +614,48 @@ export const getStandardInformationFields = (
         required: true,
         disabled: formMode !== "create",
         isLoading: isFetchingCloudNativeNetworks,
-        emptyMenuText: region ? "No VPCs found in this region" : "Select a region first",
+        emptyMenuText: region ? "No imported VPCs are available in this region" : "Select a region first",
         previewValue: (() => {
           const selected = filteredNetworks.find(
             (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]
           );
           return selected?.name || requestParams["cloudNativeNetworkId"];
         })(),
+        additionalDescription:
+          region && filteredNetworks.length === 0 ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "12px",
+                marginTop: "12px",
+                padding: "12px",
+                border: "1px solid #FEDF89",
+                borderRadius: "8px",
+                backgroundColor: "#FFFAEB",
+              }}
+            >
+              <AlertTrianglePITR style={{ flexShrink: 0, marginTop: "2px" }} />
+              <Stack gap="4px">
+                <Text size="small" weight="semibold" color="#B54708">
+                  No imported VPCs are available in this region
+                  <br />
+                  <Link
+                    href={`${getCloudAccountsRoute({
+                      serviceId,
+                      servicePlanId,
+                      subscriptionId: values.subscriptionId,
+                    })}&modifyVpcsInstanceId=${encodeURIComponent(selectedCloudAccountConfig?.id ?? "")}&openModifyVpcs=true`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#6941C6", textDecoration: "none" }}
+                  >
+                    Import VPCs ↗
+                  </Link>
+                </Text>
+              </Stack>
+            </Box>
+          ) : null,
       });
     }
   }

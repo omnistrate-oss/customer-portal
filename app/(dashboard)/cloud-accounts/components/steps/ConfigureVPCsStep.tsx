@@ -352,7 +352,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
           {(() => {
             const canUncheckNewVpcs = values.bringOwnVpcs;
             return (
-              <Stack direction="row" alignItems="center" gap="12px">
+              <Stack direction="row" alignItems="flex-start" gap="12px">
                 <Tooltip
                   title={
                     !canUncheckNewVpcs && values.enableNewVpcs
@@ -399,9 +399,14 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   </span>
                 </Tooltip>
 
-                <Text size="small" weight="medium">
-                  Enable creating new VPCs
-                </Text>
+                <Stack gap="2px">
+                  <Text size="small" weight="medium">
+                    Enable creating new VPCs
+                  </Text>
+                  <Text size="xsmall" weight="regular" color="#535862">
+                    Automatically create new VPCs for deployments when needed
+                  </Text>
+                </Stack>
               </Stack>
             );
           })()}
@@ -410,7 +415,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
           {(() => {
             const isBringOwnVpcsEnabledForProvider = isBringOwnVpcsSupported(cloudProvider);
             return (
-              <Stack direction="row" alignItems="center" gap="12px">
+              <Stack direction="row" alignItems="flex-start" gap="12px">
                 <Tooltip
                   title={
                     !isBringOwnVpcsEnabledForProvider
@@ -461,9 +466,14 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   </span>
                 </Tooltip>
 
-                <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
-                  Bring your own VPCs for deployments
-                </Text>
+                <Stack gap="2px">
+                  <Text size="small" weight="medium" color={isBringOwnVpcsEnabledForProvider ? "#344054" : "#98A2B3"}>
+                    Bring your own VPCs for deployments
+                  </Text>
+                  <Text size="xsmall" weight="regular" color={isBringOwnVpcsEnabledForProvider ? "#535862" : "#98A2B3"}>
+                    Import VPCs from this cloud account for use in deployments
+                  </Text>
+                </Stack>
               </Stack>
             );
           })()}
