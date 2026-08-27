@@ -1,8 +1,12 @@
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import { Box, Skeleton, Stack } from "@mui/material";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import Link from "next/link";
 
 import { Field } from "src/components/DynamicForm/types";
+import AlertTrianglePITR from "src/components/Icons/AlertTrianglePITR/AlertTrianglePITR";
 import StatusChip from "src/components/StatusChip/StatusChip";
+import { Text } from "src/components/Typography/Typography";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import { productTierTypes } from "src/constants/servicePlan";
 import { getVersionSetStatusStylesAndLabel } from "src/constants/statusChipStyles/versionSet";
@@ -20,7 +24,6 @@ import KubernetesDistributionsMultiSelect from "../../components/KubernetesDistr
 import SubscriptionPlanRadio from "../../components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import { ResourceSummary } from "../hooks/useResources";
-import { isExistingVpcSupported } from "../vpcCapabilities";
 import {
   cloudProviderToPlatformMap,
   filterSchemaByCloudProvider,
@@ -34,6 +37,7 @@ import {
   normalizeCustomDnsValue,
   platformToCloudProviderMap,
 } from "../utils";
+import { isExistingVpcSupported } from "../vpcCapabilities";
 
 import AccountConfigDescription from "./AccountConfigDescription";
 import CustomNetworkDescription from "./CustomNetworkDescription";
@@ -71,7 +75,8 @@ export const getStandardInformationFields = (
     inUse?: boolean;
   }>,
   isFetchingCloudNativeNetworks: boolean,
-  consumptionSubscriptionAdminRBAC = false
+  consumptionSubscriptionAdminRBAC = false,
+  orgName
 ) => {
   if (isFetchingServiceOfferings) return [];
 
@@ -558,38 +563,101 @@ export const getStandardInformationFields = (
         : "choose_existing";
     const createNewVpcDisabledMessage = "Creating new VPCs is not allowed for the selected cloud account config";
 
-    if (shouldShowVpcTypeRadio) {
+    if (selectedCloudAccountConfigId && isFetchingCloudNativeNetworks) {
+      fields.push({
+        label: "VPCs",
+        subLabel: "",
+        name: "requestParams._vpcType",
+        required: true,
+        customComponent: (
+          <Skeleton
+            variant="rounded"
+            animation="wave"
+            height={56}
+            sx={{ width: "100%", borderRadius: "8px", marginTop: "16px" }}
+          />
+        ),
+        previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
+      });
+    }
+
+    if (shouldShowVpcTypeRadio && !isFetchingCloudNativeNetworks) {
       fields.push({
         label: "VPCs",
         subLabel: "",
         name: "requestParams._vpcType",
         value: vpcType,
         type: "radio",
+        radioLayout: "column",
         required: true,
         options: [
           {
             dataTestId: "create-new-vpc-radio",
-            label: "Create new VPC",
+            label: `${orgName} Managed VPC`,
+            description: "Automatically create new VPCs for deployments when needed",
             value: "create_new",
             disabled: !isCreateNewVpcAllowed,
             disabledMessage: createNewVpcDisabledMessage,
           },
           {
             dataTestId: "choose-existing-vpc-radio",
-            label: "Choose from Existing VPCs",
+            label: "Use Existing VPC",
+            description: "Import VPCs from this cloud account for use in deployments",
             value: "choose_existing",
+            disabled: !region,
+            disabledMessage: "Select a region before choosing an existing VPC",
           },
         ],
         previewValue: vpcType === "choose_existing" ? "Existing VPC" : "New VPC",
       });
     }
 
-    if (selectedCloudAccountConfigId && vpcType === "choose_existing" && supportsExistingVpc) {
+    if (
+      selectedCloudAccountConfigId &&
+      vpcType === "choose_existing" &&
+      supportsExistingVpc &&
+      !isFetchingCloudNativeNetworks
+    ) {
       const filteredNetworks = region
         ? cloudNativeNetworks.filter(
             (n) => n.region === region && n.status?.toUpperCase() !== "FAILED" && n.imported === true
           )
         : [];
+      const noImportedVpcsAlert =
+        region && filteredNetworks.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "12px",
+              padding: "12px",
+              border: "1px solid #FEDF89",
+              borderRadius: "8px",
+              backgroundColor: "#FFFAEB",
+            }}
+          >
+            <AlertTrianglePITR style={{ flexShrink: 0, marginTop: "2px" }} />
+            <Stack gap="4px">
+              <Text size="small" weight="semibold" color="#B54708">
+                No imported VPCs are available in this region
+                <br />
+                <Link
+                  href={`/cloud-accounts?modifyVpcsInstanceId=${encodeURIComponent(selectedCloudAccountConfig?.id ?? "")}&openModifyVpcs=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#6941C6", textDecoration: "none" }}
+                >
+                  Import VPCs{" "}
+                  <ArrowOutwardIcon
+                    sx={{
+                      fontSize: "18px",
+                    }}
+                  />
+                </Link>
+              </Text>
+            </Stack>
+          </Box>
+        ) : null;
       fields.push({
         dataTestId: "existing-vpc-select",
         label: "Select VPC",
@@ -603,8 +671,9 @@ export const getStandardInformationFields = (
         })),
         required: true,
         disabled: formMode !== "create",
-        isLoading: isFetchingCloudNativeNetworks,
-        emptyMenuText: region ? "No VPCs found in this region" : "Select a region first",
+        isLoading: false,
+        emptyMenuText: region ? "No imported VPCs are available in this region" : "Select a region first",
+        customComponent: noImportedVpcsAlert || undefined,
         previewValue: (() => {
           const selected = filteredNetworks.find(
             (n) => (n.cloudNativeNetworkId || n.id) === requestParams["cloudNativeNetworkId"]

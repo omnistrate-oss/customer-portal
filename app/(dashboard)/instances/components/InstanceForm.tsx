@@ -22,6 +22,7 @@ import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useResourcesInstanceIds from "src/hooks/useResourcesInstanceIds";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
@@ -31,6 +32,7 @@ import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
+import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
 import { applyCustomDnsNormalization, filterSchemaByCloudProvider, getInitialValues } from "../utils";
@@ -58,6 +60,7 @@ const InstanceForm = ({
   setSelectedRows,
 }) => {
   const snackbar = useSnackbar();
+  const { orgName } = useProviderOrgDetails();
 
   // State for validation schema
   const [validationSchema, setValidationSchema] = useState(() =>
@@ -951,36 +954,69 @@ const InstanceForm = ({
   const selectedCloudAccountInstance = cloudAccountInstances.find(
     (config) => config.id === selectedCloudAccountInstanceId
   );
-  const selectedAccountConfigId = getResultParams(selectedCloudAccountInstance)?.cloud_provider_account_config_id;
-  const shouldFetchCloudNativeNetworks = Boolean(
-    formMode === "create" &&
-      selectedAccountConfigId &&
-      (values.cloudProvider === "aws" || values.cloudProvider === "gcp" || values.cloudProvider === "azure")
-  );
+  const selectedCloudAccountSubscription = selectedCloudAccountInstance
+    ? subscriptionsObj[selectedCloudAccountInstance.subscriptionId as string]
+    : undefined;
+  const selectedCloudAccountOffering = selectedCloudAccountSubscription
+    ? serviceOfferingsObj[selectedCloudAccountSubscription.serviceId]?.[selectedCloudAccountSubscription.productTierId]
+    : undefined;
+  const selectedCloudAccountResourceKey = selectedCloudAccountOffering?.resourceParameters?.find((resource) =>
+    resource.resourceId.startsWith("r-injectedaccountconfig")
+  )?.urlKey;
 
-  const cloudNativeNetworksQuery = $api.useQuery(
-    "get",
-    "/2022-09-01-00/accountconfig/{id}/cloud-native-networks",
-    {
-      params: {
-        path: {
-          id: selectedAccountConfigId || "",
-        },
-      },
-      headers: {
-        "x-ignore-global-error": true,
-      },
-    },
-    {
-      enabled: shouldFetchCloudNativeNetworks,
-      retry: 2,
-      retryDelay: 3000,
-    }
-  );
+  const selectedCloudAccountDescribeQuery = useInstancesDescribe({
+    serviceProviderId: selectedCloudAccountOffering?.serviceProviderId || "",
+    serviceKey: selectedCloudAccountOffering?.serviceURLKey || "",
+    serviceAPIVersion: selectedCloudAccountOffering?.serviceAPIVersion || "",
+    serviceEnvironmentKey: selectedCloudAccountOffering?.serviceEnvironmentURLKey || "",
+    serviceModelKey: selectedCloudAccountOffering?.serviceModelURLKey || "",
+    productTierKey: selectedCloudAccountOffering?.productTierURLKey || "",
+    resourceKey: selectedCloudAccountResourceKey || "",
+    id: selectedCloudAccountInstance?.id || "",
+    subscriptionId: selectedCloudAccountInstance?.subscriptionId,
+    ignoreGlobalError: true,
+    refetchOnWindowFocus: true,
+    enabled: Boolean(
+      formMode === "create" &&
+        selectedCloudAccountInstance &&
+        selectedCloudAccountOffering &&
+        selectedCloudAccountResourceKey
+    ),
+  });
 
-  const cloudNativeNetworks = useMemo(
-    () => cloudNativeNetworksQuery.data?.cloudNativeNetworks || [],
-    [cloudNativeNetworksQuery.data?.cloudNativeNetworks]
+  const describedCloudAccountInstance = selectedCloudAccountDescribeQuery.data as ResourceInstance | undefined;
+  const selectedCloudAccountResultParams = getResultParams(describedCloudAccountInstance);
+
+  const cloudNativeNetworks = useMemo(() => {
+    const networks =
+      selectedCloudAccountResultParams?.cloudNativeNetworks ||
+      selectedCloudAccountResultParams?.CloudNativeNetworks ||
+      selectedCloudAccountResultParams?.cloud_native_networks ||
+      [];
+
+    if (!Array.isArray(networks)) return [];
+
+    return networks.map((network) => ({
+      ...network,
+      id: network.id || network.ID,
+      cloudNativeNetworkId: network.cloudNativeNetworkId || network.CloudNativeNetworkID,
+      name: network.name || network.Name,
+      region: network.region || network.Region,
+      status: network.status || network.Status,
+      imported: network.imported ?? network.Imported,
+      inUse: network.inUse ?? network.InUse,
+      cidr: network.cidr || network.Cidr,
+    }));
+  }, [selectedCloudAccountResultParams]);
+
+  const effectiveCloudAccountInstances = useMemo(
+    () =>
+      cloudAccountInstances.map((config) =>
+        config.id === selectedCloudAccountInstanceId && describedCloudAccountInstance
+          ? { ...config, ...describedCloudAccountInstance, label: config.label }
+          : config
+      ),
+    [cloudAccountInstances, describedCloudAccountInstance, selectedCloudAccountInstanceId]
   );
 
   useEffect(() => {
@@ -993,7 +1029,7 @@ const InstanceForm = ({
     const regionFieldExists = resourceCreateSchema?.inputParameters?.some((param) => param.key === "region");
     const supportsExistingVpc = isExistingVpcSupported(values.cloudProvider);
     const accountConfigId = (values.requestParams as Record<string, any>)?.cloud_provider_account_config_id;
-    const selectedCloudAccountConfig = cloudAccountInstances.find((config) => config.id === accountConfigId);
+    const selectedCloudAccountConfig = effectiveCloudAccountInstances.find((config) => config.id === accountConfigId);
     const createNewVpcDisallowed =
       selectedCloudAccountConfig &&
       getResultParams(selectedCloudAccountConfig).allow_new_cloud_native_network_creation === false;
@@ -1029,7 +1065,7 @@ const InstanceForm = ({
       formData.setFieldValue("requestParams._vpcType", "create_new");
     }
   }, [
-    cloudAccountInstances,
+    effectiveCloudAccountInstances,
     formData.setFieldValue,
     formMode,
     resourceCreateSchema?.inputParameters,
@@ -1055,10 +1091,11 @@ const InstanceForm = ({
       customerVersionSets,
       isFetchingVersionSets,
       isFetchingResourceInstanceIds,
-      cloudAccountInstances,
+      effectiveCloudAccountInstances,
       cloudNativeNetworks,
-      cloudNativeNetworksQuery.isFetching,
-      consumptionSubscriptionAdminRBAC
+      selectedCloudAccountDescribeQuery.isFetching,
+      consumptionSubscriptionAdminRBAC,
+      orgName
     );
   }, [
     formMode,
@@ -1069,11 +1106,12 @@ const InstanceForm = ({
     nonCloudAccountInstances,
     customerVersionSets,
     isFetchingVersionSets,
-    cloudAccountInstances,
+    effectiveCloudAccountInstances,
     isFetchingResourceInstanceIds,
     cloudNativeNetworks,
-    cloudNativeNetworksQuery.isFetching,
+    selectedCloudAccountDescribeQuery.isFetching,
     consumptionSubscriptionAdminRBAC,
+    orgName,
   ]);
 
   const networkConfigurationFields = useMemo(() => {
