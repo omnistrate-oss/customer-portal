@@ -22,6 +22,9 @@ import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnV
 
 import { StyledLink } from "./GrantAccessStep";
 
+const AT_LEAST_ONE_VPC_OPTION_MESSAGE = "At least one VPC option must be enabled";
+const VPC_CONFIGURATION_UNSUPPORTED_MESSAGE = "VPC configuration is only supported for AWS, GCP, and Azure";
+
 export type VpcRecord = {
   id: string;
   name?: string;
@@ -145,16 +148,20 @@ const VpcsDataGridHeader = ({
 
         <Stack alignItems="flex-end" gap="4px">
           <Stack direction="row" alignItems="center" gap="12px">
-            <RefreshIcon
-              width={18}
-              height={18}
-              onClick={isFetchingVPCs || isLoadingVpcs ? undefined : onResync}
-              disabled={isFetchingVPCs || isLoadingVpcs}
-              data-testid="resync-vpcs-button"
-              style={{
-                cursor: isFetchingVPCs || isLoadingVpcs ? "default" : "pointer",
-              }}
-            />
+            <Tooltip title="Resync">
+              <span>
+                <RefreshIcon
+                  width={18}
+                  height={18}
+                  onClick={isFetchingVPCs || isLoadingVpcs ? undefined : onResync}
+                  disabled={isFetchingVPCs || isLoadingVpcs}
+                  data-testid="resync-vpcs-button"
+                  style={{
+                    cursor: isFetchingVPCs || isLoadingVpcs ? "default" : "pointer",
+                  }}
+                />
+              </span>
+            </Tooltip>
 
             <Button
               variant="contained"
@@ -218,6 +225,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   // The checkbox renders unchecked on unsupported providers, so gate the panel on the same
   // condition — otherwise the region/VPC picker stays visible under an unchecked box.
   const showVpcSelection = isBringOwnVpcsSupported(cloudProvider) && values.bringOwnVpcs;
+  const isVPCConfigurationSupported = isBringOwnVpcsSupported(cloudProvider);
   const selectableVpcIds = useMemo(
     () =>
       new Set(
@@ -355,9 +363,11 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               <Stack direction="row" alignItems="flex-start" gap="12px">
                 <Tooltip
                   title={
-                    !canUncheckNewVpcs && values.enableNewVpcs
-                      ? "Keep Bring your own VPCs enabled before disabling new VPC creation"
-                      : ""
+                    !isVPCConfigurationSupported
+                      ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
+                      : !canUncheckNewVpcs && values.enableNewVpcs
+                        ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
+                        : ""
                   }
                   placement="top"
                   arrow
@@ -419,11 +429,11 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                 <Tooltip
                   title={
                     !isBringOwnVpcsEnabledForProvider
-                      ? "Bring your own VPCs is currently available for AWS, GCP, and Azure only"
+                      ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
                       : bringOwnVpcsLocked
                         ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
                         : !values.enableNewVpcs && values.bringOwnVpcs
-                          ? "Keep new VPC creation enabled before disabling Bring your own VPCs"
+                          ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
                           : ""
                   }
                   placement="top"
