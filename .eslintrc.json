@@ -52,6 +52,49 @@
   },
   "overrides": [
     {
+      "files": [
+        "src/**/*.{js,jsx,ts,tsx}",
+        "app/**/*.{js,jsx,ts,tsx}",
+        "pages/**/*.{js,jsx,ts,tsx}",
+        "components/**/*.{js,jsx,ts,tsx}",
+        "lib/**/*.{js,jsx,ts,tsx}",
+        "constants/**/*.{js,jsx,ts,tsx}",
+        "server.js",
+        "proxy.js",
+        "next.config.js"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@playwright/test",
+                "message": "Production code must not import Playwright. Keep browser-test dependencies in test-only modules."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "page-objects/**",
+                  "tests/**",
+                  "test-fixtures/**",
+                  "test-utils/**",
+                  "playwright/**",
+                  "**/page-objects/**",
+                  "**/tests/**",
+                  "**/test-fixtures/**",
+                  "**/test-utils/**",
+                  "**/playwright/**"
+                ],
+                "message": "Production code must import shared contracts from src/ instead of test-only directories."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       // Playwright fixtures take a callback parameter named `use`, which
       // react-hooks/rules-of-hooks misreads as React's `use` hook.
       "files": [

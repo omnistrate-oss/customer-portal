@@ -4,7 +4,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Box, CircularProgress, IconButton as MuiIconButton, Stack } from "@mui/material";
 import _ from "lodash";
-import { dataTestIds } from "page-objects/constants/instance-details-page";
 import InfiniteScroll from "react-infinite-scroller";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 
@@ -15,6 +14,7 @@ import Select from "src/components/FormElementsv2/Select/Select";
 import JobCompleted from "src/components/JobResource/JobCompleted";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import Switch from "src/components/Switch/Switch";
+import { dataTestIds } from "src/constants/testIds/instance-details-page";
 
 import useSnackbar from "../../../hooks/useSnackbar";
 import Card from "../../Card/Card";

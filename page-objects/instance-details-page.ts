@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
 
+import { pageElements } from "src/constants/pageElements/instance-details-page";
+import { dataTestIds } from "src/constants/testIds/instance-details-page";
 import { getInstanceDetailsRoute } from "src/utils/routes";
-
-import { dataTestIds, pageElements } from "./constants/instance-details-page";
 
 export class InstanceDetailsPage {
   page: Page;

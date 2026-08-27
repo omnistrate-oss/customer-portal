@@ -3,7 +3,8 @@ import { BackendError } from "test-utils/backend-error";
 import { isReplayMode } from "test-utils/har-mode";
 import { UserAPIClient } from "test-utils/user-api-client";
 
-import { dataTestIds } from "./constants/instances-page";
+import { dataTestIds } from "src/constants/testIds/instances-page";
+
 import { PageURLs } from "./pages";
 
 // Replay serves HAR responses instantly, so poll aggressively to consume state
