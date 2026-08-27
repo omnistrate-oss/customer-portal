@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { Box, Stack } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import AwsCloudFormationInstructions from "src/components/AwsCloudFormationInstructions/AwsCloudFormationInstructions";
 import CardWithTitle from "src/components/Card/CardWithTitle";
@@ -148,6 +148,7 @@ export type GrantAccessStepProps = {
     ociTenancyID?: string;
     ociDomainID?: string;
     ociBootstrapShellCommand?: string;
+    nebiusTenantID?: string;
   };
   isAccessPage?: boolean;
   fetchClickedInstanceDetails?: () => Promise<any>;
@@ -174,6 +175,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
   const hasGcpAccount = !!accountInstructionDetails?.gcpProjectID;
   const hasAzureAccount = !!accountInstructionDetails?.azureSubscriptionID;
   const hasOciAccount = !!accountInstructionDetails?.ociTenancyID;
+  const hasNebiusAccount = !!accountInstructionDetails?.nebiusTenantID;
 
   const needsCloudFormation = hasAwsAccount && !cloudFormationTemplateUrl;
   const needsGcpScript = hasGcpAccount && !gcpBootstrapShellCommand;
@@ -540,20 +542,14 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
     );
   };
 
-  const stackDeployedLabel = hasAwsAccount
-    ? "CloudFormation stack deployed"
-    : hasGcpAccount
-      ? "GCP bootstrap script executed"
-      : hasAzureAccount
-        ? "Azure bootstrap script executed"
-        : "Account bootstrap completed";
+  const stackDeployedLabel = hasNebiusAccount ? "Nebius binding validated" : "Access granted and verified ";
 
   const stackInProgressLabel = hasAwsAccount
-    ? "Deploying CloudFormation stack..."
-    : hasGcpAccount
-      ? "Deploying GCP bootstrap script..."
-      : hasAzureAccount
-        ? "Deploying Azure bootstrap script..."
+    ? "Waiting for you to create the CloudFormation stack above - we will verify the access automatically"
+    : hasAzureAccount || hasGcpAccount || hasOciAccount
+      ? "Waiting for you to run the command above - we will verify the access automatically"
+      : hasNebiusAccount
+        ? "Validating Nebius binding..."
         : "Deploying account bootstrap...";
 
   return (
