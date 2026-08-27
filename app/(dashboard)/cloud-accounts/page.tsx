@@ -37,6 +37,12 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
+import {
+  getEnumFromUserRoleString,
+  isOperationAllowedByRBAC,
+  operationEnum,
+  viewEnum,
+} from "src/utils/isAllowedByRBAC";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
@@ -62,7 +68,13 @@ import { OffboardInstructionDetails } from "./components/OffboardingInstructions
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
 import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
-import { getCloudAccountId, getCloudAccountProvider, getExistingVpcCount, getOffboardReadiness } from "./utils";
+import {
+  getCloudAccountId,
+  getCloudAccountProvider,
+  getExistingVpcCount,
+  getOffboardReadiness,
+  isBringOwnVpcsSupported,
+} from "./utils";
 
 const columnHelper = createColumnHelper<ResourceInstance>();
 
@@ -181,6 +193,28 @@ const CloudAccountsPage = () => {
     const instanceToModify = instances.find((instance) => instance.id === modifyVpcsInstanceId);
     if (!instanceToModify) return;
 
+    const subscription = subscriptionsObj[instanceToModify.subscriptionId as string];
+    if (!subscription) return;
+
+    const resultParams = getResultParams(instanceToModify);
+    const role = getEnumFromUserRoleString(subscription.roleType);
+    const isUpdateAllowedByRBAC = isOperationAllowedByRBAC(operationEnum.Update, role, viewEnum.Access_Resources);
+    const instanceStatus = String(instanceToModify.status || "").toUpperCase();
+    const instanceDescribeStatus = String(resultParams?.account_config_status || instanceStatus).toUpperCase();
+    const cloudProvider = resultParams?.cloud_provider || getCloudAccountProvider(resultParams);
+    const isModifyVpcsAllowed =
+      !["FAILED", "DELETING", "DELETED"].includes(instanceStatus) &&
+      isUpdateAllowedByRBAC &&
+      isBringOwnVpcsSupported(cloudProvider) &&
+      Boolean(resultParams?.cloud_provider_account_config_id) &&
+      instanceDescribeStatus === "READY";
+
+    if (!isModifyVpcsAllowed) {
+      snackbar.showError("Modify VPCs is not available for this cloud account");
+      router.replace(getCloudAccountsRoute({}));
+      return;
+    }
+
     setSelectedRows([modifyVpcsInstanceId]);
     setClickedInstance(instanceToModify);
     setOverlayType("modify-vpcs");
@@ -193,6 +227,8 @@ const CloudAccountsPage = () => {
     modifyVpcsInstanceId,
     openModifyVpcs,
     router,
+    snackbar,
+    subscriptionsObj,
   ]);
 
   useEffect(() => {
