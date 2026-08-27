@@ -15,6 +15,7 @@ import Select from "src/components/FormElementsv2/Select/Select";
 import JobCompleted from "src/components/JobResource/JobCompleted";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import Switch from "src/components/Switch/Switch";
+import { buildLogsSocketURL } from "src/utils/logsSocketUrl";
 
 import useSnackbar from "../../../hooks/useSnackbar";
 import Card from "../../Card/Card";
@@ -111,7 +112,7 @@ function Logs(props) {
   const [errorMessage, setErrorMessage] = useState("");
   let logsSocketEndpoint = null;
   if (socketBaseURL && selectedNode) {
-    logsSocketEndpoint = `${socketBaseURL}&podName=${selectedNode.id}&instanceId=${resourceInstanceId}`;
+    logsSocketEndpoint = buildLogsSocketURL(socketBaseURL, selectedNode.id, resourceInstanceId);
   }
   if (instanceStatus === "STOPPED") {
     logsSocketEndpoint = null;
