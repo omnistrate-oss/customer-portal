@@ -1,12 +1,11 @@
 import { FC, useState } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 
-import Button from "src/components/Button/Button";
 import CopyButton from "src/components/Button/CopyButton";
-import Card from "src/components/Card/Card";
 import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
+import { BarChart01, Server05, TrendUp01 } from "src/icons";
 
 import DataUnavailableMessage from "../DataUnavailableMessage";
 import { ContainerCard } from "../ResourceInstanceDetails/PropertyDetails";
@@ -23,6 +22,14 @@ export type MetricsFeature = {
   instanceOrgPassword?: string;
 };
 
+type GrafanaMetricsProps = {
+  metricsFeature?: MetricsFeature;
+  instanceStatus?: string;
+};
+
+// Networking and Overview are the default dashboards and are always listed first.
+const DASHBOARD_ORDER = ["overview", "networking"];
+
 const isSafeDashboardUrl = (url: string): boolean => {
   try {
     const parsed = new URL(url);
@@ -32,78 +39,43 @@ const isSafeDashboardUrl = (url: string): boolean => {
   }
 };
 
-type GrafanaMetricsProps = {
-  metricsFeature?: MetricsFeature;
-  instanceStatus?: string;
-};
-
 const getDashboardDisplayName = (description: string): string => {
   // Strip instance ID prefix like "instance-d6thil8rl " from description
   return description.replace(/^instance-\S+\s+/, "");
 };
 
-const getDashboardTypeLabel = (key: string): string => {
-  if (key.includes("exporter")) {
-    return "Exporter / Service";
+const getDashboardMeta = (key: string, description: string): { label: string; Icon: typeof Server05 } => {
+  const normalizedKey = key.toLowerCase();
+  if (normalizedKey.includes("overview")) {
+    return { label: "Overview", Icon: TrendUp01 };
   }
-  return "Grafana Dashboard";
+  if (normalizedKey.includes("network")) {
+    return { label: "Networking", Icon: Server05 };
+  }
+  return { label: getDashboardDisplayName(description), Icon: BarChart01 };
 };
 
-const getDashboardTypeColor = (
-  key: string
-): {
-  color: string;
-  bgColor: string;
-  borderColor: string;
-} => {
-  if (key.includes("exporter")) {
-    return {
-      color: "#6941C6",
-      bgColor: "#F9F5FF",
-      borderColor: "#D6BBFB",
-    };
-  }
-  return {
-    color: "#067647",
-    bgColor: "#ECFDF3",
-    borderColor: "#ABEFC6",
-  };
-};
-
-const CredentialRow: FC<{
+/** A single labelled credential shown in the horizontal Grafana Access row. */
+const CredentialColumn: FC<{
   label: string;
   value: string;
-  isLast?: boolean;
   isPassword?: boolean;
-}> = ({ label, value, isLast = false, isPassword = false }) => {
+  flex?: number;
+}> = ({ label, value, isPassword = false, flex = 1 }) => {
   const [isVisible, setIsVisible] = useState(false);
-
   const displayValue = isPassword && !isVisible ? "●●●●●●●●" : value;
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      sx={{
-        padding: "14px 24px",
-        borderBottom: isLast ? "none" : "1px solid #E4E7EC",
-      }}
-    >
+    <Box flex={flex} minWidth={0}>
       <Text size="small" weight="medium" color="#414651">
         {label}
       </Text>
-      <Stack direction="row" alignItems="center" gap="8px">
+      <Stack direction="row" alignItems="center" gap="8px" mt="8px">
         <Text
           size="small"
           weight="regular"
           color="#414651"
-          sx={{
-            maxWidth: "400px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
+          sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
         >
           {displayValue}
         </Text>
@@ -111,11 +83,7 @@ const CredentialRow: FC<{
           <Text
             size="xsmall"
             weight="medium"
-            sx={{
-              color: "#7F56D9",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
+            sx={{ color: "#7F56D9", cursor: "pointer", userSelect: "none", flexShrink: 0 }}
             onClick={() => setIsVisible(!isVisible)}
           >
             {isVisible ? "Hide" : "Show"}
@@ -123,85 +91,100 @@ const CredentialRow: FC<{
         )}
         <CopyButton
           text={value}
-          iconProps={{
-            color: "#6941C6",
-            width: 18,
-            height: 18,
-          }}
+          iconProps={{ color: "#6941C6", width: 18, height: 18 }}
           iconButtonProps={{ padding: "4px" }}
         />
       </Stack>
-    </Stack>
+    </Box>
+  );
+};
+
+const OpenDashboardLink: FC<{ href: string; disabled?: boolean }> = ({ href, disabled = false }) => {
+  const baseSx = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "4px",
+    fontSize: "14px",
+    lineHeight: "20px",
+    fontWeight: 600,
+    textDecoration: "none",
+  } as const;
+
+  if (disabled) {
+    return (
+      <Box component="span" sx={{ ...baseSx, color: "#D0D5DD", cursor: "not-allowed" }}>
+        Open Dashboard
+        <ExternalArrowIcon color="#D0D5DD" width={16} height={16} />
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      component="a"
+      data-testid="open-dashboard-link"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      sx={{ ...baseSx, color: "#6941C6" }}
+    >
+      Open Dashboard
+      <ExternalArrowIcon color="#6941C6" width={16} height={16} />
+    </Box>
   );
 };
 
 const DashboardCard: FC<{
   dashboardKey: string;
   dashboard: Dashboard;
-  instanceStatus?: string;
-}> = ({ dashboardKey, dashboard, instanceStatus }) => {
-  const displayName = getDashboardDisplayName(dashboard.description);
-  const typeLabel = getDashboardTypeLabel(dashboardKey);
-  const typeColor = getDashboardTypeColor(dashboardKey);
+}> = ({ dashboardKey, dashboard }) => {
+  const { label, Icon } = getDashboardMeta(dashboardKey, dashboard.description);
   const linkIsSafe = isSafeDashboardUrl(dashboard.dashboardLink);
-  const isRunning = instanceStatus === "RUNNING";
 
   return (
     <Box
       sx={{
-        border: "1px solid #E9EAEB",
-        borderRadius: "12px",
-        padding: "20px",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        gap: "12px",
+        border: "1px solid #E9EAEB",
+        borderRadius: "12px",
+        overflow: "hidden",
       }}
     >
-      <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap="8px" mb="8px">
-          <Text size="medium" weight="semibold" color="#181D27">
-            {displayName}
-          </Text>
-          <StatusChip
-            label={typeLabel}
-            color={typeColor.color}
-            backgroundColor={typeColor.bgColor}
-            borderColor={typeColor.borderColor}
-            sx={{ flexShrink: 0 }}
-          />
-        </Stack>
-        {dashboard.description !== displayName && (
-          <Text size="small" weight="regular" color="#535862">
-            {dashboard.description}
-          </Text>
-        )}
-      </Box>
-
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        {isRunning ? (
-          <StatusChip label="Available" category="success" dot />
-        ) : (
-          <StatusChip label="Unavailable" category="unknown" dot />
-        )}
-        <Button
-          variant="contained"
-          size="xsmall"
-          href={linkIsSafe ? dashboard.dashboardLink : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          disabled={!linkIsSafe}
-          endIcon={<ExternalArrowIcon color="#FFFFFF" />}
+      <Stack direction="row" alignItems="center" gap="12px" sx={{ padding: "20px", flexGrow: 1 }}>
+        <Box
           sx={{
-            backgroundColor: "#7F56D9",
-            "&:hover": {
-              backgroundColor: "#6941C6",
-            },
+            width: "48px",
+            height: "48px",
+            borderRadius: "50%",
+            backgroundColor: "#F4EBFF",
+            color: "#7F56D9",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
           }}
         >
-          Open Dashboard
-        </Button>
+          <Icon size={24} />
+        </Box>
+        <Box minWidth={0}>
+          <Text
+            size="medium"
+            weight="semibold"
+            color="#181D27"
+            sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+          >
+            {label}
+          </Text>
+        </Box>
+        <StatusChip label="Available" category="success" sx={{ flexShrink: 0, ml: "auto" }} />
       </Stack>
+
+      <Divider sx={{ borderColor: "#E9EAEB" }} />
+
+      <Box sx={{ padding: "16px 20px", display: "flex", justifyContent: "center" }}>
+        <OpenDashboardLink href={dashboard.dashboardLink} disabled={!linkIsSafe} />
+      </Box>
     </Box>
   );
 };
@@ -221,28 +204,19 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
 
   if (!dashboards || !grafanaEndpoint || Object.keys(dashboards).length === 0) {
     return (
-      <Card
-        mt={4}
-        sx={{
-          paddingTop: "12.5px",
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          minHeight: "500px",
-        }}
-      >
-        <Stack direction="row" justifyContent="center" marginTop="200px">
-          <Text size="xlarge">
+      <ContainerCard title="Grafana Dashboards" mt="24px" contentBoxProps={{ padding: "24px" }}>
+        <Stack direction="row" justifyContent="center" sx={{ padding: "80px 0" }}>
+          <Text size="large" color="#535862">
             {`Metrics are not available${instanceStatus !== "RUNNING" ? " as the instance is not running" : ""}`}
           </Text>
         </Stack>
-      </Card>
+      </ContainerCard>
     );
   }
 
-  const dashboardOrder = ["overview", "networking"];
   const dashboardEntries = Object.entries(dashboards).sort(([a], [b]) => {
-    const aIndex = dashboardOrder.indexOf(a);
-    const bIndex = dashboardOrder.indexOf(b);
+    const aIndex = DASHBOARD_ORDER.indexOf(a.toLowerCase());
+    const bIndex = DASHBOARD_ORDER.indexOf(b.toLowerCase());
     if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
     if (aIndex !== -1) return -1;
     if (bIndex !== -1) return 1;
@@ -250,20 +224,38 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
   });
 
   return (
-    <Stack gap="20px" mt="32px">
+    <Stack gap="24px" mt="24px">
       {/* Grafana Access Section */}
-      <ContainerCard title="Grafana Access" description="Use these credentials to access the Grafana dashboards">
-        <CredentialRow label="Grafana Endpoint" value={grafanaEndpoint} />
-        {metricsFeature.instanceOrgId && (
-          <CredentialRow label="Username" value={metricsFeature.instanceOrgId} />
-        )}
-        {metricsFeature.instanceOrgPassword && (
-          <CredentialRow label="Password" value={metricsFeature.instanceOrgPassword} isPassword isLast />
-        )}
+      <ContainerCard
+        title="Grafana Access"
+        description="Use these credentials to access the Grafana dashboards"
+        contentBoxProps={{ padding: "20px 24px" }}
+      >
+        <Stack
+          direction="row"
+          spacing="24px"
+          divider={<Divider orientation="vertical" flexItem sx={{ borderColor: "#E4E7EC" }} />}
+        >
+          <CredentialColumn label="Grafana Endpoint" value={grafanaEndpoint} flex={2} />
+          {metricsFeature.instanceOrgId && <CredentialColumn label="Username" value={metricsFeature.instanceOrgId} />}
+          {metricsFeature.instanceOrgPassword && (
+            <CredentialColumn label="Password" value={metricsFeature.instanceOrgPassword} isPassword />
+          )}
+        </Stack>
       </ContainerCard>
 
       {/* Dashboards Section */}
-      <ContainerCard title="Dashboards" contentBoxProps={{ padding: "16px 24px 24px" }}>
+      <ContainerCard
+        title="Grafana Dashboards"
+        statusChip={
+          <StatusChip
+            label={`${dashboardEntries.length} Dashboards`}
+            category="success"
+            sx={{ borderRadius: "9999px" }}
+          />
+        }
+        contentBoxProps={{ padding: "16px 24px 24px" }}
+      >
         <Box
           sx={{
             display: "grid",
@@ -272,7 +264,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
           }}
         >
           {dashboardEntries.map(([key, dashboard]) => (
-            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} instanceStatus={instanceStatus} />
+            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} />
           ))}
         </Box>
       </ContainerCard>
