@@ -137,11 +137,9 @@ const OpenDashboardLink: FC<{ href: string; disabled?: boolean }> = ({ href, dis
 const DashboardCard: FC<{
   dashboardKey: string;
   dashboard: Dashboard;
-  instanceStatus?: string;
-}> = ({ dashboardKey, dashboard, instanceStatus }) => {
+}> = ({ dashboardKey, dashboard }) => {
   const { label, Icon } = getDashboardMeta(dashboardKey, dashboard.description);
   const linkIsSafe = isSafeDashboardUrl(dashboard.dashboardLink);
-  const isRunning = instanceStatus === "RUNNING";
 
   return (
     <Box
@@ -167,7 +165,7 @@ const DashboardCard: FC<{
             flexShrink: 0,
           }}
         >
-          <Icon size={20} />
+          <Icon size={24} />
         </Box>
         <Box minWidth={0}>
           <Text
@@ -179,11 +177,7 @@ const DashboardCard: FC<{
             {label}
           </Text>
         </Box>
-        <StatusChip
-          label={isRunning ? "Available" : "Unavailable"}
-          category={isRunning ? "success" : "unknown"}
-          sx={{ flexShrink: 0, ml: "auto" }}
-        />
+        <StatusChip label="Available" category="success" sx={{ flexShrink: 0, ml: "auto" }} />
       </Stack>
 
       <Divider sx={{ borderColor: "#E9EAEB" }} />
@@ -210,7 +204,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
 
   if (!dashboards || !grafanaEndpoint || Object.keys(dashboards).length === 0) {
     return (
-      <ContainerCard title="Grafana Dashboards" mt="32px" contentBoxProps={{ padding: "24px" }}>
+      <ContainerCard title="Grafana Dashboards" mt="24px" contentBoxProps={{ padding: "24px" }}>
         <Stack direction="row" justifyContent="center" sx={{ padding: "80px 0" }}>
           <Text size="large" color="#535862">
             {`Metrics are not available${instanceStatus !== "RUNNING" ? " as the instance is not running" : ""}`}
@@ -230,7 +224,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
   });
 
   return (
-    <Stack gap="20px" mt="32px">
+    <Stack gap="24px" mt="24px">
       {/* Grafana Access Section */}
       <ContainerCard
         title="Grafana Access"
@@ -270,7 +264,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
           }}
         >
           {dashboardEntries.map(([key, dashboard]) => (
-            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} instanceStatus={instanceStatus} />
+            <DashboardCard key={key} dashboardKey={key} dashboard={dashboard} />
           ))}
         </Box>
       </ContainerCard>
