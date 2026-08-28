@@ -3,6 +3,7 @@ import _ from "lodash";
 import { $api } from "src/api/query";
 import { getResultParams } from "src/utils/instance";
 import { calculateInstanceHealthPercentage } from "src/utils/instanceHealthPercentage";
+import { buildLogsSocketBaseURL } from "src/utils/logsSocketUrl";
 import processClusterPorts from "src/utils/processClusterPorts";
 
 const useResourceInstance = (queryParams) => {
@@ -159,12 +160,7 @@ const useResourceInstance = (queryParams) => {
             // Show Logs if Observability Resource Present
             // isLogsEnabled = true;
 
-            const clusterEndpoint = topologyDetails.clusterEndpoint;
-            const [userPass, baseURL] = clusterEndpoint.split("@");
-            if (userPass && baseURL) {
-              const [username, password] = userPass.split(":");
-              logsSocketURL = `wss://${baseURL}/logs?username=${username}&password=${password}`;
-            }
+            logsSocketURL = buildLogsSocketBaseURL(topologyDetails.clusterEndpoint);
 
             globalEndpoints.others.push({
               resourceName: topologyDetails.resourceName,
