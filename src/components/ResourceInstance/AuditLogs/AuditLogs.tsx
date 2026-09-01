@@ -6,7 +6,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { pageElements } from "page-objects/constants/instance-details-page";
 import { OnCopyProps } from "react-json-view";
 
 import SearchInput from "src/components/DataGrid/SearchInput";
@@ -19,6 +18,7 @@ import {
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import JSONView from "src/components/JSONView/JSONView";
 import MessageInput from "src/components/MessageInput/MessageInput";
+import { pageElements } from "src/constants/pageElements/instance-details-page";
 import useUserData from "src/hooks/usersData";
 import { AuditEvent } from "src/types/auditEvent";
 import { SetState } from "src/types/common/reactGenerics";

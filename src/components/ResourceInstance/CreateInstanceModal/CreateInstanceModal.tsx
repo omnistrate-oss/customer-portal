@@ -1,6 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
-import { dataTestIds } from "page-objects/constants/instances-page";
 
 import Button from "src/components/Button/Button";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
@@ -9,6 +8,7 @@ import InstructionsCircledIcon from "src/components/Icons/InstructionsCircled/In
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
+import { dataTestIds } from "src/constants/testIds/instances-page";
 
 const StyledContainer = styled(Box)({
   position: "fixed",

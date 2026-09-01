@@ -1,10 +1,11 @@
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
-import { dataTestIds as instanceDataTestIds } from "page-objects/constants/instances-page";
 import { InstancesPage } from "page-objects/instances-page";
 import { expect, test } from "test-fixtures/har-test";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
+
+import { dataTestIds as instanceDataTestIds } from "src/constants/testIds/instances-page";
 
 registerSoftFailureRecorder();
 
