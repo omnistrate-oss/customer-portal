@@ -113,7 +113,7 @@ const OpenDashboardLink: FC<{ href: string; disabled?: boolean }> = ({ href, dis
   if (disabled) {
     return (
       <Box component="span" sx={{ ...baseSx, color: "#D0D5DD", cursor: "not-allowed" }}>
-        Open Dashboard
+        Open dashboard
         <ExternalArrowIcon color="#D0D5DD" width={16} height={16} />
       </Box>
     );
@@ -128,7 +128,7 @@ const OpenDashboardLink: FC<{ href: string; disabled?: boolean }> = ({ href, dis
       rel="noopener noreferrer"
       sx={{ ...baseSx, color: "#6941C6" }}
     >
-      Open Dashboard
+      Open dashboard
       <ExternalArrowIcon color="#6941C6" width={16} height={16} />
     </Box>
   );
@@ -247,12 +247,9 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
       {/* Dashboards Section */}
       <ContainerCard
         title="Grafana Dashboards"
+        description="Open dashboards configured for this deployment."
         statusChip={
-          <StatusChip
-            label={`${dashboardEntries.length} Dashboards`}
-            category="success"
-            sx={{ borderRadius: "9999px" }}
-          />
+          <StatusChip label={`${dashboardEntries.length}`} category="success" sx={{ borderRadius: "9999px" }} />
         }
         contentBoxProps={{ padding: "16px 24px 24px" }}
       >
