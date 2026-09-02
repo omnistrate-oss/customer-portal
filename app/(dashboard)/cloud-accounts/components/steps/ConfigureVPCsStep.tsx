@@ -78,7 +78,7 @@ const vpcStatusCategoryMap = {
 
 const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
   <MuiTooltip
-    title={props.disabled ? "This VPC is failed or already in use and cannot be selected." : ""}
+    title={props.disabled ? "Failed VPCs cannot be selected" : ""}
     placement="top"
     arrow
   >

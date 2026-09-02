@@ -846,9 +846,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             {
               label: "Private Connectivity",
               value: privateConnectivityEnabled ? (
-                <StatusChip label="Enabled" category="success" />
+                <StatusChip size="small" label="Enabled" category="success" />
               ) : (
-                <StatusChip label="Disabled" category="unknown" />
+                <StatusChip size="small" label="Disabled" category="unknown" />
               ),
             },
           ]
@@ -864,6 +864,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           label: "Creating new VPCs",
           value: (
             <StatusChip
+              size="small"
               label={vpcValues.enableNewVpcs ? "Enabled" : "Disabled"}
               category={vpcValues.enableNewVpcs ? "success" : "unknown"}
             />
@@ -873,6 +874,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           label: "Enable existing VPCs",
           value: (
             <StatusChip
+              size="small"
               label={vpcValues.bringOwnVpcs ? "Enabled" : "Disabled"}
               category={vpcValues.bringOwnVpcs ? "success" : "unknown"}
             />
