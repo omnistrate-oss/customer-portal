@@ -77,7 +77,7 @@ const vpcStatusCategoryMap = {
 };
 
 const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
-  <Tooltip title={props.disabled ? "Failed VPCs cannot be selected" : ""}>
+  <Tooltip title={props.disabled ? "Failed or in-use VPCs cannot be selected" : ""}>
     <span>
       <Checkbox {...props} />
     </span>

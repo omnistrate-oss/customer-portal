@@ -83,7 +83,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       ? isPrivateLinkEnabled(getResultParams(selectedInstance))
       : initialFormValues?.cloudProvider === "aws"
   );
-  const hasPrivateConnectivityPreference = useRef(false);
+  const awsPrivateConnectivityPreferenceRef = useRef(
+    selectedInstance ? isPrivateLinkEnabled(getResultParams(selectedInstance)) : true
+  );
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
@@ -308,9 +310,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const { values, setFieldValue } = formData;
 
   useEffect(() => {
-    if (!selectedInstance && !hasPrivateConnectivityPreference.current) {
-      setEnablePrivateConnectivity(values.cloudProvider === "aws");
-    }
+    if (selectedInstance) return;
+    setEnablePrivateConnectivity(
+      values.cloudProvider === "aws" ? awsPrivateConnectivityPreferenceRef.current : false
+    );
   }, [selectedInstance, values.cloudProvider]);
 
   const accountConfigId = useMemo(() => {
@@ -988,7 +991,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 formMode="create"
                 enablePrivateConnectivity={enablePrivateConnectivity}
                 onTogglePrivateConnectivity={(value) => {
-                  hasPrivateConnectivityPreference.current = true;
+                  awsPrivateConnectivityPreferenceRef.current = value;
                   setEnablePrivateConnectivity(value);
                 }}
               />

@@ -582,7 +582,7 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               ? "This account configuration verification failed"
               : isRequestOrDataPending
                 ? "Verifying Account configuration"
-                : "Account config prechecks succeeded"
+                : "Account configuration prechecks succeeded"
           }
           isComplete={isVerificationComplete && !isFailed}
           isInProgress={isRequestOrDataPending && !isVerificationComplete && !isFailed}
