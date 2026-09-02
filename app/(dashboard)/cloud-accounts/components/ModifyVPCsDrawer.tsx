@@ -216,9 +216,9 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
             {
               label: "Private Connectivity",
               value: privateConnectivityEnabled ? (
-                <Chip label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
+                <Chip size="small" label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
               ) : (
-                <Chip label="Disabled" fontColor="#667085" bgColor="#F2F4F7" borderColor="#D0D5DD" />
+                <Chip size="small" label="Disabled" fontColor="#667085" bgColor="#F2F4F7" borderColor="#D0D5DD" />
               ),
             },
           ]
@@ -232,6 +232,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
         label: "Creating new VPCs",
         value: (
           <Chip
+            size="small"
             label={vpcValues.enableNewVpcs ? "Enabled" : "Disabled"}
             fontColor={vpcValues.enableNewVpcs ? "#067647" : "#667085"}
             bgColor={vpcValues.enableNewVpcs ? "#ECFDF3" : "#F2F4F7"}
@@ -243,6 +244,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
         label: "Enable existing VPCs",
         value: (
           <Chip
+            size="small"
             label={vpcValues.bringOwnVpcs ? "Enabled" : "Disabled"}
             fontColor={vpcValues.bringOwnVpcs ? "#067647" : "#667085"}
             bgColor={vpcValues.bringOwnVpcs ? "#ECFDF3" : "#F2F4F7"}

@@ -83,6 +83,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       ? isPrivateLinkEnabled(getResultParams(selectedInstance))
       : initialFormValues?.cloudProvider === "aws"
   );
+  const awsPrivateConnectivityPreferenceRef = useRef(
+    selectedInstance ? isPrivateLinkEnabled(getResultParams(selectedInstance)) : true
+  );
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
@@ -307,9 +310,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const { values, setFieldValue } = formData;
 
   useEffect(() => {
-    if (!selectedInstance) {
-      setEnablePrivateConnectivity(values.cloudProvider === "aws");
-    }
+    if (selectedInstance) return;
+    setEnablePrivateConnectivity(
+      values.cloudProvider === "aws" ? awsPrivateConnectivityPreferenceRef.current : false
+    );
   }, [selectedInstance, values.cloudProvider]);
 
   const accountConfigId = useMemo(() => {
@@ -614,7 +618,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                   // @ts-ignore – CloudProviderRadio onChange signature is broader than the typed prop
                   onChange={(cp: string) => {
                     setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cp]);
-                    setEnablePrivateConnectivity(cp === "aws");
                   }}
                   disabled={false}
                 />
@@ -846,9 +849,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             {
               label: "Private Connectivity",
               value: privateConnectivityEnabled ? (
-                <StatusChip label="Enabled" category="success" />
+                <StatusChip size="small" label="Enabled" category="success" />
               ) : (
-                <StatusChip label="Disabled" category="unknown" />
+                <StatusChip size="small" label="Disabled" category="unknown" />
               ),
             },
           ]
@@ -864,6 +867,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           label: "Creating new VPCs",
           value: (
             <StatusChip
+              size="small"
               label={vpcValues.enableNewVpcs ? "Enabled" : "Disabled"}
               category={vpcValues.enableNewVpcs ? "success" : "unknown"}
             />
@@ -873,6 +877,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           label: "Enable existing VPCs",
           value: (
             <StatusChip
+              size="small"
               label={vpcValues.bringOwnVpcs ? "Enabled" : "Disabled"}
               category={vpcValues.bringOwnVpcs ? "success" : "unknown"}
             />
@@ -985,7 +990,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 formConfiguration={formConfiguration}
                 formMode="create"
                 enablePrivateConnectivity={enablePrivateConnectivity}
-                onTogglePrivateConnectivity={setEnablePrivateConnectivity}
+                onTogglePrivateConnectivity={(value) => {
+                  awsPrivateConnectivityPreferenceRef.current = value;
+                  setEnablePrivateConnectivity(value);
+                }}
               />
             </form>
           )}
