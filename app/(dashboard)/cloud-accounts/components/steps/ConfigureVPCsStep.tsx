@@ -1,10 +1,9 @@
 "use client";
 
-import CheckIcon from "@mui/icons-material/Check";
-import { Box, Tooltip as MuiTooltip, Stack } from "@mui/material";
 import { useMemo } from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import { Box, Stack } from "@mui/material";
 
-import Tooltip from "components/Tooltip/Tooltip";
 import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
@@ -17,6 +16,7 @@ import RefreshIcon from "src/components/Icons/Refresh/Refresh";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
 
@@ -77,15 +77,11 @@ const vpcStatusCategoryMap = {
 };
 
 const VpcBaseCheckbox = (props: React.ComponentProps<typeof Checkbox>) => (
-  <MuiTooltip
-    title={props.disabled ? "Failed VPCs cannot be selected" : ""}
-    placement="top"
-    arrow
-  >
+  <Tooltip title={props.disabled ? "Failed VPCs cannot be selected" : ""}>
     <span>
       <Checkbox {...props} />
     </span>
-  </MuiTooltip>
+  </Tooltip>
 );
 
 const VpcsDataGridHeader = ({
