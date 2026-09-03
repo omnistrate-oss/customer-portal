@@ -8,33 +8,37 @@ import { Text } from "src/components/Typography/Typography";
 
 const DEFAULT_TOOLTIP_TEXT = "Click to copy";
 
-const HEADER_SURFACE = "#171D2D";
-const HEADER_BORDER = "#2B3244";
-const CODE_SURFACE = "#0E1530";
-const SCROLL_THUMB = "#33406B";
+const CODE_SURFACE = "#0C0E12";
+const BORDER_COLOR = "#22262F";
+const SCROLL_THUMB = "#373A41";
 
 export type CommandBlockProps = {
   title: string;
   command: string;
   dataTestId?: string;
+  fixedHeight?: boolean;
 };
 
 /**
- * Terminal block for long shell commands, with the header chrome and copy behaviour of
- * `CodeEditorHeader`. Lines never wrap — a command broken mid-token renders `org-EUVvex3bVm` as
- * `or` + `g-EUVvex3bVm` and cannot be checked before running — so it scrolls horizontally instead.
- * There is no height cap, leaving vertical scrolling to the surrounding dialog.
+ * Terminal block for shell commands with a copy action that always writes the original command.
+ * Visual wrapping keeps every flag readable in a narrow modal without altering the copied text.
+ * Long create commands use a fixed-height scroll area; short commands can retain their natural height.
  */
-const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId }) => {
+const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixedHeight = false }) => {
   const [tooltipText, setTooltipText] = useState(DEFAULT_TOOLTIP_TEXT);
 
   return (
     <Box
       sx={{
+        boxSizing: "border-box",
         backgroundColor: CODE_SURFACE,
-        borderRadius: "8px",
+        border: `1px solid ${BORDER_COLOR}`,
+        borderRadius: "12px",
         overflow: "hidden",
         minWidth: 0,
+        height: fixedHeight ? "236px" : "auto",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Box
@@ -42,19 +46,32 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId }) => 
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "10px",
-          padding: "4px 8px 4px 16px",
-          backgroundColor: HEADER_SURFACE,
-          borderBottom: `1px solid ${HEADER_BORDER}`,
+          gap: "12px",
+          minHeight: "56px",
+          flexShrink: 0,
+          padding: "11px 11px 8px 23px",
+          backgroundColor: CODE_SURFACE,
+          borderBottom: `1px solid ${BORDER_COLOR}`,
         }}
       >
-        <Text weight="regular" size="xsmall" color="#FFFFFF">
+        <Text weight="semibold" size="medium" color="#F7F7F7">
           {title}
         </Text>
 
         <IconButton
           aria-label={`Copy ${title.toLowerCase()} command`}
-          sx={{ flexShrink: 0 }}
+          sx={{
+            width: "36px",
+            height: "36px",
+            flexShrink: 0,
+            backgroundColor: "#13161B",
+            border: "1px solid #373A41",
+            borderRadius: "8px",
+            boxShadow: "inset 0 0 0 1px rgba(12, 14, 18, 0.18), inset 0 -2px 0 rgba(12, 14, 18, 0.05)",
+            "& svg": { width: "20px", height: "20px" },
+            "& svg path": { stroke: "#CECFD2" },
+            "&:hover": { backgroundColor: "#1F242C" },
+          }}
           onClick={() => {
             clipboard
               .write(command)
@@ -73,10 +90,13 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId }) => 
 
       <Box
         sx={{
-          overflowX: "auto",
+          flex: fixedHeight ? 1 : "none",
+          minHeight: 0,
+          overflowY: "auto",
+          overflowX: "hidden",
           scrollbarWidth: "thin",
           scrollbarColor: `${SCROLL_THUMB} ${CODE_SURFACE}`,
-          "&::-webkit-scrollbar": { height: "10px" },
+          "&::-webkit-scrollbar": { width: "10px" },
           "&::-webkit-scrollbar-track": { backgroundColor: CODE_SURFACE },
           "&::-webkit-scrollbar-thumb": {
             backgroundColor: SCROLL_THUMB,
@@ -91,17 +111,16 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId }) => 
           data-testid={dataTestId}
           sx={{
             margin: 0,
-            padding: "12px 16px",
-            // Shrink-to-fit so the trailing padding scrolls with the content instead of sitting at
-            // the container edge, where the last characters would touch the border.
-            display: "inline-block",
+            padding: "16px 24px",
             boxSizing: "border-box",
-            minWidth: "100%",
-            color: "#E6EAF5",
-            fontFamily: "'Roboto Mono', 'JetBrains Mono', monospace",
-            fontSize: "12.5px",
-            lineHeight: "20px",
-            whiteSpace: "pre",
+            width: "100%",
+            minHeight: "100%",
+            color: "#75E0A7",
+            fontFamily: "'Roboto Mono', monospace",
+            fontSize: "12px",
+            lineHeight: "16px",
+            whiteSpace: "pre-wrap",
+            overflowWrap: "anywhere",
           }}
         >
           {command}

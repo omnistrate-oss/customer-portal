@@ -1,12 +1,13 @@
 "use client";
 
-import { Box, Stack } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { Box, Stack } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 
 import AwsCloudFormationInstructions from "src/components/AwsCloudFormationInstructions/AwsCloudFormationInstructions";
+import CommandBlock from "src/components/AwsCloudFormationInstructions/CommandBlock";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
@@ -452,7 +453,11 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="regular" color="#344054">
                 Please open the {gcpCloudShellLink} environment and execute the command below.
               </Text>
-              <TextContainerToCopy text={addQuotesToShellCommand(gcpBootstrapShellCommand)} />
+              <CommandBlock
+                title="Run command"
+                command={addQuotesToShellCommand(gcpBootstrapShellCommand)}
+                dataTestId="gcp-bootstrap-command"
+              />
               <Text size="small" weight="regular" color="#344054">
                 For guidance, our instructional video is available {gcpShellScriptGuide}.
               </Text>
@@ -488,7 +493,11 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="regular" color="#344054">
                 Please open the {azureCloudShellLink} environment and execute the command below.
               </Text>
-              <TextContainerToCopy text={addQuotesToShellCommand(azureBootstrapShellCommand)} />
+              <CommandBlock
+                title="Run command"
+                command={addQuotesToShellCommand(azureBootstrapShellCommand)}
+                dataTestId="azure-bootstrap-command"
+              />
               <Text size="small" weight="regular" color="#344054">
                 For guidance, our instructional video is available {azureShellScriptGuide}.
               </Text>
@@ -524,7 +533,11 @@ const GrantAccessStep: React.FC<GrantAccessStepProps> = ({
               <Text size="small" weight="regular" color="#344054">
                 Please open the {ociCloudShellLink} environment and execute the command below.
               </Text>
-              <TextContainerToCopy text={addQuotesToShellCommand(accountInstructionDetails.ociBootstrapShellCommand)} />
+              <CommandBlock
+                title="Run command"
+                command={addQuotesToShellCommand(accountInstructionDetails.ociBootstrapShellCommand)}
+                dataTestId="oci-bootstrap-command"
+              />
             </Stack>
           ) : (
             <Text size="small" weight="regular" color="#344054">
