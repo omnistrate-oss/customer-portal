@@ -19,6 +19,12 @@ export type AwsCloudFormationInstructionsProps = {
   awsAccountId?: string;
   /** Console-based instructions, rendered unchanged under the Console tab. */
   children: ReactNode;
+  /** Optional replacement for the default CLI introduction. */
+  cliDescription?: ReactNode;
+  /** Content shared by both tabs, rendered after the selected tab's instructions. */
+  footer?: ReactNode;
+  /** Vertical spacing between the tabs and their content. */
+  contentSpacing?: string | number;
 };
 
 const BodyText: FC<{ children: ReactNode }> = ({ children }) => (
@@ -37,6 +43,9 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
   variant,
   awsAccountId,
   children,
+  cliDescription,
+  footer,
+  contentSpacing = "16px",
 }) => {
   const [selectedTab, setSelectedTab] = useState<"console" | "cli">("console");
 
@@ -45,7 +54,16 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
       ? getAwsCloudFormationCreateStackCommand(cloudFormationUrl)
       : getAwsCloudFormationDeleteStackCommand(cloudFormationUrl);
 
-  if (!command) return <>{children}</>;
+  if (!command) {
+    if (!footer) return <>{children}</>;
+
+    return (
+      <Box width="100%" minWidth={0}>
+        {children}
+        <Box marginTop="12px">{footer}</Box>
+      </Box>
+    );
+  }
 
   const accountSuffix = awsAccountId ? ` to AWS account ${awsAccountId}` : "";
 
@@ -60,24 +78,27 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
         <Tab label="AWS CLI" value="cli" data-testid="aws-cloudformation-cli-tab" />
       </Tabs>
 
-      <Box marginTop="16px" minWidth={0}>
+      <Box marginTop={contentSpacing} minWidth={0}>
         {selectedTab === "console" ? (
           children
         ) : (
           <Box display="flex" flexDirection="column" gap="12px" minWidth={0}>
-            <BodyText>
-              {variant === "onboarding"
-                ? `Run this from a terminal authenticated${accountSuffix}. It creates the same CloudFormation stack as the console flow.`
-                : `Run this from a terminal authenticated${accountSuffix} to delete the onboarding stack and revoke remaining access.`}
-            </BodyText>
+            {cliDescription ?? (
+              <BodyText>
+                {variant === "onboarding"
+                  ? `Run this from a terminal authenticated${accountSuffix}. It creates the same CloudFormation stack as the console flow.`
+                  : `Run this from a terminal authenticated${accountSuffix} to delete the onboarding stack and revoke remaining access.`}
+              </BodyText>
+            )}
 
             <CommandBlock
               title={variant === "onboarding" ? "Create stack" : "Delete stack"}
               command={command}
               dataTestId="aws-cloudformation-cli-command"
+              fixedHeight={variant === "onboarding"}
             />
 
-            {variant === "onboarding" && (
+            {variant === "onboarding" && !footer && (
               <BodyText>
                 If an existing AWSLoadBalancerControllerIAMPolicy policy causes an error, change
                 CreateLoadBalancerPolicy to &quot;false&quot; and run the command again.
@@ -86,6 +107,8 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
           </Box>
         )}
       </Box>
+
+      {footer && <Box marginTop="12px">{footer}</Box>}
     </Box>
   );
 };
