@@ -146,16 +146,14 @@ export const deriveOptionsFromData = <T>(
 
   data.forEach((item) => {
     const value = resolveAccessor(item, accessor);
-    if (value !== null && value !== undefined && value !== "") {
-      uniqueValues.add(String(value));
-    }
+    uniqueValues.add(String(value ?? ""));
   });
 
   return Array.from(uniqueValues)
     .sort()
     .map((value) => ({
       value,
-      label: labelFormatter ? labelFormatter(value) : value,
+      label: value === "" ? "(Blanks)" : labelFormatter ? labelFormatter(value) : value,
     }));
 };
 
@@ -238,4 +236,11 @@ export const formatDateRangeChipLabel = (values: string[]): string => {
   }
 
   return "";
+};
+
+export const searchData = <T>(data: T[], searchTerm: string, getSearchableText?: (item: T) => string): T[] => {
+  if (!searchTerm.trim() || !getSearchableText) return data;
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  return data.filter((item) => getSearchableText(item).toLowerCase().includes(normalizedSearch));
 };

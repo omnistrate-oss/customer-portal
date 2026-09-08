@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import DataGridFilter from "src/components/DataGridFilter/DataGridFilter";
 import { FilterConfig } from "src/components/DataGridFilter/types";
@@ -7,6 +7,7 @@ import { statuses } from "src/components/StatusChip/StatusChip";
 import { cloudProviderLabelsShort } from "src/constants/cloudProviders";
 import { SetState } from "src/types/common/reactGenerics";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
+import formatDateUTC from "src/utils/formatDateUTC";
 
 type InstanceSnapshotsFiltersProps = {
   snapshots: InstanceSnapshot[];
@@ -68,7 +69,36 @@ const InstanceSnapshotsFilters: React.FC<InstanceSnapshotsFiltersProps> = ({ sna
     [snapshots]
   );
 
-  return <DataGridFilter data={snapshots} setFilteredData={setFilteredSnapshots} filterConfig={filterConfig} />;
+  const getSearchableText = useCallback((snapshot: InstanceSnapshot) => {
+    const status = snapshot.status ?? "";
+    const completedOn =
+      snapshot.completeTime && snapshot.completeTime !== "0001-01-01T00:00:00Z"
+        ? formatDateUTC(snapshot.completeTime)
+        : "";
+    return [
+      snapshot.snapshotId,
+      snapshot.serviceName,
+      snapshot.productTierName,
+      statuses[status] ?? status,
+      snapshot.cloudProvider,
+      snapshot.region,
+      snapshot.sourceInstanceId,
+      snapshot.subscriptionOwnerUserName,
+      formatDateUTC(snapshot.createdTime),
+      completedOn,
+      snapshot.progress,
+      snapshot.encrypted ? "Encrypted" : "Not Encrypted",
+    ].join(" ");
+  }, []);
+
+  return (
+    <DataGridFilter
+      data={snapshots}
+      setFilteredData={setFilteredSnapshots}
+      filterConfig={filterConfig}
+      getSearchableText={getSearchableText}
+    />
+  );
 };
 
 export default InstanceSnapshotsFilters;

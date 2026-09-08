@@ -32,4 +32,7 @@ export type DataGridFilterProps<T> = {
   filterConfig: FilterConfig<T>;
   data: T[];
   setFilteredData: SetState<T[]>;
+  getSearchableText?: (item: T) => string;
+  searchText?: string;
+  setSearchText?: SetState<string>;
 };

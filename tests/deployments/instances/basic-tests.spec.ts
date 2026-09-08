@@ -1,6 +1,6 @@
-import { test, expect } from "test-fixtures/har-test";
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { expect, test } from "test-fixtures/har-test";
 import {
   TestConnectivityTab,
   TestEventsTab,
@@ -72,6 +72,19 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     console.log(logPrefix, "Instance ID:", instanceId);
 
     await page.getByTestId(dataTestIds.closeInstructionsButton).click();
+    await instancesPage.search(instanceId);
+    await expect(page.getByTestId(instanceId)).toBeVisible();
+
+    await instancesPage.search("no-matching-instance");
+    await expect(page.getByTestId(instanceId)).toHaveCount(0);
+
+    await instancesPage.search("");
+    const productName = `SaaSBuilder Postgres DT - ${GlobalStateManager.getDate() || ""}`;
+    await instancesPage.applyMultiSelectFilter("product-name", [productName]);
+    await expect(instancesPage.filterChip(`Product Name: ${productName}`)).toBeVisible();
+
+    await page.getByTestId("search-in-filter-input").press("Backspace");
+    await expect(instancesPage.filterChip(`Product Name: ${productName}`)).toHaveCount(0);
   });
 
   test("Wait for Running Instance -> Test Running State", async ({ page }) => {

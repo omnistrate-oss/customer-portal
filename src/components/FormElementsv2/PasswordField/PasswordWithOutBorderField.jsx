@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { InputAdornment, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
@@ -18,54 +18,37 @@ export const PasswordWithOutBorderField = (props) => {
   const { children } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const displayValue = isPasswordVisible ? children : convertToAsterisks(children);
+
   return (
-    <Stack direction="row" alignItems="center" justifyContent="flex-end">
-      <div>
-        {isPasswordVisible ? (
-          <Tooltip title={children}>
-            <div>
-              <Text
-                size="small"
-                weight="semibold"
-                color="#535862"
-                sx={{
-                  wordBreak: "break-word",
-                }}
-              >
-                {typeof children === "string"
-                  ? `${children?.slice(0, 100)}${children?.length > 100 ? "..." : ""}`
-                  : children}
-              </Text>
-            </div>
-          </Tooltip>
-        ) : (
-          <Text
-            size="small"
-            weight="semibold"
-            color="#535862"
-            sx={{
-              wordBreak: "break-word",
-            }}
-          >
-            {convertToAsterisks(children)}
+    <Stack direction="row" alignItems="flex-start" flex="1 1 auto" minWidth={0} gap="4px">
+      <Tooltip title={isPasswordVisible ? children : ""}>
+        <Box minWidth={0} flex={1}>
+          <Text size="small" weight="semibold" color="#535862" ellipsis>
+            {displayValue}
           </Text>
-        )}
-      </div>
+        </Box>
+      </Tooltip>
       {children && typeof children === "string" && (
-        <InputAdornment position="end">
-          <Typography
-            fontSize="12px"
-            color="#7F56D9"
-            style={{
-              cursor: "pointer",
-              userSelect: "none",
-              paddingRight: "14px",
-            }}
-            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            {isPasswordVisible ? "Hide" : "Show"}
-          </Typography>
-        </InputAdornment>
+        <Typography
+          component="button"
+          type="button"
+          aria-label={isPasswordVisible ? "Hide secret" : "Show secret"}
+          fontSize="12px"
+          color="#7F56D9"
+          sx={{
+            background: "none",
+            border: 0,
+            cursor: "pointer",
+            flexShrink: 0,
+            padding: 0,
+            paddingRight: "14px",
+            userSelect: "none",
+          }}
+          onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+        >
+          {isPasswordVisible ? "Hide" : "Show"}
+        </Typography>
       )}
     </Stack>
   );

@@ -46,6 +46,7 @@ const SubscriptionsPage = () => {
   const subscriptionId = searchParams?.get("subscriptionId");
 
   const [searchText, setSearchText] = useState<string>("");
+  const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("manage-subscriptions");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
@@ -195,15 +196,6 @@ const SubscriptionsPage = () => {
     },
   });
 
-  const filteredSubscriptions = useMemo(() => {
-    return existingSubscriptions.filter((sub) => {
-      return (
-        sub.serviceName.toLowerCase().includes(searchText.toLowerCase()) ||
-        sub.id.toLowerCase().includes(searchText.toLowerCase())
-      );
-    });
-  }, [searchText, existingSubscriptions]);
-
   return (
     <div>
       <AccountManagementHeader userName={selectUser?.name} userEmail={selectUser?.email} />
@@ -220,6 +212,8 @@ const SubscriptionsPage = () => {
             HeaderComponent={SubscriptionsTableHeader}
             headerProps={{
               selectedRows,
+              subscriptions: existingSubscriptions,
+              setFilteredSubscriptions,
               searchText,
               setSearchText,
               onManageSubscriptions: () => {
@@ -231,7 +225,7 @@ const SubscriptionsPage = () => {
                 setOverlayType("unsubscribe-dialog");
               },
               isUnsubscribing: unSubscribeMutation.isPending,
-              count: existingSubscriptions?.length,
+              count: existingSubscriptions.length,
               isFetchingSubscriptions,
               refetchSubscriptions,
               selectedSubscription,

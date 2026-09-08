@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Close } from "@mui/icons-material";
-import { Box, IconButton } from "@mui/material";
+import { Box, ClickAwayListener, IconButton } from "@mui/material";
 import { useFormik } from "formik";
 
 import { getISOStringfromDateAndTime } from "src/components/DateRangePicker/utils";
+import SearchLens from "src/components/Icons/SearchLens/SearchLens";
 
 import Button from "../Button/Button";
 import FilterLinesIcon from "../Icons/FilterLines/FilterLines";
 import { PopoverDynamicHeight } from "../Popover/Popover";
-import { Text } from "../Typography/Typography";
 
 import ActiveFilterChip, { MoreChip } from "./components/ActiveFilterChip";
 import FilterOptionsDateRange from "./components/FilterOptionsDateRange";
@@ -17,7 +17,7 @@ import FilterOptionsMultiSelect from "./components/FilterOptionsMultiSelect";
 import LeftMenu from "./components/LeftMenu";
 import { timeValidationSchema } from "./constants";
 import { AppliedFilters, DataGridFilterProps, DateRangeType } from "./types";
-import { filterData, formatDateRangeChipLabel, getFilterCount, parseDateRangeValues } from "./utils";
+import { filterData, formatDateRangeChipLabel, getFilterCount, parseDateRangeValues, searchData } from "./utils";
 
 type FilterChipData = {
   filterKey: string;
@@ -26,7 +26,14 @@ type FilterChipData = {
   valueLabel: string;
 };
 
-const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFilterProps<T>) => {
+const DataGridFilter = <T,>({
+  filterConfig,
+  data,
+  setFilteredData,
+  getSearchableText,
+  searchText: controlledSearchText,
+  setSearchText: setControlledSearchText,
+}: DataGridFilterProps<T>) => {
   const [filterKeys, filterConfigArr] = useMemo(() => {
     const keys = Object.keys(filterConfig);
     const arr = Object.entries(filterConfig);
@@ -37,12 +44,17 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({});
   const [pendingFilters, setPendingFilters] = useState<AppliedFilters>({});
   const [activeFilterView, setActiveFilterView] = useState<string>(filterKeys[0] || "");
+  const [internalSearchText, setInternalSearchText] = useState("");
+  const searchText = controlledSearchText ?? internalSearchText;
+  const setSearchText = setControlledSearchText ?? setInternalSearchText;
+  const [debouncedSearchText, setDebouncedSearchText] = useState("");
 
   const [visibleChipCount, setVisibleChipCount] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const chipsContainerRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
   const moreChipRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [dateRangeTab, setDateRangeTab] = useState<DateRangeType>("relative");
   const [relativeValue, setRelativeValue] = useState<number | null>(null);
@@ -89,18 +101,20 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
     },
   });
 
-  const filterConfigRef = useRef(filterConfig);
-  filterConfigRef.current = filterConfig;
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearchText(searchText), 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   useEffect(() => {
-    const filtered = filterData(data, appliedFilters, filterConfigRef.current);
+    const filtered = searchData(filterData(data, appliedFilters, filterConfig), debouncedSearchText, getSearchableText);
     setFilteredData((prev) => {
       if (prev.length === filtered.length && prev.every((item, i) => item === filtered[i])) {
         return prev;
       }
       return filtered;
     });
-  }, [data, appliedFilters, setFilteredData]);
+  }, [data, appliedFilters, debouncedSearchText, filterConfig, getSearchableText, setFilteredData]);
 
   useEffect(() => {
     const currentConfig = filterConfig[activeFilterView];
@@ -145,6 +159,7 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
   }, [appliedFilters, filterConfig]);
 
   const hasFilters = filterChips.length > 0;
+  const hasSearchOrFilters = hasFilters || searchText.length > 0;
   const hiddenChipCount = filterChips.length - visibleChipCount;
   const filterChipsLength = filterChips.length;
 
@@ -158,11 +173,12 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
       if (!containerRef.current || !chipsContainerRef.current) return;
 
       const containerWidth = containerRef.current.offsetWidth;
+      const minSearchWidth = 120;
       const iconsWidth = 60;
       const gap = 8;
       const moreChipWidth = moreChipRef.current?.offsetWidth || 80;
 
-      let availableWidth = containerWidth - iconsWidth - 24;
+      let availableWidth = containerWidth - iconsWidth - minSearchWidth - 24;
       let count = 0;
 
       for (let i = 0; i < chipRefs.current.length; i++) {
@@ -229,7 +245,8 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
   const onClearAll = useCallback(() => {
     setAppliedFilters({});
     setPendingFilters({});
-  }, []);
+    setSearchText("");
+  }, [setSearchText]);
 
   const handlePendingFilterChange = useCallback((filterKey: string, values: string[]) => {
     setPendingFilters((prev) => ({
@@ -262,6 +279,10 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
   const activeConfig = filterConfig[activeFilterView];
   const visibleChips = filterChips.slice(0, visibleChipCount);
 
+  const handleClickAway = () => {
+    if (anchorEl) onCancel();
+  };
+
   return (
     <>
       {/* Hidden measurement container for chips */}
@@ -290,116 +311,183 @@ const DataGridFilter = <T,>({ filterConfig, data, setFilteredData }: DataGridFil
         </Box>
       </Box>
 
-      <Box
-        ref={containerRef}
-        display="flex"
-        alignItems="center"
-        gap="8px"
-        border="1px solid #D5D7DA"
-        boxShadow="0 1px 2px 0 #0A0D120D"
-        width={hasFilters ? "100%" : "480px"}
-        maxWidth="565px"
-        borderRadius="100px"
-        padding={hasFilters ? "5px 12px" : "6px 12px"}
-        sx={{ cursor: "pointer" }}
-        onClick={(event) => setAnchorEl(event.currentTarget)}
-      >
-        {!hasFilters ? (
-          <Text size="medium" weight="regular" color="#717680" sx={{ flex: 1 }}>
-            Filter
-          </Text>
-        ) : (
-          <Box ref={chipsContainerRef} display="flex" alignItems="center" gap="8px" flex={1} overflow="hidden">
-            {visibleChips.map((chip, i) => (
-              <ActiveFilterChip
-                key={`${chip.filterKey}-${chip.value}-${i}`}
-                label={`${chip.filterLabel}: ${chip.valueLabel}`}
-                onRemove={() => handleRemoveChip(chip)}
-              />
-            ))}
-            {hiddenChipCount > 0 && <MoreChip count={hiddenChipCount} />}
-          </Box>
-        )}
-
-        <Box display="flex" alignItems="center" gap="4px" flexShrink={0}>
-          <FilterLinesIcon />
-          {hasFilters && (
-            <IconButton
-              size="small"
-              sx={{ p: 0.5 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClearAll();
-              }}
-            >
-              <Close sx={{ fontSize: 18 }} />
-            </IconButton>
-          )}
-        </Box>
-      </Box>
-
-      <PopoverDynamicHeight
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        sx={{ marginTop: "8px" }}
-      >
-        <Box width="828px">
-          <Box display="flex" height="414px">
-            <Box width="360px" p="16px" overflow="auto" borderRight="2px solid #E9EAEB">
-              <LeftMenu
-                options={leftMenuOptions}
-                activeFilterView={activeFilterView}
-                setActiveFilterView={setActiveFilterView}
-              />
-            </Box>
-
-            <Box flex="1" p="16px" overflow="auto">
-              {activeConfig?.filterType === "multi-select" && (
-                <FilterOptionsMultiSelect
-                  options={activeConfig.options || []}
-                  selectedValues={pendingFilters[activeFilterView] || []}
-                  onChange={(newValues) => handlePendingFilterChange(activeFilterView, newValues)}
-                />
-              )}
-              {activeConfig?.filterType === "key-value" && (
-                <FilterOptionsKeyValue
-                  keys={activeConfig.keys || []}
-                  selectedValues={pendingFilters[activeFilterView] || []}
-                  onChange={(newValues) => handlePendingFilterChange(activeFilterView, newValues)}
-                />
-              )}
-              {activeConfig?.filterType === "date-range" && (
-                <FilterOptionsDateRange
-                  tab={dateRangeTab}
-                  onTabChange={setDateRangeTab}
-                  relativeValue={relativeValue}
-                  onRelativeValueChange={setRelativeValue}
-                  dateRangeFormik={dateRangeFormik}
-                />
-              )}
-            </Box>
-          </Box>
-
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Box maxWidth="700px" width={hasSearchOrFilters ? "100%" : "480px"}>
           <Box
-            mx="20px"
-            py="20px"
-            borderTop="2px solid #E9EAEB"
+            ref={containerRef}
+            data-testid="filter-button"
             display="flex"
-            justifyContent="flex-end"
             alignItems="center"
-            gap="12px"
+            gap="8px"
+            border="1px solid #D5D7DA"
+            boxShadow="0 1px 2px 0 #0A0D120D"
+            borderRadius="100px"
+            padding="6px 12px"
+            sx={{ cursor: "pointer" }}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
           >
-            <Button variant="outlined" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button variant="contained" onClick={onApply}>
-              Apply
-            </Button>
+            <Box display="flex" alignItems="center" gap="8px" flex={1} overflow="hidden">
+              {hasFilters && (
+                <Box
+                  ref={chipsContainerRef}
+                  display="flex"
+                  alignItems="center"
+                  gap="8px"
+                  flexShrink={0}
+                  overflow="hidden"
+                >
+                  {visibleChips.map((chip, i) => (
+                    <ActiveFilterChip
+                      key={`${chip.filterKey}-${chip.value}-${i}`}
+                      label={`${chip.filterLabel}: ${chip.valueLabel}`}
+                      onRemove={() => handleRemoveChip(chip)}
+                    />
+                  ))}
+                  {hiddenChipCount > 0 && <MoreChip count={hiddenChipCount} />}
+                </Box>
+              )}
+              <Box display="flex" alignItems="center" flex={1} minWidth="120px">
+                <input
+                  ref={searchInputRef}
+                  data-testid="search-in-filter-input"
+                  aria-label="Search table"
+                  type="text"
+                  placeholder={hasSearchOrFilters ? "Search" : "Search and filter"}
+                  value={searchText}
+                  onChange={(event) => {
+                    setSearchText(event.target.value);
+                    if (anchorEl) setAnchorEl(null);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Backspace" && !searchText && filterChips.length > 0) {
+                      handleRemoveChip(filterChips[filterChips.length - 1]);
+                    }
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (!anchorEl && containerRef.current) {
+                      setAnchorEl(containerRef.current);
+                      setTimeout(() => searchInputRef.current?.focus(), 0);
+                    }
+                  }}
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    color: "#1C1F23",
+                    width: "100%",
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box display="flex" alignItems="center" gap="4px" flexShrink={0}>
+              <IconButton
+                aria-label="Search"
+                size="small"
+                sx={{ p: 0.5 }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  searchInputRef.current?.focus();
+                }}
+              >
+                <SearchLens width={18} height={18} />
+              </IconButton>
+              <FilterLinesIcon />
+              {hasSearchOrFilters && (
+                <IconButton
+                  data-testid="clear-all-filters"
+                  aria-label="Clear search and filters"
+                  size="small"
+                  sx={{ p: 0.5 }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onClearAll();
+                  }}
+                >
+                  <Close sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
+            </Box>
           </Box>
+
+          <PopoverDynamicHeight
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={(_, reason) => {
+              if (reason === "escapeKeyDown") onCancel();
+            }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            sx={{ marginTop: "8px" }}
+            disableRestoreFocus
+            disableEnforceFocus
+            disableAutoFocus
+            hideBackdrop
+            disableScrollLock
+            slotProps={{
+              root: { style: { pointerEvents: "none" } },
+              paper: { style: { pointerEvents: "auto" } },
+            }}
+          >
+            <Box width="828px">
+              <Box display="flex" height="414px">
+                <Box width="360px" p="16px" overflow="auto" borderRight="2px solid #E9EAEB">
+                  <LeftMenu
+                    options={leftMenuOptions}
+                    activeFilterView={activeFilterView}
+                    setActiveFilterView={setActiveFilterView}
+                  />
+                </Box>
+
+                <Box flex="1" p="16px" overflow="auto">
+                  {activeConfig?.filterType === "multi-select" && (
+                    <FilterOptionsMultiSelect
+                      options={activeConfig.options || []}
+                      selectedValues={pendingFilters[activeFilterView] || []}
+                      onChange={(newValues) => handlePendingFilterChange(activeFilterView, newValues)}
+                    />
+                  )}
+                  {activeConfig?.filterType === "key-value" && (
+                    <FilterOptionsKeyValue
+                      keys={activeConfig.keys || []}
+                      selectedValues={pendingFilters[activeFilterView] || []}
+                      onChange={(newValues) => handlePendingFilterChange(activeFilterView, newValues)}
+                    />
+                  )}
+                  {activeConfig?.filterType === "date-range" && (
+                    <FilterOptionsDateRange
+                      tab={dateRangeTab}
+                      onTabChange={setDateRangeTab}
+                      relativeValue={relativeValue}
+                      onRelativeValueChange={setRelativeValue}
+                      dateRangeFormik={dateRangeFormik}
+                    />
+                  )}
+                </Box>
+              </Box>
+
+              <Box
+                mx="20px"
+                py="20px"
+                borderTop="2px solid #E9EAEB"
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="center"
+                gap="12px"
+              >
+                <Button variant="outlined" onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button variant="contained" onClick={onApply}>
+                  Apply
+                </Button>
+              </Box>
+            </Box>
+          </PopoverDynamicHeight>
         </Box>
-      </PopoverDynamicHeight>
+      </ClickAwayListener>
     </>
   );
 };

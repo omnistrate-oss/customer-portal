@@ -94,7 +94,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           menuItems: instances.map((instance) => {
             const status = instance.status ?? "";
             const installer = ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status);
-            const isDisabled = ["DELETING", "DEPLOYING"].includes(status);
+            const isDisabled = !["RUNNING", "READY"].includes(status);
             const styles = getResourceInstanceStatusStylesAndLabel(status);
             const data = {
               value: instance.id,
@@ -111,7 +111,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
               disabledMessage: installer
                 ? "Snapshots are not applicable for air-gapped deployment instances"
                 : isDisabled
-                  ? "Cannot create snapshot for Deleting or Deploying instances"
+                  ? "Snapshots can only be created for running or ready instances"
                   : "",
             };
 

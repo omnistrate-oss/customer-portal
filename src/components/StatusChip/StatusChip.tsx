@@ -31,6 +31,8 @@ export const statuses = {
   COMPLETED: "Completed",
   NOT_ENABLED: "Not Enabled",
   "N/A": "N/A",
+  PENDING_NEW: "Pending New",
+  PENDING_UPDATE: "Pending Update",
 };
 
 export const statusStyles = {
@@ -65,6 +67,8 @@ export const statusStyles = {
     color: "#C83532",
   },
   PENDING: { ...chipCategoryColors.pending },
+  PENDING_NEW: { ...chipCategoryColors.inProgress },
+  PENDING_UPDATE: { ...chipCategoryColors.inProgress },
   PENDING_DEPENDENCY: {
     backgroundColor: "#EEF4FF",
     color: "#3538CD",
