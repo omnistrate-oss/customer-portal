@@ -81,10 +81,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(() =>
     selectedInstance
       ? isPrivateLinkEnabled(getResultParams(selectedInstance))
-      : initialFormValues?.cloudProvider === "aws"
+      : false
   );
   const awsPrivateConnectivityPreferenceRef = useRef(
-    selectedInstance ? isPrivateLinkEnabled(getResultParams(selectedInstance)) : true
+    selectedInstance ? isPrivateLinkEnabled(getResultParams(selectedInstance)) : false
   );
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);

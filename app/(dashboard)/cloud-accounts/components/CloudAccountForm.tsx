@@ -465,7 +465,7 @@ const CloudAccountForm = ({
                   // @ts-ignore
                   onChange={(cloudProvider: string) => {
                     setFieldValue("accountConfigurationMethod", CLOUD_PROVIDER_DEFAULT_CREATION_METHOD[cloudProvider]);
-                    setFieldValue("enablePrivateConnectivity", cloudProvider === "aws");
+                    setFieldValue("enablePrivateConnectivity", false);
                   }}
                   disabled={formMode !== "create"}
                 />
