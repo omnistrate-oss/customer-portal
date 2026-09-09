@@ -347,15 +347,16 @@ const InstanceForm = ({
           return snackbar.showError("Creating new VPCs is not allowed for the selected cloud account config");
         }
 
-        // Remove internal _vpcType field and only send cloudNativeNetworkId for existing VPC selections.
+        // Remove internal _vpcType field and send the selected existing VPC using the deployment API field.
         // Only applies when the VPC chooser is in play — otherwise the legacy
         // cloud_provider_native_network_id input is the source of truth and must pass through.
         if (data.requestParams._vpcType === "choose_existing") {
-          delete data.requestParams.cloud_provider_native_network_id;
-
           if (!data.requestParams.cloudNativeNetworkId) {
             return snackbar.showError("VPC is required");
           }
+
+          data.requestParams.cloud_provider_native_network_id = data.requestParams.cloudNativeNetworkId;
+          delete data.requestParams.cloudNativeNetworkId;
         } else if (data.requestParams._vpcType) {
           delete data.requestParams.cloudNativeNetworkId;
         }
