@@ -1,5 +1,5 @@
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
-import { Box, Skeleton, Stack } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/SubscriptionMenu";
 import Link from "next/link";
 
@@ -628,34 +628,41 @@ export const getStandardInformationFields = (
           <Box
             sx={{
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: "12px",
-              padding: "12px",
-              border: "1px solid #FEDF89",
-              borderRadius: "8px",
-              backgroundColor: "#FFFAEB",
+              marginTop: "16px",
+              marginLeft: "20px",
+              padding: "16px",
+              border: "1px solid #E4E7EC",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0px 1px 2px rgba(10, 13, 18, 0.05)",
             }}
           >
-            <AlertTrianglePITR style={{ flexShrink: 0, marginTop: "2px" }} />
-            <Stack gap="4px">
-              <Text size="small" weight="semibold" color="#B54708">
-                No imported VPCs are available in this region
-                <br />
-                <Link
-                  href={`/cloud-accounts?modifyVpcsInstanceId=${encodeURIComponent(selectedCloudAccountConfig?.id ?? "")}&openModifyVpcs=true`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "#6941C6", textDecoration: "none" }}
-                >
-                  Import VPCs{" "}
-                  <ArrowOutwardIcon
-                    sx={{
-                      fontSize: "18px",
-                    }}
-                  />
-                </Link>
-              </Text>
-            </Stack>
+            <AlertTrianglePITR color="#DC6803" style={{ flexShrink: 0 }} />
+            <Text
+              size="small"
+              weight="regular"
+              color="#535862"
+              sx={{ display: "flex", alignItems: "center", gap: "18px" }}
+            >
+              No imported VPCs are available in this region.{" "}
+              <Link
+                href={`/cloud-accounts?modifyVpcsInstanceId=${encodeURIComponent(selectedCloudAccountConfig?.id ?? "")}&openModifyVpcs=true`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#6941C6", fontWeight: 600, textDecoration: "underline" }}
+              >
+                Import VPCs
+                <ArrowOutwardIcon
+                  sx={{
+                    ml: "4px",
+                    fontSize: "18px",
+                    verticalAlign: "text-bottom",
+                  }}
+                />
+              </Link>
+            </Text>
           </Box>
         ) : null;
       fields.push({
