@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { BackendError } from "test-utils/backend-error";
 import { isReplayMode } from "test-utils/har-mode";
 import { UserAPIClient } from "test-utils/user-api-client";
@@ -45,6 +45,28 @@ export class InstancesPage {
 
   async navigate() {
     await this.page.goto(PageURLs.instances);
+  }
+
+  async search(text: string) {
+    await this.page.getByTestId("search-in-filter-input").fill(text);
+  }
+
+  async applyMultiSelectFilter(filterKey: string, values: string[]) {
+    await this.page.getByTestId("filter-button").click();
+    const filterPopover = this.page.locator(".MuiPopover-paper");
+    await expect(filterPopover).toBeVisible();
+    await filterPopover.getByTestId(`filter-menu-${filterKey}`).click();
+
+    for (const value of values) {
+      await filterPopover.getByTestId(`filter-option-${value}`).click();
+    }
+
+    await filterPopover.getByRole("button", { name: "Apply" }).click();
+    await expect(filterPopover).toHaveCount(0);
+  }
+
+  filterChip(label: string): Locator {
+    return this.page.getByTestId("filter-button").getByTestId(`filter-chip-${label}`);
   }
 
   async waitForStatus(

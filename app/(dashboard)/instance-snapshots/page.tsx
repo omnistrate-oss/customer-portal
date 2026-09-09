@@ -159,6 +159,7 @@ const InstanceSnapshotsPage = () => {
 
           return instance?.id && instanceSubscription ? (
             <DataGridText
+              showCopyButton
               color="primary"
               linkProps={{
                 href: getInstanceDetailsRoute({
@@ -175,7 +176,7 @@ const InstanceSnapshotsPage = () => {
           ) : (
             <Tooltip title="Source instance not found">
               <Box>
-                <DataGridText>{data.row.original.sourceInstanceId}</DataGridText>
+                <DataGridText showCopyButton>{data.row.original.sourceInstanceId}</DataGridText>
               </Box>
             </Tooltip>
           );

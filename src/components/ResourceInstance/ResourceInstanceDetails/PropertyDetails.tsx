@@ -59,7 +59,7 @@ type License = {
   Version: number;
 };
 
-const textType = ["String", "string", "text", "float64", "Float64", "Secret", "secret"];
+const textType = ["String", "string", "text", "float64", "Float64"];
 
 type PropertyTableProps = {
   rows: { rows: Row[]; title: string; desc: string; flexWrap: boolean };
@@ -300,7 +300,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
           } else if (valueType === "boolean" || valueType === "Boolean") {
             const statusStylesAndMap = getResourceInstanceDetailsStatusStylesAndLabel(row.value);
             value = <StatusChip {...statusStylesAndMap} />;
-          } else if (valueType === "password" || valueType === "Password") {
+          } else if (["password", "Password", "Secret", "secret"].includes(valueType)) {
             value = (
               <>
                 <PasswordWithOutBorderField>{row.value}</PasswordWithOutBorderField>
@@ -352,7 +352,7 @@ const PropertyDetails: FC<PropertyTableProps> = ({ rows, ...otherProps }) => {
                   </Text>
                 </Box>
               </Tooltip>
-              <Box flex="1 1 auto" display="flex" alignItems="center" maxWidth="100%">
+              <Box flex="1 1 auto" display="flex" alignItems="flex-start" maxWidth="100%" width="100%">
                 {value ? value : "-"}
               </Box>
             </Box>

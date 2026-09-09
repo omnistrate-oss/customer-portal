@@ -41,7 +41,14 @@ export const StyledListItem: FC<StyledListItemProps> = (props) => {
 
 const CustomLabelDescription: FC<{
   hideLinks?: boolean;
-  variant: "aws" | "gcpProjectNumber" | "gcpProjectId" | "azureSubscriptionId" | "azureTenantId" | "ociTenancyId" | "ociDomainId";
+  variant:
+    | "aws"
+    | "gcpProjectNumber"
+    | "gcpProjectId"
+    | "azureSubscriptionId"
+    | "azureTenantId"
+    | "ociTenancyId"
+    | "ociDomainId";
 }> = ({ hideLinks, variant }) => {
   return (
     <Box mt="8px">
@@ -93,7 +100,7 @@ const CustomLabelDescription: FC<{
         ) : variant === "ociDomainId" ? (
           <StyledListItem
             text="Can't find Domain OCID?"
-            link="https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm"
+            link="https://docs.oracle.com/en-us/iaas/Content/Identity/domains/to-copy-an-identity-domain-ocid.htm"
           />
         ) : (
           <StyledListItem

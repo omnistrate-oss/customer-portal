@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 
 import PropertyDetails, { Row } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { Text } from "src/components/Typography/Typography";
@@ -35,9 +35,14 @@ const SnapshotDeploymentParametersTab: React.FC<SnapshotDeploymentParametersTabP
           }}
         />
       ) : (
-        <Text size="small" weight="medium" color="#535862">
-          No deployment parameters available for this snapshot.
-        </Text>
+        <Stack alignItems="center" justifyContent="center" minHeight="160px" textAlign="center" gap="4px">
+          <Text size="small" weight="semibold" color="#414651">
+            No deployment parameters
+          </Text>
+          <Text size="xsmall" weight="regular" color="#667085">
+            This snapshot has no deployment parameters.
+          </Text>
+        </Stack>
       )}
     </Box>
   );

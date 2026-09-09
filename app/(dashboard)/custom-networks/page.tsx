@@ -40,7 +40,7 @@ const CustomNetworksPage = () => {
   const searchParams = useSearchParams();
   const overlay = searchParams?.get("overlay");
 
-  const [searchText, setSearchText] = useState<string>("");
+  const [filteredCustomNetworks, setFilteredCustomNetworks] = useState<CustomNetwork[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("peering-info-dialog");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
@@ -59,12 +59,6 @@ const CustomNetworksPage = () => {
     isFetching: isFetchingCustomNetworks,
     refetch: refetchCustomNetworks,
   } = useCustomNetworks();
-
-  const filteredCustomNetworks = useMemo(() => {
-    return customNetworks.filter((customNetwork) => {
-      return customNetwork.name?.toLowerCase().includes(searchText.toLowerCase());
-    });
-  }, [customNetworks, searchText]);
 
   const { data: regions = [], isFetching: isFetchingRegions } = useRegions();
   const { data: subscriptions = [] } = useSubscriptions();
@@ -236,8 +230,8 @@ const CustomNetworksPage = () => {
           HeaderComponent={CustomNetworksTableHeader}
           headerProps={{
             count: filteredCustomNetworks.length,
-            searchText,
-            setSearchText,
+            filterableCustomNetworks: customNetworks,
+            setFilteredCustomNetworks,
             onPeeringInfoClick: () => {
               setOverlayType("peering-info-dialog");
               setIsOverlayOpen(true);

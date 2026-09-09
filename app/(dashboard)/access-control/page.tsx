@@ -42,10 +42,11 @@ const AccessControlPage = () => {
   const searchParams = useSearchParams();
   const searchUserId = searchParams?.get("searchUserId");
   const [searchText, setSearchText] = useState<string>("");
+  const [filteredUsers, setFilteredUsers] = useState<SubscriptionUser[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-dialog");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<SubscriptionUser | null>(null);
-  const { subscriptions, isSubscriptionsPending } = useGlobalData();
+  const { subscriptionsObj, isSubscriptionsPending } = useGlobalData();
   const currentUser = useSelector(selectUserrootData);
   const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
@@ -54,13 +55,6 @@ const AccessControlPage = () => {
       setSearchText(searchUserId);
     }
   }, [searchUserId]);
-
-  const subscriptionsObj = useMemo(() => {
-    return subscriptions.reduce((acc: any, sub: any) => {
-      acc[sub.id] = sub;
-      return acc;
-    }, {});
-  }, [subscriptions]);
 
   const { data: users = [], isFetching: isFetchingUsers, refetch: refetchUsers } = useAllUsers();
 
@@ -205,24 +199,6 @@ const AccessControlPage = () => {
     }
   );
 
-  const filteredUsers = useMemo(() => {
-    let res = users || [];
-
-    if (searchText) {
-      const searchTerm = searchText.toLowerCase();
-
-      res = res.filter((user: any) => {
-        return (
-          user.name.toLowerCase().includes(searchTerm) ||
-          user.email.toLowerCase().includes(searchTerm) ||
-          user.userId.toLowerCase().includes(searchTerm)
-        );
-      });
-    }
-
-    return res;
-  }, [users, searchText]);
-
   return (
     <PageContainer>
       <PageTitle icon={AccessControlIcon} className="mb-6">
@@ -238,6 +214,9 @@ const AccessControlPage = () => {
           noRowsText="No users"
           HeaderComponent={AccessControlTableHeader}
           headerProps={{
+            users,
+            setFilteredUsers,
+            subscriptionsObj,
             searchText,
             setSearchText,
             refetchUsers,

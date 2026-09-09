@@ -1,18 +1,11 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
 
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -44,6 +37,13 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -66,8 +66,8 @@ import GovernanceControlsCell from "./components/GovernanceControlsCell";
 import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
-import { DIALOG_DATA } from "./constants";
 import useAccountConfig from "./hooks/useAccountConfig";
+import { DIALOG_DATA } from "./constants";
 import {
   getCloudAccountId,
   getCloudAccountProvider,
@@ -103,7 +103,7 @@ const CloudAccountsPage = () => {
 
   const { subscriptionsObj, serviceOfferingsObj } = useGlobalData();
   const [initialFormValues, setInitialFormValues] = useState<any>();
-  const [searchText, setSearchText] = useState("");
+  const [filteredCloudAccounts, setFilteredCloudAccounts] = useState<ResourceInstance[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("create-instance-form");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -244,16 +244,7 @@ const CloudAccountsPage = () => {
     }
   }, [serviceId, servicePlanId, subscriptionId]);
 
-  const byoaInstances = useMemo(() => {
-    const res = instances.filter((instance) => isCloudAccountInstance(instance));
-
-    if (searchText) {
-      const search = searchText.toLowerCase();
-      return res.filter((instance) => getCloudAccountId(getResultParams(instance)).toLowerCase().includes(search));
-    }
-
-    return res;
-  }, [instances, searchText]);
+  const byoaInstances = useMemo(() => instances.filter((instance) => isCloudAccountInstance(instance)), [instances]);
 
   const dataTableColumns = useMemo(() => {
     // The details route is keyed by the subscription's service and plan, so rows whose
@@ -1001,13 +992,15 @@ const CloudAccountsPage = () => {
         <DataTable
           key={Object.keys(subscriptionsObj).length} // Force re-render when subscriptionsObj changes
           columns={dataTableColumns}
-          rows={byoaInstances}
+          rows={filteredCloudAccounts}
           noRowsText="No cloud accounts"
           HeaderComponent={CloudAccountsTableHeader}
           headerProps={{
-            count: byoaInstances.length,
-            searchText,
-            setSearchText,
+            count: filteredCloudAccounts.length,
+            instances: byoaInstances,
+            setFilteredInstances: setFilteredCloudAccounts,
+            subscriptionsObj,
+            accountConfigsHash,
             onCreateClick: () => {
               setSelectedRows([]);
               setIsOverlayOpen(true);

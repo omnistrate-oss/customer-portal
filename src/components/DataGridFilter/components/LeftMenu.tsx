@@ -21,11 +21,13 @@ const activeStyles = {
 };
 
 const LeftMenuItem = ({
+  filterKey,
   label,
   count,
   isActive,
   onClick,
 }: {
+  filterKey: string;
   label: string;
   count?: number;
   isActive: boolean;
@@ -33,6 +35,7 @@ const LeftMenuItem = ({
 }) => {
   return (
     <Box
+      data-testid={`filter-menu-${filterKey}`}
       p="8px 12px"
       borderRadius="6px"
       onClick={onClick || (() => {})}
@@ -81,6 +84,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ options, activeFilterView, setActiv
       {options.map((option, index) => (
         <LeftMenuItem
           key={index}
+          filterKey={option.filterKey}
           label={option.label}
           count={option.count}
           isActive={activeFilterView === option.filterKey}

@@ -10,6 +10,7 @@ type ActiveFilterChipProps = {
 
 const ActiveFilterChip = ({ label, onRemove }: ActiveFilterChipProps) => (
   <Box
+    data-testid={`filter-chip-${label}`}
     sx={{
       display: "flex",
       alignItems: "center",
@@ -25,6 +26,7 @@ const ActiveFilterChip = ({ label, onRemove }: ActiveFilterChipProps) => (
     </Text>
     <Box
       component="span"
+      data-testid={`filter-chip-remove-${label}`}
       onClick={(e) => {
         e.stopPropagation();
         onRemove();

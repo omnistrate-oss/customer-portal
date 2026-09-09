@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import DataGridFilter from "src/components/DataGridFilter/DataGridFilter";
 import { FilterConfig, KeyConfig } from "src/components/DataGridFilter/types";
@@ -10,8 +10,10 @@ import { resourceInstanceStatusMap } from "src/constants/statusChipStyles/resour
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance, ResourceInstanceNetworkTopology } from "src/types/resourceInstance";
+import formatDateUTC from "src/utils/formatDateUTC";
 
 import { loadStatusLabel, loadStatusMap } from "../constants";
+import { getMainResourceFromInstance } from "../utils";
 
 type InstancesFiltersProps = {
   instances: ResourceInstance[];
@@ -19,7 +21,7 @@ type InstancesFiltersProps = {
 };
 
 const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilteredInstances }) => {
-  const { subscriptionsObj } = useGlobalData();
+  const { serviceOfferingsObj, subscriptionsObj } = useGlobalData();
 
   const customTagKeys = useMemo<KeyConfig[]>(() => {
     const customTagsMap = new Map<string, Set<string>>();
@@ -222,7 +224,45 @@ const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilte
     [instances, customTagKeys, subscriptionsObj]
   );
 
-  return <DataGridFilter data={instances} setFilteredData={setFilteredInstances} filterConfig={filterConfig} />;
+  const getSearchableText = useCallback(
+    (instance: ResourceInstance) => {
+      const subscription = subscriptionsObj[instance.subscriptionId as string];
+      const tags = instance.customTags?.map((tag) => `${tag.key}:${tag.value}`).join(" ") ?? "";
+      const offering = serviceOfferingsObj[subscription?.serviceId as string]?.[subscription?.productTierId as string];
+      const resourceName =
+        getMainResourceFromInstance(instance, offering)?.name ??
+        Object.values(instance.detailedNetworkTopology ?? {}).find((resource) => resource.main)?.resourceName;
+      const healthStatus = getInstanceHealthStatus(instance.detailedNetworkTopology ?? {}, instance.status ?? "");
+      const loadStatus = loadStatusMap[instance.instanceLoadStatus ?? ""] ?? "";
+
+      return [
+        instance.id,
+        tags,
+        subscription?.serviceName,
+        subscription?.productTierName,
+        resourceName,
+        resourceInstanceStatusMap[instance.status ?? ""]?.label ?? instance.status,
+        instaceHealthStatusMap[healthStatus]?.label ?? healthStatus,
+        loadStatusLabel[loadStatus] ?? loadStatus,
+        instance.cloud_provider,
+        instance.onpremPlatform,
+        instance.region ?? "Global",
+        subscription?.subscriptionOwnerName,
+        formatDateUTC(instance.created_at),
+        formatDateUTC(instance.last_modified_at),
+      ].join(" ");
+    },
+    [serviceOfferingsObj, subscriptionsObj]
+  );
+
+  return (
+    <DataGridFilter
+      data={instances}
+      setFilteredData={setFilteredInstances}
+      filterConfig={filterConfig}
+      getSearchableText={getSearchableText}
+    />
+  );
 };
 
 export default InstancesFilters;
