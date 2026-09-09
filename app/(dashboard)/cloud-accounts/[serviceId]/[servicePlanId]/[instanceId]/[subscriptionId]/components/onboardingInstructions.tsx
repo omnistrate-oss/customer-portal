@@ -50,10 +50,7 @@ type ProviderInstructions = {
   failedNotice: string;
 };
 
-/**
- * Per-provider onboarding steps, mirroring the instructions modal. Nebius and byoc-onprem are
- * onboarded through flows that surface their own instructions, so they show no card here.
- */
+/** Per-provider onboarding steps, mirroring the instructions shown immediately after creation. */
 const PROVIDER_INSTRUCTIONS: Record<CloudProvider, ProviderInstructions | null> = {
   aws: {
     title: "Create CloudFormation stack",
@@ -117,7 +114,14 @@ const PROVIDER_INSTRUCTIONS: Record<CloudProvider, ProviderInstructions | null> 
       "You may delete this failed configuration and retry adding it after carefully verifying the OCI Tenancy OCID and Domain OCID. If the issue persists, please contact Support for assistance.",
   },
   nebius: null,
-  "byoc-onprem": null,
+  "byoc-onprem": {
+    title: "Connect Kubernetes cluster",
+    description:
+      "Run the command below from a terminal that has kubectl access to the Kubernetes cluster you want to connect.",
+    getCommand: (resultParams) => resultParams?.byoc_onprem_install_command,
+    failedNotice:
+      "You may delete this failed configuration and retry adding it. If the issue persists, please contact Support for assistance.",
+  },
 };
 
 export type OnboardingInstructions = {
@@ -160,7 +164,11 @@ export const getOnboardingInstructions = (
         title: instructions.title,
         description: instructions.description,
         command,
-        ...(instructions.isUrl ? { href: command } : { copyValue: addQuotesToShellCommand(command) }),
+        ...(instructions.isUrl
+          ? { href: command }
+          : cloudProvider === "byoc-onprem"
+            ? {}
+            : { copyValue: addQuotesToShellCommand(command) }),
       },
     ],
     ...(cloudProvider === "aws" ? { awsCloudFormationUrl: command } : {}),
