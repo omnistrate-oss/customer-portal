@@ -21,13 +21,15 @@ export type ConsumptionUsagePerDay = components["schemas"]["GetConsumptionUsageR
 
 export type ConsumptionUsage = components["schemas"]["GetConsumptionUsageResult"];
 
-export type UsageDimension =
+export type BuiltInUsageDimension =
   | "Memory GiB hours"
   | "Storage GiB hours"
   | "CPU core hours"
   | "Replica hours"
   | "Deployment cell hours"
   | "GPU millicore hours";
+
+export type UsageDimension = string;
 
 export type ConsumptionPaymentMethod = components["schemas"]["PaymentMethod"];
 

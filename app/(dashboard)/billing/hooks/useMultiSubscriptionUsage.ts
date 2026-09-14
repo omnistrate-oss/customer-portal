@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getConsumptionUsage } from "src/api/consumption";
 
-import { BillingUsageTotals, getUsageDimensionTotals } from "../utils/usageDimensions";
+import { getUsageMetricValues, UsageMetricValues } from "../utils/usageDimensions";
 
 function useMultiSubscriptionUsage(queryParams: { subscriptionIds: string[] }) {
   const { subscriptionIds = [] } = queryParams;
@@ -12,16 +12,13 @@ function useMultiSubscriptionUsage(queryParams: { subscriptionIds: string[] }) {
   const query = useQuery({
     queryKey: ["multi-subscription-consumption", subscriptionIds],
     queryFn: async () => {
-      const subscriptionUsageDataMap: Record<
-        string,
-        BillingUsageTotals
-      > = {};
+      const subscriptionUsageDataMap: Record<string, UsageMetricValues> = {};
 
       await Promise.all(
         subscriptionIds.map((subscriptionId) =>
           getConsumptionUsage({ subscriptionID: subscriptionId }).then((response) => {
             const usage = response.data.usage || [];
-            subscriptionUsageDataMap[subscriptionId] = getUsageDimensionTotals(usage);
+            subscriptionUsageDataMap[subscriptionId] = getUsageMetricValues(usage);
           })
         )
       );
