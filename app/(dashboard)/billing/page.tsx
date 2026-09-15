@@ -7,6 +7,7 @@ import { Box, Stack } from "@mui/material";
 import { useSelector } from "react-redux";
 
 import StatusChip from "src/components/StatusChip/StatusChip";
+import useProductTierCustomMetrics from "src/hooks/query/useProductTierCustomMetrics";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
@@ -31,7 +32,7 @@ import useConsumptionUsage from "./hooks/useConsumptionUsage";
 import getBillingDetailsErrorMessage from "./utils/getBillingDetailsErrorMessage";
 
 const BillingPage = () => {
-  const { refetchSubscriptions } = useGlobalData();
+  const { subscriptions, isSubscriptionsPending, refetchSubscriptions } = useGlobalData();
   const [paymentURL, setPaymentURL] = useState("");
   const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
   const [isStripePaymentMethodsEmpty, setIsStripePaymentMethodsEmpty] = useState(false);
@@ -51,6 +52,14 @@ const BillingPage = () => {
   } = useBillingDetails(isBillingEnabled);
   const { data: consumptionUsageData, isPending: isConsumptionDataPending } = useConsumptionUsage();
   const { data: invoicesData, isPending: isInvoicesPending } = useConsumptionInvoices();
+
+  const rootSubscriptionIds = useMemo(
+    () =>
+      subscriptions.filter((subscription) => subscription.roleType === "root").map((subscription) => subscription.id),
+    [subscriptions]
+  );
+  const { data: productTierCustomMetricsData, isLoading: isProductTierCustomMetricsLoading } =
+    useProductTierCustomMetrics(rootSubscriptionIds);
 
   const invoices = useMemo(() => invoicesData?.invoices || [], [invoicesData]);
 
@@ -91,7 +100,12 @@ const BillingPage = () => {
   const paymentConfigured = billingDetails?.paymentConfigured;
   const errorDisplayText = error ? getBillingDetailsErrorMessage(error) : "";
 
-  const isLoading = isBillingDetailsPending || isConsumptionDataPending || isInvoicesPending;
+  const isLoading =
+    isSubscriptionsPending ||
+    isBillingDetailsPending ||
+    isConsumptionDataPending ||
+    isInvoicesPending ||
+    isProductTierCustomMetricsLoading;
   const isStripe = selectedBillingProvider === "STRIPE";
   const isCustomPaymentPortalEnabled = isStripe && Boolean(billingDetails?.customPaymentPortalEnabled);
   const showStripePaymentMethodEmptyState = isCustomPaymentPortalEnabled && isStripePaymentMethodsEmpty;
@@ -141,7 +155,10 @@ const BillingPage = () => {
           </Stack>
         ) : (
           <>
-            <ConsumptionUsage consumptionUsageData={consumptionUsageData} />
+            <ConsumptionUsage
+              consumptionUsageData={consumptionUsageData}
+              productTierCustomMetricsData={productTierCustomMetricsData}
+            />
 
             {billingDetails && billingDetails?.billingProviders && billingDetails?.billingProviders?.length > 0 && (
               <div className="mt-6 pb-2 border-b border-[#E9EAEB]">

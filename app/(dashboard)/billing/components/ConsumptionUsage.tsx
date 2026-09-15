@@ -7,9 +7,9 @@ import utc from "dayjs/plugin/utc";
 
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
-import useProductTierCustomMetrics from "src/hooks/query/useProductTierCustomMetrics";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ConsumptionUsage as ConsumptionUsageData } from "src/types/consumption";
+import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 
 import useMultiSubscriptionUsage from "../hooks/useMultiSubscriptionUsage";
 import {
@@ -27,10 +27,11 @@ dayjs.extend(utc);
 type ConsumptionUsageProps = {
   // consumptionUsagePerDayData: ConsumptionUsagePerDay | undefined;
   consumptionUsageData: ConsumptionUsageData | undefined;
+  productTierCustomMetricsData: ProductTierCustomMetricsResponse | undefined;
 };
 
 const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
-  const { consumptionUsageData } = props;
+  const { consumptionUsageData, productTierCustomMetricsData } = props;
   const [showUsageBreakdown, setShowUsageBreakdown] = useState(false);
   const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
   const [fixedMetricInlineOverflow, setFixedMetricInlineOverflow] = useState<Record<string, boolean>>({});
@@ -61,8 +62,6 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
   }, [subscriptions]);
 
   const subscriptionIds = useMemo(() => rootSubscriptions.map((subscription) => subscription.id), [rootSubscriptions]);
-
-  const { data: productTierCustomMetricsData } = useProductTierCustomMetrics(subscriptionIds);
 
   const {
     data: subscriptionUsageHashmap,

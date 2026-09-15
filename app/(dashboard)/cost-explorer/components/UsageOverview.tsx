@@ -7,10 +7,10 @@ import { DateRange, DateTimePickerPopover } from "src/components/DateRangePicker
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
 import { Text } from "src/components/Typography/Typography";
-import useProductTierCustomMetrics from "src/hooks/query/useProductTierCustomMetrics";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { SetState } from "src/types/common/reactGenerics";
 import { ConsumptionUsagePerDay } from "src/types/consumption";
+import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 import { ServiceOffering } from "src/types/serviceOffering";
 
 import ConsumptionUsageChart from "../../billing/components/ConsumptionUsageChart";
@@ -24,6 +24,7 @@ dayjs.extend(utc);
 
 type UsageOverviewProps = {
   consumptionUsagePerDayData: ConsumptionUsagePerDay | undefined;
+  productTierCustomMetricsData: ProductTierCustomMetricsResponse | undefined;
   isFetchingUsagePerDay: boolean;
   dateRange: DateRange;
   setDateRange: SetState<DateRange>;
@@ -35,6 +36,7 @@ type UsageOverviewProps = {
 const UsageOverview: FC<UsageOverviewProps> = (props) => {
   const {
     consumptionUsagePerDayData,
+    productTierCustomMetricsData,
     isFetchingUsagePerDay,
     dateRange,
     setDateRange,
@@ -55,13 +57,6 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
         .sort((left, right) => left.productTierName.localeCompare(right.productTierName)),
     [subscriptions]
   );
-
-  const rootSubscriptionIds = useMemo(
-    () => rootSubscriptions.map((subscription) => subscription.id),
-    [rootSubscriptions]
-  );
-
-  const { data: productTierCustomMetricsData } = useProductTierCustomMetrics(rootSubscriptionIds);
 
   const servicePlansGroupedByServiceId: Record<string, (ServiceOffering & { subscriptionId: string })[]> =
     useMemo(() => {

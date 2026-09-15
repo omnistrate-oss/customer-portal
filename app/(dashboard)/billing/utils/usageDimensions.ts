@@ -117,7 +117,24 @@ export const billingUsageDimensionFields = [
   },
 ] as const satisfies readonly BillingUsageDimensionField[];
 
-export const customMetricColors = ["#FDB022", "#6B7280", "#363F72", "#84AD16", "#B54708", "#0BA5EC", "#7A5AF8"];
+export const customMetricColors = [
+  "#FDB022",
+  "#6B7280",
+  "#363F72",
+  "#84AD16",
+  "#B54708",
+  "#0BA5EC",
+  "#7A5AF8",
+  "#D92D20",
+  "#15B79E",
+  "#C11574",
+  "#039855",
+  "#F97066",
+  "#444CE7",
+  "#EE46BC",
+  "#0E7090",
+  "#175CD3",
+];
 
 const customMetricFieldPrefix = "customMetric_";
 
@@ -232,12 +249,12 @@ export function getUsageMetricTableValue(
   metricValues: UsageMetricValues,
   dimension: string,
   configuredMetricNames: ReadonlySet<string>
-): number | "—" {
+): number | "-" {
   if (Object.prototype.hasOwnProperty.call(metricValues, dimension)) {
     return metricValues[dimension];
   }
 
-  return configuredMetricNames.has(dimension) ? 0 : "—";
+  return configuredMetricNames.has(dimension) ? 0 : "-";
 }
 
 /** Groups backend-produced totals by date and exact dimension name. */
