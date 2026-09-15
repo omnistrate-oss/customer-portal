@@ -105,7 +105,7 @@ function ResourceInstanceOverview(props) {
         ) : (
           <>
             <RegionIcon style={{ flexShrink: "0" }} />
-            <Text size="small" weight="regular" color="#475467" ellipsis>
+            <Text size="small" weight="regular" color="#475467" ellipsis maxWidth="100%" title={region ?? "Global"}>
               {region ?? "Global"}
             </Text>
           </>
