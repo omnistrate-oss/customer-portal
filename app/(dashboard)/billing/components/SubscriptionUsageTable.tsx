@@ -7,7 +7,12 @@ import DataTable from "src/components/DataTable/DataTable";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import { Text } from "src/components/Typography/Typography";
 
-import { billingUsageDimensionFields, BillingUsageTotals } from "../utils/usageDimensions";
+import {
+  billingUsageDimensionFields,
+  getUsageMetricTableValue,
+  UsageMetricField,
+  UsageMetricValues,
+} from "../utils/usageDimensions";
 
 dayjs.extend(utc);
 
@@ -21,12 +26,14 @@ const TableHeader = () => {
   );
 };
 
-export type SubscriptionUsageRow = BillingUsageTotals & {
+export type SubscriptionUsageRow = {
   subscriptionId: string;
   serviceId: string;
+  productTierId: string;
   serviceName: string;
   subscriptionPlanName: string;
   serviceLogoURL?: string;
+  metricValues: UsageMetricValues;
 };
 
 const columnHelper = createColumnHelper<SubscriptionUsageRow>();
@@ -34,9 +41,18 @@ const columnHelper = createColumnHelper<SubscriptionUsageRow>();
 type SubscriptionUsageTableProps = {
   rows: SubscriptionUsageRow[];
   isSubscriptionsUsagePending: boolean;
+  additionalMetricFields: UsageMetricField[];
+  configuredMetricNamesByProductTierId: Record<string, ReadonlySet<string>>;
+  showAdditionalMetrics: boolean;
 };
 
-const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubscriptionsUsagePending }) => {
+const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
+  rows,
+  isSubscriptionsUsagePending,
+  additionalMetricFields,
+  configuredMetricNamesByProductTierId,
+  showAdditionalMetrics,
+}) => {
   const columns = useMemo(() => {
     return [
       //@ts-ignore
@@ -77,7 +93,7 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
         },
       }),
       ...billingUsageDimensionFields.map((field) =>
-        columnHelper.accessor(field.rowField, {
+        columnHelper.accessor((row) => row.metricValues[field.dimension] ?? 0, {
           id: field.rowField,
           header: field.tableHeader,
           meta: {
@@ -86,14 +102,40 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({ rows, isSubsc
           cell: (data) => {
             return (
               <Text size="small" weight="regular" color="#475467" ellipsis>
-                {data.row.original[field.rowField]}
+                {data.getValue()}
               </Text>
             );
           },
         })
       ),
+      ...(showAdditionalMetrics
+        ? additionalMetricFields.map((field) =>
+            columnHelper.accessor(
+              (row) =>
+                getUsageMetricTableValue(
+                  row.metricValues,
+                  field.dimension,
+                  configuredMetricNamesByProductTierId[row.productTierId] ?? new Set<string>()
+                ),
+              {
+                id: field.key,
+                header: field.tableHeader,
+                sortingFn: "basic",
+                sortUndefined: "last",
+                meta: {
+                  minWidth: 180,
+                },
+                cell: (data) => (
+                  <Text size="small" weight="regular" color="#475467" ellipsis>
+                    {data.getValue() ?? "-"}
+                  </Text>
+                ),
+              }
+            )
+          )
+        : []),
     ];
-  }, []);
+  }, [additionalMetricFields, configuredMetricNamesByProductTierId, showAdditionalMetrics]);
 
   return (
     <DataTable

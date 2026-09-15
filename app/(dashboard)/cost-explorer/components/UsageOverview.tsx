@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import _ from "lodash";
@@ -10,14 +10,21 @@ import { Text } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { SetState } from "src/types/common/reactGenerics";
 import { ConsumptionUsagePerDay } from "src/types/consumption";
+import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 import { ServiceOffering } from "src/types/serviceOffering";
 
 import ConsumptionUsageChart from "../../billing/components/ConsumptionUsageChart";
+import { getUsageMetricRegistry } from "../../billing/utils/usageDimensions";
+import { ENABLE_COST_EXPLORER_METRIC_VISIBILITY_CONTROLS } from "../constants";
+import { getVisibleMetricFields, reconcileSelectedMetricNames } from "../utils/metricVisibility";
+
+import MetricVisibilitySelector from "./MetricVisibilitySelector";
 
 dayjs.extend(utc);
 
 type UsageOverviewProps = {
   consumptionUsagePerDayData: ConsumptionUsagePerDay | undefined;
+  productTierCustomMetricsData: ProductTierCustomMetricsResponse | undefined;
   isFetchingUsagePerDay: boolean;
   dateRange: DateRange;
   setDateRange: SetState<DateRange>;
@@ -29,6 +36,7 @@ type UsageOverviewProps = {
 const UsageOverview: FC<UsageOverviewProps> = (props) => {
   const {
     consumptionUsagePerDayData,
+    productTierCustomMetricsData,
     isFetchingUsagePerDay,
     dateRange,
     setDateRange,
@@ -37,18 +45,21 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
     setSelectedSubscriptionId,
   } = props;
   const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [selectedAdditionalMetricNames, setSelectedAdditionalMetricNames] = useState<string[]>([]);
+  const pendingSubscriptionScopeRef = useRef<string | null>(null);
+  const lastProcessedUsageScopeRef = useRef(selectedSubscriptionId || "all-subscriptions");
   const { subscriptions, serviceOfferings } = useGlobalData();
+
+  const rootSubscriptions = useMemo(
+    () =>
+      subscriptions
+        .filter((subscription) => subscription.roleType === "root")
+        .sort((left, right) => left.productTierName.localeCompare(right.productTierName)),
+    [subscriptions]
+  );
 
   const servicePlansGroupedByServiceId: Record<string, (ServiceOffering & { subscriptionId: string })[]> =
     useMemo(() => {
-      const rootSubscriptions = subscriptions
-        .filter((subscription) => {
-          return subscription.roleType === "root";
-        })
-        .sort((subscriptionA, subscriptionB) =>
-          subscriptionA.productTierName.toLowerCase() < subscriptionB.productTierName.toLowerCase() ? -1 : 1
-        );
-
       const servicePlansGroupedByServiceId: Record<string, (ServiceOffering & { subscriptionId: string })[]> = {};
 
       rootSubscriptions.forEach((subscription) => {
@@ -70,17 +81,13 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
       });
 
       return servicePlansGroupedByServiceId;
-    }, [subscriptions, serviceOfferings]);
+    }, [rootSubscriptions, serviceOfferings]);
 
   const rootSubscriptionServices: { serviceId; serviceName }[] = useMemo(() => {
-    const rootSubscriptionServices = subscriptions
-      .filter((subscription) => {
-        return subscription.roleType === "root";
-      })
-      .map((subscription) => ({
-        serviceId: subscription.serviceId,
-        serviceName: subscription.serviceName,
-      }));
+    const rootSubscriptionServices = rootSubscriptions.map((subscription) => ({
+      serviceId: subscription.serviceId,
+      serviceName: subscription.serviceName,
+    }));
 
     const deduplicated = _.uniqBy(rootSubscriptionServices, "serviceId");
 
@@ -89,7 +96,82 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
       .sort((serviceA, serviceB) => (serviceA.serviceName.toLowerCase() < serviceB.serviceName.toLowerCase() ? -1 : 1));
 
     return services;
-  }, [subscriptions, servicePlansGroupedByServiceId]);
+  }, [rootSubscriptions, servicePlansGroupedByServiceId]);
+
+  // Contains custom metric names configured on the product tiers in the current subscription scope.
+  // This may include names that have no usage in the selected date range and may contain duplicates across tiers.
+  const configuredCustomMetricNames = useMemo(() => {
+    const scopedSubscriptions = selectedSubscriptionId
+      ? rootSubscriptions.filter((subscription) => subscription.id === selectedSubscriptionId)
+      : rootSubscriptions;
+
+    return scopedSubscriptions.flatMap(
+      (subscription) =>
+        productTierCustomMetricsData?.productTiers[subscription.productTierId]?.metrics.map((metric) => metric.name) ??
+        []
+    );
+  }, [productTierCustomMetricsData, rootSubscriptions, selectedSubscriptionId]);
+
+  // Contains every metric name returned by the current usage response, including fixed metrics,
+  // configured custom metrics with usage, and unconfigured legacy/observed-only metrics.
+  const observedDimensions = useMemo(
+    () =>
+      (consumptionUsagePerDayData?.usage ?? []).flatMap((usage) =>
+        typeof usage.dimension === "string" && usage.dimension ? [usage.dimension] : []
+      ),
+    [consumptionUsagePerDayData]
+  );
+
+  // Contains metrics currently available from product-tier configuration or the current usage response.
+  const availableMetricRegistry = useMemo(
+    () => getUsageMetricRegistry(configuredCustomMetricNames, observedDimensions),
+    [configuredCustomMetricNames, observedDimensions]
+  );
+
+  const subscriptionScope = selectedSubscriptionId || "all-subscriptions";
+
+  useEffect(() => {
+    if (lastProcessedUsageScopeRef.current === subscriptionScope) return;
+
+    lastProcessedUsageScopeRef.current = subscriptionScope;
+    pendingSubscriptionScopeRef.current = subscriptionScope;
+  }, [subscriptionScope]);
+
+  useEffect(() => {
+    if (
+      !ENABLE_COST_EXPLORER_METRIC_VISIBILITY_CONTROLS ||
+      isFetchingUsagePerDay ||
+      pendingSubscriptionScopeRef.current !== subscriptionScope
+    ) {
+      return;
+    }
+
+    setSelectedAdditionalMetricNames((selectedNames) =>
+      reconcileSelectedMetricNames(selectedNames, availableMetricRegistry.additionalFields)
+    );
+    pendingSubscriptionScopeRef.current = null;
+  }, [availableMetricRegistry.additionalFields, isFetchingUsagePerDay, subscriptionScope]);
+
+  // Includes selected observed-only metrics even if they disappear after a date-range change, so they remain
+  // selectable and render as an empty series until the subscription scope changes.
+  const selectableMetricRegistry = useMemo(
+    () =>
+      getUsageMetricRegistry(configuredCustomMetricNames, [...observedDimensions, ...selectedAdditionalMetricNames]),
+    [configuredCustomMetricNames, observedDimensions, selectedAdditionalMetricNames]
+  );
+
+  // Contains the metric definitions rendered by the chart. Controls disabled means all available metrics;
+  // controls enabled means the six fixed metrics plus the user's selected additional metrics.
+  const visibleMetricFields = useMemo(
+    () =>
+      getVisibleMetricFields({
+        controlsEnabled: ENABLE_COST_EXPLORER_METRIC_VISIBILITY_CONTROLS,
+        availableMetricRegistry,
+        selectableMetricRegistry,
+        selectedAdditionalMetricNames,
+      }),
+    [availableMetricRegistry, selectableMetricRegistry, selectedAdditionalMetricNames]
+  );
 
   const serviceOptions = [{ serviceName: "All Products", serviceId: "" }, ...rootSubscriptionServices];
 
@@ -183,11 +265,21 @@ const UsageOverview: FC<UsageOverviewProps> = (props) => {
             </Select>
           </div>
         </div>
+        {ENABLE_COST_EXPLORER_METRIC_VISIBILITY_CONTROLS && selectableMetricRegistry.additionalFields.length > 0 && (
+          <div className="mt-4 flex justify-end">
+            <MetricVisibilitySelector
+              metricFields={selectableMetricRegistry.additionalFields}
+              selectedMetricNames={selectedAdditionalMetricNames}
+              onChange={setSelectedAdditionalMetricNames}
+            />
+          </div>
+        )}
       </div>
       <div className="border-t border-[#E9EAEB] py-3 px-6">
         <ConsumptionUsageChart
           usagePerDayData={consumptionUsagePerDayData}
           isFetchingUsagePerDay={isFetchingUsagePerDay}
+          metricFields={visibleMetricFields}
         />
       </div>
     </div>

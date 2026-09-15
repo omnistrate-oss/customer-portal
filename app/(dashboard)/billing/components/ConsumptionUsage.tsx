@@ -1,4 +1,6 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Collapse } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -7,12 +9,14 @@ import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ConsumptionUsage as ConsumptionUsageData } from "src/types/consumption";
+import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 
 import useMultiSubscriptionUsage from "../hooks/useMultiSubscriptionUsage";
 import {
   billingUsageDimensionFields,
-  getEmptyBillingUsageTotals,
-  getUsageDimensionTotals,
+  createUsageMetricValues,
+  getUsageMetricRegistry,
+  getUsageMetricValues,
 } from "../utils/usageDimensions";
 
 import SubscriptionUsageTable, { SubscriptionUsageRow } from "./SubscriptionUsageTable";
@@ -23,14 +27,26 @@ dayjs.extend(utc);
 type ConsumptionUsageProps = {
   // consumptionUsagePerDayData: ConsumptionUsagePerDay | undefined;
   consumptionUsageData: ConsumptionUsageData | undefined;
+  productTierCustomMetricsData: ProductTierCustomMetricsResponse | undefined;
 };
 
 const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
-  const { consumptionUsageData } = props;
+  const { consumptionUsageData, productTierCustomMetricsData } = props;
   const [showUsageBreakdown, setShowUsageBreakdown] = useState(false);
+  const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
+  const [fixedMetricInlineOverflow, setFixedMetricInlineOverflow] = useState<Record<string, boolean>>({});
+
+  const handleFixedMetricInlineOverflowChange = useCallback((dimensionName: string, overflows: boolean) => {
+    setFixedMetricInlineOverflow((currentOverflow) => {
+      if (currentOverflow[dimensionName] === overflows) return currentOverflow;
+      return { ...currentOverflow, [dimensionName]: overflows };
+    });
+  }, []);
+
+  const forceFixedMetricUnitsBelow = Object.values(fixedMetricInlineOverflow).some(Boolean);
 
   const aggregatedConsumptionDataHash = useMemo(() => {
-    return getUsageDimensionTotals(consumptionUsageData?.usage || []);
+    return getUsageMetricValues(consumptionUsageData?.usage || []);
   }, [consumptionUsageData]);
 
   const { subscriptions } = useGlobalData();
@@ -55,16 +71,48 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
     subscriptionIds,
   });
 
+  const configuredMetricNamesByProductTierId = useMemo(() => {
+    return Object.entries(productTierCustomMetricsData?.productTiers ?? {}).reduce<Record<string, ReadonlySet<string>>>(
+      (configuredMetrics, [productTierId, productTier]) => {
+        configuredMetrics[productTierId] = new Set(productTier.metrics.map((metric) => metric.name));
+        return configuredMetrics;
+      },
+      {}
+    );
+  }, [productTierCustomMetricsData]);
+
+  const configuredCustomMetricNames = useMemo(() => {
+    return rootSubscriptions.flatMap(
+      (subscription) =>
+        productTierCustomMetricsData?.productTiers[subscription.productTierId]?.metrics.map((metric) => metric.name) ??
+        []
+    );
+  }, [productTierCustomMetricsData, rootSubscriptions]);
+
+  const observedDimensions = useMemo(() => {
+    const aggregateDimensions = Object.keys(aggregatedConsumptionDataHash);
+    const subscriptionDimensions = Object.values(subscriptionUsageHashmap ?? {}).flatMap((metricValues) =>
+      Object.keys(metricValues)
+    );
+
+    return [...aggregateDimensions, ...subscriptionDimensions];
+  }, [aggregatedConsumptionDataHash, subscriptionUsageHashmap]);
+
+  const { additionalFields: additionalMetricFields } = useMemo(
+    () => getUsageMetricRegistry(configuredCustomMetricNames, observedDimensions),
+    [configuredCustomMetricNames, observedDimensions]
+  );
+
   const rows = useMemo(() => {
     let rows: SubscriptionUsageRow[] = [];
     if (isSubscriptionUsageFetched && subscriptionUsageHashmap) {
       rows = rootSubscriptions.map((subscription) => {
-        const { id, serviceName, serviceLogoURL, productTierName, serviceId } = subscription;
-        const usageData = subscriptionUsageHashmap[id] || getEmptyBillingUsageTotals();
+        const { id, serviceName, serviceLogoURL, productTierId, productTierName, serviceId } = subscription;
         const rowData: SubscriptionUsageRow = {
           subscriptionId: id,
           serviceId: serviceId,
-          ...usageData,
+          productTierId,
+          metricValues: subscriptionUsageHashmap[id] || createUsageMetricValues(),
           serviceName: serviceName,
           subscriptionPlanName: productTierName,
           serviceLogoURL: serviceLogoURL,
@@ -109,13 +157,46 @@ const ConsumptionUsage: FC<ConsumptionUsageProps> = (props) => {
               key={field.dimension}
               title={field.title}
               dimensionName={field.dimension}
-              value={aggregatedConsumptionDataHash[field.rowField]}
+              value={aggregatedConsumptionDataHash[field.dimension] ?? 0}
+              forceUnitBelow={forceFixedMetricUnitsBelow}
+              onInlineValueOverflowChange={handleFixedMetricInlineOverflowChange}
             />
           ))}
         </div>
+        {additionalMetricFields.length > 0 && (
+          <div className="mt-3">
+            <div className="flex justify-end">
+              <Button
+                endIcon={showAdditionalMetrics ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                onClick={() => setShowAdditionalMetrics((visible) => !visible)}
+              >
+                {showAdditionalMetrics ? "Hide additional metrics" : "Show additional metrics"}
+              </Button>
+            </div>
+            <Collapse in={showAdditionalMetrics}>
+              <div className="mt-3 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
+                {additionalMetricFields.map((field) => (
+                  <UsageDimensionCard
+                    key={field.dimension}
+                    title={field.title}
+                    dimensionName={field.dimension}
+                    unit={field.unit}
+                    value={aggregatedConsumptionDataHash[field.dimension] ?? 0}
+                  />
+                ))}
+              </div>
+            </Collapse>
+          </div>
+        )}
       </div>
       <Collapse in={showUsageBreakdown}>
-        <SubscriptionUsageTable rows={rows} isSubscriptionsUsagePending={isSubscriptionsUsagePending} />
+        <SubscriptionUsageTable
+          rows={rows}
+          isSubscriptionsUsagePending={isSubscriptionsUsagePending}
+          additionalMetricFields={additionalMetricFields}
+          configuredMetricNamesByProductTierId={configuredMetricNamesByProductTierId}
+          showAdditionalMetrics={showAdditionalMetrics}
+        />
       </Collapse>
     </div>
   );

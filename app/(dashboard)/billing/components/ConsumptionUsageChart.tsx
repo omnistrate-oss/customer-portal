@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react";
+import React, { FC, useEffect, useMemo, useRef } from "react";
 import { Box, Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -10,11 +10,11 @@ import { ConsumptionUsagePerDay } from "src/types/consumption";
 
 import {
   billingUsageDimensionFields,
-  type BillingUsageTotals,
-  getEmptyBillingUsageTotals,
+  getUsageChartData,
+  getUsageChartMinimumWidth,
   getUsageDimensionChartLabel,
   getUsageDimensionChartOffset,
-  getUsageDimensionChartValue,
+  type UsageMetricField,
 } from "../utils/usageDimensions";
 
 function formatDate(inputDate) {
@@ -23,19 +23,19 @@ function formatDate(inputDate) {
 
 const LegendItem = ({ title = "", bgColor }) => {
   return (
-    <Box display={"flex"} justifyContent={"space-between"} alignSelf={"center"} gap={"8px"}>
-      <Box alignSelf={"center"} sx={{ background: bgColor, width: "11px", height: "11px" }} />
-      <Text size="xsmall" weight="medium" color="#7E8299">
+    <Box display="flex" alignItems="flex-start" gap="8px" maxWidth="240px" minWidth={0}>
+      <Box sx={{ background: bgColor, width: "11px", height: "11px", flexShrink: 0, marginTop: "3px" }} />
+      <Text size="xsmall" weight="medium" color="#7E8299" sx={{ overflowWrap: "anywhere" }}>
         {title}
       </Text>
     </Box>
   );
 };
 
-const Legend = () => {
+const Legend: FC<{ metricFields: readonly UsageMetricField[] }> = ({ metricFields }) => {
   return (
     <Box display={"flex"} justifyContent={"flex-end"} flexWrap="wrap" gap={"17px"} mt="16px">
-      {billingUsageDimensionFields.map((field) => (
+      {metricFields.map((field) => (
         <LegendItem key={field.dimension} bgColor={field.chartColor} title={getUsageDimensionChartLabel(field)} />
       ))}
     </Box>
@@ -52,18 +52,19 @@ function formatTooltipValue(value: unknown) {
   });
 }
 
-export function handleYAxisShift(chartID: string, e: React.UIEvent<HTMLDivElement>) {
-  const allAxis = document.querySelectorAll(`#${chartID} .recharts-yAxis`);
+export function handleYAxisShift(chartElement: HTMLElement | null, scrollLeft: number) {
+  if (!chartElement) return;
 
-  const xAxis = document.querySelector(`#${chartID} .recharts-xAxis`);
+  const allAxis = chartElement.querySelectorAll<SVGGElement>(".recharts-yAxis");
+  const xAxis = chartElement.querySelector<SVGGElement>(".recharts-xAxis");
   const xAxisHeight = xAxis?.getBoundingClientRect().height || 0;
 
-  allAxis?.forEach((axis) => {
+  allAxis.forEach((axis) => {
     const orientation = axis.querySelector(`.recharts-cartesian-axis-tick-line`)?.getAttribute("orientation") || "hor";
 
-    const rectElement = document.querySelector(`#${chartID} .y-axis-rect-${orientation}`);
+    const rectClassName = `y-axis-rect-${orientation}`;
+    const rectElement = axis.querySelector(`.${rectClassName}`);
     if (!rectElement) {
-      //Adding a rect
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       const yAxisheight = axis.getBoundingClientRect().height;
       const yAxisWidth = axis.getBoundingClientRect().width;
@@ -73,19 +74,19 @@ export function handleYAxisShift(chartID: string, e: React.UIEvent<HTMLDivElemen
       rect.setAttribute("width", `${Math.max(yAxisWidth + 20, 53)}px`);
       rect.setAttribute("height", `${yAxisheight + xAxisHeight}px`);
       rect.setAttribute("fill", "white");
-      rect.setAttribute("class", `y-axis-rect-${orientation}`);
+      rect.setAttribute("class", rectClassName);
+      rect.setAttribute("pointer-events", "none");
 
       axis.insertBefore(rect, axis.firstChild);
     }
-  });
 
-  const axis = document.querySelector(`#${chartID} .recharts-yAxis`);
-  //@ts-ignore
-  axis.style = "transform: translateX(" + e.target.scrollLeft + "px);"; //@ts-ignore
+    axis.style.transform = `translateX(${scrollLeft}px)`;
+  });
 }
 
 const chartMargins = { bottom: 20, top: 5, left: 0, right: 0 };
-const barCategoryGap = 50;
+const barCategoryGap = 20;
+const barGap = 1;
 const barWidth = 10;
 
 const scrollbarStyles = {
@@ -114,62 +115,57 @@ const scrollbarStyles = {
 type ConsumptionUsageChartProps = {
   usagePerDayData: ConsumptionUsagePerDay | undefined;
   isFetchingUsagePerDay: boolean;
+  metricFields?: readonly UsageMetricField[];
 };
 
-type BillingUsagePerDay = BillingUsageTotals & { date: string };
-
 const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
-  const { usagePerDayData, isFetchingUsagePerDay } = props;
+  const { usagePerDayData, isFetchingUsagePerDay, metricFields = billingUsageDimensionFields } = props;
+  const chartRootRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const billingUsagePerDay: BillingUsagePerDay[] = useMemo(() => {
-    const usage = usagePerDayData?.usage || [];
-    const dataHashByDate: Record<string, BillingUsagePerDay> = {};
+  const billingUsagePerDay = useMemo(
+    () => getUsageChartData(usagePerDayData?.usage ?? [], metricFields),
+    [metricFields, usagePerDayData]
+  );
 
-    usage.forEach((usageDimensionData) => {
-      const { startTime: date, dimension, total: value } = usageDimensionData;
-      const field = billingUsageDimensionFields.find((field) => field.dimension === dimension);
+  const minChartWidth = getUsageChartMinimumWidth(billingUsagePerDay.length, metricFields.length, {
+    barWidth,
+    barGap,
+    barCategoryGap,
+    marginLeft: chartMargins.left,
+    marginRight: chartMargins.right,
+  });
 
-      if (!date || !field) {
-        return;
-      }
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
 
-      if (!dataHashByDate[date]) {
-        dataHashByDate[date] = {
-          ...getEmptyBillingUsageTotals(),
-          date,
-        };
-      }
+    scrollContainer.scrollLeft = 0;
+    const animationFrame = window.requestAnimationFrame(() => handleYAxisShift(chartRootRef.current, 0));
 
-      dataHashByDate[date][field.rowField] += getUsageDimensionChartValue(field, typeof value === "number" ? value : 0);
-    });
-    return Object.values(dataHashByDate).sort((itemA, itemB) => (itemA.date < itemB.date ? -1 : 1));
-  }, [usagePerDayData]);
-
-  const minChartWidth =
-    billingUsagePerDay.length * barWidth +
-    (billingUsagePerDay.length + 1) * barCategoryGap +
-    chartMargins.left +
-    chartMargins.right;
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [billingUsagePerDay, metricFields]);
 
   return isFetchingUsagePerDay ? (
     <LoadingSpinner />
   ) : (
-    <Box position="relative" id="usage-per-day-chart" overflow={"hidden"}>
-      <Stack direction="row" justifyContent="flex-end">
-        <Legend />
+    <Box ref={chartRootRef} position="relative" overflow={"hidden"}>
+      <Stack direction="row" justifyContent="flex-end" mr="16px">
+        <Legend metricFields={metricFields} />
       </Stack>
       <ReChartContainer mt={4} debounce={100} height={370}>
         <Box
+          ref={scrollContainerRef}
           sx={{ overflowY: "hidden", ...scrollbarStyles }}
           onScroll={(e: React.UIEvent<HTMLDivElement>) => {
-            handleYAxisShift("usage-per-day-chart", e);
+            handleYAxisShift(chartRootRef.current, e.currentTarget.scrollLeft);
           }}
         >
-          <ResponsiveContainer height={350} minWidth={minChartWidth}>
+          <ResponsiveContainer width="100%" height={350} minWidth={minChartWidth}>
             <ComposedChart
               data={billingUsagePerDay}
-              barCategoryGap={50} // Controls the space between groups of bars
-              barGap={1} // Ensures bars within the same group have no gap
+              barCategoryGap={barCategoryGap}
+              barGap={barGap}
               margin={chartMargins}
             >
               <CartesianGrid strokeDasharray="5 5" vertical={false} />
@@ -199,6 +195,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
 
               <Tooltip
                 animationDuration={0}
+                wrapperStyle={{ pointerEvents: "auto", zIndex: 10 }}
                 content={({ payload, label }) => {
                   if (!payload || payload.length === 0) return null;
 
@@ -224,6 +221,12 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                         padding: "10px",
                         borderRadius: "4px",
                         boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+                        maxHeight: "284px",
+                        maxWidth: "min(360px, calc(100vw - 32px))",
+                        overflowY: "auto",
+                        overscrollBehavior: "contain",
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#98A2B3 transparent",
                       }}
                     >
                       <p
@@ -232,6 +235,10 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
                           fontWeight: "bold",
                           fontSize: 14,
                           color: "#7E8299",
+                          position: "sticky",
+                          top: 0,
+                          background: "#fff",
+                          zIndex: 1,
                         }}
                       >
                         {formatDate(label)}
@@ -255,27 +262,27 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
               />
 
               {/* Dynamically Render Bars */}
-              {billingUsageDimensionFields.map((field) => (
+              {metricFields.map((field) => (
                 <Bar
-                  key={`bar-${field.rowField}`}
-                  dataKey={field.rowField}
+                  key={`bar-${field.key}`}
+                  dataKey={field.key}
                   name={getUsageDimensionChartLabel(field)}
-                  barSize={10}
+                  barSize={barWidth}
                   fill={field.chartColor}
                   radius={[4, 4, 4, 4]}
                 />
               ))}
 
               {/* Dynamically Render Lines with Active Dots */}
-              {billingUsageDimensionFields.map((field, index) => {
-                const offset = getUsageDimensionChartOffset(index);
+              {metricFields.map((field, index) => {
+                const offset = getUsageDimensionChartOffset(index, metricFields.length);
 
                 return (
                   <Line
-                    id={`line-${field.rowField}`}
-                    key={`line-${field.rowField}`}
+                    id={`line-${field.key}`}
+                    key={`line-${field.key}`}
                     type="monotone"
-                    dataKey={field.rowField}
+                    dataKey={field.key}
                     name={getUsageDimensionChartLabel(field)}
                     stroke={field.chartColor}
                     strokeDasharray="3 3"
