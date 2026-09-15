@@ -212,6 +212,8 @@ const AccessControlPage = () => {
           columns={dataTableColumns}
           rows={filteredUsers}
           noRowsText="No users"
+          isFilterApplied={Boolean(searchText)}
+          entityName="users"
           HeaderComponent={AccessControlTableHeader}
           headerProps={{
             users,

@@ -440,6 +440,8 @@ export default function NodesTable(props) {
         }}
         loading={isLoading}
         noRowsText={isServerless ? "No nodes to show - serverless instances do not have dedicated nodes" : "No nodes"}
+        isFilterApplied={!isServerless && Boolean(searchText)}
+        entityName="nodes"
       />
       <GenerateTokenDialog
         dashboardEndpoint={dashboardEndpoint}

@@ -270,6 +270,10 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
         rows={filteredEvents}
         renderDetailsComponent={DetailTableRowView}
         noRowsText="No events"
+        isFilterApplied={Boolean(
+          searchText || selectedDateRange?.startDate || selectedDateRange?.endDate || selectedEventTypes.length
+        )}
+        entityName="events"
         getRowCanExpand={(rowData) => Boolean(Number(rowData.original.workflowFailures?.length) > 0)}
         HeaderComponent={AuditLogsTableHeader}
         headerProps={{

@@ -86,6 +86,10 @@ const EventsPage = () => {
           setPageIndex={setPageIndex}
           showPagination={true}
           noRowsText="No audit logs"
+          isFilterApplied={Boolean(
+            selectedDateRange?.startDate || selectedDateRange?.endDate || selectedServiceId || selectedEventTypes.length
+          )}
+          entityName="audit logs"
         />
       </div>
     </PageContainer>

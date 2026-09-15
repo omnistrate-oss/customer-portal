@@ -5,6 +5,7 @@ import { DataGrid as MuiDataGrid, GridCell, GridRow } from "@mui/x-data-grid";
 import CustomCheckbox from "../Checkbox/Checkbox";
 
 import DataGridCustomPagination from "./DataGridCustomPagination";
+import NoRowsOverlayContent from "./NoRowsOverlayContent";
 
 // Define memoized components outside of the render function
 const MemoizedCell = memo(function Cell(props) {
@@ -16,7 +17,7 @@ const MemoizedRow = memo(function Row(props) {
 });
 
 const DataGrid = styled(
-  ({ components, noRowsText = "No rows", ...restProps }) => (
+  ({ components, noRowsText = "No rows", isFilterApplied = false, entityName, ...restProps }) => (
     <MuiDataGrid
       disableVirtualization // To Allow Vitest To Query All Columns
       rowsPerPageOptions={[10]}
@@ -29,8 +30,8 @@ const DataGrid = styled(
         BaseCheckbox: CustomCheckbox,
         Pagination: DataGridCustomPagination,
         NoRowsOverlay: () => (
-          <Stack height="100%" alignItems="center" justifyContent="center">
-            {noRowsText}
+          <Stack height="100%" alignItems="center" justifyContent="center" data-testid="no-rows-overlay">
+            <NoRowsOverlayContent noRowsText={noRowsText} isFilterApplied={isFilterApplied} entityName={entityName} />
           </Stack>
         ),
         ...components,

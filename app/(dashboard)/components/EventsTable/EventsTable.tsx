@@ -44,6 +44,8 @@ const EventsTable = ({
   isFetchingNextPage,
   minHeight = "667px",
   noRowsText,
+  isFilterApplied,
+  entityName,
 }: any) => {
   const { subscriptionsObj } = useGlobalData();
 
@@ -220,6 +222,8 @@ const EventsTable = ({
       data={data}
       renderDetailsComponent={EventDetailsView}
       noRowsText={noRowsText || "No events"}
+      isFilterApplied={isFilterApplied}
+      entityName={entityName}
       getRowCanExpand={(rowData) => Number(rowData.original.workflowFailures?.length) > 0}
       HeaderComponent={HeaderComponent}
       headerProps={HeaderProps}
