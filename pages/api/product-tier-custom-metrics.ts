@@ -8,6 +8,8 @@ import {
 import { getAuthToken } from "src/server/utils/authCookie";
 import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 
+const MAX_SUBSCRIPTION_IDS = 125;
+
 function parseSubscriptionIds(value: string | string[] | undefined): string[] {
   const values = Array.isArray(value) ? value : value ? [value] : [];
 
@@ -41,6 +43,12 @@ export default async function handler(
 
   if (subscriptionIds.length === 0) {
     return res.status(400).json({ message: "subscriptionIds is required" });
+  }
+
+  if (subscriptionIds.length > MAX_SUBSCRIPTION_IDS) {
+    return res.status(400).json({
+      message: `A maximum of ${MAX_SUBSCRIPTION_IDS} subscription IDs is allowed`,
+    });
   }
 
   try {

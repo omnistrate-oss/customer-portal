@@ -120,12 +120,14 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
               {
                 id: field.key,
                 header: field.tableHeader,
+                sortingFn: "basic",
+                sortUndefined: "last",
                 meta: {
                   minWidth: 180,
                 },
                 cell: (data) => (
                   <Text size="small" weight="regular" color="#475467" ellipsis>
-                    {data.getValue()}
+                    {data.getValue() ?? "-"}
                   </Text>
                 ),
               }

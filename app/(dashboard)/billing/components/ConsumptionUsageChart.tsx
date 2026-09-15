@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useId, useMemo, useRef } from "react";
+import React, { FC, useEffect, useMemo, useRef } from "react";
 import { Box, Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -120,7 +120,6 @@ type ConsumptionUsageChartProps = {
 
 const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
   const { usagePerDayData, isFetchingUsagePerDay, metricFields = billingUsageDimensionFields } = props;
-  const chartID = `usage-per-day-chart-${useId().replace(/:/g, "")}`;
   const chartRootRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +149,7 @@ const ConsumptionUsageChart: FC<ConsumptionUsageChartProps> = (props) => {
   return isFetchingUsagePerDay ? (
     <LoadingSpinner />
   ) : (
-    <Box ref={chartRootRef} position="relative" id={chartID} overflow={"hidden"}>
+    <Box ref={chartRootRef} position="relative" overflow={"hidden"}>
       <Stack direction="row" justifyContent="flex-end" mr="16px">
         <Legend metricFields={metricFields} />
       </Stack>

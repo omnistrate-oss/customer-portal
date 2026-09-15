@@ -43,7 +43,9 @@ const UsageDimensionCard: FC<UsageDimensionCardProps> = (props) => {
     forceUnitBelow = false,
     onInlineValueOverflowChange,
   } = props;
-  const Icon = usageDimensionIconMap[dimensionName] ?? CustomMetricIcon;
+  const Icon = Object.prototype.hasOwnProperty.call(usageDimensionIconMap, dimensionName)
+    ? usageDimensionIconMap[dimensionName]
+    : CustomMetricIcon;
   const unit = providedUnit ?? getBillingUsageDimensionField(dimensionName)?.unit ?? "";
   const formattedValue = value.toLocaleString();
   const valueColumnRef = useRef<HTMLDivElement>(null);

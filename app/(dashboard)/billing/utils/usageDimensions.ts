@@ -8,7 +8,6 @@ export type BillingUsageRowField =
   | "deploymentCellHours"
   | "gpu";
 
-export type BillingUsageTotals = Record<BillingUsageRowField, number>;
 export type BillingUsageChartLabel = UsageDimension | "GPU core hours";
 export type UsageMetricValues = Record<string, number>;
 export type UsageChartDataPoint = { date: string } & Record<string, string | number>;
@@ -142,10 +141,6 @@ function getCustomMetricKey(dimension: string): string {
   return `${customMetricFieldPrefix}${dimension}`;
 }
 
-export function isCustomMetricFieldKey(fieldKey: string | undefined): boolean {
-  return Boolean(fieldKey?.startsWith(customMetricFieldPrefix));
-}
-
 /**
  * Builds the ordered metric metadata shared by Billing and Cost Explorer.
  * Built-in metrics remain first, configured metrics keep their supplied order,
@@ -202,15 +197,6 @@ export function getUsageMetricRegistry(
   };
 }
 
-/** Extends a registry with dimensions discovered in a later usage response. */
-export function extendUsageMetricFields(
-  metricFields: readonly UsageMetricField[],
-  observedDimensions: readonly string[]
-): UsageMetricField[] {
-  const configuredCustomMetricNames = metricFields.filter((field) => field.isCustom).map((field) => field.dimension);
-  return getUsageMetricFields(configuredCustomMetricNames, observedDimensions);
-}
-
 export function getBillingUsageDimensionField(dimension: string) {
   return billingUsageDimensionFields.find((field) => field.dimension === dimension);
 }
@@ -234,27 +220,16 @@ export function getUsageMetricValues(usage: readonly UsageDimensionData[] = []):
   }, createUsageMetricValues());
 }
 
-export function combineUsageMetricValues(metricValueSets: readonly UsageMetricValues[]): UsageMetricValues {
-  return metricValueSets.reduce<UsageMetricValues>((combined, values) => {
-    Object.entries(values).forEach(([dimension, value]) => {
-      if (Number.isFinite(value)) {
-        combined[dimension] = (combined[dimension] ?? 0) + value;
-      }
-    });
-    return combined;
-  }, createUsageMetricValues());
-}
-
 export function getUsageMetricTableValue(
   metricValues: UsageMetricValues,
   dimension: string,
   configuredMetricNames: ReadonlySet<string>
-): number | "-" {
+): number | undefined {
   if (Object.prototype.hasOwnProperty.call(metricValues, dimension)) {
     return metricValues[dimension];
   }
 
-  return configuredMetricNames.has(dimension) ? 0 : "-";
+  return configuredMetricNames.has(dimension) ? 0 : undefined;
 }
 
 /** Groups backend-produced totals by date and exact dimension name. */
@@ -280,13 +255,6 @@ export function aggregateUsageByDateAndDimension(
     },
     Object.create(null) as Record<string, UsageMetricValues>
   );
-}
-
-export function getEmptyBillingUsageTotals(): BillingUsageTotals {
-  return billingUsageDimensionFields.reduce((acc, field) => {
-    acc[field.rowField] = 0;
-    return acc;
-  }, {} as BillingUsageTotals);
 }
 
 /** Horizontally separates overlapping line dots when dimensions share a date bucket. */
@@ -349,18 +317,4 @@ export function getUsageChartData(
 
       return dataPoint;
     });
-}
-
-export function getUsageDimensionChartValue(field: BillingUsageDimensionField, value: number): number {
-  return getUsageMetricChartValue(field, value);
-}
-
-/** Legacy fixed-field projection retained while the chart is migrated to UsageMetricValues. */
-export function getUsageDimensionTotals(usage: readonly UsageDimensionData[] = []): BillingUsageTotals {
-  const metricValues = getUsageMetricValues(usage);
-
-  return billingUsageDimensionFields.reduce((totals, field) => {
-    totals[field.rowField] = metricValues[field.dimension] ?? 0;
-    return totals;
-  }, getEmptyBillingUsageTotals());
 }

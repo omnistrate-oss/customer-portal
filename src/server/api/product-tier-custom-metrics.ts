@@ -23,10 +23,6 @@ type ProductTierIdentifier = {
 
 const supportedAggregationFunctions = new Set<CustomMeteringAggregationFunction>(["sum", "max", "count"]);
 
-function getProductTierKey({ serviceId, productTierId }: ProductTierIdentifier) {
-  return `${serviceId}:${productTierId}`;
-}
-
 export async function getAuthorizedSubscriptions(
   subscriptionIds: string[],
   authToken: string
@@ -128,7 +124,7 @@ export function getUniqueProductTierIdentifiers(subscriptions: Subscription[]): 
     if (!serviceId || !productTierId) return;
 
     const identifier = { serviceId, productTierId };
-    uniqueProductTiers.set(getProductTierKey(identifier), identifier);
+    uniqueProductTiers.set(productTierId, identifier);
   });
 
   return Array.from(uniqueProductTiers.values());
