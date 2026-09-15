@@ -524,6 +524,8 @@ const InstancesPage = () => {
           columns={dataTableColumns}
           rows={filteredInstances}
           noRowsText="No instances"
+          isFilterApplied={nonBYOAInstances.length > 0 && filteredInstances.length === 0}
+          entityName="instances"
           HeaderComponent={InstancesTableHeader}
           headerProps={{
             count: filteredInstances.length,

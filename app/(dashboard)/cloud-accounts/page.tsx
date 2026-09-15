@@ -994,6 +994,8 @@ const CloudAccountsPage = () => {
           columns={dataTableColumns}
           rows={filteredCloudAccounts}
           noRowsText="No cloud accounts"
+          isFilterApplied={byoaInstances.length > 0 && filteredCloudAccounts.length === 0}
+          entityName="cloud accounts"
           HeaderComponent={CloudAccountsTableHeader}
           headerProps={{
             count: filteredCloudAccounts.length,

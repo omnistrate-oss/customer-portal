@@ -227,6 +227,8 @@ const CustomNetworksPage = () => {
           columns={dataTableColumns}
           rows={filteredCustomNetworks}
           noRowsText="No customer networks"
+          isFilterApplied={customNetworks.length > 0 && filteredCustomNetworks.length === 0}
+          entityName="customer networks"
           HeaderComponent={CustomNetworksTableHeader}
           headerProps={{
             count: filteredCustomNetworks.length,

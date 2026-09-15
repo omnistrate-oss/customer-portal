@@ -106,7 +106,9 @@ const DataGridFilter = <T,>({
     return () => clearTimeout(timer);
   }, [searchText]);
 
-  useEffect(() => {
+  // useLayoutEffect fires before paint, so the grid never renders a frame where the
+  // data has arrived but the filtered rows have not (matches cloud-ui).
+  useLayoutEffect(() => {
     const filtered = searchData(filterData(data, appliedFilters, filterConfig), debouncedSearchText, getSearchableText);
     setFilteredData((prev) => {
       if (prev.length === filtered.length && prev.every((item, i) => item === filtered[i])) {
