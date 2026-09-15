@@ -8849,7 +8849,7 @@ __metadata:
     react-window: "npm:^2.2.3"
     recharts: "npm:^2.15.1"
     sass: "npm:^1.56.1"
-    sharp: "npm:0.35.3"
+    sharp: "npm:0.35.4"
     swagger-ui-react: "npm:^5.29.5"
     tailwind-merge: "npm:^2.6.0"
     tailwindcss: "npm:^3.4.17"
