@@ -209,6 +209,8 @@ const SubscriptionsPage = () => {
             columns={dataTableColumns}
             rows={filteredSubscriptions}
             noRowsText="No subscriptions"
+            isFilterApplied={existingSubscriptions.length > 0 && filteredSubscriptions.length === 0}
+            entityName="subscriptions"
             HeaderComponent={SubscriptionsTableHeader}
             headerProps={{
               selectedRows,

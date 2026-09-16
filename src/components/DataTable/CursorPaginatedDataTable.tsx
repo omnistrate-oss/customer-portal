@@ -16,6 +16,8 @@ import {
 
 import { SetState } from "src/types/common/reactGenerics";
 
+import NoRowsOverlayContent from "../DataGrid/NoRowsOverlayContent";
+
 import Pagination from "./components/Pagination";
 import {
   DetailViewTableRow,
@@ -44,6 +46,8 @@ type CursorPaginatedDataTableProps<TData> = {
   data?: InfiniteData<TData>;
   renderDetailsComponent?: (props: { rowData: TData }) => ReactNode;
   noRowsText: string;
+  isFilterApplied?: boolean;
+  entityName?: string;
   isLoading?: boolean;
   getRowCanExpand?: (rowData: Row<TData>) => boolean;
   getSubRows?: (originalRow: TData) => TData[];
@@ -69,6 +73,8 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
     data,
     renderDetailsComponent,
     noRowsText,
+    isFilterApplied = false,
+    entityName,
     isLoading,
     getRowCanExpand = () => true,
     HeaderComponent,
@@ -297,7 +303,15 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
                 transform: "translateX(-50%) translateY(-50%)",
               }}
             >
-              {isLoading ? <CircularProgress /> : noRowsText}
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <NoRowsOverlayContent
+                  noRowsText={noRowsText}
+                  isFilterApplied={isFilterApplied}
+                  entityName={entityName}
+                />
+              )}
             </Stack>
           )}
         </Box>

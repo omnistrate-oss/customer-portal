@@ -19,6 +19,7 @@ import {
 } from "@tanstack/react-table";
 
 import CustomCheckbox from "../Checkbox/Checkbox";
+import NoRowsOverlayContent from "../DataGrid/NoRowsOverlayContent";
 
 import Pagination from "./components/Pagination";
 import {
@@ -69,6 +70,8 @@ type DataTableProps<TData> = {
   columns: ColumnDef<TData>[];
   renderDetailsComponent?: (props: { rowData: TData }) => ReactNode;
   noRowsText: string;
+  isFilterApplied?: boolean;
+  entityName?: string;
   isLoading?: boolean;
   getRowCanExpand?: (rowData: Row<TData>) => boolean;
   getSubRows?: (orginalRow: TData) => TData[];
@@ -97,6 +100,8 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
     rows,
     renderDetailsComponent,
     noRowsText,
+    isFilterApplied = false,
+    entityName,
     isLoading,
     getRowCanExpand = () => true,
     HeaderComponent,
@@ -381,7 +386,15 @@ const DataTable = <TData,>(props: DataTableProps<TData>): ReactNode => {
                 transform: "translateX(-50%) translateY(-50%)",
               }}
             >
-              {isLoading ? <CircularProgress /> : noRowsText}
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <NoRowsOverlayContent
+                  noRowsText={noRowsText}
+                  isFilterApplied={isFilterApplied}
+                  entityName={entityName}
+                />
+              )}
             </Stack>
           )}
         </Box>

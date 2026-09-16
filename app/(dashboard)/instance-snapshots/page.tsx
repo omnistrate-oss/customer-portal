@@ -367,6 +367,8 @@ const InstanceSnapshotsPage = () => {
           columns={dataTableColumns}
           rows={filteredSnapshots}
           noRowsText="No instance snapshots"
+          isFilterApplied={snapshots.length > 0 && filteredSnapshots.length === 0}
+          entityName="instance snapshots"
           HeaderComponent={InstanceSnapshotsTableHeader}
           headerProps={{
             count: filteredSnapshots.length,

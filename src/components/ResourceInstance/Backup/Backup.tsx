@@ -437,6 +437,8 @@ const Backup: FC<{
           }}
           loading={isFetching}
           noRowsText={`No ${tab === "snapshots" ? "snapshots" : "backups"}`}
+          isFilterApplied={Boolean(searchText || (selectedDateRange?.startDate && selectedDateRange?.endDate))}
+          entityName={tab === "snapshots" ? "snapshots" : "backups"}
         />
       </Box>
       <TextConfirmationDialog
