@@ -10,7 +10,7 @@ import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import Chip from "components/Chip/Chip";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
@@ -42,10 +42,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
   const resultParams = useMemo(() => getResultParams(selectedInstance), [selectedInstance]);
   const hasSelectedInstanceCloudNativeVpc = useMemo(() => hasCloudNativeVpcConfiguration(resultParams), [resultParams]);
   const cloudProvider = resultParams?.cloud_provider || "";
-  const privateConnectivityFlag =
-    resultParams?.private_link ?? resultParams?.enable_private_connectivity ?? resultParams?.PrivateLink;
-  const privateConnectivityEnabled =
-    typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : Boolean(privateConnectivityFlag);
+  const privateConnectivityEnabled = isPrivateLinkEnabled(resultParams);
 
   const subscription = subscriptionsObj[selectedInstance.subscriptionId as string];
   const offering = subscription ? serviceOfferingsObj[subscription.serviceId]?.[subscription.productTierId] : undefined;
@@ -177,9 +174,6 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
 
   // ─── Summary ──────────────────────────────────────────────────────────────
   const summarySections = useMemo((): SummarySection[] => {
-    const privateConnectivityFlag = resultParams?.private_link;
-    const privateConnectivityEnabled = typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : false;
-
     const accountIdentityItems =
       cloudProvider === "gcp"
         ? [
@@ -264,7 +258,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     sections.push({ title: "VPC Configuration", items: vpcItems });
 
     return sections;
-  }, [resultParams, cloudProvider, servicesObj, subscription, offering, vpcValues]);
+  }, [resultParams, cloudProvider, privateConnectivityEnabled, servicesObj, subscription, offering, vpcValues]);
 
   // ─── Handle update ────────────────────────────────────────────────────────
   const handleUpdate = () => {
