@@ -143,7 +143,6 @@ const CloudAccountForm = ({
             if (values.cloudProvider === "aws") {
               resultParams.aws_account_id = values.awsAccountId;
               resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
-              resultParams.private_link = values.enablePrivateConnectivity;
             } else if (values.cloudProvider === "gcp") {
               resultParams.gcp_project_id = values.gcpProjectId;
               resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -188,7 +187,6 @@ const CloudAccountForm = ({
             ...(values.cloudProvider === CLOUD_PROVIDERS.aws
               ? {
                   aws_account_id: values.awsAccountId,
-                  private_link: values.enablePrivateConnectivity,
                 }
               : values.cloudProvider === CLOUD_PROVIDERS.gcp
                 ? {
@@ -247,7 +245,6 @@ const CloudAccountForm = ({
           aws_account_id: values.awsAccountId.trim(),
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId.trim()),
-          private_link: values.enablePrivateConnectivity,
         };
       } else if (values.cloudProvider === "gcp") {
         requestParams = {
