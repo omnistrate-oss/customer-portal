@@ -338,20 +338,33 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               Configure network settings for your workloads by allowing automatically managed VPCs or importing custom
               VPCs across selected regions
             </Text>
-            {privateConnectivityEnabled && (
-              <Text size="small" weight="regular" color="#535862">
-                <Text size="small" weight="semibold" color="#344054" sx={{ display: "inline" }}>
-                  Private Link is enabled -
-                </Text>{" "}
-                <StyledLink href="https://docs.omnistrate.com/operate-guides/byoc-cloud-accounts/#imported-vpc-requirements-for-byoc-privatelink">
-                  View VPC configuration instructions for Private Link
-                </StyledLink>
-              </Text>
-            )}
           </>
         }
       >
         <Stack gap="16px">
+          {cloudProvider === "aws" && (
+            <Stack direction="row" alignItems="flex-start" gap="12px">
+              <Checkbox
+                data-testid="private-connectivity-checkbox"
+                checked={privateConnectivityEnabled}
+                disabled
+                inputProps={{ "aria-label": "Enable Private Connectivity" }}
+                sx={{ p: 0 }}
+              />
+              <Stack gap="2px">
+                <Text size="small" weight="medium">
+                  Enable Private Connectivity
+                </Text>
+                <Text size="xsmall" weight="regular" color="#535862">
+                  Private Link is {privateConnectivityEnabled ? "enabled" : "disabled"} -{" "}
+                  <StyledLink href="https://docs.omnistrate.com/operate-guides/byoc-cloud-accounts/#imported-vpc-requirements-for-byoc-privatelink">
+                    View VPC configuration instructions for Private Link
+                  </StyledLink>
+                </Text>
+              </Stack>
+            </Stack>
+          )}
+
           {/* Enable new VPCs */}
           {(() => {
             const canUncheckNewVpcs = values.bringOwnVpcs;

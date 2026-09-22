@@ -78,14 +78,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   // ─── Step state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState<WizardStep>(0);
   const [clickedInstance, setClickedInstance] = useState<ResourceInstance | undefined>();
-  const [enablePrivateConnectivity, setEnablePrivateConnectivity] = useState(() =>
-    selectedInstance
-      ? isPrivateLinkEnabled(getResultParams(selectedInstance))
-      : false
-  );
-  const awsPrivateConnectivityPreferenceRef = useRef(
-    selectedInstance ? isPrivateLinkEnabled(getResultParams(selectedInstance)) : false
-  );
   const hasShownVpcRefreshError = useRef(false);
   const [showPrivateClusterDialog, setShowPrivateClusterDialog] = useState(false);
   const [createdInstanceId, setCreatedInstanceId] = useState<string>("");
@@ -168,7 +160,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         if (values.cloudProvider === "aws") {
           resultParams.aws_account_id = values.awsAccountId;
           resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
-          resultParams.private_link = enablePrivateConnectivity;
         } else if (values.cloudProvider === "gcp") {
           resultParams.gcp_project_id = values.gcpProjectId;
           resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -240,7 +231,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_account_id: values.awsAccountId,
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
-          private_link: enablePrivateConnectivity,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "gcp") {
@@ -309,13 +299,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
   const { values, setFieldValue } = formData;
 
-  useEffect(() => {
-    if (selectedInstance) return;
-    setEnablePrivateConnectivity(
-      values.cloudProvider === "aws" ? awsPrivateConnectivityPreferenceRef.current : false
-    );
-  }, [selectedInstance, values.cloudProvider]);
-
   const accountConfigId = useMemo(() => {
     const rp = getResultParams(clickedInstance || selectedInstance);
     return typeof rp?.cloud_provider_account_config_id === "string" ? rp.cloud_provider_account_config_id : undefined;
@@ -329,6 +312,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     if (typeof rp?.account_config_status === "string") return rp.account_config_status;
     return undefined;
   }, [clickedInstance, selectedInstance]);
+
+  const privateConnectivityEnabled = isPrivateLinkEnabled(getResultParams(clickedInstance || selectedInstance));
 
   const isAccountConfigReady = Boolean(
     accountConfigStatus && READY_STATUSES.includes(accountConfigStatus.toUpperCase())
@@ -758,9 +743,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
   const summarySections = useMemo((): SummarySection[] => {
     const rp = getResultParams(clickedInstance);
     const selectedProvider = rp?.cloud_provider || values.cloudProvider;
-    const privateConnectivityFlag = rp?.private_link ?? rp?.enable_private_connectivity ?? rp?.PrivateLink;
-    const privateConnectivityEnabled =
-      typeof privateConnectivityFlag === "boolean" ? privateConnectivityFlag : enablePrivateConnectivity;
     const accountIdentityItems =
       selectedProvider === "gcp"
         ? [
@@ -900,7 +882,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     currentStep,
     values,
     clickedInstance,
-    enablePrivateConnectivity,
+    privateConnectivityEnabled,
     servicesObj,
     serviceOfferingsObj,
     subscriptionsObj,
@@ -989,11 +971,6 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
                 formData={formData}
                 formConfiguration={formConfiguration}
                 formMode="create"
-                enablePrivateConnectivity={enablePrivateConnectivity}
-                onTogglePrivateConnectivity={(value) => {
-                  awsPrivateConnectivityPreferenceRef.current = value;
-                  setEnablePrivateConnectivity(value);
-                }}
               />
             </form>
           )}
@@ -1033,7 +1010,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
               onUnimport={handleUnimport}
               isImporting={isImporting}
               cloudProvider={values.cloudProvider}
-              privateConnectivityEnabled={enablePrivateConnectivity}
+              privateConnectivityEnabled={privateConnectivityEnabled}
               bringOwnVpcsLocked={bringOwnVpcsLocked}
               emptyStateMessage={emptyStateMessage}
             />
