@@ -211,7 +211,16 @@ const HighlightedLogContent = styled("span", {
   }),
 }));
 
-const applyBasicHighlighting = (text: string, format: string | null): string => {
+// The log text is escaped before highlighting, so the only markup in the result is the <span class=…> added
+// below. Class names stay unquoted so the quote patterns never pair a quote in the log with markup.
+const HIGHLIGHT_MARKUP = /(<span class=[\w-]+>|<\/span>)/;
+
+const escapeHtml = (text: string): string => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const unescapeHtml = (text: string): string => text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+const applyBasicHighlighting = (logLine: string, format: string | null): string => {
+  const text = escapeHtml(logLine);
   if (!format) return text;
 
   switch (format) {
@@ -219,17 +228,17 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
       return (
         text
           // Highlight JSON braces and brackets
-          .replace(/([{}[\]])/g, '<span class="json-brace">$1</span>')
+          .replace(/([{}[\]])/g, "<span class=json-brace>$1</span>")
           // Highlight keys
-          .replace(/"([^"]+)"(\s*:)/g, '<span class="json-key">"$1"</span>$2')
+          .replace(/"([^"]+)"(\s*:)/g, '<span class=json-key>"$1"</span>$2')
           // Highlight string values
-          .replace(/:\s*"([^"]*)"/g, ': <span class="json-string">"$1"</span>')
+          .replace(/:\s*"([^"]*)"/g, ': <span class=json-string>"$1"</span>')
           // Highlight numbers
-          .replace(/:\s*(\d+(?:\.\d+)?)/g, ': <span class="json-number">$1</span>')
+          .replace(/:\s*(\d+(?:\.\d+)?)/g, ": <span class=json-number>$1</span>")
           // Highlight booleans
-          .replace(/:\s*(true|false)/g, ': <span class="json-boolean">$1</span>')
+          .replace(/:\s*(true|false)/g, ": <span class=json-boolean>$1</span>")
           // Highlight null
-          .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>')
+          .replace(/:\s*(null)/g, ": <span class=json-null>$1</span>")
       );
 
     case "log":
@@ -237,24 +246,24 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
       return (
         text
           // Highlight log levels with stronger emphasis
-          .replace(/\b(ERROR|FATAL|CRITICAL)\b/gi, '<span class="log-error">$1</span>')
-          .replace(/\b(WARN|WARNING)\b/gi, '<span class="log-warning">$1</span>')
-          .replace(/\b(INFO|INFORMATION)\b/gi, '<span class="log-info">$1</span>')
-          .replace(/\b(DEBUG|TRACE|VERBOSE)\b/gi, '<span class="log-debug">$1</span>')
+          .replace(/\b(ERROR|FATAL|CRITICAL)\b/gi, "<span class=log-error>$1</span>")
+          .replace(/\b(WARN|WARNING)\b/gi, "<span class=log-warning>$1</span>")
+          .replace(/\b(INFO|INFORMATION)\b/gi, "<span class=log-info>$1</span>")
+          .replace(/\b(DEBUG|TRACE|VERBOSE)\b/gi, "<span class=log-debug>$1</span>")
           // Highlight timestamps
           .replace(
             /\d{4}-\d{2}-\d{2}[\sT]\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)?/g,
-            '<span class="log-timestamp">$&</span>'
+            "<span class=log-timestamp>$&</span>"
           )
           // Highlight IP addresses
-          .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, '<span class="log-ip">$&</span>')
+          .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, "<span class=log-ip>$&</span>")
           // Highlight HTTP status codes
           .replace(
             /\b(200|201|204|301|302|304|400|401|403|404|405|500|502|503|504)\b/g,
-            '<span class="log-status">$1</span>'
+            "<span class=log-status>$1</span>"
           )
           // Highlight HTTP methods
-          .replace(/\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\b/g, '<span class="log-method">$1</span>')
+          .replace(/\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\b/g, "<span class=log-method>$1</span>")
       );
 
     case "sql":
@@ -263,63 +272,63 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
           // Highlight SQL keywords
           .replace(
             /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|FROM|WHERE|JOIN|INNER|LEFT|RIGHT|OUTER|GROUP BY|ORDER BY|LIMIT|HAVING|DISTINCT|AS|ON|IN|EXISTS|BETWEEN|LIKE|AND|OR|NOT|IS|NULL)\b/gi,
-            '<span class="sql-keyword">$1</span>'
+            "<span class=sql-keyword>$1</span>"
           )
           // Highlight table names (simple heuristic)
-          .replace(/\bFROM\s+(\w+)/gi, 'FROM <span class="sql-table">$1</span>')
-          .replace(/\bJOIN\s+(\w+)/gi, 'JOIN <span class="sql-table">$1</span>')
+          .replace(/\bFROM\s+(\w+)/gi, "FROM <span class=sql-table>$1</span>")
+          .replace(/\bJOIN\s+(\w+)/gi, "JOIN <span class=sql-table>$1</span>")
           // Highlight functions
           .replace(
             /\b(COUNT|SUM|AVG|MAX|MIN|NOW|CONCAT|SUBSTRING|LENGTH)\s*\(/gi,
-            '<span class="sql-function">$1</span>('
+            "<span class=sql-function>$1</span>("
           )
           // Highlight strings
-          .replace(/'([^']*)'/g, "<span class=\"sql-string\">'$1'</span>")
+          .replace(/'([^']*)'/g, "<span class=sql-string>'$1'</span>")
           // Highlight comments
-          .replace(/--(.*)$/gm, '<span class="sql-comment">--$1</span>')
+          .replace(/--(.*)$/gm, "<span class=sql-comment>--$1</span>")
       );
 
     case "xml":
       return (
         text
-          // Highlight XML brackets
-          .replace(/([<>])/g, '<span class="xml-bracket">$1</span>')
-          // Highlight tag names
-          .replace(/<(\/?[^>\s]+)/g, '<span class="xml-bracket">&lt;</span><span class="xml-tag">$1</span>')
-          // Highlight attributes
-          .replace(/(\w+)=/g, '<span class="xml-attr">$1</span>=')
+          // Highlight attributes, before any markup containing "=" is added
+          .replace(/(\w+)=/g, "<span class=xml-attr>$1</span>=")
           // Highlight attribute values
-          .replace(/="([^"]*)"/g, '=<span class="xml-value">"$1"</span>')
+          .replace(/="([^"]*)"/g, '=<span class=xml-value>"$1"</span>')
+          // Highlight opening brackets and tag names
+          .replace(/&lt;(\/?[^\s&<]+)/g, "<span class=xml-bracket>&lt;</span><span class=xml-tag>$1</span>")
+          // Highlight closing brackets
+          .replace(/&gt;/g, "<span class=xml-bracket>&gt;</span>")
       );
 
     case "stacktrace":
       return (
         text
           // Highlight exception names
-          .replace(/\b(\w*Exception|\w*Error):/g, '<span class="stack-exception">$1</span>:')
+          .replace(/\b(\w*Exception|\w*Error):/g, "<span class=stack-exception>$1</span>:")
           // Highlight 'at' keyword
-          .replace(/\bat\s+/g, '<span class="stack-at">at </span>')
+          .replace(/\bat\s+/g, "<span class=stack-at>at </span>")
           // Highlight method names
-          .replace(/at\s+([^(]+)\(/g, 'at <span class="stack-method">$1</span>(')
+          .replace(/at\s+([^(]+)\(/g, "at <span class=stack-method>$1</span>(")
           // Highlight file names and line numbers
-          .replace(/\(([^:]+):(\d+)\)/g, '(<span class="stack-file">$1</span>:<span class="stack-line">$2</span>)')
+          .replace(/\(([^:]+):(\d+)\)/g, "(<span class=stack-file>$1</span>:<span class=stack-line>$2</span>)")
           // Highlight file paths
-          .replace(/File\s+"([^"]+)"/g, 'File <span class="stack-file">"$1"</span>')
+          .replace(/File\s+"([^"]+)"/g, 'File <span class=stack-file>"$1"</span>')
       );
 
     case "http":
       return (
         text
           // Highlight HTTP methods
-          .replace(/\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\b/g, '<span class="http-method">$1</span>')
+          .replace(/\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\b/g, "<span class=http-method>$1</span>")
           // Highlight paths
-          .replace(/(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+([^\s]+)/g, '$1 <span class="http-path">$2</span>')
+          .replace(/(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+([^\s]+)/g, "$1 <span class=http-path>$2</span>")
           // Highlight HTTP protocol
-          .replace(/\bHTTP\/[\d.]+\b/g, '<span class="http-protocol">$&</span>')
+          .replace(/\bHTTP\/[\d.]+\b/g, "<span class=http-protocol>$&</span>")
           // Highlight status codes
           .replace(
             /\b(200|201|204|301|302|304|400|401|403|404|405|500|502|503|504)\b/g,
-            '<span class="http-status">$1</span>'
+            "<span class=http-status>$1</span>"
           )
       );
 
@@ -329,17 +338,14 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
           // Highlight timestamps first (this fixes the issue where logs are detected as YAML)
           .replace(
             /\d{4}-\d{2}-\d{2}[\sT]\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)?/g,
-            '<span class="log-timestamp">$&</span>'
+            "<span class=log-timestamp>$&</span>"
           )
           // Highlight YAML keys
-          .replace(
-            /^(\s*)([^:\s]+)(\s*:)/gm,
-            '$1<span class="yaml-key">$2</span><span class="yaml-separator">$3</span>'
-          )
+          .replace(/^(\s*)([^:\s]+)(\s*:)/gm, "$1<span class=yaml-key>$2</span><span class=yaml-separator>$3</span>")
           // Highlight list items
-          .replace(/^(\s*)(-)(\s)/gm, '$1<span class="yaml-dash">$2</span>$3')
+          .replace(/^(\s*)(-)(\s)/gm, "$1<span class=yaml-dash>$2</span>$3")
           // Highlight document separators
-          .replace(/^(---|\.\.\.)/gm, '<span class="yaml-separator">$1</span>')
+          .replace(/^(---|\.\.\.)/gm, "<span class=yaml-separator>$1</span>")
       );
 
     case "dockerfile":
@@ -348,23 +354,43 @@ const applyBasicHighlighting = (text: string, format: string | null): string => 
           // Highlight Docker keywords
           .replace(
             /\b(FROM|RUN|COPY|ADD|WORKDIR|CMD|ENTRYPOINT|ENV|ARG|EXPOSE|VOLUME|USER|LABEL)\b/gi,
-            '<span class="log-method">$1</span>'
+            "<span class=log-method>$1</span>"
           )
           // Highlight common patterns as basic log format
-          .replace(/\b(ERROR|FATAL|CRITICAL)\b/gi, '<span class="log-error">$1</span>')
-          .replace(/\b(WARN|WARNING)\b/gi, '<span class="log-warning">$1</span>')
-          .replace(/\b(INFO|INFORMATION)\b/gi, '<span class="log-info">$1</span>')
-          .replace(/\b(DEBUG|TRACE|VERBOSE)\b/gi, '<span class="log-debug">$1</span>')
+          .replace(/\b(ERROR|FATAL|CRITICAL)\b/gi, "<span class=log-error>$1</span>")
+          .replace(/\b(WARN|WARNING)\b/gi, "<span class=log-warning>$1</span>")
+          .replace(/\b(INFO|INFORMATION)\b/gi, "<span class=log-info>$1</span>")
+          .replace(/\b(DEBUG|TRACE|VERBOSE)\b/gi, "<span class=log-debug>$1</span>")
           // Highlight timestamps
           .replace(
             /\d{4}-\d{2}-\d{2}[\sT]\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)?/g,
-            '<span class="log-timestamp">$&</span>'
+            "<span class=log-timestamp>$&</span>"
           )
       );
 
     default:
       return text;
   }
+};
+
+// Rebuilds the highlight spans as React elements, so the log text only ever renders as text.
+const toReactNodes = (parts: string[], isNested = false): React.ReactNode[] => {
+  const nodes: React.ReactNode[] = [];
+  while (parts.length > 0) {
+    const part = parts.shift() ?? "";
+    if (part === "</span>") {
+      if (isNested) break;
+    } else if (part.startsWith("<span class=")) {
+      nodes.push(
+        <span key={nodes.length} className={part.slice("<span class=".length, -1)}>
+          {toReactNodes(parts, true)}
+        </span>
+      );
+    } else if (part) {
+      nodes.push(unescapeHtml(part));
+    }
+  }
+  return nodes;
 };
 
 const SyntaxHighlightedLog: React.FC<SyntaxHighlightedLogProps> = ({ logLine, enableSyntaxHighlighting = true }) => {
@@ -381,8 +407,8 @@ const SyntaxHighlightedLog: React.FC<SyntaxHighlightedLogProps> = ({ logLine, en
 
   // Apply highlighting if we detected a format
   if (detectedFormat) {
-    const highlightedText = applyBasicHighlighting(logLine, detectedFormat);
-    return <HighlightedLogContent logType={detectedFormat} dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+    const highlightedParts = applyBasicHighlighting(logLine, detectedFormat).split(HIGHLIGHT_MARKUP);
+    return <HighlightedLogContent logType={detectedFormat}>{toReactNodes(highlightedParts)}</HighlightedLogContent>;
   }
 
   // For regular logs with ANSI colors but no structured format - use consistent wrapper

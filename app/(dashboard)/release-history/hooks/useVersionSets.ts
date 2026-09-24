@@ -1,12 +1,12 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import axios from "axios";
 
-import { TierVersionSet } from "src/types/tier-version-set";
+import { ReleaseSummary } from "src/types/tier-version-set";
 
-async function fetchVersionSets(params: { serviceId?: string; productTierId?: string }): Promise<TierVersionSet[]> {
+async function fetchVersionSets(params: { serviceId?: string; productTierId?: string }): Promise<ReleaseSummary[]> {
   const { serviceId, productTierId } = params;
 
-  const response = await axios.get<TierVersionSet[]>("/api/version-sets", {
+  const response = await axios.get<ReleaseSummary[]>("/api/version-sets", {
     params: { serviceId, productTierId },
   });
 
@@ -15,7 +15,7 @@ async function fetchVersionSets(params: { serviceId?: string; productTierId?: st
 
 const useVersionSets = (
   queryParams: { serviceId?: string; productTierId?: string },
-  queryOptions: Omit<UseQueryOptions<TierVersionSet[]>, "queryKey" | "queryFn"> = {}
+  queryOptions: Omit<UseQueryOptions<ReleaseSummary[]>, "queryKey" | "queryFn"> = {}
 ) => {
   const { serviceId, productTierId } = queryParams;
 

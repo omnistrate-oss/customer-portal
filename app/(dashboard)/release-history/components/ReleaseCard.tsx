@@ -2,13 +2,13 @@ import { FC } from "react";
 
 import { Text } from "components/Typography/Typography";
 import Chip from "src/components/Chip/Chip";
-import { TierVersionSet } from "src/types/tier-version-set";
+import { ReleaseSummary } from "src/types/tier-version-set";
 import formatDateUTC from "src/utils/formatDateUTC";
 
 import ReleaseNotesCard from "./ReleaseNotesCard";
 
 type ReleaseCardProps = {
-  release: TierVersionSet;
+  release: ReleaseSummary;
 };
 
 const ReleaseCard: FC<ReleaseCardProps> = ({ release }) => {

@@ -254,8 +254,19 @@ We welcome contributions from the community! Here's how you can help:
 
 - Fork the Repository: Start by forking the project's repository.
 - Make Your Changes: Whether it's fixing a bug or adding a feature, make your changes in a separate branch.
-- Adhere to Coding Standards: Ensure your code matches the project's style and best practices.
-- Submit a Pull Request: Open a pull request with a clear description of your changes and any relevant issue numbers.
+- Adhere to Coding Standards: Read `AGENTS.md` first. It covers the project conventions, where code goes, and the guides in `.agents/skills/` for features, UI, icons, data fetching, forms and Playwright tests. Coding agents such as Codex load it automatically.
+- Run the checks before you push:
+
+  ```bash
+  yarn lint                                   # includes the project guardrail rules
+  yarn typecheck
+  yarn check:guardrails --base origin/master  # guidance paths, lint allowlists only shrink, Prettier on changed files
+  yarn check:playwright-discovery             # every Playwright spec runs in the configured project
+  yarn build
+  ```
+
+  Files that predate a lint rule are listed in `eslint.migration-allowlists.cjs`. Those lists only shrink: when you fix a file, remove its entry, and never add one.
+- Submit a Pull Request: Open a pull request with a clear description of your changes and any relevant issue numbers. Include before/after screenshots for UI changes, and keep each pull request to one concern.
 
 ## Support and Contact
 

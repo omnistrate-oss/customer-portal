@@ -40,3 +40,7 @@ package-lock.json
 **/*.yaml
 
 yarn.lock
+
+# Markdown isn't auto-formatted. .github/copilot-instructions.md also carries an
+# org-managed security block that must stay byte-for-byte.
+**/*.md

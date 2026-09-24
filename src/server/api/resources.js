@@ -30,7 +30,7 @@ function getResources(params = {}) {
 
   return axios
     .get(
-      `/service/${serviceId}/producttier/${productTierId}/resource`,
+      `/service/${encodeURIComponent(serviceId)}/producttier/${encodeURIComponent(productTierId)}/resource`,
       productTierVersion
         ? {
             params: {
