@@ -271,6 +271,22 @@ const ShellCommandBlock = ({ command, dataTestId }) => (
   </Box>
 );
 
+/** Failed-state guidance for accounts whose provider IDs never reached the instance's result params. */
+const FailedAccountConfigInstructions = () => (
+  <Box width="100%">
+    <AccountConfigurationStatus status="FAILED" />
+
+    <List>
+      <ListItem>
+        <Box display={"flex"} flexDirection={"column"} gap={"10px"}>
+          <BodyText>You may delete this failed configuration and retry adding it.</BodyText>
+          <BodyText>If the issue persists, please contact Support for assistance.</BodyText>
+        </Box>
+      </ListItem>
+    </List>
+  </Box>
+);
+
 const CreationTimeInstructions = (props) => {
   const {
     accountConfigStatus,
@@ -572,12 +588,16 @@ const NonCreationTimeInstructions = (props) => {
     isAwsReconfiguration,
   } = props;
 
+  const status = String(selectedAccountConfig?.status ?? "").toUpperCase();
+
   if (
     !accountInstructionDetails?.awsAccountID &&
     !accountInstructionDetails?.gcpProjectID &&
     !accountInstructionDetails?.azureSubscriptionID &&
     !accountInstructionDetails?.ociTenancyID
   ) {
+    if (status === "FAILED") return <FailedAccountConfigInstructions />;
+
     return (
       <BodyText>
         Your account details are being configured. Please check back shortly for detailed setup instructions.
@@ -594,7 +614,6 @@ const NonCreationTimeInstructions = (props) => {
     );
   }
 
-  const status = String(selectedAccountConfig?.status ?? "").toUpperCase();
   const isReady = status === "READY";
 
   return (

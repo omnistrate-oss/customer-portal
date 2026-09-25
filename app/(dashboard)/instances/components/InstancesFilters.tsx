@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import DataGridFilter from "src/components/DataGridFilter/DataGridFilter";
 import { FilterConfig, KeyConfig } from "src/components/DataGridFilter/types";
-import { deriveOptionsFromData } from "src/components/DataGridFilter/utils";
+import { deriveOptionsFromData, getTagFilterKeys, matchesTagFilter } from "src/components/DataGridFilter/utils";
 import { getInstanceHealthStatus } from "src/components/InstanceHealthStatusChip/InstanceHealthStatusChip";
 import { cloudProviderLabelsShort } from "src/constants/cloudProviders";
 import { instaceHealthStatusMap } from "src/constants/statusChipStyles/resourceInstanceHealthStatus";
@@ -23,27 +23,10 @@ type InstancesFiltersProps = {
 const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilteredInstances }) => {
   const { serviceOfferingsObj, subscriptionsObj } = useGlobalData();
 
-  const customTagKeys = useMemo<KeyConfig[]>(() => {
-    const customTagsMap = new Map<string, Set<string>>();
-
-    instances?.forEach((instance) => {
-      const customTags = instance?.customTags;
-      customTags?.forEach((tag) => {
-        if (tag?.key && tag?.value) {
-          if (!customTagsMap.has(tag.key)) {
-            customTagsMap.set(tag.key, new Set());
-          }
-          customTagsMap.get(tag.key)?.add(tag.value);
-        }
-      });
-    });
-
-    return Array.from(customTagsMap.entries()).map(([key, values]) => ({
-      key,
-      label: key,
-      possibleValues: Array.from(values).map((value) => ({ label: value, value })),
-    }));
-  }, [instances]);
+  const customTagKeys = useMemo<KeyConfig[]>(
+    () => getTagFilterKeys(instances?.map((instance) => instance?.customTags) ?? []),
+    [instances]
+  );
 
   const filterConfig: FilterConfig<ResourceInstance> = useMemo(
     () => ({
@@ -148,22 +131,7 @@ const InstancesFilters: React.FC<InstancesFiltersProps> = ({ instances, setFilte
         leftMenuLabel: "Tags",
         filterType: "key-value",
         keys: customTagKeys,
-        customFilter: (item, selectedValues) => {
-          if (selectedValues.length === 0) return true;
-
-          const instanceTags = item.customTags;
-          if (!instanceTags?.length) return false;
-
-          return selectedValues.some((kv) => {
-            const separatorIndex = kv.indexOf(":");
-            if (separatorIndex === -1) return false;
-
-            const key = kv.slice(0, separatorIndex);
-            const value = kv.slice(separatorIndex + 1);
-
-            return instanceTags.some((tag) => tag?.key === key && tag?.value === value);
-          });
-        },
+        customFilter: (item, selectedValues) => matchesTagFilter(item.customTags, selectedValues),
       },
       "lifecycle-status": {
         leftMenuLabel: "Lifecycle Status",

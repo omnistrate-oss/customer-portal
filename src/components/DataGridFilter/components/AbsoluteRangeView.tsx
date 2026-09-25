@@ -5,6 +5,7 @@ import { addMonths, format, subMonths } from "date-fns";
 import { FormikErrors, FormikTouched } from "formik";
 import { DateRange as ReactDateRange, Range } from "react-date-range";
 
+import Button from "src/components/Button/Button";
 import FieldError from "src/components/FormElementsv2/FieldError/FieldError";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import { Text } from "src/components/Typography/Typography";
@@ -68,6 +69,7 @@ type AbsoluteRangeViewProps = {
   startTime: string;
   endTime: string;
   onDateChange: (startDate?: Date, endDate?: Date) => void;
+  onClear: () => void;
   handleTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleTimeBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
   touched: FormikTouched<TimeFormValues>;
@@ -80,6 +82,7 @@ const AbsoluteRangeView: React.FC<AbsoluteRangeViewProps> = ({
   startTime,
   endTime,
   onDateChange,
+  onClear,
   handleTimeChange,
   handleTimeBlur,
   touched,
@@ -116,6 +119,17 @@ const AbsoluteRangeView: React.FC<AbsoluteRangeViewProps> = ({
         />
       </Box>
       <Box borderTop="2px solid #E9EAEB" pt="12px" mt="12px">
+        <Stack direction="row" justifyContent="flex-end">
+          <Button
+            variant="text"
+            fontColor="#6941C6"
+            onClick={onClear}
+            disabled={!selectedStartDate && !selectedEndDate}
+            data-testid="clear-absolute-date-range"
+          >
+            Clear
+          </Button>
+        </Stack>
         <Stack direction={"row"} gap="12px" alignItems="center">
           <Box flex={1}>
             <Text size="small" color="#535862">
