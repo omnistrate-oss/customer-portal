@@ -5,9 +5,11 @@ import { getLocalStartOfDayfromISODateString } from "src/components/DateRangePic
 import { formatDateMMM_DD_YYYY } from "src/utils/date-utils";
 
 import { relativeRangeOptions } from "./components/RelativeRangeView";
-import { AppliedFilters, DateRangeType, FilterConfig, FilterOption, PropertyAccessor } from "./types";
+import { AppliedFilters, DateRangeType, FilterConfig, FilterOption, KeyConfig, PropertyAccessor } from "./types";
 
 dayjs.extend(utc);
+
+const BLANKS_LABEL = "(Blanks)";
 
 export const getNestedValue = <T>(obj: T, path: string): unknown =>
   path.split(".").reduce((current: unknown, key: string) => {
@@ -153,9 +155,64 @@ export const deriveOptionsFromData = <T>(
     .sort()
     .map((value) => ({
       value,
-      label: value === "" ? "(Blanks)" : labelFormatter ? labelFormatter(value) : value,
+      label: value === "" ? BLANKS_LABEL : labelFormatter ? labelFormatter(value) : value,
     }));
 };
+
+type FilterTag = { key?: string; value?: string } | null | undefined;
+
+/**
+ * Builds Tags filter keys from each row's tags, keeping tags whose value is blank.
+ *
+ * Example: [[{ key: "env", value: "dev" }, { key: "team", value: "" }]]
+ * -> [{ key: "env", label: "env", possibleValues: [{ label: "dev", value: "dev" }] },
+ *     { key: "team", label: "team", possibleValues: [{ label: "(Blanks)", value: "" }] }]
+ */
+export const getTagFilterKeys = (tagLists: (FilterTag[] | null | undefined)[]): KeyConfig[] => {
+  const tagsMap = new Map<string, Set<string>>();
+
+  tagLists.forEach((tags) =>
+    tags?.forEach((tag) => {
+      if (!tag?.key) return;
+      if (!tagsMap.has(tag.key)) tagsMap.set(tag.key, new Set());
+      tagsMap.get(tag.key)?.add(tag.value ?? "");
+    })
+  );
+
+  return Array.from(tagsMap, ([key, values]) => ({
+    key,
+    label: key,
+    possibleValues: Array.from(values, (value) => ({ label: value || BLANKS_LABEL, value })),
+  }));
+};
+
+/**
+ * True when a row's tags match any selected "key:value" pair. A missing tag value matches a blank selection.
+ *
+ * Example: matchesTagFilter([{ key: "team" }], ["team:"]) -> true
+ */
+export const matchesTagFilter = (tags: FilterTag[] | null | undefined, selectedValues: string[]): boolean => {
+  if (selectedValues.length === 0) return true;
+  if (!tags?.length) return false;
+
+  return selectedValues.some((kv) => {
+    const separatorIndex = kv.indexOf(":");
+    if (separatorIndex === -1) return false;
+
+    const key = kv.slice(0, separatorIndex);
+    const value = kv.slice(separatorIndex + 1);
+
+    return tags.some((tag) => tag?.key === key && (tag.value ?? "") === value);
+  });
+};
+
+/**
+ * Chip label for a selected "key:value" pair, naming blank values explicitly.
+ *
+ * Example: formatKeyValueChipLabel("team:") -> "team:(Blanks)"
+ */
+export const formatKeyValueChipLabel = (keyValue: string): string =>
+  keyValue.length > 0 && keyValue.indexOf(":") === keyValue.length - 1 ? `${keyValue}${BLANKS_LABEL}` : keyValue;
 
 export const parseDateRangeValues = (values: string[]) => {
   if (values.length === 0) {

@@ -7,7 +7,6 @@ import { Text } from "components/Typography/Typography";
 import AwsCloudFormationInstructions from "src/components/AwsCloudFormationInstructions/AwsCloudFormationInstructions";
 import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
-import { hasAwsCloudFormationCliCommands } from "src/utils/accountConfig/awsCloudFormation";
 
 const StyledLink = styled(Link)({
   color: "#7F56D9",
@@ -152,11 +151,9 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
       <List>
         {offboardingInstructionDetails?.awsAccountID && (
           <ListItem>
-            {!hasAwsCloudFormationCliCommands(offboardingInstructionDetails?.awsCloudFormationUrl) && (
-              <ListItemIcon>
-                <ArrowBullet />
-              </ListItemIcon>
-            )}
+            <ListItemIcon>
+              <ArrowBullet />
+            </ListItemIcon>
 
             <Box overflow="hidden" flex={1}>
               <AwsCloudFormationInstructions
