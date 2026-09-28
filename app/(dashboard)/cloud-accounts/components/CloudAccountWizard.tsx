@@ -220,10 +220,9 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       byoaServiceOfferings,
       allInstances
     ),
-    // Global instance data is refreshed after creation. Reinitializing at that point can
-    // clear the selected plan/subscription because the subscription is no longer eligible
-    // for another account, even though the rest of this wizard still needs those values.
-    enableReinitialize: currentStep === 0,
+    // Stop reinitializing as soon as creation starts. The instance cache is updated before
+    // the wizard advances, and that render can otherwise clear the now-consumed subscription.
+    enableReinitialize: currentStep === 0 && createCloudAccountMutation.isIdle,
     validationSchema: CloudAccountValidationSchema,
     onSubmit: (values) => {
       const { serviceId, servicePlanId } = values;
