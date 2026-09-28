@@ -9,20 +9,21 @@
  *   - every repo path quoted in backticks in the guidance files exists
  *   - every file on an ESLint allowlist exists
  * Diff (CI passes --base on pull requests):
- *   - allowlists only shrink (renames, including .jsx -> .tsx, carry their entry over)
- *   - no new eslint-disable comments for guarded rules
+ *   - allowlists only shrink and keep their keys (renames, including .jsx -> .tsx, carry their entry over)
+ *   - no new eslint-disable or inline eslint config comments for guarded rules
  *   - no new files in the legacy src/components/Icons/
  *   - changed files are Prettier-formatted
  *   - new Playwright specs opt into strict HAR replay (when CONFIG.strictReplay is set)
  *   - no agent or IDE artifacts
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { parseArgs } from "node:util";
 
-// Repo-specific settings. Everything below this block is shared with the customer-portal copy.
+// Repo-specific settings. This script is identical in another repository except for CONFIG; keep the copies in sync.
 const CONFIG = {
   allowlistFile: "eslint.migration-allowlists.cjs",
   guidance: [
@@ -54,12 +55,19 @@ process.chdir(REPO_ROOT);
 
 const CODE_FILE = /\.(c|m)?(j|t)sx?$/;
 const DISABLE_DIRECTIVE = /eslint-disable(?:-next-line|-line)?(?=\s|\*|$)(.*)$/;
+const INLINE_CONFIG = /\/\*\s*eslint(\s[\s\S]*?)\*\//g;
+const DISABLE_BLOCK = /\/\*\s*eslint-disable(?:-next-line|-line)?(\s[\s\S]*?)\*\//g;
 const PATH_EXTENSIONS = ["", ".ts", ".tsx", ".js", ".jsx", ".mjs", "/index.ts", "/index.tsx", "/index.js"];
 
 const failures = [];
 const fail = (message) => failures.push(message);
 const git = (...args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+// Pinned so the user's diff.external, color and prefix settings can't change the output parsed below.
+const gitDiff = (...args) =>
+  git("diff", "--no-ext-diff", "--no-color", "--src-prefix=a/", "--dst-prefix=b/", "-M", ...args);
 const withoutExtension = (file) => file.replace(/\.(c|m)?(j|t)sx?$/, "");
+// ESLint accepts quoted rule names in directives: ` "no-console" ` -> no-console.
+const ruleName = (text) => text.trim().replace(/^(["']?)(.*)\1$/s, "$2");
 
 /** Flattens the allowlist module into { listName: files[] }, e.g. { axiosAllowlist: [], "guard/no-hex-colors": [...] }. */
 const flattenAllowlists = (module) =>
@@ -68,12 +76,41 @@ const flattenAllowlists = (module) =>
       Array.isArray(value) ? [[name, value]] : Object.entries(value)
     )
   );
+const guardrailsOf = (module) => (module.default ?? module).guardrailAllowlists;
 
 const importAllowlists = async (source) => {
-  const file = join(mkdtempSync(join(tmpdir(), "guardrails-")), CONFIG.allowlistFile);
-  writeFileSync(file, source);
-  return flattenAllowlists(await import(pathToFileURL(file).href));
+  const dir = mkdtempSync(join(tmpdir(), "guardrails-"));
+  try {
+    const file = join(dir, CONFIG.allowlistFile);
+    writeFileSync(file, source);
+    return await import(pathToFileURL(file).href);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 };
+
+/** Rules set by inline config comments, e.g. `eslint no-console: "off", curly: 2` -> ["no-console", "curly"]. */
+const inlineConfigRules = (source) =>
+  [...source.matchAll(INLINE_CONFIG)].flatMap(([, body]) =>
+    [...body.split(/\s-{2,}\s/)[0].matchAll(/([\w@/.-]+)["']?\s*:/g)].map(([, rule]) => rule)
+  );
+
+/** Rules named by eslint-disable block comments that span lines (single-line ones are checked on added lines). */
+const multiLineDisabledRules = (source) =>
+  [...source.matchAll(DISABLE_BLOCK)]
+    .filter(([comment]) => comment.includes("\n"))
+    .flatMap(([, body]) => body.split(/\s-{2,}\s/)[0].split(","))
+    .map(ruleName)
+    .filter(Boolean);
+
+let baseRef;
+try {
+  baseRef = parseArgs({ options: { base: { type: "string" } } }).values.base;
+  if (baseRef === "") throw new Error("Option '--base <value>' argument missing");
+} catch (error) {
+  console.error(`✗ ${error.message}`);
+  process.exit(1);
+}
 
 const markdownFiles = CONFIG.guidance
   .filter((entry) => existsSync(entry))
@@ -102,7 +139,8 @@ for (const file of markdownFiles) {
   }
 }
 
-const allowlists = flattenAllowlists(await import(pathToFileURL(join(REPO_ROOT, CONFIG.allowlistFile)).href));
+const allowlistModule = await import(pathToFileURL(join(REPO_ROOT, CONFIG.allowlistFile)).href);
+const allowlists = flattenAllowlists(allowlistModule);
 for (const [list, files] of Object.entries(allowlists)) {
   for (const file of files) {
     if (!existsSync(file)) {
@@ -111,10 +149,9 @@ for (const [list, files] of Object.entries(allowlists)) {
   }
 }
 
-const baseIndex = process.argv.indexOf("--base");
-if (baseIndex !== -1) {
-  const base = git("merge-base", process.argv[baseIndex + 1], "HEAD").trim();
-  const changes = git("diff", "--name-status", "-M", base)
+if (baseRef !== undefined) {
+  const base = git("merge-base", baseRef, "HEAD").trim();
+  const changes = gitDiff("--name-status", base)
     .split("\n")
     .filter(Boolean)
     .map((line) => {
@@ -126,23 +163,39 @@ if (baseIndex !== -1) {
   const baseSource = git("ls-tree", "--name-only", base, CONFIG.allowlistFile).trim()
     ? git("show", `${base}:${CONFIG.allowlistFile}`)
     : "";
-  const baseAllowlists = baseSource ? await importAllowlists(baseSource) : {};
+  const baseModule = baseSource ? await importAllowlists(baseSource) : {};
+  const baseAllowlists = flattenAllowlists(baseModule);
+  const baseGuardrails = guardrailsOf(baseModule);
+  const headGuardrails = guardrailsOf(allowlistModule) ?? {};
+  for (const list of Object.keys(baseGuardrails ?? {})) {
+    if (!Object.hasOwn(headGuardrails, list)) {
+      fail(`${CONFIG.allowlistFile}: ${list} was removed. Keep the key with an empty array so the rule stays guarded.`);
+    }
+  }
   for (const [list, files] of Object.entries(allowlists)) {
-    // A guardrail introduced in this diff starts from today's debt.
-    if (!baseAllowlists[list]) continue;
-    const before = new Set(baseAllowlists[list].map(withoutExtension));
+    // A list the base lacks starts empty, unless the base predates guardrailAllowlists.
+    const before = baseAllowlists[list] ?? (baseGuardrails ? [] : undefined);
+    if (!before) continue;
     for (const file of files) {
       const origin = renamedFrom.get(file) ?? file;
-      if (!before.has(withoutExtension(origin))) {
+      // A rename git didn't pair (.jsx -> .tsx) keeps its entry; a new sibling of a listed file doesn't.
+      const renamed = before.some(
+        (entry) => withoutExtension(entry) === withoutExtension(origin) && !existsSync(entry)
+      );
+      if (!before.includes(origin) && !renamed) {
         fail(`${CONFIG.allowlistFile}: ${file} was added to ${list}. Allowlists only shrink: fix the file instead.`);
       }
     }
   }
 
-  const guardedRules = new Set([...Object.keys(allowlists), ...CONFIG.guardedCoreRules]);
+  const guardedRules = new Set([
+    ...Object.keys(baseAllowlists),
+    ...Object.keys(allowlists),
+    ...CONFIG.guardedCoreRules,
+  ]);
   const isGuarded = (rule) => rule.startsWith("guard/") || guardedRules.has(rule);
   let currentFile = "";
-  for (const line of git("diff", "-U0", base).split("\n")) {
+  for (const line of gitDiff("-U0", base).split("\n")) {
     if (line.startsWith("+++ ")) currentFile = line.replace(/^\+\+\+ (b\/)?/, "");
     if (!line.startsWith("+") || line.startsWith("+++") || !CODE_FILE.test(currentFile)) continue;
     if (currentFile === "scripts/check-guardrails.mjs") continue;
@@ -151,10 +204,32 @@ if (baseIndex !== -1) {
     const rules = directive[1]
       .split(/--|\*\//)[0]
       .split(",")
-      .map((rule) => rule.trim())
+      .map(ruleName)
       .filter(Boolean);
     if (rules.length === 0 || rules.some(isGuarded)) {
       fail(`${currentFile}: "${line.slice(1).trim()}" disables a guardrail. Fix the code instead.`);
+    }
+  }
+
+  // Whole files, not added lines: a block comment can span lines or gain a rule on an unchanged line.
+  const blockDirectives = (source) => [
+    ...inlineConfigRules(source)
+      .filter(isGuarded)
+      .map((rule) => `an inline eslint config comment sets ${rule}`),
+    ...multiLineDisabledRules(source)
+      .filter(isGuarded)
+      .map((rule) => `a multi-line eslint-disable comment disables ${rule}`),
+  ];
+  const count = (items, item) => items.filter((other) => other === item).length;
+  const present = changes.filter(({ status, path }) => status !== "D" && existsSync(path) && statSync(path).isFile());
+  for (const { status, from, path } of present) {
+    if (!CODE_FILE.test(path) || path === "scripts/check-guardrails.mjs") continue;
+    const now = blockDirectives(readFileSync(path, "utf8"));
+    const before = now.length > 0 && status !== "A" ? blockDirectives(git("show", `${base}:${from}`)) : [];
+    for (const directive of new Set(now)) {
+      if (count(now, directive) > count(before, directive)) {
+        fail(`${path}: ${directive}, which is a guardrail. Fix the code instead.`);
+      }
     }
   }
 
@@ -178,9 +253,7 @@ if (baseIndex !== -1) {
     }
   }
 
-  const formattable = changes
-    .filter(({ status, path }) => status !== "D" && existsSync(path) && statSync(path).isFile())
-    .map(({ path }) => path);
+  const formattable = present.map(({ path }) => path);
   if (formattable.length > 0) {
     try {
       execFileSync("yarn", ["prettier", "--check", "--ignore-unknown", ...formattable], { stdio: "inherit" });

@@ -16,13 +16,35 @@ process.chdir(REPO_ROOT);
 // Specs or configs that are deliberately outside playwright.config.ts. Keep this empty.
 const EXCEPTIONS = new Set([]);
 
-const report = JSON.parse(
-  execFileSync("yarn", ["playwright", "test", "--list", "--reporter=json"], {
-    encoding: "utf8",
-    maxBuffer: 64 * 1024 * 1024,
-  })
-);
-for (const error of report.errors ?? []) console.error(error.message);
+const brief = ({ location, message = "" }) =>
+  `✗ ${location ? `${relative(REPO_ROOT, location.file)}:${location.line}: ` : ""}${message.trim().split("\n")[0]}`;
+
+let report;
+try {
+  report = JSON.parse(
+    execFileSync("yarn", ["playwright", "test", "--list", "--reporter=json"], {
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+      // Set explicitly so execFileSync doesn't echo stderr; failures are summarized below.
+      stdio: "pipe",
+    })
+  );
+} catch (error) {
+  // A spec that throws at import exits non-zero, but the JSON report on stdout still lists the errors.
+  let errors = [];
+  try {
+    errors = JSON.parse(error.stdout).errors ?? [];
+  } catch {
+    // Not a report: fall back to stderr.
+  }
+  for (const line of new Set(errors.map(brief))) console.error(line);
+  if (errors.length === 0) {
+    const stderr = (error.stderr || error.message).trim().split("\n", 10);
+    console.error(`✗ yarn playwright test --list failed:\n${stderr.join("\n")}`);
+  }
+  process.exit(1);
+}
+for (const line of new Set((report.errors ?? []).map(brief))) console.error(line);
 if (report.errors?.length) process.exit(1);
 
 const discovered = new Set();

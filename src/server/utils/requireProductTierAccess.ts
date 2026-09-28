@@ -2,10 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import createFetchClient from "openapi-fetch";
 
 import { baseDomain } from "src/api/client";
-import { ENVIRONMENT_TYPES } from "src/constants/environmentTypes";
 import type { paths } from "src/types/schema";
 
 import { getAuthToken } from "./authCookie";
+import { getEnvironmentType } from "./getEnvironmentType";
 
 export type ProductTierIdentifier = {
   serviceId: string;
@@ -13,6 +13,9 @@ export type ProductTierIdentifier = {
 };
 
 const customerClient = createFetchClient<paths>({ baseUrl: baseDomain });
+
+// Service and plan IDs look like "s-KgFDwg5J6N"; anything else never reaches the backend URL.
+const ID_PATTERN = /^[\w-]+$/;
 
 const NOT_AUTHENTICATED = { message: "Not authenticated" };
 const NO_ACCESS = { message: "You don't have access to this plan" };
@@ -39,18 +42,20 @@ export async function requireProductTierAccess(
   }
 
   const { serviceId, productTierId } = req.query;
-  if (typeof serviceId !== "string" || typeof productTierId !== "string" || !serviceId || !productTierId) {
-    res.status(400).json({ message: "serviceId and productTierId are required" });
+  if (
+    typeof serviceId !== "string" ||
+    typeof productTierId !== "string" ||
+    !ID_PATTERN.test(serviceId) ||
+    !ID_PATTERN.test(productTierId)
+  ) {
+    res.status(400).json({ message: "Valid serviceId and productTierId are required" });
     return null;
   }
 
   try {
+    // Describing one service returns the same plans the UI lists for it, without fetching every service.
     const { data, response } = await customerClient.GET("/2022-09-01-00/service-offering/{serviceId}", {
-      // The same environment filter the UI uses to list the customer's offerings (app/layout.tsx).
-      params: {
-        path: { serviceId },
-        query: { environmentType: process.env.ENVIRONMENT_TYPE || ENVIRONMENT_TYPES.PROD },
-      },
+      params: { path: { serviceId }, query: { environmentType: getEnvironmentType() } },
       headers: { Authorization: `Bearer ${authToken}` },
     });
 

@@ -1,4 +1,5 @@
 import { getResources } from "src/server/api/resources";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { requireProductTierAccess } from "src/server/utils/requireProductTierAccess";
 
 export default async function handler(req, res) {
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "private, no-store");
     return res.status(200).json({ resources });
   } catch (error) {
-    console.error("Error fetching resources:", error);
+    console.error("Error fetching resources:", errorSummary(error));
 
     if (error.name === "ProviderAuthError") {
       return res.status(500).json({ message: "Provider authentication failed" });

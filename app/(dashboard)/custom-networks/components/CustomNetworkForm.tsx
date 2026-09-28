@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { FC, useMemo } from "react";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
 import { useFormik } from "formik";
 
@@ -11,13 +11,24 @@ import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudPr
 import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import { CreateCustomNetworkRequestBody, CustomNetwork } from "src/types/customNetwork";
+import { Region } from "src/types/region";
 import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
 import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
 import { FormConfiguration } from "components/DynamicForm/types";
 
 import { CustomNetworkValidationSchema } from "../constants";
 
-const CustomNetworkForm = ({
+type CustomNetworkFormProps = {
+  formMode: "create" | "modify";
+  regions: Region[];
+  isFetchingRegions: boolean;
+  refetchCustomNetworks: () => void;
+  onClose: () => void;
+  selectedCustomNetwork?: CustomNetwork;
+};
+
+const CustomNetworkForm: FC<CustomNetworkFormProps> = ({
   formMode,
   regions,
   isFetchingRegions,
@@ -84,7 +95,7 @@ const CustomNetworkForm = ({
     },
     validationSchema: CustomNetworkValidationSchema,
     onSubmit: (values) => {
-      const data: Record<string, unknown> = {
+      const data: CreateCustomNetworkRequestBody = {
         name: values.name.trim(),
         cloudProviderName: values.cloudProviderName,
         cloudProviderRegion: values.cloudProviderRegion,
@@ -96,10 +107,9 @@ const CustomNetworkForm = ({
           data.orgId = values.subscriptionOwnerId;
         }
         createCustomNetworkMutation.mutate({
-          // @ts-ignore
           body: data,
         });
-      } else {
+      } else if (selectedCustomNetwork) {
         updateCustomNetworkMutation.mutate({
           params: {
             path: {
@@ -128,7 +138,7 @@ const CustomNetworkForm = ({
   const cloudProviders = useMemo(() => {
     return (
       regions
-        .reduce((acc, region) => {
+        .reduce<string[]>((acc, region) => {
           if (!acc.includes(region.cloudProviderName)) {
             acc.push(region.cloudProviderName);
           }
@@ -296,7 +306,7 @@ const CustomNetworkForm = ({
     isFetchingSubscriptions,
     regionMenuItems,
     subscriptionOwnerMenuItems,
-    formData.values,
+    formData,
     formMode,
   ]);
 

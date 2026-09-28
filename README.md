@@ -261,9 +261,11 @@ We welcome contributions from the community! Here's how you can help:
   yarn lint                                   # includes the project guardrail rules
   yarn typecheck
   yarn check:guardrails --base origin/master  # guidance paths, lint allowlists only shrink, Prettier on changed files
-  yarn check:playwright-discovery             # every Playwright spec runs in the configured project
+  yarn check:playwright-discovery             # every Playwright spec runs in a project
   yarn build
   ```
+
+  In a fork, `origin/master` is your fork's own branch. Compare against upstream `master` instead: add the remote once with `git remote add upstream https://github.com/omnistrate-oss/customer-portal.git`, then run `git fetch upstream` and pass `--base upstream/master`.
 
   Files that predate a lint rule are listed in `eslint.migration-allowlists.cjs`. Those lists only shrink: when you fix a file, remove its entry, and never add one.
 - Submit a Pull Request: Open a pull request with a clear description of your changes and any relevant issue numbers. Include before/after screenshots for UI changes, and keep each pull request to one concern.

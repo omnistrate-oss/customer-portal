@@ -374,10 +374,11 @@ const applyBasicHighlighting = (logLine: string, format: string | null): string 
 };
 
 // Rebuilds the highlight spans as React elements, so the log text only ever renders as text.
+// `parts` arrives reversed: pop() is O(1), while shift() is O(n) and freezes the page on long lines.
 const toReactNodes = (parts: string[], isNested = false): React.ReactNode[] => {
   const nodes: React.ReactNode[] = [];
   while (parts.length > 0) {
-    const part = parts.shift() ?? "";
+    const part = parts.pop() ?? "";
     if (part === "</span>") {
       if (isNested) break;
     } else if (part.startsWith("<span class=")) {
@@ -407,7 +408,7 @@ const SyntaxHighlightedLog: React.FC<SyntaxHighlightedLogProps> = ({ logLine, en
 
   // Apply highlighting if we detected a format
   if (detectedFormat) {
-    const highlightedParts = applyBasicHighlighting(logLine, detectedFormat).split(HIGHLIGHT_MARKUP);
+    const highlightedParts = applyBasicHighlighting(logLine, detectedFormat).split(HIGHLIGHT_MARKUP).reverse();
     return <HighlightedLogContent logType={detectedFormat}>{toReactNodes(highlightedParts)}</HighlightedLogContent>;
   }
 

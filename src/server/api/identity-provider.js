@@ -1,6 +1,7 @@
 const axios = require("../axios");
 const ProviderAuthError = require("../utils/ProviderAuthError");
 const withProviderTokenExpirationHanding = require("../utils/withProviderTokenExpirationHandling");
+const { errorSummary } = require("../utils/errorSummary");
 
 function getRenderIdentityProvidersList(queryParams) {
   return axios
@@ -8,7 +9,7 @@ function getRenderIdentityProvidersList(queryParams) {
       params: queryParams,
     })
     .catch((error) => {
-      console.log("list identity provider error", error);
+      console.log("list identity provider error", errorSummary(error));
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {

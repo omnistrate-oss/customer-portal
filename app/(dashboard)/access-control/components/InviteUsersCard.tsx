@@ -3,13 +3,13 @@
 import { useMemo } from "react";
 import { Add } from "@mui/icons-material";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import { InputAdornment } from "@mui/material";
+import { buttonClasses, InputAdornment } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { FieldArray, FormikProvider, getIn, useFormik } from "formik";
-import { cn } from "lib/utils";
 
-import { inviteSubscriptionUser } from "src/api/users";
+import { $api } from "src/api/query";
 import FieldError from "src/components/FormElementsv2/FieldError/FieldError";
+import IconButtonSquare from "src/components/IconButtonSquare/IconButtonSquare";
 import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -22,7 +22,6 @@ import {
   toSubscriptionUserRoleType,
 } from "src/utils/consumptionSubscriptionAdminRBAC";
 import Button from "components/Button/Button";
-import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
 import Form from "components/FormElementsv2/Form/Form";
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
 import Select from "components/FormElementsv2/Select/Select";
@@ -117,17 +116,17 @@ type InviteUsersCardProps = {
   isFetchingUsers?: boolean;
 };
 
-interface UserInvite {
+type UserInvite = {
   email: string;
   roleType: string;
   serviceId: string;
   servicePlanId: string;
-}
+};
 
-// Define the interface for the entire form values
-interface InviteUsersFormValues {
+// Define the type for the entire form values
+type InviteUsersFormValues = {
   userInvite: UserInvite[];
-}
+};
 
 const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetchingUsers }) => {
   const snackbar = useSnackbar();
@@ -141,6 +140,11 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
   const serviceMenuItems = useMemo(
     () => getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC),
     [subscriptions, consumptionSubscriptionAdminRBAC]
+  );
+
+  const inviteUserMutation = $api.useMutation(
+    "post",
+    "/2022-09-01-00/resource-instance/subscription/{subscriptionId}/invite-user"
   );
 
   const createUserInvitesMutation = useMutation({
@@ -165,7 +169,10 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               return Promise.reject(new Error("No manageable subscription found for invite"));
             }
 
-            return inviteSubscriptionUser(subscription.id, payload);
+            return inviteUserMutation.mutateAsync({
+              params: { path: { subscriptionId: subscription.id } },
+              body: payload,
+            });
           })
         );
         snackbar.showSuccess("Invites Sent");
@@ -208,7 +215,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
   const { values, handleChange, handleBlur, setFieldValue } = formData;
 
   return (
-    <div className="shadow-[0_1px_2px_0_#0A0D120D] rounded-xl border border-[#E9EAEB] bg-white mb-6">
+    <div className="shadow-sm rounded-xl border border-gray-200 bg-white mb-6">
       {/* @ts-ignore */}
       <Form onSubmit={formData.handleSubmit}>
         <FormikProvider value={formData}>
@@ -223,9 +230,9 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               variant="contained"
               type="submit"
               disabled={createUserInvitesMutation.isPending || isFetchingUsers}
+              isLoading={createUserInvitesMutation.isPending}
             >
               Send Invites
-              {createUserInvitesMutation.isPending && <LoadingSpinnerSmall />}
             </Button>
           </div>
 
@@ -387,33 +394,44 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                               </FieldError>
                             </div>
 
-                            <div
+                            <IconButtonSquare
+                              aria-label="Remove invite"
+                              outlineColor={colors.error700}
                               onClick={() => {
                                 remove(index);
                               }}
-                              className={cn(
-                                "cursor-pointer border border-error-700 h-10 w-10 rounded-md flex items-center justify-center",
-                                index === 0 ? "invisible" : "visible"
-                              )}
+                              className={index === 0 ? "invisible" : "visible"}
+                              sx={{
+                                padding: "9px !important",
+                                borderRadius: "6px",
+                                [`&.${buttonClasses.outlined}`]: { boxShadow: "none" },
+                              }}
                             >
                               <DeleteIcon color={colors.error700} />
-                            </div>
+                            </IconButtonSquare>
                           </div>
                         );
                       })}
 
-                      <div
+                      <Button
                         data-testid="add-another-button"
-                        className="inline-flex items-center gap-1.5 mt-4 cursor-pointer"
+                        variant="text"
+                        fontColor={colors.gray700}
                         onClick={() => {
                           push(getNewEnvVariable());
                         }}
+                        sx={{
+                          mt: "16px",
+                          gap: "6px",
+                          padding: "0 !important",
+                          [`&.${buttonClasses.text}:hover`]: { color: colors.gray700 },
+                        }}
                       >
                         <Add sx={{ color: colors.gray700 }} />
-                        <Text size="small" weight="semibold" color={colors.gray700}>
+                        <Text component="span" size="small" weight="semibold" color={colors.gray700}>
                           Add Another
                         </Text>
-                      </div>
+                      </Button>
                     </>
                   );
                 }}

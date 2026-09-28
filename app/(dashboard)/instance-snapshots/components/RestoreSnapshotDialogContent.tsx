@@ -1,14 +1,17 @@
 import { Box } from "@mui/material";
+import { FormikProps } from "formik";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import { CustomNetwork } from "src/types/customNetwork";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
 
+import { SnapshotFormValues } from "../types";
+
 type RestoreSnapshotDialogContentProps = {
   customNetworks: CustomNetwork[];
   selectedSnapshot?: InstanceSnapshot;
   isFetchingCustomNetworks?: boolean;
-  formData: any;
+  formData: FormikProps<SnapshotFormValues>;
 };
 
 const RestoreSnapshotDialogContent: React.FC<RestoreSnapshotDialogContentProps> = ({

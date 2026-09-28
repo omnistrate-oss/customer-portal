@@ -1,9 +1,11 @@
 import { FC } from "react";
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from "@mui/material";
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, useTheme } from "@mui/material";
 
 import Button from "src/components/Button/Button";
 import CopyButton from "src/components/Button/CopyButton";
 import { Text } from "src/components/Typography/Typography";
+import { Server05 } from "src/icons";
+import { colors } from "src/themeConfig";
 
 export type ListItemProps = {
   title: string;
@@ -17,19 +19,6 @@ type PeeringInfoDialogProps = {
   list: ListItemProps[];
 };
 
-const PeeringInfoIcon = () => {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M22.1667 10.5C22.1667 15.0103 18.5103 18.6666 14 18.6666M22.1667 10.5C22.1667 5.98965 18.5103 2.33331 14 2.33331M22.1667 10.5H5.83333M14 18.6666C9.48967 18.6666 5.83333 15.0103 5.83333 10.5M14 18.6666C16.0427 16.4303 17.2046 13.5282 17.2677 10.5C17.2046 7.47181 16.0427 4.56963 14 2.33331M14 18.6666C11.9573 16.4303 10.7975 13.5282 10.7344 10.5C10.7975 7.47181 11.9573 4.56963 14 2.33331M14 18.6666V21M5.83333 10.5C5.83333 5.98965 9.48967 2.33331 14 2.33331M16.3333 23.3333C16.3333 24.622 15.2887 25.6666 14 25.6666C12.7113 25.6666 11.6667 24.622 11.6667 23.3333M16.3333 23.3333C16.3333 22.0446 15.2887 21 14 21M16.3333 23.3333H24.5M11.6667 23.3333C11.6667 22.0446 12.7113 21 14 21M11.6667 23.3333H3.5"
-        stroke="#7F56D9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-};
-
 const ListItem: FC<ListItemProps> = ({ title, value, icon }) => {
   return (
     <Stack
@@ -39,16 +28,16 @@ const ListItem: FC<ListItemProps> = ({ title, value, icon }) => {
       justifyContent="space-between"
       p="16px"
       borderRadius="6px"
-      border="1px solid #EAECF0"
+      border={`1px solid ${colors.gray200}`}
       mb="12px"
     >
-      <Text size="small" weight="medium" color="#344054">
+      <Text size="small" weight="medium" color={colors.gray700}>
         {title}
       </Text>
 
       <Box display="flex" alignItems="center" gap="8px">
-        {icon && icon}
-        <Text size="small" weight="semibold" color="#475467" ellipsis title={value} maxWidth="180px">
+        {icon}
+        <Text size="small" weight="semibold" color={colors.gray600} ellipsis title={value} maxWidth="180px">
           {value}
         </Text>
         <CopyButton text={value} />
@@ -58,6 +47,8 @@ const ListItem: FC<ListItemProps> = ({ title, value, icon }) => {
 };
 
 const PeeringInfoDialog: FC<PeeringInfoDialogProps> = ({ open, onClose, list }) => {
+  const theme = useTheme();
+
   return (
     <Dialog
       open={open}
@@ -78,12 +69,12 @@ const PeeringInfoDialog: FC<PeeringInfoDialogProps> = ({ open, onClose, list }) 
         }}
       >
         <Stack direction="row" gap="4px" alignItems="center">
-          <PeeringInfoIcon />
-          <Text size="large" weight="semibold" color="#101828">
+          <Server05 size={28} strokeWidth={24 / 28} color={theme.palette.primary.main} />
+          <Text size="large" weight="semibold" color={colors.gray900}>
             Peering Info
           </Text>
         </Stack>
-        <Text size="small" weight="regular" color="#475467" sx={{ mt: "4px" }}>
+        <Text size="small" weight="regular" color={colors.gray600} sx={{ mt: "4px" }}>
           Basic information for setting up VPC peering
         </Text>
       </DialogTitle>

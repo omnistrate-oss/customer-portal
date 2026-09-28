@@ -1,6 +1,7 @@
 const axios = require("../axios");
 const ProviderAuthError = require("../utils/ProviderAuthError");
 const withProviderTokenExpirationHanding = require("../utils/withProviderTokenExpirationHandling");
+const { errorSummary } = require("../utils/errorSummary");
 
 const OBSERVABILITY_RESOURCE_ID = "r-obsrv";
 const INJECTED_ACCOUNT_CONFIG_RESOURCE_ID = "r-injectedaccountconfig";
@@ -50,7 +51,7 @@ function getResources(params = {}) {
         .map((resource) => mapResourceSummary(resource));
     })
     .catch((error) => {
-      console.error("getResources error", error);
+      console.error("getResources error", errorSummary(error));
       if (error.response && error.response.status === 401) {
         throw new ProviderAuthError();
       } else {

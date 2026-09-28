@@ -4,7 +4,7 @@ applyTo: "tests/**,test-fixtures/**,test-utils/**,page-objects/**"
 
 # Test review checklist
 
-Lint already rejects `test` or `expect` imported from `@playwright/test` in a spec, `.only` and `waitForTimeout`, and CI fails specs that the Playwright project doesn't run. Flag an attempt to get around them, such as a new allowlist entry or an `eslint-disable`, as a **Blocker**.
+Lint already rejects `test` or `expect` imported from `@playwright/test` in a spec, `.only` and `waitForTimeout`, and CI fails specs that don't run in a project. Flag an attempt to get around them, such as a new allowlist entry or an `eslint-disable`, as a **Blocker**.
 
 CI runs Playwright in HAR replay: browser API responses come from the `tests/fixtures/hars` submodule at the commit the pull request pins.
 

@@ -1,5 +1,6 @@
 const axios = require("../axios");
 const ProviderAuthError = require("./ProviderAuthError");
+const { errorSummary } = require("./errorSummary");
 
 function fetchProviderAuthToken() {
   const signInPayload = {
@@ -17,7 +18,7 @@ function fetchProviderAuthToken() {
   }
 
   return axios.post("/signin", signInPayload).catch((error) => {
-    console.error("Provider sign in failure", error);
+    console.error("Provider sign in failure", errorSummary(error));
     throw new ProviderAuthError();
   });
 }

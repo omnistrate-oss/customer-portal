@@ -1,6 +1,7 @@
 import { customerSignInWithIdentityProvider } from "src/server/api/customer-user";
-import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 import { setAuthCookie, setIndicatorCookie, setRefreshCookie } from "src/server/utils/authCookie";
+import { errorSummary } from "src/server/utils/errorSummary";
+import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 import { getSaaSDomainURL } from "src/server/utils/getSaaSDomainURL";
 
 export default async function handleAuth(nextRequest, nextResponse) {
@@ -41,7 +42,7 @@ export default async function handleAuth(nextRequest, nextResponse) {
         }
         return nextResponse.redirect(307, "/signin");
       } catch (err) {
-        console.error("IDP AUTH error", err);
+        console.error("IDP AUTH error", errorSummary(err));
       }
     }
   }

@@ -36,7 +36,6 @@ Counts below are the files that imported each component in September 2026. A big
 | Confirm with custom content      | `ConfirmationDialog` from `src/components/Dialog/ConfirmationDialog`                                                                                          | 2                   | MUI `Dialog` (14 legacy files)                                                          |
 | Info or multi-step dialog        | `InformationDialogTopCenter` from `src/components/Dialog/InformationDialogTopCenter`                                                                          | 6                   | MUI `Dialog`, `Modal`                                                                   |
 | Create or modify form            | `FullScreenDrawer` from `app/(dashboard)/components/FullScreenDrawer/FullScreenDrawer.tsx` with `GridDynamicForm`                                             | 5                   | MUI `Drawer`, a new drawer component                                                    |
-| Narrow side panel                | `SideDrawerRight` from `src/components/SideDrawerRight/SideDrawerRight`                                                                                       | 0                   | MUI `Drawer` `[no-raw-mui]`; prefer `FullScreenDrawer` for forms                        |
 | Page or section loading          | `LoadingSpinner` from `src/components/LoadingSpinner/LoadingSpinner`                                                                                          | 23                  | MUI `CircularProgress` (10 legacy feature files) `[no-raw-mui]`                         |
 | Inline loading                   | Default export of `src/components/CircularProgress/CircularProgress` (`LoadingSpinnerSmall`), or `isLoading` on `Button`, `Select`, `DataTable`               | 38                  | MUI `CircularProgress`, raw `Skeleton` (2 legacy files, no wrapper)                     |
 | Progress bar                     | `src/components/LinearProgress/LinearProgress`                                                                                                                | 2                   | MUI `LinearProgress`                                                                    |
@@ -47,13 +46,13 @@ Counts below are the files that imported each component in September 2026. A big
 | Charts                           | `ChartContainer` and friends from `@/components/ui/chart` (Recharts)                                                                                          | 5                   | A second chart library                                                                  |
 | Signed-out page pieces           | `src/components/NonDashboardComponents/` (logo, headings, submit button, footer)                                                                              | 18                  | Using them outside `app/(public)/` and `app/not-found.tsx` `[no-auth-shell-components]` |
 
-`[no-raw-mui]` enforces the wrapper for `Button`, `TextField`, `Select`, `MenuItem`, `Menu`, `Tooltip`, `Typography`, `Chip`, `Tabs`, `Tab`, `Checkbox`, `Switch`, `CircularProgress`, `LinearProgress` and `Drawer` everywhere outside `src/components/` and root `components/`. The other rows (dialogs, `Alert`, `Snackbar`, `Skeleton`, `Popover`, `Divider`, `Stepper`) are review rules, not lint rules; follow them anyway.
+`[no-raw-mui]` enforces the wrapper for `Button`, `TextField`, `Select`, `MenuItem`, `Menu`, `Tooltip`, `Typography`, `Chip`, `Tabs`, `Tab`, `Checkbox`, `Switch`, `CircularProgress`, `LinearProgress` and `Drawer`, and `react/forbid-elements` rejects raw `button`, `select`, `input`, `textarea` and `table`. Both apply everywhere except the wrapper folders: `src/components/{Button,Checkbox,Chip,CircularProgress,DataGrid,DataTable,FormElementsv2,LinearProgress,LoadingSpinner,Menu,Switch,Tab,Tooltip,Typography}/` and `app/(dashboard)/components/FullScreenDrawer/`. Other shared components, including the root `components/` folder, use the wrappers too; existing exceptions are allowlisted. The other rows (dialogs, `Alert`, `Snackbar`, `Skeleton`, `Popover`, `Divider`, `Stepper`) are review rules, not lint rules; follow them anyway.
 
 If nothing fits, extend the closest wrapper in `src/components/` (a new prop) rather than styling a raw MUI component in a feature file. Say so in the PR description.
 
 ## 2. Colors and white-label
 
-The brand color is the provider's, not ours. A fork changes it in two places; a hex literal anywhere else stays in the old brand.
+The brand color is the provider's, not ours. A fork changes it in two places, `styleConfig.primaryColor` in `src/providerConfig.js` and the `--purple-*` variables in `app/globals.css`; a hex literal anywhere else stays in the old brand.
 
 | Source                            | What it holds                                                                                                                                           | How code reads it                                                                        |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -67,7 +66,7 @@ The brand color is the provider's, not ours. A fork changes it in two places; a 
 Rules:
 
 - Brand accent: `theme.palette.primary` (which is `styleConfig.primaryColor`). Neutral, success and error colors: `colors.*` or the Tailwind token classes.
-- Never write a hex, `rgb()` or named color in feature code; lint rejects hex literals `[no-hex-colors]`. About 300 older files still contain hex colors; they are allowlisted and the list must not grow. The purple brand family alone (`#5925DC`, `#7F56D9`, `#6941C6`, `#9E77ED`, `#F9F5FF` and neighbors) appears 179 times in 86 files, and `#5925DC` itself 3 times outside `src/providerConfig.js`.
+- Never write a hex, `rgb()` or named color in feature code. `[no-hex-colors]` rejects 3-, 4-, 6- and 8-digit hex anywhere in a string, such as `"1px solid #fff"`, but not URL fragments such as `/page#abc` or HTML entities; `rgb()` and named colors are left to review. About 300 older files still contain hex colors; they are allowlisted and the list must not grow. The purple brand family alone (`#5925DC`, `#7F56D9`, `#6941C6`, `#9E77ED`, `#F9F5FF` and neighbors) appears 179 times in 86 files, and `#5925DC` itself 3 times outside `src/providerConfig.js`.
 - Tailwind classes: use only the steps listed in `tailwind.config.js`. Other steps (`gray-100`, `purple-500`) silently fall back to Tailwind's default palette, not the theme variables, and `warning` or `error` steps that are not listed produce no CSS at all.
 - No arbitrary color values in classes, such as `border-[#E9EAEB]` or `shadow-[0_1px_2px_0_#0A0D120D]` (72 occurrences in 43 files today). Use `border-gray-200`.
 - Need a color that has no token? Add a CSS variable to `app/globals.css` and a key to `colors` in `src/themeConfig.ts` (and to `tailwind.config.js` if classes need it) in the same PR, and say so in the description.
@@ -85,7 +84,7 @@ import { colors } from "src/themeConfig";
 
 ## 3. Typography
 
-`Text` is MUI `Typography` with the portal's scale. Pick `size` and `weight`; never override `fontSize`, `fontWeight` or `lineHeight` through `sx`, `style` or props `[no-text-font-override]`.
+`Text` is MUI `Typography` with the portal's scale. Pick `size` and `weight`; never override `fontSize`, `fontWeight`, `lineHeight` or the `font` shorthand through `sx`, `style` or props `[no-text-font-override]`.
 
 | `size`            | Font size / line height |
 | ----------------- | ----------------------- |
@@ -125,7 +124,7 @@ import { colors } from "src/themeConfig";
 ```
 
 - SVG `<defs>` ids (`clipPath`, `linearGradient`, `mask`, `filter`, `pattern`) come from `useId()`; a hard-coded id breaks when the component renders twice. Five legacy files still hard-code one. Icons built by `yarn icons:build` are already namespaced.
-- `dangerouslySetInnerHTML` only with `DOMPurify.sanitize` from `isomorphic-dompurify`, and only for provider or backend HTML that must render as HTML `react/no-danger`.
+- No new `dangerouslySetInnerHTML`: `react/no-danger` rejects every use, sanitized or not. Render text. If HTML must render, sanitize it with `isomorphic-dompurify` and raise it in the pull request.
 - Components are arrow functions typed with `FC<Props>`; props and object shapes use `type`, not `interface` (`react/function-component-definition`, `@typescript-eslint/consistent-type-definitions`).
 
 ## 6. Accessibility basics
@@ -140,17 +139,17 @@ import { colors } from "src/themeConfig";
 
 ## 7. Lint guardrails and allowlists
 
-| Guardrail                                                                                                                     | Fix                                                                                                                                                             |
-| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[no-raw-mui]`                                                                                                                | Import the wrapper from section 1                                                                                                                               |
-| `[no-hex-colors]`                                                                                                             | Use `colors.*`, a Tailwind token class or `theme.palette`                                                                                                       |
-| `[no-text-font-override]`                                                                                                     | Change `size` or `weight` on `Text`                                                                                                                             |
-| `[no-css-modules]`                                                                                                            | `sx` or `styled()` with tokens                                                                                                                                  |
-| `[no-auth-shell-components]`                                                                                                  | Outside `app/(public)/` and `app/not-found.tsx`, use the dashboard components, not `NonDashboardComponents`                                                     |
-| `react/forbid-elements`                                                                                                       | `Button`, `TextField`, `Select`, `Checkbox`, `Switch` or `DataTable` instead of the HTML element (allowed only inside `src/components/` and root `components/`) |
-| `react/jsx-no-leaked-render`                                                                                                  | `!!value &&`, a comparison, or a ternary                                                                                                                        |
-| `react/no-danger`                                                                                                             | Sanitize with `isomorphic-dompurify`; a new HTML sink needs a maintainer's review                                                                               |
-| `react/function-component-definition`, `@typescript-eslint/consistent-type-definitions`, `@typescript-eslint/no-explicit-any` | Arrow components, `type` instead of `interface`, a real type or `unknown` instead of `any`                                                                      |
-| `no-console`                                                                                                                  | Only `console.warn` and `console.error`, never with tokens or personal data                                                                                     |
+| Guardrail                                                                                                                     | Fix                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[no-raw-mui]`                                                                                                                | Import the wrapper from section 1                                                                                                                     |
+| `[no-hex-colors]`                                                                                                             | Use `colors.*`, a Tailwind token class or `theme.palette`                                                                                             |
+| `[no-text-font-override]`                                                                                                     | Change `size` or `weight` on `Text`                                                                                                                   |
+| `[no-css-modules]`                                                                                                            | `sx` or `styled()` with tokens                                                                                                                        |
+| `[no-auth-shell-components]`                                                                                                  | Outside `app/(public)/` and `app/not-found.tsx`, use the dashboard components, not `NonDashboardComponents`                                           |
+| `react/forbid-elements`                                                                                                       | `Button`, `TextField`, `Select`, `Checkbox`, `Switch` or `DataTable` instead of the HTML element (allowed only in the wrapper folders from section 1) |
+| `react/jsx-no-leaked-render`                                                                                                  | `!!value &&`, a comparison, or a ternary                                                                                                              |
+| `react/no-danger`                                                                                                             | Render text; for HTML that must render, see section 5                                                                                                 |
+| `react/function-component-definition`, `@typescript-eslint/consistent-type-definitions`, `@typescript-eslint/no-explicit-any` | Arrow components, `type` instead of `interface`, a real type or `unknown` instead of `any`                                                            |
+| `no-console`                                                                                                                  | Only `console.warn` and `console.error`, never with tokens or personal data                                                                           |
 
 Lint runs in CI (the Verify workflow). Files that predate a rule are listed in `eslint.migration-allowlists.cjs`. Lists only shrink: fix the code instead of adding an entry or an `eslint-disable`, and delete a file's entry when you fix it.

@@ -8,15 +8,15 @@ Lint already rejects raw MUI where a wrapper exists, raw `button`, `select`, `in
 
 ## White-label
 
-- Flag "Omnistrate", "SaaS Builder" or any vendor name in customer-facing text, titles, alt text or error messages. The provider's name, logo and support email come from `useProviderOrgDetails()`.
-- Flag brand or accent colors hard-coded in any form: Tailwind arbitrary values (`bg-[#...]`, `border-[#...]`), `rgb()`/`rgba()`, named colors, or literal colors passed to third-party widgets. The brand color is `theme.palette.primary`; other colors come from `src/themeConfig.ts`.
+- Flag "Omnistrate", "SaaS Builder" or any vendor name in customer-facing text, titles, alt text or error messages. The provider's name, logo and support email come from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx`.
+- Flag brand or accent colors that lint misses: `rgb()`/`rgba()` values (Tailwind arbitrary values such as `bg-[rgb(...)]` included), named colors, Tailwind color steps that `tailwind.config.js` doesn't define, or literal colors passed to third-party widgets. The brand color is `theme.palette.primary`; other colors come from `src/themeConfig.ts`.
 - Flag hard-coded support addresses or external links; use the provider's details and `getSafeExternalURL`.
 
 ## Hand-rolled shared components
 
 - Flag tables, pagination or row actions built by hand instead of `DataTable` (`src/components/DataTable/DataTable`). New code doesn't use MUI `DataGrid`.
 - Flag dialogs built on MUI `Dialog` instead of `TextConfirmationDialog` or `ConfirmationDialog`; destructive actions use type-to-confirm.
-- Flag custom side panels instead of `FullScreenDrawer` (`app/(dashboard)/components/FullScreenDrawer/`) or `SideDrawerRight`.
+- Flag custom side panels instead of `FullScreenDrawer` (`app/(dashboard)/components/FullScreenDrawer/`).
 - Flag status pills colored by hand instead of `StatusChip`, and custom spinners instead of `LoadingSpinner` or the `CircularProgress` wrapper.
 - Flag text, cards, banners or headers built from `Box` with font sizes, borders and shadows instead of `Text`, `PageTitle` and the shared cards.
 - Flag a local copy of a shared component with small changes. Ask for a prop on the shared one instead.

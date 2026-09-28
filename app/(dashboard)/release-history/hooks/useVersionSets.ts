@@ -1,12 +1,14 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import axios from "axios";
 
+import axios from "src/axios";
 import { ReleaseSummary } from "src/types/tier-version-set";
 
 async function fetchVersionSets(params: { serviceId?: string; productTierId?: string }): Promise<ReleaseSummary[]> {
   const { serviceId, productTierId } = params;
 
+  // Same-origin route; the configured client refreshes an expired session and retries.
   const response = await axios.get<ReleaseSummary[]>("/api/version-sets", {
+    baseURL: "",
     params: { serviceId, productTierId },
   });
 

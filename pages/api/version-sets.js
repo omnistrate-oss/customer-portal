@@ -1,4 +1,5 @@
 import { getVersionSets } from "src/server/api/version-sets";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { requireProductTierAccess } from "src/server/utils/requireProductTierAccess";
 
 export default async function handler(req, res) {
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "private, no-store");
     return res.status(200).json(versionSets);
   } catch (error) {
-    console.error("Error fetching version sets:", error);
+    console.error("Error fetching version sets:", errorSummary(error));
 
     if (error.name === "ProviderAuthError") {
       return res.status(500).json({ message: "Provider authentication failed" });

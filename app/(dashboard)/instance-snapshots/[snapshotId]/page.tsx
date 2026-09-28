@@ -2,15 +2,16 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CircularProgress, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
-import { RiArrowGoBackFill } from "react-icons/ri";
 
 import Button from "src/components/Button/Button";
+import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
+import { FlipBackward } from "src/icons";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 
 import PageContainer from "../../components/Layout/PageContainer";
@@ -43,12 +44,7 @@ const SnapshotDetailPage = ({
 }) => {
   const { snapshotId } = use(params);
 
-  const [currentTab, setCurrentTab] = useState<CurrentTab>("Snapshot Details");
-
-  // Set Page Title
-  useEffect(() => {
-    document.title = "Instance Snapshot Details";
-  }, [currentTab, snapshotId]);
+  const [selectedTab, setSelectedTab] = useState<CurrentTab>("Snapshot Details");
 
   const { subscriptionsObj, isFetchingSubscriptions } = useGlobalData();
   const { data: instances = [] } = useInstances({ onlyInstances: true });
@@ -64,12 +60,13 @@ const SnapshotDetailPage = ({
     () => (hasSnapshotMetadata ? [...baseTabs, metadataTab] : baseTabs),
     [hasSnapshotMetadata]
   );
+  // Fall back to the details tab when the snapshot has no metadata to show
+  const currentTab = selectedTab === tabs.snapshotMetadata && !hasSnapshotMetadata ? tabs.snapshotDetails : selectedTab;
 
+  // Set Page Title
   useEffect(() => {
-    if (currentTab === tabs.snapshotMetadata && !hasSnapshotMetadata) {
-      setCurrentTab(tabs.snapshotDetails);
-    }
-  }, [currentTab, hasSnapshotMetadata]);
+    document.title = "Instance Snapshot Details";
+  }, [currentTab, snapshotId]);
 
   if (snapshotQuery.isLoading || isFetchingSubscriptions) {
     return (
@@ -97,7 +94,7 @@ const SnapshotDetailPage = ({
       {/* Back Button */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
         <Link href="/instance-snapshots">
-          <Button startIcon={<RiArrowGoBackFill />}>Back to list of Instance Snapshots</Button>
+          <Button startIcon={<FlipBackward />}>Back to list of Instance Snapshots</Button>
         </Link>
       </Stack>
 
@@ -111,7 +108,7 @@ const SnapshotDetailPage = ({
               label={value}
               value={value}
               onClick={() => {
-                setCurrentTab(value as CurrentTab);
+                setSelectedTab(value as CurrentTab);
               }}
               disableRipple
             />
@@ -119,7 +116,7 @@ const SnapshotDetailPage = ({
         </Tabs>
 
         <Stack direction="row" alignItems="center" gap="16px">
-          {snapshotQuery.isFetching && <CircularProgress size={20} />}
+          {!!snapshotQuery.isFetching && <LoadingSpinnerSmall size={20} sx={{ marginLeft: 0 }} />}
           <RefreshWithToolTip disabled={snapshotQuery.isFetching} refetch={refetchSnapshot} />
         </Stack>
       </Stack>
@@ -128,7 +125,7 @@ const SnapshotDetailPage = ({
         <SnapshotDetailsTab snapshot={snapshotData} instances={instances} subscriptionsObj={subscriptionsObj} />
       )}
       {currentTab === tabs.deploymentParameters && <SnapshotDeploymentParametersTab snapshot={snapshotData} />}
-      {currentTab === tabs.snapshotMetadata && hasSnapshotMetadata && <SnapshotMetadataTab snapshot={snapshotData} />}
+      {currentTab === tabs.snapshotMetadata && <SnapshotMetadataTab snapshot={snapshotData} />}
     </PageContainer>
   );
 };

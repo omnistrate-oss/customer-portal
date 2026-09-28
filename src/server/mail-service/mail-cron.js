@@ -26,6 +26,7 @@ const { getDisconnectedAccountCompleteMailContentGCP } = require("./templates/di
 const { getConnectedAccountCompleteMailContentGCP } = require("./templates/connectedAccountCompleteGCP");
 const { getPendingRevokePermissionsMailContentGCP } = require("./templates/pendingRevokePermissionsGCP");
 const { getPendingRestorePermissionsMailContentGCP } = require("./templates/pendingRestorePermissionsGCP");
+const { errorSummary } = require("../utils/errorSummary");
 
 let isRunning = false;
 
@@ -193,7 +194,7 @@ function startMailServiceCron() {
             mailPromises.push(mailPromise);
           }
         } catch (error) {
-          console.error("Mail error", error);
+          console.error("Mail error", errorSummary(error));
         }
       }
 

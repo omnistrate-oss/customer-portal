@@ -42,7 +42,7 @@ Create and modify flows open a `FullScreenDrawer` (`app/(dashboard)/components/F
 <FullScreenDrawer
   title="Create Customer Network"
   description="Create a new customer network with the specified details"
-  open={isOverlayOpen && ["create-custom-network", "modify-custom-network"].includes(overlayType)}
+  open={!!isOverlayOpen && ["create-custom-network", "modify-custom-network"].includes(overlayType)}
   closeDrawer={() => setIsOverlayOpen(false)}
   RenderUI={<CustomNetworkForm formMode="create" onClose={() => setIsOverlayOpen(false)} /* … */ />}
 />
@@ -80,7 +80,7 @@ Settings-style forms use `Form`, `FieldTitle`, a field and `FieldError` in a gri
     disabled={isDisabled}
     inputProps={{ "aria-label": "City" }}
   />
-  <FieldError>{touched.address?.city && errors.address?.city}</FieldError>
+  <FieldError>{!!touched.address?.city && errors.address?.city}</FieldError>
 
   <Button variant="outlined" onClick={() => formData.resetForm()} disabled={mutation.isPending}>
     Cancel
@@ -106,14 +106,15 @@ Settings-style forms use `Form`, `FieldTitle`, a field and `FieldError` in a gri
 | Toggle, checkbox        | `src/components/Switch/Switch`, `src/components/Checkbox/Checkbox`                                                                                                                            |
 | Label, help, error      | `FieldTitle`, `FieldDescription`, `FieldError` from `src/components/FormElementsv2/`                                                                                                          |
 
-Signed-out pages (`app/(public)/`) use the matching fields in `src/components/NonDashboardComponents/FormElementsV2/`; dashboard forms never do `[no-auth-shell-components]`. Raw `<input>`, `<select>` and `<textarea>` are lint errors outside `src/components/` and root `components/` (`react/forbid-elements`).
+Signed-out pages (`app/(public)/`) use the matching fields in `src/components/NonDashboardComponents/FormElementsV2/`; dashboard forms never do `[no-auth-shell-components]`. Raw `<input>`, `<select>` and `<textarea>` are lint errors outside the wrapper folders listed in section 1 of `.agents/skills/ui-and-styling/SKILL.md` (`react/forbid-elements`).
 
-Error text appears only after the field is touched: `touched.x && errors.x`. Messages are short and specific ("Name is required", "Please enter a valid URL").
+Error text appears only after the field is touched: `!!touched.x && errors.x`. Messages are short and specific ("Name is required", "Please enter a valid URL").
 
 ## 5. Submitting and loading
 
 - Submit through an `$api` mutation from `onSubmit`; never from an effect.
 - Loading and disabled state come from `mutation.isPending`, not a separate `useState`.
+- Keep Submit enabled when nothing has changed. Disable it only while the mutation is pending, while a required option list loads, or when the role can't submit.
 - On success: `snackbar.showSuccess(...)`, invalidate or refetch the list, close the drawer. On failure the global snackbar already shows the error; do not render `error.message`.
 - Disable Submit while a required option list is still loading, and say why when it cannot be used (`disabledMessage`).
 

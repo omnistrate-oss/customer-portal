@@ -8,7 +8,7 @@ The portal is white-label and self-hostable. SaaS providers deploy it, often fro
 
 ## Non-negotiables
 
-Lint messages start with the guardrail name, for example `[no-axios]`. Existing violations are grandfathered on shrink-only allowlists in `eslint.migration-allowlists.cjs`. New code must comply. Never add an allowlist entry or an `eslint-disable` for these rules: `yarn check:guardrails` rejects both in CI. If a rule blocks legitimate code, say so in the pull request instead.
+Lint messages start with the guardrail name, for example `[no-axios]`. Existing violations are grandfathered on shrink-only allowlists in `eslint.migration-allowlists.cjs`. New code must comply, including new lines in an allowlisted file: its guardrail is off for that whole file, so lint won't catch them, and reviewers flag them. Never add an allowlist entry, an `eslint-disable` or an inline `/* eslint */` config comment for these rules: `yarn check:guardrails` rejects all three in CI. Keep an emptied list as `[]` instead of deleting it; a new list must start empty too, so grandfathering files under a new guardrail needs a maintainer to override the check. If a rule blocks legitimate code, say so in the pull request instead.
 
 1. **Shared components, not raw MUI or native elements.** Use the wrappers in `src/components/` (`[no-raw-mui]`, `react/forbid-elements`).
 2. **Theme colors, never hex; no CSS modules.** The brand color comes only from `theme.palette.primary`, because each provider sets their own (`[no-hex-colors]`, `[no-css-modules]`).
@@ -20,11 +20,11 @@ Lint messages start with the guardrail name, for example `[no-axios]`. Existing 
 8. **Every Formik form has a Yup `validationSchema`** (`[formik-requires-yup]`).
 9. **TypeScript:** no `any` (`@typescript-eslint/no-explicit-any`); `type` over `interface` (`@typescript-eslint/consistent-type-definitions`); arrow-function components (`react/function-component-definition`); explicit types for props, hooks and API data.
 10. **The left side of a JSX `&&` is a boolean:** `{!!count && <X />}` (`react/jsx-no-leaked-render`).
-11. **No `console.log`** (`no-console`). **No `dangerouslySetInnerHTML`** without `isomorphic-dompurify` (`react/no-danger`).
-12. **White-label.** Never show "Omnistrate", "SaaS Builder" or another vendor name to end customers. Take the provider's name, logo and support email from `useProviderOrgDetails()` (review only; there is no lint rule).
+11. **No `console.log`** (`no-console`). **No new `dangerouslySetInnerHTML`**: `react/no-danger` rejects every use, sanitized or not. Render text. If HTML must render, sanitize it with `isomorphic-dompurify` and raise it in the pull request.
+12. **White-label.** Never show "Omnistrate", "SaaS Builder" or another vendor name to end customers. Take the provider's name, logo and support email from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx` (review only; there is no lint rule).
 13. **Permission-restricted actions are disabled with a reason** (`disabledMessage`), so they can't be used and the customer sees why. Never hide them, and never rely on a backend 403.
-14. **Customers never see raw backend errors.** Show fixed, friendly copy.
-15. **Tests that run:** Playwright specs import `test` and `expect` from `test-fixtures/har-test`, run in the project in `playwright.config.ts`, and ship with recorded HARs and a bumped `tests/fixtures/hars` pointer (`check:playwright-discovery`, test lint rules).
+14. **Never render backend error text yourself.** Show fixed, friendly copy.
+15. **Tests that run:** Playwright specs import `test` and `expect` from `test-fixtures/har-test`, run in a project in `playwright.config.ts`, and ship with recorded HARs and a bumped `tests/fixtures/hars` pointer (`check:playwright-discovery`, test lint rules).
 16. **Small pull requests with one concern.** Keep schema regeneration and unrelated refactors out of feature PRs. Call out changes to shared components, `src/api/`, `next.config.js`, `package.json` and workflows in the description.
 
 ## Where code goes
@@ -37,7 +37,7 @@ Lint messages start with the guardrail name, for example `[no-axios]`. Existing 
 
 ## Golden examples
 
-Copy these before inventing anything, but not their legacy parts (axios calls, hex colors, raw MUI spinners):
+Copy these before inventing anything. The few legacy parts left in them are listed in `.agents/skills/frontend-feature-development/SKILL.md` §1; don't copy those.
 
 - `app/(dashboard)/custom-networks/`: list, create and modify drawer, type-to-confirm delete, disabled buttons with reasons.
 - `app/(dashboard)/instance-snapshots/`: list plus detail route, `$api` for every query and mutation.
@@ -56,12 +56,12 @@ Copy these before inventing anything, but not their legacy parts (axios calls, h
 
 ## Definition of done
 
-| Change                         | Also run or provide                                                                                                                   |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Any                            | `yarn lint`, `yarn typecheck`, `yarn check:guardrails --base origin/master`, `yarn build`                                             |
-| Visible UI                     | before/after screenshots in the pull request, after checking the page in a browser, including with a non-default provider brand color |
-| Playwright                     | `yarn check:playwright-discovery`, `yarn record`, `yarn test:replay`, the `tests/fixtures/hars` pointer bump                          |
-| Shared component or `src/api/` | a check of its main consumers, called out in the pull request                                                                         |
+| Change                         | Also run or provide                                                                                                                                                                           |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Any                            | `yarn lint`, `yarn typecheck`, `yarn check:guardrails --base origin/master` (`--base upstream/master` from a fork, see `README.md`), `yarn build`                                             |
+| Visible UI                     | before/after screenshots in the pull request, after checking the page in a browser, including with a non-default provider brand color (section 2 of `.agents/skills/ui-and-styling/SKILL.md`) |
+| Playwright                     | `yarn check:playwright-discovery`, `yarn record` (or ask a maintainer to record the HARs), `yarn test:replay`, the `tests/fixtures/hars` pointer bump                                         |
+| Shared component or `src/api/` | a check of its main consumers, called out in the pull request                                                                                                                                 |
 
 ## Customer-facing vocabulary
 
@@ -70,11 +70,11 @@ Match the page titles in `src/constants/pageTitleMap.ts` and the sidebar: Dashbo
 ## Security and privacy
 
 - **Auth:** tokens live in the httpOnly cookies `omnistrate_token` and `omnistrate_refresh_token`, which only the `pages/api` auth routes set (`src/server/utils/authCookieConstants.ts`; the refresh cookie lasts one day). Browser code never reads, stores or logs a token. `omnistrate_logged_in` is the only JavaScript-readable auth cookie: a signed-in hint the API client checks before protected requests. It never carries a secret.
-- **Storage and URLs:** no tokens, credentials, payment data or personal data in `localStorage`, `sessionStorage`, query strings or logs.
+- **Storage and URLs:** no tokens, credentials, payment data or personal data in `localStorage`, `sessionStorage`, query strings or logs. Server code logs a caught error through `errorSummary` (`src/server/utils/errorSummary.js`), never as a raw axios error, which carries the request body and headers.
 - **External URLs:** pass provider or backend URLs through `getSafeExternalURL` (`src/utils/getSafeExternalURL.ts`) before using them in `href`, `src` or an iframe. It allows only https, plus http outside production.
 - **Redirects:** check targets with `checkRouteValidity` (`src/utils/route/checkRouteValidity.ts`); never navigate to a query parameter as-is.
 - **New `pages/api/` routes** that act with the provider's credentials must first check the customer's own session and access.
-- **HTML:** sanitize with `isomorphic-dompurify` before `dangerouslySetInnerHTML`.
+- **HTML:** render text; no new `dangerouslySetInnerHTML` (non-negotiable 11).
 - **Dependencies and CSP:** new packages, SDKs, third-party scripts or CSP changes in `next.config.js` need a maintainer's review, because every fork inherits them. Install scripts stay disabled.
 
 ## Working agreements

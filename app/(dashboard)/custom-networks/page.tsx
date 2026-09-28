@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { deleteCustomNetwork } from "src/api/customNetworks";
+import { $api } from "src/api/query";
 import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -42,17 +41,17 @@ const CustomNetworksPage = () => {
 
   const [filteredCustomNetworks, setFilteredCustomNetworks] = useState<CustomNetwork[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [overlayType, setOverlayType] = useState<Overlay>("peering-info-dialog");
-  const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
-
   // Open the Create Form Overlay when the overlay query param is set to "create"
+  const [overlayType, setOverlayType] = useState<Overlay>(
+    overlay === "create" ? "create-custom-network" : "peering-info-dialog"
+  );
+  const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(overlay === "create");
+
   useEffect(() => {
     if (overlay === "create") {
-      setOverlayType("create-custom-network");
-      setIsOverlayOpen(true);
       router.replace(getCustomNetworksRoute({}));
     }
-  }, [overlay]);
+  }, [overlay, router]);
 
   const {
     data: customNetworks = [],
@@ -143,15 +142,18 @@ const CustomNetworksPage = () => {
     ];
   }, []);
 
-  const deleteCustomNetworkMutation = useMutation({
-    mutationFn: deleteCustomNetwork,
-    onSuccess: async () => {
-      setSelectedRows([]);
-      refetchCustomNetworks();
-      setIsOverlayOpen(false);
-      snackbar.showSuccess("Customer Network deleted successfully");
-    },
-  });
+  const deleteCustomNetworkMutation = $api.useMutation(
+    "delete",
+    "/2022-09-01-00/resource-instance/custom-network/{id}",
+    {
+      onSuccess: async () => {
+        setSelectedRows([]);
+        refetchCustomNetworks();
+        setIsOverlayOpen(false);
+        snackbar.showSuccess("Customer Network deleted successfully");
+      },
+    }
+  );
 
   const peeringInfoList: ListItemProps[] = useMemo(() => {
     if (!selectedRows.length || !customNetworks) {
@@ -267,7 +269,7 @@ const CustomNetworksPage = () => {
       <FullScreenDrawer
         title="Create Customer Network"
         description="Create a new customer network with the specified details"
-        open={isOverlayOpen && ["create-custom-network", "modify-custom-network"].includes(overlayType)}
+        open={["create-custom-network", "modify-custom-network"].includes(overlayType) && isOverlayOpen}
         closeDrawer={() => setIsOverlayOpen(false)}
         RenderUI={
           <CustomNetworkForm
@@ -282,11 +284,11 @@ const CustomNetworksPage = () => {
       />
 
       <TextConfirmationDialog
-        open={isOverlayOpen && overlayType === "delete-dialog"}
+        open={overlayType === "delete-dialog" && isOverlayOpen}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
           if (!selectedRows.length) return;
-          await deleteCustomNetworkMutation.mutateAsync(selectedRows[0]);
+          await deleteCustomNetworkMutation.mutateAsync({ params: { path: { id: selectedRows[0] } } });
         }}
         title="Delete Customer Network"
         subtitle={`Are you sure you want to delete - ${selectedRows[0]}?`}
@@ -295,7 +297,7 @@ const CustomNetworksPage = () => {
       />
 
       <PeeringInfoDialog
-        open={isOverlayOpen && overlayType === "peering-info-dialog"}
+        open={overlayType === "peering-info-dialog" && isOverlayOpen}
         onClose={() => setIsOverlayOpen(false)}
         list={peeringInfoList}
       />

@@ -13,15 +13,15 @@ You are reviewing pull requests for the customer portal: a white-label, self-hos
 
 ## Already enforced by lint and CI
 
-The Verify workflow runs `yarn lint`, `yarn typecheck`, `yarn check:guardrails` and `yarn check:playwright-discovery`. Lint messages start with the guardrail name. Don't restate lint errors. Do flag any attempt to get around them: a new entry in `eslint.migration-allowlists.cjs`, an `eslint-disable` for a guarded rule, `// @ts-ignore` or `as unknown as` to silence a type error, `void someVar;` to silence the unused-variable rule, or a file renamed or moved to dodge a check. Each of these is a **Blocker**.
+The Verify workflow runs `yarn lint`, `yarn typecheck`, `yarn check:guardrails` and `yarn check:playwright-discovery`. Lint messages start with the guardrail name. Don't restate lint errors. A file on an allowlist has that guardrail off for the whole file, so flag new violations on its added lines. Do flag any attempt to get around them: a new entry in `eslint.migration-allowlists.cjs` or a removed key, an `eslint-disable` or inline `/* eslint */` config comment for a guarded rule, `// @ts-ignore` or `as unknown as` to silence a type error, `void someVar;` to silence the unused-variable rule, or a file renamed or moved to dodge a check. Each of these is a **Blocker**.
 
 - **Components and styling:**
-  - `[no-raw-mui]`: raw MUI where a wrapper exists
-  - `react/forbid-elements`: raw `button`, `select`, `input`, `textarea`, `table`
-  - `[no-hex-colors]`, `[no-css-modules]`
-  - `[no-text-font-override]`
-  - `[no-react-icons]`
-  - `[no-auth-shell-components]`: `NonDashboardComponents` outside `app/(public)/`
+  - `[no-raw-mui]`: raw MUI where a wrapper exists, outside the wrapper folders (section 1 of `.agents/skills/ui-and-styling/SKILL.md`)
+  - `react/forbid-elements`: raw `button`, `select`, `input`, `textarea`, `table`, outside the same folders
+  - `[no-hex-colors]`: hex colors anywhere in a string, such as `"1px solid #fff"`
+  - `[no-text-font-override]`: font size, weight, line height or the `font` shorthand on `Text`
+  - `[no-css-modules]`, `[no-react-icons]`
+  - `[no-auth-shell-components]`: `NonDashboardComponents` outside `app/(public)/` and `app/not-found.tsx`
 - **Data:**
   - `[no-axios]`: new axios imports
   - `[no-raw-fetch]`: `fetch` outside `src/api/` and `pages/api/`
@@ -29,10 +29,11 @@ The Verify workflow runs `yarn lint`, `yarn typecheck`, `yarn check:guardrails` 
 - **Forms and TypeScript:**
   - `[formik-requires-yup]`, `@typescript-eslint/no-explicit-any`
   - `@typescript-eslint/consistent-type-definitions`, `react/function-component-definition`
-  - `react/jsx-no-leaked-render`, `no-console`, `react/no-danger`
+  - `react/jsx-no-leaked-render`, `no-console`, `react/no-danger` (every `dangerouslySetInnerHTML`, sanitized or not)
+- **React Compiler:** `react-hooks/*` rejects reading refs, calling impure functions or setting state during render; mutating props, state or globals; components declared inside components; and memoization the compiler can't preserve.
 - **Tests:**
   - `[no-focused-tests]`, `[no-wait-for-timeout]`, `[no-playwright-test-import]`
-  - every spec runs in the Playwright project
+  - every spec runs in a project
 - **Hygiene:** changed files are Prettier-formatted, and no agent or IDE artifacts are committed.
 
 ## White-label
@@ -40,7 +41,7 @@ The Verify workflow runs `yarn lint`, `yarn typecheck`, `yarn check:guardrails` 
 These leaks ship to every provider's customers. Label them **Blocker**.
 
 - **Vendor names:** "Omnistrate", "SaaS Builder" or any vendor name in customer-facing text, page titles, alt text, emails or error messages. The provider's name, logo and support email come from `useProviderOrgDetails()` (`src/providers/ProviderOrgDetailsProvider.tsx`).
-- **Brand colors:** a hard-coded brand or accent color, such as a literal purple or a Tailwind arbitrary value like `border-[#EAECF0]`, instead of `theme.palette.primary` and the tokens in `src/themeConfig.ts`. Also flag third-party widgets (payment forms, charts) configured with literal brand colors.
+- **Brand colors:** a hard-coded brand or accent color that lint misses, such as `rgb(127, 86, 217)`, a named color or a Tailwind step that `tailwind.config.js` doesn't define, instead of `theme.palette.primary` and the tokens in `src/themeConfig.ts`. Also flag third-party widgets (payment forms, charts) configured with literal brand colors.
 - **Support contacts:** a hard-coded support address or URL instead of the provider's `orgSupportEmail`.
 - **Third-party code:** new third-party scripts, SDKs, analytics or tracking. Every fork inherits them, so they need a maintainer's approval and a CSP review.
 
@@ -51,7 +52,7 @@ Lint can't see these, so they need your judgment.
 - **Hand-rolled replacements for shared components:**
   - tables and pagination instead of `DataTable` (`src/components/DataTable/DataTable`); new code doesn't use MUI `DataGrid`
   - dialogs instead of `TextConfirmationDialog` or `ConfirmationDialog`
-  - drawers instead of `FullScreenDrawer` or `SideDrawerRight`
+  - drawers instead of `FullScreenDrawer`
   - status pills instead of `StatusChip`
   - spinners instead of `LoadingSpinner` or the `CircularProgress` wrapper
   - banners, cards or text built from `Box` with font styles
@@ -94,13 +95,13 @@ Flag these and explain the risk in one sentence. The organization checklist belo
 - **Error text:** raw backend messages, `error.message`, status codes, JSON or stack traces shown to customers. Error copy is fixed and friendly; known backend messages are mapped to copy with a generic default.
 - **URLs:** provider or backend URLs used in `href`, `src` or an iframe without `getSafeExternalURL` (`src/utils/getSafeExternalURL.ts`), or redirects to a query parameter without `checkRouteValidity` (`src/utils/route/checkRouteValidity.ts`).
 - **Tokens:** code that reads, stores or logs tokens. They live only in the httpOnly cookies that `pages/api` routes set.
-- **New API routes:** a `pages/api/` route that acts with the provider's credentials without first checking the customer's own session and access.
+- **New API routes:** a `pages/api/` route that acts with the provider's credentials without first checking the customer's own session and access (for a plan, `requireProductTierAccess` from `src/server/utils/requireProductTierAccess.ts`).
 - **Payment and personal data:** kept in state, storage, URLs or logs longer than the flow needs.
 
 ## Copy
 
 - Fix grammar and spelling in customer-facing text. Flag confusing copy, and confirmation instructions that don't match the action.
-- Use the portal's vocabulary from `src/constants/pageTitleMap.ts` and the sidebar, such as Instances, Customer Networks, Cloud Accounts, Subscriptions and Plan. Never use the SaaS provider's internal product terms.
+- Use the portal's vocabulary from `src/constants/pageTitleMap.ts` and the sidebar, such as Instances, Customer Networks, Cloud Accounts, Subscriptions and Plan. Never use API names such as service offering, product tier or resource instance.
 
 <!-- security-checklist-managed -->
 

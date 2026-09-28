@@ -113,7 +113,7 @@ test.describe("Customer Networks", () => {
 });
 ```
 
-- Use `test.describe.configure({ mode: "serial" })` when tests build on each other (create, verify, delete), as every existing suite does.
+- Use `test.describe.configure({ mode: "serial" })` when tests build on each other (create, verify, delete), as every suite under `tests/deployments/` does.
 - One page object per page in `page-objects/<page>-page.ts`: a class holding `page`, `dataTestIds`, `pageElements` (expected copy) and actions such as `navigate()`. Build URLs from `PageURLs` in `page-objects/pages.ts`, which uses `src/utils/routes.ts`.
 - Select by test ID first (`page.getByTestId`), then by role and accessible name. Avoid CSS classes such as `.MuiPopover-paper` and text that the provider can rebrand.
 - Test IDs are kebab-case `data-testid` values (`dataTestId` in a `FormConfiguration`). When the app and a page object share them, put them in `src/constants/testIds/<page>.ts` and import that in both places; app code cannot import from `page-objects/`.

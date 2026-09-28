@@ -6,16 +6,18 @@ import PropertyDetails, { Row } from "src/components/ResourceInstance/ResourceIn
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
+import { colors } from "src/themeConfig";
 import { CloudProvider } from "src/types/common/enums";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { Subscription } from "src/types/subscription";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getInstanceDetailsRoute, getSubscriptionsRoute } from "src/utils/routes";
 
 type SnapshotDetailsTabProps = {
   snapshot: InstanceSnapshot;
   instances: ResourceInstance[];
-  subscriptionsObj: Record<string, any>;
+  subscriptionsObj: Record<string, Subscription>;
 };
 
 const SnapshotDetailsTab: React.FC<SnapshotDetailsTabProps> = ({ snapshot, instances, subscriptionsObj }) => {
@@ -77,7 +79,7 @@ const SnapshotDetailsTab: React.FC<SnapshotDetailsTabProps> = ({ snapshot, insta
         value: (
           <Box display="flex" alignItems="center" gap="8px">
             <RegionIcon />
-            <Text size="small" weight="medium" color="#535862">
+            <Text size="small" weight="medium" color={colors.gray600}>
               {region}
             </Text>
           </Box>

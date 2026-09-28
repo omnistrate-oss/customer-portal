@@ -84,7 +84,7 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
 
   return (
     <>
-      <div className="py-5 px-6 flex items-center justify-between gap-4 border-b border-[#EAECF0]">
+      <div className="py-5 px-6 flex items-center justify-between gap-4 border-b border-gray-200">
         <DataGridHeaderTitle
           title="List of Customer Networks"
           desc="List of configured customer networks"
@@ -134,7 +134,7 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
           </Button>
         </div>
       </div>
-      <div className="px-6 py-4 border-b border-[#EAECF0]">
+      <div className="px-6 py-4 border-b border-gray-200">
         <CustomNetworksFilters
           customNetworks={filterableCustomNetworks}
           setFilteredCustomNetworks={setFilteredCustomNetworks}

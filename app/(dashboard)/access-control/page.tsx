@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useSelector } from "react-redux";
@@ -10,6 +10,7 @@ import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
+import { colors } from "src/themeConfig";
 import { SubscriptionUser } from "src/types/consumptionUser";
 import {
   getEnumFromUserRoleString,
@@ -41,7 +42,15 @@ const AccessControlPage = () => {
   const snackbar = useSnackbar();
   const searchParams = useSearchParams();
   const searchUserId = searchParams?.get("searchUserId");
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>(searchUserId ?? "");
+  // Search for the user in the searchUserId query param when it changes
+  const [prevSearchUserId, setPrevSearchUserId] = useState(searchUserId);
+  if (searchUserId !== prevSearchUserId) {
+    setPrevSearchUserId(searchUserId);
+    if (searchUserId) {
+      setSearchText(searchUserId);
+    }
+  }
   const [filteredUsers, setFilteredUsers] = useState<SubscriptionUser[]>([]);
   const [overlayType, setOverlayType] = useState<Overlay>("delete-dialog");
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
@@ -49,12 +58,6 @@ const AccessControlPage = () => {
   const { subscriptionsObj, isSubscriptionsPending } = useGlobalData();
   const currentUser = useSelector(selectUserrootData);
   const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
-
-  useEffect(() => {
-    if (searchUserId) {
-      setSearchText(searchUserId);
-    }
-  }, [searchUserId]);
 
   const { data: users = [], isFetching: isFetchingUsers, refetch: refetchUsers } = useAllUsers();
 
@@ -128,8 +131,7 @@ const AccessControlPage = () => {
           );
         },
       }),
-      // @ts-ignore
-      columnHelper.accessor("action", {
+      columnHelper.display({
         id: "action",
         header: "Action",
         enableSorting: false,
@@ -159,13 +161,13 @@ const AccessControlPage = () => {
           return (
             <Button
               variant="outlined"
-              fontColor="#B42318"
+              fontColor={colors.error700}
               onClick={() => {
                 setIsOverlayOpen(true);
                 setOverlayType("delete-dialog");
                 setSelectedUser(data.row.original);
               }}
-              startIcon={<DeleteIcon color="#B42318" disabled={disabled} />}
+              startIcon={<DeleteIcon color={colors.error700} disabled={disabled} />}
               sx={{
                 border: "none !important",
                 padding: "4px !important",
@@ -235,7 +237,7 @@ const AccessControlPage = () => {
       </div>
 
       <TextConfirmationDialog
-        open={isOverlayOpen && overlayType === "delete-dialog"}
+        open={overlayType === "delete-dialog" && isOverlayOpen}
         handleClose={() => setIsOverlayOpen(false)}
         onConfirm={async () => {
           if (!selectedUser) return snackbar.showError("No user selected");

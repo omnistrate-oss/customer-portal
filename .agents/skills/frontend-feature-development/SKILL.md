@@ -21,7 +21,11 @@ Read the closest existing route end to end before writing code. Copy its structu
 | `app/(dashboard)/instance-snapshots/` | List plus detail route (`[snapshotId]/page.tsx`), `$api` for every query and mutation, `ConfirmationDialog`, `TextConfirmationDialog`                   |
 | `app/(dashboard)/access-control/`     | RBAC with `isOperationAllowedByRBAC` and `disabledMessage`, Yup schema in `utils.ts`, `$api` hooks in `hooks/`                                          |
 
-Do not copy these legacy parts even from good routes: the axios call `deleteCustomNetwork` from `src/api/customNetworks.ts`, hex colors such as `border-[#EAECF0]`, and raw MUI `CircularProgress`.
+Legacy parts left in these routes, which you shouldn't copy:
+
+- `getCloudProviders` in `custom-networks/hooks/useRegions.ts`. It calls a Next.js route that uses the provider's server-side token, so `$api` can't replace it.
+- The raw MUI `Dialog` in `custom-networks/components/PeeringInfoDialog.tsx`, and the `fontWeight` passed through `DataGridText`'s `style` in `custom-networks/page.tsx`.
+- The `@ts-ignore` on `<Form>` in `access-control/components/InviteUsersCard.tsx` and the `@ts-expect-error` on `DisplayText` in `instance-snapshots/[snapshotId]/page.tsx`. The shared `Form` and `Typography` components aren't typed yet.
 
 ## 2. Where code goes
 
@@ -51,15 +55,15 @@ Do not copy these legacy parts even from good routes: the axios call `deleteCust
 
 ## 3. Import paths and the alias trap
 
-| Import prefix         | Resolves to        | Use it for                                                           |
-| --------------------- | ------------------ | -------------------------------------------------------------------- |
-| `src/<path>`          | `src/`             | Everything under `src/`; the most common form (about 1,500 imports)  |
-| `components/<path>`   | `src/components/`  | Same files as `src/components/<path>`; 274 imports use this form     |
-| `@/components/<path>` | root `components/` | Only `ActionMenu`, `GlobalProviderError` and `ui/chart`              |
-| `app/<path>`          | `app/`             | Importing from a route folder, for example a hook another route owns |
-| `lib/<path>`          | `lib/`             | `cn()`                                                               |
-| `constants/<path>`    | root `constants/`  | YAML templates only; app constants are `src/constants/<path>`        |
-| `public/<path>`       | `public/`          | Static images                                                        |
+| Import prefix         | Resolves to        | Use it for                                                              |
+| --------------------- | ------------------ | ----------------------------------------------------------------------- |
+| `src/<path>`          | `src/`             | Everything under `src/`; the most common form (about 1,500 imports)     |
+| `components/<path>`   | `src/components/`  | Same files as `src/components/<path>`; 274 imports use this form        |
+| `@/components/<path>` | root `components/` | Only `ActionMenu`, `GlobalProviderError` and `ui/chart`                 |
+| `app/<path>`          | `app/`             | Rare. Move code that two routes share to `app/(dashboard)/components/`. |
+| `lib/<path>`          | `lib/`             | `cn()`                                                                  |
+| `constants/<path>`    | root `constants/`  | YAML templates only; app constants are `src/constants/<path>`           |
+| `public/<path>`       | `public/`          | Static images                                                           |
 
 The trap: `components/<path>` and `@/components/<path>` point at different folders, and `constants/<path>` is not `src/constants/`.
 
@@ -90,7 +94,7 @@ export type ListCustomNetworksSuccessResponse =
 
 - Refine a loose field with `Omit<Base, "field"> & { field: Narrower }` instead of redeclaring the whole shape.
 - Route-only types (props, form values, tab names) go in the route's `types.ts`.
-- `src/api/client.ts` is the one file that needs `paths` directly; three other files import the schema today. Do not add more.
+- `src/api/client.ts` and typed clients in `src/server/` (such as `src/server/utils/requireProductTierAccess.ts`) are the only files that need `paths` directly; three other files import the schema today. Do not add more.
 
 ## 5. Checklists for common changes
 
@@ -151,7 +155,7 @@ Rules:
 - Success: `const snackbar = useSnackbar();` from `src/hooks/useSnackbar.js`, then `snackbar.showSuccess("Customer Network created successfully")` in the mutation's `onSuccess`.
 - Copy you write is fixed, friendly text. Never put `error.message`, `String(error)`, `error.response.data`, status codes, JSON, stack traces or request IDs into JSX, dialogs or snackbar text.
 - There is no error sanitizer in this repo. To reword known backend messages, map them to copy with a generic default, as `app/(dashboard)/billing/utils/getBillingDetailsErrorMessage.ts` does.
-- Send customers to the provider's support address, `orgSupportEmail` from `useProviderOrgDetails()` (see `app/error.tsx`), never to a hard-coded address.
+- Send customers to the provider's support address, `orgSupportEmail` from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx` (see `app/error.tsx`), never to a hard-coded address.
 
 ## 8. White-label rules
 
@@ -162,7 +166,7 @@ No lint rule checks branding; reviewers do.
 | Show the provider's name, logo and support email from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx` (`orgName`, `orgLogoURL`, `orgSupportEmail`) | Write "Omnistrate", "SaaS Builder" or any vendor name in customer-facing text, titles, alt text or emails |
 | Take colors from the theme and tokens (`.agents/skills/ui-and-styling/SKILL.md`)                                                                                               | Hard-code a brand hex such as `#5925DC` or `#7F56D9`                                                      |
 | Pass provider or backend URLs through `getSafeExternalURL` (`src/utils/getSafeExternalURL.ts`); it returns `""` unless the URL is https (http is allowed outside production)   | Put raw API values into `href`, `src` or an iframe                                                        |
-| Sanitize provider or backend HTML with `DOMPurify.sanitize` from `isomorphic-dompurify` before `dangerouslySetInnerHTML`                                                       | Render backend HTML as-is                                                                                 |
+| Render provider and backend content as text (HTML: section 5 of `.agents/skills/ui-and-styling/SKILL.md`)                                                                      | Add a `dangerouslySetInnerHTML`; `react/no-danger` rejects every use, sanitized or not                    |
 | Leave third-party scripts, SDKs and the CSP in `next.config.js` alone unless a maintainer asked                                                                                | Add analytics, chat or tracking code; every fork inherits it                                              |
 
 Known exceptions, not patterns: the default `metadata` title in `app/layout.tsx`, and the non-production sign-in help in `app/(public)/(main-image)/signin/components/NonProdLoginInstructions.tsx`, which only the provider's own team sees.
@@ -182,23 +186,31 @@ Customer-facing vocabulary (from `src/constants/pageTitleMap.ts` and the sidebar
 - Auth tokens live in httpOnly cookies that the `pages/api` auth routes set. Browser code never reads, stores or logs a token. `omnistrate_logged_in` is the only auth cookie client code may read, and only as a signed-in hint.
 - Never write tokens, credentials, payment data or personal data to `localStorage`, `sessionStorage` or a query string.
 - Validate redirect targets with `checkRouteValidity` from `src/utils/route/checkRouteValidity.ts`; never `router.push` a query parameter as-is.
-- A new `pages/api/` route that uses the provider's credentials must first check the customer's own session and access, as `pages/api/product-tier-custom-metrics.ts` does.
+- A new `pages/api/` route that uses the provider's credentials must first check the customer's own session and access, with `requireProductTierAccess` when it takes `serviceId` and `productTierId` (section 8 of `.agents/skills/data-fetching/SKILL.md`).
 
 ## 10. What lint and CI check
 
 The Verify workflow (`.github/workflows/verify.yml`) runs `yarn lint`, `yarn typecheck`, `yarn check:guardrails` and `yarn check:playwright-discovery` on every pull request. ESLint is configured in `.eslintrc.cjs`.
 
-| Rules                                                                                                                                                                                        | What they stop                                                                                                                                               | Details in       |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
-| `[no-raw-mui]`, `react/forbid-elements`                                                                                                                                                      | Raw MUI components that have a wrapper; raw `button`, `select`, `input`, `textarea` and `table` outside `src/components/` and root `components/`             | ui-and-styling   |
-| `[no-hex-colors]`, `[no-text-font-override]`, `[no-css-modules]`, `[no-auth-shell-components]`                                                                                               | Hex colors, `Text` font overrides, CSS modules, `NonDashboardComponents` outside `app/(public)/` and `app/not-found.tsx`                                     | ui-and-styling   |
-| `[no-react-icons]`                                                                                                                                                                           | `react-icons` imports (the guardrail script also rejects new files in `src/components/Icons/`)                                                               | icons            |
-| `[no-axios]`, `[no-raw-fetch]`, `[no-mutate-in-effect]`, `react-hooks/set-state-in-effect`                                                                                                   | Legacy transports, `fetch` outside `src/api/` and `pages/api/`, writes and state syncing from effects                                                        | data-fetching    |
-| `[formik-requires-yup]`                                                                                                                                                                      | Formik forms without a Yup schema                                                                                                                            | forms            |
-| `[no-focused-tests]`, `[no-wait-for-timeout]`, `[no-playwright-test-import]`                                                                                                                 | `.only`, fixed sleeps, specs that bypass the HAR fixture                                                                                                     | playwright-tests |
-| `react/jsx-no-leaked-render`, `react/function-component-definition`, `react/no-danger`, `@typescript-eslint/consistent-type-definitions`, `@typescript-eslint/no-explicit-any`, `no-console` | `&&` with non-booleans, non-arrow components, unreviewed HTML injection, `interface` instead of `type`, `any`, `console` calls other than `warn` and `error` | ui-and-styling   |
+| Rules                                                                                                                                                                                        | What they stop                                                                                                                                                                          | Details in       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `[no-raw-mui]`, `react/forbid-elements`                                                                                                                                                      | Raw MUI components that have a wrapper, and raw `button`, `select`, `input`, `textarea` and `table`, outside the wrapper folders                                                        | ui-and-styling   |
+| `[no-hex-colors]`, `[no-text-font-override]`, `[no-css-modules]`, `[no-auth-shell-components]`                                                                                               | Hex colors, `Text` font overrides, CSS modules, `NonDashboardComponents` outside `app/(public)/` and `app/not-found.tsx`                                                                | ui-and-styling   |
+| `[no-react-icons]`                                                                                                                                                                           | `react-icons` imports (the guardrail script also rejects new files in `src/components/Icons/`)                                                                                          | icons            |
+| `[no-axios]`, `[no-raw-fetch]`, `[no-mutate-in-effect]`, `react-hooks/set-state-in-effect`                                                                                                   | Legacy transports, `fetch` outside `src/api/` and `pages/api/`, writes and state syncing from effects                                                                                   | data-fetching    |
+| `[formik-requires-yup]`                                                                                                                                                                      | Formik forms without a Yup schema                                                                                                                                                       | forms            |
+| `[no-focused-tests]`, `[no-wait-for-timeout]`, `[no-playwright-test-import]`                                                                                                                 | `.only`, fixed sleeps, specs that bypass the HAR fixture                                                                                                                                | playwright-tests |
+| `react/jsx-no-leaked-render`, `react/function-component-definition`, `react/no-danger`, `@typescript-eslint/consistent-type-definitions`, `@typescript-eslint/no-explicit-any`, `no-console` | `&&` with non-booleans, non-arrow components, any `dangerouslySetInnerHTML`, `interface` instead of `type`, `any`, `console` calls other than `warn` and `error`                        | ui-and-styling   |
+| `react-hooks/*` (React Compiler)                                                                                                                                                             | Reading refs, calling impure functions or setting state during render; mutating props, state or globals; components declared inside components; memoization the compiler can't preserve | —                |
 
-`yarn check:guardrails --base origin/master` also fails when a backticked repo path in these guides does not exist, an allowlist in `eslint.migration-allowlists.cjs` grows, a change adds an `eslint-disable` for a guarded rule, a changed file is not Prettier-formatted, or agent and IDE artifacts are committed. Format only the files you changed (`yarn prettier --write <files>`).
+`yarn check:guardrails` fails when a backticked repo path in these guides, or a file on an allowlist, does not exist. With `--base origin/master` (`--base=origin/master` also works) it also fails when a change:
+
+- grows an allowlist in `eslint.migration-allowlists.cjs`. A renamed file keeps its entry, including a `.jsx` to `.tsx` rename; a new file beside a listed one that differs only by extension doesn't.
+- removes an allowlist key. Keep an emptied list as `[]`.
+- adds an `eslint-disable`, or an inline config comment such as `/* eslint no-console: "off" */`, for a guarded rule.
+- adds a file to `src/components/Icons/`.
+- leaves a changed file unformatted by Prettier. Format only the files you changed (`yarn prettier --write <files>`).
+- commits agent or IDE artifacts.
 
 ## 11. Pull request checklist
 
