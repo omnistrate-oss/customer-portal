@@ -190,6 +190,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 
         const instanceWithParams: ResourceInstance = {
           ...resourceInstance,
+          id: resourceInstance?.id || instanceId,
+          subscriptionId: resourceInstance?.subscriptionId || values.subscriptionId,
           result_params: resultParams,
         } as ResourceInstance;
 
@@ -218,7 +220,10 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       byoaServiceOfferings,
       allInstances
     ),
-    enableReinitialize: true,
+    // Global instance data is refreshed after creation. Reinitializing at that point can
+    // clear the selected plan/subscription because the subscription is no longer eligible
+    // for another account, even though the rest of this wizard still needs those values.
+    enableReinitialize: currentStep === 0,
     validationSchema: CloudAccountValidationSchema,
     onSubmit: (values) => {
       const { serviceId, servicePlanId } = values;
@@ -911,12 +916,16 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       if (!isConfigureVpcsAllowed) return;
       setCurrentStep(2);
     } else {
-      const offering = byoaServiceOfferingsObj[values.serviceId]?.[values.servicePlanId];
+      const accountSubscriptionId = clickedInstance?.subscriptionId as string | undefined;
+      const accountSubscription = accountSubscriptionId ? subscriptionsObj[accountSubscriptionId] : undefined;
+      const offering = accountSubscription
+        ? serviceOfferingsObj[accountSubscription.serviceId]?.[accountSubscription.productTierId]
+        : undefined;
       const resource = offering?.resourceParameters.find((item) =>
         item.resourceId.startsWith("r-injectedaccountconfig")
       );
 
-      if (!clickedInstance?.id || !offering || !resource) {
+      if (!clickedInstance?.id || !accountSubscriptionId || !offering || !resource) {
         snackbar.showError("Account configuration resource not found.");
         return;
       }
@@ -933,7 +942,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
             resourceKey: resource.urlKey,
             id: clickedInstance.id,
           },
-          query: { subscriptionId: values.subscriptionId },
+          query: { subscriptionId: accountSubscriptionId },
         },
         body: {
           requestParams: {
@@ -967,11 +976,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         <div className="col-span-5">
           {currentStep === 0 && (
             <form onSubmit={formData.handleSubmit} data-testid="add-new-account-form">
-              <AddNewAccountStep
-                formData={formData}
-                formConfiguration={formConfiguration}
-                formMode="create"
-              />
+              <AddNewAccountStep formData={formData} formConfiguration={formConfiguration} formMode="create" />
             </form>
           )}
 
