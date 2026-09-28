@@ -220,8 +220,8 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
       byoaServiceOfferings,
       allInstances
     ),
-    // Stop reinitializing as soon as creation starts. The instance cache is updated before
-    // the wizard advances, and that render can otherwise clear the now-consumed subscription.
+    // Creation updates the instance cache before advancing the wizard. Disable reinitialization
+    // during the mutation so the intermediate render cannot clear the now-consumed subscription.
     enableReinitialize: currentStep === 0 && createCloudAccountMutation.isIdle,
     validationSchema: CloudAccountValidationSchema,
     onSubmit: (values) => {
