@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+
+import axios from "src/axios";
 
 type QueryParams = {
   serviceId?: string;
@@ -23,6 +24,7 @@ async function fetchResources(params: QueryParams): Promise<ResourceSummary[]> {
   const { serviceId, productTierId, productTierVersion, isInjectedAccountConfig } = params;
 
   const response = await axios.get("/api/resources", {
+    baseURL: "",
     params: {
       serviceId,
       productTierId,

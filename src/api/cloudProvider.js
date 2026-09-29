@@ -1,5 +1,5 @@
-import rawAxios from "axios"; //unconfigured axios to make calls to next js server
+import axios from "src/axios";
 
 export const getCloudProviders = () => {
-  return rawAxios.get("/api/cloud-providers");
+  return axios.get("/api/cloud-providers", { baseURL: "" });
 };
