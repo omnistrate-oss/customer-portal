@@ -83,6 +83,7 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
     isAccountConfigReady,
     hasExistingCloudNativeVpc: hasSelectedInstanceCloudNativeVpc,
     contextKey: selectedInstance.id as string,
+    autoSyncOnFirstLoad: true,
     initialEnableNewVpcs: resultParams?.allow_new_cloud_native_network_creation !== false,
   });
 

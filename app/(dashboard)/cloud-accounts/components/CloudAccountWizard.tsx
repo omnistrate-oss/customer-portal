@@ -343,7 +343,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
     hasExistingCloudNativeVpc: hasSelectedInstanceCloudNativeVpc,
     contextKey: vpcContextKey,
     enabled: currentStep === 2,
-    autoSyncWhenEmpty: true,
+    autoSyncOnFirstLoad: true,
   });
 
   const updateCloudAccountVpcMutation = $api.useMutation(

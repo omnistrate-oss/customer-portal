@@ -11,6 +11,7 @@ import type { ConfigureVPCsFormValues, VpcRecord } from "../components/steps/Con
 import { getCloudNativeNetworkRegions } from "../utils";
 
 const RESOURCE_INSTANCE_QUERY_KEY = ["get", "/2022-09-01-00/resource-instance"];
+const autoSyncedAccountIds = new Set<string>();
 
 const getSyncPayload = (regions: string[]): SyncAccountConfigCloudNativeNetworksPayload => ({
   cloudNativeNetworks: regions.map((region) => ({ region })),
@@ -26,8 +27,8 @@ type UseCloudNativeNetworksParams = {
   contextKey: string;
   /** Extra gate on top of accountConfigId/readiness — the wizard only fetches on its VPC step. */
   enabled?: boolean;
-  /** Kick off a sync the first time the list comes back empty. Wizard-only behaviour. */
-  autoSyncWhenEmpty?: boolean;
+  /** Discover provider VPCs once when this account's VPC view first loads. */
+  autoSyncOnFirstLoad?: boolean;
   /** Persisted setting used to initialize the new-VPC checkbox. */
   initialEnableNewVpcs?: boolean;
 };
@@ -60,7 +61,7 @@ const useCloudNativeNetworks = ({
   hasExistingCloudNativeVpc,
   contextKey,
   enabled = true,
-  autoSyncWhenEmpty = false,
+  autoSyncOnFirstLoad = false,
   initialEnableNewVpcs = true,
 }: UseCloudNativeNetworksParams): UseCloudNativeNetworksResult => {
   const queryClient = useQueryClient();
@@ -168,42 +169,32 @@ const useCloudNativeNetworks = ({
   const isFetchingVPCs = networksQuery.isFetching || syncMutation.isPending;
   const hasConfigurationChanges = vpcValues.enableNewVpcs !== initialEnableNewVpcsRef.current;
 
-  const hasSyncedOnEmpty = useRef(false);
   useEffect(() => {
-    if (!autoSyncWhenEmpty) return;
-
     if (
-      enabled &&
-      vpcValues.bringOwnVpcs &&
-      accountConfigId &&
-      isAccountConfigReady &&
-      !networksQuery.isFetching &&
-      networksQuery.isSuccess &&
-      allNetworks.length === 0 &&
-      !syncMutation.isPending &&
-      !hasSyncedOnEmpty.current
-    ) {
-      hasSyncedOnEmpty.current = true;
-      syncMutation.mutate({
-        params: { path: { id: accountConfigId } },
-        headers: { "x-ignore-global-error": "true" },
-        body: getSyncPayload([]),
-      });
-    }
+      !autoSyncOnFirstLoad ||
+      !enabled ||
+      !accountConfigId ||
+      !isAccountConfigReady ||
+      !networksQuery.isFetched ||
+      networksQuery.isFetching ||
+      syncMutation.isPending ||
+      autoSyncedAccountIds.has(accountConfigId)
+    )
+      return;
 
-    // Reset flag when bringOwnVpcs is toggled off or the account changes
-    if (!vpcValues.bringOwnVpcs || !accountConfigId) {
-      hasSyncedOnEmpty.current = false;
-    }
+    autoSyncedAccountIds.add(accountConfigId);
+    syncMutation.mutate({
+      params: { path: { id: accountConfigId } },
+      headers: { "x-ignore-global-error": "true" },
+      body: getSyncPayload([]),
+    });
   }, [
-    autoSyncWhenEmpty,
+    autoSyncOnFirstLoad,
     enabled,
-    vpcValues.bringOwnVpcs,
     accountConfigId,
     isAccountConfigReady,
+    networksQuery.isFetched,
     networksQuery.isFetching,
-    networksQuery.isSuccess,
-    allNetworks.length,
     syncMutation,
   ]);
 
