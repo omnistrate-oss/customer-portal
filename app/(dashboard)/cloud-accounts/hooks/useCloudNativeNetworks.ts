@@ -1,15 +1,20 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { $api } from "src/api/query";
 import useSnackbar from "src/hooks/useSnackbar";
+import type { SyncAccountConfigCloudNativeNetworksPayload } from "src/types/account-config";
 
 import type { ConfigureVPCsFormValues, VpcRecord } from "../components/steps/ConfigureVPCsStep";
 import { getCloudNativeNetworkRegions } from "../utils";
 
 const RESOURCE_INSTANCE_QUERY_KEY = ["get", "/2022-09-01-00/resource-instance"];
+
+const getSyncPayload = (regions: string[]): SyncAccountConfigCloudNativeNetworksPayload => ({
+  cloudNativeNetworks: regions.map((region) => ({ region })),
+});
 
 type UseCloudNativeNetworksParams = {
   /** Account config the VPCs belong to. The query stays idle until this is known and ready. */
@@ -182,7 +187,7 @@ const useCloudNativeNetworks = ({
       syncMutation.mutate({
         params: { path: { id: accountConfigId } },
         headers: { "x-ignore-global-error": "true" },
-        body: {},
+        body: getSyncPayload([]),
       });
     }
 
@@ -207,7 +212,7 @@ const useCloudNativeNetworks = ({
     syncMutation.mutate({
       params: { path: { id: accountConfigId } },
       headers: { "x-ignore-global-error": "true" },
-      body: {},
+      body: getSyncPayload(vpcValues.selectedRegions),
     });
   };
 
