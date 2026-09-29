@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import CloudProviderRadio from "app/(dashboard)/components/CloudProviderRadio/CloudProviderRadio";
@@ -7,16 +8,14 @@ import SubscriptionMenu from "app/(dashboard)/components/SubscriptionMenu/Subscr
 import SubscriptionPlanRadio from "app/(dashboard)/components/SubscriptionPlanRadio/SubscriptionPlanRadio";
 import { getServiceMenuItems } from "app/(dashboard)/instances/utils";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { FormConfiguration } from "components/DynamicForm/types";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -30,18 +29,20 @@ import {
 } from "src/utils/accountConfig/accountConfig";
 import { CLOUD_PROVIDER_DEFAULT_CREATION_METHOD } from "src/utils/constants/accountConfig";
 import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
+import { FormConfiguration } from "components/DynamicForm/types";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import { CloudAccountValidationSchema } from "../constants";
 import useCloudNativeNetworks from "../hooks/useCloudNativeNetworks";
 import { getInitialValues, getValidSubscriptionForInstanceCreation, hasCloudNativeVpcConfiguration } from "../utils";
 
-import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
-import CustomLabelDescription from "./CustomLabelDescription";
-import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import AddNewAccountStep from "./steps/AddNewAccountStep";
 import ConfigureVPCsStep from "./steps/ConfigureVPCsStep";
 import GrantAccessStep from "./steps/GrantAccessStep";
 import NebiusBindingsStep from "./steps/NebiusBindingsStep";
+import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
+import CustomLabelDescription from "./CustomLabelDescription";
+import SetupPrivateClusterDialog from "./SetupPrivateClusterDialog";
 import WizardStepper, { WizardStep } from "./WizardStepper";
 
 type CloudAccountWizardProps = {
@@ -62,6 +63,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const environmentType = useEnvironmentType();
+  const { autoEnabledByocPrivateLink } = useFeatureFlags();
   const snackbar = useSnackbar();
   const selectUser = useSelector(selectUserrootData);
 
@@ -160,6 +162,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
         if (values.cloudProvider === "aws") {
           resultParams.aws_account_id = values.awsAccountId;
           resultParams.aws_bootstrap_role_arn = getAwsBootstrapArn(values.awsAccountId);
+          resultParams.private_link = autoEnabledByocPrivateLink;
         } else if (values.cloudProvider === "gcp") {
           resultParams.gcp_project_id = values.gcpProjectId;
           resultParams.gcp_project_number = values.gcpProjectNumber;
@@ -235,6 +238,7 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           aws_account_id: values.awsAccountId,
           account_configuration_method: values.accountConfigurationMethod,
           aws_bootstrap_role_arn: getAwsBootstrapArn(values.awsAccountId),
+          private_link: autoEnabledByocPrivateLink,
           allow_new_cloud_native_network_creation: ALLOW_NEW_CLOUD_NATIVE_NETWORK_CREATION,
         };
       } else if (values.cloudProvider === "gcp") {
