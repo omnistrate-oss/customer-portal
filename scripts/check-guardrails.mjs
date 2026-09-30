@@ -11,7 +11,7 @@
  * Diff (CI passes --base on pull requests):
  *   - allowlists only shrink and keep their keys (renames, including .jsx -> .tsx, carry their entry over)
  *   - no new eslint-disable or inline eslint config comments for guarded rules
- *   - no new files in the legacy src/components/Icons/
+ *   - no new files in CONFIG.legacyIconDirs
  *   - changed files are Prettier-formatted
  *   - new Playwright specs opt into strict HAR replay (when CONFIG.strictReplay is set)
  *   - no agent or IDE artifacts
@@ -34,7 +34,7 @@ const CONFIG = {
     ".github/instructions",
     ".agents/skills",
   ],
-  legacyIconDirs: ["src/components/Icons/"],
+  legacyIconDirs: [],
   artifacts: [
     /(^|\/)\.idea\//,
     /(^|\/)\.playwright-mcp\//,

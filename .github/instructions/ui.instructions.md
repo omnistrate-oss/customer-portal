@@ -30,7 +30,7 @@ Lint already rejects raw MUI where a wrapper exists, raw `button`, `select`, `in
 
 ## Icons and assets
 
-- Flag new icon components or inline `<svg>` icons in route folders, and UI icons added to `public/`. New icons go in `src/icons/svg/` and are generated with `yarn icons:build`.
+- Flag new icon components or inline `<svg>` icons in route folders, and UI icons added to `public/`. For now, new icons are components in `src/components/Icons/` (`.agents/skills/icons/SKILL.md`), not additions to `src/icons/`.
 
 ## Pull request
 

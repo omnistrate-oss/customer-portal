@@ -1,101 +1,85 @@
 ---
 name: icons
-description: Use when adding, replacing or rendering an icon or small SVG in the customer portal — exporting an SVG into src/icons/svg, running yarn icons:build, importing from src/icons, icon size, color, stroke width and accessibility, the legacy icon folders (src/components/Icons, app/(dashboard)/components/Icons, feature Icons.tsx files), react-icons, @mui/icons-material, and cloud or identity provider logos.
+description: Use when adding, replacing or rendering an icon or small SVG in the customer portal — writing a new icon component in src/components/Icons, reusing icons from src/components/Icons, app/(dashboard)/components/Icons or src/icons, icon size, color and accessibility, react-icons, @mui/icons-material, and cloud or identity provider logos.
 ---
 
 # Icons
 
-Every new UI icon is an SVG in `src/icons/svg/`, turned into a typed React component by `yarn icons:build`, and imported from `src/icons`. `src/icons/README.md` explains the generator in more depth.
+Until the team revisits the icon approach, a new icon is a hand-written React component in `src/components/Icons/`, built the same way as the ones already there. `src/icons/` holds a few generated icons (listed in `src/icons/index.ts`). Use them where they fit, but don't add new icons there for now.
 
-| Do                                                                                                                  | Don't                                                                       |
-| ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Save the SVG as `src/icons/svg/<kebab-name>.svg`, run `yarn icons:build`, then `import { Copy02 } from "src/icons"` | Add a file to `src/components/Icons/`; `yarn check:guardrails` fails the PR |
-| Commit the SVG and the generated files together                                                                     | Hand-edit a generated `src/icons/<Name>.tsx` or `src/icons/index.ts`        |
-| Let the icon inherit `currentColor`, or pass a token: `color={colors.gray500}`                                      | Hard-code a hex fill or stroke                                              |
-| Pass `title` when the icon is the only content of a button or link                                                  | Leave an icon-only control without an accessible name                       |
-| Ask for the design-system SVG when the icon you need is missing                                                     | Import from `react-icons` `[no-react-icons]`                                |
+| Do                                                                                                   | Don't                                                                                |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Reuse an icon from `src/components/Icons/`, `app/(dashboard)/components/Icons/` or `src/icons` first | Import from `react-icons` `[no-react-icons]`                                         |
+| Add a new icon as `src/components/Icons/<Name>/<Name>Icon.tsx`, typed `FC<SVGIconProps>`             | Put an icon component or inline `<svg>` in a route folder, or a UI icon in `public/` |
+| Default the color to `currentColor`; call sites pass a token: `color={colors.gray500}`               | Add new SVGs to `src/icons/svg/` or run `yarn icons:build` for a new icon (paused)   |
+| Give an icon-only button or link an `aria-label`                                                     | Leave an icon-only control without an accessible name                                |
 
 ## 1. Add an icon
 
-1. Export the SVG from the design file with "Include viewBox" on. Name it after the design system's own icon name, in kebab-case: `copy-02.svg`, `arrow-up-right.svg`, `trend-up-01.svg`.
-2. Save it to `src/icons/svg/`.
-3. Run `yarn icons:build`. It writes one component per SVG (`copy-02.svg` becomes `src/icons/Copy02.tsx`), rewrites the barrel `src/icons/index.ts`, removes components whose SVG was deleted, and runs Prettier and `eslint --fix` on the generated files only.
-4. Import from the barrel:
+1. Search `src/components/Icons/`, `app/(dashboard)/components/Icons/` and `src/icons/index.ts` first. The icon may already exist.
+2. Export the SVG from the design file with "Include viewBox" on.
+3. Create `src/components/Icons/<Name>/<Name>Icon.tsx`. Convert the attributes to JSX spelling (`stroke-linecap` becomes `strokeLinecap`), and use `currentColor` so the color can follow the theme:
 
 ```tsx
-import { ArrowUpRight, Copy02 } from "src/icons";
+import { FC } from "react";
 
-<Copy02 />                        // design size from the viewBox, inherits text color
-<Copy02 size={16} />              // scales glyph and stroke together
-<ArrowUpRight color={colors.gray500} />
-<IconButton aria-label="Copy URL"><Copy02 /></IconButton>
-<Copy02 title="Copy URL" />       // icon that carries meaning on its own
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const ExampleIcon: FC<SVGIconProps> = ({ color = "currentColor", ...props }) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden {...props}>
+    <path d="M…" stroke={color} strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export default ExampleIcon;
 ```
 
-The build fails when an SVG has no `viewBox` or its name does not convert to a valid component name. Fix the SVG; do not patch the generated file. `src/icons/createIcon.tsx` is the only hand-written file in `src/icons/`.
+4. Import it by path: `import ExampleIcon from "src/components/Icons/Example/ExampleIcon";`.
 
-## 2. What the generator does for you
+`src/components/Icons/` is exempt from `[no-hex-colors]`, so older icons carry hex defaults. New icons default to `currentColor` instead.
 
-| In the exported SVG     | Result                                                               |
-| ----------------------- | -------------------------------------------------------------------- |
-| `stroke="#..."`         | Removed, so the icon strokes with `currentColor`                     |
-| `fill="#..."`           | Rewritten to `fill="currentColor"`                                   |
-| `stroke-width` on paths | Hoisted to the `<svg>` so the `strokeWidth` prop works               |
-| Full-size `<clipPath>`  | Removed                                                              |
-| Other ids               | Namespaced per icon, so two icons on one page cannot collide         |
-| Attributes              | Converted to JSX spelling (`stroke-linecap` becomes `strokeLinecap`) |
+## 2. Color, size and accessibility
 
-Every icon has the same props (`IconProps` from `src/icons`): `size`, `color`, `strokeWidth`, `title`, a forwarded ref (so it works inside `Tooltip`), and any other SVG attribute. Without `title` the icon is `aria-hidden`.
-
-Because every fill becomes `currentColor`, the pipeline is for single-color UI glyphs. Multi-color marks are not icons (see section 5).
-
-## 3. Color and size
-
-- Leave `color` off in most cases. The icon follows the surrounding text color, so hover, focus and disabled styles set on the parent reach it.
+- Leave `color` off in most cases. With `currentColor`, the icon follows the surrounding text color, so hover, focus and disabled styles set on the parent reach it.
 - When a color is needed, pass a token from `src/themeConfig.ts` (`colors.gray500`) or `theme.palette`, never a hex. Brand accents come from `theme.palette.primary`; see `.agents/skills/ui-and-styling/SKILL.md`.
-- Use `size` for scaling. Use `strokeWidth` only for optical corrections at unusual sizes.
+- Size with `width` and `height`, and keep the `viewBox` so the glyph scales with them.
+- Decorative icons are `aria-hidden` (the template sets it). An icon-only button or link needs an `aria-label`.
+- When an icon has `<defs>` (`clipPath`, `mask`, gradients, `filter`), take the ids from `useId()`. Hard-coded ids collide when the icon renders twice on a page.
+- Generated icons from `src/icons` (`import { Copy02 } from "src/icons"`) take `size`, `color`, `strokeWidth` and `title`, and are `aria-hidden` unless they get a `title`.
 
-## 4. Legacy locations: use, don't extend
+## 3. Where icons live
 
-| Location                                                                                                                                                                                                        | Contents                                                                                        | Rule                                                                               |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `src/components/Icons/`                                                                                                                                                                                         | 128 hand-written components in 99 folders, each with its own props and often a hard-coded color | No new files (checked by `yarn check:guardrails`). Reusing an existing one is fine |
-| `app/(dashboard)/components/Icons/`                                                                                                                                                                             | 21 page and menu icons                                                                          | No new files                                                                       |
-| Feature `Icons.tsx` files: `app/(dashboard)/billing/components/Icons.tsx`, `app/(dashboard)/payment-methods/components/Icons.tsx`                                                                               | Inline SVG components for one route                                                             | No new icons here; add them to `src/icons`                                         |
-| `app/(dashboard)/components/CloudProviderRadio/`, `app/(dashboard)/components/KubernetesDistributionsMultiSelect/Kubernetes/`, `src/components/Logos/`, `src/components/Stepper/`, `src/components/CodeEditor/` | Logos and component-specific glyphs                                                             | Leave in place                                                                     |
-| `react-icons`                                                                                                                                                                                                   | 2 files import `RiArrowGoBackFill` (the instance and cloud account detail pages)                | Banned for new code `[no-react-icons]`; replace when you touch those files         |
-| `@mui/icons-material`                                                                                                                                                                                           | 58 files, generic glyphs such as close and sort arrows                                          | Do not add new usages when a design-system icon exists; prefer `src/icons`         |
+| Location                                                                                                                                                                                                        | Contents                                                                         | Rule                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `src/components/Icons/`                                                                                                                                                                                         | Hand-written components, one folder per icon                                     | Where new icons go. Reuse an existing one first                            |
+| `app/(dashboard)/components/Icons/`                                                                                                                                                                             | 21 page and menu icons                                                           | Reuse them; add new ones to `src/components/Icons/`                        |
+| Feature `Icons.tsx` files: `app/(dashboard)/billing/components/Icons.tsx`, `app/(dashboard)/payment-methods/components/Icons.tsx`                                                                               | Inline SVG components for one route                                              | No new icons here; add them to `src/components/Icons/`                     |
+| `src/icons/`                                                                                                                                                                                                    | Icons generated by `yarn icons:build`                                            | Use them; don't add new ones while the approach is revisited               |
+| `app/(dashboard)/components/CloudProviderRadio/`, `app/(dashboard)/components/KubernetesDistributionsMultiSelect/Kubernetes/`, `src/components/Logos/`, `src/components/Stepper/`, `src/components/CodeEditor/` | Logos and component-specific glyphs                                              | Leave in place                                                             |
+| `react-icons`                                                                                                                                                                                                   | 2 files import `RiArrowGoBackFill` (the instance and cloud account detail pages) | Banned for new code `[no-react-icons]`; replace when you touch those files |
+| `@mui/icons-material`                                                                                                                                                                                           | 58 files, generic glyphs such as close and sort arrows                           | Don't add new usages when an existing icon fits                            |
 
-Migrating a legacy icon (only when you are already touching it):
+`src/icons/` and `scripts/build-icons.mjs` are kept in sync with another codebase. If you have to change them, say so in the pull request.
 
-1. Save its SVG to `src/icons/svg/` under the design-system name, not the old component name.
-2. Run `yarn icons:build`.
-3. Update the call sites. New icons take `size` instead of `width` and `height`, and default to `currentColor` rather than a built-in color, so pass the color or set it on the parent where the old default mattered.
-4. Delete the old component once nothing imports it.
-
-Do not bulk-migrate icons. It produces a large diff with no behavior change and a real risk of silently changing a color.
-
-## 5. Logos and brand marks
+## 4. Logos and brand marks
 
 - Cloud provider logos: reuse the existing maps, `cloudProviderLogoMap` and `cloudProviderLongLogoMap` from `src/constants/cloudProviders.tsx`, and the components in `src/components/Logos/`.
 - Identity provider buttons already have their logos under `src/components/Icons/` (Google, GitHub, Okta and others); reuse them.
 - The provider's own logo is data, not an icon. Take `orgLogoURL` and `orgName` from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx`, then render `getSafeExternalURL(orgLogoURL)` (`src/utils/getSafeExternalURL.ts`) with `alt={orgName}`; don't copy the `Logo` import in `app/(dashboard)/components/Layout/Navbar.tsx`.
 - A new multi-color logo is a design decision; ask a maintainer before adding one.
 
-## 6. Troubleshooting
+## 5. Troubleshooting
 
-| Symptom                                          | Cause and fix                                                                                                                                    |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The icon looks off-center or cropped             | The SVG's `viewBox` is missing or does not match the artwork. Re-export it with the viewBox; the generator refuses SVGs without one              |
-| The icon ignores hover, focus or disabled colors | It is a legacy component with a hard-coded fill. Pass `color`, or migrate it (section 4). Generated icons follow `currentColor`                  |
-| One of two identical icons renders blank         | Duplicate SVG ids in a legacy component. Generated icons namespace their ids; in hand-written SVG use `useId()`                                  |
-| `strokeWidth` has no effect                      | The icon is legacy or its generated file was edited by hand. Regenerate it from `src/icons/svg/`                                                 |
-| A few pixels of space below the icon             | Legacy icons render inline. Generated icons set `display: block`                                                                                 |
-| Your diff deletes other generated icons          | `src/icons/` mirrors `src/icons/svg/`: an SVG missing from your checkout removes its component. Restore the SVG and run `yarn icons:build` again |
+| Symptom                                          | Cause and fix                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| The icon looks off-center or cropped             | The SVG's `viewBox` is missing or doesn't match the artwork. Re-export it with the viewBox |
+| The icon ignores hover, focus or disabled colors | It has a hard-coded fill or stroke. Use `currentColor`, or pass `color` from the call site |
+| One of two identical icons renders blank         | Duplicate SVG ids. Take them from `useId()`                                                |
+| A few pixels of space below the icon             | The SVG renders inline. Give it `className="block"` or place it in a flex container        |
 
-## 7. Checklist
+## 6. Checklist
 
-- [ ] The SVG is in `src/icons/svg/`, named in kebab-case after the design system, with a `viewBox`.
-- [ ] `yarn icons:build` was run and its output is committed with the SVG.
-- [ ] No new files in the legacy folders, no `react-icons`, no new `@mui/icons-material` glyph where a design-system icon exists.
-- [ ] No hex colors on icons; icon-only controls have an `aria-label` or the icon has a `title`.
+- [ ] The icon didn't already exist in `src/components/Icons/`, `app/(dashboard)/components/Icons/` or `src/icons`.
+- [ ] A new icon is `src/components/Icons/<Name>/<Name>Icon.tsx`, typed `FC<SVGIconProps>`, with a `viewBox`, `currentColor` and `aria-hidden`.
+- [ ] Nothing new in `src/icons/`, no `react-icons`, no new `@mui/icons-material` glyph where an existing icon fits.
+- [ ] No hex colors at the call site; icon-only controls have an `aria-label`.

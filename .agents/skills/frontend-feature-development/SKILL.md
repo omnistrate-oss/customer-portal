@@ -100,7 +100,7 @@ export type ListCustomNetworksSuccessResponse =
 
 New signed-in page:
 
-1. Create `app/(dashboard)/<route>/page.tsx` with `PageContainer` and `PageTitle`. Take the title icon from `src/icons` (see `.agents/skills/icons/SKILL.md`).
+1. Create `app/(dashboard)/<route>/page.tsx` with `PageContainer` and `PageTitle`. Take the title icon from `app/(dashboard)/components/Icons/`; a new one goes in `src/components/Icons/` (see `.agents/skills/icons/SKILL.md`).
 2. Add a getter to `src/utils/routes.ts` and use it everywhere instead of string paths.
 3. Add the path to `PAGE_TITLE_MAP` in `src/constants/pageTitleMap.ts`, built with a getter from `src/utils/routes.ts`. The map sets the browser tab title and is the allowlist for post-sign-in redirects (`proxy.js`, `src/utils/route/checkRouteValidity.ts`). The Alerts entry uses the legacy getter from `src/utils/route/access/accessRoute.js` and produces a wrong key; do not copy it.
 4. Add a menu entry in `app/(dashboard)/components/Layout/Sidebar.tsx` if customers reach the page from the sidebar.
@@ -196,7 +196,7 @@ The Verify workflow (`.github/workflows/verify.yml`) runs `yarn lint`, `yarn typ
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | `[no-raw-mui]`, `react/forbid-elements`                                                                                                                                                      | Raw MUI components that have a wrapper, and raw `button`, `select`, `input`, `textarea` and `table`, outside the wrapper folders                                                        | ui-and-styling   |
 | `[no-hex-colors]`, `[no-text-font-override]`, `[no-css-modules]`, `[no-auth-shell-components]`                                                                                               | Hex colors, `Text` font overrides, CSS modules, `NonDashboardComponents` outside `app/(public)/` and `app/not-found.tsx`                                                                | ui-and-styling   |
-| `[no-react-icons]`                                                                                                                                                                           | `react-icons` imports (the guardrail script also rejects new files in `src/components/Icons/`)                                                                                          | icons            |
+| `[no-react-icons]`                                                                                                                                                                           | `react-icons` imports                                                                                                                                                                   | icons            |
 | `[no-axios]`, `[no-raw-fetch]`, `[no-mutate-in-effect]`, `react-hooks/set-state-in-effect`                                                                                                   | Legacy transports, `fetch` outside `src/api/` and `pages/api/`, writes and state syncing from effects                                                                                   | data-fetching    |
 | `[formik-requires-yup]`                                                                                                                                                                      | Formik forms without a Yup schema                                                                                                                                                       | forms            |
 | `[no-focused-tests]`, `[no-wait-for-timeout]`, `[no-playwright-test-import]`                                                                                                                 | `.only`, fixed sleeps, specs that bypass the HAR fixture                                                                                                                                | playwright-tests |
@@ -208,7 +208,6 @@ The Verify workflow (`.github/workflows/verify.yml`) runs `yarn lint`, `yarn typ
 - grows an allowlist in `eslint.migration-allowlists.cjs`. A renamed file keeps its entry, including a `.jsx` to `.tsx` rename; a new file beside a listed one that differs only by extension doesn't.
 - removes an allowlist key. Keep an emptied list as `[]`.
 - adds an `eslint-disable`, or an inline config comment such as `/* eslint no-console: "off" */`, for a guarded rule.
-- adds a file to `src/components/Icons/`.
 - leaves a changed file unformatted by Prettier. Format only the files you changed (`yarn prettier --write <files>`).
 - commits agent or IDE artifacts.
 

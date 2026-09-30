@@ -148,7 +148,7 @@ const guardrails = {
         {
           group: ["react-icons", "react-icons/*"],
           message:
-            "[no-react-icons] Add the SVG to src/icons/svg/ and run yarn icons:build. See .agents/skills/icons/SKILL.md.",
+            "[no-react-icons] Reuse or add an icon component in src/components/Icons/. See .agents/skills/icons/SKILL.md.",
         },
       ],
     },

@@ -80,7 +80,7 @@ Lint can't see these, so they need your judgment.
   - pages added under `pages/` (API routes only)
 - **Server-only code:** `src/server/` imported from a `"use client"` file.
 - **TypeScript quality:** `!` non-null assertions and casts that hide `undefined`, and props without types.
-- **Icons:** feature-local SVG components, or SVGs in `public/` used as UI icons, instead of `src/icons/svg/` + `yarn icons:build`.
+- **Icons:** feature-local SVG components, or SVGs in `public/` used as UI icons, instead of a component in `src/components/Icons/`, and new icons added to `src/icons/` while that approach is paused.
 
 ## Tests
 

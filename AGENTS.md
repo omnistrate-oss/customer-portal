@@ -13,7 +13,7 @@ Lint messages start with the guardrail name, for example `[no-axios]`. Existing 
 1. **Shared components, not raw MUI or native elements.** Use the wrappers in `src/components/` (`[no-raw-mui]`, `react/forbid-elements`).
 2. **Theme colors, never hex; no CSS modules.** The brand color comes only from `theme.palette.primary`, because each provider sets their own (`[no-hex-colors]`, `[no-css-modules]`).
 3. **Typography from the `Text` scale.** Never override font size, weight or line height (`[no-text-font-override]`).
-4. **Icons through `src/icons/`.** New SVGs go in `src/icons/svg/`, then run `yarn icons:build`. Add nothing to `src/components/Icons/`; no `react-icons` (`[no-react-icons]`, `check:guardrails`).
+4. **Icons in `src/components/Icons/`.** Until the team revisits icons, a new icon is a component at `src/components/Icons/<Name>/<Name>Icon.tsx`, like the ones already there; reuse an existing icon first. Add nothing to `src/icons/` for now, and no `react-icons` (`[no-react-icons]`).
 5. **API calls through `$api`** (`src/api/query.ts`), which goes through the `/api/action` proxy. Add every new method and path to `src/server/utils/allowedRoutes.ts`, or the proxy answers 403. axios is legacy: new code doesn't import it, and `fetch` belongs only in `src/api/` and `pages/api/` (`[no-axios]`, `[no-raw-fetch]`).
 6. **Types flow from the generated schema.** `src/types/schema.ts` → `src/types/<feature>.ts` → feature code. Regenerate the schema in its own pull request.
 7. **Server state stays in React Query.** Don't copy it into `useState` or context; no setState or mutations inside effects (`react-hooks/set-state-in-effect`, `[no-mutate-in-effect]`).
