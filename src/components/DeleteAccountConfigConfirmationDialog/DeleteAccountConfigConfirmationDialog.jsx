@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
+import DOMPurify from "isomorphic-dompurify";
 
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
 import Button from "components/Button/Button";
@@ -301,7 +302,13 @@ function DeleteAccountConfigConfirmationDialog(props) {
         <Content>
           <DeleteInstructions accountInstructionDetails={accountInstructionDetails} />
 
-          <Text size="small" weight="medium" color="#344054" mt="9px" dangerouslySetInnerHTML={{ __html: message }} />
+          <Text
+            size="small"
+            weight="medium"
+            color="#344054"
+            mt="9px"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
+          />
           <TextField
             id="deleteme"
             name="deleteme"

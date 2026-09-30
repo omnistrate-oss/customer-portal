@@ -20,7 +20,7 @@ async function getCloudProviders() {
 
     return cloudProvidersResponse;
   } catch (error) {
-    console.log("getCloudProviders error", errorSummary(error));
+    console.error("getCloudProviders error", errorSummary(error));
     if (error.response && error.response.status === 401) {
       throw new ProviderAuthError();
     } else {

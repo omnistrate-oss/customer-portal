@@ -24,6 +24,7 @@ import { StyledLink } from "./GrantAccessStep";
 
 const AT_LEAST_ONE_VPC_OPTION_MESSAGE = "At least one VPC option must be enabled";
 const VPC_CONFIGURATION_UNSUPPORTED_MESSAGE = "VPC configuration is only supported for AWS, GCP, and Azure";
+const VPC_CONFIGURATION_LOADING_MESSAGE = "VPC data is loading";
 
 export type VpcRecord = {
   id: string;
@@ -222,6 +223,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
   // condition — otherwise the region/VPC picker stays visible under an unchecked box.
   const showVpcSelection = isBringOwnVpcsSupported(cloudProvider) && values.bringOwnVpcs;
   const isVPCConfigurationSupported = isBringOwnVpcsSupported(cloudProvider);
+  const areVpcOptionsLoading = isLoadingVpcs || isFetchingVPCs || isImporting;
   const selectableVpcIds = useMemo(
     () =>
       new Set(
@@ -372,11 +374,13 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               <Stack direction="row" alignItems="flex-start" gap="12px">
                 <Tooltip
                   title={
-                    !isVPCConfigurationSupported
-                      ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
-                      : !canUncheckNewVpcs && values.enableNewVpcs
-                        ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
-                        : ""
+                    areVpcOptionsLoading
+                      ? VPC_CONFIGURATION_LOADING_MESSAGE
+                      : !isVPCConfigurationSupported
+                        ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
+                        : !canUncheckNewVpcs && values.enableNewVpcs
+                          ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
+                          : ""
                   }
                   placement="top"
                   arrow
@@ -389,7 +393,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                         if (!e.target.checked && !values.bringOwnVpcs) return;
                         onChange({ enableNewVpcs: e.target.checked });
                       }}
-                      disabled={!canUncheckNewVpcs}
+                      disabled={areVpcOptionsLoading || !canUncheckNewVpcs}
                       checkedIcon={
                         <Box
                           className="bring-own-vpcs-checked-icon"
@@ -437,13 +441,15 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
               <Stack direction="row" alignItems="flex-start" gap="12px">
                 <Tooltip
                   title={
-                    !isBringOwnVpcsEnabledForProvider
-                      ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
-                      : bringOwnVpcsLocked
-                        ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
-                        : !values.enableNewVpcs && values.bringOwnVpcs
-                          ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
-                          : ""
+                    areVpcOptionsLoading
+                      ? VPC_CONFIGURATION_LOADING_MESSAGE
+                      : !isBringOwnVpcsEnabledForProvider
+                        ? VPC_CONFIGURATION_UNSUPPORTED_MESSAGE
+                        : bringOwnVpcsLocked
+                          ? "Bring your own VPCs is enabled because cloud-native VPCs are available."
+                          : !values.enableNewVpcs && values.bringOwnVpcs
+                            ? AT_LEAST_ONE_VPC_OPTION_MESSAGE
+                            : ""
                   }
                   placement="top"
                   arrow
@@ -456,7 +462,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                         if (!e.target.checked && !values.enableNewVpcs) return;
                         onChange({ bringOwnVpcs: e.target.checked });
                       }}
-                      disabled={!isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
+                      disabled={areVpcOptionsLoading || !isBringOwnVpcsEnabledForProvider || bringOwnVpcsLocked}
                       checkedIcon={
                         <Box
                           className="bring-own-vpcs-checked-icon"

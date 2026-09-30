@@ -76,6 +76,7 @@ const guardrailAllowlists = {
     "src/hooks/usersData.ts",
     "src/providers/AxiosGlobalErrorHandler.tsx",
     "src/server/api/product-tier-custom-metrics.ts",
+    "src/server/utils/validateUserToken.ts",
     "src/utils/accountConfig/accountConfig.ts",
   ],
   "no-hex-colors": [
@@ -378,7 +379,11 @@ const guardrailAllowlists = {
     "app/(public)/idp-auth/page.tsx",
     "src/components/CookieConsent/CookieConsentModal.tsx",
   ],
-  "no-raw-fetch": ["src/hooks/useLogout.js", "src/providers/AxiosGlobalErrorHandler.tsx"],
+  "no-raw-fetch": [
+    "src/hooks/useLogout.js",
+    "src/providers/AxiosGlobalErrorHandler.tsx",
+    "src/server/utils/validateUserToken.ts",
+  ],
   "formik-requires-yup": [
     "app/(dashboard)/cloud-accounts/components/DeleteConfirmationDialog.tsx",
     "src/components/AccountConfigDialog/ConnectAccountConfigDialog.jsx",
@@ -659,12 +664,8 @@ const guardrailAllowlists = {
   "react-hooks/preserve-manual-memoization": ["app/(dashboard)/payment-methods/components/AddPaymentMethodModal.tsx"],
   "no-console": [
     "app/(public)/idp-auth/page.tsx",
-    "pages/api/sign-in-with-idp.js",
     "src/components/ResourceInstance/Logs/Logs.jsx",
-    "src/server/api/cloud-providers.js",
-    "src/server/api/customer-user.js",
     "src/server/api/events.js",
-    "src/server/api/identity-provider.js",
     "src/server/mail-service/mail-cron.js",
     "src/server/utils/verifyEnvironmentVariables.js",
     "src/server/utils/withProviderTokenExpirationHandling.js",

@@ -11,6 +11,7 @@ import {
   styled,
 } from "@mui/material";
 import { useFormik } from "formik";
+import DOMPurify from "isomorphic-dompurify";
 
 import useSnackbar from "src/hooks/useSnackbar";
 import Button from "components/Button/Button";
@@ -107,7 +108,13 @@ const TextConfirmationDialog = (props) => {
           <Text size="medium" weight="semibold" mt="20px">
             {subtitle}
           </Text>
-          <Text size="small" weight="medium" color="#344054" mt="9px" dangerouslySetInnerHTML={{ __html: message }} />
+          <Text
+            size="small"
+            weight="medium"
+            color="#344054"
+            mt="9px"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
+          />
           <TextField
             id="confirmationText"
             name="confirmationText"

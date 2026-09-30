@@ -248,7 +248,7 @@ if (baseRef !== undefined) {
         `${path}: new specs must call test.use({ strictHarReplay: true }), or harModeOverride: "off" when fully mocked.`
       );
     }
-    if (status !== "D" && status !== "M" && CONFIG.artifacts.some((pattern) => pattern.test(path))) {
+    if (status !== "D" && CONFIG.artifacts.some((pattern) => pattern.test(path))) {
       fail(`${path}: agent and IDE artifacts don't belong in the repository.`);
     }
   }
