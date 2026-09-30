@@ -1,12 +1,13 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import axios from "axios";
 
+import axios from "src/axios";
 import { TierVersionSet } from "src/types/tier-version-set";
 
 async function fetchVersionSets(params: { serviceId?: string; productTierId?: string }): Promise<TierVersionSet[]> {
   const { serviceId, productTierId } = params;
 
   const response = await axios.get<TierVersionSet[]>("/api/version-sets", {
+    baseURL: "",
     params: { serviceId, productTierId },
   });
 

@@ -8,12 +8,10 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 
 import SearchInput from "src/components/DataGrid/SearchInput";
-import FieldTitle from "src/components/FormElementsv2/FieldTitle/FieldTitle";
 import MenuItem from "src/components/FormElementsv2/MenuItem/MenuItem";
 import Select from "src/components/FormElementsv2/Select/Select";
 import JobCompleted from "src/components/JobResource/JobCompleted";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
-import Switch from "src/components/Switch/Switch";
 import { dataTestIds } from "src/constants/testIds/instance-details-page";
 import { buildLogsSocketURL } from "src/utils/logsSocketUrl";
 
@@ -92,7 +90,6 @@ function Logs(props) {
   const logsRef = useRef([]); // Store logs in ref to avoid re-renders
   const logsBuffer = useRef(""); // Buffer for partial log lines
   const bufferTimeoutRef = useRef(null); // Add this ref
-  const [enableSyntaxHighlighting, setEnableSyntaxHighlighting] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [
     invertLogOrder,
@@ -421,15 +418,6 @@ function Logs(props) {
               width="250px"
             />
 
-            <Stack direction="row" gap="6px" alignItems="center">
-              <FieldTitle>Syntax Highlight</FieldTitle>
-              <Switch
-                checked={enableSyntaxHighlighting}
-                onChange={(e) => setEnableSyntaxHighlighting(e.target.checked)}
-                size="small"
-              />
-            </Stack>
-
             {/* <Stack direction="row" gap="6px" alignItems="center">
             <FieldTitle>Log Order</FieldTitle>
             <Switch checked={invertLogOrder} onChange={(e) => setInvertLogOrder(e.target.checked)} size="small" />
@@ -450,7 +438,7 @@ function Logs(props) {
                   .map((log, index) => {
                     return (
                       <Log key={`${log}-${index}`}>
-                        <SyntaxHighlightedLog logLine={log} enableSyntaxHighlighting={enableSyntaxHighlighting} />
+                        <SyntaxHighlightedLog logLine={log} />
                       </Log>
                     );
                   })}
