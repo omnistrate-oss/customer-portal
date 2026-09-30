@@ -612,9 +612,7 @@ const guardrailAllowlists = {
     "components/ui/chart.tsx",
     "src/components/AccountConfigDialog/ConnectAccountConfigDialog.jsx",
     "src/components/AccountConfigDialog/DisconnectAccountConfigDialog.jsx",
-    "src/components/DeleteAccountConfigConfirmationDialog/DeleteAccountConfigConfirmationDialog.jsx",
     "src/components/ServicePlanDetails/ServicePlanDetails.tsx",
-    "src/components/TextConfirmationDialog/TextConfirmationDialog.jsx",
   ],
   "react-hooks/set-state-in-effect": [
     "app/(dashboard)/audit-logs/page.tsx",

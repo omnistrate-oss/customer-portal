@@ -275,7 +275,11 @@ const SubscriptionsPage = () => {
           buttonLabel="Unsubscribe"
           isLoading={unSubscribeMutation.isPending}
           subtitle={`Are you sure you want to unsubscribe from ${selectedSubscription?.serviceName}?`}
-          message="To confirm, please enter <b>unsubscribe</b>, in the field below:"
+          message={
+            <>
+              To confirm, please enter <b>unsubscribe</b>, in the field below:
+            </>
+          }
         />
       </PageContainer>
     </div>

@@ -284,7 +284,11 @@ const ManageSubscriptionsForm = ({ defaultServiceId, defaultServicePlanId, isFet
         buttonLabel="Unsubscribe"
         isLoading={unSubscribeMutation.isPending}
         subtitle={`Are you sure you want to unsubscribe from ${subscriptionsObj[selectedPlanId]?.serviceName}?`}
-        message="To confirm, please enter <b>unsubscribe</b>, in the field below:"
+        message={
+          <>
+            To confirm, please enter <b>unsubscribe</b>, in the field below:
+          </>
+        }
       />
     </div>
   );

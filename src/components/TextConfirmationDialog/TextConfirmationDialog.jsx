@@ -11,7 +11,6 @@ import {
   styled,
 } from "@mui/material";
 import { useFormik } from "formik";
-import DOMPurify from "isomorphic-dompurify";
 
 import useSnackbar from "src/hooks/useSnackbar";
 import Button from "components/Button/Button";
@@ -62,7 +61,11 @@ const TextConfirmationDialog = (props) => {
     ...rest
   } = props;
 
-  const message = props.message || `To confirm, please enter <b>${confirmationText}</b>, in the field below:`;
+  const message = props.message || (
+    <>
+      To confirm, please enter <b>{confirmationText}</b>, in the field below:
+    </>
+  );
   const snackbar = useSnackbar();
 
   const formData = useFormik({
@@ -108,13 +111,9 @@ const TextConfirmationDialog = (props) => {
           <Text size="medium" weight="semibold" mt="20px">
             {subtitle}
           </Text>
-          <Text
-            size="small"
-            weight="medium"
-            color="#344054"
-            mt="9px"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
-          />
+          <Text size="small" weight="medium" color="#344054" mt="9px">
+            {message}
+          </Text>
           <TextField
             id="confirmationText"
             name="confirmationText"

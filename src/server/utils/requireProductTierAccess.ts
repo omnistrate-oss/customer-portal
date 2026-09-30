@@ -14,7 +14,8 @@ export type ProductTierIdentifier = {
 
 const customerClient = createFetchClient<paths>({ baseUrl: baseDomain });
 
-// Service and plan IDs look like "s-KgFDwg5J6N"; anything else never reaches the backend URL.
+// IDs go into the backend URL path, so only word characters and hyphens pass (IDs look like "s-KgFDwg5J6N").
+// An ID that doesn't exist gets 403 from the offering lookup below.
 const ID_PATTERN = /^[\w-]+$/;
 
 const NOT_AUTHENTICATED = { message: "Not authenticated" };

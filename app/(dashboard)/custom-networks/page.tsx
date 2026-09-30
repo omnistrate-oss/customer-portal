@@ -292,7 +292,11 @@ const CustomNetworksPage = () => {
         }}
         title="Delete Customer Network"
         subtitle={`Are you sure you want to delete - ${selectedRows[0]}?`}
-        message="To confirm deletion, please enter <b>deleteme</b>, in the field below:"
+        message={
+          <>
+            To confirm deletion, please enter <b>deleteme</b>, in the field below:
+          </>
+        }
         isLoading={deleteCustomNetworkMutation.isPending}
       />
 

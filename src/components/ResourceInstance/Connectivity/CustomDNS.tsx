@@ -334,7 +334,11 @@ const CustomDNS: FC<EndpointProps> = (props) => {
               }}
               title="Delete Endpoint Alias"
               subtitle={deleteMessage}
-              message="To confirm deletion, please enter <b>deleteme</b>, in the field below:"
+              message={
+                <>
+                  To confirm deletion, please enter <b>deleteme</b>, in the field below:
+                </>
+              }
               isLoading={removeCustomDNSMutation.isPending}
             />
           )}
