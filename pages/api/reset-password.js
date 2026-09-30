@@ -2,6 +2,7 @@ import axios from "src/axios";
 import { customerUserResetPassword } from "src/server/api/customer-user";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
 
 export default async function handleResetPassword(nextRequest, nextResponse) {
@@ -66,7 +67,7 @@ async function getUser(token) {
 
     return response.status === 200;
   } catch (error) {
-    console.error("getUser error", error);
+    console.error("getUser error", errorSummary(error));
     return false;
   }
 }

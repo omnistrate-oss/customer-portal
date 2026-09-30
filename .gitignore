@@ -49,3 +49,11 @@ node_modules/
 /playwright/.cache/
 /playwright/auth/
 tests/backend-failures.json
+
+# agent and IDE artifacts (yarn check:guardrails rejects them)
+.idea/
+.omx/
+.playwright-mcp/
+/docs/superpowers/
+/mockups/
+*.plan.md

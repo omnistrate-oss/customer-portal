@@ -3,6 +3,7 @@ import { Box, Stack } from "@mui/material";
 
 import PropertyDetails, { Row } from "src/components/ResourceInstance/ResourceInstanceDetails/PropertyDetails";
 import { Text } from "src/components/Typography/Typography";
+import { colors } from "src/themeConfig";
 import { InstanceSnapshot } from "src/types/instance-snapshot";
 
 type SnapshotDeploymentParametersTabProps = {
@@ -36,10 +37,10 @@ const SnapshotDeploymentParametersTab: React.FC<SnapshotDeploymentParametersTabP
         />
       ) : (
         <Stack alignItems="center" justifyContent="center" minHeight="160px" textAlign="center" gap="4px">
-          <Text size="small" weight="semibold" color="#414651">
+          <Text size="small" weight="semibold" color={colors.gray700}>
             No deployment parameters
           </Text>
-          <Text size="xsmall" weight="regular" color="#667085">
+          <Text size="xsmall" weight="regular" color={colors.gray500}>
             This snapshot has no deployment parameters.
           </Text>
         </Stack>

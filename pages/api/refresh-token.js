@@ -7,6 +7,7 @@ import {
   setIndicatorCookie,
   setRefreshCookie,
 } from "src/server/utils/authCookie";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
@@ -62,7 +63,7 @@ export default async function handleRefreshToken(nextRequest, nextResponse) {
 
     return nextResponse.status(200).json({ message: "Token refreshed" });
   } catch (error) {
-    console.error("Error refreshing token", error);
+    console.error("Error refreshing token", errorSummary(error));
     clearAuthCookie(nextResponse);
     clearRefreshCookie(nextResponse);
     clearIndicatorCookie(nextResponse);

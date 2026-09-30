@@ -32,6 +32,9 @@ jobs:
       run: |
         git config --global url."https://x-access-token:${{ secrets.HAR_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
         git submodule update --init --recursive
+        # Record on top of the sub-repo's master, not the pinned pointer
+        git -C tests/fixtures/hars fetch --quiet origin master
+        git -C tests/fixtures/hars checkout --quiet FETCH_HEAD
 
     - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
       with:
@@ -216,7 +219,10 @@ jobs:
           git commit -m "chore: update HAR files (${DATE})
 
         Test result: ${{ steps.playwright.outcome }}"
-          git push origin HEAD:refs/heads/master --force
+          # No --force: recording starts from the sub-repo's master
+          # If master moved during the run, fail loudly
+          # rather than discard whatever landed in the meantime.
+          git push origin HEAD:refs/heads/master
         fi
 
     - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0

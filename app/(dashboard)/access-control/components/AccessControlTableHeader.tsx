@@ -31,7 +31,7 @@ const AccessControlTableHeader: FC<AccessControlTableHeaderProps> = ({
 }) => {
   return (
     <>
-      <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#EAECF0]">
+      <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-gray-200">
         <DataGridHeaderTitle
           title="Access Permissions"
           desc="Manage user roles and permissions for your Product subscriptions"
@@ -46,7 +46,7 @@ const AccessControlTableHeader: FC<AccessControlTableHeaderProps> = ({
           <RefreshWithToolTip refetch={refetchUsers} disabled={isFetchingUsers} />
         </div>
       </div>
-      <div className="px-6 py-4 border-b border-[#EAECF0]">
+      <div className="px-6 py-4 border-b border-gray-200">
         <AccessControlFilters
           users={users}
           setFilteredUsers={setFilteredUsers}

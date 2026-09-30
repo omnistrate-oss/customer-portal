@@ -1,6 +1,7 @@
-import { Stack } from "@mui/material";
+import { useMemo } from "react";
+import { SelectChangeEvent, Stack } from "@mui/material";
 import { getMainResourceFromInstance, getRegionMenuItems } from "app/(dashboard)/instances/utils";
-import { useEffect, useMemo } from "react";
+import { FormikProps } from "formik";
 
 import DynamicField from "src/components/DynamicForm/DynamicField";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -8,13 +9,44 @@ import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChi
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { ServiceOffering } from "src/types/serviceOffering";
+import { Subscription } from "src/types/subscription";
 
+import { SnapshotFormValues } from "../types";
 import { isOperatorCRDResourceType } from "../utils";
 
 type CreateSnapshotDialogContentProps = {
-  formData: any;
+  formData: FormikProps<SnapshotFormValues>;
   instances: ResourceInstance[];
   isFetchingInstances?: boolean;
+};
+
+const getInstanceServiceOffering = (
+  instance: ResourceInstance | undefined,
+  subscriptionsObj: Record<string, Subscription>,
+  serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>
+) => {
+  if (!instance) {
+    return undefined;
+  }
+
+  const subscription = subscriptionsObj[instance.subscriptionId as string];
+  const { serviceId, productTierId } = subscription || {};
+
+  return serviceOfferingsObj[serviceId as string]?.[productTierId as string];
+};
+
+/** The region an instance's snapshots are pinned to (operator CRD resources), and the regions to offer for it. */
+const getRegionOptions = (instance?: ResourceInstance, serviceOffering?: ServiceOffering) => {
+  const resource = getMainResourceFromInstance(instance, serviceOffering);
+  const targetRegion = isOperatorCRDResourceType(resource?.resourceType) ? instance?.region : undefined;
+  const regionMenuItems = instance ? getRegionMenuItems(serviceOffering, instance.cloud_provider as CloudProvider) : [];
+
+  if (!targetRegion || regionMenuItems.some((option) => option.value === targetRegion)) {
+    return { targetRegion, menuItems: regionMenuItems };
+  }
+
+  return { targetRegion, menuItems: [{ label: targetRegion, value: targetRegion }, ...regionMenuItems] };
 };
 
 const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = ({
@@ -28,58 +60,30 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
     return instances.find((inst) => inst.id === formData.values.createSnapshotInstanceId);
   }, [formData.values.createSnapshotInstanceId, instances]);
 
-  const selectedInstanceServiceOffering = useMemo(() => {
-    if (!selectedInstance) {
-      return undefined;
-    }
+  const { targetRegion, menuItems } = useMemo(
+    () =>
+      getRegionOptions(
+        selectedInstance,
+        getInstanceServiceOffering(selectedInstance, subscriptionsObj, serviceOfferingsObj)
+      ),
+    [selectedInstance, serviceOfferingsObj, subscriptionsObj]
+  );
 
-    const subscription = subscriptionsObj[selectedInstance.subscriptionId as string];
-    const { serviceId, productTierId } = subscription || {};
-
-    return serviceOfferingsObj[serviceId as string]?.[productTierId as string];
-  }, [selectedInstance, serviceOfferingsObj, subscriptionsObj]);
-
-  const selectedInstanceResource = useMemo(() => {
-    return getMainResourceFromInstance(selectedInstance, selectedInstanceServiceOffering);
-  }, [selectedInstance, selectedInstanceServiceOffering]);
-
-  const targetRegion = isOperatorCRDResourceType(selectedInstanceResource?.resourceType)
-    ? selectedInstance?.region
-    : undefined;
-
-  const regionMenuItems = useMemo(() => {
-    if (formData.values.createSnapshotInstanceId && selectedInstance) {
-      return getRegionMenuItems(selectedInstanceServiceOffering, selectedInstance.cloud_provider as CloudProvider);
-    }
-
-    return [];
-  }, [formData.values.createSnapshotInstanceId, selectedInstance, selectedInstanceServiceOffering]);
-
-  const menuItems = useMemo(() => {
-    if (!targetRegion || regionMenuItems.some((option) => option.value === targetRegion)) {
-      return regionMenuItems;
-    }
-
-    return [
-      {
-        label: targetRegion,
-        value: targetRegion,
-      },
-      ...regionMenuItems,
-    ];
-  }, [regionMenuItems, targetRegion]);
-
-  useEffect(() => {
-    if (targetRegion && formData.values.createSnapshotRegion !== targetRegion) {
-      formData.setFieldValue("createSnapshotRegion", targetRegion, false);
-      return;
-    }
-
+  // Picking an instance sets the region it is pinned to, or clears a region it doesn't offer
+  const handleInstanceChange = (event: SelectChangeEvent<string>) => {
+    const instance = instances.find((inst) => inst.id === event.target.value);
+    const next = getRegionOptions(
+      instance,
+      getInstanceServiceOffering(instance, subscriptionsObj, serviceOfferingsObj)
+    );
     const currentRegion = formData.values.createSnapshotRegion;
-    if (currentRegion && !menuItems.some((item) => item.value === currentRegion)) {
+
+    if (next.targetRegion) {
+      formData.setFieldValue("createSnapshotRegion", next.targetRegion, false);
+    } else if (currentRegion && !next.menuItems.some((item) => item.value === currentRegion)) {
       formData.setFieldValue("createSnapshotRegion", "", false);
     }
-  }, [formData, menuItems, targetRegion]);
+  };
 
   const targetRegionDisabledMessage = "Snapshots can only be created in the same region as the selected instance";
 
@@ -117,6 +121,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
 
             return data;
           }),
+          onChange: handleInstanceChange,
           required: true,
           isLoading: isFetchingInstances,
           emptyMenuText: "No instances found",
@@ -130,6 +135,8 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           name: "createSnapshotRegion",
           type: "select",
           menuItems: menuItems,
+          // A pinned region is shown even before the form holds it; the page submits it too
+          value: targetRegion,
           required: true,
           disabled: Boolean(targetRegion),
           disabledMessage: targetRegion ? targetRegionDisabledMessage : "",

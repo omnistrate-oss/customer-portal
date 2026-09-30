@@ -283,7 +283,11 @@ const StripePaymentMethodsSection = ({
         handleClose={() => setMethodToRemove(null)}
         title="Remove Payment Method"
         subtitle={removeDialogSubtitle}
-        message="To confirm removal, please enter <b>remove</b> in the field below:"
+        message={
+          <>
+            To confirm removal, please enter <b>remove</b> in the field below:
+          </>
+        }
         confirmationText="remove"
         buttonLabel="Remove"
         closeButtonAriaLabel="Close remove payment method dialog"

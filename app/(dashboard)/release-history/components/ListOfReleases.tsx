@@ -4,7 +4,7 @@ import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import { TierVersionSet } from "src/types/tier-version-set";
+import { ReleaseSummary } from "src/types/tier-version-set";
 
 import { Option } from "../types";
 
@@ -12,7 +12,7 @@ import FilterSelect from "./FilterSelect";
 import ReleaseCard from "./ReleaseCard";
 
 type ListOfReleasesProps = {
-  releases: TierVersionSet[];
+  releases: ReleaseSummary[];
   searchText: string;
   setSearchText: (text: string) => void;
   selectedProduct: string;

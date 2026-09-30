@@ -11,7 +11,8 @@
  * What it normalises, and why:
  *   - hardcoded stroke colors are dropped so the icon inherits `currentColor`
  *   - hardcoded fill colors become `currentColor` (solid icons keep their shape)
- *   - stroke-width is hoisted onto the <svg> so the `strokeWidth` prop can override it
+ *   - stroke-width is hoisted onto the <svg> so the `strokeWidth` prop can override it; a
+ *     fill-only icon gets 0, or it would inherit a 1px outline from the <svg>'s stroke
  *   - Figma's no-op full-bleed clipPath is removed; any surviving ids are namespaced per
  *     icon so two icons on one page cannot collide
  *   - SVG attributes are rewritten to their JSX spelling
@@ -145,7 +146,8 @@ const buildIcon = (fileName) => {
   markup = removeNoOpClipPath(markup, viewBoxWidth, viewBoxHeight);
   markup = namespaceIds(markup, kebabName);
 
-  const strokeWidth = Number(markup.match(/stroke-width="([^"]+)"/)?.[1]);
+  const isFillOnly = !/\sstroke(-width)?="(?!none)[^"]*"/.test(markup);
+  const strokeWidth = isFillOnly ? 0 : Number(markup.match(/stroke-width="([^"]+)"/)?.[1]);
   markup = markup
     .replace(/\sstroke-width="[^"]*"/g, "")
     .replace(/\sstroke="(?!none)[^"]*"/g, "")

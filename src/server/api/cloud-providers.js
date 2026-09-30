@@ -1,6 +1,7 @@
 const axios = require("../axios");
 const ProviderAuthError = require("../utils/ProviderAuthError");
 const withProviderTokenExpirationHanding = require("../utils/withProviderTokenExpirationHandling");
+const { errorSummary } = require("../utils/errorSummary");
 
 async function getCloudProviders() {
   try {
@@ -19,7 +20,7 @@ async function getCloudProviders() {
 
     return cloudProvidersResponse;
   } catch (error) {
-    console.log("getCloudProviders error", error);
+    console.error("getCloudProviders error", errorSummary(error));
     if (error.response && error.response.status === 401) {
       throw new ProviderAuthError();
     } else {

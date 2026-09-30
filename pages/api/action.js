@@ -4,6 +4,7 @@ import { baseDomain } from "src/api/client";
 import { isAllowedRoute, normalizeEndpoint } from "src/server/utils/allowedRoutes";
 import { getAuthToken } from "src/server/utils/authCookie";
 import { httpRequestMethods } from "src/server/utils/constants/httpsRequestMethods";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { checkIsNonProtectedEndpoint } from "src/utils/authUtils";
 import {
   isPasswordSameAsEmail,
@@ -59,7 +60,7 @@ export default async function handleAction(nextRequest, nextResponse) {
       const arrayBuffer = await response.arrayBuffer();
       return nextResponse.status(200).send(Buffer.from(arrayBuffer));
     } catch (error) {
-      console.error("Action Route GET proxy error", error);
+      console.error("Action Route GET proxy error", errorSummary(error));
       return nextResponse.status(500).send({ message: defaultErrorMessage });
     }
   }
@@ -166,7 +167,7 @@ export default async function handleAction(nextRequest, nextResponse) {
 
           // Handle errors from OpenAPI Fetch
           if (error) {
-            console.error("Action Route error", error);
+            console.error("Action Route error", errorSummary(error));
             const errorCode = fetchResponse?.status || 500;
             const errorMessage = error.message || defaultErrorMessage;
             return nextResponse.status(errorCode).send({
@@ -193,7 +194,7 @@ export default async function handleAction(nextRequest, nextResponse) {
           return;
         }
       } catch (error) {
-        console.error("Action Route error", error);
+        console.error("Action Route error", errorSummary(error));
         const errorCode = error?.status || 500;
         const errorMessage = error?.message || defaultErrorMessage;
         return nextResponse.status(errorCode).send({

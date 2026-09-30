@@ -409,7 +409,18 @@ const main = async () => {
   const date = new Date().toISOString().slice(0, 10);
   run("git --no-pager diff --staged --stat");
   git(["commit", "-m", `chore: update HAR files (${date})`]);
-  run("git --no-pager push origin master");
+  // The submodule is often on a detached HEAD (step 2 only checks out master when behind), so push the commit itself.
+  git(["--no-pager", "push", "origin", "HEAD:master"]);
+  git(["fetch", "origin", "master", "--quiet"]);
+  if (
+    !gitSilent(["branch", "-r", "--contains", "HEAD"])
+      .split("\n")
+      .some((branch) => branch.trim() === "origin/master")
+  ) {
+    throw new Error(
+      `HAR commit ${gitSilent(["rev-parse", "--short", "HEAD"])} did not reach the HAR repo's master. Push it with: git -C tests/fixtures/hars push origin HEAD:master`
+    );
+  }
 
   process.chdir(repoRoot);
   console.log("\nHAR files updated and pushed successfully.");

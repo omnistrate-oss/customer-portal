@@ -23,6 +23,7 @@ type ResourcesResponse = {
 async function fetchResources(params: QueryParams): Promise<ResourceSummary[]> {
   const { serviceId, productTierId, productTierVersion, isInjectedAccountConfig } = params;
 
+  // Same-origin route; the configured client refreshes an expired session and retries.
   const response = await axios.get("/api/resources", {
     baseURL: "",
     params: {

@@ -276,7 +276,11 @@ function DeleteAccountConfigConfirmationDialog(props) {
     handleClose,
     formData,
     title = "Delete",
-    message = "To confirm deletion, please enter <b>deleteme</b>, in the field below:",
+    message = (
+      <>
+        To confirm deletion, please enter <b>deleteme</b>, in the field below:
+      </>
+    ),
     buttonLabel = "Delete",
     buttonColor = "#D92D20",
     isLoading,
@@ -301,7 +305,9 @@ function DeleteAccountConfigConfirmationDialog(props) {
         <Content>
           <DeleteInstructions accountInstructionDetails={accountInstructionDetails} />
 
-          <Text size="small" weight="medium" color="#344054" mt="9px" dangerouslySetInnerHTML={{ __html: message }} />
+          <Text size="small" weight="medium" color="#344054" mt="9px">
+            {message}
+          </Text>
           <TextField
             id="deleteme"
             name="deleteme"

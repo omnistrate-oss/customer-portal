@@ -1,5 +1,9 @@
 # Icons
 
+> **Paused.** Until the team revisits the icon approach, don't add icons here or migrate
+> icons into this folder. New icons are components in `src/components/Icons/` (see
+> `.agents/skills/icons/SKILL.md`). The icons already here keep working.
+
 One icon, one API. `size`, `color`, `strokeWidth`, a forwarded ref, and correct
 accessibility defaults — the same for every icon, generated from the design system's SVG
 exports so the code and the Figma library cannot drift.

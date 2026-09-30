@@ -1,4 +1,5 @@
 import { clearAuthCookie, clearIndicatorCookie, clearRefreshCookie, getAuthToken } from "src/server/utils/authCookie";
+import { errorSummary } from "src/server/utils/errorSummary";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
 
@@ -19,11 +20,11 @@ export default async function handleLogout(nextRequest, nextResponse) {
           Authorization: `Bearer ${authToken}`,
         },
       }).catch((error) => {
-        console.error("Backend logout request failed", error);
+        console.error("Backend logout request failed", errorSummary(error));
       });
     }
   } catch (error) {
-    console.error("Error during logout", error);
+    console.error("Error during logout", errorSummary(error));
   } finally {
     // Always clear all auth cookies (both httpOnly + the indicator) even if the backend call fails.
     // Missing the indicator clear here is why "log out" used to leave the UI thinking it was still
