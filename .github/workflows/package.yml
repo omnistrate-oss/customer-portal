@@ -158,7 +158,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_name == 'v0.570-patch-1' }}
+            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_name == 'v0.57-patch-1' }}
             type=sha,format=long
 
       # Login against a Docker registry
@@ -237,7 +237,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_name == 'v0.570-patch-1' }}
+            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_name == 'v0.57-patch-1' }}
             type=sha,format=long
 
       # Login against a Docker registry
