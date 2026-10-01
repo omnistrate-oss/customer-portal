@@ -31,7 +31,11 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
       return { ok: true };
     }
 
-    return { ok: false, status: 401, message: "Not authenticated" };
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      return { ok: false, status: 401, message: "Not authenticated" };
+    }
+
+    return { ok: false, status: 503, message: "Authentication service unavailable" };
   } catch {
     return { ok: false, status: 401, message: "Not authenticated" };
   }
