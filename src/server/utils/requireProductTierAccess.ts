@@ -4,8 +4,8 @@ import createFetchClient from "openapi-fetch";
 import { baseDomain } from "src/api/client";
 import type { paths } from "src/types/schema";
 
-import { getAuthToken } from "./authCookie";
 import { getEnvironmentType } from "./getEnvironmentType";
+import { validateUserToken } from "./validateUserToken";
 
 export type ProductTierIdentifier = {
   serviceId: string;
@@ -18,7 +18,6 @@ const customerClient = createFetchClient<paths>({ baseUrl: baseDomain });
 // An ID that doesn't exist gets 403 from the offering lookup below.
 const ID_PATTERN = /^[\w-]+$/;
 
-const NOT_AUTHENTICATED = { message: "Not authenticated" };
 const NO_ACCESS = { message: "You don't have access to this plan" };
 const DEFAULT_ERROR = { message: "Something went wrong. Please retry" };
 
@@ -36,11 +35,12 @@ export async function requireProductTierAccess(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<ProductTierIdentifier | null> {
-  const authToken = getAuthToken(req);
-  if (!authToken) {
-    res.status(401).json(NOT_AUTHENTICATED);
+  const authentication = await validateUserToken(req);
+  if (!authentication.ok) {
+    res.status(authentication.status).json({ message: authentication.message });
     return null;
   }
+  const { authToken } = authentication;
 
   const { serviceId, productTierId } = req.query;
   if (
@@ -61,7 +61,7 @@ export async function requireProductTierAccess(
     });
 
     if (response.status === 401) {
-      res.status(401).json(NOT_AUTHENTICATED);
+      res.status(401).json({ message: "Not authenticated" });
       return null;
     }
     if (!response.ok && ![400, 403, 404].includes(response.status)) {
