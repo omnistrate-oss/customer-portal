@@ -1,8 +1,6 @@
 import { Box, Stack } from "@mui/material";
 import { FormikProps } from "formik";
 
-import { parseDateRangeValues } from "../utils";
-
 import AbsoluteRangeView from "./AbsoluteRangeView";
 import RelativeRangeView from "./RelativeRangeView";
 
@@ -42,16 +40,11 @@ const FilterOptionsDateRange: React.FC<FilterOptionsDateRangeProps> = ({
   onRelativeValueChange,
   dateRangeFormik,
 }) => {
-  const { values, handleChange, handleBlur, touched, errors, setFieldValue, resetForm } = dateRangeFormik;
+  const { values, handleChange, handleBlur, touched, errors, setFieldValue } = dateRangeFormik;
 
   const handleDateChange = (startDate?: Date, endDate?: Date) => {
     setFieldValue("startDate", startDate);
     setFieldValue("endDate", endDate);
-  };
-
-  const handleClearAbsoluteRange = () => {
-    resetForm({ values: parseDateRangeValues([]) });
-    onRelativeValueChange(null);
   };
 
   return (
@@ -87,7 +80,6 @@ const FilterOptionsDateRange: React.FC<FilterOptionsDateRangeProps> = ({
           startTime={values.startTime}
           endTime={values.endTime}
           onDateChange={handleDateChange}
-          onClear={handleClearAbsoluteRange}
           handleTimeChange={handleChange}
           handleTimeBlur={handleBlur}
           touched={touched}

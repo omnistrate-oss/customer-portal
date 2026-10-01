@@ -17,14 +17,7 @@ import FilterOptionsMultiSelect from "./components/FilterOptionsMultiSelect";
 import LeftMenu from "./components/LeftMenu";
 import { timeValidationSchema } from "./constants";
 import { AppliedFilters, DataGridFilterProps, DateRangeType } from "./types";
-import {
-  filterData,
-  formatDateRangeChipLabel,
-  formatKeyValueChipLabel,
-  getFilterCount,
-  parseDateRangeValues,
-  searchData,
-} from "./utils";
+import { filterData, formatDateRangeChipLabel, getFilterCount, parseDateRangeValues, searchData } from "./utils";
 
 type FilterChipData = {
   filterKey: string;
@@ -158,7 +151,7 @@ const DataGridFilter = <T,>({
             filterKey,
             filterLabel: config.leftMenuLabel,
             value,
-            valueLabel: option?.label || (config.filterType === "key-value" ? formatKeyValueChipLabel(value) : value),
+            valueLabel: option?.label || value,
           });
         });
       }
