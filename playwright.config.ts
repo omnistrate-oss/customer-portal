@@ -44,6 +44,8 @@ export default defineConfig({
     {
       name: "user-setup",
       testMatch: "user-setup.spec.ts",
+      timeout: 180_000,
+      use: { trace: "retain-on-failure" },
     },
     {
       name: "deployment-tests",

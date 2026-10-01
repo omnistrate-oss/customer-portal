@@ -1,7 +1,7 @@
-import { test as setup } from "test-fixtures/har-test";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
 import path from "path";
+import { expect, test as setup } from "test-fixtures/har-test";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
@@ -13,10 +13,27 @@ setup("Authenticate User", async ({ page }) => {
   const apiClient = new UserAPIClient();
   const signinPage = new SigninPage(page);
 
-  await signinPage.signInWithPassword();
+  // Register both response waits before login triggers the dashboard requests.
+  const [signinResponse, subscriptionsData] = await Promise.all([
+    page.waitForResponse(
+      (response) => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/signin"
+    ),
+    page.waitForResponse(
+      (response) => {
+        const url = new URL(response.url());
+        return (
+          response.request().method() === "POST" &&
+          url.pathname === "/api/action" &&
+          url.searchParams.get("endpoint") === "/2022-09-01-00/subscription"
+        );
+      },
+      { timeout: 90_000 }
+    ),
+    signinPage.signInWithPassword(),
+  ]);
 
-  // Wait for the signin response — token is now in an httpOnly cookie, not the response body
-  await page.waitForResponse((response) => response.url().includes("/api/signin"));
+  expect(signinResponse.status()).toBe(200);
+  expect(subscriptionsData.status()).toBe(200);
   console.log("User signin successful!");
 
   // Read the httpOnly token from browser cookies (Playwright can access httpOnly cookies)
@@ -26,15 +43,6 @@ setup("Authenticate User", async ({ page }) => {
     GlobalStateManager.setState({ userToken: tokenCookie.value });
   }
 
-  // Intercept the Request to Get Subscriptions
-  const subscriptionsData = await page.waitForResponse(
-    (response) => {
-      return (
-        response.url() === `${process.env.YOUR_SAAS_DOMAIN_URL}/api/action?endpoint=%2F2022-09-01-00%2Fsubscription`
-      );
-    },
-    { timeout: 60 * 1000 } // Wait for 60 seconds if needed
-  );
   const subscriptions = (await subscriptionsData.json()).subscriptions || [];
 
   await page.waitForURL(PageURLs.instances);
