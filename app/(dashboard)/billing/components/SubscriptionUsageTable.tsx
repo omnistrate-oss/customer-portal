@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
 import DataTable from "src/components/DataTable/DataTable";
+import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import { Text } from "src/components/Typography/Typography";
 
@@ -16,12 +17,18 @@ import {
 
 dayjs.extend(utc);
 
-const TableHeader = () => {
+type TableHeaderProps = {
+  count: number;
+};
+
+const TableHeader: FC<TableHeaderProps> = ({ count }) => {
   return (
     <div className=" py-5 px-6 border-b border-[#E4E7EC]">
-      <Text size="large" weight="semibold" color="#101828">
-        Usage Breakdown
-      </Text>
+      <DataGridHeaderTitle
+        title="Usage Breakdown"
+        units={{ singular: "Subscription", plural: "Subscriptions" }}
+        count={count}
+      />
     </div>
   );
 };
@@ -142,6 +149,7 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
       columns={columns}
       rows={rows}
       HeaderComponent={TableHeader}
+      headerProps={{ count: rows.length }}
       noRowsText="No subscriptions"
       isLoading={isSubscriptionsUsagePending}
       hidePagination={rows.length < 11}
