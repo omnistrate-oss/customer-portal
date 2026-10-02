@@ -6,6 +6,7 @@ import type { paths } from "src/types/schema";
 
 import { getAuthToken } from "./authCookie";
 import { getEnvironmentType } from "./getEnvironmentType";
+import { validateUserToken } from "./validateUserToken";
 
 export type ProductTierIdentifier = {
   serviceId: string;
@@ -39,6 +40,12 @@ export async function requireProductTierAccess(
   const authToken = getAuthToken(req);
   if (!authToken) {
     res.status(401).json(NOT_AUTHENTICATED);
+    return null;
+  }
+
+  const authentication = await validateUserToken(req);
+  if (!authentication.ok) {
+    res.status(authentication.status).json({ message: authentication.message });
     return null;
   }
 

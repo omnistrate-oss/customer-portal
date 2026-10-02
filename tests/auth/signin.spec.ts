@@ -175,3 +175,27 @@ test.describe("Signin Page", () => {
     await expect(page).toHaveURL(PageURLs.instances, { timeout: 10000 });
   });
 });
+
+test.describe("Provider API authentication", () => {
+  const invalidSessions = [
+    { name: "missing", cookie: "omnistrate_refresh_token=invalid-refresh" },
+    { name: "malformed", cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=malformed-jwt" },
+  ];
+
+  for (const endpoint of ["resources", "version-sets", "cloud-providers"]) {
+    for (const session of invalidSessions) {
+      test(`${endpoint} rejects ${session.name} tokens with 401`, async ({ request }) => {
+        const response = await request.get(`/api/${endpoint}`, {
+          params: { serviceId: "s-auth-regression", productTierId: "pt-auth-regression" },
+          // A refresh hint lets the page proxy defer auth to the API route.
+          // Neither cookie is a real credential; the route must reject this session.
+          headers: { Cookie: session.cookie },
+          maxRedirects: 0,
+        });
+
+        expect(response.status()).toBe(401);
+        expect(await response.json()).toEqual({ message: "Not authenticated" });
+      });
+    }
+  }
+});
