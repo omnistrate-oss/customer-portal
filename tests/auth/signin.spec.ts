@@ -1,8 +1,7 @@
-import { test, expect } from "test-fixtures/har-test";
 import { getIdentityProviderButtonLabel } from "app/(public)/(main-image)/signin/utils";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
-import { GlobalStateManager } from "test-utils/global-state-manager";
+import { expect, test } from "test-fixtures/har-test";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
 
 test.describe("Signin Page", () => {
@@ -158,30 +157,45 @@ test.describe("Signin Page", () => {
       sessionStorage.setItem("authState", encodedLocalAuthState);
     }, encodedLocalAuthState);
 
-    //get userToken the global state manager
-    const userToken = GlobalStateManager.getToken("user");
-
-    // intercept the request to the identity provider auth endpoint "/api/sign-in-with-idp
-    // Mock must set the httpOnly cookie (like the real server does)
-    await page.route("**/api/sign-in-with-idp", async (route) => {
-      try {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          headers: {
-            "Set-Cookie": `omnistrate_token=${userToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`,
-          },
-          body: JSON.stringify({}),
-        });
-      } catch (error) {
-        console.log("Error in route handler:", error);
-      }
+    // Obtain a fresh session independently of user-setup, then let the callback
+    // install all auth cookies, including the client-readable signed-in indicator.
+    const signinResponse = await page.request.post("/api/signin", {
+      data: { email: process.env.USER_EMAIL!, password: process.env.USER_PASSWORD! },
     });
-    await page.waitForTimeout(2000);
+    expect(signinResponse.status()).toBe(200);
+    await page.context().clearCookies();
+
+    await page.route("**/api/sign-in-with-idp", async (route) => {
+      await route.fulfill({ response: signinResponse, body: JSON.stringify({}) });
+    });
 
     await page.goto(`/idp-auth?state=${state}&code=test-code`);
 
     //expect page to have redirected to the instances page
     await expect(page).toHaveURL(PageURLs.instances, { timeout: 10000 });
   });
+});
+
+test.describe("Provider API authentication", () => {
+  const invalidSessions = [
+    { name: "missing", cookie: "omnistrate_refresh_token=invalid-refresh" },
+    { name: "malformed", cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=malformed-jwt" },
+  ];
+
+  for (const endpoint of ["resources", "version-sets", "cloud-providers"]) {
+    for (const session of invalidSessions) {
+      test(`${endpoint} rejects ${session.name} tokens with 401`, async ({ request }) => {
+        const response = await request.get(`/api/${endpoint}`, {
+          params: { serviceId: "s-auth-regression", productTierId: "pt-auth-regression" },
+          // A refresh hint lets the page proxy defer auth to the API route.
+          // Neither cookie is a real credential; the route must reject this session.
+          headers: { Cookie: session.cookie },
+          maxRedirects: 0,
+        });
+
+        expect(response.status()).toBe(401);
+        expect(await response.json()).toEqual({ message: "Not authenticated" });
+      });
+    }
+  }
 });

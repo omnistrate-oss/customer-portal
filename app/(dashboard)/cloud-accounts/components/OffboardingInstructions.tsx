@@ -151,70 +151,74 @@ export const OffboardingInstructions: FC<{ offboardingInstructionDetails: Offboa
       <List>
         {offboardingInstructionDetails?.awsAccountID && (
           <ListItem>
-            <ListItemIcon>
-              <ArrowBullet />
-            </ListItemIcon>
-
             <Box overflow="hidden" flex={1}>
               <AwsCloudFormationInstructions
                 cloudFormationUrl={offboardingInstructionDetails?.awsCloudFormationUrl}
                 variant="offboarding"
                 awsAccountId={offboardingInstructionDetails?.awsAccountID}
               >
-                <Text size="medium" weight="regular" color="#374151">
-                  Delete the CloudFormation stack that was created during onboarding:
-                </Text>
-                <List sx={{ marginTop: "8px", gap: "6px" }}>
-                  <ListItem sx={{ gap: "8px" }}>
-                    <ListItemIcon>
-                      <StepBullet />
-                    </ListItemIcon>
-                    <Text size="small" weight="regular" color="#374151">
-                      Open the{" "}
-                      <StyledLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://console.aws.amazon.com/cloudformation/"
-                      >
-                        AWS CloudFormation Console
-                        <ArrowOutwardIcon
-                          sx={{
-                            fontSize: "1.3em !important",
-                            flexShrink: 0,
-                            color: "inherit",
-                            verticalAlign: "middle",
-                            ml: "2px",
-                          }}
-                          aria-hidden="true"
-                        />
-                      </StyledLink>
+                <ListItem>
+                  <ListItemIcon>
+                    <ArrowBullet />
+                  </ListItemIcon>
+
+                  <Box overflow="hidden" flex={1}>
+                    <Text size="medium" weight="regular" color="#374151">
+                      Delete the CloudFormation stack that was created during onboarding:
                     </Text>
-                  </ListItem>
-                  <ListItem sx={{ gap: "8px" }}>
-                    <ListItemIcon>
-                      <StepBullet />
-                    </ListItemIcon>
-                    <Text size="small" weight="regular" color="#374151">
-                      Locate the onboarding stack created during setup
-                    </Text>
-                  </ListItem>
-                  <ListItem sx={{ gap: "8px" }}>
-                    <ListItemIcon>
-                      <StepBullet />
-                    </ListItemIcon>
-                    <Text size="small" weight="regular" color="#374151">
-                      Select the stack and choose Delete
-                    </Text>
-                  </ListItem>
-                  <ListItem sx={{ gap: "8px" }}>
-                    <ListItemIcon>
-                      <StepBullet />
-                    </ListItemIcon>
-                    <Text size="small" weight="regular" color="#374151">
-                      Wait for the stack deletion to complete
-                    </Text>
-                  </ListItem>
-                </List>
+                    <List sx={{ marginTop: "8px", gap: "6px" }}>
+                      <ListItem sx={{ gap: "8px" }}>
+                        <ListItemIcon>
+                          <StepBullet />
+                        </ListItemIcon>
+                        <Text size="small" weight="regular" color="#374151">
+                          Open the{" "}
+                          <StyledLink
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://console.aws.amazon.com/cloudformation/"
+                          >
+                            AWS CloudFormation Console
+                            <ArrowOutwardIcon
+                              sx={{
+                                fontSize: "1.3em !important",
+                                flexShrink: 0,
+                                color: "inherit",
+                                verticalAlign: "middle",
+                                ml: "2px",
+                              }}
+                              aria-hidden="true"
+                            />
+                          </StyledLink>
+                        </Text>
+                      </ListItem>
+                      <ListItem sx={{ gap: "8px" }}>
+                        <ListItemIcon>
+                          <StepBullet />
+                        </ListItemIcon>
+                        <Text size="small" weight="regular" color="#374151">
+                          Locate the onboarding stack created during setup
+                        </Text>
+                      </ListItem>
+                      <ListItem sx={{ gap: "8px" }}>
+                        <ListItemIcon>
+                          <StepBullet />
+                        </ListItemIcon>
+                        <Text size="small" weight="regular" color="#374151">
+                          Select the stack and choose Delete
+                        </Text>
+                      </ListItem>
+                      <ListItem sx={{ gap: "8px" }}>
+                        <ListItemIcon>
+                          <StepBullet />
+                        </ListItemIcon>
+                        <Text size="small" weight="regular" color="#374151">
+                          Wait for the stack deletion to complete
+                        </Text>
+                      </ListItem>
+                    </List>
+                  </Box>
+                </ListItem>
               </AwsCloudFormationInstructions>
             </Box>
           </ListItem>

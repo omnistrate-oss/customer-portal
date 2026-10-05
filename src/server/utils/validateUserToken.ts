@@ -16,16 +16,11 @@ type AccessTokenClaims = {
 
 type UserTokenValidationResult =
   | { ok: true; authToken: string; user: User }
-  | { ok: false; status: 401 | 403 | 503; message: string };
+  | { ok: false; status: 401 | 403; message: string };
 
 const AUTHENTICATION_TIMEOUT_MS = 10000;
 const NOT_AUTHENTICATED = { ok: false, status: 401, message: "Not authenticated" } as const;
 const WRONG_ORGANIZATION = { ok: false, status: 403, message: "Forbidden" } as const;
-const AUTHENTICATION_UNAVAILABLE = {
-  ok: false,
-  status: 503,
-  message: "Authentication service unavailable",
-} as const;
 
 export async function validateUserToken(req: NextApiRequest): Promise<UserTokenValidationResult> {
   const authToken = getAuthToken(req);
@@ -46,28 +41,17 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
       signal: AbortSignal.timeout(AUTHENTICATION_TIMEOUT_MS),
     });
 
-    if (response.status === 400 || response.status === 401 || response.status === 403) {
-      return NOT_AUTHENTICATED;
-    }
-
     if (response.status !== 200) {
-      return AUTHENTICATION_UNAVAILABLE;
+      return NOT_AUTHENTICATED;
     }
 
     const user = (await response.json()) as User;
     if (typeof user.orgId !== "string" || !user.orgId.trim()) {
-      return AUTHENTICATION_UNAVAILABLE;
-    }
-
-    // /user has authenticated this exact token. jwtDecode only reads the claims used for the organization check.
-    let claims: AccessTokenClaims;
-    try {
-      claims = jwtDecode<AccessTokenClaims>(authToken);
-    } catch {
       return NOT_AUTHENTICATED;
     }
 
-    const { organizationID, serviceProviderID } = claims;
+    // /user has authenticated this exact token. jwtDecode only reads the claims used for the organization check.
+    const { organizationID, serviceProviderID } = jwtDecode<AccessTokenClaims>(authToken);
     if (
       typeof organizationID !== "string" ||
       !organizationID.trim() ||
@@ -84,6 +68,6 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
 
     return { ok: true, authToken, user };
   } catch {
-    return AUTHENTICATION_UNAVAILABLE;
+    return NOT_AUTHENTICATED;
   }
 }
