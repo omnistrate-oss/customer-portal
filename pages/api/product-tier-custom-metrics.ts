@@ -5,7 +5,7 @@ import {
   getProductTierCustomMetrics,
   getUniqueProductTierIdentifiers,
 } from "src/server/api/product-tier-custom-metrics";
-import { getAuthToken } from "src/server/utils/authCookie";
+import { validateUserToken } from "src/server/utils/validateUserToken";
 import type { ProductTierCustomMetricsResponse } from "src/types/productTierCustomMetrics";
 
 const MAX_SUBSCRIPTION_IDS = 125;
@@ -34,10 +34,11 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const authToken = getAuthToken(req);
-  if (!authToken) {
-    return res.status(401).json({ message: "Not authenticated" });
+  const authentication = await validateUserToken(req);
+  if (!authentication.ok) {
+    return res.status(authentication.status).json({ message: authentication.message });
   }
+  const { authToken } = authentication;
 
   const subscriptionIds = parseSubscriptionIds(req.query.subscriptionIds);
 
