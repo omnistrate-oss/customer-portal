@@ -374,7 +374,7 @@ test.describe("My Infra Test", () => {
 
 - **`BackendError`** is thrown by page objects (`InstancesPage.waitForStatus`, `CloudAccountsPage.waitForStatus`) when an instance reaches `Failed` status or times out.
 - **`BackendSetupGuard`** catches `BackendError` in `beforeAll`/`beforeEach` setup and marks the suite for skipping. Non-backend errors (assertions, missing elements) still fail normally.
-- **`skipOnBackendError(test, fn)`** wraps individual test bodies — it catches `BackendError` and calls `test.skip()`.
+- **`skipOnBackendError(test, fn)`** wraps individual test bodies — it catches `BackendError` and calls `test.skip()`. The HAR fixture then skips the remaining tests in that spec file, since serial suites build on the skipped test's backend state.
 - **The soft failure tracker** records every skip to backend-failures.json in the `tests` folder. Global setup deletes the file at the start of each run.
 
 ### CI behavior

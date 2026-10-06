@@ -19,6 +19,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as zlib from "zlib";
 
+import { hasBackendFailure } from "test-utils/backend-error";
 import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 
 export type HarMode = "record" | "replay" | "off";
@@ -71,6 +72,7 @@ type HarFixtures = {
   harMode: HarMode;
   testId: string;
   harFilePath: string;
+  skipAfterBackendFailure: void;
 };
 
 const getHarMode = (): HarMode => {
@@ -139,7 +141,8 @@ const normalizeUrl = (url: string): string => {
 // bodies/Set-Cookie headers contain credentials). Replay must let these fall
 // through to the real Next.js routes — without this, a refresh-token call
 // during a replay test would have no HAR entry and abort("failed").
-const REPLAY_LIVE_API_PATHS = /\/api\/(signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)(?:\/|$|\?)/i;
+const REPLAY_LIVE_API_PATHS =
+  /\/api\/(signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)(?:\/|$|\?)/i;
 
 export const test = base.extend<HarFixtures>({
   harMode: async ({}, use) => {
@@ -157,6 +160,15 @@ export const test = base.extend<HarFixtures>({
   harFilePath: async ({}, use, testInfo) => {
     await use(getHarGzPath(testInfo));
   },
+
+  // Serial suites skip only the test that hit a backend failure; skip the rest of the spec too
+  skipAfterBackendFailure: [
+    async ({}, use, testInfo) => {
+      testInfo.skip(hasBackendFailure(testInfo.file), "Skipping: an earlier test in this spec hit a backend failure");
+      await use();
+    },
+    { auto: true },
+  ],
 
   context: async ({ browser, harMode, viewport, storageState }, use, testInfo) => {
     // Preserve project-level context options (storageState, viewport, device settings)
