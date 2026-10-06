@@ -5,6 +5,7 @@ import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 
 import { GlobalStateManager } from "./global-state-manager";
+import { retryOnRateLimit } from "./retry-on-rate-limit";
 
 export class UserAPIClient {
   baseURL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN}`;
@@ -58,9 +59,11 @@ export class UserAPIClient {
     payload: CreateResourceInstancePayload
   ) {
     const context = await this.createUserRequest();
-    const response = await context.post(
-      `/${this.apiVersion}/resource-instance/${serviceProviderId}/${serviceKey}/${serviceAPIVersion}/${serviceEnvironmentKey}/${serviceModelKey}/${productTierKey}/${resourceKey}?subscriptionId=${subscriptionId}`,
-      { data: payload }
+    const response = await retryOnRateLimit(() =>
+      context.post(
+        `/${this.apiVersion}/resource-instance/${serviceProviderId}/${serviceKey}/${serviceAPIVersion}/${serviceEnvironmentKey}/${serviceModelKey}/${productTierKey}/${resourceKey}?subscriptionId=${subscriptionId}`,
+        { data: payload }
+      )
     );
 
     if (!response.ok()) {

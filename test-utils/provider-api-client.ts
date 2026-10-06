@@ -7,6 +7,7 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { Service } from "src/types/service";
 
 import { GlobalStateManager } from "./global-state-manager";
+import { retryOnRateLimit } from "./retry-on-rate-limit";
 
 export class ProviderAPIClient {
   baseURL = `${process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN}`;
@@ -132,11 +133,13 @@ export class ProviderAPIClient {
 
   async deleteInstance(serviceId: string, environmentId: string, instanceId: string, resourceId: string) {
     const context = await this.createProviderRequest();
-    const response = await context.delete(
-      `/${this.apiVersion}/fleet/service/${serviceId}/environment/${environmentId}/instance/${instanceId}`,
-      {
-        data: { resourceId },
-      }
+    const response = await retryOnRateLimit(() =>
+      context.delete(
+        `/${this.apiVersion}/fleet/service/${serviceId}/environment/${environmentId}/instance/${instanceId}`,
+        {
+          data: { resourceId },
+        }
+      )
     );
 
     if (!response.ok()) {
