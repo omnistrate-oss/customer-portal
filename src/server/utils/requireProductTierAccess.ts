@@ -24,7 +24,7 @@ const DEFAULT_ERROR = { message: "Something went wrong. Please retry" };
 /**
  * Guards API routes that call the backend with the provider's credentials. The signed-in customer must see
  * the requested plan among their own service offerings, checked with their own token. Otherwise it sends
- * 400, 401, 403 or 500 and returns null.
+ * 400, 401, 403, 500 or 503 and returns null.
  *
  * @example
  * // GET /api/resources?serviceId=s-1&productTierId=pt-1
