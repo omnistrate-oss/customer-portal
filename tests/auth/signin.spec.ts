@@ -182,7 +182,7 @@ test.describe("Provider API authentication", () => {
     { name: "malformed", cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=malformed-jwt" },
   ];
 
-  for (const endpoint of ["resources", "version-sets", "cloud-providers"]) {
+  for (const endpoint of ["resources", "version-sets", "cloud-providers", "product-tier-custom-metrics"]) {
     for (const session of invalidSessions) {
       test(`${endpoint} rejects ${session.name} tokens with 401`, async ({ request }) => {
         const response = await request.get(`/api/${endpoint}`, {
