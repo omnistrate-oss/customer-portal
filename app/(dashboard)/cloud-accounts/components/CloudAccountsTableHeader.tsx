@@ -1,6 +1,9 @@
 import { FC } from "react";
 import { CircularProgress } from "@mui/material";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import { AccountConfig } from "src/types/account-config";
 import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance } from "src/types/resourceInstance";
@@ -35,6 +38,7 @@ type CloudAccountTableHeaderProps = {
   serviceModelType: string;
   onConnectClick: () => void;
   onDisconnectClick: () => void;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
@@ -57,6 +61,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
   onConnectClick,
   onDisconnectClick,
   serviceModelType,
+  columnPreference,
 }) => {
   return (
     <>
@@ -93,6 +98,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
             serviceModelType={serviceModelType}
             isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
           />
+          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-[#EAECF0]">

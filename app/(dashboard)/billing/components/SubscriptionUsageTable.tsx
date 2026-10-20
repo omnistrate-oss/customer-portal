@@ -3,6 +3,11 @@ import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataTable from "src/components/DataTable/DataTable";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
@@ -19,16 +24,18 @@ dayjs.extend(utc);
 
 type TableHeaderProps = {
   count: number;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
-const TableHeader: FC<TableHeaderProps> = ({ count }) => {
+const TableHeader: FC<TableHeaderProps> = ({ count, columnPreference }) => {
   return (
-    <div className=" py-5 px-6 border-b border-[#E4E7EC]">
+    <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#E4E7EC]">
       <DataGridHeaderTitle
         title="Usage Breakdown"
         units={{ singular: "Subscription", plural: "Subscriptions" }}
         count={count}
       />
+      <ColumnPreferenceButton {...columnPreference} />
     </div>
   );
 };
@@ -144,12 +151,17 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
     ];
   }, [additionalMetricFields, configuredMetricNamesByProductTierId, showAdditionalMetrics]);
 
+  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.usageBreakdown,
+    columns,
+  });
+
   return (
     <DataTable
-      columns={columns}
+      columns={preferredColumns}
       rows={rows}
       HeaderComponent={TableHeader}
-      headerProps={{ count: rows.length }}
+      headerProps={{ columnPreference, count: rows.length }}
       noRowsText="No subscriptions"
       isLoading={isSubscriptionsUsagePending}
       hidePagination={rows.length < 11}

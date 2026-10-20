@@ -8,6 +8,11 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { OnCopyProps } from "react-json-view";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataTable from "src/components/DataTable/DataTable";
 import {
@@ -45,6 +50,7 @@ type AuditLogsTableHeaderProps = {
   setSelectedDateRange: SetState<DateRange>;
   selectedEventTypes: EventType[];
   setSelectedEventTypes: SetState<EventType[]>;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const columnHelper = createColumnHelper<AuditEvent>();
@@ -58,6 +64,7 @@ const AuditLogsTableHeader: FC<AuditLogsTableHeaderProps> = (props) => {
     setSelectedDateRange,
     selectedEventTypes,
     setSelectedEventTypes,
+    columnPreference,
   } = props;
 
   return (
@@ -89,6 +96,7 @@ const AuditLogsTableHeader: FC<AuditLogsTableHeaderProps> = (props) => {
           selectedEventTypes={selectedEventTypes}
           setSelectedEventTypes={setSelectedEventTypes}
         />
+        <ColumnPreferenceButton {...columnPreference} />
       </Stack>
     </Stack>
   );
@@ -231,6 +239,12 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
     ];
   }, [currentUserOrgId]);
 
+  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.instanceAuditLogs,
+    columns: dataTableColumns,
+    clickableColumnIds: ["userName"],
+  });
+
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
@@ -265,8 +279,7 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
   return (
     <Box mt="32px">
       <DataTable
-        // @ts-ignore
-        columns={dataTableColumns}
+        columns={preferredColumns}
         rows={filteredEvents}
         renderDetailsComponent={DetailTableRowView}
         noRowsText="No events"
@@ -277,6 +290,7 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
         getRowCanExpand={(rowData) => Boolean(Number(rowData.original.workflowFailures?.length) > 0)}
         HeaderComponent={AuditLogsTableHeader}
         headerProps={{
+          columnPreference,
           count: filteredEvents.length,
           searchText: searchText,
           setSearchText: setSearchText,

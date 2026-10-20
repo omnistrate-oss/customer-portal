@@ -8,6 +8,11 @@ import Button from "src/components/Button/Button";
 import CardWithTitle from "src/components/Card/CardWithTitle";
 import Checkbox from "src/components/Checkbox/Checkbox";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useGridColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataGrid from "src/components/DataGrid/DataGrid";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import Autocomplete from "src/components/FormElementsv2/AutoComplete/AutoComplete";
@@ -95,6 +100,7 @@ const VpcsDataGridHeader = ({
   isImporting,
   selectedImportIds,
   selectedUnimportIds,
+  columnPreference,
 }: {
   totalCount: number;
   isLoadingVpcs: boolean;
@@ -105,6 +111,7 @@ const VpcsDataGridHeader = ({
   isImporting: boolean;
   selectedImportIds: string[];
   selectedUnimportIds: string[];
+  columnPreference: ColumnPreferenceButtonProps;
 }) => {
   const selectedVpcs = selectedImportIds.length + selectedUnimportIds.length;
   const hasMixedSelection = selectedImportIds.length > 0 && selectedUnimportIds.length > 0;
@@ -196,6 +203,7 @@ const VpcsDataGridHeader = ({
                 ""
               )}
             </Button>
+            <ColumnPreferenceButton {...columnPreference} />
           </Stack>
         </Stack>
       </Stack>
@@ -329,6 +337,15 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
     ],
     []
   );
+
+  const {
+    columns: preferredColumns,
+    columnVisibilityModel,
+    columnPreference,
+  } = useGridColumnPreference<VpcRecord>({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.chooseVpcs,
+    columns: vpcColumns,
+  });
 
   return (
     <Stack gap="20px">
@@ -530,7 +547,8 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   checkboxSelection
                   disableSelectionOnClick
                   getRowId={(row) => row.id}
-                  columns={vpcColumns}
+                  columns={preferredColumns}
+                  columnVisibilityModel={columnVisibilityModel}
                   rows={isFetchingVPCs || isLoadingVpcs ? [] : availableVpcs}
                   selectionModel={values.selectedVpcIds}
                   onSelectionModelChange={(newSelection) => {
@@ -544,6 +562,7 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                   }}
                   componentsProps={{
                     header: {
+                      columnPreference,
                       totalCount: availableVpcs.length,
                       isLoadingVpcs,
                       isFetchingVPCs,

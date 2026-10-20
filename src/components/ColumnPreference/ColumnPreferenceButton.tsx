@@ -150,6 +150,7 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
         aria-haspopup="dialog"
         aria-expanded={!!anchorEl}
         data-testid={columnPreferenceTestIds.button(tableId)}
+        sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
       >
         {COLUMN_PREFERENCE_LABEL}
       </Button>

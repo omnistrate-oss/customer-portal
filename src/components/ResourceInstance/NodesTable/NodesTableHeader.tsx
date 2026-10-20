@@ -2,6 +2,9 @@ import { CircularProgress, Stack } from "@mui/material";
 
 import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import GenerateTokenIcon from "src/components/Icons/GenerateToken/GenerateTokenIcon";
@@ -22,6 +25,7 @@ type NodesTableHeaderProps = {
   failoverMutation: { isPending: boolean };
   searchText: string;
   setSearchText: (text: string) => void;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
@@ -39,6 +43,7 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
   failoverMutation,
   searchText,
   setSearchText,
+  columnPreference,
 }) => {
   return (
     <>
@@ -101,6 +106,7 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
               Generate Token
             </Button>
           )}
+          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </Stack>
     </>
