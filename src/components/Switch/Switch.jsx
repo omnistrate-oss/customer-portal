@@ -1,6 +1,8 @@
 import { styled } from "@mui/material/styles";
 import MuiSwitch from "@mui/material/Switch";
 
+import { colors } from "src/themeConfig";
+
 import Tooltip from "../Tooltip/Tooltip";
 
 const SwitchBase = ({ disabledMessage = "", ...props }) => {
@@ -30,7 +32,7 @@ const Switch = styled(SwitchBase)(({ theme }) => ({
       transform: "translateX(16px)",
       color: "#fff",
       "& + .MuiSwitch-track": {
-        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : theme.palette.primary.main,
+        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : colors.success600,
         opacity: 1,
         border: 0,
       },
