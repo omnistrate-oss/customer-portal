@@ -24,13 +24,21 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
     return NOT_AUTHENTICATED;
   }
 
+  let headers: Headers;
+
+  try {
+    headers = new Headers({
+      Accept: "application/json",
+      Authorization: `Bearer ${authToken}`,
+    });
+  } catch (error) {
+    return error instanceof TypeError ? NOT_AUTHENTICATED : VALIDATION_FAILED;
+  }
+
   try {
     const requestOptions = {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
+      headers,
       cache: "no-store",
       redirect: "manual",
       signal: AbortSignal.timeout(AUTHENTICATION_TIMEOUT_MS),
