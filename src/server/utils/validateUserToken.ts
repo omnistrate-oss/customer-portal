@@ -31,8 +31,8 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
       Accept: "application/json",
       Authorization: `Bearer ${authToken}`,
     });
-  } catch (error) {
-    return error instanceof TypeError ? NOT_AUTHENTICATED : VALIDATION_FAILED;
+  } catch {
+    return NOT_AUTHENTICATED;
   }
 
   try {
