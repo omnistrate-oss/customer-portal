@@ -19,6 +19,12 @@ import { DisplayText } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams } from "src/utils/instance";
+import {
+  getEnumFromUserRoleString,
+  isOperationAllowedByRBAC,
+  operationEnum,
+  viewEnum,
+} from "src/utils/isAllowedByRBAC";
 import { CloudAccountTab } from "src/utils/routes";
 
 import AccountDetailsTab from "./components/AccountDetailsTab";
@@ -167,7 +173,14 @@ const CloudAccountDetailsPage = ({
 
       {activeTab === "Account Details" && <AccountDetailsTab instance={instance} />}
       {activeTab === "Governance Controls" && (
-        <GovernanceControlsTab cloudFormationUrl={resultParams?.cloudformation_url} />
+        <GovernanceControlsTab
+          accountConfigId={resultParams?.cloud_provider_account_config_id ?? ""}
+          canUpdate={isOperationAllowedByRBAC(
+            operationEnum.Update,
+            getEnumFromUserRoleString(subscription?.roleType),
+            viewEnum.Access_Resources
+          )}
+        />
       )}
     </PageContainer>
   );
