@@ -5,10 +5,11 @@ import { Typography } from "@mui/material";
 
 import { useCookieConsentContext } from "src/context/cookieConsentContext";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
+import { getPolicyLink } from "src/utils/getPolicyLink";
 
 const Footer = () => {
   const { setIsConsentModalOpen } = useCookieConsentContext();
-  const { orgName } = useProviderOrgDetails();
+  const { orgName, orgTermsOfUse, orgPrivacyPolicy } = useProviderOrgDetails();
 
   return (
     <footer
@@ -18,8 +19,9 @@ const Footer = () => {
       }}
     >
       <Link
-        href="/terms-of-use"
+        href={getPolicyLink(orgTermsOfUse, "/terms-of-use")}
         target="_blank"
+        rel="noopener noreferrer"
         style={{
           fontWeight: "500",
           fontSize: "14px",
@@ -30,8 +32,9 @@ const Footer = () => {
         Terms of Use
       </Link>
       <Link
-        href="/privacy-policy"
+        href={getPolicyLink(orgPrivacyPolicy, "/privacy-policy")}
         target="_blank"
+        rel="noopener noreferrer"
         style={{
           fontWeight: "500",
           fontSize: "14px",
