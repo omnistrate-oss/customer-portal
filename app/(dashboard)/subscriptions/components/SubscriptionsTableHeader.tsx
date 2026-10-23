@@ -1,5 +1,8 @@
 import { FC } from "react";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { SetState } from "src/types/common/reactGenerics";
@@ -23,6 +26,7 @@ type SubscriptionsTableHeaderProps = {
   isFetchingSubscriptions: boolean;
   refetchSubscriptions: () => void;
   selectedSubscription?: Subscription;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
@@ -38,6 +42,7 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
   isFetchingSubscriptions,
   refetchSubscriptions,
   selectedSubscription,
+  columnPreference,
 }) => {
   const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
@@ -89,6 +94,7 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
           >
             Manage Subscriptions
           </Button>
+          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-[#EAECF0]">

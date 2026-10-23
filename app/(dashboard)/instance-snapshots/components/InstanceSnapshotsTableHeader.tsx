@@ -1,5 +1,8 @@
 import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import { SetState } from "src/types/common/reactGenerics";
@@ -22,6 +25,7 @@ type InstanceSnapshotsTableHeaderProps = {
   createDisabledMessage: string;
   onCopyClick: () => void;
   copyDisabledMessage: string;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> = ({
@@ -39,6 +43,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
   createDisabledMessage,
   onCopyClick,
   copyDisabledMessage,
+  columnPreference,
 }) => {
   return (
     <div>
@@ -95,6 +100,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
           >
             Create
           </Button>
+          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="py-5 px-6 border-b border-gray-200">
