@@ -4,6 +4,9 @@ import { UseMutationResult } from "@tanstack/react-query";
 
 import Button from "src/components/Button/Button";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import SearchInput from "src/components/DataGrid/SearchInput";
 import { DateRange, DateTimePickerPopover } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
@@ -30,6 +33,7 @@ type BackupsTableHeaderProps = {
   handleRestoreInstanceClick?: () => void;
   handleDeleteSnapshotDialogOpen?: () => void;
   isDeleting?: boolean;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
@@ -49,6 +53,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
   handleRestoreInstanceClick,
   handleDeleteSnapshotDialogOpen,
   isDeleting,
+  columnPreference,
 }) => {
   const copySnapshotDisabledMessage = useMemo(() => {
     if (copySnapshotMutation.isPending) {
@@ -121,6 +126,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             width="250px"
           />
           <RefreshWithToolTip refetch={refetch} disabled={isRefetching} />
+          <ColumnPreferenceButton {...columnPreference} />
           <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
 
           {tab === "snapshots" && (

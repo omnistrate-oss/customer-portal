@@ -10,6 +10,8 @@ import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
 import DisconnectAccountConfigDialog from "src/components/AccountConfigDialog/DisconnectAccountConfigDialog";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DeleteProtectionIcon from "src/components/Icons/DeleteProtection/DeleteProtection";
 import TextConfirmationDialog from "src/components/TextConfirmationDialog/TextConfirmationDialog";
 import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
@@ -602,6 +604,13 @@ const CloudAccountsPage = () => {
     ];
   }, [subscriptionsObj, accountConfigsHash]);
 
+  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.cloudAccounts,
+    columns: dataTableColumns,
+    primaryColumnId: "account_id",
+    clickableColumnIds: ["status"],
+  });
+
   const selectedInstance = useMemo(() => {
     return instances.find((instance) => instance.id === selectedRows[0]);
   }, [selectedRows, instances]);
@@ -991,13 +1000,14 @@ const CloudAccountsPage = () => {
       <div>
         <DataTable
           key={Object.keys(subscriptionsObj).length} // Force re-render when subscriptionsObj changes
-          columns={dataTableColumns}
+          columns={preferredColumns}
           rows={filteredCloudAccounts}
           noRowsText="No cloud accounts"
           isFilterApplied={byoaInstances.length > 0 && filteredCloudAccounts.length === 0}
           entityName="cloud accounts"
           HeaderComponent={CloudAccountsTableHeader}
           headerProps={{
+            columnPreference,
             count: filteredCloudAccounts.length,
             instances: byoaInstances,
             setFilteredInstances: setFilteredCloudAccounts,

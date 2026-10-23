@@ -2,6 +2,9 @@ import { FC, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import Button from "src/components/Button/Button";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import useFeatureFlags from "src/hooks/useFeatureFlags";
@@ -26,6 +29,7 @@ type CustomNetworksTableHeaderProps = {
   selectedRows: string[];
   customNetworks?: CustomNetwork[];
   subscriptions?: Subscription[];
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
@@ -41,6 +45,7 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
   selectedRows,
   customNetworks = [],
   subscriptions = [],
+  columnPreference,
 }) => {
   const currentUser = useSelector(selectUserrootData);
   const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
@@ -97,6 +102,7 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
 
         <div className="flex items-center gap-4 flex-shrink-0">
           <RefreshWithToolTip refetch={refetchCustomNetworks} disabled={isFetchingCustomNetworks} />
+          <ColumnPreferenceButton {...columnPreference} />
           <Button
             data-testid="modify-button"
             variant={"outlined"}

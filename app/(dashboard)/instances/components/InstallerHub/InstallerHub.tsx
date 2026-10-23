@@ -3,6 +3,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { FC, useMemo, useState } from "react";
 
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataTable from "src/components/DataTable/DataTable";
 import DownloadCLIIcon from "src/components/Icons/SideNavbar/DownloadCLI/DownloadCLIIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
@@ -120,14 +122,21 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
     ];
   }, [isDownloading, download, instanceDetails?.id]);
 
+  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.installerHub,
+    columns,
+    clickableColumnIds: ["action"],
+  });
+
   return (
     <Box mt="32px">
       <DataTable
-        columns={columns}
+        columns={preferredColumns}
         rows={rows}
         noRowsText="No Installer/Upgrader available"
         HeaderComponent={DataGridHeader}
         headerProps={{
+          columnPreference,
           handleDrawerOpen: handleModalOpen,
           selectedRows,
         }}

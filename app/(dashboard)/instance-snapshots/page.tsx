@@ -7,6 +7,8 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { $api } from "src/api/query";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import DataTable from "src/components/DataTable/DataTable";
 import ConfirmationDialog from "src/components/Dialog/ConfirmationDialog";
@@ -218,6 +220,13 @@ const InstanceSnapshotsPage = () => {
     ];
   }, [instances, subscriptionsObj]);
 
+  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.instanceSnapshots,
+    columns: dataTableColumns,
+    primaryColumnId: "snapshotId",
+    clickableColumnIds: ["sourceInstanceId"],
+  });
+
   const selectedSnapshot = useMemo(() => {
     if (!selectedRows.length) return undefined;
     return snapshots.find((snapshot) => snapshot.snapshotId === selectedRows[0]);
@@ -361,13 +370,14 @@ const InstanceSnapshotsPage = () => {
       <div>
         {/* TODO: Solve the Problem of shifting DataTable height when paginating */}
         <DataTable
-          columns={dataTableColumns}
+          columns={preferredColumns}
           rows={filteredSnapshots}
           noRowsText="No instance snapshots"
           isFilterApplied={snapshots.length > 0 && filteredSnapshots.length === 0}
           entityName="instance snapshots"
           HeaderComponent={InstanceSnapshotsTableHeader}
           headerProps={{
+            columnPreference,
             count: filteredSnapshots.length,
             snapshots,
             setFilteredSnapshots,

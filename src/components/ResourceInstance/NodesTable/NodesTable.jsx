@@ -5,6 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import _ from "lodash";
 import { useSelector } from "react-redux";
 
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useGridColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialog";
 import NodeIcon from "src/components/Icons/Node/NodeIcon";
@@ -331,6 +333,18 @@ export default function NodesTable(props) {
     []
   );
 
+  const {
+    columns: preferredColumns,
+    columnVisibilityModel,
+    columnPreference,
+  } = useGridColumnPreference({
+    tableId: isCustomTenancy
+      ? COLUMN_PREFERENCE_TABLE_IDS.instanceNodesCustomTenancy
+      : COLUMN_PREFERENCE_TABLE_IDS.instanceNodes,
+    columns: isCustomTenancy ? customTenancyColumns : columns,
+    clickableColumnIds: ["kubernetesDashboardEndpoint"],
+  });
+
   const failoverMutation = useMutation({
     mutationFn: (payload) => {
       return failoverResourceInstanceNode(payload);
@@ -381,13 +395,15 @@ export default function NodesTable(props) {
       <DataGrid
         checkboxSelection={!isCustomTenancy}
         disableSelectionOnClick
-        columns={isCustomTenancy ? customTenancyColumns : columns}
+        columns={preferredColumns}
+        columnVisibilityModel={columnVisibilityModel}
         rows={isLoading ? [] : filteredNodes}
         components={{
           Header: NodesTableHeader,
         }}
         componentsProps={{
           header: {
+            columnPreference,
             resourceName,
             count: filteredNodes.length,
             isRefetching,
