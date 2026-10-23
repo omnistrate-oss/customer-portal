@@ -1,11 +1,11 @@
 import { FC, MouseEvent, useState } from "react";
 import { DragDropContext, Draggable, DraggableProvidedDragHandleProps, Droppable, DropResult } from "@hello-pangea/dnd";
-import { Box, Stack } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 
 import Button from "src/components/Button/Button";
 import Dot from "src/components/Dot/Dot";
+import ColumnsIcon from "src/components/Icons/Columns/ColumnsIcon";
 import DragHandleIcon from "src/components/Icons/DragHandle/DragHandleIcon";
-import SlidersIcon from "src/components/Icons/Sliders/SlidersIcon";
 import Popover from "src/components/Popover/Popover";
 import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
@@ -19,7 +19,7 @@ import { ColumnPreferenceTableId } from "./tableIds";
 export const COLUMN_PREFERENCE_LABEL = "Column Preference";
 
 const PRIMARY_COLUMN_REASON = "This column opens the row, so it stays in place and is always shown";
-const PRIMARY_COLUMN_MOVE_REASON = "This column opens the row, so it can't be moved";
+const PRIMARY_COLUMN_MOVE_REASON = "This column opens the row, so its order can't be changed";
 const LOCKED_COLUMN_REASON = "This column has links or actions, so it can't be hidden";
 const LAST_VISIBLE_COLUMN_REASON = "At least one column must be shown";
 const DRAGGING_SHADOW = "0px 1px 2px 0px rgba(10, 13, 18, 0.05)";
@@ -113,6 +113,7 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
   const hasAlwaysShownColumn = items.some((item) => item.kind !== "optional");
   const shownCount = items.filter((item) => !hiddenIds.has(item.id)).length;
   const isCustomized = toStoredColumnLayout(layout, defaultLayout, null) !== null;
+  const triggerLabel = isCustomized ? `${COLUMN_PREFERENCE_LABEL} (customized)` : COLUMN_PREFERENCE_LABEL;
 
   const getDisabledMessage = (item: ColumnPreferenceItem): string | undefined => {
     if (item.kind === "locked") return LOCKED_COLUMN_REASON;
@@ -147,28 +148,30 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
 
   return (
     <>
-      <Button
-        variant="outlined"
-        startIcon={<SlidersIcon />}
-        onClick={openPopover}
-        disabled={disabled}
-        disabledMessage="Loading your column preferences"
-        aria-haspopup="dialog"
-        aria-expanded={!!anchorEl}
-        aria-label={isCustomized ? `${COLUMN_PREFERENCE_LABEL}, customized` : undefined}
-        data-testid={columnPreferenceTestIds.button(tableId)}
-        sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
-      >
-        {COLUMN_PREFERENCE_LABEL}
-        {!!isCustomized && (
-          <Dot
-            size={8}
-            color={colors.success600}
-            data-testid={columnPreferenceTestIds.customized}
-            sx={{ position: "absolute", top: "5px", right: "5px" }}
-          />
-        )}
-      </Button>
+      <Tooltip title={disabled ? "Loading your column preferences" : triggerLabel}>
+        <Box component="span" sx={{ display: "inline-flex", alignSelf: "center" }}>
+          <IconButton
+            size="small"
+            onClick={openPopover}
+            disabled={disabled}
+            aria-haspopup="dialog"
+            aria-expanded={!!anchorEl}
+            aria-label={triggerLabel}
+            data-testid={columnPreferenceTestIds.button(tableId)}
+            sx={{ color: colors.gray600 }}
+          >
+            <ColumnsIcon />
+            {!!isCustomized && (
+              <Dot
+                size={8}
+                color={colors.success600}
+                data-testid={columnPreferenceTestIds.customized}
+                sx={{ position: "absolute", top: "3px", right: "3px" }}
+              />
+            )}
+          </IconButton>
+        </Box>
+      </Tooltip>
 
       <Popover
         open={!!anchorEl}
@@ -190,16 +193,18 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
       >
         <Box data-testid={columnPreferenceTestIds.popover}>
           <Box pt="6px">
-            {primaryItems.map((item) => (
-              <ColumnRow key={item.id} item={item} isShown disabledMessage={PRIMARY_COLUMN_REASON} />
-            ))}
+            <Box sx={{ overflowY: "hidden", scrollbarGutter: "stable" }}>
+              {primaryItems.map((item) => (
+                <ColumnRow key={item.id} item={item} isShown disabledMessage={PRIMARY_COLUMN_REASON} />
+              ))}
+            </Box>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId={`column-preference-${tableId}`}>
                 {(droppableProvided) => (
                   <Box
                     ref={droppableProvided.innerRef}
                     {...droppableProvided.droppableProps}
-                    sx={{ maxHeight: "min(360px, calc(100vh - 240px))", overflowY: "auto" }}
+                    sx={{ maxHeight: "min(360px, calc(100vh - 240px))", overflowY: "auto", scrollbarGutter: "stable" }}
                   >
                     {movableItems.map((item, index) => (
                       <Draggable key={item.id} draggableId={item.id} index={index}>
@@ -246,7 +251,7 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
                 Cancel
               </Button>
               <Button variant="contained" onClick={handleConfirm} data-testid={columnPreferenceTestIds.confirm}>
-                Confirm
+                Apply
               </Button>
             </Stack>
           </Stack>

@@ -126,6 +126,7 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
             width="250px"
           />
           <RefreshWithToolTip refetch={refetch} disabled={isRefetching} />
+          <ColumnPreferenceButton {...columnPreference} />
           <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
 
           {tab === "snapshots" && (
@@ -174,7 +175,6 @@ const BackupsTableHeader: FC<BackupsTableHeaderProps> = ({
           >
             {tab === "backups" ? "Create Snapshot" : "Copy"}
           </Button>
-          <ColumnPreferenceButton {...columnPreference} />
         </Stack>
       </Stack>
     </>

@@ -21,6 +21,7 @@ const DashboardLogsTableHeader: FC<DashboardLogsTableHeaderProps> = ({ columnPre
       />
 
       <div className="flex items-center gap-4 flex-shrink-0">
+        <ColumnPreferenceButton {...columnPreference} />
         <Button
           data-testid="view-all-audit-logs-button"
           variant="outlined"
@@ -30,7 +31,6 @@ const DashboardLogsTableHeader: FC<DashboardLogsTableHeaderProps> = ({ columnPre
         >
           View all audit logs
         </Button>
-        <ColumnPreferenceButton {...columnPreference} />
       </div>
     </div>
   );

@@ -102,6 +102,7 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
 
         <div className="flex items-center gap-4 flex-shrink-0">
           <RefreshWithToolTip refetch={refetchCustomNetworks} disabled={isFetchingCustomNetworks} />
+          <ColumnPreferenceButton {...columnPreference} />
           <Button
             data-testid="modify-button"
             variant={"outlined"}
@@ -137,7 +138,6 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
           >
             Create
           </Button>
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-gray-200">

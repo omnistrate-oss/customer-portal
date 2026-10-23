@@ -71,6 +71,7 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
             placeholder="Search by Node ID"
             width="250px"
           />
+          <ColumnPreferenceButton {...columnPreference} />
 
           {showFailoverButton && (
             <Button
@@ -106,7 +107,6 @@ const NodesTableHeader: React.FC<NodesTableHeaderProps> = ({
               Generate Token
             </Button>
           )}
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </Stack>
     </>

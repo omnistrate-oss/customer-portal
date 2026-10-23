@@ -80,6 +80,7 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
           <div className="flex items-center mr-6">{isFetchingInstances && <CircularProgress size={20} />}</div>
 
           <RefreshWithToolTip refetch={refetchInstances} disabled={isFetchingInstances || isFetchingAccountConfigs} />
+          <ColumnPreferenceButton {...columnPreference} />
           <Button data-testid="create-button" variant="contained" onClick={onCreateClick}>
             Create
           </Button>
@@ -98,7 +99,6 @@ const CloudAccountsTableHeader: FC<CloudAccountTableHeaderProps> = ({
             serviceModelType={serviceModelType}
             isSelectedInstanceReadyToOffboard={isSelectedInstanceReadyToOffboard}
           />
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-[#EAECF0]">

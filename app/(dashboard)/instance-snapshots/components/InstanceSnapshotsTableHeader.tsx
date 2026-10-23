@@ -63,6 +63,7 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
             {!!isFetchingSnapshots && <LoadingSpinnerSmall size={20} sx={{ marginLeft: 0 }} />}
             <RefreshWithToolTip refetch={refetchSnapshots} disabled={isFetchingSnapshots} />
           </div>
+          <ColumnPreferenceButton {...columnPreference} />
           <Button
             data-testid="delete-button"
             variant="outlined"
@@ -100,7 +101,6 @@ const InstanceSnapshotsTableHeader: React.FC<InstanceSnapshotsTableHeaderProps> 
           >
             Create
           </Button>
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="py-5 px-6 border-b border-gray-200">

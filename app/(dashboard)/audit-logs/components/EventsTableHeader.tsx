@@ -42,6 +42,7 @@ const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
 
       <div className="flex justify-end items-center gap-4 flex-wrap flex-grow">
         <RefreshWithToolTip refetch={refetchAuditLogs} disabled={isFetchingAuditLogs} />
+        <ColumnPreferenceButton {...columnPreference} />
         <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
         <AuditLogsEventFilterDropdown
           selectedEventTypes={selectedEventTypes}
@@ -54,7 +55,6 @@ const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
           setSelectedServiceId={setSelectedServiceId}
           serviceOfferings={serviceOfferings}
         />
-        <ColumnPreferenceButton {...columnPreference} />
       </div>
     </div>
   );

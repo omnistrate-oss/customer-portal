@@ -32,6 +32,7 @@ const DataGridHeader: FC<DataGridHeaderProps> = (props) => {
           }
         />
         <Stack direction="row" alignItems="center" gap="16px">
+          <ColumnPreferenceButton {...columnPreference} />
           <Tooltip title={isNoneSelected ? "Installer/Upgrader is not selected" : ""}>
             <span>
               <Button
@@ -44,7 +45,6 @@ const DataGridHeader: FC<DataGridHeaderProps> = (props) => {
               </Button>
             </span>
           </Tooltip>
-          <ColumnPreferenceButton {...columnPreference} />
         </Stack>
       </Stack>
     </Box>

@@ -61,6 +61,7 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
 
         <div className="flex items-center gap-4 flex-shrink-0">
           <RefreshWithToolTip refetch={refetchSubscriptions} disabled={isFetchingSubscriptions} />
+          <ColumnPreferenceButton {...columnPreference} />
           <Button
             variant="outlined"
             onClick={onUnsubscribe}
@@ -94,7 +95,6 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
           >
             Manage Subscriptions
           </Button>
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-[#EAECF0]">

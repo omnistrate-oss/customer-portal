@@ -302,10 +302,11 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
           units={{ singular: "Instance", plural: "Instances" }}
         />
 
-        <div className="flex flex-wrap items-center justify-end gap-4">
+        <div className="flex items-center gap-4">
           <div className="flex items-center">{isFetchingInstances && <CircularProgress size={20} />}</div>
 
           <RefreshWithToolTip refetch={refetchInstances} disabled={isFetchingInstances} />
+          <ColumnPreferenceButton {...columnPreference} />
 
           {mainActions.map((action, index) => {
             return (
@@ -336,7 +337,6 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
             refetchData={refetchInstances}
             setSelectedRows={setSelectedRows}
           />
-          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
 
