@@ -13,6 +13,7 @@ import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider"
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
 import { getPolicyLink } from "src/utils/getPolicyLink";
+import { getPrivacyPolicyRoute, getTermsOfUseRoute } from "src/utils/routes";
 import FieldError from "components/FormElementsv2/FieldError/FieldError";
 import FieldContainer from "components/NonDashboardComponents/FormElementsV2/FieldContainer";
 import FieldLabel from "components/NonDashboardComponents/FormElementsV2/FieldLabel";
@@ -353,7 +354,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           <Link
             target="_blank"
             rel="noopener noreferrer"
-            href={getPolicyLink(orgTermsOfUse, "/terms-of-use")}
+            href={getPolicyLink(orgTermsOfUse, getTermsOfUseRoute())}
             style={{ color: "#364152", fontWeight: 600 }}
           >
             Terms & Conditions
@@ -362,7 +363,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           <Link
             target="_blank"
             rel="noopener noreferrer"
-            href={getPolicyLink(orgPrivacyPolicy, "/privacy-policy")}
+            href={getPolicyLink(orgPrivacyPolicy, getPrivacyPolicyRoute())}
             style={{ color: "#364152", fontWeight: 600 }}
           >
             Privacy Policy

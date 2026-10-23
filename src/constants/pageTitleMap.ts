@@ -7,8 +7,10 @@ import {
   getEventsRoute,
   getInstanceSnapshotsRoute,
   getPaymentSettingsRoute,
+  getPrivacyPolicyRoute,
   getReleaseHistoryRoute,
   getSettingsRoute,
+  getTermsOfUseRoute,
 } from "src/utils/routes";
 
 export const PAGE_TITLE_MAP = {
@@ -18,8 +20,8 @@ export const PAGE_TITLE_MAP = {
   "/reset-password": "Reset Password",
   "/validate-token": "Validate Token",
 
-  "/terms-of-use": "Terms of Use",
-  "/privacy-policy": "Privacy Policy",
+  [getTermsOfUseRoute()]: "Terms of Use",
+  [getPrivacyPolicyRoute()]: "Privacy Policy",
 
   "/dashboard": "Dashboard",
   "/instances": "Instances",

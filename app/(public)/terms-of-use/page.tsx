@@ -7,6 +7,7 @@ import DOMPurify from "isomorphic-dompurify";
 
 import { styleConfig } from "src/providerConfig";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
+import { getPrivacyPolicyRoute } from "src/utils/routes";
 import Container from "components/NonDashboardComponents/Container/Container";
 import Footer from "components/NonDashboardComponents/Footer";
 
@@ -184,7 +185,7 @@ const DefaultTermsOfUse = ({ orgName, orgSupportEmail }) => {
       <SectionHeading>Privacy Policy</SectionHeading>
       <SectionDescription>
         Our collection and use of your information is governed by our Privacy Policy, available{" "}
-        <Link href="/privacy-policy" style={{ color: "#2970FF" }}>
+        <Link href={getPrivacyPolicyRoute()} style={{ color: "#2970FF" }}>
           here
         </Link>
         .

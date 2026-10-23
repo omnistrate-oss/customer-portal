@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { useCookieConsentContext } from "src/context/cookieConsentContext";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { getPolicyLink } from "src/utils/getPolicyLink";
+import { getPrivacyPolicyRoute, getTermsOfUseRoute } from "src/utils/routes";
 
 const Footer = (props) => {
   const { nonFloatingBottomPosition = false } = props;
@@ -28,7 +29,7 @@ const Footer = (props) => {
       </Typography>
 
       <Link
-        href={getPolicyLink(orgTermsOfUse, "/terms-of-use")}
+        href={getPolicyLink(orgTermsOfUse, getTermsOfUseRoute())}
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -41,7 +42,7 @@ const Footer = (props) => {
         Terms & Conditions
       </Link>
       <Link
-        href={getPolicyLink(orgPrivacyPolicy, "/privacy-policy")}
+        href={getPolicyLink(orgPrivacyPolicy, getPrivacyPolicyRoute())}
         target="_blank"
         rel="noopener noreferrer"
         style={{

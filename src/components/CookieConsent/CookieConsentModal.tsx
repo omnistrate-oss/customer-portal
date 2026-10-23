@@ -6,6 +6,7 @@ import { Box, Stack, styled } from "@mui/material";
 import { useCookieConsentContext } from "src/context/cookieConsentContext";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { getPolicyLink } from "src/utils/getPolicyLink";
+import { getCookiePolicyRoute } from "src/utils/routes";
 
 import Button from "../Button/Button";
 import FlagWithBackground from "../Icons/Flag/FlagWithBackground";
@@ -103,7 +104,7 @@ function CookieConsentModal() {
                     cookies help us improve the platform experience. Accept All enables analytics cookies. Reject All
                     uses only necessary cookies. Learn more in our{" "}
                     <Link
-                      href={getPolicyLink(orgCookiePolicy, "/cookie-policy")}
+                      href={getPolicyLink(orgCookiePolicy, getCookiePolicyRoute())}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ textDecoration: "underline", cursor: "pointer", fontWeight: 600, color: "#FFFFFF" }}
