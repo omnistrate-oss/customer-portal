@@ -3,20 +3,23 @@ import { DragDropContext, Draggable, DraggableProvidedDragHandleProps, Droppable
 import { Box, Stack } from "@mui/material";
 
 import Button from "src/components/Button/Button";
+import Dot from "src/components/Dot/Dot";
 import DragHandleIcon from "src/components/Icons/DragHandle/DragHandleIcon";
 import SlidersIcon from "src/components/Icons/Sliders/SlidersIcon";
 import Popover from "src/components/Popover/Popover";
 import Switch from "src/components/Switch/Switch";
+import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
 import { columnPreferenceTestIds } from "src/constants/testIds/column-preference";
 import { colors } from "src/themeConfig";
 
-import { ColumnKind, ColumnLayout, moveItem } from "./columnLayout";
+import { ColumnKind, ColumnLayout, moveItem, toStoredColumnLayout } from "./columnLayout";
 import { ColumnPreferenceTableId } from "./tableIds";
 
 export const COLUMN_PREFERENCE_LABEL = "Column Preference";
 
 const PRIMARY_COLUMN_REASON = "This column opens the row, so it stays in place and is always shown";
+const PRIMARY_COLUMN_MOVE_REASON = "This column opens the row, so it can't be moved";
 const LOCKED_COLUMN_REASON = "This column has links or actions, so it can't be hidden";
 const LAST_VISIBLE_COLUMN_REASON = "At least one column must be shown";
 const DRAGGING_SHADOW = "0px 1px 2px 0px rgba(10, 13, 18, 0.05)";
@@ -68,9 +71,11 @@ const ColumnRow: FC<ColumnRowProps> = ({ item, isShown, disabledMessage, onToggl
         <DragHandleIcon />
       </Box>
     ) : (
-      <Box display="flex" color={colors.gray300}>
-        <DragHandleIcon />
-      </Box>
+      <Tooltip title={PRIMARY_COLUMN_MOVE_REASON}>
+        <Box display="flex" color={colors.gray300} sx={{ cursor: "not-allowed" }}>
+          <DragHandleIcon />
+        </Box>
+      </Tooltip>
     )}
     <Text size="small" weight="medium" color={colors.gray700} ellipsis sx={{ flex: 1, minWidth: 0 }}>
       {item.label}
@@ -107,6 +112,7 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
   const hiddenIds = new Set(draft.hidden);
   const hasAlwaysShownColumn = items.some((item) => item.kind !== "optional");
   const shownCount = items.filter((item) => !hiddenIds.has(item.id)).length;
+  const isCustomized = toStoredColumnLayout(layout, defaultLayout, null) !== null;
 
   const getDisabledMessage = (item: ColumnPreferenceItem): string | undefined => {
     if (item.kind === "locked") return LOCKED_COLUMN_REASON;
@@ -149,10 +155,19 @@ const ColumnPreferenceButton: FC<ColumnPreferenceButtonProps> = ({
         disabledMessage="Loading your column preferences"
         aria-haspopup="dialog"
         aria-expanded={!!anchorEl}
+        aria-label={isCustomized ? `${COLUMN_PREFERENCE_LABEL}, customized` : undefined}
         data-testid={columnPreferenceTestIds.button(tableId)}
         sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
       >
         {COLUMN_PREFERENCE_LABEL}
+        {!!isCustomized && (
+          <Dot
+            size={8}
+            color={colors.success600}
+            data-testid={columnPreferenceTestIds.customized}
+            sx={{ position: "absolute", top: "5px", right: "5px" }}
+          />
+        )}
       </Button>
 
       <Popover

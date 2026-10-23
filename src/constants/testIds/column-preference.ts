@@ -7,4 +7,5 @@ export const columnPreferenceTestIds = {
   reset: "column-preference-reset",
   cancel: "column-preference-cancel",
   confirm: "column-preference-confirm",
+  customized: "column-preference-customized",
 } as const;
