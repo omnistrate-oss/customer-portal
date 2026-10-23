@@ -4,7 +4,6 @@ export const COLUMN_PREFERENCE_TABLE_IDS = {
   alerts: "alerts",
   auditLogs: "audit-logs",
   billingInvoices: "billing-invoices",
-  chooseVpcs: "choose-vpcs",
   cloudAccounts: "cloud-accounts",
   customNetworks: "custom-networks",
   dashboardAuditLogs: "dashboard-audit-logs",
