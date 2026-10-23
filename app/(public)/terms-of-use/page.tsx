@@ -7,6 +7,7 @@ import DOMPurify from "isomorphic-dompurify";
 
 import { styleConfig } from "src/providerConfig";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
+import getSafeExternalURL from "src/utils/getSafeExternalURL";
 import { getPrivacyPolicyRoute } from "src/utils/routes";
 import Container from "components/NonDashboardComponents/Container/Container";
 import Footer from "components/NonDashboardComponents/Footer";
@@ -196,12 +197,19 @@ const DefaultTermsOfUse = ({ orgName, orgSupportEmail }) => {
 
 const TermsPage = () => {
   const { orgName, orgSupportEmail, orgTermsOfUse } = useProviderOrgDetails();
+  const policyURL = getSafeExternalURL(orgTermsOfUse);
 
   useEffect(() => {
     const pageTitle = orgName ? `Terms and Conditions - ${orgName}` : "Terms and Conditions";
 
     document.title = pageTitle;
   }, [orgName]);
+
+  useEffect(() => {
+    if (policyURL) window.location.replace(policyURL);
+  }, [policyURL]);
+
+  if (policyURL) return null;
 
   return (
     <>
