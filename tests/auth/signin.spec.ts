@@ -177,12 +177,41 @@ test.describe("Signin Page", () => {
 });
 
 test.describe("Provider API authentication", () => {
+  const invalidSignatureToken = [
+    Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url"),
+    Buffer.from(
+      JSON.stringify({
+        exp: Math.floor(Date.now() / 1000) - 60,
+        userID: "user-auth-regression",
+        organizationID: "org-auth-regression",
+        serviceProviderID: "org-auth-regression",
+      })
+    ).toString("base64url"),
+    Buffer.alloc(32).toString("base64url"),
+  ].join(".");
+
   const invalidSessions = [
     { name: "missing", cookie: "omnistrate_refresh_token=invalid-refresh" },
     { name: "malformed", cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=malformed-jwt" },
+    {
+      name: "invalid-signature",
+      cookie: `omnistrate_refresh_token=invalid-refresh; omnistrate_token=${invalidSignatureToken}`,
+    },
+    {
+      name: "newline-containing",
+      cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=invalid%0Acredential",
+    },
+    {
+      name: "carriage-return-containing",
+      cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=invalid%0Dcredential",
+    },
+    {
+      name: "unicode-containing",
+      cookie: "omnistrate_refresh_token=invalid-refresh; omnistrate_token=%E2%82%AC",
+    },
   ];
 
-  for (const endpoint of ["resources", "version-sets", "cloud-providers"]) {
+  for (const endpoint of ["resources", "version-sets", "cloud-providers", "product-tier-custom-metrics"]) {
     for (const session of invalidSessions) {
       test(`${endpoint} rejects ${session.name} tokens with 401`, async ({ request }) => {
         const response = await request.get(`/api/${endpoint}`, {
