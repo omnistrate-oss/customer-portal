@@ -21,3 +21,7 @@ export const COLUMN_PREFERENCE_TABLE_IDS = {
 } as const;
 
 export type ColumnPreferenceTableId = (typeof COLUMN_PREFERENCE_TABLE_IDS)[keyof typeof COLUMN_PREFERENCE_TABLE_IDS];
+
+// Bump a table's version (default 1) when its columns or defaults change enough that saved layouts should start
+// over. Layouts saved for an older version are ignored, and deleted the next time the user saves any table.
+export const COLUMN_PREFERENCE_TABLE_VERSIONS: Partial<Record<ColumnPreferenceTableId, number>> = {};

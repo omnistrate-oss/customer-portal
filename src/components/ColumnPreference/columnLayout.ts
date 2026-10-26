@@ -24,6 +24,11 @@ const isMovable = (rule: ColumnRule): boolean => rule.kind === "locked" || rule.
 const isSameOrder = (first: readonly string[], second: readonly string[]): boolean =>
   first.length === second.length && first.every((id, index) => id === second[index]);
 
+const isSameSet = (first: readonly string[], second: readonly string[]): boolean => {
+  const firstIds = new Set(first);
+  return firstIds.size === new Set(second).size && second.every((id) => firstIds.has(id));
+};
+
 /** Returns the saved layout, or null when the entry is missing, corrupt or the wrong shape. */
 export const parseColumnLayout = (raw: string | null): ColumnLayout | null => {
   if (!raw) return null;
@@ -70,9 +75,9 @@ export const resolveColumnLayout = (rules: readonly ColumnRule[], saved: ColumnL
 };
 
 /**
- * Returns the value to store, or null when the layout matches the default, so the entry is removed and later
- * changes to the default still apply. Hidden ids of columns that aren't present right now (another plan's
- * metrics, a column that only shows for some rows) are kept.
+ * Returns the value to store, or null when the layout matches the default order and hidden columns, so the entry
+ * is removed and later changes to the default still apply. Hidden ids of columns that aren't present right now
+ * (another plan's metrics, a column that only shows for some rows) are kept.
  *
  * toStoredColumnLayout({ order: ["a", "b"], hidden: ["b"] }, { order: ["a", "b"], hidden: [] }, { order: [], hidden: ["x"] })
  * → '{"order":["a","b"],"hidden":["b","x"]}'
@@ -82,7 +87,7 @@ export const toStoredColumnLayout = (
   defaults: ColumnLayout,
   previous: ColumnLayout | null
 ): string | null => {
-  if (next.hidden.length === 0 && isSameOrder(next.order, defaults.order)) return null;
+  if (isSameOrder(next.order, defaults.order) && isSameSet(next.hidden, defaults.hidden)) return null;
   const absentHidden = (previous?.hidden ?? []).filter((id) => !defaults.order.includes(id));
   return JSON.stringify({ order: next.order, hidden: [...new Set([...next.hidden, ...absentHidden])] });
 };
@@ -99,8 +104,25 @@ const listeners = new Set<() => void>();
 // Values localStorage refused to save (blocked or full), kept for the rest of the session.
 const unsavedValues = new Map<string, string | null>();
 
-/** getColumnLayoutKey("user-1", "apiKeys") → "columnPreferences:v1:user-1:apiKeys" */
-export const getColumnLayoutKey = (userId: string, tableId: string): string => `${KEY_PREFIX}${userId}:${tableId}`;
+/**
+ * getColumnLayoutKey("user-1", "apiKeys") → "columnPreferences:v1:user-1:apiKeys"
+ * getColumnLayoutKey("user-1", "customers", 2) → "columnPreferences:v1:user-1:customers@2"
+ */
+export const getColumnLayoutKey = (userId: string, tableId: string, tableVersion = 1): string =>
+  `${KEY_PREFIX}${userId}:${tableId}${tableVersion > 1 ? `@${tableVersion}` : ""}`;
+
+/** Deletes the user's saved layouts whose key isn't in `currentKeys`: older table versions and removed tables. */
+export const pruneStoredColumnLayouts = (userId: string, currentKeys: ReadonlySet<string>): void => {
+  const userPrefix = `${KEY_PREFIX}${userId}:`;
+  try {
+    const staleKeys = Array.from({ length: window.localStorage.length }, (_, index) =>
+      window.localStorage.key(index)
+    ).filter((key): key is string => !!key?.startsWith(userPrefix) && !currentKeys.has(key));
+    staleKeys.forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // Storage is blocked, so nothing was saved there to delete.
+  }
+};
 
 export const readStoredColumnLayout = (key: string): string | null => {
   if (unsavedValues.has(key)) return unsavedValues.get(key) ?? null;

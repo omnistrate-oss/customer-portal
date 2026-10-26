@@ -10,6 +10,7 @@ import {
   ColumnLayout,
   getColumnLayoutKey,
   parseColumnLayout,
+  pruneStoredColumnLayouts,
   readStoredColumnLayout,
   resolveColumnLayout,
   subscribeToStoredColumnLayouts,
@@ -17,7 +18,7 @@ import {
   writeStoredColumnLayout,
 } from "./columnLayout";
 import type { ColumnPreferenceButtonProps, ColumnPreferenceItem } from "./ColumnPreferenceButton";
-import { ColumnPreferenceTableId } from "./tableIds";
+import { COLUMN_PREFERENCE_TABLE_IDS, COLUMN_PREFERENCE_TABLE_VERSIONS, ColumnPreferenceTableId } from "./tableIds";
 
 type ColumnPreferenceOptions<TColumn> = {
   tableId: ColumnPreferenceTableId;
@@ -47,6 +48,13 @@ const getColumnKind = (id: string, label: string, primaryColumnId: string | unde
 
 const readServerSnapshot = (): string | null => null;
 
+const getCurrentKeys = (userId: string): Set<string> =>
+  new Set(
+    Object.values(COLUMN_PREFERENCE_TABLE_IDS).map((id) =>
+      getColumnLayoutKey(userId, id, COLUMN_PREFERENCE_TABLE_VERSIONS[id])
+    )
+  );
+
 /**
  * Applies the signed-in user's saved column order and visibility to `columns`. Pass `getColumnId` and
  * `getColumnLabel` as module-level functions so the results stay memoized. Columns without a label aren't listed.
@@ -63,7 +71,7 @@ export const useColumnPreference = <TColumn>({
   clickableColumnIds = [],
 }: ColumnPreferenceOptions<TColumn>): ColumnPreferenceResult<TColumn> => {
   const userId = useSelector(selectUserrootData).id;
-  const storageKey = userId ? getColumnLayoutKey(userId, tableId) : null;
+  const storageKey = userId ? getColumnLayoutKey(userId, tableId, COLUMN_PREFERENCE_TABLE_VERSIONS[tableId]) : null;
   const stored = useSyncExternalStore(
     subscribeToStoredColumnLayouts,
     () => (storageKey ? readStoredColumnLayout(storageKey) : null),
@@ -109,9 +117,11 @@ export const useColumnPreference = <TColumn>({
 
   const onSave = useCallback(
     (next: ColumnLayout) => {
-      if (storageKey) writeStoredColumnLayout(storageKey, toStoredColumnLayout(next, defaultLayout, saved));
+      if (!userId || !storageKey) return;
+      pruneStoredColumnLayouts(userId, getCurrentKeys(userId));
+      writeStoredColumnLayout(storageKey, toStoredColumnLayout(next, defaultLayout, saved));
     },
-    [storageKey, defaultLayout, saved]
+    [userId, storageKey, defaultLayout, saved]
   );
 
   const columnPreference = useMemo(
