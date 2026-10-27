@@ -1,20 +1,12 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import useCustomNetworks from "app/(dashboard)/custom-networks/hooks/useCustomNetworks";
 import { useFormik } from "formik";
 import _, { cloneDeep } from "lodash";
-import { useEffect, useMemo, useState } from "react";
 import type { StringSchema } from "yup";
 import * as yup from "yup";
 
-import Button from "components/Button/Button";
-import CardWithTitle from "components/Card/CardWithTitle";
-import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
-import GridDynamicField from "components/DynamicForm/GridDynamicField";
-import PreviewCard from "components/DynamicForm/PreviewCard";
-import Form from "components/FormElementsv2/Form/Form";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
-import { Text } from "components/Typography/Typography";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
@@ -29,8 +21,17 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance";
+import Button from "components/Button/Button";
+import CardWithTitle from "components/Card/CardWithTitle";
+import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
+import GridDynamicField from "components/DynamicForm/GridDynamicField";
+import PreviewCard from "components/DynamicForm/PreviewCard";
+import Form from "components/FormElementsv2/Form/Form";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import { Text } from "components/Typography/Typography";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
+import { getSubscriptionDeploymentOffering, getSubscriptionDeploymentValues } from "../deploymentLocations";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import useResources from "../hooks/useResources";
@@ -197,13 +198,24 @@ const InstanceForm = ({
     [consumptionSubscriptionAdminRBAC, selectedInstance?.id]
   );
 
-  const formData = useFormik({
+  const rawFormData = useFormik({
     initialValues,
     enableReinitialize: true,
     validationSchema: validationSchema,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values) => {
+    onSubmit: async (submittedValues) => {
+      const subscription = subscriptionsObj[submittedValues.subscriptionId];
+      const values =
+        formMode === "create" && subscription?.allowedDeploymentLocations?.length
+          ? getSubscriptionDeploymentValues(
+              submittedValues,
+              getSubscriptionDeploymentOffering(
+                serviceOfferingsObj[submittedValues.serviceId]?.[submittedValues.servicePlanId],
+                subscription
+              )
+            )
+          : submittedValues;
       const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
 
       // Determine if we should use version set resources or service offering resources
@@ -585,9 +597,37 @@ const InstanceForm = ({
     },
   });
 
+  const subscription = subscriptionsObj[rawFormData.values.subscriptionId];
+  const planOffering = serviceOfferingsObj[rawFormData.values.serviceId]?.[rawFormData.values.servicePlanId];
+  const offering = useMemo(
+    () => (formMode === "create" ? getSubscriptionDeploymentOffering(planOffering, subscription) : planOffering),
+    [formMode, planOffering, subscription]
+  );
+  const deploymentValues = useMemo(
+    () =>
+      formMode === "create" && subscription?.allowedDeploymentLocations?.length
+        ? getSubscriptionDeploymentValues(rawFormData.values, offering)
+        : rawFormData.values,
+    [formMode, subscription, rawFormData.values, offering]
+  );
+  const formData = {
+    ...rawFormData,
+    values: deploymentValues,
+  };
   const { values } = formData;
-
-  const offering = serviceOfferingsObj[values.serviceId]?.[values.servicePlanId];
+  const deploymentOfferingsObj = useMemo(
+    () =>
+      offering
+        ? {
+            ...serviceOfferingsObj,
+            [rawFormData.values.serviceId]: {
+              ...serviceOfferingsObj[rawFormData.values.serviceId],
+              [rawFormData.values.servicePlanId]: offering,
+            },
+          }
+        : serviceOfferingsObj,
+    [offering, serviceOfferingsObj, rawFormData.values.serviceId, rawFormData.values.servicePlanId]
+  );
 
   const { data: customNetworks = [], isFetching: isFetchingCustomNetworks } = useCustomNetworks({
     enabled: (values.requestParams as Record<string, any>)?.custom_network_id !== undefined, // Fetch only if custom_network_id is present
@@ -1078,7 +1118,7 @@ const InstanceForm = ({
     return getStandardInformationFields(
       servicesObj,
       serviceOfferings,
-      serviceOfferingsObj,
+      deploymentOfferingsObj,
       isFetchingServiceOfferings,
       subscriptions,
       subscriptionsObj,
@@ -1099,6 +1139,7 @@ const InstanceForm = ({
       orgName
     );
   }, [
+    deploymentOfferingsObj,
     formMode,
     formData.values,
     resourceCreateSchema,
@@ -1121,7 +1162,7 @@ const InstanceForm = ({
       formData,
       formData.values,
       resourceCreateSchema,
-      serviceOfferingsObj,
+      deploymentOfferingsObj,
       resources,
       customNetworks,
       isFetchingCustomNetworks
@@ -1130,7 +1171,7 @@ const InstanceForm = ({
     formMode,
     formData.values,
     resourceCreateSchema,
-    serviceOfferingsObj,
+    deploymentOfferingsObj,
     resources,
     customNetworks,
     isFetchingCustomNetworks,
