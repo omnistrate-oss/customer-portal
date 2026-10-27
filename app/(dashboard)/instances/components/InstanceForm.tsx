@@ -31,12 +31,17 @@ import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { Text } from "components/Typography/Typography";
 
 import { REQUEST_PARAMS_FIELDS_TO_FILTER } from "../constants";
-import { getSubscriptionDeploymentOffering, getSubscriptionDeploymentValues } from "../deploymentLocations";
 import useCustomerVersionSets from "../hooks/useCustomerVersionSets";
 import useInstancesDescribe from "../hooks/useInstancesDescribe";
 import useResources from "../hooks/useResources";
 import useResourceSchema from "../hooks/useResourceSchema";
-import { applyCustomDnsNormalization, filterSchemaByCloudProvider, getInitialValues } from "../utils";
+import {
+  applyCustomDnsNormalization,
+  filterSchemaByCloudProvider,
+  getInitialValues,
+  getSubscriptionDeploymentOffering,
+  getSubscriptionDeploymentValues,
+} from "../utils";
 import { isExistingVpcSupported } from "../vpcCapabilities";
 
 import {
