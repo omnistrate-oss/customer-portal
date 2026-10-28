@@ -29,6 +29,18 @@ const isSameSet = (first: readonly string[], second: readonly string[]): boolean
   return firstIds.size === new Set(second).size && second.every((id) => firstIds.has(id));
 };
 
+// Puts each id of `reference` that `include` accepts and `order` lacks right after the id it follows in `reference`.
+const insertMissingIds = (order: string[], reference: readonly string[], include: (id: string) => boolean): void => {
+  reference.forEach((id, index) => {
+    if (order.includes(id) || !include(id)) return;
+    const predecessor = reference
+      .slice(0, index)
+      .reverse()
+      .find((previousId) => order.includes(previousId));
+    order.splice(predecessor === undefined ? 0 : order.indexOf(predecessor) + 1, 0, id);
+  });
+};
+
 /** Returns the saved layout, or null when the entry is missing, corrupt or the wrong shape. */
 export const parseColumnLayout = (raw: string | null): ColumnLayout | null => {
   if (!raw) return null;
@@ -54,14 +66,7 @@ export const parseColumnLayout = (raw: string | null): ColumnLayout | null => {
 export const resolveColumnLayout = (rules: readonly ColumnRule[], saved: ColumnLayout | null): ResolvedColumnLayout => {
   const movableIds = rules.filter(isMovable).map((rule) => rule.id);
   const order = [...new Set(saved?.order ?? [])].filter((id) => movableIds.includes(id));
-  movableIds.forEach((id, index) => {
-    if (order.includes(id)) return;
-    const predecessor = movableIds
-      .slice(0, index)
-      .reverse()
-      .find((previousId) => order.includes(previousId));
-    order.splice(predecessor === undefined ? 0 : order.indexOf(predecessor) + 1, 0, id);
-  });
+  insertMissingIds(order, movableIds, () => true);
 
   const optionalIds = rules.filter((rule) => rule.kind === "optional").map((rule) => rule.id);
   const hidden = [...new Set(saved?.hidden ?? [])].filter((id) => optionalIds.includes(id));
@@ -75,21 +80,26 @@ export const resolveColumnLayout = (rules: readonly ColumnRule[], saved: ColumnL
 };
 
 /**
- * Returns the value to store, or null when the layout matches the default order and hidden columns, so the entry
- * is removed and later changes to the default still apply. Hidden ids of columns that aren't present right now
- * (another plan's metrics, a column that only shows for some rows) are kept.
+ * Returns the value to store, or null when the layout matches the default order and hidden columns and no column
+ * that's absent right now is remembered, so the entry is removed and later changes to the default still apply.
+ * Columns that aren't present right now (another plan's metrics, a column that only shows for some rows) keep their
+ * saved place, after the column they followed, and stay hidden if they were.
  *
- * toStoredColumnLayout({ order: ["a", "b"], hidden: ["b"] }, { order: ["a", "b"], hidden: [] }, { order: [], hidden: ["x"] })
- * → '{"order":["a","b"],"hidden":["b","x"]}'
+ * toStoredColumnLayout({ order: ["b", "a"], hidden: [] }, { order: ["a", "b"], hidden: [] }, { order: ["a", "x", "b"], hidden: ["x"] })
+ * → '{"order":["b","a","x"],"hidden":["x"]}'
  */
 export const toStoredColumnLayout = (
   next: ColumnLayout,
   defaults: ColumnLayout,
   previous: ColumnLayout | null
 ): string | null => {
-  if (isSameOrder(next.order, defaults.order) && isSameSet(next.hidden, defaults.hidden)) return null;
-  const absentHidden = (previous?.hidden ?? []).filter((id) => !defaults.order.includes(id));
-  return JSON.stringify({ order: next.order, hidden: [...new Set([...next.hidden, ...absentHidden])] });
+  const isAbsent = (id: string) => !defaults.order.includes(id);
+  const absentHidden = (previous?.hidden ?? []).filter(isAbsent);
+  const order = [...next.order];
+  insertMissingIds(order, previous?.order ?? [], isAbsent);
+  const isDefault = isSameOrder(next.order, defaults.order) && isSameSet(next.hidden, defaults.hidden);
+  if (isDefault && !absentHidden.length && order.length === next.order.length) return null;
+  return JSON.stringify({ order, hidden: [...new Set([...next.hidden, ...absentHidden])] });
 };
 
 /** moveItem(["a", "b", "c"], 0, 2) → ["b", "c", "a"] */
