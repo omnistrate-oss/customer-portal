@@ -12,6 +12,7 @@ import {
   Row,
   RowData,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 
 import { SetState } from "src/types/common/reactGenerics";
@@ -28,6 +29,7 @@ import {
   TableHead,
   TableRow,
 } from "./components/styled";
+import { getColumnId } from "./utils";
 
 type InfiniteData<TData> = {
   pages: Array<{
@@ -43,6 +45,7 @@ type CursorPaginatedDataTableProps<TData> = {
   pageIndex: number;
   setPageIndex: SetState<number>;
   columns: ColumnDef<TData, any>[];
+  columnVisibility?: VisibilityState;
   data?: InfiniteData<TData>;
   renderDetailsComponent?: (props: { rowData: TData }) => ReactNode;
   noRowsText: string;
@@ -64,12 +67,14 @@ type CursorPaginatedDataTableProps<TData> = {
 };
 
 const DEFAULT_COLUMN_MIN_WIDTH = 150;
+const ALL_COLUMNS_VISIBLE: VisibilityState = {};
 
 const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<TData>): ReactNode => {
   const {
     pageIndex,
     setPageIndex,
     columns,
+    columnVisibility = ALL_COLUMNS_VISIBLE,
     data,
     renderDetailsComponent,
     noRowsText,
@@ -109,6 +114,7 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
     columns: columns,
     state: {
       expanded,
+      columnVisibility,
       pagination: {
         pageIndex,
         pageSize,
@@ -147,7 +153,10 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
     return columnFlex ? Math.min(columnFlex, 2) : isFixedColumnSizeSet ? 0 : 1;
   };
 
-  const flexTotal = columns.reduce((acc, curr) => {
+  // Hidden columns stay in the table so sorting by them keeps working, but only visible ones take up width.
+  const visibleColumns = columns.filter((column) => columnVisibility[getColumnId(column)] !== false);
+
+  const flexTotal = visibleColumns.reduce((acc, curr) => {
     const flexValue = getColumnFlexValue(curr);
     acc = acc + flexValue;
     return acc;
@@ -192,7 +201,7 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
             sx={{
               tableLayout: "fixed",
               minWidth:
-                columns.reduce((acc, curr) => {
+                visibleColumns.reduce((acc, curr) => {
                   return acc + Number(getColumnMinWidth(curr));
                 }, 0) || "100%",
             }}

@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataTable from "src/components/DataTable/DataTable";
 import EventTypeChip from "src/components/EventsTable/EventTypeChip";
 import MessageInput from "src/components/MessageInput/MessageInput";
@@ -129,15 +131,26 @@ const NotificationsTable = () => {
     ];
   }, [subscriptionsObj, serviceOfferingsObj]);
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.alerts,
+    columns: dataTableColumns,
+  });
+
   return (
     <DataTable
-      columns={dataTableColumns}
+      columns={preferredColumns}
+      columnVisibility={columnVisibility}
       rows={rows}
       noRowsText="No alerts"
       HeaderComponent={NotificationsTableHeader}
       headerProps={{
         refetchNotifications: refetchInstances,
         isFetchingNotifications: isFetchingInstances,
+        columnPreference,
       }}
       isLoading={isInstancesPending}
     />

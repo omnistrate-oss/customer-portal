@@ -1,3 +1,6 @@
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import { DateRange, DateTimePickerPopover } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import AuditLogsEventFilterDropdown from "src/components/ResourceInstance/AuditLogs/components/AuditLogsEventFilterDropdown";
 import { SetState } from "src/types/common/reactGenerics";
@@ -18,6 +21,7 @@ type EventsTableHeaderProps = {
   serviceOfferings: ServiceOffering[];
   selectedEventTypes: EventType[];
   setSelectedEventTypes: SetState<EventType[]>;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
@@ -30,6 +34,7 @@ const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
   serviceOfferings,
   selectedEventTypes,
   setSelectedEventTypes,
+  columnPreference,
 }) => {
   return (
     <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#EAECF0]">
@@ -37,6 +42,7 @@ const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
 
       <div className="flex justify-end items-center gap-4 flex-wrap flex-grow">
         <RefreshWithToolTip refetch={refetchAuditLogs} disabled={isFetchingAuditLogs} />
+        <ColumnPreferenceButton {...columnPreference} />
         <DateTimePickerPopover dateRange={selectedDateRange} setDateRange={setSelectedDateRange} />
         <AuditLogsEventFilterDropdown
           selectedEventTypes={selectedEventTypes}

@@ -3,6 +3,11 @@ import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataTable from "src/components/DataTable/DataTable";
 import GridCellExpand from "src/components/GridCellExpand/GridCellExpand";
 import InvoiceIcon from "src/components/Icons/Invoice/Invoice";
@@ -15,12 +20,17 @@ dayjs.extend(utc);
 
 const columnHelper = createColumnHelper<Invoice>();
 
-const TableHeader = () => {
+type TableHeaderProps = {
+  columnPreference: ColumnPreferenceButtonProps;
+};
+
+const TableHeader: FC<TableHeaderProps> = ({ columnPreference }) => {
   return (
-    <div className=" py-5 px-6 border-b border-[#E4E7EC]">
+    <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#E4E7EC]">
       <Text size="large" weight="semibold" color="#101828">
         Invoices
       </Text>
+      <ColumnPreferenceButton {...columnPreference} />
     </div>
   );
 };
@@ -135,11 +145,23 @@ const InvoicesTable: FC<InvoicesTableProps> = ({ invoices = [] }) => {
     ];
   }, []);
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.billingInvoices,
+    columns,
+    primaryColumnId: "invoiceNumber",
+  });
+
   return (
     <DataTable
-      columns={columns}
+      columns={preferredColumns}
+      columnVisibility={columnVisibility}
       rows={invoices}
       HeaderComponent={TableHeader}
+      headerProps={{ columnPreference }}
       noRowsText="No invoices"
       tableStyles={{ marginTop: "12px" }}
       rowId="invoiceNumber"

@@ -67,13 +67,7 @@ const BillingProviderTabs = ({
                   <div className="w-6 h-6 flex items-center justify-center rounded-sm overflow-hidden">
                     {provider.logoURL ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={provider.logoURL}
-                        width="24"
-                        height="24"
-                        alt={provider.name ? `${provider.name} logo` : "Billing provider logo"}
-                        className="object-cover"
-                      />
+                      <img src={provider.logoURL} width="24" height="24" alt="" className="object-cover" />
                     ) : null}
                   </div>
                   <div>{provider.name || "Billing Provider"}</div>
