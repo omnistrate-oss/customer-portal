@@ -216,7 +216,11 @@ const EventsTable = ({
     return columns.map((columnName) => columnsConfig[columnName]);
   }, [columns, columnsConfig]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference<AuditEvent>({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference<AuditEvent>({
     tableId,
     columns: selectedColumns,
     clickableColumnIds: ["userName"],
@@ -227,6 +231,7 @@ const EventsTable = ({
       pageIndex={pageIndex}
       setPageIndex={setPageIndex}
       columns={preferredColumns}
+      columnVisibility={columnVisibility}
       data={data}
       renderDetailsComponent={EventDetailsView}
       noRowsText={noRowsText || "No events"}

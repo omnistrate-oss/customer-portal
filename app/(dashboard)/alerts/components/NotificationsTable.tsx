@@ -131,7 +131,11 @@ const NotificationsTable = () => {
     ];
   }, [subscriptionsObj, serviceOfferingsObj]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.alerts,
     columns: dataTableColumns,
   });
@@ -139,6 +143,7 @@ const NotificationsTable = () => {
   return (
     <DataTable
       columns={preferredColumns}
+      columnVisibility={columnVisibility}
       rows={rows}
       noRowsText="No alerts"
       HeaderComponent={NotificationsTableHeader}

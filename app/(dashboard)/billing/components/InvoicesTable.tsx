@@ -145,7 +145,11 @@ const InvoicesTable: FC<InvoicesTableProps> = ({ invoices = [] }) => {
     ];
   }, []);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.billingInvoices,
     columns,
     primaryColumnId: "invoiceNumber",
@@ -154,6 +158,7 @@ const InvoicesTable: FC<InvoicesTableProps> = ({ invoices = [] }) => {
   return (
     <DataTable
       columns={preferredColumns}
+      columnVisibility={columnVisibility}
       rows={invoices}
       HeaderComponent={TableHeader}
       headerProps={{ columnPreference }}

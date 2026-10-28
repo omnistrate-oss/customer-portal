@@ -122,7 +122,11 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
     ];
   }, [isDownloading, download, instanceDetails?.id]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.installerHub,
     columns,
     clickableColumnIds: ["action"],
@@ -132,6 +136,7 @@ const InstallerHub: FC<InstallerHubProps> = ({ instanceDetails }) => {
     <Box mt="32px">
       <DataTable
         columns={preferredColumns}
+        columnVisibility={columnVisibility}
         rows={rows}
         noRowsText="No Installer/Upgrader available"
         HeaderComponent={DataGridHeader}

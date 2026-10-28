@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { GridColDef, GridColumnVisibilityModel, GridValidRowModel } from "@mui/x-data-grid";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, VisibilityState } from "@tanstack/react-table";
 import { useSelector } from "react-redux";
 
+import { getColumnId as getTableColumnId } from "src/components/DataTable/utils";
 import { selectUserrootData } from "src/slices/userDataSlice";
 
 import {
@@ -158,13 +159,6 @@ export const useGridColumnPreference = <TRow extends GridValidRowModel>(
   return { columns: orderedColumns, columnVisibilityModel, columnPreference };
 };
 
-// The same id table-core gives a column: its id, then its accessorKey with dots replaced, then a string header.
-const getTableColumnId = <TData>(column: ColumnDef<TData>): string => {
-  const accessorKey = "accessorKey" in column ? String(column.accessorKey) : "";
-  const headerId = typeof column.header === "string" ? column.header : "";
-  return column.id ?? (accessorKey ? accessorKey.replace(/\./g, "_") : undefined) ?? headerId;
-};
-
 const getTableColumnLabel = <TData>(column: ColumnDef<TData>): string | undefined => {
   if (typeof column.header === "string") return column.header;
   const label: unknown = column.meta && "label" in column.meta ? column.meta.label : undefined;
@@ -172,16 +166,25 @@ const getTableColumnLabel = <TData>(column: ColumnDef<TData>): string | undefine
 };
 
 /**
- * Column Preference for DataTable and CursorPaginatedDataTable. Returns the visible columns in the saved order,
- * because DataTable sizes columns from its `columns` prop. A column whose header is a function needs `meta.label`.
+ * Column Preference for DataTable and CursorPaginatedDataTable. Pass `columns` and `columnVisibility` to the table and
+ * `columnPreference` to `ColumnPreferenceButton`. Hidden columns stay in `columns`, so sorting by them keeps working.
+ * A column whose header is a function needs `meta.label`.
  */
 export const useTableColumnPreference = <TData>(
   options: AdapterOptions<ColumnDef<TData>>
-): { columns: ColumnDef<TData>[]; columnPreference: ColumnPreferenceButtonProps } => {
-  const { visibleColumns, columnPreference } = useColumnPreference<ColumnDef<TData>>({
+): {
+  columns: ColumnDef<TData>[];
+  columnVisibility: VisibilityState;
+  columnPreference: ColumnPreferenceButtonProps;
+} => {
+  const { orderedColumns, hiddenColumnIds, columnPreference } = useColumnPreference<ColumnDef<TData>>({
     ...options,
     getColumnId: getTableColumnId,
     getColumnLabel: getTableColumnLabel,
   });
-  return { columns: visibleColumns, columnPreference };
+  const columnVisibility = useMemo(
+    (): VisibilityState => Object.fromEntries(hiddenColumnIds.map((id) => [id, false])),
+    [hiddenColumnIds]
+  );
+  return { columns: orderedColumns, columnVisibility, columnPreference };
 };

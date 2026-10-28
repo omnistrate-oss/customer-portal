@@ -220,7 +220,11 @@ const InstanceSnapshotsPage = () => {
     ];
   }, [instances, subscriptionsObj]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.instanceSnapshots,
     columns: dataTableColumns,
     primaryColumnId: "snapshotId",
@@ -371,6 +375,7 @@ const InstanceSnapshotsPage = () => {
         {/* TODO: Solve the Problem of shifting DataTable height when paginating */}
         <DataTable
           columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredSnapshots}
           noRowsText="No instance snapshots"
           isFilterApplied={snapshots.length > 0 && filteredSnapshots.length === 0}

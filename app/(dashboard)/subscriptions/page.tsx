@@ -168,7 +168,11 @@ const SubscriptionsPage = () => {
     ];
   }, []);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.subscriptions,
     columns: dataTableColumns,
     primaryColumnId: "id",
@@ -215,6 +219,7 @@ const SubscriptionsPage = () => {
         <div>
           <DataTable
             columns={preferredColumns}
+            columnVisibility={columnVisibility}
             rows={filteredSubscriptions}
             noRowsText="No subscriptions"
             isFilterApplied={existingSubscriptions.length > 0 && filteredSubscriptions.length === 0}

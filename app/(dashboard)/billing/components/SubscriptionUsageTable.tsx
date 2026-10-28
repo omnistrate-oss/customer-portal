@@ -151,7 +151,11 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
     ];
   }, [additionalMetricFields, configuredMetricNamesByProductTierId, showAdditionalMetrics]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.usageBreakdown,
     columns,
   });
@@ -159,6 +163,7 @@ const SubscriptionUsageTable: FC<SubscriptionUsageTableProps> = ({
   return (
     <DataTable
       columns={preferredColumns}
+      columnVisibility={columnVisibility}
       rows={rows}
       HeaderComponent={TableHeader}
       headerProps={{ columnPreference, count: rows.length }}

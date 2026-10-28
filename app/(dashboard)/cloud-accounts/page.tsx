@@ -604,7 +604,11 @@ const CloudAccountsPage = () => {
     ];
   }, [subscriptionsObj, accountConfigsHash]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.cloudAccounts,
     columns: dataTableColumns,
     primaryColumnId: "account_id",
@@ -1001,6 +1005,7 @@ const CloudAccountsPage = () => {
         <DataTable
           key={Object.keys(subscriptionsObj).length} // Force re-render when subscriptionsObj changes
           columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredCloudAccounts}
           noRowsText="No cloud accounts"
           isFilterApplied={byoaInstances.length > 0 && filteredCloudAccounts.length === 0}

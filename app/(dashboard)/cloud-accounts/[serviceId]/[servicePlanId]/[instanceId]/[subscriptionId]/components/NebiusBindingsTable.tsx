@@ -125,7 +125,11 @@ const NebiusBindingsTable: FC<NebiusBindingsTableProps> = ({ accountConfigId }) 
     []
   );
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.nebiusBindings,
     columns,
   });
@@ -134,6 +138,7 @@ const NebiusBindingsTable: FC<NebiusBindingsTableProps> = ({ accountConfigId }) 
     <div data-testid="nebius-bindings-table">
       <DataTable
         columns={preferredColumns}
+        columnVisibility={columnVisibility}
         rows={bindings}
         noRowsText="No Nebius bindings"
         isLoading={isFetching}

@@ -190,7 +190,11 @@ const AccessControlPage = () => {
     ];
   }, [consumptionSubscriptionAdminRBAC, currentUser?.id, subscriptionsObj]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.accessControl,
     columns: dataTableColumns,
     clickableColumnIds: ["action"],
@@ -220,6 +224,7 @@ const AccessControlPage = () => {
       <div>
         <DataTable
           columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredUsers}
           noRowsText="No users"
           isFilterApplied={users.length > 0 && filteredUsers.length === 0}

@@ -450,7 +450,11 @@ const InstancesPage = () => {
     ];
   }, [subscriptionsObj, serviceOfferingsObj, isDownloading, handleDownload, instanceId]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.instances,
     columns: dataTableColumns,
     primaryColumnId: "id",
@@ -531,6 +535,7 @@ const InstancesPage = () => {
       <div className="mt-8">
         <DataTable
           columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredInstances}
           noRowsText="No instances"
           isFilterApplied={nonBYOAInstances.length > 0 && filteredInstances.length === 0}

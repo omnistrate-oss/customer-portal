@@ -144,7 +144,11 @@ const CustomNetworksPage = () => {
     ];
   }, []);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.customNetworks,
     columns: dataTableColumns,
   });
@@ -234,6 +238,7 @@ const CustomNetworksPage = () => {
       <div>
         <DataTable
           columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredCustomNetworks}
           noRowsText="No customer networks"
           isFilterApplied={customNetworks.length > 0 && filteredCustomNetworks.length === 0}

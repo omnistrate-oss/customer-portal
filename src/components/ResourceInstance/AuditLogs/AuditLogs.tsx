@@ -239,7 +239,11 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
     ];
   }, [currentUserOrgId]);
 
-  const { columns: preferredColumns, columnPreference } = useTableColumnPreference({
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
     tableId: COLUMN_PREFERENCE_TABLE_IDS.instanceAuditLogs,
     columns: dataTableColumns,
     clickableColumnIds: ["userName"],
@@ -280,6 +284,7 @@ const AuditLogs: FC<AuditLogsTabProps> = ({ instanceId, subscriptionId }) => {
     <Box mt="32px">
       <DataTable
         columns={preferredColumns}
+        columnVisibility={columnVisibility}
         rows={filteredEvents}
         renderDetailsComponent={DetailTableRowView}
         noRowsText="No events"
