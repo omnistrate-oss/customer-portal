@@ -18,7 +18,8 @@ on:
 jobs:
   test:
     name: Playwright Tests - SaaSBuilder
-    if: github.event.pull_request.draft == false
+    # Private HARs and live runtime auth are available only for trusted PRs.
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository)
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +48,12 @@ jobs:
           YARN_ENABLE_SCRIPTS=false yarn install --immutable
           yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
 
+      - name: Validate HAR corpus and tracked auth
+        run: yarn check:har-secrets --require-hars
+
+      - name: HAR security tests
+        run: yarn test:har-security
+
       - name: Log Installed Dependency Versions
         run: |
           echo "::group::Installed dependency versions"
@@ -55,6 +62,12 @@ jobs:
 
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
+
+      - name: Recorder security integration tests
+        run: yarn test:har-recorder
+
+      - name: API fixture security tests
+        run: yarn test:api-fixture-security
 
       - name: Build and start saasbuilder server
         run: |

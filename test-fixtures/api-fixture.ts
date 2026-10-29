@@ -13,16 +13,26 @@
  */
 
 import * as fs from "fs";
+import { randomUUID } from "node:crypto";
 import * as path from "path";
 import { isReplayMode } from "test-utils/har-mode";
 import * as zlib from "zlib";
 
+import { assertSafeFixture, sanitizeFixture } from "../scripts/har-security.mjs";
+
 const harsDir = path.resolve(__dirname, "../tests/fixtures/hars", "fixtures");
 
 const readGz = (gzPath: string): Record<string, unknown> => {
-  const compressed = fs.readFileSync(gzPath);
-  const json = zlib.gunzipSync(new Uint8Array(compressed)).toString("utf-8");
-  return JSON.parse(json);
+  try {
+    const compressed = fs.readFileSync(gzPath);
+    const json = new TextDecoder("utf-8", { fatal: true }).decode(zlib.gunzipSync(new Uint8Array(compressed)));
+    const data: unknown = JSON.parse(json);
+    if (data === null || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid fixture shape");
+    assertSafeFixture(data, gzPath);
+    return data as Record<string, unknown>;
+  } catch {
+    throw new Error(`[ApiFixture] Fixture rejected: ${gzPath}`);
+  }
 };
 
 export class ApiFixture {
@@ -63,25 +73,29 @@ export class ApiFixture {
    * a half-written file.
    */
   private flush(latestKey: string, latestValue: unknown): void {
-    const dir = path.dirname(this.gzPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    if (fs.existsSync(this.gzPath)) {
-      try {
+    const tmpPath = `${this.gzPath}.${randomUUID()}.tmp`;
+    try {
+      fs.mkdirSync(path.dirname(this.gzPath), { recursive: true });
+      if (fs.existsSync(this.gzPath)) {
         const onDisk = readGz(this.gzPath);
         this.data = { ...onDisk, ...this.data, [latestKey]: latestValue };
+      }
+
+      // The live factory result and in-memory state retain their original values.
+      const sanitized = sanitizeFixture(this.data);
+      assertSafeFixture(sanitized, this.gzPath);
+      const compressed = zlib.gzipSync(new Uint8Array(Buffer.from(JSON.stringify(sanitized, null, 2))), { level: 9 });
+      fs.writeFileSync(tmpPath, new Uint8Array(compressed), { mode: 0o600, flag: "wx" });
+      fs.renameSync(tmpPath, this.gzPath);
+    } catch {
+      throw new Error(`[ApiFixture] Fixture rejected: ${this.gzPath}`);
+    } finally {
+      try {
+        fs.rmSync(tmpPath, { force: true });
       } catch {
-        // Corrupt or partially-written file from a concurrent flush — overwrite with our copy.
+        throw new Error(`[ApiFixture] Fixture cleanup failed: ${this.gzPath}`);
       }
     }
-
-    const json = JSON.stringify(this.data, null, 2);
-    const compressed = zlib.gzipSync(new Uint8Array(Buffer.from(json)), { level: 9 });
-    const tmpPath = `${this.gzPath}.${process.pid}.tmp`;
-    fs.writeFileSync(tmpPath, new Uint8Array(compressed));
-    fs.renameSync(tmpPath, this.gzPath);
   }
 }
 
