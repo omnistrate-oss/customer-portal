@@ -1,5 +1,6 @@
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { readRecordedServiceOffering } from "test-fixtures/har-replay.mjs";
 import { expect, test } from "test-fixtures/har-test";
 import {
   TestConnectivityTab,
@@ -35,7 +36,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Overall Structure and Elements + Create a Postgres DT Instance", async ({ page }) => {
+  test("Overall Structure and Elements + Create a Postgres DT Instance", async ({ page, harMode, harFilePath }) => {
     const dataTestIds = instancesPage.dataTestIds;
 
     // Expect the Refresh, Stop, Start, Modify, Delete, Create, and Actions Menu to be Visible
@@ -48,11 +49,18 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(dataTestIds.actionsMenu)).toBeVisible();
 
     const date = GlobalStateManager.getDate() || "";
+    const recordedOffering =
+      harMode === "replay" ? readRecordedServiceOffering(harFilePath, "SaaSBuilder Postgres DT - ") : undefined;
+    const productName = recordedOffering?.serviceName || `SaaSBuilder Postgres DT - ${date}`;
     await page.getByTestId(dataTestIds.createButton).click();
 
     // Wait for the Form to Load and Click the Service Name Dropdown
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
-    await page.getByRole("option", { name: `SaaSBuilder Postgres DT - ${date}` }).click();
+    if (recordedOffering) {
+      await page.locator(`[role="option"][data-value="${recordedOffering.serviceId}"]`).click();
+    } else {
+      await page.getByRole("option", { name: productName }).click();
+    }
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
@@ -79,7 +87,6 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(instanceId)).toHaveCount(0);
 
     await instancesPage.search("");
-    const productName = `SaaSBuilder Postgres DT - ${GlobalStateManager.getDate() || ""}`;
     await instancesPage.applyMultiSelectFilter("product-name", [productName]);
     await expect(instancesPage.filterChip(`Product Name: ${productName}`)).toBeVisible();
 

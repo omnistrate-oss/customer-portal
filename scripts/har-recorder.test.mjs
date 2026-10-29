@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import zlib from "node:zlib";
 
 const withFiles = async (run) => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "portal-har-test-"));
@@ -137,5 +138,164 @@ test("aborted entries are discarded before sanitation while valid entries persis
     const saved = JSON.parse((await import("node:zlib")).gunzipSync(fs.readFileSync(gzPath)).toString("utf8"));
     assert.equal(saved.log.entries.length, 1);
     assert.equal(saved.log.entries[0].request.url, "https://example.invalid/ok");
+  });
+});
+
+const selectionEntry = (url, value, encoding) => ({
+  request: { method: "GET", url, headers: [], cookies: [] },
+  response: {
+    status: 200,
+    headers: [],
+    cookies: [],
+    content: {
+      mimeType: "application/json",
+      text: encoding === "base64" ? Buffer.from(JSON.stringify(value)).toString("base64") : JSON.stringify(value),
+      ...(encoding ? { encoding } : {}),
+    },
+  },
+});
+
+const selectionHar = (extraServices = [], extraReferences = [], encoding) => ({
+  log: {
+    entries: [
+      selectionEntry(
+        "https://recording.example.invalid/api/action?endpoint=%2F2022-09-01-00%2Fservice-offering",
+        {
+          services: [
+            {
+              id: "s-newer-global-date",
+              name: "Newer global fixture product",
+              offerings: [{ serviceId: "s-newer-global-date", serviceName: "SaaSBuilder Postgres DT - newer-date" }],
+            },
+            {
+              id: "s-default",
+              name: "Default product",
+              offerings: [{ serviceId: "s-default", serviceName: "A different product" }],
+            },
+            {
+              id: "s-recorded",
+              name: "Recorded product",
+              offerings: [{ serviceId: "s-recorded", serviceName: "SaaSBuilder Postgres DT - recorded-date" }],
+            },
+            ...extraServices,
+          ],
+        },
+        encoding
+      ),
+      selectionEntry("https://recording.example.invalid/api/resources?serviceId=s-default", {}),
+      selectionEntry(
+        "https://recording.example.invalid/api/action?endpoint=%2F2022-09-01-00%2Fservice-offering%2Fs-recorded%2Fresource%2Fr-recorded%2Finstance%2Fnone",
+        {}
+      ),
+      selectionEntry("https://recording.example.invalid/api/version-sets?serviceId=s-recorded", {}),
+      ...extraReferences,
+      selectionEntry("https://recording.example.invalid/api/resources?serviceId=s-default", {}),
+    ],
+  },
+});
+
+const selectionReader = async () => {
+  const loaded = await import("../test-fixtures/har-replay.mjs");
+  assert.equal(typeof loaded.readRecordedServiceOffering, "function", "recorded product selection helper is missing");
+  return loaded.readRecordedServiceOffering;
+};
+
+const assertSafeSelectionFailure = (run) =>
+  assert.throws(run, (error) => {
+    assert.equal(error.message, "Unable to resolve a unique recorded product for replay");
+    return true;
+  });
+
+test("replay product selection uses referenced IDs instead of a newer global date or the first product", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    fs.writeFileSync(gzPath, zlib.gzipSync(JSON.stringify(selectionHar())));
+    assert.deepEqual(read(gzPath, "SaaSBuilder Postgres DT - "), {
+      serviceId: "s-recorded",
+      serviceName: "SaaSBuilder Postgres DT - recorded-date",
+    });
+  });
+});
+
+test("replay selection decodes base64 offering data without changing the recording or public name", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    const har = selectionHar([], [], "base64");
+    const list = JSON.parse(Buffer.from(har.log.entries[0].response.content.text, "base64").toString("utf8"));
+    list.services[2].offerings[0].serviceName = 'SaaSBuilder Postgres DT - "recorded name"';
+    har.log.entries[0].response.content.text = Buffer.from(JSON.stringify(list)).toString("base64");
+    const original = zlib.gzipSync(JSON.stringify(har));
+    fs.writeFileSync(gzPath, original);
+    assert.deepEqual(read(gzPath, "SaaSBuilder Postgres DT - "), {
+      serviceId: "s-recorded",
+      serviceName: 'SaaSBuilder Postgres DT - "recorded name"',
+    });
+    assert.deepEqual(fs.readFileSync(gzPath), original);
+  });
+});
+
+test("replay selection rejects multiple referenced products with the expected prefix", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    const har = selectionHar(
+      [
+        {
+          id: "s-second",
+          offerings: [{ serviceId: "s-second", serviceName: "SaaSBuilder Postgres DT - another-date" }],
+        },
+      ],
+      [selectionEntry("https://recording.example.invalid/api/resources?serviceId=s-second", {})]
+    );
+    fs.writeFileSync(gzPath, zlib.gzipSync(JSON.stringify(har)));
+    assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
+  });
+});
+
+test("replay selection rejects an expected product that has no recorded request reference", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    const har = selectionHar();
+    har.log.entries = [har.log.entries[0], har.log.entries[1]];
+    fs.writeFileSync(gzPath, zlib.gzipSync(JSON.stringify(har)));
+    assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
+  });
+});
+
+test("replay selection rejects references without a recorded offering list", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    const har = selectionHar();
+    har.log.entries.shift();
+    fs.writeFileSync(gzPath, zlib.gzipSync(JSON.stringify(har)));
+    assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
+  });
+});
+
+test("replay selection rejects an ID that cannot be safely used as an option attribute value", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    const id = 's-recorded"][data-value="synthetic-other';
+    const har = selectionHar();
+    const list = JSON.parse(har.log.entries[0].response.content.text);
+    list.services[2].offerings[0].serviceId = id;
+    har.log.entries[0].response.content.text = JSON.stringify(list);
+    har.log.entries = [
+      har.log.entries[0],
+      selectionEntry(`https://recording.example.invalid/api/resources?serviceId=${encodeURIComponent(id)}`, {}),
+    ];
+    fs.writeFileSync(gzPath, zlib.gzipSync(JSON.stringify(har)));
+    assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
+  });
+});
+
+test("replay selection reports malformed or missing files without exposing source data or file paths", async () => {
+  const read = await selectionReader();
+  await withFiles(async (_, gzPath) => {
+    for (const invalid of [Buffer.from("synthetic-private-source"), zlib.gzipSync("{synthetic-private-source")]) {
+      fs.writeFileSync(gzPath, invalid);
+      assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
+    }
+    fs.rmSync(gzPath);
+    assertSafeSelectionFailure(() => read(gzPath, "SaaSBuilder Postgres DT - "));
   });
 });
