@@ -1,8 +1,14 @@
 import { customerUserSignUp } from "src/server/api/customer-user";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
+import { errorSummary } from "src/server/utils/errorSummary";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
-import { isPasswordSameAsEmail, passwordMatchesEmailText, passwordRegex, passwordText as passwordRegexFailText } from "src/utils/passwordRegex";
+import {
+  isPasswordSameAsEmail,
+  passwordMatchesEmailText,
+  passwordRegex,
+  passwordText as passwordRegexFailText,
+} from "src/utils/passwordRegex";
 
 export default async function handleSignup(nextRequest, nextResponse) {
   if (nextRequest.method === "POST") {
@@ -37,8 +43,8 @@ export default async function handleSignup(nextRequest, nextResponse) {
 
       nextResponse.status(200).send();
     } catch (error) {
-      console.error(error?.response);
       const defaultErrorMessage = "Something went wrong. Please retry";
+      console.error("Sign up error", errorSummary(error));
 
       if (error.name === "ProviderAuthError" || error?.response?.status === undefined) {
         nextResponse.status(500).send({
