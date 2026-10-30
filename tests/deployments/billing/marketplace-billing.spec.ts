@@ -1,36 +1,7 @@
 import { expect, test } from "test-fixtures/har-test";
 
-const fixtureToken = `unsigned.${Buffer.from(JSON.stringify({ exp: 4102444800 })).toString("base64url")}.fixture`;
-
 // These rollout states have no existing customer fixtures in dev.
-test.use({
-  harMode: "off",
-  storageState: {
-    cookies: [
-      {
-        name: "omnistrate_token",
-        value: fixtureToken,
-        domain: "localhost",
-        path: "/",
-        expires: -1,
-        httpOnly: true,
-        secure: false,
-        sameSite: "Lax",
-      },
-      {
-        name: "omnistrate_logged_in",
-        value: "true",
-        domain: "localhost",
-        path: "/",
-        expires: -1,
-        httpOnly: false,
-        secure: false,
-        sameSite: "Lax",
-      },
-    ],
-    origins: [],
-  },
-});
+test.use({ harMode: "off" });
 
 test.describe.configure({ mode: "serial" });
 let mixed = false;
@@ -128,7 +99,6 @@ test.beforeEach(async ({ page }) => {
 
 test("marketplace payments stay external and do not require a Stripe payment method", async ({ page }, testInfo) => {
   await page.goto("/billing");
-  await page.getByRole("button", { name: "Reject All", exact: true }).click();
   await expect(page.getByRole("tab", { name: "Marketplace", exact: true })).toHaveCount(0);
   for (const provider of [
     { tab: "AWS Marketplace", label: "Open AWS billing", url: "https://console.aws.amazon.com/costmanagement/" },
@@ -198,7 +168,6 @@ test("mixed billing isolates Stripe invoices and warns only for the unpaid subsc
 test("legacy-only customers retain marketplace billing and payment settings", async ({ page }) => {
   legacyOnly = true;
   await page.goto("/billing");
-  await page.getByRole("button", { name: "Reject All", exact: true }).click();
   await expect(page.getByRole("tab", { name: "Marketplace", exact: true })).toBeVisible();
   await expect(page.getByText("Unavailable in this portal", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /Open (AWS|Google Cloud|Azure) billing/ })).toHaveCount(0);
