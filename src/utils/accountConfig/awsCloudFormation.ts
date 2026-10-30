@@ -25,7 +25,7 @@ export type AwsCloudFormationStackDetails = {
 };
 
 export type AwsCloudFormationUpdateStackDetails = {
-  region: string;
+  region?: string;
   stackId: string;
   stackName: string;
   templateUrl?: string;
@@ -153,7 +153,7 @@ export const parseAwsCloudFormationUpdateUrl = (
     );
     if (!stackId || (!stack && !/^[A-Za-z][A-Za-z0-9-]*$/.test(stackId))) return null;
     const region = stack?.[1] || getStackRegion(url.toString().split("#")[0]);
-    if (!region || !/^[a-z]{2}(?:-[a-z]+)+-\d+$/.test(region)) return null;
+    if (region && !/^[a-z]{2}(?:-[a-z]+)+-\d+$/.test(region)) return null;
 
     const parameters = Array.from(values.entries())
       .filter(([key]) => key.startsWith(QUICK_CREATE_PARAM_PREFIX))
@@ -198,14 +198,14 @@ export const getAwsCloudFormationUpdateStackCommand = (
   ).replace(/`/g, "\\`");
   const parameterQuery = `[Stacks[0].Parameters[?!contains(\`${changedKeys}\`, ParameterKey)].{ParameterKey: ParameterKey, UsePreviousValue: \`true\`}, \`${requestedParameters}\`][]`;
   const describeFlags = [
-    `--region ${quoteShellArg(stack.region)}`,
+    ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
     `--stack-name ${quoteShellArg(stack.stackId)}`,
     `--query ${quoteShellArg(parameterQuery)}`,
     "--output json",
   ];
   const parameterLookup = `aws cloudformation describe-stacks ${describeFlags.join(" ")} || printf '%s' 'STACK_LOOKUP_FAILED'`;
   const flags = [
-    `--region ${quoteShellArg(stack.region)}`,
+    ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
     `--stack-name ${quoteShellArg(stack.stackId)}`,
     stack.templateUrl && !isSetupUpdate
       ? `--template-url ${quoteShellArg(stack.templateUrl)}`
