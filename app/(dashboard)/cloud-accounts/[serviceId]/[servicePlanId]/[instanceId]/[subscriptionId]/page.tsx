@@ -18,6 +18,7 @@ import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
+import { parseAwsCloudFormationUpdateUrl } from "src/utils/accountConfig/awsCloudFormation";
 import { getResultParams } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
@@ -175,6 +176,9 @@ const CloudAccountDetailsPage = ({
       {activeTab === "Governance Controls" && (
         <GovernanceControlsTab
           accountConfigId={resultParams?.cloud_provider_account_config_id ?? ""}
+          cloudFormationUrl={[resultParams?.cloudformation_url, resultParams?.cloudformation_url_no_lb].find(
+            (url: unknown): url is string => typeof url === "string" && !!parseAwsCloudFormationUpdateUrl(url)
+          )}
           canUpdate={isOperationAllowedByRBAC(
             operationEnum.Update,
             getEnumFromUserRoleString(subscription?.roleType),
