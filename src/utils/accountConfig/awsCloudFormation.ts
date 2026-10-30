@@ -169,7 +169,7 @@ export const parseAwsCloudFormationUpdateUrl = (
   }
 };
 
-/** Builds an update command using saved settings while retaining the stack's other parameters. */
+/** Converts URL parameters to an update command, followed by the saved governance settings. */
 export const getAwsCloudFormationUpdateStackCommand = (
   cloudFormationUrl?: string | null,
   governanceControls?: AccountGovernanceControls
@@ -177,41 +177,27 @@ export const getAwsCloudFormationUpdateStackCommand = (
   const stack = parseAwsCloudFormationUpdateUrl(cloudFormationUrl);
   if (!stack) return null;
 
-  const isSetupUpdate = !!governanceControls && !!cloudFormationUrl?.includes("#/stacks/quickcreate?");
-  const parameters = new Map<string, string>(
-    isSetupUpdate ? [] : stack.parameters.map(({ key, value }) => [key, value])
-  );
+  const parameters = new Map(stack.parameters.map(({ key, value }) => [key, value]));
   if (typeof governanceControls?.connected === "boolean") {
+    parameters.delete("AccountAction");
     parameters.set("AccountAction", governanceControls.connected ? "Connect" : "Disconnect");
   }
-  if (typeof governanceControls?.debugAccessEnabled === "boolean") {
-    parameters.set("K8sDebugAccessEnabled", String(governanceControls.debugAccessEnabled));
-  }
   if (typeof governanceControls?.infrastructureMutationEnabled === "boolean") {
+    parameters.delete("AgentInfrastructureMutationEnabled");
     parameters.set("AgentInfrastructureMutationEnabled", String(governanceControls.infrastructureMutationEnabled));
+  }
+  if (typeof governanceControls?.debugAccessEnabled === "boolean") {
+    parameters.delete("K8sDebugAccessEnabled");
+    parameters.set("K8sDebugAccessEnabled", String(governanceControls.debugAccessEnabled));
   }
   if (!parameters.size) return null;
 
-  const changedKeys = JSON.stringify(Array.from(parameters.keys()));
-  const requestedParameters = JSON.stringify(
-    Array.from(parameters, ([ParameterKey, ParameterValue]) => ({ ParameterKey, ParameterValue }))
-  ).replace(/`/g, "\\`");
-  const parameterQuery = `[Stacks[0].Parameters[?!contains(\`${changedKeys}\`, ParameterKey)].{ParameterKey: ParameterKey, UsePreviousValue: \`true\`}, \`${requestedParameters}\`][]`;
-  const describeFlags = [
-    ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
-    `--stack-name ${quoteShellArg(stack.stackId)}`,
-    `--query ${quoteShellArg(parameterQuery)}`,
-    "--output json",
-  ];
-  const parameterLookup = `aws cloudformation describe-stacks ${describeFlags.join(" ")} || printf '%s' 'STACK_LOOKUP_FAILED'`;
   const flags = [
     ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
     `--stack-name ${quoteShellArg(stack.stackId)}`,
-    stack.templateUrl && !isSetupUpdate
-      ? `--template-url ${quoteShellArg(stack.templateUrl)}`
-      : "--use-previous-template",
+    stack.templateUrl ? `--template-url ${quoteShellArg(stack.templateUrl)}` : "--use-previous-template",
     "--capabilities CAPABILITY_NAMED_IAM",
-    `--parameters "$(${parameterLookup})"`,
+    `--parameters ${Array.from(parameters, ([key, value]) => formatStackParameter({ key, value })).join(" \\\n    ")}`,
   ];
 
   return `aws cloudformation update-stack \\\n  ${flags.join(" \\\n  ")}`;
