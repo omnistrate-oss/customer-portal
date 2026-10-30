@@ -15,6 +15,8 @@ export type ListConsumptionInvoicesSuccessResponse =
 export type DescribeConsumptionBillingDetailsSuccessResponse =
   paths["/2022-09-01-00/resource-instance/billing-details"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export type CustomerBillingProvider = components["schemas"]["CustomerBillingProvider"];
+
 export type Invoice = components["schemas"]["Invoice"];
 
 export type ConsumptionUsagePerDay = components["schemas"]["GetConsumptionUsageResult"];
