@@ -10,7 +10,8 @@ import StatusChip from "src/components/StatusChip/StatusChip";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
-import type { DescribeConsumptionBillingDetailsSuccessResponse } from "src/types/consumption";
+import { colors } from "src/themeConfig";
+import type { CustomerBillingProvider } from "src/types/consumption";
 import { getPaymentSettingsRoute } from "src/utils/routes";
 import Card from "components/Card/Card";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
@@ -21,20 +22,21 @@ import useBillingDetails from "../billing/hooks/useBillingDetails";
 import useBillingStatus from "../billing/hooks/useBillingStatus";
 import getBillingDetailsErrorMessage from "../billing/utils/getBillingDetailsErrorMessage";
 import AccountManagementHeader from "../components/AccountManagement/AccountManagementHeader";
+import BillingProviderLabel, {
+  getBillingProviderLabel,
+  getSelectedBillingProvider,
+} from "../components/BillingProviders/BillingProviderLabel";
 import SlidersIcon from "../components/Icons/Sliders";
 import PageContainer from "../components/Layout/PageContainer";
 import PageTitle from "../components/Layout/PageTitle";
 
 import StripePaymentMethodsSection from "./components/StripePaymentMethodsSection";
 
-type BillingProvider = NonNullable<DescribeConsumptionBillingDetailsSuccessResponse["billingProviders"]>[number];
-
-const ProviderManagedPaymentMethodPanel = ({ provider }: { provider: BillingProvider }) => {
+const ProviderManagedPaymentMethodPanel = ({ provider }: { provider: CustomerBillingProvider }) => {
   return (
     <Card
       sx={{
         mt: "12px",
-        boxShadow: "0px 1px 2px 0px #0A0D120D",
       }}
     >
       <Stack
@@ -45,16 +47,17 @@ const ProviderManagedPaymentMethodPanel = ({ provider }: { provider: BillingProv
         marginBottom="14px"
       >
         <Box>
-          <Text size="medium" weight="semibold" color="#181D27">
+          <BillingProviderLabel provider={provider} />
+          <Text size="medium" weight="semibold" color={colors.gray900}>
             Payment Method
           </Text>
-          <Text size="small" weight="regular" color="#535862" sx={{ mt: "2px" }}>
-            {provider.name || "Billing Provider"} manages payment configuration for this account
+          <Text size="small" weight="regular" color={colors.gray600} sx={{ mt: "2px" }}>
+            {getBillingProviderLabel(provider)} manages payment configuration for this account
           </Text>
         </Box>
 
         <Stack direction="row" gap="12px" alignItems="center" flexWrap="wrap">
-          <StatusChip label="Non Configurable" category="failed" />
+          <StatusChip label="Managed externally" category="unknown" />
         </Stack>
       </Stack>
     </Card>
@@ -67,7 +70,7 @@ const PaymentMethodsPage = () => {
   const snackbar = useSnackbar();
   const { refetchSubscriptions } = useGlobalData();
   const selectUser = useSelector(selectUserrootData);
-  const [selectedBillingProvider, setSelectedBillingProvider] = useState("");
+  const [userSelectedProvider, setUserSelectedProvider] = useState<CustomerBillingProvider["type"]>();
   const handledSetupCompleteRef = useRef(false);
 
   const billingStatusQuery = useBillingStatus();
@@ -75,26 +78,16 @@ const PaymentMethodsPage = () => {
   const {
     isPending: isBillingDetailsPending,
     data: billingDetails,
-    error,
+    error: billingDetailsError,
     refetch: refetchBillingDetails,
   } = useBillingDetails(isBillingEnabled);
 
-  useEffect(() => {
-    if (billingDetails?.billingProviders?.length) {
-      const firstProvider = billingDetails.billingProviders[0];
-      setSelectedBillingProvider(firstProvider.type);
-    } else {
-      setSelectedBillingProvider("");
-    }
-  }, [billingDetails]);
-
+  const selectedProvider = getSelectedBillingProvider(billingDetails?.billingProviders, userSelectedProvider);
+  const selectedBillingProvider = selectedProvider?.type || "";
   const isLoading = billingStatusQuery.isPending || (isBillingEnabled && isBillingDetailsPending);
   const hasBillingProviders = Boolean(billingDetails?.billingProviders?.length);
-  const isStripe = selectedBillingProvider === "STRIPE";
+  const isStripe = isBillingEnabled && selectedProvider?.type === "STRIPE";
   const isCustomPaymentPortalEnabled = isStripe && Boolean(billingDetails?.customPaymentPortalEnabled);
-  const selectedProvider = billingDetails?.billingProviders?.find(
-    (provider) => provider.type === selectedBillingProvider
-  );
 
   useEffect(() => {
     if (
@@ -129,6 +122,8 @@ const PaymentMethodsPage = () => {
 
     void reconcileSetupRedirect();
   }, [isCustomPaymentPortalEnabled, refetchBillingDetails, refetchSubscriptions, router, searchParams, snackbar]);
+
+  const error = billingDetailsError || billingStatusQuery.error;
 
   return (
     <div>
@@ -171,7 +166,7 @@ const PaymentMethodsPage = () => {
             <BillingProviderTabs
               billingProviders={billingDetails?.billingProviders}
               selectedBillingProvider={selectedBillingProvider}
-              onBillingProviderChange={setSelectedBillingProvider}
+              onBillingProviderChange={setUserSelectedProvider}
             />
 
             {isStripe ? (
@@ -185,7 +180,7 @@ const PaymentMethodsPage = () => {
                 }}
               />
             ) : (
-              selectedProvider && <ProviderManagedPaymentMethodPanel provider={selectedProvider} />
+              !!selectedProvider && <ProviderManagedPaymentMethodPanel provider={selectedProvider} />
             )}
           </>
         )}
