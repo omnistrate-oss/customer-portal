@@ -47,7 +47,13 @@ jobs:
         corepack prepare yarn@4.5.0 --activate
 
     - name: Install dependencies
-      run: yarn install --immutable
+      run: YARN_ENABLE_SCRIPTS=false yarn install --immutable
+
+    - name: Validate retained HAR corpus and tracked auth
+      run: yarn check:har-secrets --require-hars
+
+    - name: HAR security tests
+      run: yarn test:har-security
 
     - name: Log Resolved Dependency Versions
       run: |
@@ -187,8 +193,6 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        git add -A
-
         # Exclude HAR files for specs that had backend soft failures
         # These HAR files would be incomplete/empty and break replay mode
         FAILED_SPECS="${{ steps.soft-failures.outputs.failed_specs }}"
@@ -203,25 +207,33 @@ jobs:
               for dir in $MATCHES; do
                 git reset HEAD -- "$dir" 2>/dev/null || true
                 git checkout -- "$dir" 2>/dev/null || true
+                git clean -fd -- "$dir"
               done
             fi
             # Also unstage any fixture files for this spec
             git reset HEAD -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
             git checkout -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
+            git clean -f -- "fixtures/${spec}.fixture.json.gz"
           done
         fi
+
+        # Validate the full final corpus before staging, including retained files.
+        (cd ../../.. && yarn check:har-secrets --require-hars)
+        git add -A
 
         if git diff --staged --quiet; then
           echo "No HAR file changes to commit"
         else
           echo "HAR file changes detected:"
           git diff --staged --stat
+          node "${GITHUB_WORKSPACE}/scripts/check-har-secrets.mjs" --require-hars --tracked-auth --staged .
           git commit -m "chore: update HAR files (${DATE})
 
         Test result: ${{ steps.playwright.outcome }}"
           # No --force: recording starts from the sub-repo's master
           # If master moved during the run, fail loudly
           # rather than discard whatever landed in the meantime.
+          node "${GITHUB_WORKSPACE}/scripts/check-har-secrets.mjs" --require-hars --tracked-auth --staged .
           git push origin HEAD:refs/heads/master
         fi
 

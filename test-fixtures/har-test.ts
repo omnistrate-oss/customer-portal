@@ -16,11 +16,16 @@
 
 import { expect, test as base } from "@playwright/test";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
-import * as zlib from "zlib";
-
 import { hasBackendFailure } from "test-utils/backend-error";
 import { isRecordMode, isReplayMode } from "test-utils/har-mode";
+import * as zlib from "zlib";
+
+import { assertSafeHar } from "../scripts/har-security.mjs";
+
+import { persistRecordedHar } from "./har-recording.mjs";
+import { normalizeHarReplayUrl } from "./har-replay.mjs";
 
 export type HarMode = "record" | "replay" | "off";
 
@@ -38,35 +43,6 @@ type HarResponse = {
 };
 type HarEntry = { request: HarRequest; response: HarResponse };
 type HarFile = { log: { entries: HarEntry[] } };
-
-// Recursively replace values of sensitive-looking keys in JSON bodies. Used to
-// keep credentials out of committed request payloads (e.g. createInstance posts
-// a `password` field). Replay matches on method+URL, so redaction is safe.
-const SENSITIVE_KEY_PATTERN = /password|secret|token|apikey|access[-_]?key|private[-_]?key|credential/i;
-
-const redactSensitive = (value: unknown): unknown => {
-  if (Array.isArray(value)) return value.map(redactSensitive);
-  if (value !== null && typeof value === "object") {
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      out[k] = SENSITIVE_KEY_PATTERN.test(k) ? "[REDACTED]" : redactSensitive(v);
-    }
-    return out;
-  }
-  return value;
-};
-
-const redactJsonPostData = (postData: HarPostData | undefined): void => {
-  if (!postData?.text) return;
-  const mime = (postData.mimeType ?? "").toLowerCase();
-  if (!mime.includes("json")) return;
-  try {
-    const parsed = JSON.parse(postData.text);
-    postData.text = JSON.stringify(redactSensitive(parsed));
-  } catch {
-    // Non-JSON despite the mime type — leave the raw text alone rather than corrupt it.
-  }
-};
 
 type HarFixtures = {
   harMode: HarMode;
@@ -102,38 +78,16 @@ const getHarGzPath = (testInfo: {
   return path.join(harsDir, projectDir, testFileName, `${testTitle}.har.gz`);
 };
 
-const ensureDir = (filePath: string): void => {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-};
-
-// Read and decompress a .har.gz file
+// Read and decompress a validated .har.gz file.
 const readHarGz = (gzPath: string): HarFile => {
-  const compressed = fs.readFileSync(gzPath);
-  const json = zlib.gunzipSync(new Uint8Array(compressed)).toString("utf-8");
-  return JSON.parse(json);
-};
-
-// Compress and write a .har.gz file
-const writeHarGz = (gzPath: string, har: HarFile): void => {
-  const json = JSON.stringify(har);
-  const compressed = zlib.gzipSync(new Uint8Array(Buffer.from(json)), { level: 9 });
-  fs.writeFileSync(gzPath, new Uint8Array(compressed));
-};
-
-// Track which HAR files have been cleared this run
-const clearedHarFiles = new Set<string>();
-
-// Match on path+query only so HARs recorded against one host:port (e.g. dev on
-// :3000) replay correctly on another (CI on :8080).
-const normalizeUrl = (url: string): string => {
   try {
-    const parsed = new URL(url);
-    return parsed.pathname + parsed.search;
+    const compressed = fs.readFileSync(gzPath);
+    const json = new TextDecoder("utf-8", { fatal: true }).decode(zlib.gunzipSync(new Uint8Array(compressed)));
+    const har: unknown = JSON.parse(json);
+    assertSafeHar(har, gzPath);
+    return har as HarFile;
   } catch {
-    return url;
+    throw new Error(`[HAR] Replay recording rejected: ${gzPath}`);
   }
 };
 
@@ -190,80 +144,54 @@ export const test = base.extend<HarFixtures>({
     }
 
     const gzPath = getHarGzPath(testInfo);
-    // Playwright's recordHar writes raw .har; we compress after
-    const rawHarPath = gzPath.replace(".har.gz", ".har");
-
     if (effectiveHarMode === "record") {
-      ensureDir(gzPath);
-
-      if (!clearedHarFiles.has(gzPath)) {
-        if (fs.existsSync(gzPath)) fs.unlinkSync(gzPath);
-        if (fs.existsSync(rawHarPath)) fs.unlinkSync(rawHarPath);
-        clearedHarFiles.add(gzPath);
-      }
-
-      const context = await browser.newContext({
-        ...baseContextOptions,
-        recordHar: {
-          path: rawHarPath,
-          content: "embed",
-          // Capture /api/* but skip auth endpoints — their response bodies and
-          // Set-Cookie headers contain credentials that shouldn't land in a
-          // committed HAR. Replay re-authenticates at runtime anyway.
-          urlFilter: /\/api\/(?!signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)/,
-        },
-      });
-
-      await use(context);
-
-      for (const page of context.pages()) {
-        try {
-          await page.waitForLoadState("networkidle", { timeout: 10000 });
-        } catch {
-          // Ignore timeout
-        }
-      }
-      // Buffer for async refetches triggered by mutation onSuccess callbacks
-      await new Promise((r) => setTimeout(r, 4000));
-
-      await context.close();
-
-      // Don't save HAR for skipped tests — these are soft failures from backend issues
-      // and would produce incomplete/empty HAR files that break replay mode
-      if (testInfo.status === "skipped") {
-        if (fs.existsSync(rawHarPath)) fs.unlinkSync(rawHarPath);
-        return;
-      }
-
-      // Post-process: remove failed entries, then compress
-      if (fs.existsSync(rawHarPath)) {
-        try {
-          const har: HarFile = JSON.parse(fs.readFileSync(rawHarPath, "utf-8"));
-          har.log.entries = har.log.entries.filter((entry) => {
-            const resp = entry.response;
-            if (resp.status < 0) return false;
-            if (resp._failureText && resp.status !== 200) return false;
-            return true;
+      // Raw captures stay in a private temporary directory outside the fixture corpus.
+      const rawDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "portal-har-"));
+      const rawHarPath = path.join(rawDirectory, "capture.har");
+      try {
+        const context = await browser
+          .newContext({
+            ...baseContextOptions,
+            recordHar: {
+              path: rawHarPath,
+              content: "embed",
+              // Capture /api/* but skip auth endpoints — their response bodies and
+              // Set-Cookie headers contain credentials that shouldn't land in a
+              // committed HAR. Replay re-authenticates at runtime anyway.
+              urlFilter:
+                /\/api\/(?!signin|signup|refresh-token|sign-in-with-idp|logout|reset-password|change-password)/,
+            },
+          })
+          .catch(() => {
+            throw new Error("[HAR] Cannot create recording context safely");
           });
 
-          // Strip sensitive headers and redact sensitive request body fields. The replay
-          // matcher only uses method+URL, so headers/postData aren't needed for matching —
-          // dropping them keeps secrets out of the committed HAR.
-          for (const entry of har.log.entries) {
-            entry.request.headers = entry.request.headers.filter(
-              (h) => !["authorization", "cookie"].includes(h.name.toLowerCase())
-            );
-            entry.response.headers = entry.response.headers.filter(
-              (h) => !["set-cookie"].includes(h.name.toLowerCase())
-            );
-            redactJsonPostData(entry.request.postData);
-          }
+        try {
+          await use(context);
 
-          writeHarGz(gzPath, har);
-          // Clean up raw file
-          fs.unlinkSync(rawHarPath);
-        } catch (e) {
-          console.warn(`[HAR] Failed to post-process: ${e}`);
+          for (const page of context.pages()) {
+            try {
+              await page.waitForLoadState("networkidle", { timeout: 10000 });
+            } catch {
+              // Ignore timeout
+            }
+          }
+          // Buffer for async refetches triggered by mutation onSuccess callbacks.
+          await new Promise((r) => setTimeout(r, 4000));
+        } finally {
+          try {
+            await context.close();
+          } catch {
+            throw new Error(`[HAR] Recording capture failed: ${gzPath}`);
+          }
+        }
+
+        persistRecordedHar(rawHarPath, gzPath, testInfo.status);
+      } finally {
+        try {
+          fs.rmSync(rawDirectory, { recursive: true, force: true });
+        } catch {
+          throw new Error(`[HAR] Recording cleanup failed: ${gzPath}`);
         }
       }
     } else if (effectiveHarMode === "replay") {
@@ -276,8 +204,8 @@ export const test = base.extend<HarFixtures>({
         return;
       }
 
-      const context = await browser.newContext(baseContextOptions);
       const har = readHarGz(gzPath);
+      const context = await browser.newContext(baseContextOptions);
 
       // Each entry is served exactly once. We track consumed entries and always find
       // the first unconsumed match. This handles out-of-order requests correctly —
@@ -296,7 +224,7 @@ export const test = base.extend<HarFixtures>({
         const request = route.request();
         const method = request.method();
         const url = request.url();
-        const normalizedUrl = normalizeUrl(url);
+        const normalizedUrl = normalizeHarReplayUrl(url);
 
         if (REPLAY_LIVE_API_PATHS.test(new URL(url).pathname)) {
           await route.fallback();
@@ -309,7 +237,7 @@ export const test = base.extend<HarFixtures>({
           if (
             !consumed.has(i) &&
             entryQueue[i].request.method === method &&
-            normalizeUrl(entryQueue[i].request.url) === normalizedUrl
+            normalizeHarReplayUrl(entryQueue[i].request.url) === normalizedUrl
           ) {
             matchIndex = i;
             break;
@@ -330,7 +258,7 @@ export const test = base.extend<HarFixtures>({
             // The abort surfaces as a network failure to the page; the test will fail on
             // the resulting expect/await. Throwing from this handler would land as an
             // unhandled rejection — abort is the deterministic signal.
-            console.error(`[HAR REPLAY] No matching HAR entry found for ${method} ${url}`);
+            console.error(`[HAR REPLAY] No matching HAR entry found for ${method}`);
             await route.abort("failed");
           }
           return;

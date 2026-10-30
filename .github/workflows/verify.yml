@@ -41,6 +41,19 @@ jobs:
         # Install scripts stay disabled to prevent supply-chain attacks.
         run: YARN_ENABLE_SCRIPTS=false yarn install --immutable
 
+      - name: HAR security tests
+        run: yarn test:har-security
+
+      - name: Recorder boundary tests
+        run: node --test scripts/har-recorder.test.mjs
+
+      - name: API fixture security tests
+        run: yarn test:api-fixture-security
+
+      - name: HAR and tracked auth guard
+        # A fork can run this with no private HAR submodule access.
+        run: yarn check:har-secrets
+
       - name: Lint
         run: yarn lint
 

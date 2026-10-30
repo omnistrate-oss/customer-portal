@@ -17,9 +17,13 @@
     "icons:build": "node scripts/build-icons.mjs",
     "find:unused": "next-unused",
     "update-api-types": "yarn rebuild puppeteer && node scripts/updateAPITypes.js",
-    "test:record": "HAR_MODE=record yarn playwright test",
-    "test:replay": "HAR_MODE=replay yarn playwright test",
-    "record": "yarn tsx scripts/record-hars.ts"
+    "test:record": "yarn check:har-secrets --require-hars && HAR_MODE=record yarn playwright test \"$@\" && yarn check:har-secrets --require-hars",
+    "test:replay": "yarn check:har-secrets --require-hars && HAR_MODE=replay yarn playwright test \"$@\"",
+    "record": "yarn tsx scripts/record-hars.ts",
+    "check:har-secrets": "node scripts/check-har-secrets.mjs --tracked-auth tests/fixtures/hars",
+    "test:har-security": "node --test scripts/har-security.test.mjs",
+    "test:har-recorder": "node --test scripts/har-recorder.test.mjs scripts/har-recorder-browser.test.mjs",
+    "test:api-fixture-security": "node --import tsx --test scripts/api-fixture.test.mjs"
   },
   "next-unused": {
     "alias": {},
