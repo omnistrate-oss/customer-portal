@@ -198,7 +198,7 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
 
         <AwsCloudFormationInstructions
           cloudFormationUrl={cloudFormationUrl}
-          variant="onboarding"
+          variant="reconfiguration"
           awsAccountId={awsAccountId}
           contentSpacing="12px"
           cliDescription={
@@ -207,7 +207,7 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
               <Box component="span" sx={{ fontWeight: 600 }}>
                 {awsAccountId}
               </Box>
-              . It creates the same CloudFormation stack as the console flow.
+              . It updates the existing CloudFormation stack.
             </Text>
           }
           footer={<ExistingLoadBalancerPolicyNotice />}
@@ -907,8 +907,7 @@ function CloudProviderAccountOrgIdModal(props) {
   );
 
   const isAwsReconfiguration =
-    !isAccountCreation &&
-    String(selectedAccountConfig?.status ?? "").toUpperCase() === "READY" &&
+    ["READY", "RUNNING"].includes(String(selectedAccountConfig?.status ?? "").toUpperCase()) &&
     Boolean(accountInstructionDetails?.awsAccountID && safeCloudFormationTemplateUrl);
 
   return (
@@ -939,7 +938,7 @@ function CloudProviderAccountOrgIdModal(props) {
           </IconButton>
         </Header>
         <Content>
-          {isAccountCreation ? (
+          {isAccountCreation && !isAwsReconfiguration ? (
             <CreationTimeInstructions
               cloudformationlink={cloudformationlink}
               cloudFormationGuide={cloudFormationGuide}
