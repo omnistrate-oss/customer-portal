@@ -638,7 +638,7 @@ function walk(value, path, issues, depth = 0, context = "") {
   });
   return result;
 }
-const scrubMultipart = (text, mimeType, path, issues) => {
+const scrubMultipart = (text, mimeType, path, issues, response) => {
   const boundary =
     mimeType
       .match(/boundary=(?:"([^"]+)"|([^;\s]+))/i)
@@ -666,7 +666,7 @@ const scrubMultipart = (text, mimeType, path, issues) => {
     output.push(`\r\n${scrubText(match[1], path, issues)}\r\n\r\n${clean}\r\n`);
   }
   output.push("--\r\n");
-  return output.join("--HAR_REDACTED_BOUNDARY");
+  return output.join(response ? delimiter : "--HAR_REDACTED_BOUNDARY");
 };
 const bodyText = (container, path, issues, apiKeyResponse = false, secretPayload = false, response = false) => {
   if (container.encoding !== undefined && container.encoding !== "base64") fail(path, "unsupported HAR encoding");
@@ -708,8 +708,7 @@ const bodyText = (container, path, issues, apiKeyResponse = false, secretPayload
         return false;
       }
     })();
-  if (response && !textMime && !recognizedJson) {
-    if (text !== null) scrubText(text, path, issues);
+  if (response && !textMime && text === null) {
     add(issues, path, "unsupported binary response body");
     delete container.text;
     return;
@@ -728,8 +727,8 @@ const bodyText = (container, path, issues, apiKeyResponse = false, secretPayload
     clean = JSON.stringify(value) === JSON.stringify(output) && !keyChanged ? text : JSON.stringify(output);
   } else if (mime === "application/x-www-form-urlencoded") clean = scrubPairs(text, path, issues, 0);
   else if (mime === "multipart/form-data") {
-    clean = scrubMultipart(text, container.mimeType, path, issues);
-    container.mimeType = "multipart/form-data; boundary=HAR_REDACTED_BOUNDARY";
+    clean = scrubMultipart(text, container.mimeType, path, issues, response);
+    if (!response) container.mimeType = "multipart/form-data; boundary=HAR_REDACTED_BOUNDARY";
   } else clean = scrubText(text, path, issues);
   container.text = container.encoding === "base64" ? Buffer.from(clean).toString("base64") : clean;
 };

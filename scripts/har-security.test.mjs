@@ -864,9 +864,34 @@ for (const encoded of [false, true])
     const clean = security.sanitizeHar(input);
     noSecret(clean);
     assert.ok(entry(clean).request.postData.text.includes("public"));
+    assert.equal(entry(clean).request.postData.mimeType, "multipart/form-data; boundary=HAR_REDACTED_BOUNDARY");
+    assert.ok(entry(clean).request.postData.text.startsWith("--HAR_REDACTED_BOUNDARY\r\n"));
     assert.deepEqual(security.inspectHar(clean), []);
     const inferred = { mimeType: "multipart/form-data", text };
     assert.equal(security.sanitizePostData(inferred).text, entry(clean).request.postData.text);
+  });
+for (const encoded of [false, true])
+  test(`keeps multipart response boundaries while scrubbing parts (base64=${encoded})`, () => {
+    const input = har();
+    const mimeType = "multipart/form-data; boundary=B";
+    const fileContent = Buffer.from(JSON.stringify({ password: opaque, public: "value" })).toString("base64");
+    const text = `--B\r\nContent-Disposition: form-data; name="password"\r\n\r\n${opaque}\r\n--B\r\nContent-Disposition: form-data; name="fileContent"\r\n\r\n${fileContent}\r\n--B--\r\n`;
+    entry(input).response.headers = [{ name: "Content-Type", value: mimeType }];
+    entry(input).response.content = {
+      mimeType,
+      text: encoded ? Buffer.from(text).toString("base64") : text,
+      ...(encoded ? { encoding: "base64" } : {}),
+    };
+    assert.ok(security.inspectHar(input).length > 0);
+    const clean = security.sanitizeHar(input);
+    const content = entry(clean).response.content;
+    const body = encoded ? Buffer.from(content.text, "base64").toString() : content.text;
+    const cleanFile = Buffer.from(JSON.stringify({ password: marker, public: "value" })).toString("base64");
+    assert.equal(body, text.replace(opaque, marker).replace(fileContent, cleanFile));
+    assert.equal(content.mimeType, mimeType);
+    assert.deepEqual(entry(clean).response.headers, entry(input).response.headers);
+    assert.deepEqual(security.inspectHar(clean), []);
+    assert.deepEqual(security.sanitizeHar(clean), clean);
   });
 test("replaces unparseable multipart with a fixed placeholder", () => {
   const input = har();
@@ -889,6 +914,45 @@ for (const label of ["PRIVATE KEY", "RSA PRIVATE KEY", "EC PRIVATE KEY", "ENCRYP
     assert.ok(security.inspectFixture(input).some(({ reason }) => reason === "PEM private key"));
     assert.deepEqual(security.sanitizeFixture(input), { notice: `prefix ${marker} suffix` });
   });
+for (const mimeType of ["x-unknown", "application/octet-stream"])
+  test(`keeps base64 UTF-8 response text (${mimeType})`, () => {
+    const input = har();
+    const content = {
+      mimeType,
+      encoding: "base64",
+      text: Buffer.from("sub-abc123XYZ").toString("base64"),
+    };
+    entry(input).response.content = content;
+    const clean = security.sanitizeHar(input);
+    assert.deepEqual(entry(clean).response.content, content);
+    assert.deepEqual(security.inspectHar(clean), []);
+    assert.deepEqual(security.sanitizeHar(clean), clean);
+  });
+for (const encoded of [false, true])
+  test(`keeps and scrubs x-unknown response text (base64=${encoded})`, () => {
+    const input = har();
+    const text = `password=opaque-secret ${jwt} Bearer abc.def public`;
+    entry(input).response.content = {
+      mimeType: "x-unknown",
+      text: encoded ? Buffer.from(text).toString("base64") : text,
+      ...(encoded ? { encoding: "base64" } : {}),
+    };
+    assert.deepEqual(
+      security
+        .inspectHar(input)
+        .map(({ reason }) => reason)
+        .sort(),
+      ["credential text field", "JWT literal", "Bearer credential literal"].sort()
+    );
+    const clean = security.sanitizeHar(input);
+    const content = entry(clean).response.content;
+    const expected = `password=${marker} ${marker} Bearer ${marker} public`;
+    assert.equal(content.text, encoded ? Buffer.from(expected).toString("base64") : expected);
+    assert.equal(content.mimeType, "x-unknown");
+    assert.equal(content.encoding, encoded ? "base64" : undefined);
+    assert.deepEqual(security.inspectHar(clean), []);
+    assert.deepEqual(security.sanitizeHar(clean), clean);
+  });
 for (const mimeType of [
   "image/png",
   "application/pdf",
@@ -905,7 +969,10 @@ for (const mimeType of [
       text: Buffer.from([0, 255, 1, 254, 2]).toString("base64"),
     };
     assert.ok(security.inspectHar(input).some(({ reason }) => reason === "unsupported binary response body"));
-    assert.deepEqual(entry(security.sanitizeHar(input)).response.content, { mimeType, size: 5, encoding: "base64" });
+    const clean = security.sanitizeHar(input);
+    assert.deepEqual(entry(clean).response.content, { mimeType, size: 5, encoding: "base64" });
+    assert.deepEqual(security.inspectHar(clean), []);
+    assert.deepEqual(security.sanitizeHar(clean), clean);
   });
 test("inspects base64 websocket extension data even though persistence drops it", () => {
   const input = har();
