@@ -21,6 +21,7 @@ import { ResourceInstance } from "src/types/resourceInstance";
 import { APIEntity } from "src/types/serviceOffering";
 import { isCloudAccountInstance } from "src/utils/access/byoaResource";
 import { checkBYOADeploymentInstance, getResultParams } from "src/utils/instance";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 import Button from "components/Button/Button";
 import CardWithTitle from "components/Card/CardWithTitle";
 import LoadingSpinnerSmall from "components/CircularProgress/CircularProgress";
@@ -976,7 +977,7 @@ const InstanceForm = ({
             return values.cloudProvider === "byoc-onprem";
           }
         })
-        .filter((instance) => ["READY", "RUNNING"].includes(instance.status))
+        .filter((instance) => instance.status === "READY" || isActiveInstanceLifecycle(instance.status))
         .map((instance) => {
           const resultParams = getResultParams(instance);
           return {

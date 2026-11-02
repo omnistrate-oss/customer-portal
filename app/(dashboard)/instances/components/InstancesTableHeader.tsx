@@ -18,6 +18,7 @@ import {
   operationEnum,
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 import Button from "components/Button/Button";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "components/RefreshWithTooltip/RefreshWithToolTip";
@@ -135,7 +136,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       isLoading: stopInstanceMutation.isPending,
       isDisabled:
         !selectedInstance ||
-        status !== "RUNNING" ||
+        !isActiveInstanceLifecycle(status) ||
         blocksLifecycleActions ||
         isProxyResource ||
         !isUpdateAllowedByRBAC ||
@@ -151,7 +152,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
           ? "Not applicable for air-gapped deployment instances"
           : status === "DISCONNECTED"
             ? "Instance is disconnected"
-            : status !== "RUNNING"
+            : !isActiveInstanceLifecycle(status)
               ? "Instance must be running to stop it"
               : !supportsStop
                 ? "Instance does not support stop operation"
@@ -209,7 +210,10 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
       actionType: "secondary",
       isDisabled:
         !selectedInstance ||
-        (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
+        (!isActiveInstanceLifecycle(status) &&
+          status !== "INSTALLER_READY" &&
+          status !== "FAILED" &&
+          status !== "COMPLETE") ||
         isProxyResource ||
         !isUpdateAllowedByRBAC,
       onClick: () => {
@@ -221,7 +225,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
         ? "Please select an instance"
         : status === "DISCONNECTED"
           ? "Instance is disconnected"
-          : status !== "RUNNING" && status !== "FAILED"
+          : !isActiveInstanceLifecycle(status) && status !== "FAILED"
             ? "Instance must be running or failed to modify"
             : isProxyResource
               ? "System managed instances cannot be modified"

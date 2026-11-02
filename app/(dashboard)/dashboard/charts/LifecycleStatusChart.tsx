@@ -14,6 +14,10 @@ const chartConfig = {
     label: "Instances",
     color: "#B7C7C8",
   },
+  ACTIVE: {
+    label: "Active",
+    color: "#079455",
+  },
   RUNNING: {
     label: "Running",
     color: "#7BBC29",
@@ -51,7 +55,7 @@ type LifecycleStatusChartProps = {
 const LifecycleStatusChart: React.FC<LifecycleStatusChartProps> = ({ instances }) => {
   const { ref, radius } = useDynamicInnerRadius();
 
-  const knownStatuses = ["RUNNING", "FAILED", "CANCELLED", "STOPPED", "UNKNOWN", "DEPLOYING"] as const; // <-- all the ones you want individual wedges for
+  const knownStatuses = ["ACTIVE", "RUNNING", "FAILED", "CANCELLED", "STOPPED", "UNKNOWN", "DEPLOYING"] as const; // <-- all the ones you want individual wedges for
 
   const chartData = useMemo(() => {
     const statusBreakdown: Record<string, number> = {}; // ✅ Define it here

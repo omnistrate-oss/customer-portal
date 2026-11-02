@@ -14,6 +14,7 @@ import {
   operationEnum,
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 import { getCustomWorkflowOperations } from "../customWorkflow";
 import { Overlay } from "../page";
@@ -113,7 +114,11 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
             dataTestId: "stop-button",
             label: "Stop",
             isDisabled:
-              !instance || status !== "RUNNING" || blocksLifecycleActions || isProxyResource || !isUpdateAllowedByRBAC,
+              !instance ||
+              !isActiveInstanceLifecycle(status) ||
+              blocksLifecycleActions ||
+              isProxyResource ||
+              !isUpdateAllowedByRBAC,
             onClick: () => {
               if (!instance) return snackbar.showError("Please select an instance");
               setOverlayType("stop-dialog");
@@ -121,7 +126,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
             },
             disabledMessage: !instance
               ? "Please select an instance"
-              : status !== "RUNNING"
+              : !isActiveInstanceLifecycle(status)
                 ? "Instance must be running to stop it"
                 : blocksLifecycleActions || isProxyResource
                   ? "System manages instances cannot be stopped"
@@ -169,7 +174,10 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           label: "Modify",
           isDisabled:
             !instance ||
-            (status !== "RUNNING" && status !== "INSTALLER_READY" && status !== "FAILED" && status !== "COMPLETE") ||
+            (!isActiveInstanceLifecycle(status) &&
+              status !== "INSTALLER_READY" &&
+              status !== "FAILED" &&
+              status !== "COMPLETE") ||
             isProxyResource ||
             !isUpdateAllowedByRBAC,
           onClick: () => {
@@ -179,7 +187,10 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           },
           disabledMessage: !instance
             ? "Please select an instance"
-            : status !== "RUNNING" && status !== "FAILED" && status !== "INSTALLER_READY" && status !== "COMPLETE"
+            : !isActiveInstanceLifecycle(status) &&
+                status !== "FAILED" &&
+                status !== "INSTALLER_READY" &&
+                status !== "COMPLETE"
               ? "Instance must be running or failed to modify"
               : isProxyResource
                 ? "System managed instances cannot be modified"
@@ -247,7 +258,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           label: "Reboot",
           isDisabled:
             !instance ||
-            (status !== "RUNNING" && status !== "FAILED" && status !== "COMPLETE") ||
+            (!isActiveInstanceLifecycle(status) && status !== "FAILED" && status !== "COMPLETE") ||
             !isUpdateAllowedByRBAC,
           onClick: () => {
             if (!instance) return snackbar.showError("Please select an instance");
@@ -256,7 +267,7 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
           },
           disabledMessage: !instance
             ? "Please select an instance"
-            : status !== "RUNNING" && status !== "FAILED"
+            : !isActiveInstanceLifecycle(status) && status !== "FAILED"
               ? "Instance must be running or failed to reboot"
               : !isUpdateAllowedByRBAC
                 ? "Unauthorized to reboot instances"
@@ -289,10 +300,12 @@ const InstanceActionMenu: React.FC<InstanceActionMenuProps> = ({
         dataTestId: "upgrade-button",
         label: "Upgrade",
         isDisabled:
-          !instance || !["RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string) || !isUpdateAllowedByRBAC,
+          !instance ||
+          !["ACTIVE", "RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string) ||
+          !isUpdateAllowedByRBAC,
         disabledMessage: !instance
           ? "Please select an instance"
-          : !["RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string)
+          : !["ACTIVE", "RUNNING", "STOPPED", "INSTALLER_READY"].includes(status as string)
             ? "Instance must be running or stopped to upgrade"
             : !isUpdateAllowedByRBAC
               ? "Unauthorized to upgrade instances"
