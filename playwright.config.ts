@@ -1,9 +1,12 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices, type ReporterDescription } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 import { isRecordMode, isReplayMode } from "test-utils/har-mode";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+
+const reporters: ReporterDescription[] = process.env.CI ? [["list"], ["html"], ["github"]] : [["html"]];
+if (isRecordMode()) reporters.push(["./test-fixtures/har-recording-reporter.ts"]);
 
 // Replay mode: deterministic (0 retries), instant responses (short timeout)
 // Record mode: 2 workers to balance speed vs deterministic capture
@@ -25,27 +28,28 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: isReplayMode() ? 0 : process.env.CI ? 2 : 1,
   workers: getWorkers(),
-  reporter: process.env.CI ? [["list"], ["html"], ["github"]] : [["html"]],
+  reporter: reporters,
 
   timeout: isReplayMode() ? 60 * 1000 : 12 * 60 * 1000,
 
   use: {
     actionTimeout: 30 * 1000,
     baseURL: process.env.YOUR_SAAS_DOMAIN_URL || "http://127.0.0.1:3000",
-    trace: "on-first-retry",
+    trace: isRecordMode() ? "off" : "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   projects: [
     {
       name: "auth-tests",
       testDir: "./tests/auth",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], trace: "off" },
     },
     {
       name: "user-setup",
       testMatch: "user-setup.spec.ts",
       timeout: 180_000,
-      use: { trace: "retain-on-failure" },
+      use: { trace: "off" },
     },
     {
       name: "deployment-tests",

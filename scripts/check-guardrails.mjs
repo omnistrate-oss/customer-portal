@@ -48,6 +48,7 @@ const CONFIG = {
   strictReplay: null,
   // Core rules that only guardrails use, so disabling them is disabling a guardrail.
   guardedCoreRules: ["no-restricted-imports", "no-restricted-syntax"],
+  externalPaths: ["tests/fixtures/hars"],
 };
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -122,7 +123,9 @@ const markdownFiles = CONFIG.guidance
       : [entry]
   );
 const topLevelEntries = new Set(readdirSync("."));
-const submodules = [...readFileSync(".gitmodules", "utf8").matchAll(/path = (.+)/g)].map(([, path]) => path.trim());
+const submodules = existsSync(".gitmodules")
+  ? [...readFileSync(".gitmodules", "utf8").matchAll(/path = (.+)/g)].map(([, path]) => path.trim())
+  : [];
 
 for (const file of markdownFiles) {
   for (const [, token] of readFileSync(file, "utf8").matchAll(/`([^`\n]+)`/g)) {
@@ -132,7 +135,12 @@ for (const file of markdownFiles) {
       .replace(/\/$/, "");
     if (/[<>*{}\s$]/.test(candidate) || !candidate.includes("/")) continue;
     if (!topLevelEntries.has(candidate.split("/")[0])) continue;
-    if (submodules.some((submodule) => candidate.startsWith(`${submodule}/`))) continue;
+    if (
+      [...submodules, ...(CONFIG.externalPaths ?? [])].some(
+        (entry) => candidate === entry || candidate.startsWith(`${entry}/`)
+      )
+    )
+      continue;
     if (!PATH_EXTENSIONS.some((extension) => existsSync(candidate + extension))) {
       fail(`${file}: \`${token}\` does not exist. Fix the reference or the guidance.`);
     }

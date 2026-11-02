@@ -47,7 +47,10 @@ jobs:
         corepack prepare yarn@4.5.0 --activate
 
     - name: Install dependencies
-      run: yarn install --immutable
+      run: YARN_ENABLE_SCRIPTS=false yarn install --immutable
+
+    - name: Validate retained HAR corpus and tracked auth
+      run: yarn check:har-secrets --require-hars
 
     - name: Log Resolved Dependency Versions
       run: |
@@ -138,15 +141,6 @@ jobs:
         if [ -f tests/backend-failures.json ]; then
           echo "has_failures=true" >> $GITHUB_OUTPUT
 
-          # Extract failed spec basenames (e.g. "basic-tests upgrades") for HAR exclusion
-          FAILED_SPECS=$(node -e "
-            const path = require('path');
-            const failures = JSON.parse(require('fs').readFileSync('tests/backend-failures.json', 'utf-8'));
-            const names = [...new Set(failures.map(f => path.basename(f.specFile, '.spec.ts')))];
-            console.log(names.join(' '));
-          ")
-          echo "failed_specs=${FAILED_SPECS}" >> $GITHUB_OUTPUT
-
           # Build a markdown summary for Mattermost
           SUMMARY=$(node -e "
             const failures = JSON.parse(require('fs').readFileSync('tests/backend-failures.json', 'utf-8'));
@@ -177,6 +171,12 @@ jobs:
           echo "has_failures=false" >> $GITHUB_OUTPUT
         fi
 
+    - name: Validate restored recordings against staged bytes
+      if: ${{ !cancelled() && steps.playwright.outcome != 'skipped' }}
+      run: |
+        git -C tests/fixtures/hars add -A
+        (cd tests/fixtures/hars && node "${GITHUB_WORKSPACE}/scripts/check-har-secrets.mjs" --require-hars --tracked-auth --staged .)
+
     - name: Push HAR files to sub-repo
       if: ${{ steps.playwright.outcome == 'success' }}
       run: |
@@ -187,29 +187,8 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        git add -A
-
-        # Exclude HAR files for specs that had backend soft failures
-        # These HAR files would be incomplete/empty and break replay mode
-        FAILED_SPECS="${{ steps.soft-failures.outputs.failed_specs }}"
-        if [ -n "$FAILED_SPECS" ]; then
-          for spec in $FAILED_SPECS; do
-            # HAR dirs live at exactly {project}/{specName}/ — depth 2 from repo root.
-            # Restricting depth keeps a stray nested directory with the same name
-            # (e.g. a snapshot folder) from being unstaged.
-            MATCHES=$(find . -mindepth 2 -maxdepth 2 -type d -name "$spec" 2>/dev/null || true)
-            if [ -n "$MATCHES" ]; then
-              echo "Excluding HAR files for soft-failed spec: $spec"
-              for dir in $MATCHES; do
-                git reset HEAD -- "$dir" 2>/dev/null || true
-                git checkout -- "$dir" 2>/dev/null || true
-              done
-            fi
-            # Also unstage any fixture files for this spec
-            git reset HEAD -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
-            git checkout -- "fixtures/${spec}.fixture.json.gz" 2>/dev/null || true
-          done
-        fi
+        # The recording reporter restores HARs and every explicitly owned fixture,
+        # including subscriptions and global setup, before this step.
 
         if git diff --staged --quiet; then
           echo "No HAR file changes to commit"
@@ -229,7 +208,12 @@ jobs:
       if: ${{ !cancelled() }}
       with:
         name: playwright-report-recording
-        path: playwright-report/
+        path: |
+          playwright-report/index.html
+          playwright-report/data/*.png
+          !**/*auth*/**
+          !**/*storage-state*
+          !**/global-state.json
         retention-days: 7
 
     - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
