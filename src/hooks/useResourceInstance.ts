@@ -5,6 +5,7 @@ import { getResultParams } from "src/utils/instance";
 import { calculateInstanceHealthPercentage } from "src/utils/instanceHealthPercentage";
 import { buildLogsSocketBaseURL } from "src/utils/logsSocketUrl";
 import processClusterPorts from "src/utils/processClusterPorts";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 const useResourceInstance = (queryParams) => {
   const {
@@ -129,7 +130,7 @@ const useResourceInstance = (queryParams) => {
             });
           } else {
             // assume that the resource is serverless
-            if (!resourceId.includes("r-obsrv") && data.status === "RUNNING") {
+            if (!resourceId.includes("r-obsrv") && isActiveInstanceLifecycle(data.status)) {
               nodes.push({
                 id: `${topologyDetails.resourceKey}-0`,
                 displayName: `serverless-${topologyDetails.resourceKey}`,
@@ -206,7 +207,7 @@ const useResourceInstance = (queryParams) => {
                 });
               } else {
                 // assume that the resource is serverless
-                if (!resourceId.includes("r-obsrv") && data.status === "RUNNING") {
+                if (!resourceId.includes("r-obsrv") && isActiveInstanceLifecycle(data.status)) {
                   nodes.push({
                     id: `${topologyDetails.resourceKey}-0`,
                     displayName: `serverless-${topologyDetails.resourceKey}`,

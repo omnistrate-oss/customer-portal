@@ -1,5 +1,6 @@
 import { RESOURCE_TYPES } from "src/constants/resource";
 import { InstanceSnapshotListItem } from "src/types/instance-snapshot";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 export const isOperatorCRDResourceType = (resourceType?: string) => {
   return resourceType?.toLowerCase() === RESOURCE_TYPES.OperatorCRD.toLowerCase();
@@ -7,7 +8,7 @@ export const isOperatorCRDResourceType = (resourceType?: string) => {
 
 /** Returns whether an instance can take a final snapshot while being deleted. */
 export const canTakeFinalSnapshotBeforeDeletion = (snapshotEnabled?: boolean, status?: string): boolean =>
-  Boolean(snapshotEnabled && status && ["RUNNING", "READY"].includes(status));
+  Boolean(snapshotEnabled && (isActiveInstanceLifecycle(status) || status === "READY"));
 
 type SnapshotCopyTargetRegionInput = {
   snapshot?: Pick<InstanceSnapshotListItem, "instanceResourceType" | "region">;

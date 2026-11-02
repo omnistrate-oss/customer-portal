@@ -12,6 +12,7 @@ import GenerateTokenDialog from "src/components/GenerateToken/GenerateTokenDialo
 import NodeIcon from "src/components/Icons/Node/NodeIcon";
 import { productTierTypes } from "src/constants/servicePlan";
 import { getResourceInstanceStatusStylesAndLabel } from "src/constants/statusChipStyles/resourceInstanceStatus";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 import zoneIcon from "public/assets/images/dashboard/resource-instance-nodes/zone.svg";
 
@@ -386,7 +387,7 @@ export default function NodesTable(props) {
 
   let isFailoverEnabled = false;
 
-  if (selectedNode && selectedNode.status === "RUNNING") {
+  if (selectedNode && isActiveInstanceLifecycle(selectedNode.status)) {
     isFailoverEnabled = true;
   }
 
@@ -418,7 +419,7 @@ export default function NodesTable(props) {
                 ? "Unauthorized to failover nodes"
                 : isInventoryManageInstance && isManagedProxy
                   ? "System managed proxy nodes cannot be failed over"
-                  : selectedNode?.status !== "RUNNING"
+                  : !isActiveInstanceLifecycle(selectedNode?.status)
                     ? "Node must be running to failover"
                     : failoverMutation.isPending
                       ? "Failover in progress"

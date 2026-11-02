@@ -11,6 +11,7 @@ import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 import { SnapshotFormValues } from "../types";
 import { isOperatorCRDResourceType } from "../utils";
@@ -98,7 +99,7 @@ const CreateSnapshotDialogContent: React.FC<CreateSnapshotDialogContentProps> = 
           menuItems: instances.map((instance) => {
             const status = instance.status ?? "";
             const installer = ["UPDATING_INSTALLER", "CREATING_INSTALLER", "INSTALLER_READY"].includes(status);
-            const isDisabled = !["RUNNING", "READY"].includes(status);
+            const isDisabled = !isActiveInstanceLifecycle(status) && status !== "READY";
             const styles = getResourceInstanceStatusStylesAndLabel(status);
             const data = {
               value: instance.id,

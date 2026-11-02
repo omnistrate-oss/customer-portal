@@ -16,6 +16,7 @@ import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import Switch from "src/components/Switch/Switch";
 import { dataTestIds } from "src/constants/testIds/instance-details-page";
 import { buildLogsSocketURL } from "src/utils/logsSocketUrl";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 import useSnackbar from "../../../hooks/useSnackbar";
 import Card from "../../Card/Card";
@@ -338,7 +339,7 @@ function Logs(props) {
           <Stack direction="row" justifyContent="center" marginTop="200px">
             <Text size="xlarge">
               {errorMessage ||
-                `Logs are not available ${instanceStatus !== "RUNNING" ? "as the instance is not running" : ""}`}
+                `Logs are not available ${!isActiveInstanceLifecycle(instanceStatus) ? "as the instance is not running" : ""}`}
             </Text>
           </Stack>
         </Card>

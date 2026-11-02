@@ -30,3 +30,6 @@ export const getRowBorderStyles = () => {
   }
   return styles;
 };
+
+export const isActiveInstanceLifecycle = (status?: string | null): boolean =>
+  status === "ACTIVE" || status === "RUNNING";

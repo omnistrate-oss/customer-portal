@@ -14,6 +14,7 @@ export const statuses = {
   CANCELLED: "Cancelled",
   PENDING_DEPENDENCY: "Pending Dependency",
   PENDING: "Pending",
+  ACTIVE: "Active",
   RUNNING: "Running",
   DEPLOYING: "Deploying",
   READY: "Ready",

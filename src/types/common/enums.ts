@@ -12,6 +12,7 @@ export type InstanceStatus =
   | "CANCELLED"
   | "PENDING_DEPENDENCY"
   | "PENDING"
+  | "ACTIVE"
   | "RUNNING"
   | "DEPLOYING"
   | "READY"

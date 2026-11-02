@@ -4,6 +4,7 @@ import { Label, Legend, Pie, PieChart } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Text } from "src/components/Typography/Typography";
 import { resourceInstanceStatusMap } from "src/constants/statusChipStyles/resourceInstanceStatus";
+import { colors } from "src/themeConfig";
 import { ResourceInstance } from "src/types/resourceInstance";
 
 import CustomLegend from "./CustomLegend";
@@ -13,6 +14,10 @@ const chartConfig = {
   instances: {
     label: "Instances",
     color: "#B7C7C8",
+  },
+  ACTIVE: {
+    label: "Active",
+    color: colors.success600,
   },
   RUNNING: {
     label: "Running",
@@ -51,7 +56,7 @@ type LifecycleStatusChartProps = {
 const LifecycleStatusChart: React.FC<LifecycleStatusChartProps> = ({ instances }) => {
   const { ref, radius } = useDynamicInnerRadius();
 
-  const knownStatuses = ["RUNNING", "FAILED", "CANCELLED", "STOPPED", "UNKNOWN", "DEPLOYING"] as const; // <-- all the ones you want individual wedges for
+  const knownStatuses = ["ACTIVE", "RUNNING", "FAILED", "CANCELLED", "STOPPED", "UNKNOWN", "DEPLOYING"] as const; // <-- all the ones you want individual wedges for
 
   const chartData = useMemo(() => {
     const statusBreakdown: Record<string, number> = {}; // ✅ Define it here

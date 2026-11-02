@@ -6,6 +6,7 @@ import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal"
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
 import { BarChart01, Server05, TrendUp01 } from "src/icons";
+import { isActiveInstanceLifecycle } from "src/utils/resourceInstance";
 
 import DataUnavailableMessage from "../DataUnavailableMessage";
 import { ContainerCard } from "../ResourceInstanceDetails/PropertyDetails";
@@ -207,7 +208,7 @@ const GrafanaMetrics: FC<GrafanaMetricsProps> = ({ metricsFeature, instanceStatu
       <ContainerCard title="Grafana Dashboards" mt="24px" contentBoxProps={{ padding: "24px" }}>
         <Stack direction="row" justifyContent="center" sx={{ padding: "80px 0" }}>
           <Text size="large" color="#535862">
-            {`Metrics are not available${instanceStatus !== "RUNNING" ? " as the instance is not running" : ""}`}
+            {`Metrics are not available${!isActiveInstanceLifecycle(instanceStatus) ? " as the instance is not running" : ""}`}
           </Text>
         </Stack>
       </ContainerCard>

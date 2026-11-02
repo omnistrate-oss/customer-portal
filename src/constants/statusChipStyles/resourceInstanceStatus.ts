@@ -5,6 +5,7 @@ export const resourceInstanceStatusMap: Record<string, { category: Category; lab
   CANCELLED: { category: "failed", label: "Cancelled" },
   PENDING_DEPENDENCY: { category: "pending", label: "Pending Dependency" },
   PENDING: { category: "pending", label: "Pending" },
+  ACTIVE: { category: "success", label: "Active" },
   RUNNING: { category: "success", label: "Running" },
   DEPLOYING: { category: "pending", label: "Deploying" },
   READY: { category: "success", label: "Ready" },
