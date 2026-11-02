@@ -4,7 +4,6 @@ import { Label, Legend, Pie, PieChart } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Text } from "src/components/Typography/Typography";
 import { resourceInstanceStatusMap } from "src/constants/statusChipStyles/resourceInstanceStatus";
-import { colors } from "src/themeConfig";
 import { ResourceInstance } from "src/types/resourceInstance";
 
 import CustomLegend from "./CustomLegend";
@@ -17,7 +16,7 @@ const chartConfig = {
   },
   ACTIVE: {
     label: "Active",
-    color: colors.success600,
+    color: "#079455",
   },
   RUNNING: {
     label: "Running",
