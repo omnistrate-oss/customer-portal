@@ -6,6 +6,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useSelector } from "react-redux";
 
 import { $api } from "src/api/query";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -188,6 +190,16 @@ const AccessControlPage = () => {
     ];
   }, [consumptionSubscriptionAdminRBAC, currentUser?.id, subscriptionsObj]);
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.accessControl,
+    columns: dataTableColumns,
+    clickableColumnIds: ["action"],
+  });
+
   const deleteUserMutation = $api.useMutation(
     "delete",
     "/2022-09-01-00/resource-instance/subscription/{subscriptionId}/revoke-user-role",
@@ -211,13 +223,15 @@ const AccessControlPage = () => {
 
       <div>
         <DataTable
-          columns={dataTableColumns}
+          columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredUsers}
           noRowsText="No users"
           isFilterApplied={users.length > 0 && filteredUsers.length === 0}
           entityName="users"
           HeaderComponent={AccessControlTableHeader}
           headerProps={{
+            columnPreference,
             users,
             setFilteredUsers,
             subscriptionsObj,

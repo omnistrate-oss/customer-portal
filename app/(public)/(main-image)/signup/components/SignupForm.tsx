@@ -9,8 +9,11 @@ import { styled } from "@mui/system";
 import Button from "src/components/Button/Button";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import { Text } from "src/components/Typography/Typography";
+import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
+import { getPolicyLink } from "src/utils/getPolicyLink";
+import { getPrivacyPolicyRoute, getTermsOfUseRoute } from "src/utils/routes";
 import FieldError from "components/FormElementsv2/FieldError/FieldError";
 import FieldContainer from "components/NonDashboardComponents/FormElementsV2/FieldContainer";
 import FieldLabel from "components/NonDashboardComponents/FormElementsV2/FieldLabel";
@@ -72,6 +75,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   hasNoLoginMethodsForEmail,
   hasNoLoginMethods,
 }) => {
+  const { orgTermsOfUse, orgPrivacyPolicy } = useProviderOrgDetails();
   const { values, errors, touched, handleChange, handleBlur } = formData;
   const [areOtherSigninOptionsExpanded, setAreOtherSigninOptionsExpanded] = useState(
     isPasswordLoginEnabled ? false : true
@@ -347,11 +351,21 @@ const SignupForm: React.FC<SignupFormProps> = ({
       ) : (
         <Text size="small" weight="regular" sx={{ color: "#535862", textAlign: "center", marginTop: "32px" }}>
           {policyAgreementText}{" "}
-          <Link target="_blank" href="/terms-of-use" style={{ color: "#364152", fontWeight: 600 }}>
+          <Link
+            target="_blank"
+            rel="noopener noreferrer"
+            href={getPolicyLink(orgTermsOfUse, getTermsOfUseRoute())}
+            style={{ color: "#364152", fontWeight: 600 }}
+          >
             Terms & Conditions
           </Link>{" "}
           and{" "}
-          <Link target="_blank" href="/privacy-policy" style={{ color: "#364152", fontWeight: 600 }}>
+          <Link
+            target="_blank"
+            rel="noopener noreferrer"
+            href={getPolicyLink(orgPrivacyPolicy, getPrivacyPolicyRoute())}
+            style={{ color: "#364152", fontWeight: 600 }}
+          >
             Privacy Policy
           </Link>
         </Text>

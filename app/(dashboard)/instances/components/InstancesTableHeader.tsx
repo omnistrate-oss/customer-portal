@@ -3,6 +3,9 @@ import { CircularProgress } from "@mui/material";
 
 import { $api } from "src/api/query";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import { CLI_MANAGED_RESOURCES } from "src/constants/resource";
 import useSnackbar from "src/hooks/useSnackbar";
 import { SetState } from "src/types/common/reactGenerics";
@@ -49,6 +52,7 @@ type InstancesTableHeaderProps = {
   instances: ResourceInstance[];
   setFilteredInstances: SetState<ResourceInstance[]>;
   isLoadingInstances: boolean;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
@@ -65,6 +69,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
   instances,
   setFilteredInstances,
   isLoadingInstances,
+  columnPreference,
 }) => {
   const snackbar = useSnackbar();
 
@@ -301,6 +306,7 @@ const InstancesTableHeader: React.FC<InstancesTableHeaderProps> = ({
           <div className="flex items-center">{isFetchingInstances && <CircularProgress size={20} />}</div>
 
           <RefreshWithToolTip refetch={refetchInstances} disabled={isFetchingInstances} />
+          <ColumnPreferenceButton {...columnPreference} />
 
           {mainActions.map((action, index) => {
             return (

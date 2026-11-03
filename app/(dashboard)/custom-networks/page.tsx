@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { $api } from "src/api/query";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import { cloudProviderLogoMap, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useSubscriptions from "src/hooks/query/useSubscriptions";
 import useSnackbar from "src/hooks/useSnackbar";
@@ -142,6 +144,15 @@ const CustomNetworksPage = () => {
     ];
   }, []);
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.customNetworks,
+    columns: dataTableColumns,
+  });
+
   const deleteCustomNetworkMutation = $api.useMutation(
     "delete",
     "/2022-09-01-00/resource-instance/custom-network/{id}",
@@ -226,13 +237,15 @@ const CustomNetworksPage = () => {
 
       <div>
         <DataTable
-          columns={dataTableColumns}
+          columns={preferredColumns}
+          columnVisibility={columnVisibility}
           rows={filteredCustomNetworks}
           noRowsText="No customer networks"
           isFilterApplied={customNetworks.length > 0 && filteredCustomNetworks.length === 0}
           entityName="customer networks"
           HeaderComponent={CustomNetworksTableHeader}
           headerProps={{
+            columnPreference,
             count: filteredCustomNetworks.length,
             filterableCustomNetworks: customNetworks,
             setFilteredCustomNetworks,

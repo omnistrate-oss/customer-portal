@@ -3,6 +3,11 @@ import { CircularProgress, Stack } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import useAccountConfig from "app/(dashboard)/cloud-accounts/hooks/useAccountConfig";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataTable from "src/components/DataTable/DataTable";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
@@ -30,9 +35,15 @@ type NebiusBindingsTableHeaderProps = {
   count: number;
   refetch: () => void;
   isFetching: boolean;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
-const NebiusBindingsTableHeader: FC<NebiusBindingsTableHeaderProps> = ({ count, refetch, isFetching }) => (
+const NebiusBindingsTableHeader: FC<NebiusBindingsTableHeaderProps> = ({
+  count,
+  refetch,
+  isFetching,
+  columnPreference,
+}) => (
   <div className="flex items-center justify-between gap-4 py-5 px-6 border-b border-[#EAECF0]">
     <DataGridHeaderTitle
       title="Nebius Bindings"
@@ -44,6 +55,7 @@ const NebiusBindingsTableHeader: FC<NebiusBindingsTableHeaderProps> = ({ count, 
     <div className="flex justify-end items-center gap-4 flex-wrap flex-grow">
       <div className="flex items-center">{isFetching && <CircularProgress size={20} />}</div>
       <RefreshWithToolTip refetch={refetch} disabled={isFetching} />
+      <ColumnPreferenceButton {...columnPreference} />
     </div>
   </div>
 );
@@ -113,15 +125,26 @@ const NebiusBindingsTable: FC<NebiusBindingsTableProps> = ({ accountConfigId }) 
     []
   );
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.nebiusBindings,
+    columns,
+  });
+
   return (
     <div data-testid="nebius-bindings-table">
       <DataTable
-        columns={columns}
+        columns={preferredColumns}
+        columnVisibility={columnVisibility}
         rows={bindings}
         noRowsText="No Nebius bindings"
         isLoading={isFetching}
         HeaderComponent={NebiusBindingsTableHeader}
         headerProps={{
+          columnPreference,
           count: bindings.length,
           refetch,
           isFetching,

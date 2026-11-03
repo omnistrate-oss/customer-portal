@@ -10,6 +10,8 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 import { $api } from "src/api/query";
 import { copyResourceInstanceSnapshot, postInstanceRestoreAccess } from "src/api/resourceInstance";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useGridColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataGrid, { selectSingleItem } from "src/components/DataGrid/DataGrid";
 import { DateRange, initialRangeState } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import InformationDialogTopCenter from "src/components/Dialog/InformationDialogTopCenter";
@@ -374,7 +376,7 @@ const Backup: FC<{
         headerName: "Encryption Status",
         flex: 0.7,
         valueGetter: (params: { row: SnapshotBase }) => (params.row.encrypted ? "ENCRYPTED" : "NOT_ENCRYPTED"),
-        renderCell: (params: { row: SnapshotBase; value: "ENCRYPTED" | "NOT_ENCRYPTED" }) => {
+        renderCell: (params: { row: SnapshotBase; value?: "ENCRYPTED" | "NOT_ENCRYPTED" }) => {
           return <StatusChip status={params.value} />;
         },
         minWidth: 150,
@@ -382,6 +384,18 @@ const Backup: FC<{
     ],
     []
   );
+
+  const {
+    columns: preferredColumns,
+    columnVisibilityModel,
+    columnPreference,
+  } = useGridColumnPreference({
+    tableId:
+      tab === "snapshots"
+        ? COLUMN_PREFERENCE_TABLE_IDS.instanceDetailsSnapshots
+        : COLUMN_PREFERENCE_TABLE_IDS.instanceBackups,
+    columns,
+  });
 
   return (
     <>
@@ -398,13 +412,15 @@ const Backup: FC<{
           checkboxSelection
           getRowId={(row: SnapshotBase) => row.snapshotId}
           disableSelectionOnClick
-          columns={columns}
+          columns={preferredColumns}
+          columnVisibilityModel={columnVisibilityModel}
           rows={filteredsnapshots}
           components={{
             Header: BackupsTableHeader,
           }}
           componentsProps={{
             header: {
+              columnPreference,
               count: filteredsnapshots?.length,
               refetch,
               isRefetching,

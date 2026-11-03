@@ -1,5 +1,6 @@
 "use client";
 
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 
@@ -37,6 +38,7 @@ const DashboardPage = () => {
 
       <div className="mt-8">
         <EventsTable
+          tableId={COLUMN_PREFERENCE_TABLE_IDS.dashboardAuditLogs}
           HeaderComponent={DashboardLogsTableHeader}
           HeaderProps={{}}
           columns={[

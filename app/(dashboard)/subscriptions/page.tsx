@@ -7,6 +7,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useSelector } from "react-redux";
 
 import { deleteSubscription } from "src/api/subscriptions";
+import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
+import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -166,6 +168,16 @@ const SubscriptionsPage = () => {
     ];
   }, []);
 
+  const {
+    columns: preferredColumns,
+    columnVisibility,
+    columnPreference,
+  } = useTableColumnPreference({
+    tableId: COLUMN_PREFERENCE_TABLE_IDS.subscriptions,
+    columns: dataTableColumns,
+    primaryColumnId: "id",
+  });
+
   const selectedSubscription = useMemo(() => {
     return subscriptions.find((subscription) => subscription.id === selectedRows[0]);
   }, [selectedRows, subscriptions]);
@@ -206,13 +218,15 @@ const SubscriptionsPage = () => {
 
         <div>
           <DataTable
-            columns={dataTableColumns}
+            columns={preferredColumns}
+            columnVisibility={columnVisibility}
             rows={filteredSubscriptions}
             noRowsText="No subscriptions"
             isFilterApplied={existingSubscriptions.length > 0 && filteredSubscriptions.length === 0}
             entityName="subscriptions"
             HeaderComponent={SubscriptionsTableHeader}
             headerProps={{
+              columnPreference,
               selectedRows,
               subscriptions: existingSubscriptions,
               setFilteredSubscriptions,

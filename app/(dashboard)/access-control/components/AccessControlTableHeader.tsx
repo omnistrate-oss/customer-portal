@@ -1,5 +1,8 @@
 import { FC } from "react";
 
+import ColumnPreferenceButton, {
+  ColumnPreferenceButtonProps,
+} from "src/components/ColumnPreference/ColumnPreferenceButton";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
 import { SetState } from "src/types/common/reactGenerics";
@@ -17,6 +20,7 @@ type AccessControlTableHeaderProps = {
   refetchUsers: () => void;
   isFetchingUsers: boolean;
   count: number;
+  columnPreference: ColumnPreferenceButtonProps;
 };
 
 const AccessControlTableHeader: FC<AccessControlTableHeaderProps> = ({
@@ -28,6 +32,7 @@ const AccessControlTableHeader: FC<AccessControlTableHeaderProps> = ({
   refetchUsers,
   isFetchingUsers,
   count,
+  columnPreference,
 }) => {
   return (
     <>
@@ -44,6 +49,7 @@ const AccessControlTableHeader: FC<AccessControlTableHeaderProps> = ({
 
         <div className="flex items-center gap-4 flex-shrink-0">
           <RefreshWithToolTip refetch={refetchUsers} disabled={isFetchingUsers} />
+          <ColumnPreferenceButton {...columnPreference} />
         </div>
       </div>
       <div className="px-6 py-4 border-b border-gray-200">

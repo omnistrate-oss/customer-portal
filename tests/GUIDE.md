@@ -100,6 +100,58 @@ yarn check:playwright-discovery
 
 > **Important:** Locally, the `webServer` in `playwright.config.ts` runs `yarn dev:test` (`node server.js`), not `yarn dev`. `yarn dev` uses `nodemon`, which restarts the server when `playwright-report/` and `test-results/` are written. In CI there is no `webServer`: the workflow builds the app, starts it on port 8080 and sets `YOUR_SAAS_DOMAIN_URL`.
 
+### Controlled authentication regression tests
+
+```bash
+yarn test:replay tests/auth/auth-validation.spec.ts --project=auth-tests
+```
+
+The existing `auth-tests` project discovers this spec without changes to `playwright.config.ts` or the GitHub workflows. The command above selects the spec but still runs the normal global setup, teardown, and local portal-server configuration. Use the usual test credentials and backend prerequisites; global teardown can delete test infrastructure.
+
+A worker-local harness runs the actual Pages API handlers through Next.js's API resolver against a synthetic HTTP backend. Browser tests bundle the existing Axios interceptor and exercise the real refresh and logout handlers. The harness does not cover Next.js's page proxy or a complete dashboard page.
+
+The suite always uses live local requests, including in replay mode: replaying recorded error responses would bypass the server authentication logic being tested. Backend request tracking stores only token-identity booleans, never token values. Synthetic JWT signatures, expiry and revocation are checked by the test backend; these tests establish the portal's response to backend rejection, not the deployed backend's authentication correctness. Changes to this suite do not require backend HAR recordings.
+
+`auth-validation-lifecycle.spec.ts` separately checks child-process cleanup, parent disconnection (including parent `SIGKILL` and startup races), open requests, bounded force-kill fallback, and listener cleanup. The server stops itself when its parent's IPC channel disconnects; fixture teardown allows five seconds for `SIGTERM`, then one second to confirm `SIGKILL` termination.
+
+The four lifecycle cases run in the existing Ubuntu GitHub job through `yarn test:replay`. They signal only processes created by the tests, use ephemeral localhost ports, and need no real backend credentials or HAR files. Local verification with `CI=true` and the workflow's replay/environment settings passed; this is not a claim that the hosted GitHub job itself was executed. Windows signal behavior is outside this coverage.
+
+#### Isolated local run without changing repository configuration
+
+To run this spec without real credentials, global infrastructure provisioning/teardown, or the normal portal server, create a disposable configuration **outside the repository**. Run the following from the repository root in the same shell:
+
+```bash
+local_config="${TMPDIR:-/tmp}/customer-portal-auth-validation.local.config.cjs"
+cat > "$local_config" <<'CONFIG'
+const path = require("node:path");
+const root = process.cwd();
+const base = require(path.join(root, "playwright.config.ts")).default;
+const authProject = base.projects.find((project) => project.name === "auth-tests");
+
+module.exports = {
+  ...base,
+  globalSetup: undefined,
+  globalTeardown: undefined,
+  webServer: undefined,
+  testDir: path.join(root, "tests"),
+  tsconfig: path.join(root, "tsconfig.json"),
+  outputDir: path.join(root, "test-results"),
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: path.join(root, "playwright-report"), open: "never" }],
+  ],
+  projects: [{
+    ...authProject,
+    testDir: path.join(root, "tests/auth"),
+    testMatch: "auth-validation*.spec.ts",
+  }],
+};
+CONFIG
+yarn test:replay --config="$local_config"
+```
+
+This wrapper imports the existing configuration, selects the controlled and lifecycle specs, and disables only the global setup/teardown hooks and portal server that they do not need. Absolute paths keep discovery, TypeScript aliases, and reports rooted in the repository rather than the temporary directory. Add `--grep "equal organization IDs"`, `--grep "Provider API browser refresh"`, or `--grep "Authentication harness lifecycle"` for focused runs. The temporary file is local-only; do not commit it. You can delete it after testing. The existing CI configuration and full-suite command remain unchanged.
+
 ## HAR Record and Replay
 
 ### Always import from the HAR fixture
