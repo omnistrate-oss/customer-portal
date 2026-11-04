@@ -1469,3 +1469,156 @@ test("still redacts tokens, text assignments, Bearer literals and connection pas
   assert.deepEqual(security.inspectFixture(clean), []);
   assert.deepEqual(security.sanitizeFixture(clean), clean);
 });
+
+for (const alias of [
+  "gcpServiceAccountKey",
+  "apiKeyValue",
+  "authorizationCode",
+  "integrationKey",
+  "privateModuleGitAccessTokens",
+  "billingCredentials",
+])
+  test(`redacts schema credential alias ${alias} in bodies, nested objects and queries`, () => {
+    for (const value of [opaque, Buffer.from(opaque).toString("base64")]) {
+      const fixture = { [alias]: value, nested: { [alias]: value } };
+      const expected = { [alias]: marker, nested: { [alias]: marker } };
+      assert.equal(security.inspectFixture(fixture).length, 2);
+      assert.deepEqual(security.sanitizeFixture(fixture), expected);
+      const input = har();
+      entry(input).request.url = `https://example.test/items?${alias}=${encodeURIComponent(value)}`;
+      entry(input).request.queryString = [{ name: alias, value }];
+      entry(input).request.postData.text = JSON.stringify(fixture);
+      entry(input).response.content.text = JSON.stringify(fixture);
+      assert.ok(security.inspectHar(input).length >= 6);
+      const clean = security.sanitizeHar(input);
+      assert.deepEqual(JSON.parse(entry(clean).request.postData.text), expected);
+      assert.deepEqual(JSON.parse(entry(clean).response.content.text), expected);
+      assert.equal(new URL(entry(clean).request.url).searchParams.get(alias), marker);
+      assert.deepEqual(security.inspectHar(clean), []);
+    }
+  });
+
+test("redacts every schema credential dictionary value, retaining dictionary keys", () => {
+  for (const alias of ["privateModuleGitAccessTokens", "billingCredentials"]) {
+    const input = { [alias]: { module: opaque, name: opaque, path: opaque, nested: { id: opaque } } };
+    const expected = { [alias]: { module: marker, name: marker, path: marker, nested: { id: marker } } };
+    assert.equal(security.inspectFixture(input).length, 4);
+    assert.deepEqual(security.sanitizeFixture(input), expected);
+    assert.deepEqual(security.inspectFixture(expected), []);
+  }
+});
+
+const yamlScalars = [
+  ["spaces", `${opaque} two words here`, marker],
+  ["hash within scalar", `${opaque}#suffix`, marker],
+  ["comment after whitespace", `${opaque} words # public comment`, `${marker} # public comment`],
+  ["anchor", `&a ${opaque}`, marker],
+  ["tag", `!!str ${opaque}`, marker],
+  ["tag and anchor", `!<tag:yaml.org,2002:str> &a ${opaque}`, marker],
+  ["double quoted multiline", `"${opaque}\n    second private line"`, `"${marker}"`],
+  ["single quoted multiline", `'${opaque}\n    second private line'`, `'${marker}'`],
+  ["doubled single quote", `'${opaque} it''s private'`, `'${marker}'`],
+  ["plain continuation", `${opaque}\n      second private line`, marker],
+  ["plain continuation with blank lines", `${opaque}\n\n      second private line`, marker],
+  ["anchored block", `&a !!str |\n      ${opaque}\n      second private line`, marker],
+];
+for (const [label, scalar, replacement] of yamlScalars)
+  test(`redacts complete YAML credential scalars (${label}) in fields and env mappings`, () => {
+    for (const prefix of ["password: ", "token: ", "- name: DB_PASSWORD\n  value: "]) {
+      const text = prefix + scalar + "\nregion: public\ndescription: |\n  public prose";
+      const expected = prefix + replacement + "\nregion: public\ndescription: |\n  public prose";
+      assert.ok(security.inspectFixture(text).length > 0);
+      assert.equal(security.sanitizeFixture(text), expected);
+      assert.deepEqual(security.inspectFixture(expected), []);
+      assert.equal(security.sanitizeFixture(expected), expected);
+      const input = har();
+      entry(input).response.content = { mimeType: "application/yaml", text };
+      const clean = security.sanitizeHar(input);
+      assert.equal(entry(clean).response.content.text, expected);
+      assert.deepEqual(security.inspectHar(clean), []);
+      const encoded = { configFile: { content: Buffer.from(text).toString("base64") } };
+      assert.ok(security.inspectFixture(encoded).length > 0);
+      const encodedClean = security.sanitizeFixture(encoded);
+      assert.equal(Buffer.from(encodedClean.configFile.content, "base64").toString(), expected);
+      assert.deepEqual(security.inspectFixture(encodedClean), []);
+    }
+  });
+
+test("finds YAML env credentials in every mapping field order without crossing items", () => {
+  const orders = [
+    ["name", "value", "description"],
+    ["name", "description", "value"],
+    ["value", "name", "description"],
+    ["value", "description", "name"],
+    ["description", "name", "value"],
+    ["description", "value", "name"],
+  ];
+  for (const nameKey of ["name", "key"])
+    for (const order of orders)
+      for (const [_label, scalar, replacement] of yamlScalars) {
+        const fields = {
+          name: `${nameKey}: DB_PASSWORD`,
+          value: `value: ${scalar}`,
+          description: "description: public",
+        };
+        const item = order.map((key, index) => (index ? "    " : "  - ") + fields[key]).join("\n");
+        const text = `env:\n${item}\n  - value: public\n    name: REGION\nregion: public`;
+        const expected = text.replace(scalar, replacement);
+        assert.ok(security.inspectFixture(text).length > 0);
+        assert.equal(security.sanitizeFixture(text), expected);
+        assert.deepEqual(security.inspectFixture(expected), []);
+        assert.equal(security.sanitizeFixture(expected), expected);
+      }
+  const publicText =
+    "env:\n  - value: public\n    name: REGION\n  - name: DB_PASSWORD\n    valueFrom:\n      secretKeyRef:\n        name: public\n        key: public";
+  assert.equal(security.sanitizeFixture(publicText), publicText);
+  assert.deepEqual(security.inspectFixture(publicText), []);
+});
+
+test("rejects unterminated YAML credential quotes safely", () => {
+  for (const quote of ["'", '"'])
+    for (const prefix of ["password: ", "- value: "]) {
+      const text = `${prefix}${quote}${opaque}\n  name: DB_PASSWORD`;
+      assert.ok(security.inspectFixture(text).length > 0);
+      assert.throws(() => security.sanitizeFixture(text), { name: "HarSecurityError" });
+    }
+});
+
+test("staged parent scan skips a scanned HAR submodule gitlink and checks its index", async (t) => {
+  const root = await temp(t);
+  const corpus = join(root, "corpus");
+  await mkdir(corpus);
+  const git = (cwd, args) => {
+    assert.equal(
+      spawnSync("git", ["-C", cwd, ...args], { encoding: "utf8" }).status,
+      0,
+      "temporary git command failed"
+    );
+  };
+  git(root, ["init", "-q"]);
+  git(corpus, ["init", "-q"]);
+  await writeFile(join(root, ".gitmodules"), '[submodule "corpus"]\n\tpath = corpus\n\turl = ./corpus\n');
+  git(root, ["add", ".gitmodules"]);
+  git(root, ["update-index", "--add", "--cacheinfo", `160000,${"1".repeat(40)},corpus`]);
+  const fixture = join(corpus, "retained.har");
+  const clean = security.sanitizeHar(har());
+  await writeFile(fixture, JSON.stringify(clean));
+  git(corpus, ["add", "retained.har"]);
+  const allowed = run(["--staged", "--require-hars", "--tracked-auth", "corpus"], root);
+  assert.equal(allowed.status, 0, "clean submodule index was rejected");
+  assert.match(allowed.stdout, /HAR files: 1;.*issues: 0/);
+  const dirty = har();
+  entry(dirty).response.content.text = JSON.stringify({ gcpServiceAccountKey: opaque });
+  await writeFile(fixture, JSON.stringify(dirty));
+  git(corpus, ["add", "retained.har"]);
+  await writeFile(fixture, JSON.stringify(clean));
+  const blocked = run(["--staged", "--require-hars", "corpus"], root);
+  assert.equal(blocked.status, 1, "contaminated submodule index was accepted");
+  noSecret(blocked.stdout + blocked.stderr);
+  git(corpus, ["add", "retained.har"]);
+  assert.equal(run(["--staged", "--require-hars", "corpus"], root).status, 0);
+  await rm(join(corpus, ".git"), { recursive: true });
+  const unscanned = run(["--staged", "corpus"], root);
+  assert.equal(unscanned.status, 1, "unscanned gitlink was accepted");
+  assert.match(unscanned.stderr, /unexpected file in HAR corpus/);
+});
