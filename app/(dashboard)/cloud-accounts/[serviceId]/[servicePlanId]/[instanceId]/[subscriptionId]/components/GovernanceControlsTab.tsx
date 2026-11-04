@@ -529,8 +529,8 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                         <Button
                           type="button"
                           variant="outlined"
-                          outlineColor={form.values.connected ? theme.palette.error.main : theme.palette.primary.main}
-                          fontColor={colors.gray700}
+                          outlineColor={form.values.connected ? colors.error300 : theme.palette.primary.main}
+                          fontColor={form.values.connected ? colors.error700 : colors.gray700}
                           disabled={!!fieldDisabledReason}
                           disabledMessage={fieldDisabledReason}
                           aria-describedby={[
