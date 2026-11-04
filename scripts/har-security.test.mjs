@@ -1344,16 +1344,7 @@ test("keeps secret schema descriptors while redacting every named secret diction
   assert.deepEqual(security.inspectFixture(expected), []);
 });
 
-for (const reference of [
-  "$var.dbPassword",
-  "${DB_PASSWORD}",
-  "{{ .Values.password }}",
-  "$(read_password)",
-  "/tmp/x-kubeconfig",
-  "./config",
-  "~/config",
-  "",
-])
+for (const reference of ["$var.dbPassword", "${DB_PASSWORD}", "{{ .Values.password }}", "$(read_password)", ""])
   test(`preserves nonliteral credential assignments (${reference || "empty"})`, () => {
     for (const text of [
       `POSTGRES_PASSWORD: ${reference}\ntype: password`,
@@ -1386,6 +1377,73 @@ test("keeps kubeconfig paths and compose references beside literal credentials",
   assert.deepEqual(security.sanitizeFixture(input), expected);
   assert.deepEqual(security.inspectFixture(expected), []);
 });
+
+test("redacts path-shaped credentials while preserving values of path keys", () => {
+  const input = {
+    env: { name: "DB_PASSWORD", value: "/synthetic-private-password" },
+    credentials: { value: "./synthetic-private-password" },
+    secret: { data: "~/synthetic-private-password" },
+    specContent:
+      "password=/synthetic\ntoken: ./x\nsecret: ~/y\nexport KUBECONFIG=/tmp/x-kubeconfig\nmountPath: /etc/x\nCONFIG_PATH=/opt/app",
+    paths: { KUBECONFIG: "/tmp/x-kubeconfig", mountPath: "/etc/x", CONFIG_PATH: "/opt/app" },
+  };
+  const expected = {
+    ...input,
+    env: { name: "DB_PASSWORD", value: marker },
+    credentials: { value: marker },
+    secret: { data: marker },
+    specContent: `password=${marker}\ntoken: ${marker}\nsecret: ${marker}\nexport KUBECONFIG=/tmp/x-kubeconfig\nmountPath: /etc/x\nCONFIG_PATH=/opt/app`,
+  };
+  assert.equal(security.inspectFixture(input).length, 6);
+  assert.deepEqual(security.sanitizeFixture(input), expected);
+  assert.deepEqual(security.inspectFixture(expected), []);
+  assert.deepEqual(security.sanitizeFixture(expected), expected);
+  for (const text of [
+    "name: DB_PASSWORD\nvalue: /synthetic-private-password",
+    "name: KUBECONFIG\nvalue: /tmp/x-kubeconfig",
+  ]) {
+    const clean = text.replace("/synthetic-private-password", marker);
+    assert.equal(security.sanitizeFixture(text), clean);
+    assert.equal(security.inspectFixture(text).length, text === clean ? 0 : 1);
+    assert.deepEqual(security.inspectFixture(clean), []);
+  }
+});
+
+for (const indicator of ["|", ">", "|-", ">-", "|+", ">+", "|2", "|2-", ">2+", "|-2", ">+2"])
+  test(`redacts whole YAML credential blocks (${indicator}) in text and encoded fields`, () => {
+    for (const field of ["password", "- name: DB_PASSWORD\n  value", '"token"']) {
+      const indent = field.includes("\n") ? "      " : "    ";
+      const text = `config:\n  ${field.replaceAll("\n", "\n  ")}: ${indicator} # credential\n${indent}${opaque}\n\n${indent}  second-private-line\n  description: |\n    public description\n  region: public\n`;
+      const expected = text.replace(
+        `${indicator} # credential\n${indent}${opaque}\n\n${indent}  second-private-line`,
+        `${marker} # credential`
+      );
+      const input = {
+        specContent: text,
+        dockerComposeYAML: text,
+        fileContent: Buffer.from(text).toString("base64"),
+        nested: JSON.stringify({ specContent: text }),
+      };
+      const clean = security.sanitizeFixture(input);
+      assert.ok(security.inspectFixture(input).length >= 4);
+      assert.equal(clean.specContent, expected);
+      assert.equal(clean.dockerComposeYAML, expected);
+      assert.equal(Buffer.from(clean.fileContent, "base64").toString(), expected);
+      assert.deepEqual(JSON.parse(clean.nested), { specContent: expected });
+      assert.deepEqual(security.inspectFixture(clean), []);
+      assert.deepEqual(security.sanitizeFixture(clean), clean);
+      const recording = har();
+      entry(recording).response.content = { mimeType: "text/plain", text };
+      assert.ok(security.inspectHar(recording).length > 0);
+      const cleanHar = security.sanitizeHar(recording);
+      assert.equal(entry(cleanHar).response.content.text, expected);
+      assert.deepEqual(security.inspectHar(cleanHar), []);
+      assert.deepEqual(security.sanitizeHar(cleanHar), cleanHar);
+    }
+    const publicBlock = `description: ${indicator}\n  public text\n\n    more public text\nregion: public`;
+    assert.equal(security.sanitizeFixture(publicBlock), publicBlock);
+    assert.deepEqual(security.inspectFixture(publicBlock), []);
+  });
 
 for (const type of ["string", "password", "secret", "boolean", "number", "integer", "object", "array"])
   test(`keeps credential schema type ${type}`, () => {

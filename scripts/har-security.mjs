@@ -188,7 +188,13 @@ const safeValue = (value) =>
   value === "" ||
   value === REDACTED_NUMBER ||
   (typeof value === "string" && /^(?:om_)?(?:REDACTED_PLAYWRIGHT_HAR|\[REDACTED\])$/.test(value));
-const nonliteralAssignment = (value) => safeValue(value) || /^(?:\$[A-Za-z_{(]|\{\{|\/|\.\/|~\/)/.test(value.trim());
+const pathValue = (value, key) =>
+  typeof value === "string" &&
+  /^(?:\/|\.\/|~\/)/.test(value.trim()) &&
+  (normalizeKey(key) === "kubeconfig" ||
+    (!sensitive(key) && /(?:path$|_(?:file|dir|home)$|^(?:file|dir|home)$)/i.test(key)));
+const nonliteralAssignment = (value, key) =>
+  safeValue(value) || /^(?:\$[A-Za-z_{(]|\{\{)/.test(value.trim()) || pathValue(value, key);
 const fieldPath = (path, key, index) => (safePathKeys.has(key) ? `${path}.${key}` : `${path}[field:${index}]`);
 // Labels may contain opaque credentials: hashing avoids returning attacker-controlled names.
 const fileLabel = (path) => `file[${createHash("sha256").update(String(path)).digest("hex").slice(0, 16)}]`;
@@ -301,6 +307,18 @@ const decodeQuery = (value, path) => {
   }
 };
 
+const yamlBlock = (text, start, indent) => {
+  const indicator = text.slice(start).match(/^[|>](?:[1-9][+-]?|[+-][1-9]?)?[ \t]*(?:#[^\r\n]*)?(?=\r?\n|$)/);
+  if (!indicator) return null;
+  let end = start + indicator[0].length;
+  while (end < text.length) {
+    const next = text.slice(end).match(/^\r?\n([^\r\n]*)/);
+    if (!next || (next[1].trim() && next[1].match(/^[ \t]*/)[0].length <= indent)) break;
+    end += next[0].length;
+  }
+  return { end, comment: indicator[0].slice(indicator[0].search(/[ \t]|$/)) };
+};
+
 const literalScrub = (text, path, issues) => {
   let result = text.replace(/(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{2,}\.[A-Za-z0-9_-]*/g, (literal) => {
     try {
@@ -349,7 +367,7 @@ const literalScrub = (text, path, issues) => {
     const quote = /^["']/.test(credential) ? credential[0] : "";
     const punctuation = quote ? "" : (credential.match(/[).!]+$/)?.[0] ?? "");
     const value = quote ? credential.slice(1, -1) : credential.slice(0, credential.length - punctuation.length);
-    if (nonliteralAssignment(value)) return whole;
+    if (nonliteralAssignment(value, name)) return whole;
     add(issues, path, "credential text field");
     return `${prefix}${field}${quote}${REDACTED}${quote}${punctuation}`;
   };
@@ -360,7 +378,17 @@ const literalScrub = (text, path, issues) => {
   while ((assignment = assignments.exec(result)) !== null) {
     const [field, _quote, name] = assignment;
     if (!sensitive(name) && !credentialHeaders.has(name.toLowerCase())) continue;
-    if (nonliteralAssignment(result.slice(assignments.lastIndex).replace(/^["']/, ""))) continue;
+    if (nonliteralAssignment(result.slice(assignments.lastIndex).replace(/^["']/, ""), name)) continue;
+    const lineStart = result.lastIndexOf("\n", assignment.index - 1) + 1;
+    const indent = result.slice(lineStart).match(/^[ \t]*/)[0].length;
+    const block = field.includes(":") ? yamlBlock(result, assignments.lastIndex, indent) : null;
+    if (block) {
+      add(issues, path, "credential YAML block scalar");
+      scrubbed += result.slice(offset, assignments.lastIndex) + REDACTED + block.comment;
+      offset = block.end;
+      assignments.lastIndex = block.end;
+      continue;
+    }
     const credential = result
       .slice(assignments.lastIndex)
       .match(
@@ -376,15 +404,29 @@ const literalScrub = (text, path, issues) => {
     }
   }
   result = scrubbed + result.slice(offset);
-  result = result.replace(
-    /^([ \t]*(?:-[ \t]+)?(?:name|key)[ \t]*:[ \t]*)(?:"([^"\r\n]+)"|'([^'\r\n]+)'|([A-Za-z][A-Za-z0-9_-]*))([ \t]*(?:#[^\r\n]*)?\r?\n[ \t]*value[ \t]*:[ \t]*)("(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\$\{[^}\r\n]*\}|[^\s,;{}\[\]"'#]+)/gm,
-    (whole, field, doubleQuotedName, singleQuotedName, bareName, separator, credential) => {
-      const name = doubleQuotedName ?? singleQuotedName ?? bareName;
-      const quotedName = doubleQuotedName ? `"${name}"` : singleQuotedName ? `'${name}'` : name;
-      return redactAssignment(whole, "", `${field}${quotedName}${separator}`, name, credential);
+  const namedValues =
+    /^([ \t]*(?:-[ \t]+)?(?:name|key)[ \t]*:[ \t]*)(?:"([^"\r\n]+)"|'([^'\r\n]+)'|([A-Za-z][A-Za-z0-9_-]*))[ \t]*(?:#[^\r\n]*)?\r?\n([ \t]*)value[ \t]*:[ \t]*/gm;
+  scrubbed = "";
+  offset = 0;
+  while ((assignment = namedValues.exec(result)) !== null) {
+    const [field, _prefix, doubleQuotedName, singleQuotedName, bareName, indent] = assignment;
+    const name = doubleQuotedName ?? singleQuotedName ?? bareName;
+    if (!sensitive(name)) continue;
+    const block = yamlBlock(result, namedValues.lastIndex, indent.length);
+    const credential = result
+      .slice(namedValues.lastIndex)
+      .match(/^(?:"(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\$\{[^}\r\n]*\}|[^\s,;{}\[\]"'#]+)/)?.[0];
+    if (!block && credential === undefined) continue;
+    const whole = field + (credential ?? "");
+    const clean = block ? field + REDACTED + block.comment : redactAssignment(whole, "", field, name, credential);
+    if (block || clean !== whole) {
+      if (block) add(issues, path, "credential YAML block scalar");
+      scrubbed += result.slice(offset, assignment.index) + clean;
+      offset = block?.end ?? namedValues.lastIndex + credential.length;
+      namedValues.lastIndex = offset;
     }
-  );
-  return result;
+  }
+  return scrubbed + result.slice(offset);
 };
 const encodedLiteralScrub = (text, path, issues) => {
   const decoded = decodeQuery(text, path);
@@ -421,7 +463,7 @@ const scrubPairs = (text, path, issues, depth, callback = false, strictEncoding 
       if (
         (sensitive(name) || (azure && name.toLowerCase() === "sig") || (callback && name.toLowerCase() === "code")) &&
         !safeValue(value) &&
-        (strictEncoding || !nonliteralAssignment(value))
+        (strictEncoding || !nonliteralAssignment(value, name))
       ) {
         add(issues, itemPath, "sensitive query parameter");
         clean = REDACTED;
@@ -599,7 +641,9 @@ function walk(value, path, issues, depth = 0, context = "") {
         (["content", "data"].includes(normalized) &&
           (fileContext(context) || normalizeKey(context).includes("websocket"))));
     let clean;
-    if (sensitive(key) || namedCredential || material)
+    if (!credentialContext(context) && !namedCredential && pathValue(item, key))
+      clean = scrubText(item, itemPath, issues, depth + 1);
+    else if (sensitive(key) || namedCredential || material)
       clean = redactLeaves(
         item,
         itemPath,
@@ -1032,7 +1076,7 @@ export const scanFixtures = async (paths, options = {}) => {
     for (const planned of writes) {
       const temporary = join(dirname(planned.path), `.${randomUUID()}.tmp`);
       try {
-        await writeFile(temporary, /\.gz$/i.test(planned.path) ? gzipSync(planned.text) : planned.text, {
+        await writeFile(temporary, /\.gz$/i.test(planned.path) ? gzipSync(planned.text, { level: 9 }) : planned.text, {
           flag: "wx",
           mode: planned.mode,
         });
