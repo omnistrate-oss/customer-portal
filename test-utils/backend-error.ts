@@ -84,7 +84,7 @@ export class BackendSetupGuard {
   }
 
   get failureMessage(): string {
-    return this.error?.message ?? "";
+    return this.error ? `[backend] ${this.error.message}` : "";
   }
 }
 
@@ -121,7 +121,7 @@ export async function skipOnBackendError(
           reason: error.message,
         });
       }
-      testFn.skip(true, `Skipping: ${error.message}`);
+      testFn.skip(true, `[backend] ${error.message}`);
     } else {
       throw error;
     }
