@@ -6,15 +6,18 @@ import { Text } from "src/components/Typography/Typography";
 import {
   getAwsCloudFormationCreateStackCommand,
   getAwsCloudFormationDeleteStackCommand,
+  getAwsCloudFormationUpdateStackCommand,
 } from "src/utils/accountConfig/awsCloudFormation";
 
 import CommandBlock from "./CommandBlock";
 
-type InstructionsVariant = "onboarding" | "offboarding";
+type InstructionsVariant = "onboarding" | "reconfiguration" | "offboarding";
 
 export type AwsCloudFormationInstructionsProps = {
-  /** The URL the console instructions point at. The CLI command is derived from this exact URL. */
+  /** Console URL; updates require a verified existing-stack link. */
   cloudFormationUrl?: string | null;
+  /** Full onboarding parameter list for updates; never used as the existing stack identity. */
+  cloudFormationCreateUrl?: string | null;
   variant: InstructionsVariant;
   awsAccountId?: string;
   /** Console-based instructions, rendered unchanged under the Console tab. */
@@ -40,6 +43,7 @@ const BodyText: FC<{ children: ReactNode }> = ({ children }) => (
  */
 const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
   cloudFormationUrl,
+  cloudFormationCreateUrl,
   variant,
   awsAccountId,
   children,
@@ -50,9 +54,11 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
   const [selectedTab, setSelectedTab] = useState<"console" | "cli">("console");
 
   const command =
-    variant === "onboarding"
-      ? getAwsCloudFormationCreateStackCommand(cloudFormationUrl)
-      : getAwsCloudFormationDeleteStackCommand(cloudFormationUrl);
+    variant === "offboarding"
+      ? getAwsCloudFormationDeleteStackCommand(cloudFormationUrl)
+      : variant === "reconfiguration"
+        ? getAwsCloudFormationUpdateStackCommand(cloudFormationUrl, cloudFormationCreateUrl)
+        : getAwsCloudFormationCreateStackCommand(cloudFormationUrl);
 
   if (!command) {
     if (!footer) return <>{children}</>;
@@ -87,15 +93,23 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
               <BodyText>
                 {variant === "onboarding"
                   ? `Run this from a terminal authenticated${accountSuffix}. It creates the same CloudFormation stack as the console flow.`
-                  : `Run this from a terminal authenticated${accountSuffix} to delete the onboarding stack and revoke remaining access.`}
+                  : variant === "reconfiguration"
+                    ? `Run this from a terminal authenticated${accountSuffix} to update the existing CloudFormation stack.`
+                    : `Run this from a terminal authenticated${accountSuffix} to delete the onboarding stack and revoke remaining access.`}
               </BodyText>
             )}
 
             <CommandBlock
-              title={variant === "onboarding" ? "Create stack" : "Delete stack"}
+              title={
+                variant === "onboarding"
+                  ? "Create stack"
+                  : variant === "reconfiguration"
+                    ? "Update stack"
+                    : "Delete stack"
+              }
               command={command}
               dataTestId="aws-cloudformation-cli-command"
-              fixedHeight={variant === "onboarding"}
+              fixedHeight={variant !== "offboarding"}
             />
 
             {variant === "onboarding" && !footer && (

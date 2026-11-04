@@ -19327,7 +19327,28 @@ export interface components {
      *       "statusMessage": "Account is ready"
      *     }
      */
+    AccountConfigSettings: {
+      accountGovernanceControls?: components["schemas"]["AccountGovernanceControls"];
+    };
+    AccountGovernanceControls: {
+      /**
+       * @description Whether dataplane connectivity to the control plane is requested. Defaults to true for requested settings. Disconnect overrides the effective debug and infrastructure permissions without discarding those preferences.
+       * @example true
+       */
+      connected?: boolean;
+      /**
+       * @description Whether Kubernetes debug access is requested. Defaults to false for AWS requested settings; omitted for other cloud providers unless explicitly configured.
+       * @example false
+       */
+      debugAccessEnabled?: boolean;
+      /**
+       * @description Whether the dataplane agent may change cloud infrastructure. Defaults to true for AWS requested settings; omitted for other cloud providers unless explicitly configured.
+       * @example true
+       */
+      infrastructureMutationEnabled?: boolean;
+    };
     DescribeAccountConfigResult: {
+      appliedSettings?: components["schemas"]["AccountConfigSettings"];
       /**
        * @description The AWS account ID
        * @example 123456789012
@@ -19348,6 +19369,11 @@ export interface components {
        * @example https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml
        */
       awsCloudFormationTemplateURL?: string;
+      /**
+       * @description The AWS console URL for updating the existing account setup stack using saved requested settings. Uses the verified stack identity and its actual region. Omitted when the stack identity is unknown or the account does not support this flow.
+       * @example https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update?stackId=arn%3Aaws%3Acloudformation%3Aus-east-1%3A992382367881%3Astack%2FAccountConfigSetup%2F2b1a10e0-6e9f-11f1-9330-0afff85e6be1&param_AccountAction=Connect&param_K8sDebugAccessEnabled=false&param_AgentInfrastructureMutationEnabled=true
+       */
+      awsCloudFormationUpdateURL?: string;
       /**
        * @description The Azure bootstrap shell command
        * @example bash -c "$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)"
@@ -19511,9 +19537,10 @@ export interface components {
        * @example ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
        */
       ociTenancyID?: string;
+      requestedSettings?: components["schemas"]["AccountConfigSettings"];
       /**
-       * @description The status of the account configuration
-       * @example PENDING|VERIFYING|READY|FAILED|DELETING|READY_TO_OFFBOARD
+       * @description The status of the account configuration. BYOA Private settings updates remain PENDING_UPDATE until verification finishes, including while waiting for the customer to apply account setup changes. Successful verification sets READY for connected accounts or DISCONNECTED after access is revoked. CONNECTING and DISCONNECTING are also used by the legacy account access actions.
+       * @example PENDING|PENDING_UPDATE|VERIFYING|READY|CONNECTING|DISCONNECTING|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD
        */
       status: string;
       /**
@@ -63705,6 +63732,7 @@ export interface components {
        *     ]
        */
       nebiusBindings?: components["schemas"]["NebiusAccountBindingInput"][];
+      settings?: components["schemas"]["AccountConfigSettings"];
     };
     /**
      * @example {

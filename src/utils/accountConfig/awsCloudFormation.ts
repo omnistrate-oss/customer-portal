@@ -1,6 +1,6 @@
 /**
  * Derives AWS CLI equivalents of the CloudFormation quick-create URL issued for AWS account
- * onboarding. Everything is read off the URL so the command and the console link cannot drift.
+ * onboarding. Updates use a verified existing-stack URL and preserve omitted deployed parameters.
  */
 
 const QUICK_CREATE_PARAM_PREFIX = "param_";
@@ -19,6 +19,14 @@ export type AwsCloudFormationStackDetails = {
   region?: string;
   stackName: string;
   templateUrl: string;
+  parameters: AwsCloudFormationStackParameter[];
+};
+
+export type AwsCloudFormationUpdateStackDetails = {
+  region?: string;
+  stackId: string;
+  stackName: string;
+  templateUrl?: string;
   parameters: AwsCloudFormationStackParameter[];
 };
 
@@ -124,25 +132,120 @@ const formatStackParameter = ({ key, value }: AwsCloudFormationStackParameter): 
 };
 
 /**
- * Builds the `create-stack` equivalent of the quick-create link. `CAPABILITY_NAMED_IAM` is
+ * Builds stack commands from their URL details. `CAPABILITY_NAMED_IAM` is
  * mandatory: the template creates explicitly named IAM roles, and CloudFormation rejects the call
  * with `InsufficientCapabilities` without it.
  */
-export const getAwsCloudFormationCreateStackCommand = (cloudFormationUrl?: string | null): string | null => {
-  const stack = parseAwsCloudFormationQuickCreateUrl(cloudFormationUrl);
-  if (!stack) return null;
-
+const buildAwsCloudFormationStackCommand = (
+  operation: "create-stack" | "update-stack",
+  stack: Omit<AwsCloudFormationStackDetails, "templateUrl"> & { templateUrl?: string; preservedParameters?: string[] }
+): string => {
+  const parameters = [
+    ...(stack.preservedParameters ?? []).map((key) => `ParameterKey=${key},UsePreviousValue=true`),
+    ...stack.parameters.map(formatStackParameter),
+    ...(operation === "update-stack" ? ["$(printf '%s' \"$previous_stack_parameters\")"] : []),
+  ];
   const flags = [
     ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
     `--stack-name ${quoteShellArg(stack.stackName)}`,
-    `--template-url ${quoteShellArg(stack.templateUrl)}`,
+    stack.templateUrl ? `--template-url ${quoteShellArg(stack.templateUrl)}` : "--use-previous-template",
     "--capabilities CAPABILITY_NAMED_IAM",
-    ...(stack.parameters.length
-      ? [`--parameters ${stack.parameters.map(formatStackParameter).join(" \\\n    ")}`]
-      : []),
+    ...(parameters.length ? [`--parameters ${parameters.join(" \\\n    ")}`] : []),
   ];
 
-  return `aws cloudformation create-stack \\\n  ${flags.join(" \\\n  ")}`;
+  return `aws cloudformation ${operation} \\\n  ${flags.join(" \\\n  ")}`;
+};
+
+export const getAwsCloudFormationCreateStackCommand = (cloudFormationUrl?: string | null): string | null => {
+  const stack = parseAwsCloudFormationQuickCreateUrl(cloudFormationUrl);
+  return stack ? buildAwsCloudFormationStackCommand("create-stack", stack) : null;
+};
+
+/** Reads stack identifiers and parameters from verified existing-stack update links. */
+export const parseAwsCloudFormationUpdateUrl = (
+  cloudFormationUrl?: string | null
+): AwsCloudFormationUpdateStackDetails | null => {
+  if (!cloudFormationUrl) return null;
+
+  try {
+    const url = new URL(cloudFormationUrl);
+    if (url.protocol !== "https:" || !/^(?:[a-z0-9-]+\.)?console\.aws\.amazon\.com$/.test(url.hostname)) return null;
+    if (!url.hash.startsWith("#/stacks/update?")) return null;
+    const params = parseQueryPairs(url.hash.slice(url.hash.indexOf("?") + 1));
+    const stackId = params.get("stackId") ?? "";
+    const stack = stackId.match(
+      /^arn:[a-z0-9-]+:cloudformation:([a-z0-9-]+):\d{12}:stack\/([A-Za-z][A-Za-z0-9-]*)\/[^/]+$/
+    );
+    if (!stackId || (!stack && !/^[A-Za-z][A-Za-z0-9-]*$/.test(stackId))) return null;
+    const region = stack?.[1] || getStackRegion(url.toString().split("#")[0]);
+    if (region && !/^[a-z]{2}(?:-[a-z]+)+-\d+$/.test(region)) return null;
+    const parameters = Array.from(params.entries())
+      .filter(([key]) => key.startsWith(QUICK_CREATE_PARAM_PREFIX))
+      .map(([key, value]) => ({ key: key.slice(QUICK_CREATE_PARAM_PREFIX.length), value }));
+    if (parameters.some(({ key }) => !/^[A-Za-z0-9]+$/.test(key))) return null;
+    const templateUrl = params.get("templateURL");
+    if (templateUrl && new URL(templateUrl).protocol !== "https:") return null;
+    return { region, stackId, stackName: stack?.[2] || stackId, templateUrl, parameters };
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Uses the full onboarding parameters and formatter, with the verified URL as the update target.
+ * Saved parameters override URL values; omitted deployed parameters use their previous values.
+ * Example: verified update + onboarding URL + saved AccountAction=Disconnect → disconnect update.
+ */
+export const getAwsCloudFormationUpdateStackCommand = (
+  cloudFormationUrl?: string | null,
+  cloudFormationCreateUrl?: string | null,
+  savedParameters: AwsCloudFormationStackParameter[] = []
+): string | null => {
+  const verifiedStack = parseAwsCloudFormationUpdateUrl(cloudFormationUrl);
+  if (!verifiedStack) return null;
+  const stack = parseAwsCloudFormationQuickCreateUrl(cloudFormationCreateUrl);
+  if (stack) {
+    try {
+      if (
+        new URL(cloudFormationCreateUrl ?? "").protocol !== "https:" ||
+        new URL(stack.templateUrl).protocol !== "https:"
+      )
+        return null;
+    } catch {
+      return null;
+    }
+  }
+  const supplied = savedParameters.length ? savedParameters : verifiedStack.parameters;
+  const requested = Array.from(new Map(supplied.map(({ key, value }) => [key, value])), ([key, value]) => ({
+    key,
+    value,
+  }));
+  const overriddenKeys = new Set(requested.map(({ key }) => key));
+  const governanceKeys = new Set(["AccountAction", "AgentInfrastructureMutationEnabled", "K8sDebugAccessEnabled"]);
+  const preservedParameters = (stack?.parameters ?? [])
+    .filter(({ key }) => governanceKeys.has(key) && !overriddenKeys.has(key))
+    .map(({ key }) => key);
+  const parameters = [
+    ...(stack?.parameters ?? []).filter(({ key }) => !overriddenKeys.has(key) && !governanceKeys.has(key)),
+    ...requested,
+  ];
+  const parameterKeys = [...preservedParameters, ...parameters.map(({ key }) => key)];
+  if (parameterKeys.some((key) => !/^[A-Za-z][A-Za-z0-9]*$/.test(key))) return null;
+  const query = `Stacks[0].Parameters[?!contains(\`${JSON.stringify(parameterKeys)}\`, ParameterKey)].join(\`""\`, [\`"ParameterKey="\`, ParameterKey, \`",UsePreviousValue=true"\`]) | join(\`" "\`, @)`;
+  const describeFlags = [
+    ...(verifiedStack.region ? [`--region ${quoteShellArg(verifiedStack.region)}`] : []),
+    `--stack-name ${quoteShellArg(verifiedStack.stackId)}`,
+    `--query ${quoteShellArg(query)}`,
+    "--output text",
+  ];
+  const command = buildAwsCloudFormationStackCommand("update-stack", {
+    ...verifiedStack,
+    templateUrl: stack?.templateUrl ?? verifiedStack.templateUrl,
+    stackName: verifiedStack.stackId,
+    parameters,
+    preservedParameters,
+  });
+  return `previous_stack_parameters=$(aws cloudformation describe-stacks \\\n  ${describeFlags.join(" \\\n  ")}) &&\n${command}`;
 };
 
 /**
