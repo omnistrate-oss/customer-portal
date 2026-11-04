@@ -4,6 +4,8 @@ import { CreateResourceInstancePayload, ResourceInstance } from "src/types/resou
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 
+import { sanitizeDiagnostic } from "../scripts/har-security.mjs";
+
 import { GlobalStateManager } from "./global-state-manager";
 import { retryOnRateLimit } from "./retry-on-rate-limit";
 
@@ -67,7 +69,9 @@ export class UserAPIClient {
     );
 
     if (!response.ok()) {
-      throw new Error(`Failed to create resource instance: ${response.status()} ${await response.text()}`);
+      throw new Error(
+        `Failed to create resource instance: ${response.status()} ${sanitizeDiagnostic(await response.text()).slice(0, 300)}`
+      );
     }
 
     const instanceId = (await response.json()).id;
@@ -193,7 +197,9 @@ export class UserAPIClient {
     );
 
     if (!response.ok()) {
-      throw new Error(`Failed to list subscriptions: ${response.status()} ${await response.text()}`);
+      throw new Error(
+        `Failed to list subscriptions: ${response.status()} ${sanitizeDiagnostic(await response.text()).slice(0, 300)}`
+      );
     }
 
     return (await response.json()).subscriptions || [];
@@ -206,7 +212,9 @@ export class UserAPIClient {
     });
 
     if (!response.ok()) {
-      throw new Error(`Failed to create subscription: ${response.status()} ${await response.text()}`);
+      throw new Error(
+        `Failed to create subscription: ${response.status()} ${sanitizeDiagnostic(await response.text()).slice(0, 300)}`
+      );
     }
 
     // The API returns the bare id, either as a JSON string or wrapped in an object
