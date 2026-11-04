@@ -75,6 +75,12 @@ const sensitiveKeys = new Set([
   "xamzsecuritytoken",
   "xgoogsignature",
   "xgoogcredential",
+  "gcpserviceaccountkey",
+  "apikeyvalue",
+  "authorizationcode",
+  "integrationkey",
+  "privatemodulegitaccesstokens",
+  "billingcredentials",
 ]);
 const credentialHeaders = new Set([
   "authorization",
@@ -164,6 +170,7 @@ const credentialContainers = new Set([
   "auth",
   "authentication",
 ]);
+const credentialDictionaries = new Set(["secrets", "privatemodulegitaccesstokens", "billingcredentials"]);
 const sensitive = (key) =>
   sensitiveKeys.has(normalizeKey(key)) ||
   /(?:password|passwordhash|hashedpassword|passwd|clientsecret|secretkey|signingsecret|apikey|apitoken|accesstoken|refreshtoken|authtoken|jwttoken|privatekey|handofftoken)$/.test(
@@ -319,6 +326,121 @@ const yamlBlock = (text, start, indent) => {
   return { end, comment: indicator[0].slice(indicator[0].search(/[ \t]|$/)) };
 };
 
+// Read the entire scalar before deciding whether it is a literal credential.
+const yamlScalar = (text, start, indent) => {
+  let cursor = start;
+  let property;
+  while ((property = text.slice(cursor).match(/^(?:&[^\s,[\]{}]+|!<[^>\r\n]*>|![^\s,[\]{}]*)[ \t]+/)))
+    cursor += property[0].length;
+  const block = yamlBlock(text, cursor, indent);
+  if (block) return { ...block, value: text.slice(cursor, block.end), quote: "", block: true, valid: true };
+  const quote = /^["']/.test(text[cursor] ?? "") ? text[cursor] : "";
+  if (quote) {
+    const valueStart = ++cursor;
+    let closed = false;
+    while (cursor < text.length) {
+      if (quote === '"' && text[cursor] === "\\") cursor += 2;
+      else if (text[cursor] === quote) {
+        if (quote === "'" && text[cursor + 1] === "'") cursor += 2;
+        else {
+          closed = true;
+          break;
+        }
+      } else cursor++;
+    }
+    const value = text.slice(valueStart, cursor);
+    const end = closed ? cursor + 1 : text.length;
+    const tail = text.slice(end).match(/^[^\r\n]*/)[0];
+    return { end, value, quote, comment: "", block: false, valid: closed && /^[ \t]*(?:#.*)?$/.test(tail) };
+  }
+  let end = cursor + text.slice(cursor).match(/^[^\r\n]*/)[0].length;
+  const line = text.slice(cursor, end);
+  const comment = line.search(/(?:^|[ \t]+)#/);
+  if (comment !== -1) end = cursor + comment;
+  else {
+    while (end < text.length) {
+      let nextStart = end;
+      let next = text.slice(nextStart).match(/^\r?\n([^\r\n]*)/);
+      while (next && !next[1].trim()) {
+        nextStart += next[0].length;
+        next = text.slice(nextStart).match(/^\r?\n([^\r\n]*)/);
+      }
+      if (
+        !next ||
+        !next[1].trim() ||
+        next[1].match(/^[ \t]*/)[0].length <= indent ||
+        /^[ \t]*(?:-[ \t]+)?["']?[A-Za-z][A-Za-z0-9_-]*["']?[ \t]*:/.test(next[1])
+      )
+        break;
+      end = nextStart + next[0].length;
+    }
+  }
+  const value = text.slice(cursor, end).trimEnd();
+  return { end: cursor + value.length, value, quote: "", comment: "", block: false, valid: true };
+};
+
+const scrubYaml = (text, path, issues) => {
+  const fields = /^([ \t]*)(-[ \t]+)?(["']?)([A-Za-z][A-Za-z0-9_-]*)\3[ \t]*:[ \t]*/gm;
+  const groups = new Map();
+  const replacements = new Map();
+  const redact = (field, name) => {
+    const { scalar } = field;
+    if (!scalar.valid) fail(path, "unsupported YAML credential scalar");
+    if (nonliteralAssignment(scalar.value, name)) return;
+    add(issues, path, scalar.block ? "credential YAML block scalar" : "credential text field");
+    replacements.set(field.start, {
+      end: scalar.end,
+      text: scalar.quote + REDACTED + scalar.quote + scalar.comment,
+    });
+  };
+  const finish = (group) => {
+    const name = group.find((field) => ["name", "key"].includes(field.key) && sensitive(field.scalar.value));
+    if (name) for (const field of group) if (field.key === "value") redact(field, name.scalar.value);
+  };
+  let match;
+  while ((match = fields.exec(text)) !== null) {
+    const [_whole, space, dash = "", _quote, key] = match;
+    const indent = space.length + dash.length;
+    const scalar = yamlScalar(text, fields.lastIndex, indent);
+    const field = { key, start: fields.lastIndex, scalar };
+    fields.lastIndex = scalar.end;
+    if (sensitive(key) || credentialHeaders.has(key.toLowerCase())) redact(field, key);
+    else if (key === "value" && !scalar.valid) fail(path, "unsupported YAML credential scalar");
+    for (const [depth, group] of groups)
+      if (depth > indent || (dash && depth >= indent)) {
+        finish(group);
+        groups.delete(depth);
+      }
+    let depth = indent;
+    // Retain the previously supported adjacent, indented name/value form.
+    if (key === "value" && !dash && !groups.has(depth))
+      for (const [parentDepth, group] of groups) {
+        const last = group.at(-1);
+        if (
+          parentDepth < depth &&
+          ["name", "key"].includes(last.key) &&
+          /^\s*$/.test(text.slice(last.scalar.end, match.index))
+        )
+          depth = parentDepth;
+      }
+    let group = groups.get(depth) ?? [];
+    if (group.some((item) => item.key === key)) {
+      finish(group);
+      group = [];
+    }
+    group.push(field);
+    groups.set(depth, group);
+  }
+  for (const group of groups.values()) finish(group);
+  let result = "";
+  let offset = 0;
+  for (const [start, replacement] of [...replacements].sort(([left], [right]) => left - right)) {
+    result += text.slice(offset, start) + replacement.text;
+    offset = replacement.end;
+  }
+  return result + text.slice(offset);
+};
+
 const literalScrub = (text, path, issues) => {
   let result = text.replace(/(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{2,}\.[A-Za-z0-9_-]*/g, (literal) => {
     try {
@@ -362,6 +484,7 @@ const literalScrub = (text, path, issues) => {
     add(issues, path, "handoff credential literal");
     return `hoff_${REDACTED}`;
   });
+  result = scrubYaml(result, path, issues);
   const redactAssignment = (whole, prefix, field, name, credential) => {
     if (!sensitive(name) && !credentialHeaders.has(name.toLowerCase())) return whole;
     const quote = /^["']/.test(credential) ? credential[0] : "";
@@ -404,29 +527,7 @@ const literalScrub = (text, path, issues) => {
     }
   }
   result = scrubbed + result.slice(offset);
-  const namedValues =
-    /^([ \t]*(?:-[ \t]+)?(?:name|key)[ \t]*:[ \t]*)(?:"([^"\r\n]+)"|'([^'\r\n]+)'|([A-Za-z][A-Za-z0-9_-]*))[ \t]*(?:#[^\r\n]*)?\r?\n([ \t]*)value[ \t]*:[ \t]*/gm;
-  scrubbed = "";
-  offset = 0;
-  while ((assignment = namedValues.exec(result)) !== null) {
-    const [field, _prefix, doubleQuotedName, singleQuotedName, bareName, indent] = assignment;
-    const name = doubleQuotedName ?? singleQuotedName ?? bareName;
-    if (!sensitive(name)) continue;
-    const block = yamlBlock(result, namedValues.lastIndex, indent.length);
-    const credential = result
-      .slice(namedValues.lastIndex)
-      .match(/^(?:"(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\$\{[^}\r\n]*\}|[^\s,;{}\[\]"'#]+)/)?.[0];
-    if (!block && credential === undefined) continue;
-    const whole = field + (credential ?? "");
-    const clean = block ? field + REDACTED + block.comment : redactAssignment(whole, "", field, name, credential);
-    if (block || clean !== whole) {
-      if (block) add(issues, path, "credential YAML block scalar");
-      scrubbed += result.slice(offset, assignment.index) + clean;
-      offset = block?.end ?? namedValues.lastIndex + credential.length;
-      namedValues.lastIndex = offset;
-    }
-  }
-  return scrubbed + result.slice(offset);
+  return result;
 };
 const encodedLiteralScrub = (text, path, issues) => {
   const decoded = decodeQuery(text, path);
@@ -649,12 +750,12 @@ function walk(value, path, issues, depth = 0, context = "") {
         itemPath,
         issues,
         depth + 1,
-        namedCredential ||
-          (context !== "secretDictionary" &&
-            (credentialValueKeys.has(normalized) || (sensitive(key) && !credentialContainers.has(normalized))))
-          ? "credentialValue"
-          : normalized === "secrets" && secretDictionary(item, context)
-            ? "secretDictionary"
+        credentialDictionaries.has(normalized) && secretDictionary(item, context)
+          ? "secretDictionary"
+          : namedCredential ||
+              (context !== "secretDictionary" &&
+                (credentialValueKeys.has(normalized) || (sensitive(key) && !credentialContainers.has(normalized))))
+            ? "credentialValue"
             : credentialContext(context)
               ? context
               : key
@@ -1209,6 +1310,7 @@ export const scanStagedFixtures = async (paths, options = {}) => {
       const name = row.slice(tab + 1);
       const path = resolve(repo, name);
       if (!roots.some((root) => within(path, root)) || relative(repo, path).split(sep).includes(".git")) continue;
+      if (fields[0] === "160000" && fields[2] === "0" && repos.has(path)) continue;
       const label = `${fileLabel(path)}.index`;
       if (fields[0] === "120000") {
         result.issues.push({ path: label, reason: "symbolic fixture paths are unsupported" });
