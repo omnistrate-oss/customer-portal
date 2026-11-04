@@ -18,7 +18,8 @@ on:
 jobs:
   test:
     name: Playwright Tests - SaaSBuilder
-    if: github.event.pull_request.draft == false
+    # Private HARs and live runtime auth are available only for trusted PRs.
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]')
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +48,9 @@ jobs:
           YARN_ENABLE_SCRIPTS=false yarn install --immutable
           yarn rebuild sharp tree-sitter tree-sitter-json @tree-sitter-grammars/tree-sitter-yaml
 
+      - name: Validate HAR corpus and tracked auth
+        run: yarn check:har-secrets --require-hars
+
       - name: Log Installed Dependency Versions
         run: |
           echo "::group::Installed dependency versions"
@@ -55,6 +59,9 @@ jobs:
 
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
+
+      - name: Recorder security integration tests
+        run: yarn test:har-recorder
 
       - name: Build and start saasbuilder server
         run: |
@@ -107,7 +114,12 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/index.html
+            playwright-report/data/*.png
+            !**/*auth*/**
+            !**/*storage-state*
+            !**/global-state.json
           retention-days: 7
 
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -116,3 +128,13 @@ jobs:
           name: backend-failures
           path: tests/backend-failures.json
           retention-days: 7
+
+  replay-skipped:
+    name: Replay unavailable (fork or Dependabot)
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && (github.event.pull_request.head.repo.full_name != github.repository || github.event.pull_request.user.login == 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain unavailable replay validation
+        run: |
+          echo "::warning::Replay did not run: private HAR access and live authentication secrets are unavailable for fork and Dependabot PRs. Verify still runs security tests."
+          echo "Replay validation was skipped because this PR cannot use Actions secrets. A maintainer must run replay in a trusted context." >> "$GITHUB_STEP_SUMMARY"

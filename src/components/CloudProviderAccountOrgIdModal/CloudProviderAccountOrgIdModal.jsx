@@ -176,7 +176,7 @@ const ExistingLoadBalancerPolicyNotice = () => (
 );
 
 /** Renders the ready-state AWS reconfiguration instructions from the Cloud Accounts design. */
-const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => {
+const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl, cloudFormationCreateUrl }) => {
   return (
     <Stack gap="20px">
       <Box>
@@ -199,6 +199,7 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
 
         <AwsCloudFormationInstructions
           cloudFormationUrl={cloudFormationUrl}
+          cloudFormationCreateUrl={cloudFormationCreateUrl}
           variant="reconfiguration"
           awsAccountId={awsAccountId}
           contentSpacing="12px"
@@ -615,6 +616,7 @@ const NonCreationTimeInstructions = (props) => {
       <AwsReconfigurationInstructions
         awsAccountId={accountInstructionDetails.awsAccountID}
         cloudFormationUrl={cloudFormationUpdateUrl}
+        cloudFormationCreateUrl={cloudFormationTemplateUrl}
       />
     );
   }

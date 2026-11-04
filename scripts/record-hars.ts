@@ -93,13 +93,13 @@ Examples:
 `);
 };
 
-interface Options {
+type Options = {
   modules: string[];
   files: string[];
   all: boolean;
   skipPush: boolean;
   interactive: boolean;
-}
+};
 
 const parseArgs = (): Options => {
   const args = process.argv.slice(2);
@@ -362,6 +362,25 @@ const main = async () => {
   }
   process.chdir(repoRoot);
 
+  // Check retained recordings too, including when the caller requested --skip-push.
+  const checkHarCorpus = (staged = false) => {
+    execFileSync(
+      process.execPath,
+      [
+        path.join(repoRoot, "scripts/check-har-secrets.mjs"),
+        "--require-hars",
+        "--tracked-auth",
+        ...(staged ? ["--staged"] : []),
+        path.join(repoRoot, HAR_SUBMODULE),
+      ],
+      {
+        cwd: staged ? path.join(repoRoot, HAR_SUBMODULE) : repoRoot,
+        stdio: "inherit",
+      }
+    );
+  };
+  checkHarCorpus();
+
   // ─── 3. Run tests in record mode ───
   heading("Running Playwright tests in record mode");
 
@@ -370,10 +389,14 @@ const main = async () => {
   // execFileSync (not execSync) — pwArgs include resolved spec paths that may
   // contain spaces or shell metacharacters. Avoid the shell entirely.
   console.log(`> HAR_MODE=record yarn playwright test ${pwArgs.join(" ")}\n`);
-  execFileSync("yarn", ["playwright", "test", ...pwArgs], {
-    stdio: "inherit",
-    env: { ...process.env, HAR_MODE: "record" },
-  });
+  try {
+    execFileSync("yarn", ["playwright", "test", ...pwArgs], {
+      stdio: "inherit",
+      env: { ...process.env, HAR_MODE: "record" },
+    });
+  } finally {
+    checkHarCorpus();
+  }
 
   console.log("\nTests passed.");
 
@@ -408,6 +431,7 @@ const main = async () => {
 
   const date = new Date().toISOString().slice(0, 10);
   run("git --no-pager diff --staged --stat");
+  checkHarCorpus(true);
   git(["commit", "-m", `chore: update HAR files (${date})`]);
   // The submodule is often on a detached HEAD (step 2 only checks out master when behind), so push the commit itself.
   git(["--no-pager", "push", "origin", "HEAD:master"]);

@@ -1,5 +1,6 @@
-import { test, expect } from "test-fixtures/har-test";
 import { InstancesPage } from "page-objects/instances-page";
+import { readRecordedServiceOffering } from "test-fixtures/har-replay";
+import { expect, test } from "test-fixtures/har-test";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 
@@ -15,14 +16,19 @@ test.describe("Instances Page - Helm Instance Tests", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Create a Helm Instance", async ({ page }) => {
+  test("Create a Helm Instance", async ({ page, harMode, harFilePath }) => {
     const dataTestIds = instancesPage.dataTestIds;
 
     await page.getByTestId("create-button").click();
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
 
-    const date = GlobalStateManager.getDate();
-    await page.getByRole("option", { name: `SaaSBuilder Redis Helm - ${date}` }).click();
+    const recordedOffering =
+      harMode === "replay" ? readRecordedServiceOffering(harFilePath, "SaaSBuilder Redis Helm - ") : undefined;
+    if (recordedOffering) {
+      await page.locator(`[role="option"][data-value="${recordedOffering.serviceId}"]`).click();
+    } else {
+      await page.getByRole("option", { name: `SaaSBuilder Redis Helm - ${GlobalStateManager.getDate()}` }).click();
+    }
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
