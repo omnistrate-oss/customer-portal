@@ -543,8 +543,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                             .join(" ")}
                           onClick={() => {
                             if (!fieldDisabledReason) {
-                              setConnectionAction(form.values.connected ? "disconnect" : "connect");
-                              setIsConnectionDialogOpen(true);
+                              if (form.values.connected) {
+                                setConnectionAction("disconnect");
+                                setIsConnectionDialogOpen(true);
+                              } else {
+                                void form.setFieldValue("connected", true);
+                              }
                             }
                           }}
                         >
