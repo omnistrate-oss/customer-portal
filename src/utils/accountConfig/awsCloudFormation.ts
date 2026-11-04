@@ -133,7 +133,7 @@ const formatStackParameter = ({ key, value }: AwsCloudFormationStackParameter): 
   return SHELL_SAFE_VALUE.test(value) ? entry : `'${entry.replace(/'/g, `'\\''`)}'`;
 };
 
-/** Reads stack identifiers and parameters from existing-stack update or quick-create links. */
+/** Reads stack identifiers and parameters from verified existing-stack update links. */
 export const parseAwsCloudFormationUpdateUrl = (
   cloudFormationUrl?: string | null
 ): AwsCloudFormationUpdateStackDetails | null => {
@@ -143,11 +143,10 @@ export const parseAwsCloudFormationUpdateUrl = (
     const url = new URL(cloudFormationUrl);
     if (url.protocol !== "https:" || !/^(?:[a-z0-9-]+\.)?console\.aws\.amazon\.com$/.test(url.hostname)) return null;
     const queryIndex = url.hash.indexOf("?");
-    if (queryIndex < 0 || !["/stacks/update", "/stacks/quickcreate"].includes(url.hash.slice(1, queryIndex)))
-      return null;
+    if (queryIndex < 0 || url.hash.slice(1, queryIndex) !== "/stacks/update") return null;
 
     const values = parseQueryPairs(url.hash.slice(queryIndex + 1));
-    const stackId = values.get("stackId") || values.get("stackName");
+    const stackId = values.get("stackId");
     const stack = stackId?.match(
       /^arn:[a-z0-9-]+:cloudformation:([a-z0-9-]+):\d{12}:stack\/([A-Za-z][A-Za-z0-9-]*)\/[^/]+$/
     );

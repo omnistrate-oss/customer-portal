@@ -37,7 +37,7 @@ const validationSchema = Yup.object({
   infrastructureMutationEnabled: Yup.boolean().required(),
 });
 
-const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canUpdate, cloudFormationUrl }) => {
+const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canUpdate }) => {
   const theme = useTheme();
   const id = useId();
   const snackbar = useSnackbar();
@@ -85,9 +85,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     effectiveFields.every((field) => applied?.[field] === initialValues[field]);
   const canEditAgentPermissions =
     applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected);
-  const updateURL = [account.awsCloudFormationUpdateURL, cloudFormationUrl]
-    .map((url) => getSafeExternalURL(url))
-    .find((url) => !!parseAwsCloudFormationUpdateUrl(url));
+  const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
   const stack = parseAwsCloudFormationUpdateUrl(updateURL);
   const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, initialValues);
   const cloudShellURL = stack ? getSafeExternalURL(`https://console.aws.amazon.com/cloudshell/home`) : "";

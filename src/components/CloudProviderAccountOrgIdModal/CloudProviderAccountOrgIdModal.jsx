@@ -9,6 +9,7 @@ import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
+import { parseAwsCloudFormationUpdateUrl } from "src/utils/accountConfig/awsCloudFormation";
 import {
   // ACCOUNT_CREATION_METHODS,
   getAccountConfigStatusBasedHeader,
@@ -214,7 +215,7 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
         >
           <Stack gap="28px">
             <Text size="small" weight="regular" color="#344054">
-              To reconfigure it, please create your CloudFormation Stack for AWS account{" "}
+              To reconfigure it, please update your existing CloudFormation stack for AWS account{" "}
               <Box component="span" sx={{ fontWeight: 600 }}>
                 {awsAccountId}
               </Box>{" "}
@@ -576,6 +577,7 @@ const NonCreationTimeInstructions = (props) => {
     cloudformationlink,
     cloudFormationGuide,
     cloudFormationTemplateUrl,
+    cloudFormationUpdateUrl,
     gcpBootstrapShellCommand,
     gcpCloudShellLink,
     gcpShellScriptGuide,
@@ -606,10 +608,13 @@ const NonCreationTimeInstructions = (props) => {
   }
 
   if (isAwsReconfiguration) {
+    if (!cloudFormationUpdateUrl) {
+      return <BodyText>The AWS update instructions are not available yet. Please try again later.</BodyText>;
+    }
     return (
       <AwsReconfigurationInstructions
         awsAccountId={accountInstructionDetails.awsAccountID}
-        cloudFormationUrl={cloudFormationTemplateUrl}
+        cloudFormationUrl={cloudFormationUpdateUrl}
       />
     );
   }
@@ -826,6 +831,7 @@ function CloudProviderAccountOrgIdModal(props) {
     isAccountCreation,
     cloudFormationTemplateUrl,
     isAccessPage = false,
+    cloudFormationUpdateUrl,
     accountConfigId,
     selectedAccountConfig,
     gcpBootstrapShellCommand,
@@ -847,6 +853,10 @@ function CloudProviderAccountOrgIdModal(props) {
   );
 
   const safeCloudFormationTemplateUrl = getSafeExternalURL(cloudFormationTemplateUrl);
+  const safeCloudFormationUpdateUrl = getSafeExternalURL(cloudFormationUpdateUrl);
+  const verifiedCloudFormationUpdateUrl = parseAwsCloudFormationUpdateUrl(safeCloudFormationUpdateUrl)
+    ? safeCloudFormationUpdateUrl
+    : "";
 
   const cloudformationlink = safeCloudFormationTemplateUrl ? (
     <StyledLink href={safeCloudFormationTemplateUrl} target="_blank" rel="noopener noreferrer">
@@ -908,7 +918,7 @@ function CloudProviderAccountOrgIdModal(props) {
 
   const isAwsReconfiguration =
     ["READY", "RUNNING"].includes(String(selectedAccountConfig?.status ?? "").toUpperCase()) &&
-    Boolean(accountInstructionDetails?.awsAccountID && safeCloudFormationTemplateUrl);
+    Boolean(accountInstructionDetails?.awsAccountID);
 
   return (
     <Dialog disableRestoreFocus open={open} onClose={handleClose} fullWidth>
@@ -974,6 +984,7 @@ function CloudProviderAccountOrgIdModal(props) {
               azureBootstrapShellCommand={azureBootstrapShellCommand}
               ociCloudShellLink={ociCloudShellLink}
               isAwsReconfiguration={isAwsReconfiguration}
+              cloudFormationUpdateUrl={verifiedCloudFormationUpdateUrl}
               // ociShellScriptGuide={ociShellScriptGuide}
             />
           )}
