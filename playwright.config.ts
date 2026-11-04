@@ -36,7 +36,7 @@ export default defineConfig({
     actionTimeout: 30 * 1000,
     baseURL: process.env.YOUR_SAAS_DOMAIN_URL || "http://127.0.0.1:3000",
     trace: isRecordMode() ? "off" : "on-first-retry",
-    screenshot: "only-on-failure",
+    screenshot: isRecordMode() ? "off" : "only-on-failure",
   },
 
   projects: [
