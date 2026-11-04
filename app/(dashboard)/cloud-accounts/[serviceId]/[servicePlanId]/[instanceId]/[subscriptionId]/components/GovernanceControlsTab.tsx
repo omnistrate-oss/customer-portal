@@ -28,8 +28,16 @@ import getSafeExternalURL from "src/utils/getSafeExternalURL";
 
 const fields = ["connected", "debugAccessEnabled", "infrastructureMutationEnabled"] as const;
 type GovernanceValues = Required<AccountGovernanceControls>;
-type GovernanceSettingsFormProps = { account: AccountConfig; canUpdate: boolean; cloudFormationUrl?: string };
-type GovernanceControlsTabProps = { accountConfigId: string; canUpdate: boolean; cloudFormationUrl?: string };
+type GovernanceSettingsFormProps = {
+  account: AccountConfig;
+  canUpdate: boolean;
+  cloudFormationCreateUrl?: string;
+};
+type GovernanceControlsTabProps = {
+  accountConfigId: string;
+  canUpdate: boolean;
+  cloudFormationCreateUrl?: string;
+};
 
 const validationSchema = Yup.object({
   connected: Yup.boolean().required(),
@@ -37,7 +45,7 @@ const validationSchema = Yup.object({
   infrastructureMutationEnabled: Yup.boolean().required(),
 });
 
-const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canUpdate }) => {
+const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canUpdate, cloudFormationCreateUrl }) => {
   const theme = useTheme();
   const id = useId();
   const snackbar = useSnackbar();
@@ -87,8 +95,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected);
   const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
   const stack = parseAwsCloudFormationUpdateUrl(updateURL);
-  const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, initialValues);
-  const cloudShellURL = stack ? getSafeExternalURL(`https://console.aws.amazon.com/cloudshell/home`) : "";
+  const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
+    { key: "AccountAction", value: initialValues.connected ? "Connect" : "Disconnect" },
+    { key: "AgentInfrastructureMutationEnabled", value: String(initialValues.infrastructureMutationEnabled) },
+    { key: "K8sDebugAccessEnabled", value: String(initialValues.debugAccessEnabled) },
+  ]);
+  const cloudShellURL = updateCommand ? "https://console.aws.amazon.com/cloudshell/home" : "";
   const awsDetails = [
     account.awsAccountID ? `AWS account ${account.awsAccountID}` : "",
     stack ? `Stack ${stack.stackName}` : "",
@@ -414,7 +426,11 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
   );
 };
 
-const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId, canUpdate, cloudFormationUrl }) => {
+const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({
+  accountConfigId,
+  canUpdate,
+  cloudFormationCreateUrl,
+}) => {
   const query = $api.useQuery(
     "get",
     "/2022-09-01-00/accountconfig/{id}",
@@ -428,7 +444,11 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId
   return (
     <Box mt="24px">
       {query.data ? (
-        <GovernanceSettingsForm account={query.data} canUpdate={canUpdate} cloudFormationUrl={cloudFormationUrl} />
+        <GovernanceSettingsForm
+          account={query.data}
+          canUpdate={canUpdate}
+          cloudFormationCreateUrl={cloudFormationCreateUrl}
+        />
       ) : (
         <Text weight="regular" color={colors.gray600}>
           Account settings are unavailable. Please try again later.

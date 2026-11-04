@@ -14,8 +14,10 @@ import CommandBlock from "./CommandBlock";
 type InstructionsVariant = "onboarding" | "reconfiguration" | "offboarding";
 
 export type AwsCloudFormationInstructionsProps = {
-  /** The URL the console instructions point at. The CLI command is derived from this exact URL. */
+  /** Console URL; updates require a verified existing-stack link. */
   cloudFormationUrl?: string | null;
+  /** Full onboarding parameter list for updates; never used as the existing stack identity. */
+  cloudFormationCreateUrl?: string | null;
   variant: InstructionsVariant;
   awsAccountId?: string;
   /** Console-based instructions, rendered unchanged under the Console tab. */
@@ -41,6 +43,7 @@ const BodyText: FC<{ children: ReactNode }> = ({ children }) => (
  */
 const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
   cloudFormationUrl,
+  cloudFormationCreateUrl,
   variant,
   awsAccountId,
   children,
@@ -54,7 +57,7 @@ const AwsCloudFormationInstructions: FC<AwsCloudFormationInstructionsProps> = ({
     variant === "offboarding"
       ? getAwsCloudFormationDeleteStackCommand(cloudFormationUrl)
       : variant === "reconfiguration"
-        ? getAwsCloudFormationUpdateStackCommand(cloudFormationUrl)
+        ? getAwsCloudFormationUpdateStackCommand(cloudFormationUrl, cloudFormationCreateUrl)
         : getAwsCloudFormationCreateStackCommand(cloudFormationUrl);
 
   if (!command) {
