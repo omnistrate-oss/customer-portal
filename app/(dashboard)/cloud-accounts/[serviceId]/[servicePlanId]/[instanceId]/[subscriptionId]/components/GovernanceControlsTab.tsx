@@ -54,12 +54,16 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
   const providerPossessive = orgName ? `${orgName}${/s$/i.test(orgName) ? "’" : "’s"}` : "your service provider’s";
   const queryClient = useQueryClient();
   const requested = account.requestedSettings?.accountGovernanceControls;
-  const applied = account.appliedSettings?.accountGovernanceControls;
+  const appliedControls = account.appliedSettings?.accountGovernanceControls;
+  const applied: GovernanceValues = {
+    connected: appliedControls?.connected ?? true,
+    debugAccessEnabled: appliedControls?.debugAccessEnabled ?? false,
+    infrastructureMutationEnabled: appliedControls?.infrastructureMutationEnabled ?? true,
+  };
   const initialValues: GovernanceValues = {
-    connected: requested?.connected ?? applied?.connected ?? true,
-    debugAccessEnabled: requested?.debugAccessEnabled ?? applied?.debugAccessEnabled ?? false,
-    infrastructureMutationEnabled:
-      requested?.infrastructureMutationEnabled ?? applied?.infrastructureMutationEnabled ?? true,
+    connected: requested?.connected ?? applied.connected,
+    debugAccessEnabled: requested?.debugAccessEnabled ?? applied.debugAccessEnabled,
+    infrastructureMutationEnabled: requested?.infrastructureMutationEnabled ?? applied.infrastructureMutationEnabled,
   };
   const update = $api.useMutation("put", "/2022-09-01-00/accountconfig/{id}", {
     onSuccess: async () => {
@@ -83,16 +87,10 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
   });
   const unsaved = fields.filter((field) => form.values[field] !== initialValues[field]).length;
   const effectiveFields = initialValues.connected ? fields : (["connected"] as const);
-  const appliedKnown = effectiveFields.every((field) => typeof applied?.[field] === "boolean");
   const needsApply =
-    effectiveFields.some((field) => typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field]) ||
-    account.status === "PENDING_UPDATE";
+    effectiveFields.some((field) => applied[field] !== initialValues[field]) || account.status === "PENDING_UPDATE";
   const isVerifying =
-    account.status === "PENDING_UPDATE" &&
-    appliedKnown &&
-    effectiveFields.every((field) => applied?.[field] === initialValues[field]);
-  const canEditAgentPermissions =
-    applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected);
+    account.status === "PENDING_UPDATE" && effectiveFields.every((field) => applied[field] === initialValues[field]);
   const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
   const stack = parseAwsCloudFormationUpdateUrl(updateURL);
   const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
@@ -137,21 +135,21 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
       label: `Manage ${providerPossessive} access`,
       description: `Allow ${providerName} to manage your workloads in this AWS account.`,
       warning: `Without access, ${providerName} can’t manage workloads in this account.`,
-      pendingDetail: `Access stays ${applied?.connected ? "enabled" : "disabled"} until you apply this change in AWS.`,
+      pendingDetail: `Access stays ${applied.connected ? "enabled" : "disabled"} until you apply this change in AWS.`,
     },
     {
       field: "debugAccessEnabled" as const,
       label: "Allow support debug access",
       description: `Allow ${providerName} to access your Kubernetes API for support and troubleshooting.`,
       warning: "Disabling support debug access may require you to provide access manually for troubleshooting.",
-      pendingDetail: `Support debug access stays ${applied?.debugAccessEnabled ? "enabled" : "disabled"} until you apply this change in AWS.`,
+      pendingDetail: `Support debug access stays ${applied.debugAccessEnabled ? "enabled" : "disabled"} until you apply this change in AWS.`,
     },
     {
       field: "infrastructureMutationEnabled" as const,
       label: "Allow AWS infrastructure changes",
       description: `Allow ${providerName} to create, update, and delete AWS resources for your workloads.`,
       warning: `${providerName} can’t complete workload operations that require AWS changes while this is disabled.`,
-      pendingDetail: applied?.infrastructureMutationEnabled
+      pendingDetail: applied.infrastructureMutationEnabled
         ? "The agent can still change AWS resources until you apply this change in AWS."
         : "AWS permissions stay read-only until you apply this change in AWS.",
     },
@@ -241,27 +239,16 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
 
       {sections.map((section) => {
         const field = section.field;
-        const permissionLocked = field !== "connected" && !canEditAgentPermissions;
-        const permissionReason =
-          typeof applied?.connected !== "boolean"
-            ? "Account access has not yet been verified. Please try again later."
-            : form.values.connected
-              ? `Save your request to enable ${providerPossessive} access before changing agent permissions.`
-              : `Agent permissions can’t be changed while ${providerPossessive} access is disabled.`;
-        const fieldDisabledReason = disabledReason || (permissionLocked ? permissionReason : "");
-        const pending = needsApply && typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field];
+        const fieldDisabledReason =
+          disabledReason ||
+          (field !== "connected" && !form.values.connected ? "Connect this account to change its permissions." : "");
+        const pending = needsApply && applied[field] !== initialValues[field];
         const changed = form.values[field] !== initialValues[field];
         const pendingDetail =
           section.pendingDetail + (changed ? " You also have an unsaved change to this setting." : "");
         const warning =
-          !isVerifying &&
-          applied?.[field] === true &&
-          initialValues[field] &&
-          !form.values[field] &&
-          !fieldDisabledReason;
-        const selection = `${changed ? "Unsaved: " : pending ? "Requested: " : ""}${form.values[field] ? "Enabled" : "Disabled"}`;
+          !isVerifying && applied[field] && initialValues[field] && !form.values[field] && !fieldDisabledReason;
         const descriptionId = `${id}-${field}-description`;
-        const selectionId = `${id}-${field}-selection`;
         const pendingId = `${id}-${field}-pending`;
         const warningId = `${id}-${field}-warning`;
         const lockId = `${id}-${field}-lock`;
@@ -347,7 +334,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                       "aria-label": section.label,
                       "aria-describedby": [
                         descriptionId,
-                        selectionId,
                         pending ? pendingId : "",
                         warning ? warningId : "",
                         fieldDisabledReason ? lockId : "",
@@ -369,9 +355,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                   />
                 </Box>
               </Tooltip>
-              <Text id={selectionId} size="xsmall" weight="regular" color={colors.gray600}>
-                {selection}
-              </Text>
             </Stack>
           </Box>
         );
@@ -395,11 +378,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
               stay active until then.
             </Text>
           </Stack>
-          {!appliedKnown && (
-            <Text size="xsmall" weight="regular" color={colors.gray500}>
-              Applied settings have not yet been verified.
-            </Text>
-          )}
         </Stack>
         <Stack direction="row" justifyContent="flex-end" gap="10px" flexShrink={0}>
           <Button

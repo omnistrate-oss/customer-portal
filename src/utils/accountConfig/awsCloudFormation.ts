@@ -143,7 +143,6 @@ const buildAwsCloudFormationStackCommand = (
   const parameters = [
     ...(stack.preservedParameters ?? []).map((key) => `ParameterKey=${key},UsePreviousValue=true`),
     ...stack.parameters.map(formatStackParameter),
-    ...(operation === "update-stack" ? ["$(printf '%s' \"$previous_stack_parameters\")"] : []),
   ];
   const flags = [
     ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
@@ -201,53 +200,35 @@ export const getAwsCloudFormationUpdateStackCommand = (
   cloudFormationCreateUrl?: string | null,
   savedParameters: AwsCloudFormationStackParameter[] = []
 ): string | null => {
-  const verifiedStack = parseAwsCloudFormationUpdateUrl(cloudFormationUrl);
-  if (!verifiedStack) return null;
-  const stack = parseAwsCloudFormationQuickCreateUrl(cloudFormationCreateUrl);
-  if (stack) {
-    try {
-      if (
-        new URL(cloudFormationCreateUrl ?? "").protocol !== "https:" ||
-        new URL(stack.templateUrl).protocol !== "https:"
-      )
-        return null;
-    } catch {
-      return null;
-    }
+  const sourceUrl = cloudFormationCreateUrl ?? cloudFormationUrl;
+  const stack = parseAwsCloudFormationQuickCreateUrl(sourceUrl);
+  if (!stack || !stack.parameters.length) return null;
+  try {
+    if (new URL(sourceUrl ?? "").protocol !== "https:" || new URL(stack.templateUrl).protocol !== "https:") return null;
+  } catch {
+    return null;
   }
-  const supplied = savedParameters.length ? savedParameters : verifiedStack.parameters;
+  const verifiedStack = parseAwsCloudFormationUpdateUrl(cloudFormationUrl);
+  if (verifiedStack && verifiedStack.stackName !== stack.stackName) return null;
+  const supplied = savedParameters.length ? savedParameters : (verifiedStack?.parameters ?? []);
   const requested = Array.from(new Map(supplied.map(({ key, value }) => [key, value])), ([key, value]) => ({
     key,
     value,
   }));
-  const overriddenKeys = new Set(requested.map(({ key }) => key));
-  const governanceKeys = new Set(["AccountAction", "AgentInfrastructureMutationEnabled", "K8sDebugAccessEnabled"]);
-  const preservedParameters = (stack?.parameters ?? [])
-    .filter(({ key }) => governanceKeys.has(key) && !overriddenKeys.has(key))
-    .map(({ key }) => key);
-  const parameters = [
-    ...(stack?.parameters ?? []).filter(({ key }) => !overriddenKeys.has(key) && !governanceKeys.has(key)),
-    ...requested,
-  ];
-  const parameterKeys = [...preservedParameters, ...parameters.map(({ key }) => key)];
-  if (parameterKeys.some((key) => !/^[A-Za-z][A-Za-z0-9]*$/.test(key))) return null;
-  const query = `Stacks[0].Parameters[?!contains(\`${JSON.stringify(parameterKeys)}\`, ParameterKey)].join(\`""\`, [\`"ParameterKey="\`, ParameterKey, \`",UsePreviousValue=true"\`]) | join(\`" "\`, @)`;
-  const describeFlags = [
-    ...(verifiedStack.region ? [`--region ${quoteShellArg(verifiedStack.region)}`] : []),
-    `--stack-name ${quoteShellArg(verifiedStack.stackId)}`,
-    `--query ${quoteShellArg(query)}`,
-    "--output text",
-  ];
-  const command = buildAwsCloudFormationStackCommand("update-stack", {
-    ...verifiedStack,
-    templateUrl: stack?.templateUrl ?? verifiedStack.templateUrl,
-    stackName: verifiedStack.stackId,
+  const preservedParameters = supplied.length
+    ? []
+    : ["AccountAction", "AgentInfrastructureMutationEnabled", "K8sDebugAccessEnabled"];
+  const overriddenKeys = new Set([...requested.map(({ key }) => key), ...preservedParameters]);
+  const parameters = [...stack.parameters.filter(({ key }) => !overriddenKeys.has(key)), ...requested];
+  if (parameters.some(({ key }) => !/^[A-Za-z][A-Za-z0-9]*$/.test(key))) return null;
+  return buildAwsCloudFormationStackCommand("update-stack", {
+    ...stack,
+    stackName: verifiedStack?.stackId ?? stack.stackName,
+    region: verifiedStack?.region ?? stack.region,
     parameters,
     preservedParameters,
   });
-  return `previous_stack_parameters=$(aws cloudformation describe-stacks \\\n  ${describeFlags.join(" \\\n  ")}) &&\n${command}`;
 };
-
 /**
  * Builds the `delete-stack` equivalent of the console offboarding step. The stack name is read off
  * the URL, never assumed — onboarding URLs ship with both `AccountConfigSetup` and
