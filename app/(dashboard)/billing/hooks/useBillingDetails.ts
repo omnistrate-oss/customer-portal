@@ -1,25 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { $api } from "src/api/query";
 
-import { getBillingDetails } from "src/api/consumption";
+import { isMarketplaceBillingProvider } from "../../components/BillingProviders/BillingProviderLabel";
 
-function useBillingDetails(isBillingEnabled = false) {
-  const baseURL = typeof window !== "undefined" ? `${window.location.origin}/billing` : "";
+const useBillingDetails = (isBillingEnabled = false) => {
+  const returnUrl = typeof window !== "undefined" ? `${window.location.origin}/billing` : "";
 
-  const query = useQuery({
-    queryKey: ["consumption-billing-details", baseURL],
-    queryFn: async () => {
-      const response = await getBillingDetails({
-        returnUrl: baseURL,
-        supportsCustomPaymentPortal: true,
-      });
-
-      return response.data;
+  return $api.useQuery(
+    "get",
+    "/2022-09-01-00/resource-instance/billing-details",
+    {
+      params: { query: { returnUrl, supportsCustomPaymentPortal: true } },
+      headers: { "x-ignore-global-error": true },
     },
-    enabled: isBillingEnabled,
-    refetchOnWindowFocus: true,
-  });
-
-  return query;
-}
+    {
+      enabled: isBillingEnabled,
+      refetchOnWindowFocus: true,
+      select: (data) =>
+        data.billingProviders?.some(
+          (provider) => provider.type !== "MARKETPLACE" && isMarketplaceBillingProvider(provider.type)
+        )
+          ? { ...data, billingProviders: data.billingProviders.filter((provider) => provider.type !== "MARKETPLACE") }
+          : data,
+    }
+  );
+};
 
 export default useBillingDetails;

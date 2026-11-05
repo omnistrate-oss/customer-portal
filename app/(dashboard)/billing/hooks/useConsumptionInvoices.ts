@@ -5,12 +5,13 @@ import { $api } from "src/api/query";
 
 dayjs.extend(utc);
 
-const useConsumptionInvoices = () => {
+const useConsumptionInvoices = (enabled = false) => {
   const query = $api.useQuery(
     "get",
     "/2022-09-01-00/resource-instance/invoice",
-    {},
+    { headers: { "x-ignore-global-error": true } },
     {
+      enabled,
       select: (data) => {
         const invoices = data.invoices || [];
         const updatedInvoices = invoices.map((invoice) => {

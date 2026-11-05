@@ -7,16 +7,9 @@ const getBillingErrorMessage = (error: unknown) => {
   }
 
   const response = "response" in error ? error.response : undefined;
-  if (!response || typeof response !== "object") {
-    return undefined;
-  }
-
-  const data = "data" in response ? response.data : undefined;
-  if (!data || typeof data !== "object") {
-    return undefined;
-  }
-
-  const message = "message" in data ? data.message : undefined;
+  const data = response && typeof response === "object" && "data" in response ? response.data : undefined;
+  const body = data && typeof data === "object" ? data : error;
+  const message = "message" in body ? body.message : undefined;
   return typeof message === "string" ? message : undefined;
 };
 
@@ -42,7 +35,7 @@ const getBillingDetailsErrorMessage = (error: unknown) => {
     return "You have not been enrolled in a plan with a billing plan. Please contact support for assistance";
   }
 
-  return errorMessage;
+  return DEFAULT_BILLING_DETAILS_ERROR_MESSAGE;
 };
 
 export default getBillingDetailsErrorMessage;
