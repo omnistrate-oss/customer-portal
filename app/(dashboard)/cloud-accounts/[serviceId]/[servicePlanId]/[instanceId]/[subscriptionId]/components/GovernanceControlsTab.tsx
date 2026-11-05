@@ -91,8 +91,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     account.status === "PENDING_UPDATE" &&
     appliedKnown &&
     effectiveFields.every((field) => applied?.[field] === initialValues[field]);
-  const canEditAgentPermissions =
-    applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected);
   const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
   const stack = parseAwsCloudFormationUpdateUrl(updateURL);
   const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
@@ -241,14 +239,9 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
 
       {sections.map((section) => {
         const field = section.field;
-        const permissionLocked = field !== "connected" && !canEditAgentPermissions;
-        const permissionReason =
-          typeof applied?.connected !== "boolean"
-            ? "Account access has not yet been verified. Please try again later."
-            : form.values.connected
-              ? `Save your request to enable ${providerPossessive} access before changing agent permissions.`
-              : `Agent permissions can’t be changed while ${providerPossessive} access is disabled.`;
-        const fieldDisabledReason = disabledReason || (permissionLocked ? permissionReason : "");
+        const fieldDisabledReason =
+          disabledReason ||
+          (field !== "connected" && !form.values.connected ? "Connect this account to change its permissions." : "");
         const pending = needsApply && typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field];
         const changed = form.values[field] !== initialValues[field];
         const pendingDetail =
@@ -259,9 +252,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
           initialValues[field] &&
           !form.values[field] &&
           !fieldDisabledReason;
-        const selection = `${changed ? "Unsaved: " : pending ? "Requested: " : ""}${form.values[field] ? "Enabled" : "Disabled"}`;
         const descriptionId = `${id}-${field}-description`;
-        const selectionId = `${id}-${field}-selection`;
         const pendingId = `${id}-${field}-pending`;
         const warningId = `${id}-${field}-warning`;
         const lockId = `${id}-${field}-lock`;
@@ -347,7 +338,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                       "aria-label": section.label,
                       "aria-describedby": [
                         descriptionId,
-                        selectionId,
                         pending ? pendingId : "",
                         warning ? warningId : "",
                         fieldDisabledReason ? lockId : "",
@@ -369,9 +359,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                   />
                 </Box>
               </Tooltip>
-              <Text id={selectionId} size="xsmall" weight="regular" color={colors.gray600}>
-                {selection}
-              </Text>
             </Stack>
           </Box>
         );
