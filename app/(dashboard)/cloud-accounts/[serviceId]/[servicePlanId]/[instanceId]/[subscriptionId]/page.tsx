@@ -10,9 +10,9 @@ import { getCloudAccountId, getCloudAccountProvider } from "app/(dashboard)/clou
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
 import useInstancesDescribe from "app/(dashboard)/instances/hooks/useInstancesDescribe";
-import { RiArrowGoBackFill } from "react-icons/ri";
 
 import Button from "src/components/Button/Button";
+import ArrowLeftCircleBrokenIcon from "src/components/Icons/ArrowLeftCircleBroken/ArrowLeftCircleBroken";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
@@ -135,7 +135,7 @@ const CloudAccountDetailsPage = ({
     <PageContainer>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Link href="/cloud-accounts">
-          <Button startIcon={<RiArrowGoBackFill />}>Back to Cloud Accounts</Button>
+          <Button startIcon={<ArrowLeftCircleBrokenIcon color="currentColor" />}>Back to Cloud Accounts</Button>
         </Link>
         <Button
           endIcon={isSummaryVisible ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -146,15 +146,19 @@ const CloudAccountDetailsPage = ({
       </Stack>
 
       <Collapse in={isSummaryVisible}>
-        <CloudAccountOverview
-          accountId={getCloudAccountId(resultParams)}
-          cloudProvider={cloudProvider}
-          serviceName={subscription?.serviceName}
-          serviceLogoURL={subscription?.serviceLogoURL}
-          productTierName={subscription?.productTierName}
-          subscriptionOwnerName={subscription?.subscriptionOwnerName}
-          status={instance.status}
-        />
+        <Box sx={{ overflowX: "auto" }}>
+          <Box minWidth="850px">
+            <CloudAccountOverview
+              accountId={getCloudAccountId(resultParams)}
+              cloudProvider={cloudProvider}
+              serviceName={subscription?.serviceName}
+              serviceLogoURL={subscription?.serviceLogoURL}
+              productTierName={subscription?.productTierName}
+              subscriptionOwnerName={subscription?.subscriptionOwnerName}
+              status={instance.status}
+            />
+          </Box>
+        </Box>
       </Collapse>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
@@ -184,6 +188,7 @@ const CloudAccountDetailsPage = ({
             getEnumFromUserRoleString(subscription?.roleType),
             viewEnum.Access_Resources
           )}
+          canUpdateAgentPermissions={subscription?.roleType === "root" || subscription?.roleType === "admin"}
         />
       )}
     </PageContainer>

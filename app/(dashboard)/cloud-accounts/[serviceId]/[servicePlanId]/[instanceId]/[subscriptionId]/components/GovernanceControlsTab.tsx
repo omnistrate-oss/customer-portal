@@ -1,7 +1,7 @@
+import { FC, useId, useRef, useState } from "react";
 import { Box, Dialog, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { FC, useId, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -10,9 +10,6 @@ import CommandBlock from "src/components/AwsCloudFormationInstructions/CommandBl
 import Button from "src/components/Button/Button";
 import Card from "src/components/Card/Card";
 import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
-import CloseIcon from "src/components/Icons/Close/CloseIcon";
-import ConnectIcon from "src/components/Icons/Connect/Connect";
-import DisconnectIcon from "src/components/Icons/Disconnect/Disconnect";
 import InfoCircleTooltipIcon from "src/components/Icons/InfoCircleTooltip/InfoCircleTooltip";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -25,14 +22,25 @@ import { colors } from "src/themeConfig";
 import { AccountConfig, AccountGovernanceControls } from "src/types/account-config";
 import {
   getAwsCloudFormationUpdateStackCommand,
+  parseAwsCloudFormationQuickCreateUrl,
   parseAwsCloudFormationUpdateUrl,
 } from "src/utils/accountConfig/awsCloudFormation";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
 
 const fields = ["connected", "debugAccessEnabled", "infrastructureMutationEnabled"] as const;
 type GovernanceValues = Required<AccountGovernanceControls>;
-type GovernanceSettingsFormProps = { account: AccountConfig; canUpdate: boolean; cloudFormationCreateUrl?: string };
-type GovernanceControlsTabProps = { accountConfigId: string; canUpdate: boolean; cloudFormationCreateUrl?: string };
+type GovernanceSettingsFormProps = {
+  account: AccountConfig;
+  canUpdate: boolean;
+  canUpdateAgentPermissions: boolean;
+  cloudFormationCreateUrl?: string;
+};
+type GovernanceControlsTabProps = {
+  accountConfigId: string;
+  canUpdate: boolean;
+  canUpdateAgentPermissions: boolean;
+  cloudFormationCreateUrl?: string;
+};
 
 const validationSchema = Yup.object({
   connected: Yup.boolean().required(),
@@ -73,66 +81,17 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
       onClose={onClose}
       aria-labelledby={`${id}-heading`}
       aria-describedby={`${id}-description`}
-      PaperProps={{
-        sx: {
-          width: connected ? "min(600px, calc(100vw - 64px))" : "min(588px, calc(100vw - 48px))",
-          maxWidth: "none",
-          maxHeight: connected ? "calc(100% - 64px)" : "calc(100% - 48px)",
-          m: connected ? "32px" : "24px",
-          p: "24px",
-          borderRadius: "12px",
-          boxSizing: "border-box",
-        },
-      }}
+      maxWidth="xs"
+      fullWidth
+      PaperProps={{ sx: { borderRadius: "12px", boxSizing: "border-box" } }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between" position="relative" mb="20px">
-        <Stack direction="row" alignItems="center" gap="16px" minWidth={0} pr={connected ? "40px" : undefined}>
-          {connected ? (
-            <ConnectIcon color={theme.palette.primary.main} aria-hidden />
-          ) : (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              width="56px"
-              height="56px"
-              flexShrink={0}
-              borderRadius="50%"
-              border={`8px solid ${colors.error50}`}
-              bgcolor={colors.error200}
-              boxSizing="border-box"
-            >
-              <DisconnectIcon width={24} height={24} color={colors.error700} aria-hidden />
-            </Box>
-          )}
-          <Text
-            component="h2"
-            id={`${id}-heading`}
-            size="large"
-            weight={connected ? "semibold" : "bold"}
-            color={colors.gray900}
-          >
-            {title}
-          </Text>
-        </Stack>
-        <Button
-          type="button"
-          variant="text"
-          fontColor={colors.gray500}
-          aria-label={`Close ${title.toLowerCase()} dialog`}
-          disabled={isLoading}
-          disabledMessage={loadingReason}
-          onClick={onClose}
-          sx={{
-            "&.MuiButton-sizeMedium": { p: "8px", minWidth: "auto" },
-            ...(connected ? { position: "absolute", top: "-8px", right: "-8px" } : { alignSelf: "flex-start" }),
-          }}
-        >
-          <CloseIcon color="currentColor" aria-hidden />
-        </Button>
-      </Stack>
+      <Box px="24px" pt="24px" pb="12px">
+        <Text component="h2" id={`${id}-heading`} size="large" weight="semibold" color={colors.gray900}>
+          {connected ? "Connect AWS Account?" : "Disconnect AWS Account?"}
+        </Text>
+      </Box>
 
-      <Stack id={`${id}-description`} gap="12px" minHeight={0} sx={{ overflowY: "auto" }}>
+      <Stack id={`${id}-description`} gap="12px" px="24px" pb="16px" minHeight={0} sx={{ overflowY: "auto" }}>
         <Text weight="regular" color={colors.gray700}>
           {providerName} will {connected ? "" : "no longer "}be able to manage{" "}
           {awsAccountID ? "AWS account " : "this AWS account"}
@@ -153,31 +112,25 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
         )}
       </Stack>
 
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        gap={connected ? "20px" : "16px"}
-        mt={connected ? "28px" : "24px"}
-      >
+      <Stack direction="row" justifyContent="flex-end" gap="8px" px="24px" pb="24px">
         <Button
           type="button"
           variant="outlined"
           disabled={isLoading}
           disabledMessage={loadingReason}
           onClick={onClose}
-          sx={!connected ? { height: "40px", px: "14px" } : undefined}
+          autoFocus
         >
           Cancel
         </Button>
         <Button
           type="button"
           variant="contained"
-          bgColor={connected ? theme.palette.primary.main : colors.error700}
+          bgColor={theme.palette.primary.main}
           disabled={!!disabledReason || isLoading}
           disabledMessage={disabledReason || loadingReason}
           isLoading={isLoading}
           onClick={onConfirm}
-          sx={!connected ? { height: "40px", px: "14px" } : undefined}
         >
           {title}
         </Button>
@@ -186,7 +139,12 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
   );
 };
 
-const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canUpdate, cloudFormationCreateUrl }) => {
+const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
+  account,
+  canUpdate,
+  canUpdateAgentPermissions,
+  cloudFormationCreateUrl,
+}) => {
   const theme = useTheme();
   const id = useId();
   const snackbar = useSnackbar();
@@ -205,6 +163,13 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     infrastructureMutationEnabled:
       requested?.infrastructureMutationEnabled ?? applied?.infrastructureMutationEnabled ?? true,
   };
+  const getSaveValues = (values: GovernanceValues): GovernanceValues => ({
+    ...values,
+    ...(!canUpdateAgentPermissions && {
+      debugAccessEnabled: initialValues.debugAccessEnabled,
+      infrastructureMutationEnabled: initialValues.infrastructureMutationEnabled,
+    }),
+  });
   const update = $api.useMutation("put", "/2022-09-01-00/accountconfig/{id}", {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/accountconfig/{id}"] });
@@ -217,15 +182,18 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
-      if (!canUpdate || update.isPending || fields.every((field) => values[field] === initialValues[field])) return;
+      const savedValues = getSaveValues(values);
+      if (!canUpdate || update.isPending || fields.every((field) => savedValues[field] === initialValues[field]))
+        return;
       update.mutate({
         params: { path: { id: account.id } },
         headers: { "x-ignore-global-error": true },
-        body: { settings: { accountGovernanceControls: values } },
+        body: { settings: { accountGovernanceControls: savedValues } },
       });
     },
   });
-  const unsaved = fields.filter((field) => form.values[field] !== initialValues[field]).length;
+  const effectiveValues = getSaveValues(form.values);
+  const unsaved = fields.filter((field) => effectiveValues[field] !== initialValues[field]).length;
   const effectiveFields = initialValues.connected ? fields : (["connected"] as const);
   const appliedKnown = effectiveFields.every((field) => typeof applied?.[field] === "boolean");
   const needsApply =
@@ -236,9 +204,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     appliedKnown &&
     effectiveFields.every((field) => applied?.[field] === initialValues[field]);
   const canEditAgentPermissions =
-    applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected);
+    canUpdateAgentPermissions &&
+    (applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected));
   const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
-  const stack = parseAwsCloudFormationUpdateUrl(updateURL);
+  const stack =
+    parseAwsCloudFormationUpdateUrl(updateURL) ??
+    parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(cloudFormationCreateUrl ?? updateURL));
   const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
     { key: "AccountAction", value: initialValues.connected ? "Connect" : "Disconnect" },
     { key: "AgentInfrastructureMutationEnabled", value: String(initialValues.infrastructureMutationEnabled) },
@@ -265,7 +236,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
         params: { path: { id: account.id } },
         headers: { "x-ignore-global-error": true },
         body: {
-          settings: { accountGovernanceControls: { ...form.values, connected: connectionAction === "connect" } },
+          settings: { accountGovernanceControls: { ...effectiveValues, connected: connectionAction === "connect" } },
         },
       });
       setIsConnectionDialogOpen(false);
@@ -321,7 +292,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
 
   return (
     <Stack component="form" onSubmit={form.handleSubmit} aria-labelledby={`${id}-heading`}>
-      <Stack gap="6px" mb="24px">
+      <Stack gap="6px" mb={{ xs: "24px", md: "28px" }}>
         <Stack direction="row" gap="12px" alignItems="center" flexWrap="wrap">
           <Text size="large" weight="semibold" color={colors.gray900} component="h2" id={`${id}-heading`}>
             Governance Controls
@@ -336,24 +307,28 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
         <Card
           role="status"
           aria-label={isVerifying ? "Refreshing account settings" : "AWS update required"}
-          mb="24px"
-          p={{ xs: "14px", md: "18px" }}
+          mb={{ xs: "24px", md: "28px" }}
+          py={{ xs: "16px", md: "18px" }}
+          px={{ xs: "16px", md: "20px" }}
           sx={{ bgcolor: colors.white, borderColor: colors.warning200, boxShadow: "none", borderRadius: "8px" }}
         >
           <Stack direction={{ xs: "column", md: "row" }} alignItems={{ md: "center" }} gap="16px">
-            <Stack gap="6px" flex={1} minWidth={0}>
-              <Text color={colors.gray900}>{isVerifying ? "Updating account settings" : "Pending AWS Update"}</Text>
-              <Text weight="regular" color={colors.gray700}>
-                {isVerifying
-                  ? "The AWS update is complete. We’re updating the account status automatically."
-                  : "Copy the command below, then paste and run it in AWS CloudShell or a Bash terminal authenticated to this AWS account to apply your saved access changes."}
+            <Stack flex={1} minWidth={0}>
+              <Text weight="semibold" color={colors.gray900}>
+                {isVerifying ? "Updating Account Settings" : "Pending AWS Update"}
               </Text>
-              {!isVerifying && (
-                <Text weight="regular" color={colors.gray500}>
-                  The account status refreshes automatically once those changes are applied in AWS.
+              {!isVerifying && !!updateCommand && (
+                <Text weight="regular" color={colors.gray700} sx={{ mt: "4px" }}>
+                  Copy the command below, then paste and run it in AWS CloudShell or your terminal to apply your saved
+                  access changes.
                 </Text>
               )}
-              <Text size="xsmall" weight="regular" color={colors.gray500}>
+              <Text weight="regular" color={colors.gray500} sx={{ mt: "6px" }}>
+                {isVerifying
+                  ? "The AWS changes are applied. The account status is refreshing automatically."
+                  : "The account status refreshes automatically once those changes are applied in AWS."}
+              </Text>
+              <Text size="xsmall" weight="regular" color={colors.gray500} sx={{ mt: "8px" }}>
                 {awsDetails}
               </Text>
             </Stack>
@@ -369,34 +344,20 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
               Open AWS CloudShell
             </Button>
           </Stack>
-          <Box mt="16px" minWidth={0}>
-            <Tooltip title={copyDisabledReason} describeChild>
-              <Box
-                tabIndex={copyDisabledReason ? 0 : undefined}
-                role={copyDisabledReason ? "group" : undefined}
-                aria-label={copyDisabledReason ? "AWS update command unavailable" : undefined}
-                aria-disabled={!!copyDisabledReason || undefined}
-              >
-                <Box
-                  component="fieldset"
-                  disabled={!!copyDisabledReason}
-                  sx={{
-                    m: 0,
-                    p: 0,
-                    border: 0,
-                    minWidth: 0,
-                    ...(copyDisabledReason && { "& .MuiIconButton-root": { opacity: 0.38, pointerEvents: "none" } }),
-                  }}
-                >
-                  <CommandBlock
-                    title="AWS update"
-                    command={updateCommand ?? "The AWS update command is not available yet. Please try again later."}
-                    dataTestId="aws-governance-update-command"
-                    fixedHeight
-                  />
-                </Box>
-              </Box>
-            </Tooltip>
+          <Box mt="12px" minWidth={0}>
+            {updateCommand ? (
+              <CommandBlock
+                title="AWS update"
+                command={updateCommand}
+                dataTestId="aws-governance-update-command"
+                compact
+                copyDisabledReason={copyDisabledReason}
+              />
+            ) : (
+              <Text size="xsmall" weight="regular" color={colors.gray500} role="status">
+                The AWS command is not available yet.
+              </Text>
+            )}
           </Box>
         </Card>
       )}
@@ -404,31 +365,33 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
       <Card
         role="region"
         aria-labelledby={`${id}-access-heading`}
-        p={{ xs: "18px", md: "24px" }}
-        sx={{ borderColor: colors.gray200, boxShadow: "none", borderRadius: "12px" }}
+        py={{ xs: "16px", md: "18px" }}
+        px={{ xs: "16px", md: "20px" }}
+        sx={{ borderColor: colors.gray200, boxShadow: "none", borderRadius: "8px" }}
       >
         {sections.map((section) => {
           const field = section.field;
           const permissionLocked = field !== "connected" && !canEditAgentPermissions;
-          const permissionReason =
-            typeof applied?.connected !== "boolean"
+          const permissionReason = !canUpdateAgentPermissions
+            ? "Only root and admin can change support debug access and AWS infrastructure permissions."
+            : typeof applied?.connected !== "boolean"
               ? "Account access has not yet been verified. Please try again later."
-              : form.values.connected
+              : effectiveValues.connected
                 ? `Save your request to enable ${providerPossessive} access before changing agent permissions.`
                 : `Agent permissions can’t be changed while ${providerPossessive} access is disabled.`;
           const fieldDisabledReason = disabledReason || (permissionLocked ? permissionReason : "");
           const pending =
             needsApply && typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field];
-          const changed = form.values[field] !== initialValues[field];
+          const changed = effectiveValues[field] !== initialValues[field];
           const pendingDetail =
             section.pendingDetail + (changed ? " You also have an unsaved change to this setting." : "");
           const warning =
             !isVerifying &&
             applied?.[field] === true &&
             initialValues[field] &&
-            !form.values[field] &&
+            !effectiveValues[field] &&
             !fieldDisabledReason;
-          const selection = `${changed ? "Unsaved: " : pending ? "Requested: " : ""}${form.values[field] ? "Enabled" : "Disabled"}`;
+          const selection = `${changed ? "Unsaved: " : pending ? "Requested: " : ""}${effectiveValues[field] ? "Enabled" : "Disabled"}`;
           const descriptionId = `${id}-${field}-description`;
           const selectionId = `${id}-${field}-selection`;
           const pendingId = `${id}-${field}-pending`;
@@ -437,13 +400,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
           return (
             <Box
               key={field}
-              mx={field !== "connected" ? { xs: 0, md: "24px" } : undefined}
-              mt={field !== "connected" ? "24px" : undefined}
-              pb={field !== "infrastructureMutationEnabled" ? "24px" : undefined}
-              borderBottom={field !== "infrastructureMutationEnabled" ? `1px solid ${colors.gray200}` : undefined}
+              mt={field === "debugAccessEnabled" ? "20px" : undefined}
+              pt={field === "debugAccessEnabled" ? "20px" : undefined}
+              borderTop={field === "debugAccessEnabled" ? `1px solid ${colors.gray200}` : undefined}
             >
               {field === "debugAccessEnabled" && (
-                <Text component="h4" size="medium" color={colors.gray500} mb="24px">
+                <Text component="h4" size="small" color={colors.gray500} pl={{ xs: "12px", md: "24px" }}>
                   Support and Infrastructure Permissions
                 </Text>
               )}
@@ -454,13 +416,18 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                   md: "minmax(0, 1fr) auto",
                 }}
                 gap={{ xs: "16px", md: "24px" }}
+                alignItems="center"
+                ml={field !== "connected" ? { xs: "12px", md: "24px" } : undefined}
+                pt={field !== "connected" ? "18px" : undefined}
+                pb={field === "debugAccessEnabled" ? "18px" : undefined}
+                borderBottom={field === "debugAccessEnabled" ? `1px solid ${colors.gray200}` : undefined}
               >
                 <Stack gap="5px" minWidth={0}>
                   <Stack direction="row" alignItems="center" flexWrap="wrap" gap="8px">
                     <Text
                       component={field === "connected" ? "h3" : "h4"}
                       id={field === "connected" ? `${id}-access-heading` : undefined}
-                      size={field === "connected" ? "large" : "medium"}
+                      size={field === "connected" ? "medium" : "small"}
                       color={colors.gray900}
                     >
                       {section.label}
@@ -482,7 +449,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                       </Stack>
                     )}
                   </Stack>
-                  <Text id={descriptionId} weight="regular" color={colors.gray500}>
+                  <Text id={descriptionId} weight="regular" color={colors.gray500} maxWidth="680px">
                     {section.description}
                   </Text>
                   {!!pending && (
@@ -514,7 +481,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                     </Box>
                   )}
                 </Stack>
-                <Stack alignItems="flex-end" gap="8px" minWidth={0} pt="3px">
+                <Stack alignItems="flex-end" gap="8px" minWidth={0}>
                   <Tooltip title={field === "connected" ? "" : fieldDisabledReason} describeChild>
                     <Box
                       component="span"
@@ -528,9 +495,11 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                       {field === "connected" ? (
                         <Button
                           type="button"
-                          variant="outlined"
-                          outlineColor={form.values.connected ? colors.error300 : theme.palette.primary.main}
-                          fontColor={form.values.connected ? colors.error700 : colors.gray700}
+                          variant={form.values.connected ? "outlined" : "contained"}
+                          outlineColor={form.values.connected ? colors.error700 : undefined}
+                          bgColor={form.values.connected ? undefined : theme.palette.primary.main}
+                          fontColor={form.values.connected ? colors.gray700 : colors.white}
+                          aria-haspopup={form.values.connected ? "dialog" : undefined}
                           disabled={!!fieldDisabledReason}
                           disabledMessage={fieldDisabledReason}
                           aria-describedby={[
@@ -556,7 +525,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                         </Button>
                       ) : (
                         <Switch
-                          checked={form.values[field]}
+                          checked={effectiveValues[field]}
                           disabled={!!fieldDisabledReason}
                           inputProps={{
                             role: "switch",
@@ -586,13 +555,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
                       )}
                     </Box>
                   </Tooltip>
-                  <Text
-                    id={selectionId}
-                    size="xsmall"
-                    weight="regular"
-                    color={colors.gray600}
-                    hidden={!changed && !pending}
-                  >
+                  <Text id={selectionId} size="xsmall" weight="regular" color={colors.gray600} hidden>
                     {selection}
                   </Text>
                 </Stack>
@@ -608,9 +571,10 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
         alignItems={{ md: "center" }}
         gap="20px"
         py="18px"
+        borderBottom={`1px solid ${colors.gray200}`}
       >
-        <Stack gap="6px" flex={1}>
-          <Box px="12px" py="10px" borderRadius="8px" bgcolor={colors.lightBlue50} alignSelf="flex-start">
+        <Stack gap="6px" flex={1} minWidth={0}>
+          <Box px="10px" py="6px" borderRadius="6px" bgcolor={colors.lightBlue50} alignSelf="flex-start">
             <Text weight="regular" color={colors.blue600}>
               Save your permission changes here, then run the command in AWS to apply them.
             </Text>
@@ -624,6 +588,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
         <Stack direction="row" justifyContent="flex-end" gap="10px" flexShrink={0}>
           <Button
             variant="outlined"
+            size="small"
             disabled={update.isPending || !unsaved}
             disabledMessage={update.isPending ? "Account settings are being saved." : "No changes to discard."}
             onClick={() => form.resetForm()}
@@ -633,6 +598,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
           <Button
             type="submit"
             variant="contained"
+            size="small"
             bgColor={theme.palette.primary.main}
             isLoading={update.isPending}
             disabled={!!disabledReason || !unsaved}
@@ -662,6 +628,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
 const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({
   accountConfigId,
   canUpdate,
+  canUpdateAgentPermissions,
   cloudFormationCreateUrl,
 }) => {
   const query = $api.useQuery(
@@ -675,11 +642,12 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({
   );
   if (accountConfigId && query.isPending) return <LoadingSpinner />;
   return (
-    <Box mt="24px">
+    <Box mt="32px">
       {query.data ? (
         <GovernanceSettingsForm
           account={query.data}
           canUpdate={canUpdate}
+          canUpdateAgentPermissions={canUpdateAgentPermissions}
           cloudFormationCreateUrl={cloudFormationCreateUrl}
         />
       ) : (
