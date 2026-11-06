@@ -10,6 +10,8 @@ import CommandBlock from "src/components/AwsCloudFormationInstructions/CommandBl
 import Button from "src/components/Button/Button";
 import Card from "src/components/Card/Card";
 import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
+import CloseIcon from "src/components/Icons/Close/CloseIcon";
+import DisconnectIcon from "src/components/Icons/Disconnect/Disconnect";
 import InfoCircleTooltipIcon from "src/components/Icons/InfoCircleTooltip/InfoCircleTooltip";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -85,11 +87,25 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
       fullWidth
       PaperProps={{ sx: { borderRadius: "12px", boxSizing: "border-box" } }}
     >
-      <Box px="24px" pt="24px" pb="12px">
-        <Text component="h2" id={`${id}-heading`} size="large" weight="semibold" color={colors.gray900}>
+      <Stack direction="row" alignItems="center" gap="16px" px="24px" pt="24px" pb={connected ? "12px" : "20px"}>
+        {!connected && <DisconnectIcon color={colors.error700} width="24" height="24" aria-hidden />}
+        <Text component="h2" id={`${id}-heading`} size="large" weight="semibold" color={colors.gray900} flex={1}>
           {connected ? "Connect AWS Account?" : "Disconnect AWS Account?"}
         </Text>
-      </Box>
+        {!connected && (
+          <Button
+            type="button"
+            variant="text"
+            aria-label="Close disconnect confirmation"
+            disabled={isLoading}
+            disabledMessage={loadingReason}
+            onClick={onClose}
+            sx={{ p: "4px" }}
+          >
+            <CloseIcon color={colors.gray400} aria-hidden />
+          </Button>
+        )}
+      </Stack>
 
       <Stack id={`${id}-description`} gap="12px" px="24px" pb="16px" minHeight={0} sx={{ overflowY: "auto" }}>
         <Text weight="regular" color={colors.gray700}>
@@ -112,7 +128,14 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
         )}
       </Stack>
 
-      <Stack direction="row" justifyContent="flex-end" gap="8px" px="24px" pb="24px">
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        gap={connected ? "8px" : "16px"}
+        px="24px"
+        pt={connected ? 0 : "12px"}
+        pb="24px"
+      >
         <Button
           type="button"
           variant="outlined"
@@ -125,8 +148,10 @@ const AccountConnectionConfirmationDialog: FC<AccountConnectionConfirmationDialo
         </Button>
         <Button
           type="button"
-          variant="contained"
-          bgColor={theme.palette.primary.main}
+          variant={connected ? "contained" : "outlined"}
+          bgColor={connected ? theme.palette.primary.main : undefined}
+          outlineColor={connected ? undefined : colors.error300}
+          fontColor={connected ? colors.white : colors.error700}
           disabled={!!disabledReason || isLoading}
           disabledMessage={disabledReason || loadingReason}
           isLoading={isLoading}
@@ -378,7 +403,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
               ? "Account access has not yet been verified. Please try again later."
               : effectiveValues.connected
                 ? `Save your request to enable ${providerPossessive} access before changing agent permissions.`
-                : `Agent permissions can’t be changed while ${providerPossessive} access is disabled.`;
+                : "Connect this account to change its permissions.";
           const fieldDisabledReason = disabledReason || (permissionLocked ? permissionReason : "");
           const pending =
             needsApply && typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field];
@@ -496,9 +521,9 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
                         <Button
                           type="button"
                           variant={form.values.connected ? "outlined" : "contained"}
-                          outlineColor={form.values.connected ? colors.error700 : undefined}
+                          outlineColor={form.values.connected ? colors.error300 : undefined}
                           bgColor={form.values.connected ? undefined : theme.palette.primary.main}
-                          fontColor={form.values.connected ? colors.gray700 : colors.white}
+                          fontColor={form.values.connected ? colors.error700 : colors.white}
                           aria-haspopup={form.values.connected ? "dialog" : undefined}
                           disabled={!!fieldDisabledReason}
                           disabledMessage={fieldDisabledReason}
