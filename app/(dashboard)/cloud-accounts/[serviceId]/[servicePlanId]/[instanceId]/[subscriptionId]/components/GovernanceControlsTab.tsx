@@ -1,7 +1,7 @@
-import { FC, useId, useRef, useState } from "react";
 import { Box, Dialog, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { FC, useId, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -181,12 +181,16 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const [isConnectionDialogOpen, setIsConnectionDialogOpen] = useState(false);
   const connectionRequestInFlight = useRef(false);
   const requested = account.requestedSettings?.accountGovernanceControls;
-  const applied = account.appliedSettings?.accountGovernanceControls;
+  const appliedControls = account.appliedSettings?.accountGovernanceControls;
+  const applied: GovernanceValues = {
+    connected: appliedControls?.connected ?? true,
+    debugAccessEnabled: appliedControls?.debugAccessEnabled ?? false,
+    infrastructureMutationEnabled: appliedControls?.infrastructureMutationEnabled ?? true,
+  };
   const initialValues: GovernanceValues = {
-    connected: requested?.connected ?? applied?.connected ?? true,
-    debugAccessEnabled: requested?.debugAccessEnabled ?? applied?.debugAccessEnabled ?? false,
-    infrastructureMutationEnabled:
-      requested?.infrastructureMutationEnabled ?? applied?.infrastructureMutationEnabled ?? true,
+    connected: requested?.connected ?? applied.connected,
+    debugAccessEnabled: requested?.debugAccessEnabled ?? applied.debugAccessEnabled,
+    infrastructureMutationEnabled: requested?.infrastructureMutationEnabled ?? applied.infrastructureMutationEnabled,
   };
   const getSaveValues = (values: GovernanceValues): GovernanceValues => ({
     ...values,
@@ -220,14 +224,10 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const effectiveValues = getSaveValues(form.values);
   const unsaved = fields.filter((field) => effectiveValues[field] !== initialValues[field]).length;
   const effectiveFields = initialValues.connected ? fields : (["connected"] as const);
-  const appliedKnown = effectiveFields.every((field) => typeof applied?.[field] === "boolean");
   const needsApply =
-    effectiveFields.some((field) => typeof applied?.[field] === "boolean" && applied[field] !== initialValues[field]) ||
-    account.status === "PENDING_UPDATE";
+    effectiveFields.some((field) => applied[field] !== initialValues[field]) || account.status === "PENDING_UPDATE";
   const isVerifying =
-    account.status === "PENDING_UPDATE" &&
-    appliedKnown &&
-    effectiveFields.every((field) => applied?.[field] === initialValues[field]);
+    account.status === "PENDING_UPDATE" && effectiveFields.every((field) => applied[field] === initialValues[field]);
   const canEditAgentPermissions =
     canUpdateAgentPermissions &&
     (applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected));
@@ -295,21 +295,21 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
       label: `Account Access for ${providerName}`,
       description: `Allow ${providerName} to manage this AWS account and its workloads.`,
       warning: `Without access, ${providerName} can’t manage workloads in this account.`,
-      pendingDetail: `Access stays ${applied?.connected ? "enabled" : "disabled"} until you apply this change in AWS.`,
+      pendingDetail: `Access stays ${applied.connected ? "enabled" : "disabled"} until you apply this change in AWS.`,
     },
     {
       field: "debugAccessEnabled" as const,
       label: "Allow Support Debug Access",
       description: `Allow ${providerName} to access your Kubernetes API for support and troubleshooting.`,
       warning: "Disabling support debug access may require you to provide access manually for troubleshooting.",
-      pendingDetail: `Support debug access stays ${applied?.debugAccessEnabled ? "enabled" : "disabled"} until you apply this change in AWS.`,
+      pendingDetail: `Support debug access stays ${applied.debugAccessEnabled ? "enabled" : "disabled"} until you apply this change in AWS.`,
     },
     {
       field: "infrastructureMutationEnabled" as const,
       label: "Allow AWS Infrastructure Changes",
       description: `Allow ${providerName} to create, update, and delete AWS resources for your workloads.`,
       warning: `${providerName} can’t complete workload operations that require AWS changes while this is disabled.`,
-      pendingDetail: applied?.infrastructureMutationEnabled
+      pendingDetail: applied.infrastructureMutationEnabled
         ? "The agent can still change AWS resources until you apply this change in AWS."
         : "AWS permissions stay read-only until you apply this change in AWS.",
     },
@@ -604,11 +604,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
               Save your permission changes here, then run the command in AWS to apply them.
             </Text>
           </Box>
-          {!appliedKnown && (
-            <Text size="xsmall" weight="regular" color={colors.gray500}>
-              Applied settings have not yet been verified.
-            </Text>
-          )}
         </Stack>
         <Stack direction="row" justifyContent="flex-end" gap="10px" flexShrink={0}>
           <Button

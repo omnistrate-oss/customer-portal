@@ -229,7 +229,6 @@ export const getAwsCloudFormationUpdateStackCommand = (
     preservedParameters,
   });
 };
-
 /**
  * Builds the `delete-stack` equivalent of the console offboarding step. The stack name is read off
  * the URL, never assumed — onboarding URLs ship with both `AccountConfigSetup` and
