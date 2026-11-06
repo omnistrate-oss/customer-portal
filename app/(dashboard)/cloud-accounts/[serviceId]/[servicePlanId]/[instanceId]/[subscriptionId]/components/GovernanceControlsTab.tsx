@@ -1,7 +1,7 @@
+import { FC, useEffect, useId, useRef, useState } from "react";
 import { Box, Dialog, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { FC, useId, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -12,6 +12,7 @@ import Card from "src/components/Card/Card";
 import ExternalArrowIcon from "src/components/Icons/ArrowExternal/ArrowExternal";
 import CloseIcon from "src/components/Icons/Close/CloseIcon";
 import DisconnectIcon from "src/components/Icons/Disconnect/Disconnect";
+import FullscreenIcon from "src/components/Icons/Fullscreen/FullscreenIcon";
 import InfoCircleTooltipIcon from "src/components/Icons/InfoCircleTooltip/InfoCircleTooltip";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
@@ -179,7 +180,33 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const queryClient = useQueryClient();
   const [connectionAction, setConnectionAction] = useState<"connect" | "disconnect">("disconnect");
   const [isConnectionDialogOpen, setIsConnectionDialogOpen] = useState(false);
+  const [pendingUpdateDismissed, setPendingUpdateDismissed] = useState(false);
+  const [isCommandExpanded, setIsCommandExpanded] = useState(false);
+  const commandContainer = useRef<HTMLDivElement | null>(null);
+  const expandCommandButton = useRef<HTMLButtonElement | null>(null);
+  const commandId = `${id}-command`;
   const connectionRequestInFlight = useRef(false);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsCommandExpanded(document.fullscreenElement === commandContainer.current);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+  const toggleCommandSize = async () => {
+    const container = commandContainer.current;
+    if (!container) return;
+    try {
+      if (document.fullscreenElement === container) {
+        await document.exitFullscreen();
+        expandCommandButton.current?.focus();
+      } else {
+        await container.requestFullscreen();
+      }
+    } catch {
+      snackbar.showError("Unable to resize the command view. Please try again.");
+    }
+  };
   const requested = account.requestedSettings?.accountGovernanceControls;
   const appliedControls = account.appliedSettings?.accountGovernanceControls;
   const applied: GovernanceValues = {
@@ -200,9 +227,17 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     }),
   });
   const update = $api.useMutation("put", "/2022-09-01-00/accountconfig/{id}", {
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      const restoresAppliedSettings = fields.every(
+        (field) => variables.body.settings?.accountGovernanceControls?.[field] === applied[field]
+      );
       await queryClient.invalidateQueries({ queryKey: ["get", "/2022-09-01-00/accountconfig/{id}"] });
-      snackbar.showSuccess("Account settings saved. Apply your changes in AWS.");
+      setPendingUpdateDismissed(restoresAppliedSettings);
+      snackbar.showSuccess(
+        restoresAppliedSettings
+          ? "Previous account settings restored."
+          : "Account settings saved. Apply your changes in AWS."
+      );
     },
     onError: () => snackbar.showError("Unable to save account settings. Please try again later."),
   });
@@ -228,6 +263,11 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     effectiveFields.some((field) => applied[field] !== initialValues[field]) || account.status === "PENDING_UPDATE";
   const isVerifying =
     account.status === "PENDING_UPDATE" && effectiveFields.every((field) => applied[field] === initialValues[field]);
+  const showPendingUpdate = needsApply && !(isVerifying && pendingUpdateDismissed);
+  const pendingConnectionChange = applied.connected !== initialValues.connected;
+  const discardValues = getSaveValues(applied);
+  const canDiscardPending =
+    needsApply && !isVerifying && fields.some((field) => discardValues[field] !== initialValues[field]);
   const canEditAgentPermissions =
     canUpdateAgentPermissions &&
     (applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected));
@@ -253,6 +293,25 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     : update.isPending
       ? "Account settings are being saved."
       : "";
+  const discardDisabledReason =
+    disabledReason ||
+    (!unsaved && !canDiscardPending
+      ? isVerifying
+        ? "Wait for the account settings to refresh."
+        : "No changes to discard."
+      : "");
+  const discardChanges = () => {
+    if (discardDisabledReason) return;
+    if (unsaved) {
+      form.resetForm();
+      return;
+    }
+    update.mutate({
+      params: { path: { id: account.id } },
+      headers: { "x-ignore-global-error": true },
+      body: { settings: { accountGovernanceControls: discardValues } },
+    });
+  };
   const confirmConnectionChange = async () => {
     if (!isConnectionDialogOpen || disabledReason || connectionRequestInFlight.current) return;
     connectionRequestInFlight.current = true;
@@ -328,7 +387,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
         </Text>
       </Stack>
 
-      {!!needsApply && (
+      {!!showPendingUpdate && (
         <Card
           role="status"
           aria-label={isVerifying ? "Refreshing account settings" : "AWS update required"}
@@ -340,18 +399,16 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
           <Stack direction={{ xs: "column", md: "row" }} alignItems={{ md: "center" }} gap="16px">
             <Stack flex={1} minWidth={0}>
               <Text weight="semibold" color={colors.gray900}>
-                {isVerifying ? "Updating Account Settings" : "Pending AWS Update"}
+                Pending AWS Update
               </Text>
-              {!isVerifying && !!updateCommand && (
+              {!!updateCommand && (
                 <Text weight="regular" color={colors.gray700} sx={{ mt: "4px" }}>
                   Copy the command below, then paste and run it in AWS CloudShell or your terminal to apply your saved
                   access changes.
                 </Text>
               )}
               <Text weight="regular" color={colors.gray500} sx={{ mt: "6px" }}>
-                {isVerifying
-                  ? "The AWS changes are applied. The account status is refreshing automatically."
-                  : "The account status refreshes automatically once those changes are applied in AWS."}
+                The account status refreshes automatically once those changes are applied in AWS.
               </Text>
               <Text size="xsmall" weight="regular" color={colors.gray500} sx={{ mt: "8px" }}>
                 {awsDetails}
@@ -369,21 +426,83 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
               Open AWS CloudShell
             </Button>
           </Stack>
-          <Box mt="12px" minWidth={0}>
+          <Stack mt="12px" minWidth={0}>
             {updateCommand ? (
-              <CommandBlock
-                title="AWS update"
-                command={updateCommand}
-                dataTestId="aws-governance-update-command"
-                compact
-                copyDisabledReason={copyDisabledReason}
-              />
+              <Box
+                ref={commandContainer}
+                id={commandId}
+                role="region"
+                aria-label="AWS update command"
+                onKeyDown={(event) => {
+                  if (isCommandExpanded && event.key === "Escape") {
+                    event.preventDefault();
+                    void toggleCommandSize();
+                  }
+                }}
+                sx={{
+                  minWidth: 0,
+                  position: "relative",
+                  "& > fieldset > div:first-of-type > div:first-of-type": { pr: "64px" },
+                  "&:fullscreen": { width: "100%", height: "100%", bgcolor: colors.gray900 },
+                  "&:fullscreen > fieldset": { height: "100%" },
+                  "&:fullscreen > fieldset > div:first-of-type": { height: "100%", borderRadius: 0 },
+                }}
+              >
+                <Box
+                  component="fieldset"
+                  disabled={!!copyDisabledReason}
+                  sx={{
+                    m: 0,
+                    p: 0,
+                    border: 0,
+                    minWidth: 0,
+                    ...(copyDisabledReason && {
+                      "& .MuiIconButton-root": { opacity: 0.38, pointerEvents: "none" },
+                    }),
+                  }}
+                >
+                  <CommandBlock
+                    title="AWS Command"
+                    command={updateCommand}
+                    fixedHeight={isCommandExpanded}
+                    dataTestId="aws-governance-update-command"
+                    copyDisabledReason={copyDisabledReason}
+                  />
+                </Box>
+                <Tooltip title={isCommandExpanded ? "Minimize" : "Open Fullscreen"}>
+                  <Button
+                    ref={expandCommandButton}
+                    type="button"
+                    variant="outlined"
+                    aria-label={isCommandExpanded ? "Minimize" : "Open Fullscreen"}
+                    aria-pressed={isCommandExpanded}
+                    onClick={() => void toggleCommandSize()}
+                    fontColor={colors.gray300}
+                    outlineBg={colors.gray900}
+                    outlineColor={colors.gray700}
+                    sx={{
+                      position: "absolute",
+                      top: "12px",
+                      right: "16px",
+                      width: "32px",
+                      height: "32px",
+                      p: "6px",
+                      borderRadius: "6px",
+                      boxShadow: "none",
+                      "&:hover": { bgcolor: colors.gray800 },
+                      "& svg path": { stroke: "currentColor" },
+                    }}
+                  >
+                    <FullscreenIcon minimize={isCommandExpanded} />
+                  </Button>
+                </Tooltip>
+              </Box>
             ) : (
               <Text size="xsmall" weight="regular" color={colors.gray500} role="status">
                 The AWS command is not available yet.
               </Text>
             )}
-          </Box>
+          </Stack>
         </Card>
       )}
 
@@ -518,36 +637,44 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
                       sx={{ display: "inline-flex", "& .Mui-disabled": { pointerEvents: "none" } }}
                     >
                       {field === "connected" ? (
-                        <Button
-                          type="button"
-                          variant={form.values.connected ? "outlined" : "contained"}
-                          outlineColor={form.values.connected ? colors.error300 : undefined}
-                          bgColor={form.values.connected ? undefined : theme.palette.primary.main}
-                          fontColor={form.values.connected ? colors.error700 : colors.white}
-                          aria-haspopup={form.values.connected ? "dialog" : undefined}
-                          disabled={!!fieldDisabledReason}
-                          disabledMessage={fieldDisabledReason}
-                          aria-describedby={[
-                            descriptionId,
-                            selectionId,
-                            pending ? pendingId : "",
-                            warning ? warningId : "",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
-                          onClick={() => {
-                            if (!fieldDisabledReason) {
-                              if (form.values.connected) {
-                                setConnectionAction("disconnect");
-                                setIsConnectionDialogOpen(true);
-                              } else {
-                                void form.setFieldValue("connected", true);
+                        !pendingConnectionChange && (
+                          <Button
+                            type="button"
+                            variant={form.values.connected ? "outlined" : "contained"}
+                            outlineColor={form.values.connected ? colors.error300 : undefined}
+                            bgColor={form.values.connected ? undefined : theme.palette.primary.main}
+                            fontColor={form.values.connected ? colors.error700 : colors.white}
+                            aria-haspopup={form.values.connected ? "dialog" : undefined}
+                            disabled={!!fieldDisabledReason}
+                            disabledMessage={fieldDisabledReason}
+                            aria-describedby={[
+                              descriptionId,
+                              selectionId,
+                              pending ? pendingId : "",
+                              warning ? warningId : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => {
+                              if (!fieldDisabledReason) {
+                                if (form.values.connected) {
+                                  setConnectionAction("disconnect");
+                                  setIsConnectionDialogOpen(true);
+                                } else {
+                                  update.mutate({
+                                    params: { path: { id: account.id } },
+                                    headers: { "x-ignore-global-error": true },
+                                    body: {
+                                      settings: { accountGovernanceControls: { ...effectiveValues, connected: true } },
+                                    },
+                                  });
+                                }
                               }
-                            }
-                          }}
-                        >
-                          {form.values.connected ? "Disconnect Account" : "Connect Account"}
-                        </Button>
+                            }}
+                          >
+                            {form.values.connected ? "Disconnect Account" : "Connect Account"}
+                          </Button>
+                        )
                       ) : (
                         <Switch
                           checked={effectiveValues[field]}
@@ -609,9 +736,9 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
           <Button
             variant="outlined"
             size="small"
-            disabled={update.isPending || !unsaved}
-            disabledMessage={update.isPending ? "Account settings are being saved." : "No changes to discard."}
-            onClick={() => form.resetForm()}
+            disabled={!!discardDisabledReason}
+            disabledMessage={discardDisabledReason}
+            onClick={discardChanges}
           >
             Discard
           </Button>
