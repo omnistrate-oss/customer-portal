@@ -474,6 +474,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
                     ref={expandCommandButton}
                     type="button"
                     variant="outlined"
+                    size="xsmall"
                     aria-label={isCommandExpanded ? "Minimize" : "Open Fullscreen"}
                     aria-pressed={isCommandExpanded}
                     onClick={() => void toggleCommandSize()}
