@@ -267,7 +267,10 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const pendingConnectionChange = applied.connected !== initialValues.connected;
   const discardValues = getSaveValues(applied);
   const canDiscardPending =
-    needsApply && !isVerifying && fields.some((field) => discardValues[field] !== initialValues[field]);
+    needsApply &&
+    !isVerifying &&
+    fields.every((field) => typeof appliedControls?.[field] === "boolean") &&
+    fields.some((field) => discardValues[field] !== initialValues[field]);
   const canEditAgentPermissions =
     canUpdateAgentPermissions &&
     (applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected));
