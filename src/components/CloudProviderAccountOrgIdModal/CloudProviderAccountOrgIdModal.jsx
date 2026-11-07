@@ -1,9 +1,9 @@
 // import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
@@ -833,7 +833,6 @@ function CloudProviderAccountOrgIdModal(props) {
     isAccountCreation,
     cloudFormationTemplateUrl,
     isAccessPage = false,
-    cloudFormationUpdateUrl,
     accountConfigId,
     selectedAccountConfig,
     gcpBootstrapShellCommand,
@@ -855,7 +854,7 @@ function CloudProviderAccountOrgIdModal(props) {
   );
 
   const safeCloudFormationTemplateUrl = getSafeExternalURL(cloudFormationTemplateUrl);
-  const safeCloudFormationUpdateUrl = getSafeExternalURL(cloudFormationUpdateUrl);
+  const safeCloudFormationUpdateUrl = getSafeExternalURL(cloudFormationTemplateUrl);
   const verifiedCloudFormationUpdateUrl = parseAwsCloudFormationUpdateUrl(safeCloudFormationUpdateUrl)
     ? safeCloudFormationUpdateUrl
     : "";

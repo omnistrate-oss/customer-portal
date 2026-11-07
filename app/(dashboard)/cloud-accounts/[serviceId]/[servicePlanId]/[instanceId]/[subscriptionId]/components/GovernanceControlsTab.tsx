@@ -1,7 +1,7 @@
-import { FC, useEffect, useId, useRef, useState } from "react";
 import { Box, Dialog, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { FC, useEffect, useId, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -36,13 +36,13 @@ type GovernanceSettingsFormProps = {
   account: AccountConfig;
   canUpdate: boolean;
   canUpdateAgentPermissions: boolean;
-  cloudFormationCreateUrl?: string;
+  awsCloudFormationTemplateURL?: string;
 };
 type GovernanceControlsTabProps = {
   accountConfigId: string;
   canUpdate: boolean;
   canUpdateAgentPermissions: boolean;
-  cloudFormationCreateUrl?: string;
+  awsCloudFormationTemplateURL?: string;
 };
 
 const validationSchema = Yup.object({
@@ -169,7 +169,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   account,
   canUpdate,
   canUpdateAgentPermissions,
-  cloudFormationCreateUrl,
+  awsCloudFormationTemplateURL,
 }) => {
   const theme = useTheme();
   const id = useId();
@@ -274,11 +274,11 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const canEditAgentPermissions =
     canUpdateAgentPermissions &&
     (applied?.connected === true || (applied?.connected === false && needsApply && initialValues.connected));
-  const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
+  const updateURL = getSafeExternalURL(account.awsCloudFormationTemplateURL);
   const stack =
     parseAwsCloudFormationUpdateUrl(updateURL) ??
-    parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(cloudFormationCreateUrl ?? updateURL));
-  const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
+    parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(awsCloudFormationTemplateURL ?? updateURL));
+  const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, awsCloudFormationTemplateURL, [
     { key: "AccountAction", value: initialValues.connected ? "Connect" : "Disconnect" },
     { key: "AgentInfrastructureMutationEnabled", value: String(initialValues.infrastructureMutationEnabled) },
     { key: "K8sDebugAccessEnabled", value: String(initialValues.debugAccessEnabled) },
@@ -780,7 +780,7 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({
   accountConfigId,
   canUpdate,
   canUpdateAgentPermissions,
-  cloudFormationCreateUrl,
+  awsCloudFormationTemplateURL,
 }) => {
   const query = $api.useQuery(
     "get",
@@ -799,7 +799,7 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({
           account={query.data}
           canUpdate={canUpdate}
           canUpdateAgentPermissions={canUpdateAgentPermissions}
-          cloudFormationCreateUrl={cloudFormationCreateUrl}
+          awsCloudFormationTemplateURL={awsCloudFormationTemplateURL}
         />
       ) : (
         <Text weight="regular" color={colors.gray600}>
