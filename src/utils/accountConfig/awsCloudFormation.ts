@@ -1,6 +1,6 @@
 /**
  * Derives AWS CLI equivalents of the CloudFormation quick-create URL issued for AWS account
- * onboarding. Updates use a verified existing-stack URL and preserve omitted deployed parameters.
+ * onboarding. Updates prefer a verified existing-stack URL and preserve omitted deployed parameters.
  */
 
 const QUICK_CREATE_PARAM_PREFIX = "param_";
@@ -191,9 +191,9 @@ export const parseAwsCloudFormationUpdateUrl = (
 };
 
 /**
- * Uses the full onboarding parameters and formatter, with the verified URL as the update target.
- * Saved parameters override URL values; omitted deployed parameters use their previous values.
- * Example: verified update + onboarding URL + saved AccountAction=Disconnect → disconnect update.
+ * Converts the full onboarding URL into an update command using the create command's formatter.
+ * Saved parameters override URL values and appear once at the end of the parameter list.
+ * Example: onboarding URL + saved connected=false → update-stack with AccountAction=Disconnect.
  */
 export const getAwsCloudFormationUpdateStackCommand = (
   cloudFormationUrl?: string | null,

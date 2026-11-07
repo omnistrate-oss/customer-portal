@@ -17,6 +17,7 @@ export type CommandBlockProps = {
   command: string;
   dataTestId?: string;
   fixedHeight?: boolean;
+  copyDisabledReason?: string;
 };
 
 /**
@@ -24,7 +25,13 @@ export type CommandBlockProps = {
  * Visual wrapping keeps every flag readable in a narrow modal without altering the copied text.
  * Long create commands use a fixed-height scroll area; short commands can retain their natural height.
  */
-const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixedHeight = false }) => {
+const CommandBlock: FC<CommandBlockProps> = ({
+  title,
+  command,
+  dataTestId,
+  fixedHeight = false,
+  copyDisabledReason = "",
+}) => {
   const [tooltipText, setTooltipText] = useState(DEFAULT_TOOLTIP_TEXT);
 
   return (
@@ -60,6 +67,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
 
         <IconButton
           aria-label={`Copy ${title.toLowerCase()} command`}
+          disabled={!!copyDisabledReason}
           sx={{
             width: "36px",
             height: "36px",
@@ -73,6 +81,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
             "&:hover": { backgroundColor: "#1F242C" },
           }}
           onClick={() => {
+            if (copyDisabledReason) return;
             clipboard
               .write(command)
               .then(() => setTooltipText("Copied"))
@@ -80,7 +89,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
               .finally(() => setTimeout(() => setTooltipText(DEFAULT_TOOLTIP_TEXT), 1500));
           }}
         >
-          <Tooltip title={tooltipText}>
+          <Tooltip title={copyDisabledReason || tooltipText}>
             <span>
               <CopyIcon />
             </span>
