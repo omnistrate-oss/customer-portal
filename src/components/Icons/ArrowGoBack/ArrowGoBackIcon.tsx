@@ -1,0 +1,20 @@
+import { FC } from "react";
+
+import { SVGIconProps } from "src/types/common/generalTypes";
+
+const ArrowGoBackIcon: FC<SVGIconProps> = ({ color = "currentColor", disabled, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1em"
+    height="1em"
+    viewBox="0 0 24 24"
+    fill={color}
+    aria-hidden
+    aria-disabled={disabled || undefined}
+    {...props}
+  >
+    <path d="M8 7V11L2 6L8 1V5H13C17.4183 5 21 8.58172 21 13C21 17.4183 17.4183 21 13 21H4V19H13C16.3137 19 19 16.3137 19 13C19 9.68629 16.3137 7 13 7H8Z" />
+  </svg>
+);
+
+export default ArrowGoBackIcon;

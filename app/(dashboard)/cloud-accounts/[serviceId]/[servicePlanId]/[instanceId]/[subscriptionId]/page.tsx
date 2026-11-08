@@ -12,7 +12,7 @@ import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServ
 import useInstancesDescribe from "app/(dashboard)/instances/hooks/useInstancesDescribe";
 
 import Button from "src/components/Button/Button";
-import ArrowLeftCircleBrokenIcon from "src/components/Icons/ArrowLeftCircleBroken/ArrowLeftCircleBroken";
+import RiArrowGoBackFill from "src/components/Icons/ArrowGoBack/ArrowGoBackIcon";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
@@ -135,7 +135,7 @@ const CloudAccountDetailsPage = ({
     <PageContainer>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Link href="/cloud-accounts">
-          <Button startIcon={<ArrowLeftCircleBrokenIcon color="currentColor" />}>Back to Cloud Accounts</Button>
+          <Button startIcon={<RiArrowGoBackFill />}>Back to Cloud Accounts</Button>
         </Link>
         <Button
           endIcon={isSummaryVisible ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
