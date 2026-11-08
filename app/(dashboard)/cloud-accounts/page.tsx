@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -39,13 +46,6 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -68,8 +68,8 @@ import GovernanceControlsCell from "./components/GovernanceControlsCell";
 import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
-import useAccountConfig from "./hooks/useAccountConfig";
 import { DIALOG_DATA } from "./constants";
+import useAccountConfig from "./hooks/useAccountConfig";
 import {
   getCloudAccountId,
   getCloudAccountProvider,
@@ -1195,7 +1195,7 @@ const CloudAccountsPage = () => {
         cloudFormationTemplateUrl={awsCloudFormationTemplateUrl}
         cloudFormationUpdateUrl={
           accountConfigsHash?.[getResultParams(clickedInstance)?.cloud_provider_account_config_id ?? ""]
-            ?.awsCloudFormationUpdateURL
+            ?.awsCloudFormationTemplateURL
         }
         isAccountCreation={isAccountCreation}
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}

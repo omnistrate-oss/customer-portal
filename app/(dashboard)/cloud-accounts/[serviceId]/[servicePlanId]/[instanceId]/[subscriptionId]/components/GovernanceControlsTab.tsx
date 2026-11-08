@@ -91,7 +91,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({ account, canU
     effectiveFields.some((field) => applied[field] !== initialValues[field]) || account.status === "PENDING_UPDATE";
   const isVerifying =
     account.status === "PENDING_UPDATE" && effectiveFields.every((field) => applied[field] === initialValues[field]);
-  const updateURL = getSafeExternalURL(account.awsCloudFormationUpdateURL);
+  const updateURL = getSafeExternalURL(account.awsCloudFormationTemplateURL);
   const stack = parseAwsCloudFormationUpdateUrl(updateURL);
   const updateCommand = getAwsCloudFormationUpdateStackCommand(updateURL, cloudFormationCreateUrl, [
     { key: "AccountAction", value: initialValues.connected ? "Connect" : "Disconnect" },
