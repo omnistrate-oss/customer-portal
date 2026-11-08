@@ -9,7 +9,9 @@ import {
   getAzureBootstrapShellCommand,
   getGcpBootstrapShellCommand,
 } from "src/utils/accountConfig/accountConfig";
+import { getAwsCloudFormationUpdateConsoleUrl } from "src/utils/accountConfig/awsCloudFormation";
 import { getAccountConfigStatusBasedHeader } from "src/utils/constants/accountConfig";
+import getSafeExternalURL from "src/utils/getSafeExternalURL";
 import { getResultParams } from "src/utils/instance";
 
 import { CommandListItem } from "./CommandList";
@@ -154,6 +156,32 @@ export const getOnboardingInstructions = (
       header,
       steps: [],
       notice: instance?.status === "FAILED" ? instructions.failedNotice : PENDING_NOTICE,
+    };
+  }
+
+  if (cloudProvider === "aws" && ["READY", "RUNNING"].includes(instance.status ?? "")) {
+    const updateUrl = getAwsCloudFormationUpdateConsoleUrl(command);
+    const templateUrl = getSafeExternalURL(command);
+    const consoleUrl = updateUrl || "https://console.aws.amazon.com/cloudformation/home";
+    return {
+      header,
+      awsCloudFormationUrl: templateUrl || undefined,
+      steps: [
+        {
+          title: "Update CloudFormation stack",
+          description: (
+            <>
+              {updateUrl
+                ? "Update your existing account setup stack using the provided link."
+                : "Open AWS CloudFormation, select your existing account setup stack, and choose Update."}{" "}
+              Keep the existing parameter values unless you intend to change them. For guidance, our instructional video
+              is available <ExternalLink href={CLOUDFORMATION_GUIDE_URL}>here</ExternalLink>.
+            </>
+          ),
+          command: consoleUrl,
+          href: consoleUrl,
+        },
+      ],
     };
   }
 

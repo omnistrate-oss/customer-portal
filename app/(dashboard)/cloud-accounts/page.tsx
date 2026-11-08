@@ -1192,7 +1192,13 @@ const CloudAccountsPage = () => {
         }}
         accountConfigId={clickedInstance?.id}
         selectedAccountConfig={clickedInstance}
-        cloudFormationTemplateUrl={awsCloudFormationTemplateUrl}
+        cloudFormationTemplateUrl={
+          awsCloudFormationTemplateUrl ||
+          accountConfigsHash[getResultParams(clickedInstance)?.cloud_provider_account_config_id ?? ""]
+            ?.awsCloudFormationTemplateURL ||
+          accountConfigsHash[getResultParams(clickedInstance)?.cloud_provider_account_config_id ?? ""]
+            ?.awsCloudFormationNoLBTemplateURL
+        }
         isAccountCreation={isAccountCreation}
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}
         azureBootstrapShellCommand={azureBootstrapShellCommand}

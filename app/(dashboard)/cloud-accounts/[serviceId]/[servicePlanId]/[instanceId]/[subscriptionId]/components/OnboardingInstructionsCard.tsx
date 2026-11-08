@@ -6,7 +6,10 @@ import { ContainerCard } from "src/components/ResourceInstance/ResourceInstanceD
 import { Text } from "src/components/Typography/Typography";
 import { CloudProvider } from "src/types/common/enums";
 import { ResourceInstance } from "src/types/resourceInstance";
-import { hasAwsCloudFormationCliCommands } from "src/utils/accountConfig/awsCloudFormation";
+import {
+  getAwsCloudFormationUpdateStackCommand,
+  hasAwsCloudFormationCliCommands,
+} from "src/utils/accountConfig/awsCloudFormation";
 import { getResultParams } from "src/utils/instance";
 
 import CommandList from "./CommandList";
@@ -21,7 +24,10 @@ const OnboardingInstructionsCard: FC<OnboardingInstructionsCardProps> = ({ insta
   const instructions = getOnboardingInstructions(instance, cloudProvider);
   if (!instructions) return null;
 
-  const hasCliTab = hasAwsCloudFormationCliCommands(instructions.awsCloudFormationUrl);
+  const isAwsReconfiguration = cloudProvider === "aws" && ["READY", "RUNNING"].includes(instance.status ?? "");
+  const hasCliTab = isAwsReconfiguration
+    ? Boolean(getAwsCloudFormationUpdateStackCommand(instructions.awsCloudFormationUrl))
+    : hasAwsCloudFormationCliCommands(instructions.awsCloudFormationUrl);
 
   return (
     <ContainerCard
@@ -46,7 +52,7 @@ const OnboardingInstructionsCard: FC<OnboardingInstructionsCardProps> = ({ insta
           <Box padding="16px 24px 24px">
             <AwsCloudFormationInstructions
               cloudFormationUrl={instructions.awsCloudFormationUrl}
-              variant="onboarding"
+              variant={isAwsReconfiguration ? "reconfiguration" : "onboarding"}
               awsAccountId={getResultParams(instance)?.aws_account_id}
             >
               <CommandList commands={instructions.steps} titleTestId="account-onboarding-step" disableGutters />

@@ -1,6 +1,7 @@
 /**
  * Derives AWS CLI equivalents of the CloudFormation quick-create URL issued for AWS account
- * onboarding. Updates prefer a verified existing-stack URL and preserve omitted deployed parameters.
+ * onboarding. Setup parameters come from the URL; updates preserve deployed governance unless
+ * saved governance values are supplied.
  */
 
 const QUICK_CREATE_PARAM_PREFIX = "param_";
@@ -23,10 +24,9 @@ export type AwsCloudFormationStackDetails = {
 };
 
 export type AwsCloudFormationUpdateStackDetails = {
-  region?: string;
+  region: string;
   stackId: string;
   stackName: string;
-  templateUrl?: string;
   parameters: AwsCloudFormationStackParameter[];
 };
 
@@ -132,22 +132,22 @@ const formatStackParameter = ({ key, value }: AwsCloudFormationStackParameter): 
 };
 
 /**
- * Builds stack commands from their URL details. `CAPABILITY_NAMED_IAM` is
+ * Builds stack commands from the quick-create details. `CAPABILITY_NAMED_IAM` is
  * mandatory: the template creates explicitly named IAM roles, and CloudFormation rejects the call
  * with `InsufficientCapabilities` without it.
  */
 const buildAwsCloudFormationStackCommand = (
   operation: "create-stack" | "update-stack",
-  stack: Omit<AwsCloudFormationStackDetails, "templateUrl"> & { templateUrl?: string; preservedParameters?: string[] }
+  stack: AwsCloudFormationStackDetails & { preservedParameters?: string[] }
 ): string => {
   const parameters = [
-    ...(stack.preservedParameters ?? []).map((key) => `ParameterKey=${key},UsePreviousValue=true`),
     ...stack.parameters.map(formatStackParameter),
+    ...(stack.preservedParameters ?? []).map((key) => `ParameterKey=${key},UsePreviousValue=true`),
   ];
   const flags = [
     ...(stack.region ? [`--region ${quoteShellArg(stack.region)}`] : []),
     `--stack-name ${quoteShellArg(stack.stackName)}`,
-    stack.templateUrl ? `--template-url ${quoteShellArg(stack.templateUrl)}` : "--use-previous-template",
+    `--template-url ${quoteShellArg(stack.templateUrl)}`,
     "--capabilities CAPABILITY_NAMED_IAM",
     ...(parameters.length ? [`--parameters ${parameters.join(" \\\n    ")}`] : []),
   ];
@@ -160,31 +160,58 @@ export const getAwsCloudFormationCreateStackCommand = (cloudFormationUrl?: strin
   return stack ? buildAwsCloudFormationStackCommand("create-stack", stack) : null;
 };
 
-/** Reads stack identifiers and parameters from verified existing-stack update links. */
 export const parseAwsCloudFormationUpdateUrl = (
   cloudFormationUrl?: string | null
 ): AwsCloudFormationUpdateStackDetails | null => {
-  if (!cloudFormationUrl) return null;
-
   try {
-    const url = new URL(cloudFormationUrl);
-    if (url.protocol !== "https:" || !/^(?:[a-z0-9-]+\.)?console\.aws\.amazon\.com$/.test(url.hostname)) return null;
-    if (!url.hash.startsWith("#/stacks/update?")) return null;
+    const url = new URL(cloudFormationUrl ?? "");
+    if (url.protocol !== "https:" || !url.hash.startsWith("#/stacks/update?")) return null;
     const params = parseQueryPairs(url.hash.slice(url.hash.indexOf("?") + 1));
     const stackId = params.get("stackId") ?? "";
     const stack = stackId.match(
-      /^arn:[a-z0-9-]+:cloudformation:([a-z0-9-]+):\d{12}:stack\/([A-Za-z][A-Za-z0-9-]*)\/[^/]+$/
+      /^arn:(?:aws|aws-us-gov|aws-cn):cloudformation:([a-z0-9-]+):[0-9]{12}:stack\/([A-Za-z][A-Za-z0-9-]*)\/[A-Za-z0-9-]+$/
     );
-    if (!stackId || (!stack && !/^[A-Za-z][A-Za-z0-9-]*$/.test(stackId))) return null;
-    const region = stack?.[1] || getStackRegion(url.toString().split("#")[0]);
-    if (region && !/^[a-z]{2}(?:-[a-z]+)+-\d+$/.test(region)) return null;
+    const region = stack?.[1];
+    const stackName = stack?.[2];
+    if (!region || !stackName) return null;
     const parameters = Array.from(params.entries())
       .filter(([key]) => key.startsWith(QUICK_CREATE_PARAM_PREFIX))
       .map(([key, value]) => ({ key: key.slice(QUICK_CREATE_PARAM_PREFIX.length), value }));
-    if (parameters.some(({ key }) => !/^[A-Za-z0-9]+$/.test(key))) return null;
+    if (parameters.some(({ key }) => !/^[A-Za-z][A-Za-z0-9]*$/.test(key))) return null;
+    return { region, stackId, stackName, parameters };
+  } catch {
+    return null;
+  }
+};
+
+/** Converts AWS Console setup links to the update flow while preserving deployed governance settings. */
+export const getAwsCloudFormationUpdateConsoleUrl = (cloudFormationUrl?: string | null): string | null => {
+  try {
+    const url = new URL(cloudFormationUrl ?? "");
+    if (url.protocol !== "https:" || !/^(?:[a-z0-9-]+\.)?console\.aws\.amazon\.com$/.test(url.hostname)) return null;
+
+    if (url.hash.startsWith("#/stacks/quickcreate?")) {
+      const stack = parseAwsCloudFormationQuickCreateUrl(cloudFormationUrl);
+      if (!stack) return null;
+      const params = new URLSearchParams({ stackId: stack.stackName, templateURL: stack.templateUrl });
+      const preservedParameters = new Set([
+        "AccountAction",
+        "AgentInfrastructureMutationEnabled",
+        "K8sDebugAccessEnabled",
+      ]);
+      for (const { key, value } of stack.parameters) {
+        if (!preservedParameters.has(key)) params.set(`${QUICK_CREATE_PARAM_PREFIX}${key}`, value);
+      }
+      url.hash = `/stacks/update?${params.toString()}`;
+    }
+
+    if (!url.hash.startsWith("#/stacks/update?")) return null;
+    const params = parseQueryPairs(url.hash.slice(url.hash.indexOf("?") + 1));
+    const stackId = params.get("stackId") ?? "";
+    if (!/^[A-Za-z][A-Za-z0-9-]*$/.test(stackId) && !parseAwsCloudFormationUpdateUrl(url.toString())) return null;
     const templateUrl = params.get("templateURL");
     if (templateUrl && new URL(templateUrl).protocol !== "https:") return null;
-    return { region, stackId, stackName: stack?.[2] || stackId, templateUrl, parameters };
+    return url.toString();
   } catch {
     return null;
   }
@@ -229,6 +256,7 @@ export const getAwsCloudFormationUpdateStackCommand = (
     preservedParameters,
   });
 };
+
 /**
  * Builds the `delete-stack` equivalent of the console offboarding step. The stack name is read off
  * the URL, never assumed — onboarding URLs ship with both `AccountConfigSetup` and
