@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import clipboard from "clipboardy";
+import { FC, useState } from "react";
 
 import CopyIcon from "src/components/CodeEditor/CopyIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
@@ -61,6 +61,7 @@ const CommandBlock: FC<CommandBlockProps> = ({
           minHeight: compact ? undefined : "56px",
           position: compact ? "absolute" : "static",
           top: compact ? "10px" : undefined,
+          bottom: compact ? "10px" : undefined,
           right: compact ? "16px" : undefined,
           zIndex: compact ? 1 : undefined,
           flexShrink: 0,
