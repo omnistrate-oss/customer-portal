@@ -21,7 +21,8 @@ jobs:
   record:
     name: Record HAR Files
     timeout-minutes: 120
-    runs-on: ubuntu-latest
+    # Playwright 1.60 has no Chromium build for ubuntu-latest (26.04); unpin after upgrading to 1.61+.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
 
