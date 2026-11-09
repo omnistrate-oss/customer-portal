@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 
 import { API_SPEC_URLS, downloadOpenAPIJSON } from "./downloadOpenAPIJSON.mjs";
 import { sanitizeDiagnostic } from "./har-security.mjs";
-import { normalizeOpenAPIOperationIds } from "./normalizeOpenAPIOperationIds.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +21,7 @@ const run = async (): Promise<void> => {
 
     log(`Downloading external OpenAPI spec from ${API_SPEC_URLS.external}...`);
     const content = await downloadOpenAPIJSON(API_SPEC_URLS.external);
-    writeFileSync(jsonOutputPath, normalizeOpenAPIOperationIds(content), "utf8");
+    writeFileSync(jsonOutputPath, content, "utf8");
     log(`OpenAPI spec downloaded to ${jsonOutputPath}`);
 
     log("Converting OpenAPI spec to TypeScript...");

@@ -1,93 +1,66 @@
 import { get } from "node:https";
+import { setTimeout as delay } from "node:timers/promises";
 
 export const API_SPEC_URLS = {
-  external: "https://api.omnistrate.dev/docs/external/",
+  external: "https://api.omnistrate.dev/docs/external/openapi.json",
 };
 
-const extractRedocDefinition = (content) => {
-  const declaration = /\bconst\s+__redoc_definition\s*=\s*\{/.exec(content);
-  if (!declaration) return null;
+const isRecord = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 
-  const start = declaration.index + declaration[0].length - 1;
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-
-  for (let index = start; index < content.length; index += 1) {
-    const character = content[index];
-    if (inString) {
-      if (escaped) escaped = false;
-      else if (character === "\\") escaped = true;
-      else if (character === '"') inString = false;
-    } else if (character === '"') {
-      inString = true;
-    } else if (character === "{") {
-      depth += 1;
-    } else if (character === "}") {
-      depth -= 1;
-      if (depth === 0) return content.slice(start, index + 1);
-    }
-  }
-
-  return "";
-};
-
-/** Reads a JSON specification or the JSON embedded in a Redoc documentation page without executing scripts. */
-export const parseOpenAPIJSON = (content) => {
-  let spec;
-  try {
-    spec = JSON.parse(extractRedocDefinition(content) ?? content);
-  } catch {
-    throw new Error("OpenAPI JSON was not found in the response");
-  }
-
-  if (
-    !spec ||
-    typeof spec !== "object" ||
-    Array.isArray(spec) ||
-    typeof spec.openapi !== "string" ||
-    !spec.openapi.startsWith("3.") ||
-    !spec.info ||
-    typeof spec.info.title !== "string" ||
-    typeof spec.info.version !== "string" ||
-    !spec.paths ||
-    typeof spec.paths !== "object" ||
-    Array.isArray(spec.paths)
-  ) {
-    throw new Error("Response does not contain a valid OpenAPI 3 specification");
-  }
-
-  return JSON.stringify(spec, null, 2);
-};
-
-/** Downloads and validates the specification, including specifications embedded in Redoc pages. */
-export const downloadOpenAPIJSON = (url) =>
+const downloadAttempt = (url, signal) =>
   new Promise((resolve, reject) => {
-    const request = get(url, (response) => {
+    const request = get(url, { agent: false, headers: { Accept: "application/json" }, signal }, (response) => {
+      response.on("error", reject);
+
       if (response.statusCode !== 200) {
         response.resume();
-        reject(new Error(`OpenAPI download returned HTTP ${response.statusCode}`));
+        reject(new Error(`Failed to download OpenAPI spec: HTTP ${response.statusCode ?? "unknown"}`));
         return;
       }
 
-      response.setEncoding("utf8");
       let content = "";
+      response.setEncoding("utf8");
       response.on("data", (chunk) => {
         content += chunk;
       });
-      response.on("error", reject);
       response.on("end", () => {
         try {
-          resolve(parseOpenAPIJSON(content));
-        } catch (error) {
-          reject(error);
+          const spec = JSON.parse(content);
+          if (
+            !isRecord(spec) ||
+            typeof spec.openapi !== "string" ||
+            !/^3\.\d+\.\d+$/.test(spec.openapi) ||
+            !isRecord(spec.info) ||
+            typeof spec.info.title !== "string" ||
+            typeof spec.info.version !== "string" ||
+            !isRecord(spec.paths)
+          ) {
+            throw new Error("Invalid OpenAPI document");
+          }
+          resolve(content);
+        } catch {
+          reject(new Error("Downloaded response is not a valid OpenAPI 3 JSON document"));
         }
       });
     });
 
-    const timeout = setTimeout(() => {
-      request.destroy(new Error("OpenAPI download timed out after 30 seconds"));
-    }, 30_000);
-    request.on("close", () => clearTimeout(timeout));
     request.on("error", reject);
   });
+
+/** Downloads and validates the published OpenAPI JSON, retrying reset connections twice. */
+export const downloadOpenAPIJSON = async (url) => {
+  const signal = AbortSignal.timeout(300_000);
+
+  for (let retries = 0; ; retries += 1) {
+    try {
+      return await downloadAttempt(url, signal);
+    } catch (error) {
+      if (signal.aborted || retries >= 2 || !isRecord(error) || error.code !== "ECONNRESET") {
+        throw error;
+      }
+
+      process.stdout.write(`Connection reset while downloading OpenAPI spec. Retrying (${retries + 1}/2)...\n`);
+      await delay((retries + 1) * 1_000, undefined, { signal });
+    }
+  }
+};

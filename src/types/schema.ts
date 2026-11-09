@@ -21,151 +21,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/accountconfig/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * DescribeAccountConfig account-config-api
-     * @description Describe an account accessible to the service provider or end customer, including requested settings, verified or last-observed applied configuration, and the existing AWS account setup stack update URL when available.
-     */
-    get: operations["account-config-api/DescribeAccountConfig"];
-    /**
-     * UpdateAccountConfig account-config-api
-     * @description Update account metadata or BYOA Private settings as an authorized service provider or end-customer Root/Admin user. Settings changes apply account-wide and are verified asynchronously after the customer updates account setup.
-     */
-    put: operations["account-config-api/UpdateAccountConfig"];
-    post?: never;
-    /** DeleteAccountConfig account-config-api */
-    delete: operations["account-config-api/DeleteAccountConfig"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * ListAccountConfigCloudNativeNetworks account-config-api
-     * @description List all registered CloudNativeNetworks for an account configuration
-     */
-    get: operations["account-config-api/ListAccountConfigCloudNativeNetworks"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/host-clusters/{hostClusterName}/import": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * ImportAccountConfigCloudNativeNetworkHostCluster account-config-api
-     * @description Import a discovered host cluster from an imported cloud native network
-     */
-    post: operations["account-config-api/ImportAccountConfigCloudNativeNetworkHostCluster"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/import": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * ImportAccountConfigCloudNativeNetwork account-config-api
-     * @description Import an available cloud native network for deployments (sets status to READY)
-     */
-    post: operations["account-config-api/ImportAccountConfigCloudNativeNetwork"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/unimport": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * UnimportAccountConfigCloudNativeNetwork account-config-api
-     * @description Unimport a cloud native network, reverting it from READY to AVAILABLE
-     */
-    post: operations["account-config-api/UnimportAccountConfigCloudNativeNetwork"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/import": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * BulkImportAccountConfigCloudNativeNetworks account-config-api
-     * @description Bulk import or unimport CloudNativeNetworks for deployments
-     */
-    post: operations["account-config-api/BulkImportAccountConfigCloudNativeNetworks"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/sync": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * SyncAccountConfigCloudNativeNetworks account-config-api
-     * @description Sync CloudNativeNetworks from the provider's cloud account: discovers CloudNativeNetworks and upserts them into the database
-     */
-    post: operations["account-config-api/SyncAccountConfigCloudNativeNetworks"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/accountconfig/aws/{awsAccountID}": {
     parameters: {
       query?: never;
@@ -322,6 +177,151 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/accountconfig/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * DescribeAccountConfig account-config-api
+     * @description Describe an account accessible to the service provider or end customer, including requested settings, verified or last-observed applied configuration, and the existing AWS account setup stack update URL when available.
+     */
+    get: operations["account-config-api/DescribeAccountConfig"];
+    /**
+     * UpdateAccountConfig account-config-api
+     * @description Update account metadata or BYOA Private settings as an authorized service provider or end-customer Root/Admin user. Settings changes apply account-wide and are verified asynchronously after the customer updates account setup.
+     */
+    put: operations["account-config-api/UpdateAccountConfig"];
+    post?: never;
+    /** DeleteAccountConfig account-config-api */
+    delete: operations["account-config-api/DeleteAccountConfig"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * ListAccountConfigCloudNativeNetworks account-config-api
+     * @description List all registered CloudNativeNetworks for an account configuration
+     */
+    get: operations["account-config-api/ListAccountConfigCloudNativeNetworks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/import": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * BulkImportAccountConfigCloudNativeNetworks account-config-api
+     * @description Bulk import or unimport CloudNativeNetworks for deployments
+     */
+    post: operations["account-config-api/BulkImportAccountConfigCloudNativeNetworks"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/sync": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * SyncAccountConfigCloudNativeNetworks account-config-api
+     * @description Sync CloudNativeNetworks from the provider's cloud account: discovers CloudNativeNetworks and upserts them into the database
+     */
+    post: operations["account-config-api/SyncAccountConfigCloudNativeNetworks"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/host-clusters/{hostClusterName}/import": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * ImportAccountConfigCloudNativeNetworkHostCluster account-config-api
+     * @description Import a discovered host cluster from an imported cloud native network
+     */
+    post: operations["account-config-api/ImportAccountConfigCloudNativeNetworkHostCluster"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/import": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * ImportAccountConfigCloudNativeNetwork account-config-api
+     * @description Import an available cloud native network for deployments (sets status to READY)
+     */
+    post: operations["account-config-api/ImportAccountConfigCloudNativeNetwork"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/accountconfig/{id}/cloud-native-networks/{region}/{cloudNativeNetworkId}/unimport": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * UnimportAccountConfigCloudNativeNetwork account-config-api
+     * @description Unimport a cloud native network, reverting it from READY to AVAILABLE
+     */
+    post: operations["account-config-api/UnimportAccountConfigCloudNativeNetwork"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/api-key": {
     parameters: {
       query?: never;
@@ -396,23 +396,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/availability-zone/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeAvailabilityZone availability-zone-api */
-    get: operations["availability-zone-api/DescribeAvailabilityZone"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/availability-zone/cloud-provider/{cloudProviderName}": {
     parameters: {
       query?: never;
@@ -456,6 +439,23 @@ export interface paths {
     };
     /** ListAvailabilityZonesByRegionCode availability-zone-api */
     get: operations["availability-zone-api/ListAvailabilityZonesByRegionCode"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/availability-zone/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeAvailabilityZone availability-zone-api */
+    get: operations["availability-zone-api/DescribeAvailabilityZone"];
     put?: never;
     post?: never;
     delete?: never;
@@ -515,23 +515,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/cloud-provider/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeCloudProvider cloud-provider-api */
-    get: operations["cloud-provider-api/DescribeCloudProvider"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/cloud-provider/name/{name}": {
     parameters: {
       query?: never;
@@ -541,6 +524,23 @@ export interface paths {
     };
     /** GetCloudProviderByName cloud-provider-api */
     get: operations["cloud-provider-api/GetCloudProviderByName"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/cloud-provider/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeCloudProvider cloud-provider-api */
+    get: operations["cloud-provider-api/DescribeCloudProvider"];
     put?: never;
     post?: never;
     delete?: never;
@@ -622,24 +622,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/customdomain/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeCustomDomain custom-domain-api */
-    get: operations["custom-domain-api/DescribeCustomDomain"];
-    put?: never;
-    post?: never;
-    /** DeleteCustomDomain custom-domain-api */
-    delete: operations["custom-domain-api/DeleteCustomDomain"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/customdomain/identityid": {
     parameters: {
       query?: never;
@@ -672,6 +654,24 @@ export interface paths {
     /** VerifyCustomDomain custom-domain-api */
     post: operations["custom-domain-api/VerifyCustomDomain"];
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/customdomain/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeCustomDomain custom-domain-api */
+    get: operations["custom-domain-api/DescribeCustomDomain"];
+    put?: never;
+    post?: never;
+    /** DeleteCustomDomain custom-domain-api */
+    delete: operations["custom-domain-api/DeleteCustomDomain"];
     options?: never;
     head?: never;
     patch?: never;
@@ -1467,23 +1467,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/region/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeRegion region-api */
-    get: operations["region-api/DescribeRegion"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/region/cloudprovider/{cloudProviderName}": {
     parameters: {
       query?: never;
@@ -1518,6 +1501,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/region/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeRegion region-api */
+    get: operations["region-api/DescribeRegion"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/reset-password": {
     parameters: {
       query?: never;
@@ -1544,401 +1544,6 @@ export interface paths {
     };
     /** ListAllResourceInstances resource-instance-api */
     get: operations["resource-instance-api/ListAllResourceInstances"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{id}/deployment-cell-dashboard/token": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** GenerateTokenForDeploymentCellDashboard resource-instance-api */
-    post: operations["resource-instance-api/GenerateTokenForDeploymentCellDashboard"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{id}/version-upgrade": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** UpgradeResourceInstanceVersion resource-instance-api */
-    post: operations["resource-instance-api/UpgradeResourceInstanceVersion"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{instanceId}/audit-events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListAuditEventsForInstance audit-events-api */
-    get: operations["audit-events-api/ListAuditEventsForInstance"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{instanceId}/event": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DeprecatedListAuditEventsForInstance audit-events-api */
-    get: operations["audit-events-api/DeprecatedListAuditEventsForInstance"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListResourceInstances resource-instance-api */
-    get: operations["resource-instance-api/ListResourceInstances"];
-    put?: never;
-    /** CreateResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/CreateResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeResourceInstance resource-instance-api */
-    get: operations["resource-instance-api/DescribeResourceInstance"];
-    put?: never;
-    post?: never;
-    /** DeleteResourceInstance resource-instance-api */
-    delete: operations["resource-instance-api/DeleteResourceInstance"];
-    options?: never;
-    head?: never;
-    /** UpdateResourceInstance resource-instance-api */
-    patch: operations["resource-instance-api/UpdateResourceInstance"];
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/add-capacity": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** AddCapacityToResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/AddCapacityToResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/copy-snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** CopyResourceInstanceSnapshot resource-instance-api */
-    post: operations["resource-instance-api/CopyResourceInstanceSnapshot"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/custom-dns": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** AddCustomDNSToResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/AddCustomDNSToResourceInstance"];
-    /** RemoveCustomDNSFromResourceInstance resource-instance-api */
-    delete: operations["resource-instance-api/RemoveCustomDNSFromResourceInstance"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/custom-workflow/{workflowId}/execute": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** ResourceInstanceCustomWorkflow resource-instance-api */
-    post: operations["resource-instance-api/ResourceInstanceCustomWorkflow"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/failover": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** FailoverResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/FailoverResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/health-history": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeResourceInstanceHealthHistory resource-instance-api */
-    get: operations["resource-instance-api/DescribeResourceInstanceHealthHistory"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** UpdateResourceInstanceMetadata resource-instance-api */
-    patch: operations["resource-instance-api/UpdateResourceInstanceMetadata"];
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/remove-capacity": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** RemoveCapacityFromResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/RemoveCapacityFromResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** RestartResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/RestartResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restore": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** RestoreResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/RestoreResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListResourceInstanceSnapshots resource-instance-api */
-    get: operations["resource-instance-api/ListResourceInstanceSnapshots"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/start": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** StartResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/StartResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** StopResourceInstance resource-instance-api */
-    post: operations["resource-instance-api/StopResourceInstance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/snapshot/{snapshotId}/restore": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** RestoreResourceInstanceFromSnapshot resource-instance-api */
-    post: operations["resource-instance-api/RestoreResourceInstanceFromSnapshot"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/audit-events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListAuditEventsForServicePlan audit-events-api */
-    get: operations["audit-events-api/ListAuditEventsForServicePlan"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/event": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DeprecatedListAuditEventsForServicePlan audit-events-api */
-    get: operations["audit-events-api/DeprecatedListAuditEventsForServicePlan"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/setup-kit": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ResourceInstanceProvisionerSetupKit resource-instance-api */
-    get: operations["resource-instance-api/ResourceInstanceProvisionerSetupKit"];
     put?: never;
     post?: never;
     delete?: never;
@@ -2072,6 +1677,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/setup-intent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * CreateConsumptionSetupIntent consumption-payment-method-api
+     * @description Create a Stripe SetupIntent for adding a new payment method via the connected account
+     */
+    post: operations["consumption-payment-method-api/CreateConsumptionSetupIntent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/{id}": {
     parameters: {
       query?: never;
@@ -2106,26 +1731,6 @@ export interface paths {
      * @description Set a payment method as default on the connected account
      */
     post: operations["consumption-payment-method-api/SetDefaultConsumptionPaymentMethod"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/resource-instance/billing/stripe/payment-methods/setup-intent": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CreateConsumptionSetupIntent consumption-payment-method-api
-     * @description Create a Stripe SetupIntent for adding a new payment method via the connected account
-     */
-    post: operations["consumption-payment-method-api/CreateConsumptionSetupIntent"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2449,23 +2054,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/resource-instance/user/{id}/billing-details": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeUserBillingDetails consumption-user-api */
-    get: operations["consumption-user-api/DescribeUserBillingDetails"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/resource-instance/user/signin": {
     parameters: {
       query?: never;
@@ -2477,6 +2065,23 @@ export interface paths {
     put?: never;
     /** Signin consumption-user-api */
     post: operations["consumption-user-api/Signin"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/user/{id}/billing-details": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeUserBillingDetails consumption-user-api */
+    get: operations["consumption-user-api/DescribeUserBillingDetails"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -2497,6 +2102,401 @@ export interface paths {
     get: operations["global-api/consumptionServiceVersion"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{id}/deployment-cell-dashboard/token": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** GenerateTokenForDeploymentCellDashboard resource-instance-api */
+    post: operations["resource-instance-api/GenerateTokenForDeploymentCellDashboard"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{id}/version-upgrade": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** UpgradeResourceInstanceVersion resource-instance-api */
+    post: operations["resource-instance-api/UpgradeResourceInstanceVersion"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{instanceId}/audit-events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListAuditEventsForInstance audit-events-api */
+    get: operations["audit-events-api/ListAuditEventsForInstance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{instanceId}/event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DeprecatedListAuditEventsForInstance audit-events-api */
+    get: operations["audit-events-api/DeprecatedListAuditEventsForInstance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/setup-kit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ResourceInstanceProvisionerSetupKit resource-instance-api */
+    get: operations["resource-instance-api/ResourceInstanceProvisionerSetupKit"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/audit-events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListAuditEventsForServicePlan audit-events-api */
+    get: operations["audit-events-api/ListAuditEventsForServicePlan"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DeprecatedListAuditEventsForServicePlan audit-events-api */
+    get: operations["audit-events-api/DeprecatedListAuditEventsForServicePlan"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListResourceInstances resource-instance-api */
+    get: operations["resource-instance-api/ListResourceInstances"];
+    put?: never;
+    /** CreateResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/CreateResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/snapshot/{snapshotId}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** RestoreResourceInstanceFromSnapshot resource-instance-api */
+    post: operations["resource-instance-api/RestoreResourceInstanceFromSnapshot"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeResourceInstance resource-instance-api */
+    get: operations["resource-instance-api/DescribeResourceInstance"];
+    put?: never;
+    post?: never;
+    /** DeleteResourceInstance resource-instance-api */
+    delete: operations["resource-instance-api/DeleteResourceInstance"];
+    options?: never;
+    head?: never;
+    /** UpdateResourceInstance resource-instance-api */
+    patch: operations["resource-instance-api/UpdateResourceInstance"];
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/add-capacity": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AddCapacityToResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/AddCapacityToResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/copy-snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** CopyResourceInstanceSnapshot resource-instance-api */
+    post: operations["resource-instance-api/CopyResourceInstanceSnapshot"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/custom-dns": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AddCustomDNSToResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/AddCustomDNSToResourceInstance"];
+    /** RemoveCustomDNSFromResourceInstance resource-instance-api */
+    delete: operations["resource-instance-api/RemoveCustomDNSFromResourceInstance"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/custom-workflow/{workflowId}/execute": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** ResourceInstanceCustomWorkflow resource-instance-api */
+    post: operations["resource-instance-api/ResourceInstanceCustomWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/failover": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** FailoverResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/FailoverResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/health-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeResourceInstanceHealthHistory resource-instance-api */
+    get: operations["resource-instance-api/DescribeResourceInstanceHealthHistory"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/metadata": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** UpdateResourceInstanceMetadata resource-instance-api */
+    patch: operations["resource-instance-api/UpdateResourceInstanceMetadata"];
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/remove-capacity": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** RemoveCapacityFromResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/RemoveCapacityFromResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restart": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** RestartResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/RestartResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** RestoreResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/RestoreResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListResourceInstanceSnapshots resource-instance-api */
+    get: operations["resource-instance-api/ListResourceInstanceSnapshots"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/start": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** StartResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/StartResourceInstance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/resource-instance/{serviceProviderId}/{serviceKey}/{serviceAPIVersion}/{serviceEnvironmentKey}/{serviceModelKey}/{productTierKey}/{resourceKey}/{id}/stop": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** StopResourceInstance resource-instance-api */
+    post: operations["resource-instance-api/StopResourceInstance"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2679,6 +2679,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/service/composespec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** BuildServiceFromComposeSpec service-api */
+    put: operations["service-api/BuildServiceFromComposeSpec"];
+    /** CreateServiceFromComposeSpec service-api */
+    post: operations["service-api/CreateServiceFromComposeSpec"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/service/serviceplanspec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** BuildServiceFromServicePlanSpec service-api */
+    put: operations["service-api/BuildServiceFromServicePlanSpec"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/service/serviceplanspec/prepare": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** PrepareServiceFromServicePlanSpec service-api */
+    put: operations["service-api/PrepareServiceFromServicePlanSpec"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/service/{id}": {
     parameters: {
       query?: never;
@@ -2733,6 +2785,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/service/{serviceId}/compute-config/cloud-provider/{cloudProviderName}/instance-types": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListComputeInstanceTypes compute-config-api */
+    get: operations["compute-config-api/ListComputeInstanceTypes"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/service/{serviceId}/compute-config/{id}": {
     parameters: {
       query?: never;
@@ -2765,23 +2834,6 @@ export interface paths {
     post: operations["compute-config-api/AddComputeInstanceType"];
     /** RemoveComputeInstanceType compute-config-api */
     delete: operations["compute-config-api/RemoveComputeInstanceType"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/service/{serviceId}/compute-config/cloud-provider/{cloudProviderName}/instance-types": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListComputeInstanceTypes compute-config-api */
-    get: operations["compute-config-api/ListComputeInstanceTypes"];
-    put?: never;
-    post?: never;
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3157,6 +3209,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/service/{serviceId}/model/copy/{sourceId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * CopyServiceModel service-model-api
+     * @description DEPRECATED: Create a new service model from spec instead
+     */
+    post: operations["service-model-api/CopyServiceModel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/service/{serviceId}/model/{id}": {
     parameters: {
       query?: never;
@@ -3280,26 +3352,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/service/{serviceId}/model/copy/{sourceId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * CopyServiceModel service-model-api
-     * @description DEPRECATED: Create a new service model from spec instead
-     */
-    post: operations["service-model-api/CopyServiceModel"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/service/{serviceId}/network-config": {
     parameters: {
       query?: never;
@@ -3407,6 +3459,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/service/{serviceId}/product-tier/copy/{sourceId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** CopyProductTier product-tier-api */
+    post: operations["product-tier-api/CopyProductTier"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/service/{serviceId}/product-tier/{id}": {
     parameters: {
       query?: never;
@@ -3439,23 +3508,6 @@ export interface paths {
     post?: never;
     /** DisableProductTierFeature product-tier-api */
     delete: operations["product-tier-api/DisableProductTierFeature"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/service/{serviceId}/product-tier/{id}/workspace-artifacts/{workspaceArtifactId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeProductTierWorkspaceArtifacts product-tier-api */
-    get: operations["product-tier-api/DescribeProductTierWorkspaceArtifacts"];
-    put?: never;
-    post?: never;
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3512,6 +3564,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/2022-09-01-00/service/{serviceId}/product-tier/{id}/workspace-artifacts/{workspaceArtifactId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeProductTierWorkspaceArtifacts product-tier-api */
+    get: operations["product-tier-api/DescribeProductTierWorkspaceArtifacts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/2022-09-01-00/service/{serviceId}/product-tier/{productTierId}/custom-workflow": {
     parameters: {
       query?: never;
@@ -3547,23 +3616,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/service/{serviceId}/product-tier/copy/{sourceId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** CopyProductTier product-tier-api */
-    post: operations["product-tier-api/CopyProductTier"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/service/{serviceId}/productTier/{productTierId}/customer-version-set": {
     parameters: {
       query?: never;
@@ -3593,6 +3645,40 @@ export interface paths {
     put?: never;
     /** CreateTierVersionSet tier-version-set-api */
     post: operations["tier-version-set-api/CreateTierVersionSet"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/service/{serviceId}/productTier/{productTierId}/version-set/spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** GetTierVersionSetSpec tier-version-set-api */
+    get: operations["tier-version-set-api/GetTierVersionSetSpec"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/service/{serviceId}/productTier/{productTierId}/version-set/specs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** ListTierVersionSetSpecs tier-version-set-api */
+    get: operations["tier-version-set-api/ListTierVersionSetSpecs"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -3701,40 +3787,6 @@ export interface paths {
     head?: never;
     /** ReleaseTierVersionSet tier-version-set-api */
     patch: operations["tier-version-set-api/ReleaseTierVersionSet"];
-    trace?: never;
-  };
-  "/2022-09-01-00/service/{serviceId}/productTier/{productTierId}/version-set/spec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** GetTierVersionSetSpec tier-version-set-api */
-    get: operations["tier-version-set-api/GetTierVersionSetSpec"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/service/{serviceId}/productTier/{productTierId}/version-set/specs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** ListTierVersionSetSpecs tier-version-set-api */
-    get: operations["tier-version-set-api/ListTierVersionSetSpecs"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/2022-09-01-00/service/{serviceId}/producttier/{productTierId}/resource": {
@@ -4337,58 +4389,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/service/composespec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** BuildServiceFromComposeSpec service-api */
-    put: operations["service-api/BuildServiceFromComposeSpec"];
-    /** CreateServiceFromComposeSpec service-api */
-    post: operations["service-api/CreateServiceFromComposeSpec"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/service/serviceplanspec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** BuildServiceFromServicePlanSpec service-api */
-    put: operations["service-api/BuildServiceFromServicePlanSpec"];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/2022-09-01-00/service/serviceplanspec/prepare": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** PrepareServiceFromServicePlanSpec service-api */
-    put: operations["service-api/PrepareServiceFromServicePlanSpec"];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/signin": {
     parameters: {
       query?: never;
@@ -4497,24 +4497,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/2022-09-01-00/subscription/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** DescribeSubscription subscription-api */
-    get: operations["subscription-api/DescribeSubscription"];
-    put?: never;
-    post?: never;
-    /** DeleteSubscription subscription-api */
-    delete: operations["subscription-api/DeleteSubscription"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/2022-09-01-00/subscription/request": {
     parameters: {
       query?: never;
@@ -4546,6 +4528,24 @@ export interface paths {
     post?: never;
     /** CancelSubscriptionRequest subscription-request-api */
     delete: operations["subscription-request-api/CancelSubscriptionRequest"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/2022-09-01-00/subscription/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** DescribeSubscription subscription-api */
+    get: operations["subscription-api/DescribeSubscription"];
+    put?: never;
+    post?: never;
+    /** DeleteSubscription subscription-api */
+    delete: operations["subscription-api/DeleteSubscription"];
     options?: never;
     head?: never;
     patch?: never;
@@ -12524,7 +12524,6 @@ export interface components {
     /**
      * @example {
      *       "cloud_provider": "aws",
-     *       "custom_network_id": "n-1234567890",
      *       "customTags": [
      *         {
      *           "key": "customKey1",
@@ -12535,6 +12534,7 @@ export interface components {
      *           "value": "customValue2"
      *         }
      *       ],
+     *       "custom_network_id": "n-1234567890",
      *       "externalBillingId": "external-billing-id-1234",
      *       "idempotencyKey": "6a7b1c2d-3e4f-5061-7283-94a5b6c7d8e9",
      *       "network_type": "PUBLIC|INTERNAL",
@@ -12563,11 +12563,6 @@ export interface components {
        */
       cloud_provider?: string;
       /**
-       * @description Custom network for resource
-       * @example n-1234567890
-       */
-      custom_network_id?: string;
-      /**
        * @description The custom tags for the resource instance
        * @example [
        *       {
@@ -12581,6 +12576,11 @@ export interface components {
        *     ]
        */
       customTags?: components["schemas"]["CustomTag"][];
+      /**
+       * @description Custom network for resource
+       * @example n-1234567890
+       */
+      custom_network_id?: string;
       /**
        * @description This externalBillingId is deprecated and will be removed in the future
        * @example external-billing-id-1234
@@ -12668,7 +12668,6 @@ export interface components {
     /**
      * @example {
      *       "cloud_provider": "aws",
-     *       "custom_network_id": "n-1234567890",
      *       "customTags": [
      *         {
      *           "key": "customKey1",
@@ -12679,6 +12678,7 @@ export interface components {
      *           "value": "customValue2"
      *         }
      *       ],
+     *       "custom_network_id": "n-1234567890",
      *       "externalBillingId": "external-billing-id-1234",
      *       "network_type": "PUBLIC|INTERNAL",
      *       "onprem_platform": "OpenShift",
@@ -12697,11 +12697,6 @@ export interface components {
        */
       cloud_provider?: string;
       /**
-       * @description Custom network for resource
-       * @example n-1234567890
-       */
-      custom_network_id?: string;
-      /**
        * @description The custom tags for the resource instance
        * @example [
        *       {
@@ -12715,6 +12710,11 @@ export interface components {
        *     ]
        */
       customTags?: components["schemas"]["CustomTag"][];
+      /**
+       * @description Custom network for resource
+       * @example n-1234567890
+       */
+      custom_network_id?: string;
       /**
        * @description This externalBillingId is deprecated and will be removed in the future
        * @example external-billing-id-1234
@@ -23011,9 +23011,9 @@ export interface components {
      *         "lastBackupTime": "2021-09-01T00:00:00Z"
      *       },
      *       "cloud_provider": "aws",
-     *       "created_at": "2023-01-10T00:00:00Z",
      *       "createdByUserId": "user-12345678",
      *       "createdByUserName": "John Doe",
+     *       "created_at": "2023-01-10T00:00:00Z",
      *       "currentReplicas": "2",
      *       "customNetworkDetail": {
      *         "cidr": "10.177.0.0/16",
@@ -23400,11 +23400,6 @@ export interface components {
        */
       cloud_provider?: string;
       /**
-       * @description The instance creation time
-       * @example 2023-01-10T00:00:00Z
-       */
-      created_at?: string;
-      /**
        * @description ID of a User
        * @example Sequi esse.
        */
@@ -23414,6 +23409,11 @@ export interface components {
        * @example John Doe
        */
       createdByUserName?: string;
+      /**
+       * @description The instance creation time
+       * @example 2023-01-10T00:00:00Z
+       */
+      created_at?: string;
       /**
        * @description The current number of replicas
        * @example 2
@@ -33612,9 +33612,9 @@ export interface components {
      *             "lastBackupTime": "2021-09-01T00:00:00Z"
      *           },
      *           "cloud_provider": "aws",
-     *           "created_at": "2023-01-10T00:00:00Z",
      *           "createdByUserId": "user-12345678",
      *           "createdByUserName": "John Doe",
+     *           "created_at": "2023-01-10T00:00:00Z",
      *           "currentReplicas": "2",
      *           "customNetworkDetail": {
      *             "cidr": "10.177.0.0/16",
@@ -33917,9 +33917,9 @@ export interface components {
      *             "lastBackupTime": "2021-09-01T00:00:00Z"
      *           },
      *           "cloud_provider": "aws",
-     *           "created_at": "2023-01-10T00:00:00Z",
      *           "createdByUserId": "user-12345678",
      *           "createdByUserName": "John Doe",
+     *           "created_at": "2023-01-10T00:00:00Z",
      *           "currentReplicas": "2",
      *           "customNetworkDetail": {
      *             "cidr": "10.177.0.0/16",
@@ -34234,9 +34234,9 @@ export interface components {
        *           "lastBackupTime": "2021-09-01T00:00:00Z"
        *         },
        *         "cloud_provider": "aws",
-       *         "created_at": "2023-01-10T00:00:00Z",
        *         "createdByUserId": "user-12345678",
        *         "createdByUserName": "John Doe",
+       *         "created_at": "2023-01-10T00:00:00Z",
        *         "currentReplicas": "2",
        *         "customNetworkDetail": {
        *           "cidr": "10.177.0.0/16",
@@ -34539,9 +34539,9 @@ export interface components {
        *           "lastBackupTime": "2021-09-01T00:00:00Z"
        *         },
        *         "cloud_provider": "aws",
-       *         "created_at": "2023-01-10T00:00:00Z",
        *         "createdByUserId": "user-12345678",
        *         "createdByUserName": "John Doe",
+       *         "created_at": "2023-01-10T00:00:00Z",
        *         "currentReplicas": "2",
        *         "customNetworkDetail": {
        *           "cidr": "10.177.0.0/16",
@@ -34844,9 +34844,9 @@ export interface components {
        *           "lastBackupTime": "2021-09-01T00:00:00Z"
        *         },
        *         "cloud_provider": "aws",
-       *         "created_at": "2023-01-10T00:00:00Z",
        *         "createdByUserId": "user-12345678",
        *         "createdByUserName": "John Doe",
+       *         "created_at": "2023-01-10T00:00:00Z",
        *         "currentReplicas": "2",
        *         "customNetworkDetail": {
        *           "cidr": "10.177.0.0/16",
@@ -35149,9 +35149,9 @@ export interface components {
        *           "lastBackupTime": "2021-09-01T00:00:00Z"
        *         },
        *         "cloud_provider": "aws",
-       *         "created_at": "2023-01-10T00:00:00Z",
        *         "createdByUserId": "user-12345678",
        *         "createdByUserName": "John Doe",
+       *         "created_at": "2023-01-10T00:00:00Z",
        *         "currentReplicas": "2",
        *         "customNetworkDetail": {
        *           "cidr": "10.177.0.0/16",
@@ -60987,57 +60987,7 @@ export interface components {
      *       "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8",
      *       "terraformExecutionIdentity": "arn:aws:iam::123456789012:role/role-name",
      *       "terraformPath": "/project1/tf",
-     *       "variablesValuesFileOverride": [
-     *         118,
-     *         97,
-     *         114,
-     *         105,
-     *         97,
-     *         98,
-     *         108,
-     *         101,
-     *         32,
-     *         34,
-     *         105,
-     *         110,
-     *         115,
-     *         116,
-     *         97,
-     *         110,
-     *         99,
-     *         101,
-     *         95,
-     *         116,
-     *         121,
-     *         112,
-     *         101,
-     *         34,
-     *         32,
-     *         123,
-     *         32,
-     *         100,
-     *         101,
-     *         102,
-     *         97,
-     *         117,
-     *         108,
-     *         116,
-     *         32,
-     *         61,
-     *         32,
-     *         34,
-     *         116,
-     *         50,
-     *         46,
-     *         109,
-     *         105,
-     *         99,
-     *         114,
-     *         111,
-     *         34,
-     *         32,
-     *         125
-     *       ]
+     *       "variablesValuesFileOverride": "dmFyaWFibGUgImluc3RhbmNlX3R5cGUiIHsgZGVmYXVsdCA9ICJ0Mi5taWNybyIgfQ=="
      *     }
      */
     TerraformConfiguration: {
@@ -61105,57 +61055,7 @@ export interface components {
       terraformPath: string;
       /**
        * @description The variables values file override in base64 format for the Terraform configuration
-       * @example [
-       *       118,
-       *       97,
-       *       114,
-       *       105,
-       *       97,
-       *       98,
-       *       108,
-       *       101,
-       *       32,
-       *       34,
-       *       105,
-       *       110,
-       *       115,
-       *       116,
-       *       97,
-       *       110,
-       *       99,
-       *       101,
-       *       95,
-       *       116,
-       *       121,
-       *       112,
-       *       101,
-       *       34,
-       *       32,
-       *       123,
-       *       32,
-       *       100,
-       *       101,
-       *       102,
-       *       97,
-       *       117,
-       *       108,
-       *       116,
-       *       32,
-       *       61,
-       *       32,
-       *       34,
-       *       116,
-       *       50,
-       *       46,
-       *       109,
-       *       105,
-       *       99,
-       *       114,
-       *       111,
-       *       34,
-       *       32,
-       *       125
-       *     ]
+       * @example dmFyaWFibGUgImluc3RhbmNlX3R5cGUiIHsgZGVmYXVsdCA9ICJ0Mi5taWNybyIgfQ==
        */
       variablesValuesFileOverride?: string;
     };
@@ -68098,2030 +67998,6 @@ export interface operations {
       };
     };
   };
-  "account-config-api/DescribeAccountConfig": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "accountOnboardingDetails": {
-           *         "awsAccountOnboardingDetails": {
-           *           "cloudFormationARN": "arn:aws:cloudformation:us-east-1:123456789012:stack/AccountConfigSetup/2b1a10e0-6e9f-11f1-9330-0afff85e6be1"
-           *         }
-           *       },
-           *       "appliedSettings": {
-           *         "accountGovernanceControls": {
-           *           "connected": true,
-           *           "debugAccessEnabled": false,
-           *           "infrastructureMutationEnabled": true
-           *         }
-           *       },
-           *       "awsAccountID": "123456789012",
-           *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
-           *       "awsBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/aws-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
-           *       "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
-           *       "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "azureOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *       "byoaInstanceIDs": [
-           *         "instance-12345678",
-           *         "instance-abcdefgh"
-           *       ],
-           *       "cloudProviderId": "Unde assumenda magni dolorum at et non.",
-           *       "customTags": [
-           *         {
-           *           "key": "customKey",
-           *           "value": "customValue"
-           *         },
-           *         {
-           *           "key": "customKey",
-           *           "value": "customValue"
-           *         },
-           *         {
-           *           "key": "customKey",
-           *           "value": "customValue"
-           *         },
-           *         {
-           *           "key": "customKey",
-           *           "value": "customValue"
-           *         }
-           *       ],
-           *       "description": "An AWS account hosting multiple dev environments",
-           *       "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "gcpOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "gcpProjectID": "my-project",
-           *       "gcpProjectNumber": "123456789012",
-           *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
-           *       "id": "Eveniet sint accusantium occaecati quisquam consequatur.",
-           *       "name": "Dev AWS account",
-           *       "nebiusBindings": [
-           *         {
-           *           "derivedPublicKeyFingerprint": "SHA256:derived-public-key-fingerprint",
-           *           "keyExpiresAt": "2026-04-15T12:00:00Z",
-           *           "keyFingerprint": "SHA256:live-nebius-auth-public-key-fingerprint",
-           *           "keyState": "ACTIVE",
-           *           "ownsArtifactBucket": true,
-           *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-           *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-           *           "publicKeyIDMatches": true,
-           *           "region": "eu-north1",
-           *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8",
-           *           "serviceAccountKeyValidated": true,
-           *           "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
-           *           "statusMessage": "Binding is ready"
-           *         },
-           *         {
-           *           "derivedPublicKeyFingerprint": "SHA256:derived-public-key-fingerprint",
-           *           "keyExpiresAt": "2026-04-15T12:00:00Z",
-           *           "keyFingerprint": "SHA256:live-nebius-auth-public-key-fingerprint",
-           *           "keyState": "ACTIVE",
-           *           "ownsArtifactBucket": true,
-           *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-           *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-           *           "publicKeyIDMatches": true,
-           *           "region": "eu-north1",
-           *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8",
-           *           "serviceAccountKeyValidated": true,
-           *           "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
-           *           "statusMessage": "Binding is ready"
-           *         }
-           *       ],
-           *       "nebiusTenantID": "tenant-e00abc123",
-           *       "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *       "ociOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
-           *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *       "requestedSettings": {
-           *         "accountGovernanceControls": {
-           *           "connected": true,
-           *           "debugAccessEnabled": false,
-           *           "infrastructureMutationEnabled": true
-           *         }
-           *       },
-           *       "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
-           *       "statusMessage": "Account is ready"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeAccountConfigResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe an account config */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/UpdateAccountConfig": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "customTags": [
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         },
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         }
-         *       ],
-         *       "description": "Nebius account for eu-north1 and eu-west1 projects",
-         *       "name": "Updated Nebius account",
-         *       "nebiusBindings": [
-         *         {
-         *           "ownsArtifactBucket": true,
-         *           "privateKeyPEM": "Voluptate unde natus.",
-         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
-         *         },
-         *         {
-         *           "ownsArtifactBucket": true,
-         *           "privateKeyPEM": "Voluptate unde natus.",
-         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
-         *         },
-         *         {
-         *           "ownsArtifactBucket": true,
-         *           "privateKeyPEM": "Voluptate unde natus.",
-         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
-         *         }
-         *       ],
-         *       "settings": {
-         *         "accountGovernanceControls": {
-         *           "connected": true,
-         *           "debugAccessEnabled": false,
-         *           "infrastructureMutationEnabled": true
-         *         }
-         *       }
-         *     }
-         */
-        "application/json": components["schemas"]["UpdateAccountConfigRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example Ex eius modi quod tempora. */
-          "application/json": string;
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to update an account config */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/DeleteAccountConfig": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to delete an account config */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/ListAccountConfigCloudNativeNetworks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudNativeNetworks": [
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list cloud native networks */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/ImportAccountConfigCloudNativeNetworkHostCluster": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-        /**
-         * @description The deployment region where the host cluster resides
-         * @example us-east-1
-         */
-        region: string;
-        /**
-         * @description The cloud provider network ID (e.g. AWS VPC ID) that contains the host cluster to import
-         * @example vpc-0abc123def456
-         */
-        cloudNativeNetworkId: string;
-        /**
-         * @description The cloud provider host cluster name to import from this cloud native network
-         * @example existing-eks-cluster
-         */
-        hostClusterName: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "created": true,
-           *       "hostClusterId": "Molestiae dolorum quaerat mollitia labore rerum quia."
-           *     }
-           */
-          "application/json": components["schemas"]["ImportAccountConfigCloudNativeNetworkHostClusterResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to import cloud native network host cluster */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/ImportAccountConfigCloudNativeNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-        /**
-         * @description The deployment region whose validated subnetworks should be imported
-         * @example us-east-1
-         */
-        region: string;
-        /**
-         * @description The provider-native network ID (for example, AWS VPC ID, GCP VPC name, or Azure VNet resource ID) to import for deployments
-         * @example /subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet
-         */
-        cloudNativeNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudNativeNetworks": [
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to import cloud native network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/UnimportAccountConfigCloudNativeNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-        /**
-         * @description The deployment region whose cloud native network row should be unimported
-         * @example us-east-1
-         */
-        region: string;
-        /**
-         * @description The provider-native network ID (for example, AWS VPC ID, GCP VPC name, or Azure VNet resource ID) to unimport. Rejected with HTTP 400 if the network is currently in use by a host cluster.
-         * @example /subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet
-         */
-        cloudNativeNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudNativeNetworks": [
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to unimport cloud native network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/BulkImportAccountConfigCloudNativeNetworks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "cloudNativeNetworks": [
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "import": true,
-         *           "region": "us-east-1"
-         *         },
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "import": true,
-         *           "region": "us-east-1"
-         *         },
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "import": true,
-         *           "region": "us-east-1"
-         *         },
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "import": true,
-         *           "region": "us-east-1"
-         *         }
-         *       ]
-         *     }
-         */
-        "application/json": components["schemas"]["BulkImportAccountConfigCloudNativeNetworksRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudNativeNetworks": [
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to bulk import cloud native networks */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "account-config-api/SyncAccountConfigCloudNativeNetworks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Account Config ID to operate on
-         * @example ac-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "cloudNativeNetworks": [
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "includeHostClusters": false,
-         *           "region": "us-east-1"
-         *         },
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "includeHostClusters": false,
-         *           "region": "us-east-1"
-         *         },
-         *         {
-         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-         *           "includeHostClusters": false,
-         *           "region": "us-east-1"
-         *         }
-         *       ]
-         *     }
-         */
-        "application/json": components["schemas"]["SyncAccountConfigCloudNativeNetworksRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudNativeNetworks": [
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         },
-           *         {
-           *           "accountConfigId": "Natus ut ut eos.",
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
-           *           "createdAt": "2026-04-14T10:00:00Z",
-           *           "createdByOmnistrate": false,
-           *           "hostClusters": [
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             },
-           *             {
-           *               "eligibleToImport": true,
-           *               "ineligibilityReason": "Host cluster is already imported",
-           *               "name": "existing-eks-cluster"
-           *             }
-           *           ],
-           *           "id": "acvpc-12345678",
-           *           "imported": true,
-           *           "inUse": false,
-           *           "name": "production-vpc",
-           *           "privateSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "publicSubnets": [
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             },
-           *             {
-           *               "az": "us-east-1a",
-           *               "cidr": "10.0.1.0/24",
-           *               "id": "subnet-0abc123def456",
-           *               "isPublic": false,
-           *               "isTagged": true
-           *             }
-           *           ],
-           *           "region": "us-east-1",
-           *           "status": "PENDING|VERIFYING|READY|FAILED",
-           *           "statusMessage": "Cloud native network validated successfully",
-           *           "supportsPrivateDeployment": true,
-           *           "supportsPublicDeployment": true,
-           *           "updatedAt": "2026-04-14T10:05:00Z"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to sync cloud native networks */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "account-config-api/DescribeAccountConfigByAWSAccountID": {
     parameters: {
       query?: never;
@@ -71479,6 +69355,2030 @@ export interface operations {
       };
     };
   };
+  "account-config-api/DescribeAccountConfig": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "accountOnboardingDetails": {
+           *         "awsAccountOnboardingDetails": {
+           *           "cloudFormationARN": "arn:aws:cloudformation:us-east-1:123456789012:stack/AccountConfigSetup/2b1a10e0-6e9f-11f1-9330-0afff85e6be1"
+           *         }
+           *       },
+           *       "appliedSettings": {
+           *         "accountGovernanceControls": {
+           *           "connected": true,
+           *           "debugAccessEnabled": false,
+           *           "infrastructureMutationEnabled": true
+           *         }
+           *       },
+           *       "awsAccountID": "123456789012",
+           *       "awsBootstrapRoleARN": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>",
+           *       "awsBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/aws-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "awsCloudFormationNoLBTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template-no-lb-policy.yaml",
+           *       "awsCloudFormationTemplateURL": "https://s3.amazonaws.com/omnistrate-cloudformation/org-EUVvex3bVm/account-config-setup-template.yaml",
+           *       "azureBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "azureDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "azureOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/azure-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *       "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *       "byoaInstanceIDs": [
+           *         "instance-12345678",
+           *         "instance-abcdefgh"
+           *       ],
+           *       "cloudProviderId": "Unde assumenda magni dolorum at et non.",
+           *       "customTags": [
+           *         {
+           *           "key": "customKey",
+           *           "value": "customValue"
+           *         },
+           *         {
+           *           "key": "customKey",
+           *           "value": "customValue"
+           *         },
+           *         {
+           *           "key": "customKey",
+           *           "value": "customValue"
+           *         },
+           *         {
+           *           "key": "customKey",
+           *           "value": "customValue"
+           *         }
+           *       ],
+           *       "description": "An AWS account hosting multiple dev environments",
+           *       "gcpBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "gcpDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "gcpOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/gcp-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "gcpProjectID": "my-project",
+           *       "gcpProjectNumber": "123456789012",
+           *       "gcpServiceAccountEmail": "bootstrap@my-project.iam.gserviceaccount.com",
+           *       "id": "Eveniet sint accusantium occaecati quisquam consequatur.",
+           *       "name": "Dev AWS account",
+           *       "nebiusBindings": [
+           *         {
+           *           "derivedPublicKeyFingerprint": "SHA256:derived-public-key-fingerprint",
+           *           "keyExpiresAt": "2026-04-15T12:00:00Z",
+           *           "keyFingerprint": "SHA256:live-nebius-auth-public-key-fingerprint",
+           *           "keyState": "ACTIVE",
+           *           "ownsArtifactBucket": true,
+           *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+           *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+           *           "publicKeyIDMatches": true,
+           *           "region": "eu-north1",
+           *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8",
+           *           "serviceAccountKeyValidated": true,
+           *           "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
+           *           "statusMessage": "Binding is ready"
+           *         },
+           *         {
+           *           "derivedPublicKeyFingerprint": "SHA256:derived-public-key-fingerprint",
+           *           "keyExpiresAt": "2026-04-15T12:00:00Z",
+           *           "keyFingerprint": "SHA256:live-nebius-auth-public-key-fingerprint",
+           *           "keyState": "ACTIVE",
+           *           "ownsArtifactBucket": true,
+           *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+           *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+           *           "publicKeyIDMatches": true,
+           *           "region": "eu-north1",
+           *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8",
+           *           "serviceAccountKeyValidated": true,
+           *           "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
+           *           "statusMessage": "Binding is ready"
+           *         }
+           *       ],
+           *       "nebiusTenantID": "tenant-e00abc123",
+           *       "ociBootstrapShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-bootstrap.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "ociDisconnectShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-disconnect.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *       "ociOffboardShellCommand": "bash -c \"$(curl -fsSL https://omnistrate.com/account-setup/oci-offboard.sh?account_config_id=ac-MOju2uwKM0)\"",
+           *       "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *       "requestedSettings": {
+           *         "accountGovernanceControls": {
+           *           "connected": true,
+           *           "debugAccessEnabled": false,
+           *           "infrastructureMutationEnabled": true
+           *         }
+           *       },
+           *       "status": "PENDING|PENDING_UPDATE|VERIFYING|READY|DISCONNECTED|FAILED|DELETING|READY_TO_OFFBOARD",
+           *       "statusMessage": "Account is ready"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeAccountConfigResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe an account config */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/UpdateAccountConfig": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "customTags": [
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         },
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         }
+         *       ],
+         *       "description": "Nebius account for eu-north1 and eu-west1 projects",
+         *       "name": "Updated Nebius account",
+         *       "nebiusBindings": [
+         *         {
+         *           "ownsArtifactBucket": true,
+         *           "privateKeyPEM": "Voluptate unde natus.",
+         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
+         *         },
+         *         {
+         *           "ownsArtifactBucket": true,
+         *           "privateKeyPEM": "Voluptate unde natus.",
+         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
+         *         },
+         *         {
+         *           "ownsArtifactBucket": true,
+         *           "privateKeyPEM": "Voluptate unde natus.",
+         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
+         *         }
+         *       ],
+         *       "settings": {
+         *         "accountGovernanceControls": {
+         *           "connected": true,
+         *           "debugAccessEnabled": false,
+         *           "infrastructureMutationEnabled": true
+         *         }
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["UpdateAccountConfigRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example Ex eius modi quod tempora. */
+          "application/json": string;
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to update an account config */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/DeleteAccountConfig": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to delete an account config */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/ListAccountConfigCloudNativeNetworks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudNativeNetworks": [
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list cloud native networks */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/BulkImportAccountConfigCloudNativeNetworks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "cloudNativeNetworks": [
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "import": true,
+         *           "region": "us-east-1"
+         *         },
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "import": true,
+         *           "region": "us-east-1"
+         *         },
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "import": true,
+         *           "region": "us-east-1"
+         *         },
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "import": true,
+         *           "region": "us-east-1"
+         *         }
+         *       ]
+         *     }
+         */
+        "application/json": components["schemas"]["BulkImportAccountConfigCloudNativeNetworksRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudNativeNetworks": [
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to bulk import cloud native networks */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/SyncAccountConfigCloudNativeNetworks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "cloudNativeNetworks": [
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "includeHostClusters": false,
+         *           "region": "us-east-1"
+         *         },
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "includeHostClusters": false,
+         *           "region": "us-east-1"
+         *         },
+         *         {
+         *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+         *           "includeHostClusters": false,
+         *           "region": "us-east-1"
+         *         }
+         *       ]
+         *     }
+         */
+        "application/json": components["schemas"]["SyncAccountConfigCloudNativeNetworksRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudNativeNetworks": [
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to sync cloud native networks */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/ImportAccountConfigCloudNativeNetworkHostCluster": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+        /**
+         * @description The deployment region where the host cluster resides
+         * @example us-east-1
+         */
+        region: string;
+        /**
+         * @description The cloud provider network ID (e.g. AWS VPC ID) that contains the host cluster to import
+         * @example vpc-0abc123def456
+         */
+        cloudNativeNetworkId: string;
+        /**
+         * @description The cloud provider host cluster name to import from this cloud native network
+         * @example existing-eks-cluster
+         */
+        hostClusterName: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "created": true,
+           *       "hostClusterId": "Molestiae dolorum quaerat mollitia labore rerum quia."
+           *     }
+           */
+          "application/json": components["schemas"]["ImportAccountConfigCloudNativeNetworkHostClusterResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to import cloud native network host cluster */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/ImportAccountConfigCloudNativeNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+        /**
+         * @description The deployment region whose validated subnetworks should be imported
+         * @example us-east-1
+         */
+        region: string;
+        /**
+         * @description The provider-native network ID (for example, AWS VPC ID, GCP VPC name, or Azure VNet resource ID) to import for deployments
+         * @example /subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet
+         */
+        cloudNativeNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudNativeNetworks": [
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to import cloud native network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "account-config-api/UnimportAccountConfigCloudNativeNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Account Config ID to operate on
+         * @example ac-12345678
+         */
+        id: string;
+        /**
+         * @description The deployment region whose cloud native network row should be unimported
+         * @example us-east-1
+         */
+        region: string;
+        /**
+         * @description The provider-native network ID (for example, AWS VPC ID, GCP VPC name, or Azure VNet resource ID) to unimport. Rejected with HTTP 400 if the network is currently in use by a host cluster.
+         * @example /subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet
+         */
+        cloudNativeNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudNativeNetworks": [
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         },
+           *         {
+           *           "accountConfigId": "Natus ut ut eos.",
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudNativeNetworkId": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/customer-rg/providers/Microsoft.Network/virtualNetworks/customer-vnet",
+           *           "createdAt": "2026-04-14T10:00:00Z",
+           *           "createdByOmnistrate": false,
+           *           "hostClusters": [
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             },
+           *             {
+           *               "eligibleToImport": true,
+           *               "ineligibilityReason": "Host cluster is already imported",
+           *               "name": "existing-eks-cluster"
+           *             }
+           *           ],
+           *           "id": "acvpc-12345678",
+           *           "imported": true,
+           *           "inUse": false,
+           *           "name": "production-vpc",
+           *           "privateSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "publicSubnets": [
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             },
+           *             {
+           *               "az": "us-east-1a",
+           *               "cidr": "10.0.1.0/24",
+           *               "id": "subnet-0abc123def456",
+           *               "isPublic": false,
+           *               "isTagged": true
+           *             }
+           *           ],
+           *           "region": "us-east-1",
+           *           "status": "PENDING|VERIFYING|READY|FAILED",
+           *           "statusMessage": "Cloud native network validated successfully",
+           *           "supportsPrivateDeployment": true,
+           *           "supportsPublicDeployment": true,
+           *           "updatedAt": "2026-04-14T10:05:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAccountConfigCloudNativeNetworksResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to unimport cloud native network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "api-key-api/ListAPIKeys": {
     parameters: {
       query?: never;
@@ -72104,92 +72004,6 @@ export interface operations {
       };
     };
   };
-  "availability-zone-api/DescribeAvailabilityZone": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @example az-12345678 */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "code": "us-east-1a",
-           *       "description": "US East (N. Virginia) Availability Zone A",
-           *       "id": "Aperiam cumque.",
-           *       "regionCode": "us-east-1"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeAvailabilityZoneResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe an availability zone */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "availability-zone-api/ListAvailabilityZone": {
     parameters: {
       query?: never;
@@ -72446,6 +72260,92 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to list availability zones by region code */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "availability-zone-api/DescribeAvailabilityZone": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @example az-12345678 */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "code": "us-east-1a",
+           *       "description": "US East (N. Virginia) Availability Zone A",
+           *       "id": "Aperiam cumque.",
+           *       "regionCode": "us-east-1"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeAvailabilityZoneResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe an availability zone */
       500: {
         headers: {
           [name: string]: unknown;
@@ -72720,6 +72620,87 @@ export interface operations {
       };
     };
   };
+  "cloud-provider-api/GetCloudProviderByName": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Name of the CloudProvider
+         * @example aws
+         */
+        name: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example Et occaecati. */
+          "application/json": string;
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to get an cloud provider by name */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "cloud-provider-api/DescribeCloudProvider": {
     parameters: {
       query?: never;
@@ -72797,87 +72778,6 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to describe an cloud provider */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "cloud-provider-api/GetCloudProviderByName": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Name of the CloudProvider
-         * @example aws
-         */
-        name: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example Et occaecati. */
-          "application/json": string;
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to get an cloud provider by name */
       500: {
         headers: {
           [name: string]: unknown;
@@ -73441,6 +73341,127 @@ export interface operations {
       };
     };
   };
+  "custom-domain-api/CustomDomainIdentityID": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "id": "Quos voluptate nobis provident est."
+           *     }
+           */
+          "application/json": components["schemas"]["CustomDomainIdentityIDResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to get an Custom Domain identity id */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-domain-api/VerifyCustomDomain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description custom domain ID to operate on
+         * @example cd-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list Custom Domains */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "custom-domain-api/DescribeCustomDomain": {
     parameters: {
       query?: never;
@@ -73594,127 +73615,6 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to delete an Custom Domain */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-domain-api/CustomDomainIdentityID": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "id": "Quos voluptate nobis provident est."
-           *     }
-           */
-          "application/json": components["schemas"]["CustomDomainIdentityIDResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to get an Custom Domain identity id */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-domain-api/VerifyCustomDomain": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description custom domain ID to operate on
-         * @example cd-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list Custom Domains */
       500: {
         headers: {
           [name: string]: unknown;
@@ -80699,95 +80599,6 @@ export interface operations {
       };
     };
   };
-  "region-api/DescribeRegion": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description ID of the Region
-         * @example region-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudProviderId": "Eaque eos sequi non.",
-           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "code": "us-east-1",
-           *       "description": "US East (N. Virginia)",
-           *       "id": "Ab vero sapiente."
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeRegionResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a region */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "region-api/ListRegion": {
     parameters: {
       query?: {
@@ -80984,6 +80795,95 @@ export interface operations {
       };
     };
   };
+  "region-api/DescribeRegion": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description ID of the Region
+         * @example region-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudProviderId": "Eaque eos sequi non.",
+           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "code": "us-east-1",
+           *       "description": "US East (N. Virginia)",
+           *       "id": "Ab vero sapiente."
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeRegionResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a region */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "signup-api/ResetPassword": {
     parameters: {
       query?: never;
@@ -81102,9 +81002,9 @@ export interface operations {
            *             "lastBackupTime": "2021-09-01T00:00:00Z"
            *           },
            *           "cloud_provider": "aws",
-           *           "created_at": "2023-01-10T00:00:00Z",
            *           "createdByUserId": "Aliquid sapiente vel ea praesentium.",
            *           "createdByUserName": "John Doe",
+           *           "created_at": "2023-01-10T00:00:00Z",
            *           "currentReplicas": "2",
            *           "customNetworkDetail": {
            *             "cidr": "10.177.0.0/16",
@@ -81641,9 +81541,9 @@ export interface operations {
            *             "lastBackupTime": "2021-09-01T00:00:00Z"
            *           },
            *           "cloud_provider": "aws",
-           *           "created_at": "2023-01-10T00:00:00Z",
            *           "createdByUserId": "Aliquid sapiente vel ea praesentium.",
            *           "createdByUserName": "John Doe",
+           *           "created_at": "2023-01-10T00:00:00Z",
            *           "currentReplicas": "2",
            *           "customNetworkDetail": {
            *             "cidr": "10.177.0.0/16",
@@ -82226,6 +82126,4043 @@ export interface operations {
         };
         content: {
           "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "resource-instance-api/UpdateAccountConfigResourceInstance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The instance ID
+         * @example instance-abcd1234
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "customTags": [
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         },
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         },
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         },
+         *         {
+         *           "key": "customKey",
+         *           "value": "customValue"
+         *         }
+         *       ],
+         *       "nebiusBindings": [
+         *         {
+         *           "privateKeyPEM": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----",
+         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
+         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
+         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
+         *         }
+         *       ],
+         *       "serviceId": "service-1234",
+         *       "setConnection": true,
+         *       "subscriptionId": "sub-abcd1234"
+         *     }
+         */
+        "application/json": components["schemas"]["UpdateAccountConfigResourceInstanceRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to update a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "audit-events-api/ListAllAuditEvents": {
+    parameters: {
+      query?: {
+        /** @example token */
+        nextPageToken?: string;
+        /** @example 10 */
+        pageSize?: number;
+        /**
+         * @description The service ID to list events for
+         * @example s-123456
+         */
+        serviceID?: string;
+        /** @example PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL */
+        environmentType?: string;
+        /**
+         * @description The event types to filter by
+         * @example [
+         *       "Possimus qui.",
+         *       "Dolorum perferendis velit et et amet repellendus.",
+         *       "Ea unde debitis ut.",
+         *       "Placeat ut reprehenderit earum sequi perspiciatis sit."
+         *     ]
+         */
+        eventSourceTypes?: string[];
+        /**
+         * @description The instance ID to list events for
+         * @example instance-12345678
+         */
+        instanceID?: string;
+        /**
+         * @description Start date of the events
+         * @example 2023-01-01T10:00:00Z
+         */
+        startDate?: string;
+        /**
+         * @description End date of the events
+         * @example 2024-01-01T10:00:00Z
+         */
+        endDate?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "events": [
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         }
+           *       ],
+           *       "ids": [
+           *         "event-12345678"
+           *       ],
+           *       "nextPageToken": "token"
+           *     }
+           */
+          "application/json": components["schemas"]["ListAuditEventsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list all events */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "audit-events-api/DescribeAuditEvent": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The ID of the event
+         * @example event-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "authMethod": "API_KEY",
+           *       "billingProvider": "STRIPE",
+           *       "billingProviderId": "payer_acme_corp_2024",
+           *       "cloudProvider": "aws",
+           *       "cloudProviderAccountId": "account-12345678",
+           *       "environmentId": "se-123456",
+           *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *       "eventSource": "Customer, Infra or Maintenance",
+           *       "id": "Ad dolor est eos voluptatum.",
+           *       "ipAddress": "203.0.113.42",
+           *       "message": "instance-abcd1234 created",
+           *       "orgId": "Adipisci quos nisi.",
+           *       "orgName": "Acme Corporation",
+           *       "planVersion": "v1.0",
+           *       "productTierId": "Iure autem voluptatibus debitis rerum eum error.",
+           *       "region": "us-east-1",
+           *       "resourceInstanceId": "instance-abcd1234",
+           *       "resourceName": "Galera",
+           *       "roleType": "root",
+           *       "serviceId": "s-123456",
+           *       "serviceName": "mysql",
+           *       "servicePlanName": "Basic Plan",
+           *       "sessionId": "ak-12345678",
+           *       "subscriptionId": "sub-abcd1234",
+           *       "time": "2023-01-10T00:00:00Z",
+           *       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *       "userId": "Culpa rem aliquid.",
+           *       "userName": "John Doe",
+           *       "workflowFailures": [
+           *         {
+           *           "eventTime": "2020-01-01T00:00:00Z",
+           *           "message": "Bootstrap failed for reason X"
+           *         },
+           *         {
+           *           "eventTime": "2020-01-01T00:01:00Z",
+           *           "message": "Compute failed for reason Y"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeAuditEventResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe event */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-billing-api/DescribeConsumptionBillingDetails": {
+    parameters: {
+      query?: {
+        /**
+         * @description Return Url used to configure payment methods links
+         * @example https://mysaasportal.com
+         */
+        returnUrl?: string;
+        /**
+         * @description Whether the caller supports inline custom payment method management
+         * @example true
+         */
+        supportsCustomPaymentPortal?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "billingProviders": [
+           *         {
+           *           "paymentConfigurable": true,
+           *           "paymentConfigured": true,
+           *           "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx",
+           *           "type": "STRIPE"
+           *         },
+           *         {
+           *           "balanceDueLink": "https://billing.provider.com/balance-due",
+           *           "logoURL": "https://example.com/logo.png",
+           *           "name": "GovPay",
+           *           "paymentConfigurable": false,
+           *           "paymentConfigured": false,
+           *           "paymentInfoPortalURL": null,
+           *           "type": "BRING_YOUR_OWN"
+           *         }
+           *       ],
+           *       "customPaymentPortalEnabled": true,
+           *       "paymentConfigured": true,
+           *       "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeConsumptionBillingDetailsResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-billing-api/DescribeConsumptionBillingStatus": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "enabled": true
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeConsumptionBillingStatusResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-payment-method-api/GetConsumptionStripeConfig": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "publishableKey": "pk_test_51...",
+           *       "stripeAccountId": "acct_1M2JTkLkdIwHu7ix"
+           *     }
+           */
+          "application/json": components["schemas"]["StripeConfigResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when billing is not configured */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-payment-method-api/ListConsumptionPaymentMethods": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "paymentMethods": [
+           *         {
+           *           "bankName": "STRIPE TEST BANK",
+           *           "brand": "visa",
+           *           "displayName": "Visa ending 4242",
+           *           "expMonth": 12,
+           *           "expYear": 2030,
+           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+           *           "isDefault": true,
+           *           "last4": "4242",
+           *           "type": "card"
+           *         },
+           *         {
+           *           "bankName": "STRIPE TEST BANK",
+           *           "brand": "visa",
+           *           "displayName": "Visa ending 4242",
+           *           "expMonth": 12,
+           *           "expYear": 2030,
+           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+           *           "isDefault": true,
+           *           "last4": "4242",
+           *           "type": "card"
+           *         },
+           *         {
+           *           "bankName": "STRIPE TEST BANK",
+           *           "brand": "visa",
+           *           "displayName": "Visa ending 4242",
+           *           "expMonth": 12,
+           *           "expYear": 2030,
+           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+           *           "isDefault": true,
+           *           "last4": "4242",
+           *           "type": "card"
+           *         },
+           *         {
+           *           "bankName": "STRIPE TEST BANK",
+           *           "brand": "visa",
+           *           "displayName": "Visa ending 4242",
+           *           "expMonth": 12,
+           *           "expYear": 2030,
+           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
+           *           "isDefault": true,
+           *           "last4": "4242",
+           *           "type": "card"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListPaymentMethodsResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when billing is not configured */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list payment methods */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-payment-method-api/CreateConsumptionSetupIntent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "clientSecret": "seti_1NVChw2eZvKYlo2C_secret_..."
+           *     }
+           */
+          "application/json": components["schemas"]["CreateSetupIntentResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when billing is not configured */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create setup intent */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-payment-method-api/RemoveConsumptionPaymentMethod": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Payment method ID to remove
+         * @example pm_1NVChw2eZvKYlo2CwkOranTh
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content response. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the payment method is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when removal is blocked by unpaid invoices or active resources */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to remove payment method */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-payment-method-api/SetDefaultConsumptionPaymentMethod": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Payment method ID to set as default
+         * @example pm_1NVChw2eZvKYlo2CwkOranTh
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content response. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the payment method is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to set default */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-network-api/ListCustomNetworks": {
+    parameters: {
+      query?: {
+        /**
+         * @description The name of the cloud provider to filter custom networks by
+         * @example aws
+         */
+        cloudProviderName?: string;
+        /**
+         * @description The region of the cloud provider to filter custom networks by
+         * @example us-east-1
+         */
+        cloudProviderRegion?: string;
+        /**
+         * @description Flag indicating whether to return only custom networks, or to include default and imported networks as well
+         * @example false
+         */
+        customNetworksOnly?: boolean;
+        /**
+         * @description List available custom networks for the given subscription ID
+         * @example sub-12345678
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "customNetworks": [
+           *         {
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *           "cloudProviderRegion": "us-east-1",
+           *           "created_at": "2023-01-10T00:00:00Z",
+           *           "id": "Hic sed voluptas cumque vel est.",
+           *           "last_modified_at": "2023-01-20T00:00:00Z",
+           *           "name": "Prod us-east-1",
+           *           "networkDefinitionType": "Default|Custom|Imported",
+           *           "networkFeaturesConfiguration": {
+           *             "isPrivateLinkEnabled": false
+           *           },
+           *           "networkInstances": [
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             },
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             }
+           *           ],
+           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
+           *           "owningUserName": "John Doe",
+           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *         },
+           *         {
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *           "cloudProviderRegion": "us-east-1",
+           *           "created_at": "2023-01-10T00:00:00Z",
+           *           "id": "Hic sed voluptas cumque vel est.",
+           *           "last_modified_at": "2023-01-20T00:00:00Z",
+           *           "name": "Prod us-east-1",
+           *           "networkDefinitionType": "Default|Custom|Imported",
+           *           "networkFeaturesConfiguration": {
+           *             "isPrivateLinkEnabled": false
+           *           },
+           *           "networkInstances": [
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             },
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             }
+           *           ],
+           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
+           *           "owningUserName": "John Doe",
+           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *         },
+           *         {
+           *           "cidr": "10.0.0.0/16",
+           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *           "cloudProviderRegion": "us-east-1",
+           *           "created_at": "2023-01-10T00:00:00Z",
+           *           "id": "Hic sed voluptas cumque vel est.",
+           *           "last_modified_at": "2023-01-20T00:00:00Z",
+           *           "name": "Prod us-east-1",
+           *           "networkDefinitionType": "Default|Custom|Imported",
+           *           "networkFeaturesConfiguration": {
+           *             "isPrivateLinkEnabled": false
+           *           },
+           *           "networkInstances": [
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             },
+           *             {
+           *               "awsAccountID": "123456789012",
+           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *               "cloudProviderNativeNetworkId": "vpc-12345678",
+           *               "gcpProjectID": "my-project",
+           *               "gcpProjectNumber": "123456789012",
+           *               "hostClusterID": "Maiores voluptate labore omnis.",
+           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *             }
+           *           ],
+           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
+           *           "owningUserName": "John Doe",
+           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListCustomNetworksResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list custom networks */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-network-api/CreateCustomNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "cidr": "10.0.0.0/16",
+         *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+         *       "cloudProviderRegion": "us-east-1",
+         *       "name": "Prod us-east-1",
+         *       "networkFeaturesConfiguration": {
+         *         "isPrivateLinkEnabled": false
+         *       },
+         *       "orgId": "Non omnis."
+         *     }
+         */
+        "application/json": components["schemas"]["CreateCustomNetworkRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cidr": "10.0.0.0/16",
+           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "cloudProviderRegion": "us-east-1",
+           *       "created_at": "2023-01-10T00:00:00Z",
+           *       "id": "Eos dolores omnis vitae.",
+           *       "last_modified_at": "2023-01-20T00:00:00Z",
+           *       "name": "Prod us-east-1",
+           *       "networkDefinitionType": "Default|Custom|Imported",
+           *       "networkFeaturesConfiguration": {
+           *         "isPrivateLinkEnabled": false
+           *       },
+           *       "networkInstances": [
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         },
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         }
+           *       ],
+           *       "owningUserId": "Architecto asperiores facilis nobis.",
+           *       "owningUserName": "John Doe",
+           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *     }
+           */
+          "application/json": components["schemas"]["CustomNetwork"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a custom network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-network-api/DescribeCustomNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description ID of a custom network
+         * @example n-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cidr": "10.0.0.0/16",
+           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "cloudProviderRegion": "us-east-1",
+           *       "created_at": "2023-01-10T00:00:00Z",
+           *       "id": "Non libero rerum est.",
+           *       "last_modified_at": "2023-01-20T00:00:00Z",
+           *       "name": "Prod us-east-1",
+           *       "networkDefinitionType": "Default|Custom|Imported",
+           *       "networkFeaturesConfiguration": {
+           *         "isPrivateLinkEnabled": false
+           *       },
+           *       "networkInstances": [
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         },
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         },
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         }
+           *       ],
+           *       "owningUserId": "Ut earum numquam error quia impedit expedita.",
+           *       "owningUserName": "John Doe",
+           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *     }
+           */
+          "application/json": components["schemas"]["CustomNetwork"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request to describe a custom network */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested custom network is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a custom network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-network-api/DeleteCustomNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description ID of a custom network
+         * @example n-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request to delete a custom network */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested custom network is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to delete a custom network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "custom-network-api/UpdateCustomNetwork": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description ID of a custom network
+         * @example n-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "name": "Dev us-east-1"
+         *     }
+         */
+        "application/json": components["schemas"]["UpdateCustomNetworkRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cidr": "10.0.0.0/16",
+           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "cloudProviderRegion": "us-east-1",
+           *       "created_at": "2023-01-10T00:00:00Z",
+           *       "id": "Tempore dignissimos et.",
+           *       "last_modified_at": "2023-01-20T00:00:00Z",
+           *       "name": "Prod us-east-1",
+           *       "networkDefinitionType": "Default|Custom|Imported",
+           *       "networkFeaturesConfiguration": {
+           *         "isPrivateLinkEnabled": false
+           *       },
+           *       "networkInstances": [
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         },
+           *         {
+           *           "awsAccountID": "123456789012",
+           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
+           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
+           *           "cloudProviderNativeNetworkId": "vpc-12345678",
+           *           "gcpProjectID": "my-project",
+           *           "gcpProjectNumber": "123456789012",
+           *           "hostClusterID": "Maiores voluptate labore omnis.",
+           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+           *         }
+           *       ],
+           *       "owningUserId": "Et repudiandae inventore.",
+           *       "owningUserName": "John Doe",
+           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *     }
+           */
+          "application/json": components["schemas"]["CustomNetwork"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested custom network is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a custom network */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "audit-events-api/DeprecatedDescribeAuditEvent": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The ID of the event
+         * @example event-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "authMethod": "API_KEY",
+           *       "billingProvider": "STRIPE",
+           *       "billingProviderId": "payer_acme_corp_2024",
+           *       "cloudProvider": "aws",
+           *       "cloudProviderAccountId": "account-12345678",
+           *       "environmentId": "se-123456",
+           *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *       "eventSource": "Customer, Infra or Maintenance",
+           *       "id": "Eum ea accusamus maxime eum fugit.",
+           *       "ipAddress": "203.0.113.42",
+           *       "message": "instance-abcd1234 created",
+           *       "orgId": "Consequatur sunt.",
+           *       "orgName": "Acme Corporation",
+           *       "planVersion": "v1.0",
+           *       "productTierId": "Eum et consequatur eos.",
+           *       "region": "us-east-1",
+           *       "resourceInstanceId": "instance-abcd1234",
+           *       "resourceName": "Galera",
+           *       "roleType": "root",
+           *       "serviceId": "s-123456",
+           *       "serviceName": "mysql",
+           *       "servicePlanName": "Basic Plan",
+           *       "sessionId": "ak-12345678",
+           *       "subscriptionId": "sub-abcd1234",
+           *       "time": "2023-01-10T00:00:00Z",
+           *       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *       "userId": "Eligendi repellendus vel quas qui.",
+           *       "userName": "John Doe",
+           *       "workflowFailures": [
+           *         {
+           *           "eventTime": "2020-01-01T00:00:00Z",
+           *           "message": "Bootstrap failed for reason X"
+           *         },
+           *         {
+           *           "eventTime": "2020-01-01T00:01:00Z",
+           *           "message": "Compute failed for reason Y"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeAuditEventResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe event */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "expression-evaluator-api/ExpressionEvaluator": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "deploymentCellID": "Rem distinctio voluptatum.",
+         *       "expression": "{{ $sys.network.externalClusterEndpoint }}",
+         *       "expressionMap": {
+         *         "dbHost": "{{ $sys.database.host }}",
+         *         "dbPort": "{{ $var.port }}"
+         *       },
+         *       "instanceID": "instance-12345678",
+         *       "productTierID": "Sed ut impedit aut deserunt.",
+         *       "resourceKey": "mysql",
+         *       "serviceID": "s-123456"
+         *     }
+         */
+        "application/json": components["schemas"]["ExpressionEvaluatorRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": "failed to evaluate expression: ...",
+           *       "result": "my-cluster.example.com"
+           *     }
+           */
+          "application/json": components["schemas"]["ExpressionEvaluatorResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to evaluate expression */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "global-api/consumptionServiceHealth": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
+           *     }
+           */
+          "application/json": components["schemas"]["OmnistrateServiceHealthResult"];
+        };
+      };
+    };
+  };
+  "consumption-invoice-api/ListConsumptionInvoices": {
+    parameters: {
+      query?: {
+        /**
+         * @description Billing provider. If specified, list invoices for the specified billing provider.
+         * @example STRIPE
+         */
+        billingProvider?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "invoices": [
+           *         {
+           *           "currency": "USD",
+           *           "dueDate": "2023-10-01T00:00:00Z",
+           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
+           *           "invoiceId": "in_1234568",
+           *           "invoiceNumber": "2021-01-01-1234567890",
+           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
+           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
+           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
+           *           "paymentTerms": "Net 30",
+           *           "taxAmount": 10,
+           *           "totalAmount": 110,
+           *           "totalAmountWithoutTax": 100
+           *         },
+           *         {
+           *           "currency": "USD",
+           *           "dueDate": "2023-10-01T00:00:00Z",
+           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
+           *           "invoiceId": "in_1234568",
+           *           "invoiceNumber": "2021-01-01-1234567890",
+           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
+           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
+           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
+           *           "paymentTerms": "Net 30",
+           *           "taxAmount": 10,
+           *           "totalAmount": 110,
+           *           "totalAmountWithoutTax": 100
+           *         },
+           *         {
+           *           "currency": "USD",
+           *           "dueDate": "2023-10-01T00:00:00Z",
+           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
+           *           "invoiceId": "in_1234568",
+           *           "invoiceNumber": "2021-01-01-1234567890",
+           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
+           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
+           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
+           *           "paymentTerms": "Net 30",
+           *           "taxAmount": 10,
+           *           "totalAmount": 110,
+           *           "totalAmountWithoutTax": 100
+           *         },
+           *         {
+           *           "currency": "USD",
+           *           "dueDate": "2023-10-01T00:00:00Z",
+           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
+           *           "invoiceId": "in_1234568",
+           *           "invoiceNumber": "2021-01-01-1234567890",
+           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
+           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
+           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
+           *           "paymentTerms": "Net 30",
+           *           "taxAmount": 10,
+           *           "totalAmount": 110,
+           *           "totalAmountWithoutTax": 100
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListInvoicesResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list invoices */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "services-orchestration-api/ListServicesOrchestrations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example [
+           *       {
+           *         "ServicesTopology": [
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           }
+           *         ],
+           *         "createdAt": "2021-01-01T00:00:00Z",
+           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
+           *         "orchestrationFailedReason": "Invalid DSL",
+           *         "resultParams": {
+           *           "param1": "value1",
+           *           "param2": "value2"
+           *         },
+           *         "status": "PENDING",
+           *         "updatedAt": "2021-01-01T00:00:00Z"
+           *       },
+           *       {
+           *         "ServicesTopology": [
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           }
+           *         ],
+           *         "createdAt": "2021-01-01T00:00:00Z",
+           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
+           *         "orchestrationFailedReason": "Invalid DSL",
+           *         "resultParams": {
+           *           "param1": "value1",
+           *           "param2": "value2"
+           *         },
+           *         "status": "PENDING",
+           *         "updatedAt": "2021-01-01T00:00:00Z"
+           *       },
+           *       {
+           *         "ServicesTopology": [
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           },
+           *           {
+           *             "dependsOnDeployment": [
+           *               "instanceDeploymentAlias1",
+           *               "instanceDeploymentAlias2"
+           *             ],
+           *             "failedReason": "Invalid inputs",
+           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *             "instanceId": "instance-12345678",
+           *             "serviceId": "s-123456",
+           *             "status": "PENDING",
+           *             "statusMessage": "Creating deployment",
+           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
+           *           }
+           *         ],
+           *         "createdAt": "2021-01-01T00:00:00Z",
+           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
+           *         "orchestrationFailedReason": "Invalid DSL",
+           *         "resultParams": {
+           *           "param1": "value1",
+           *           "param2": "value2"
+           *         },
+           *         "status": "PENDING",
+           *         "updatedAt": "2021-01-01T00:00:00Z"
+           *       }
+           *     ]
+           */
+          "application/json": components["schemas"]["DescribeServicesOrchestrationResult"][];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list resource instances */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "services-orchestration-api/CreateServicesOrchestration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "orchestrationCreateDSL": "Fugiat aut enim nobis ut aperiam fugit."
+         *     }
+         */
+        "application/json": components["schemas"]["CreateServicesOrchestrationRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "id": "Pariatur rerum minus necessitatibus consequatur quod ipsa."
+           *     }
+           */
+          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "services-orchestration-api/DescribeServicesOrchestration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The ID of the services orchestration
+         * @example so-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "ServicesTopology": [
+           *         {
+           *           "dependsOnDeployment": [
+           *             "instanceDeploymentAlias1",
+           *             "instanceDeploymentAlias2"
+           *           ],
+           *           "failedReason": "Invalid inputs",
+           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *           "instanceId": "instance-12345678",
+           *           "serviceId": "s-123456",
+           *           "status": "PENDING",
+           *           "statusMessage": "Creating deployment",
+           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
+           *         },
+           *         {
+           *           "dependsOnDeployment": [
+           *             "instanceDeploymentAlias1",
+           *             "instanceDeploymentAlias2"
+           *           ],
+           *           "failedReason": "Invalid inputs",
+           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *           "instanceId": "instance-12345678",
+           *           "serviceId": "s-123456",
+           *           "status": "PENDING",
+           *           "statusMessage": "Creating deployment",
+           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
+           *         },
+           *         {
+           *           "dependsOnDeployment": [
+           *             "instanceDeploymentAlias1",
+           *             "instanceDeploymentAlias2"
+           *           ],
+           *           "failedReason": "Invalid inputs",
+           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *           "instanceId": "instance-12345678",
+           *           "serviceId": "s-123456",
+           *           "status": "PENDING",
+           *           "statusMessage": "Creating deployment",
+           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
+           *         },
+           *         {
+           *           "dependsOnDeployment": [
+           *             "instanceDeploymentAlias1",
+           *             "instanceDeploymentAlias2"
+           *           ],
+           *           "failedReason": "Invalid inputs",
+           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
+           *           "instanceId": "instance-12345678",
+           *           "serviceId": "s-123456",
+           *           "status": "PENDING",
+           *           "statusMessage": "Creating deployment",
+           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
+           *         }
+           *       ],
+           *       "createdAt": "2021-01-01T00:00:00Z",
+           *       "id": "Ducimus rerum in accusamus quia voluptatum non.",
+           *       "orchestrationFailedReason": "Invalid DSL",
+           *       "resultParams": {
+           *         "param1": "value1",
+           *         "param2": "value2"
+           *       },
+           *       "status": "PENDING",
+           *       "updatedAt": "2021-01-01T00:00:00Z"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeServicesOrchestrationResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "services-orchestration-api/DeleteServicesOrchestration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The ID of the services orchestration
+         * @example so-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to delete a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "services-orchestration-api/ModifyServicesOrchestration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The ID of the services orchestration
+         * @example so-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "orchestrationModifyDSL": "Non rerum minima facere nesciunt."
+         *     }
+         */
+        "application/json": components["schemas"]["ModifyServicesOrchestrationRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to update a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/ListAllInstanceSnapshots": {
+    parameters: {
+      query?: {
+        /**
+         * @description The environment type to filter by
+         * @example DEV
+         */
+        environmentType?: string;
+        /**
+         * @description The type of snapshot to list. Valid values are: 'ManualSnapshot' and 'AutomatedSnapshot'
+         * @example AutomatedSnapshot|ManualSnapshot
+         */
+        snapshotType?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "snapshots": [
+           *         {
+           *           "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *           "completeTime": "2021-09-01T00:00:00Z",
+           *           "createdTime": "2021-09-01T00:00:00Z",
+           *           "encrypted": true,
+           *           "instanceResourceType": "OperatorCRD",
+           *           "productTierId": "Minus similique enim ducimus consequuntur aliquid rem.",
+           *           "productTierName": "Premium",
+           *           "productTierVersion": "1.0",
+           *           "productTierVersionDescription": "Version 1.0",
+           *           "progress": 99,
+           *           "region": "us-west-2",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "Postgres",
+           *           "snapshotId": "Repellendus est illum debitis laborum.",
+           *           "snapshotMetadata": {
+           *             "backupId": "20260522T230105",
+           *             "backupName": "backup-20260522230104"
+           *           },
+           *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+           *           "sourceInstanceId": "instance-12345678",
+           *           "status": "completed",
+           *           "subscriptionId": "Laboriosam accusantium beatae id eveniet dolor.",
+           *           "subscriptionOwnerOrgId": "Itaque iure quo quae.",
+           *           "subscriptionOwnerOrgName": "Example Inc.",
+           *           "subscriptionOwnerUserId": "Ipsa modi.",
+           *           "subscriptionOwnerUserName": "Admin"
+           *         },
+           *         {
+           *           "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *           "completeTime": "2021-09-01T00:00:00Z",
+           *           "createdTime": "2021-09-01T00:00:00Z",
+           *           "encrypted": true,
+           *           "instanceResourceType": "OperatorCRD",
+           *           "productTierId": "Minus similique enim ducimus consequuntur aliquid rem.",
+           *           "productTierName": "Premium",
+           *           "productTierVersion": "1.0",
+           *           "productTierVersionDescription": "Version 1.0",
+           *           "progress": 99,
+           *           "region": "us-west-2",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "Postgres",
+           *           "snapshotId": "Repellendus est illum debitis laborum.",
+           *           "snapshotMetadata": {
+           *             "backupId": "20260522T230105",
+           *             "backupName": "backup-20260522230104"
+           *           },
+           *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+           *           "sourceInstanceId": "instance-12345678",
+           *           "status": "completed",
+           *           "subscriptionId": "Laboriosam accusantium beatae id eveniet dolor.",
+           *           "subscriptionOwnerOrgId": "Itaque iure quo quae.",
+           *           "subscriptionOwnerOrgName": "Example Inc.",
+           *           "subscriptionOwnerUserId": "Ipsa modi.",
+           *           "subscriptionOwnerUserName": "Admin"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListInstanceSnapshotsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list snapshots of a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/CreateInstanceSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "instanceId": "instance-abcd1234",
+         *       "targetRegion": "us-west-2"
+         *     }
+         */
+        "application/json": components["schemas"]["CreateInstanceSnapshotRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "id": "Hic dolorum iste et fugiat."
+           *     }
+           */
+          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to copy a resource instance snapshot */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/DescribeInstanceSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The instance snapshot ID
+         * @example instance-ss-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
+           *       "completeTime": "2021-09-01T00:00:00Z",
+           *       "createdTime": "2021-09-01T00:00:00Z",
+           *       "encrypted": true,
+           *       "outputParams": [
+           *         {
+           *           "displayName": "Server Name",
+           *           "key": "serverName",
+           *           "type": "string",
+           *           "value": "server1"
+           *         },
+           *         {
+           *           "displayName": "Server Type",
+           *           "key": "serverType",
+           *           "type": "string",
+           *           "value": "db.t3.micro"
+           *         }
+           *       ],
+           *       "productTierId": "Sunt quia.",
+           *       "productTierName": "Premium",
+           *       "productTierVersion": "1.0",
+           *       "productTierVersionDescription": "Version 1.0",
+           *       "progress": 99,
+           *       "region": "us-west-2",
+           *       "serviceId": "s-123456",
+           *       "serviceName": "Postgres",
+           *       "snapshotId": "Vel dicta sint eum mollitia.",
+           *       "snapshotMetadata": {
+           *         "backupId": "20260522T230105",
+           *         "backupName": "backup-20260522230104"
+           *       },
+           *       "snapshotType": "AutomatedSnapshot|ManualSnapshot",
+           *       "sourceInstanceId": "instance-12345678",
+           *       "status": "completed",
+           *       "subscriptionId": "Unde vel.",
+           *       "subscriptionOwnerOrgId": "Similique illo aliquam non quam consequatur.",
+           *       "subscriptionOwnerOrgName": "Example Inc.",
+           *       "subscriptionOwnerUserId": "Sapiente quidem neque id architecto a.",
+           *       "subscriptionOwnerUserName": "Admin"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeInstanceSnapshotResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list snapshots of a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/DeleteInstanceSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The instance snapshot ID
+         * @example instance-ss-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Failed to delete a resource instance snapshot */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/RestoreResourceInstanceFromSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The snapshot ID
+         * @example instance-ss-abcd1234
+         */
+        snapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "custom_network_id": "n-1234567890",
+         *       "network_type": "PUBLIC|INTERNAL"
+         *     }
+         */
+        "application/json": components["schemas"]["RestoreFromInstanceSnapshotRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "instanceId": "Porro tempora dignissimos."
+           *     }
+           */
+          "application/json": components["schemas"]["RestoreResourceInstanceFromSnapshotResponseBody"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "instance-snapshot-api/CopyInstanceSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The source snapshot ID
+         * @example instance-ss-abcd1234
+         */
+        sourceSnapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "targetRegion": "us-west-2"
+         *     }
+         */
+        "application/json": components["schemas"]["CopyInstanceSnapshotRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "id": "Eligendi distinctio voluptatem tempora fugit unde dolorum."
+           *     }
+           */
+          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to copy a resource instance snapshot */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/ListAllSubscriptionUsers": {
+    parameters: {
+      query?: {
+        /**
+         * @description The environment type to filter by
+         * @example DEV
+         */
+        environmentType?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "subscriptionUsers": [
+           *         {
+           *           "email": "abc@gmail.com",
+           *           "name": "John Doe",
+           *           "roleType": "reader",
+           *           "userId": "user-abcd1234"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListAllSubscriptionUsersResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list all subscription users */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/InviteUser": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "email": "abc@gmail.com",
+         *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator"
+         *     }
+         */
+        "application/json": components["schemas"]["InviteConsumptionUserRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to invite user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/RevokeUserRole": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "email": "abc@gmail.com",
+         *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator"
+         *     }
+         */
+        "application/json": components["schemas"]["RevokeConsumptionUserRoleRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to delete user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/DescribeUsersBySubscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The subscription ID
+         * @example sub-abcd1234
+         */
+        subscriptionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "Id": "sub-abcd1234",
+           *       "subscriptionUsers": [
+           *         {
+           *           "email": "abc@gmail.com",
+           *           "name": "John Doe",
+           *           "roleType": "reader",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "userId": "user-abcd1234"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeUsersBySubscriptionResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-usage-api/GetCurrentConsumptionUsage": {
+    parameters: {
+      query?: {
+        /**
+         * @description The subscription ID to get usage for
+         * @example sub-12345678
+         */
+        subscriptionID?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "endTime": "2021-01-01T00:00:00.000Z",
+           *       "startTime": "2021-01-01T00:00:00.000Z",
+           *       "usage": [
+           *         {
+           *           "dimension": "CPU core hours",
+           *           "endTime": "2021-01-01T00:00:00.000Z",
+           *           "startTime": "2021-01-01T00:00:00.000Z",
+           *           "total": 0.67
+           *         },
+           *         {
+           *           "dimension": "custom_metric",
+           *           "endTime": "2026-09-01T00:00:000Z",
+           *           "startTime": "2026-09-01T00:00:000Z",
+           *           "total": 2.5
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["GetConsumptionUsageResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to get usage */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-usage-api/GetConsumptionUsagePerDay": {
+    parameters: {
+      query?: {
+        /**
+         * @description Start date of the usage report
+         * @example 2023-01-01T10:00:00Z
+         */
+        startDate?: string;
+        /**
+         * @description End date of the usage report
+         * @example 2024-01-01T10:00:00Z
+         */
+        endDate?: string;
+        /**
+         * @description The subscription ID to get usage for
+         * @example sub-12345678
+         */
+        subscriptionID?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "endTime": "2021-01-01T00:00:00.000Z",
+           *       "startTime": "2021-01-01T00:00:00.000Z",
+           *       "usage": [
+           *         {
+           *           "dimension": "CPU core hours",
+           *           "endTime": "2021-01-01T00:00:00.000Z",
+           *           "startTime": "2021-01-01T00:00:00.000Z",
+           *           "total": 0.67
+           *         },
+           *         {
+           *           "dimension": "custom_metric",
+           *           "endTime": "2026-09-01T00:00:000Z",
+           *           "startTime": "2026-09-01T00:00:000Z",
+           *           "total": 2.5
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["GetConsumptionUsageResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to get usage */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/Signin": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "token": "xkj"
+           *     }
+           */
+          "application/json": components["schemas"]["ConsumptionServiceAuthResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to signin */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "consumption-user-api/DescribeUserBillingDetails": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @example user-abcd1234 */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "billingEmbedURL": "DEPRECATED",
+           *       "name": "John Dae",
+           *       "paymentConfigured": true,
+           *       "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx",
+           *       "userId": "Omnis et."
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeConsumptionUserBillingDetailsResult"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a user */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "global-api/consumptionServiceVersion": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "additionalVersions": {
+           *         "dataplaneAgent": "v1.12.3",
+           *         "managerAgent": "v1.12.3"
+           *       },
+           *       "apiVersion": "1.0",
+           *       "buildCommitSHA": "1234567890abcdef1234567890abcdef12345678",
+           *       "buildTimestamp": "2020-01-01T00:00:00Z",
+           *       "componentVersion": "v0.47.96"
+           *     }
+           */
+          "application/json": components["schemas"]["OmnistrateServiceVersionResult"];
         };
       };
     };
@@ -82815,6 +86752,592 @@ export interface operations {
       };
     };
   };
+  "resource-instance-api/ResourceInstanceProvisionerSetupKit": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The service provider ID
+         * @example omnistrate
+         */
+        serviceProviderId: string;
+        /**
+         * @description The service name
+         * @example service-orchestration
+         */
+        serviceKey: string;
+        /**
+         * @description The service API version
+         * @example v1
+         */
+        serviceAPIVersion: string;
+        /**
+         * @description The service environment name
+         * @example dev
+         */
+        serviceEnvironmentKey: string;
+        /**
+         * @description The service model name
+         * @example hosted
+         */
+        serviceModelKey: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to setup kit for a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "audit-events-api/ListAuditEventsForServicePlan": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The service provider ID
+         * @example omnistrate
+         */
+        serviceProviderId: string;
+        /**
+         * @description The service name
+         * @example service-orchestration
+         */
+        serviceKey: string;
+        /**
+         * @description The service API version
+         * @example v1
+         */
+        serviceAPIVersion: string;
+        /**
+         * @description The service environment name
+         * @example dev
+         */
+        serviceEnvironmentKey: string;
+        /**
+         * @description The service model name
+         * @example hosted
+         */
+        serviceModelKey: string;
+        /**
+         * @description The product tier name
+         * @example premium
+         */
+        productTierKey: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "events": [
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         }
+           *       ],
+           *       "ids": [
+           *         "event-12345678"
+           *       ],
+           *       "nextPageToken": "token"
+           *     }
+           */
+          "application/json": components["schemas"]["ListAuditEventsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list event */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "audit-events-api/DeprecatedListAuditEventsForServicePlan": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The service provider ID
+         * @example omnistrate
+         */
+        serviceProviderId: string;
+        /**
+         * @description The service name
+         * @example service-orchestration
+         */
+        serviceKey: string;
+        /**
+         * @description The service API version
+         * @example v1
+         */
+        serviceAPIVersion: string;
+        /**
+         * @description The service environment name
+         * @example dev
+         */
+        serviceEnvironmentKey: string;
+        /**
+         * @description The service model name
+         * @example hosted
+         */
+        serviceModelKey: string;
+        /**
+         * @description The product tier name
+         * @example premium
+         */
+        productTierKey: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "events": [
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         },
+           *         {
+           *           "authMethod": "API_KEY",
+           *           "billingProvider": "STRIPE",
+           *           "billingProviderId": "payer_acme_corp_2024",
+           *           "cloudProvider": "aws",
+           *           "cloudProviderAccountId": "account-12345678",
+           *           "environmentId": "se-123456",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "eventSource": "Customer, Infra or Maintenance",
+           *           "id": "Dolor sed.",
+           *           "ipAddress": "203.0.113.42",
+           *           "message": "instance-abcd1234 created",
+           *           "orgId": "Itaque est eius non aut officiis est.",
+           *           "orgName": "Acme Corporation",
+           *           "planVersion": "v1.0",
+           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
+           *           "region": "us-east-1",
+           *           "resourceInstanceId": "instance-abcd1234",
+           *           "resourceName": "Galera",
+           *           "roleType": "root",
+           *           "serviceId": "s-123456",
+           *           "serviceName": "mysql",
+           *           "servicePlanName": "Basic Plan",
+           *           "sessionId": "ak-12345678",
+           *           "subscriptionId": "sub-abcd1234",
+           *           "time": "2023-01-10T00:00:00Z",
+           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
+           *           "userId": "Fugit aut est voluptas.",
+           *           "userName": "John Doe",
+           *           "workflowFailures": [
+           *             {
+           *               "eventTime": "2020-01-01T00:00:00Z",
+           *               "message": "Bootstrap failed for reason X"
+           *             },
+           *             {
+           *               "eventTime": "2020-01-01T00:01:00Z",
+           *               "message": "Compute failed for reason Y"
+           *             }
+           *           ]
+           *         }
+           *       ],
+           *       "ids": [
+           *         "event-12345678"
+           *       ],
+           *       "nextPageToken": "token"
+           *     }
+           */
+          "application/json": components["schemas"]["ListAuditEventsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list event */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "resource-instance-api/ListResourceInstances": {
     parameters: {
       query?: {
@@ -83000,7 +87523,6 @@ export interface operations {
         /**
          * @example {
          *       "cloud_provider": "aws",
-         *       "custom_network_id": "n-1234567890",
          *       "customTags": [
          *         {
          *           "key": "customKey1",
@@ -83011,6 +87533,7 @@ export interface operations {
          *           "value": "customValue2"
          *         }
          *       ],
+         *       "custom_network_id": "n-1234567890",
          *       "externalBillingId": "external-billing-id-1234",
          *       "network_type": "PUBLIC|INTERNAL",
          *       "onprem_platform": "OpenShift",
@@ -83035,6 +87558,142 @@ export interface operations {
           /**
            * @example {
            *       "id": "Sint eos eos eum."
+           *     }
+           */
+          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a resource instance */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "resource-instance-api/RestoreResourceInstanceFromSnapshot": {
+    parameters: {
+      query?: {
+        /**
+         * @description Subscription Id
+         * @example sub-abcd1234
+         */
+        subscriptionId?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description The service provider ID
+         * @example omnistrate
+         */
+        serviceProviderId: string;
+        /**
+         * @description The service name
+         * @example service-orchestration
+         */
+        serviceKey: string;
+        /**
+         * @description The service API version
+         * @example v1
+         */
+        serviceAPIVersion: string;
+        /**
+         * @description The service environment name
+         * @example dev
+         */
+        serviceEnvironmentKey: string;
+        /**
+         * @description The service model name
+         * @example hosted
+         */
+        serviceModelKey: string;
+        /**
+         * @description The product tier name
+         * @example premium
+         */
+        productTierKey: string;
+        /**
+         * @description The resource key
+         * @example mysql
+         */
+        resourceKey: string;
+        /**
+         * @description The snapshot ID
+         * @example instance-ss-abcd1234
+         */
+        snapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "custom_network_id": "n-1234567890",
+         *       "network_type": "PUBLIC|INTERNAL"
+         *     }
+         */
+        "application/json": components["schemas"]["RestoreResourceInstanceFromSnapshotRequest2"];
+      };
+    };
+    responses: {
+      /** @description Accepted response. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "id": "Voluptate ut."
            *     }
            */
           "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
@@ -83171,9 +87830,9 @@ export interface operations {
            *         "lastBackupTime": "2021-09-01T00:00:00Z"
            *       },
            *       "cloud_provider": "aws",
-           *       "created_at": "2023-01-10T00:00:00Z",
            *       "createdByUserId": "Suscipit quod aut et numquam harum.",
            *       "createdByUserName": "John Doe",
+           *       "created_at": "2023-01-10T00:00:00Z",
            *       "currentReplicas": "2",
            *       "customNetworkDetail": {
            *         "cidr": "10.177.0.0/16",
@@ -86309,4765 +90968,6 @@ export interface operations {
       };
     };
   };
-  "resource-instance-api/RestoreResourceInstanceFromSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The service provider ID
-         * @example omnistrate
-         */
-        serviceProviderId: string;
-        /**
-         * @description The service name
-         * @example service-orchestration
-         */
-        serviceKey: string;
-        /**
-         * @description The service API version
-         * @example v1
-         */
-        serviceAPIVersion: string;
-        /**
-         * @description The service environment name
-         * @example dev
-         */
-        serviceEnvironmentKey: string;
-        /**
-         * @description The service model name
-         * @example hosted
-         */
-        serviceModelKey: string;
-        /**
-         * @description The product tier name
-         * @example premium
-         */
-        productTierKey: string;
-        /**
-         * @description The resource key
-         * @example mysql
-         */
-        resourceKey: string;
-        /**
-         * @description The snapshot ID
-         * @example instance-ss-abcd1234
-         */
-        snapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "custom_network_id": "n-1234567890",
-         *       "network_type": "PUBLIC|INTERNAL"
-         *     }
-         */
-        "application/json": components["schemas"]["RestoreResourceInstanceFromSnapshotRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "id": "Voluptate ut."
-           *     }
-           */
-          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "audit-events-api/ListAuditEventsForServicePlan": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The service provider ID
-         * @example omnistrate
-         */
-        serviceProviderId: string;
-        /**
-         * @description The service name
-         * @example service-orchestration
-         */
-        serviceKey: string;
-        /**
-         * @description The service API version
-         * @example v1
-         */
-        serviceAPIVersion: string;
-        /**
-         * @description The service environment name
-         * @example dev
-         */
-        serviceEnvironmentKey: string;
-        /**
-         * @description The service model name
-         * @example hosted
-         */
-        serviceModelKey: string;
-        /**
-         * @description The product tier name
-         * @example premium
-         */
-        productTierKey: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "events": [
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         }
-           *       ],
-           *       "ids": [
-           *         "event-12345678"
-           *       ],
-           *       "nextPageToken": "token"
-           *     }
-           */
-          "application/json": components["schemas"]["ListAuditEventsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list event */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "audit-events-api/DeprecatedListAuditEventsForServicePlan": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The service provider ID
-         * @example omnistrate
-         */
-        serviceProviderId: string;
-        /**
-         * @description The service name
-         * @example service-orchestration
-         */
-        serviceKey: string;
-        /**
-         * @description The service API version
-         * @example v1
-         */
-        serviceAPIVersion: string;
-        /**
-         * @description The service environment name
-         * @example dev
-         */
-        serviceEnvironmentKey: string;
-        /**
-         * @description The service model name
-         * @example hosted
-         */
-        serviceModelKey: string;
-        /**
-         * @description The product tier name
-         * @example premium
-         */
-        productTierKey: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "events": [
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         }
-           *       ],
-           *       "ids": [
-           *         "event-12345678"
-           *       ],
-           *       "nextPageToken": "token"
-           *     }
-           */
-          "application/json": components["schemas"]["ListAuditEventsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list event */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "resource-instance-api/ResourceInstanceProvisionerSetupKit": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The service provider ID
-         * @example omnistrate
-         */
-        serviceProviderId: string;
-        /**
-         * @description The service name
-         * @example service-orchestration
-         */
-        serviceKey: string;
-        /**
-         * @description The service API version
-         * @example v1
-         */
-        serviceAPIVersion: string;
-        /**
-         * @description The service environment name
-         * @example dev
-         */
-        serviceEnvironmentKey: string;
-        /**
-         * @description The service model name
-         * @example hosted
-         */
-        serviceModelKey: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to setup kit for a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "resource-instance-api/UpdateAccountConfigResourceInstance": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The instance ID
-         * @example instance-abcd1234
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "customTags": [
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         },
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         },
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         },
-         *         {
-         *           "key": "customKey",
-         *           "value": "customValue"
-         *         }
-         *       ],
-         *       "nebiusBindings": [
-         *         {
-         *           "privateKeyPEM": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----",
-         *           "projectID": "project-e00b497fpr00n5hg8wbh2d",
-         *           "publicKeyID": "publickey-e00ngem85mc6pr5v63",
-         *           "serviceAccountID": "serviceaccount-e00vqdp9fskhmmaan8"
-         *         }
-         *       ],
-         *       "serviceId": "service-1234",
-         *       "setConnection": true,
-         *       "subscriptionId": "sub-abcd1234"
-         *     }
-         */
-        "application/json": components["schemas"]["UpdateAccountConfigResourceInstanceRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to update a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "audit-events-api/ListAllAuditEvents": {
-    parameters: {
-      query?: {
-        /** @example token */
-        nextPageToken?: string;
-        /** @example 10 */
-        pageSize?: number;
-        /**
-         * @description The service ID to list events for
-         * @example s-123456
-         */
-        serviceID?: string;
-        /** @example PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL */
-        environmentType?: string;
-        /**
-         * @description The event types to filter by
-         * @example [
-         *       "Possimus qui.",
-         *       "Dolorum perferendis velit et et amet repellendus.",
-         *       "Ea unde debitis ut.",
-         *       "Placeat ut reprehenderit earum sequi perspiciatis sit."
-         *     ]
-         */
-        eventSourceTypes?: string[];
-        /**
-         * @description The instance ID to list events for
-         * @example instance-12345678
-         */
-        instanceID?: string;
-        /**
-         * @description Start date of the events
-         * @example 2023-01-01T10:00:00Z
-         */
-        startDate?: string;
-        /**
-         * @description End date of the events
-         * @example 2024-01-01T10:00:00Z
-         */
-        endDate?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "events": [
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         },
-           *         {
-           *           "authMethod": "API_KEY",
-           *           "billingProvider": "STRIPE",
-           *           "billingProviderId": "payer_acme_corp_2024",
-           *           "cloudProvider": "aws",
-           *           "cloudProviderAccountId": "account-12345678",
-           *           "environmentId": "se-123456",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "eventSource": "Customer, Infra or Maintenance",
-           *           "id": "Dolor sed.",
-           *           "ipAddress": "203.0.113.42",
-           *           "message": "instance-abcd1234 created",
-           *           "orgId": "Itaque est eius non aut officiis est.",
-           *           "orgName": "Acme Corporation",
-           *           "planVersion": "v1.0",
-           *           "productTierId": "Natus voluptas nobis ullam est illum nobis.",
-           *           "region": "us-east-1",
-           *           "resourceInstanceId": "instance-abcd1234",
-           *           "resourceName": "Galera",
-           *           "roleType": "root",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "mysql",
-           *           "servicePlanName": "Basic Plan",
-           *           "sessionId": "ak-12345678",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "time": "2023-01-10T00:00:00Z",
-           *           "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *           "userId": "Fugit aut est voluptas.",
-           *           "userName": "John Doe",
-           *           "workflowFailures": [
-           *             {
-           *               "eventTime": "2020-01-01T00:00:00Z",
-           *               "message": "Bootstrap failed for reason X"
-           *             },
-           *             {
-           *               "eventTime": "2020-01-01T00:01:00Z",
-           *               "message": "Compute failed for reason Y"
-           *             }
-           *           ]
-           *         }
-           *       ],
-           *       "ids": [
-           *         "event-12345678"
-           *       ],
-           *       "nextPageToken": "token"
-           *     }
-           */
-          "application/json": components["schemas"]["ListAuditEventsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list all events */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "audit-events-api/DescribeAuditEvent": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The ID of the event
-         * @example event-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "authMethod": "API_KEY",
-           *       "billingProvider": "STRIPE",
-           *       "billingProviderId": "payer_acme_corp_2024",
-           *       "cloudProvider": "aws",
-           *       "cloudProviderAccountId": "account-12345678",
-           *       "environmentId": "se-123456",
-           *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *       "eventSource": "Customer, Infra or Maintenance",
-           *       "id": "Ad dolor est eos voluptatum.",
-           *       "ipAddress": "203.0.113.42",
-           *       "message": "instance-abcd1234 created",
-           *       "orgId": "Adipisci quos nisi.",
-           *       "orgName": "Acme Corporation",
-           *       "planVersion": "v1.0",
-           *       "productTierId": "Iure autem voluptatibus debitis rerum eum error.",
-           *       "region": "us-east-1",
-           *       "resourceInstanceId": "instance-abcd1234",
-           *       "resourceName": "Galera",
-           *       "roleType": "root",
-           *       "serviceId": "s-123456",
-           *       "serviceName": "mysql",
-           *       "servicePlanName": "Basic Plan",
-           *       "sessionId": "ak-12345678",
-           *       "subscriptionId": "sub-abcd1234",
-           *       "time": "2023-01-10T00:00:00Z",
-           *       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *       "userId": "Culpa rem aliquid.",
-           *       "userName": "John Doe",
-           *       "workflowFailures": [
-           *         {
-           *           "eventTime": "2020-01-01T00:00:00Z",
-           *           "message": "Bootstrap failed for reason X"
-           *         },
-           *         {
-           *           "eventTime": "2020-01-01T00:01:00Z",
-           *           "message": "Compute failed for reason Y"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeAuditEventResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe event */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-billing-api/DescribeConsumptionBillingDetails": {
-    parameters: {
-      query?: {
-        /**
-         * @description Return Url used to configure payment methods links
-         * @example https://mysaasportal.com
-         */
-        returnUrl?: string;
-        /**
-         * @description Whether the caller supports inline custom payment method management
-         * @example true
-         */
-        supportsCustomPaymentPortal?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "billingProviders": [
-           *         {
-           *           "paymentConfigurable": true,
-           *           "paymentConfigured": true,
-           *           "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx",
-           *           "type": "STRIPE"
-           *         },
-           *         {
-           *           "balanceDueLink": "https://billing.provider.com/balance-due",
-           *           "logoURL": "https://example.com/logo.png",
-           *           "name": "GovPay",
-           *           "paymentConfigurable": false,
-           *           "paymentConfigured": false,
-           *           "paymentInfoPortalURL": null,
-           *           "type": "BRING_YOUR_OWN"
-           *         }
-           *       ],
-           *       "customPaymentPortalEnabled": true,
-           *       "paymentConfigured": true,
-           *       "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeConsumptionBillingDetailsResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-billing-api/DescribeConsumptionBillingStatus": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "enabled": true
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeConsumptionBillingStatusResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-payment-method-api/GetConsumptionStripeConfig": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "publishableKey": "pk_test_51...",
-           *       "stripeAccountId": "acct_1M2JTkLkdIwHu7ix"
-           *     }
-           */
-          "application/json": components["schemas"]["StripeConfigResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when billing is not configured */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-payment-method-api/ListConsumptionPaymentMethods": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "paymentMethods": [
-           *         {
-           *           "bankName": "STRIPE TEST BANK",
-           *           "brand": "visa",
-           *           "displayName": "Visa ending 4242",
-           *           "expMonth": 12,
-           *           "expYear": 2030,
-           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
-           *           "isDefault": true,
-           *           "last4": "4242",
-           *           "type": "card"
-           *         },
-           *         {
-           *           "bankName": "STRIPE TEST BANK",
-           *           "brand": "visa",
-           *           "displayName": "Visa ending 4242",
-           *           "expMonth": 12,
-           *           "expYear": 2030,
-           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
-           *           "isDefault": true,
-           *           "last4": "4242",
-           *           "type": "card"
-           *         },
-           *         {
-           *           "bankName": "STRIPE TEST BANK",
-           *           "brand": "visa",
-           *           "displayName": "Visa ending 4242",
-           *           "expMonth": 12,
-           *           "expYear": 2030,
-           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
-           *           "isDefault": true,
-           *           "last4": "4242",
-           *           "type": "card"
-           *         },
-           *         {
-           *           "bankName": "STRIPE TEST BANK",
-           *           "brand": "visa",
-           *           "displayName": "Visa ending 4242",
-           *           "expMonth": 12,
-           *           "expYear": 2030,
-           *           "id": "pm_1NVChw2eZvKYlo2CwkOranTh",
-           *           "isDefault": true,
-           *           "last4": "4242",
-           *           "type": "card"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListPaymentMethodsResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when billing is not configured */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list payment methods */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-payment-method-api/RemoveConsumptionPaymentMethod": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Payment method ID to remove
-         * @example pm_1NVChw2eZvKYlo2CwkOranTh
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content response. */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the payment method is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when removal is blocked by unpaid invoices or active resources */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to remove payment method */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-payment-method-api/SetDefaultConsumptionPaymentMethod": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Payment method ID to set as default
-         * @example pm_1NVChw2eZvKYlo2CwkOranTh
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content response. */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the payment method is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to set default */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-payment-method-api/CreateConsumptionSetupIntent": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "clientSecret": "seti_1NVChw2eZvKYlo2C_secret_..."
-           *     }
-           */
-          "application/json": components["schemas"]["CreateSetupIntentResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when billing is not configured */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create setup intent */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-network-api/ListCustomNetworks": {
-    parameters: {
-      query?: {
-        /**
-         * @description The name of the cloud provider to filter custom networks by
-         * @example aws
-         */
-        cloudProviderName?: string;
-        /**
-         * @description The region of the cloud provider to filter custom networks by
-         * @example us-east-1
-         */
-        cloudProviderRegion?: string;
-        /**
-         * @description Flag indicating whether to return only custom networks, or to include default and imported networks as well
-         * @example false
-         */
-        customNetworksOnly?: boolean;
-        /**
-         * @description List available custom networks for the given subscription ID
-         * @example sub-12345678
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "customNetworks": [
-           *         {
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *           "cloudProviderRegion": "us-east-1",
-           *           "created_at": "2023-01-10T00:00:00Z",
-           *           "id": "Hic sed voluptas cumque vel est.",
-           *           "last_modified_at": "2023-01-20T00:00:00Z",
-           *           "name": "Prod us-east-1",
-           *           "networkDefinitionType": "Default|Custom|Imported",
-           *           "networkFeaturesConfiguration": {
-           *             "isPrivateLinkEnabled": false
-           *           },
-           *           "networkInstances": [
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             },
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             }
-           *           ],
-           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
-           *           "owningUserName": "John Doe",
-           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *         },
-           *         {
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *           "cloudProviderRegion": "us-east-1",
-           *           "created_at": "2023-01-10T00:00:00Z",
-           *           "id": "Hic sed voluptas cumque vel est.",
-           *           "last_modified_at": "2023-01-20T00:00:00Z",
-           *           "name": "Prod us-east-1",
-           *           "networkDefinitionType": "Default|Custom|Imported",
-           *           "networkFeaturesConfiguration": {
-           *             "isPrivateLinkEnabled": false
-           *           },
-           *           "networkInstances": [
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             },
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             }
-           *           ],
-           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
-           *           "owningUserName": "John Doe",
-           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *         },
-           *         {
-           *           "cidr": "10.0.0.0/16",
-           *           "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *           "cloudProviderRegion": "us-east-1",
-           *           "created_at": "2023-01-10T00:00:00Z",
-           *           "id": "Hic sed voluptas cumque vel est.",
-           *           "last_modified_at": "2023-01-20T00:00:00Z",
-           *           "name": "Prod us-east-1",
-           *           "networkDefinitionType": "Default|Custom|Imported",
-           *           "networkFeaturesConfiguration": {
-           *             "isPrivateLinkEnabled": false
-           *           },
-           *           "networkInstances": [
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             },
-           *             {
-           *               "awsAccountID": "123456789012",
-           *               "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *               "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *               "cloudProviderNativeNetworkId": "vpc-12345678",
-           *               "gcpProjectID": "my-project",
-           *               "gcpProjectNumber": "123456789012",
-           *               "hostClusterID": "Maiores voluptate labore omnis.",
-           *               "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *               "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *             }
-           *           ],
-           *           "owningUserId": "Ea officiis ullam culpa vitae dolorem delectus.",
-           *           "owningUserName": "John Doe",
-           *           "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListCustomNetworksResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list custom networks */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-network-api/CreateCustomNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "cidr": "10.0.0.0/16",
-         *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-         *       "cloudProviderRegion": "us-east-1",
-         *       "name": "Prod us-east-1",
-         *       "networkFeaturesConfiguration": {
-         *         "isPrivateLinkEnabled": false
-         *       },
-         *       "orgId": "Non omnis."
-         *     }
-         */
-        "application/json": components["schemas"]["CreateCustomNetworkRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cidr": "10.0.0.0/16",
-           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "cloudProviderRegion": "us-east-1",
-           *       "created_at": "2023-01-10T00:00:00Z",
-           *       "id": "Eos dolores omnis vitae.",
-           *       "last_modified_at": "2023-01-20T00:00:00Z",
-           *       "name": "Prod us-east-1",
-           *       "networkDefinitionType": "Default|Custom|Imported",
-           *       "networkFeaturesConfiguration": {
-           *         "isPrivateLinkEnabled": false
-           *       },
-           *       "networkInstances": [
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         },
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         }
-           *       ],
-           *       "owningUserId": "Architecto asperiores facilis nobis.",
-           *       "owningUserName": "John Doe",
-           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *     }
-           */
-          "application/json": components["schemas"]["CustomNetwork"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a custom network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-network-api/DescribeCustomNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description ID of a custom network
-         * @example n-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cidr": "10.0.0.0/16",
-           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "cloudProviderRegion": "us-east-1",
-           *       "created_at": "2023-01-10T00:00:00Z",
-           *       "id": "Non libero rerum est.",
-           *       "last_modified_at": "2023-01-20T00:00:00Z",
-           *       "name": "Prod us-east-1",
-           *       "networkDefinitionType": "Default|Custom|Imported",
-           *       "networkFeaturesConfiguration": {
-           *         "isPrivateLinkEnabled": false
-           *       },
-           *       "networkInstances": [
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         },
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         },
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         }
-           *       ],
-           *       "owningUserId": "Ut earum numquam error quia impedit expedita.",
-           *       "owningUserName": "John Doe",
-           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *     }
-           */
-          "application/json": components["schemas"]["CustomNetwork"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request to describe a custom network */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested custom network is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a custom network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-network-api/DeleteCustomNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description ID of a custom network
-         * @example n-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request to delete a custom network */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested custom network is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to delete a custom network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "custom-network-api/UpdateCustomNetwork": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description ID of a custom network
-         * @example n-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "name": "Dev us-east-1"
-         *     }
-         */
-        "application/json": components["schemas"]["UpdateCustomNetworkRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cidr": "10.0.0.0/16",
-           *       "cloudProviderName": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "cloudProviderRegion": "us-east-1",
-           *       "created_at": "2023-01-10T00:00:00Z",
-           *       "id": "Tempore dignissimos et.",
-           *       "last_modified_at": "2023-01-20T00:00:00Z",
-           *       "name": "Prod us-east-1",
-           *       "networkDefinitionType": "Default|Custom|Imported",
-           *       "networkFeaturesConfiguration": {
-           *         "isPrivateLinkEnabled": false
-           *       },
-           *       "networkInstances": [
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         },
-           *         {
-           *           "awsAccountID": "123456789012",
-           *           "azureSubscriptionID": "12345678-1234-1234-1234-123456789012",
-           *           "azureTenantID": "12345678-1234-1234-1234-123456789012",
-           *           "cloudProviderNativeNetworkId": "vpc-12345678",
-           *           "gcpProjectID": "my-project",
-           *           "gcpProjectNumber": "123456789012",
-           *           "hostClusterID": "Maiores voluptate labore omnis.",
-           *           "ociDomainID": "ocid1.domain.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-           *           "ociTenancyID": "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-           *         }
-           *       ],
-           *       "owningUserId": "Et repudiandae inventore.",
-           *       "owningUserName": "John Doe",
-           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *     }
-           */
-          "application/json": components["schemas"]["CustomNetwork"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested custom network is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a custom network */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "audit-events-api/DeprecatedDescribeAuditEvent": {
-    parameters: {
-      query?: {
-        /**
-         * @description Subscription Id
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The ID of the event
-         * @example event-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "authMethod": "API_KEY",
-           *       "billingProvider": "STRIPE",
-           *       "billingProviderId": "payer_acme_corp_2024",
-           *       "cloudProvider": "aws",
-           *       "cloudProviderAccountId": "account-12345678",
-           *       "environmentId": "se-123456",
-           *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *       "eventSource": "Customer, Infra or Maintenance",
-           *       "id": "Eum ea accusamus maxime eum fugit.",
-           *       "ipAddress": "203.0.113.42",
-           *       "message": "instance-abcd1234 created",
-           *       "orgId": "Consequatur sunt.",
-           *       "orgName": "Acme Corporation",
-           *       "planVersion": "v1.0",
-           *       "productTierId": "Eum et consequatur eos.",
-           *       "region": "us-east-1",
-           *       "resourceInstanceId": "instance-abcd1234",
-           *       "resourceName": "Galera",
-           *       "roleType": "root",
-           *       "serviceId": "s-123456",
-           *       "serviceName": "mysql",
-           *       "servicePlanName": "Basic Plan",
-           *       "sessionId": "ak-12345678",
-           *       "subscriptionId": "sub-abcd1234",
-           *       "time": "2023-01-10T00:00:00Z",
-           *       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0",
-           *       "userId": "Eligendi repellendus vel quas qui.",
-           *       "userName": "John Doe",
-           *       "workflowFailures": [
-           *         {
-           *           "eventTime": "2020-01-01T00:00:00Z",
-           *           "message": "Bootstrap failed for reason X"
-           *         },
-           *         {
-           *           "eventTime": "2020-01-01T00:01:00Z",
-           *           "message": "Compute failed for reason Y"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeAuditEventResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe event */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "expression-evaluator-api/ExpressionEvaluator": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "deploymentCellID": "Rem distinctio voluptatum.",
-         *       "expression": "{{ $sys.network.externalClusterEndpoint }}",
-         *       "expressionMap": {
-         *         "dbHost": "{{ $sys.database.host }}",
-         *         "dbPort": "{{ $var.port }}"
-         *       },
-         *       "instanceID": "instance-12345678",
-         *       "productTierID": "Sed ut impedit aut deserunt.",
-         *       "resourceKey": "mysql",
-         *       "serviceID": "s-123456"
-         *     }
-         */
-        "application/json": components["schemas"]["ExpressionEvaluatorRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "error": "failed to evaluate expression: ...",
-           *       "result": "my-cluster.example.com"
-           *     }
-           */
-          "application/json": components["schemas"]["ExpressionEvaluatorResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to evaluate expression */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "global-api/consumptionServiceHealth": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED"
-           *     }
-           */
-          "application/json": components["schemas"]["OmnistrateServiceHealthResult"];
-        };
-      };
-    };
-  };
-  "consumption-invoice-api/ListConsumptionInvoices": {
-    parameters: {
-      query?: {
-        /**
-         * @description Billing provider. If specified, list invoices for the specified billing provider.
-         * @example STRIPE
-         */
-        billingProvider?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "invoices": [
-           *         {
-           *           "currency": "USD",
-           *           "dueDate": "2023-10-01T00:00:00Z",
-           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
-           *           "invoiceId": "in_1234568",
-           *           "invoiceNumber": "2021-01-01-1234567890",
-           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
-           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-           *           "paymentTerms": "Net 30",
-           *           "taxAmount": 10,
-           *           "totalAmount": 110,
-           *           "totalAmountWithoutTax": 100
-           *         },
-           *         {
-           *           "currency": "USD",
-           *           "dueDate": "2023-10-01T00:00:00Z",
-           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
-           *           "invoiceId": "in_1234568",
-           *           "invoiceNumber": "2021-01-01-1234567890",
-           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
-           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-           *           "paymentTerms": "Net 30",
-           *           "taxAmount": 10,
-           *           "totalAmount": 110,
-           *           "totalAmountWithoutTax": 100
-           *         },
-           *         {
-           *           "currency": "USD",
-           *           "dueDate": "2023-10-01T00:00:00Z",
-           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
-           *           "invoiceId": "in_1234568",
-           *           "invoiceNumber": "2021-01-01-1234567890",
-           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
-           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-           *           "paymentTerms": "Net 30",
-           *           "taxAmount": 10,
-           *           "totalAmount": 110,
-           *           "totalAmountWithoutTax": 100
-           *         },
-           *         {
-           *           "currency": "USD",
-           *           "dueDate": "2023-10-01T00:00:00Z",
-           *           "invoiceDate": "2021-01-01T00:00:00.000Z",
-           *           "invoiceId": "in_1234568",
-           *           "invoiceNumber": "2021-01-01-1234567890",
-           *           "invoicePdf": "https://pay.stripe.com/invoice/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm/pdf?s=ap",
-           *           "invoiceStatus": "draft|open|paid|uncollectible|void",
-           *           "invoiceUrl": "https://invoice.stripe.com/i/acct_1M2JTkLkdIwHu7ix/test_YWNjdF8xTTJKVGtMa2RJd0h1N2l4LF9OZVp3dVBYNnF0dGlvdXRubGVjSXVOOWhiVWpmUktPLDcxMTgyMTA10200x7P2wMSm?s=ap",
-           *           "paymentTerms": "Net 30",
-           *           "taxAmount": 10,
-           *           "totalAmount": 110,
-           *           "totalAmountWithoutTax": 100
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListInvoicesResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list invoices */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "services-orchestration-api/ListServicesOrchestrations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example [
-           *       {
-           *         "ServicesTopology": [
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           }
-           *         ],
-           *         "createdAt": "2021-01-01T00:00:00Z",
-           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
-           *         "orchestrationFailedReason": "Invalid DSL",
-           *         "resultParams": {
-           *           "param1": "value1",
-           *           "param2": "value2"
-           *         },
-           *         "status": "PENDING",
-           *         "updatedAt": "2021-01-01T00:00:00Z"
-           *       },
-           *       {
-           *         "ServicesTopology": [
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           }
-           *         ],
-           *         "createdAt": "2021-01-01T00:00:00Z",
-           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
-           *         "orchestrationFailedReason": "Invalid DSL",
-           *         "resultParams": {
-           *           "param1": "value1",
-           *           "param2": "value2"
-           *         },
-           *         "status": "PENDING",
-           *         "updatedAt": "2021-01-01T00:00:00Z"
-           *       },
-           *       {
-           *         "ServicesTopology": [
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           },
-           *           {
-           *             "dependsOnDeployment": [
-           *               "instanceDeploymentAlias1",
-           *               "instanceDeploymentAlias2"
-           *             ],
-           *             "failedReason": "Invalid inputs",
-           *             "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *             "instanceId": "instance-12345678",
-           *             "serviceId": "s-123456",
-           *             "status": "PENDING",
-           *             "statusMessage": "Creating deployment",
-           *             "subscriptionId": "Quas sint impedit quisquam est et quibusdam."
-           *           }
-           *         ],
-           *         "createdAt": "2021-01-01T00:00:00Z",
-           *         "id": "Ut voluptates officiis quaerat quas dolorum molestias.",
-           *         "orchestrationFailedReason": "Invalid DSL",
-           *         "resultParams": {
-           *           "param1": "value1",
-           *           "param2": "value2"
-           *         },
-           *         "status": "PENDING",
-           *         "updatedAt": "2021-01-01T00:00:00Z"
-           *       }
-           *     ]
-           */
-          "application/json": components["schemas"]["DescribeServicesOrchestrationResult"][];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list resource instances */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "services-orchestration-api/CreateServicesOrchestration": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "orchestrationCreateDSL": "Fugiat aut enim nobis ut aperiam fugit."
-         *     }
-         */
-        "application/json": components["schemas"]["CreateServicesOrchestrationRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "id": "Pariatur rerum minus necessitatibus consequatur quod ipsa."
-           *     }
-           */
-          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "services-orchestration-api/DescribeServicesOrchestration": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The ID of the services orchestration
-         * @example so-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "ServicesTopology": [
-           *         {
-           *           "dependsOnDeployment": [
-           *             "instanceDeploymentAlias1",
-           *             "instanceDeploymentAlias2"
-           *           ],
-           *           "failedReason": "Invalid inputs",
-           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *           "instanceId": "instance-12345678",
-           *           "serviceId": "s-123456",
-           *           "status": "PENDING",
-           *           "statusMessage": "Creating deployment",
-           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
-           *         },
-           *         {
-           *           "dependsOnDeployment": [
-           *             "instanceDeploymentAlias1",
-           *             "instanceDeploymentAlias2"
-           *           ],
-           *           "failedReason": "Invalid inputs",
-           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *           "instanceId": "instance-12345678",
-           *           "serviceId": "s-123456",
-           *           "status": "PENDING",
-           *           "statusMessage": "Creating deployment",
-           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
-           *         },
-           *         {
-           *           "dependsOnDeployment": [
-           *             "instanceDeploymentAlias1",
-           *             "instanceDeploymentAlias2"
-           *           ],
-           *           "failedReason": "Invalid inputs",
-           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *           "instanceId": "instance-12345678",
-           *           "serviceId": "s-123456",
-           *           "status": "PENDING",
-           *           "statusMessage": "Creating deployment",
-           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
-           *         },
-           *         {
-           *           "dependsOnDeployment": [
-           *             "instanceDeploymentAlias1",
-           *             "instanceDeploymentAlias2"
-           *           ],
-           *           "failedReason": "Invalid inputs",
-           *           "instanceDeploymentAlias": "instanceDeploymentAlias",
-           *           "instanceId": "instance-12345678",
-           *           "serviceId": "s-123456",
-           *           "status": "PENDING",
-           *           "statusMessage": "Creating deployment",
-           *           "subscriptionId": "Occaecati veritatis debitis enim voluptas quibusdam ut."
-           *         }
-           *       ],
-           *       "createdAt": "2021-01-01T00:00:00Z",
-           *       "id": "Ducimus rerum in accusamus quia voluptatum non.",
-           *       "orchestrationFailedReason": "Invalid DSL",
-           *       "resultParams": {
-           *         "param1": "value1",
-           *         "param2": "value2"
-           *       },
-           *       "status": "PENDING",
-           *       "updatedAt": "2021-01-01T00:00:00Z"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeServicesOrchestrationResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "services-orchestration-api/DeleteServicesOrchestration": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The ID of the services orchestration
-         * @example so-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to delete a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "services-orchestration-api/ModifyServicesOrchestration": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The ID of the services orchestration
-         * @example so-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "orchestrationModifyDSL": "Non rerum minima facere nesciunt."
-         *     }
-         */
-        "application/json": components["schemas"]["ModifyServicesOrchestrationRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to update a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/ListAllInstanceSnapshots": {
-    parameters: {
-      query?: {
-        /**
-         * @description The environment type to filter by
-         * @example DEV
-         */
-        environmentType?: string;
-        /**
-         * @description The type of snapshot to list. Valid values are: 'ManualSnapshot' and 'AutomatedSnapshot'
-         * @example AutomatedSnapshot|ManualSnapshot
-         */
-        snapshotType?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "snapshots": [
-           *         {
-           *           "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *           "completeTime": "2021-09-01T00:00:00Z",
-           *           "createdTime": "2021-09-01T00:00:00Z",
-           *           "encrypted": true,
-           *           "instanceResourceType": "OperatorCRD",
-           *           "productTierId": "Minus similique enim ducimus consequuntur aliquid rem.",
-           *           "productTierName": "Premium",
-           *           "productTierVersion": "1.0",
-           *           "productTierVersionDescription": "Version 1.0",
-           *           "progress": 99,
-           *           "region": "us-west-2",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "Postgres",
-           *           "snapshotId": "Repellendus est illum debitis laborum.",
-           *           "snapshotMetadata": {
-           *             "backupId": "20260522T230105",
-           *             "backupName": "backup-20260522230104"
-           *           },
-           *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
-           *           "sourceInstanceId": "instance-12345678",
-           *           "status": "completed",
-           *           "subscriptionId": "Laboriosam accusantium beatae id eveniet dolor.",
-           *           "subscriptionOwnerOrgId": "Itaque iure quo quae.",
-           *           "subscriptionOwnerOrgName": "Example Inc.",
-           *           "subscriptionOwnerUserId": "Ipsa modi.",
-           *           "subscriptionOwnerUserName": "Admin"
-           *         },
-           *         {
-           *           "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *           "completeTime": "2021-09-01T00:00:00Z",
-           *           "createdTime": "2021-09-01T00:00:00Z",
-           *           "encrypted": true,
-           *           "instanceResourceType": "OperatorCRD",
-           *           "productTierId": "Minus similique enim ducimus consequuntur aliquid rem.",
-           *           "productTierName": "Premium",
-           *           "productTierVersion": "1.0",
-           *           "productTierVersionDescription": "Version 1.0",
-           *           "progress": 99,
-           *           "region": "us-west-2",
-           *           "serviceId": "s-123456",
-           *           "serviceName": "Postgres",
-           *           "snapshotId": "Repellendus est illum debitis laborum.",
-           *           "snapshotMetadata": {
-           *             "backupId": "20260522T230105",
-           *             "backupName": "backup-20260522230104"
-           *           },
-           *           "snapshotType": "AutomatedSnapshot|ManualSnapshot",
-           *           "sourceInstanceId": "instance-12345678",
-           *           "status": "completed",
-           *           "subscriptionId": "Laboriosam accusantium beatae id eveniet dolor.",
-           *           "subscriptionOwnerOrgId": "Itaque iure quo quae.",
-           *           "subscriptionOwnerOrgName": "Example Inc.",
-           *           "subscriptionOwnerUserId": "Ipsa modi.",
-           *           "subscriptionOwnerUserName": "Admin"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListInstanceSnapshotsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list snapshots of a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/CreateInstanceSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "instanceId": "instance-abcd1234",
-         *       "targetRegion": "us-west-2"
-         *     }
-         */
-        "application/json": components["schemas"]["CreateInstanceSnapshotRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "id": "Hic dolorum iste et fugiat."
-           *     }
-           */
-          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to copy a resource instance snapshot */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/DescribeInstanceSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The instance snapshot ID
-         * @example instance-ss-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "cloudProvider": "aws|azure|gcp|nebius|oci|byoc-onprem|all",
-           *       "completeTime": "2021-09-01T00:00:00Z",
-           *       "createdTime": "2021-09-01T00:00:00Z",
-           *       "encrypted": true,
-           *       "outputParams": [
-           *         {
-           *           "displayName": "Server Name",
-           *           "key": "serverName",
-           *           "type": "string",
-           *           "value": "server1"
-           *         },
-           *         {
-           *           "displayName": "Server Type",
-           *           "key": "serverType",
-           *           "type": "string",
-           *           "value": "db.t3.micro"
-           *         }
-           *       ],
-           *       "productTierId": "Sunt quia.",
-           *       "productTierName": "Premium",
-           *       "productTierVersion": "1.0",
-           *       "productTierVersionDescription": "Version 1.0",
-           *       "progress": 99,
-           *       "region": "us-west-2",
-           *       "serviceId": "s-123456",
-           *       "serviceName": "Postgres",
-           *       "snapshotId": "Vel dicta sint eum mollitia.",
-           *       "snapshotMetadata": {
-           *         "backupId": "20260522T230105",
-           *         "backupName": "backup-20260522230104"
-           *       },
-           *       "snapshotType": "AutomatedSnapshot|ManualSnapshot",
-           *       "sourceInstanceId": "instance-12345678",
-           *       "status": "completed",
-           *       "subscriptionId": "Unde vel.",
-           *       "subscriptionOwnerOrgId": "Similique illo aliquam non quam consequatur.",
-           *       "subscriptionOwnerOrgName": "Example Inc.",
-           *       "subscriptionOwnerUserId": "Sapiente quidem neque id architecto a.",
-           *       "subscriptionOwnerUserName": "Admin"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeInstanceSnapshotResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list snapshots of a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/DeleteInstanceSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The instance snapshot ID
-         * @example instance-ss-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Failed to delete a resource instance snapshot */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/RestoreResourceInstanceFromSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The snapshot ID
-         * @example instance-ss-abcd1234
-         */
-        snapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "custom_network_id": "n-1234567890",
-         *       "network_type": "PUBLIC|INTERNAL"
-         *     }
-         */
-        "application/json": components["schemas"]["RestoreFromInstanceSnapshotRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "instanceId": "Porro tempora dignissimos."
-           *     }
-           */
-          "application/json": components["schemas"]["RestoreResourceInstanceFromSnapshotResponseBody"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a resource instance */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "instance-snapshot-api/CopyInstanceSnapshot": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description The source snapshot ID
-         * @example instance-ss-abcd1234
-         */
-        sourceSnapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "targetRegion": "us-west-2"
-         *     }
-         */
-        "application/json": components["schemas"]["CopyInstanceSnapshotRequest2"];
-      };
-    };
-    responses: {
-      /** @description Accepted response. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "id": "Eligendi distinctio voluptatem tempora fugit unde dolorum."
-           *     }
-           */
-          "application/json": components["schemas"]["CreateServicesOrchestrationResponseBody"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to copy a resource instance snapshot */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/ListAllSubscriptionUsers": {
-    parameters: {
-      query?: {
-        /**
-         * @description The environment type to filter by
-         * @example DEV
-         */
-        environmentType?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "subscriptionUsers": [
-           *         {
-           *           "email": "abc@gmail.com",
-           *           "name": "John Doe",
-           *           "roleType": "reader",
-           *           "userId": "user-abcd1234"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListAllSubscriptionUsersResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list all subscription users */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/InviteUser": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "email": "abc@gmail.com",
-         *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator"
-         *     }
-         */
-        "application/json": components["schemas"]["InviteConsumptionUserRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to invite user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/RevokeUserRole": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "email": "abc@gmail.com",
-         *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator"
-         *     }
-         */
-        "application/json": components["schemas"]["RevokeConsumptionUserRoleRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to delete user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/DescribeUsersBySubscription": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The subscription ID
-         * @example sub-abcd1234
-         */
-        subscriptionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "Id": "sub-abcd1234",
-           *       "subscriptionUsers": [
-           *         {
-           *           "email": "abc@gmail.com",
-           *           "name": "John Doe",
-           *           "roleType": "reader",
-           *           "subscriptionId": "sub-abcd1234",
-           *           "userId": "user-abcd1234"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeUsersBySubscriptionResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-usage-api/GetCurrentConsumptionUsage": {
-    parameters: {
-      query?: {
-        /**
-         * @description The subscription ID to get usage for
-         * @example sub-12345678
-         */
-        subscriptionID?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "endTime": "2021-01-01T00:00:00.000Z",
-           *       "startTime": "2021-01-01T00:00:00.000Z",
-           *       "usage": [
-           *         {
-           *           "dimension": "CPU core hours",
-           *           "endTime": "2021-01-01T00:00:00.000Z",
-           *           "startTime": "2021-01-01T00:00:00.000Z",
-           *           "total": 0.67
-           *         },
-           *         {
-           *           "dimension": "custom_metric",
-           *           "endTime": "2026-09-01T00:00:000Z",
-           *           "startTime": "2026-09-01T00:00:000Z",
-           *           "total": 2.5
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["GetConsumptionUsageResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to get usage */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-usage-api/GetConsumptionUsagePerDay": {
-    parameters: {
-      query?: {
-        /**
-         * @description Start date of the usage report
-         * @example 2023-01-01T10:00:00Z
-         */
-        startDate?: string;
-        /**
-         * @description End date of the usage report
-         * @example 2024-01-01T10:00:00Z
-         */
-        endDate?: string;
-        /**
-         * @description The subscription ID to get usage for
-         * @example sub-12345678
-         */
-        subscriptionID?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "endTime": "2021-01-01T00:00:00.000Z",
-           *       "startTime": "2021-01-01T00:00:00.000Z",
-           *       "usage": [
-           *         {
-           *           "dimension": "CPU core hours",
-           *           "endTime": "2021-01-01T00:00:00.000Z",
-           *           "startTime": "2021-01-01T00:00:00.000Z",
-           *           "total": 0.67
-           *         },
-           *         {
-           *           "dimension": "custom_metric",
-           *           "endTime": "2026-09-01T00:00:000Z",
-           *           "startTime": "2026-09-01T00:00:000Z",
-           *           "total": 2.5
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["GetConsumptionUsageResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to get usage */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/DescribeUserBillingDetails": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @example user-abcd1234 */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "billingEmbedURL": "DEPRECATED",
-           *       "name": "John Dae",
-           *       "paymentConfigured": true,
-           *       "paymentInfoPortalURL": "https://billing.provider.com/stripe-portal?customerId=cus_xxxxxxxxxxxxxx",
-           *       "userId": "Omnis et."
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeConsumptionUserBillingDetailsResult"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a user */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "consumption-user-api/Signin": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "token": "xkj"
-           *     }
-           */
-          "application/json": components["schemas"]["ConsumptionServiceAuthResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to signin */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "global-api/consumptionServiceVersion": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "additionalVersions": {
-           *         "dataplaneAgent": "v1.12.3",
-           *         "managerAgent": "v1.12.3"
-           *       },
-           *       "apiVersion": "1.0",
-           *       "buildCommitSHA": "1234567890abcdef1234567890abcdef12345678",
-           *       "buildTimestamp": "2020-01-01T00:00:00Z",
-           *       "componentVersion": "v0.47.96"
-           *     }
-           */
-          "application/json": components["schemas"]["OmnistrateServiceVersionResult"];
-        };
-      };
-    };
-  };
   "signin-api/RevokeToken": {
     parameters: {
       query?: never;
@@ -93166,6 +93066,428 @@ export interface operations {
       };
     };
   };
+  "service-api/BuildServiceFromComposeSpec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "configs": {
+         *         "Debitis veniam fugiat totam porro.": "Reiciendis debitis.",
+         *         "Libero natus nostrum ipsa cumque explicabo.": "Aut vero et."
+         *       },
+         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *       "dryrun": true,
+         *       "environment": "dev",
+         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+         *       "fileContent": "Quo laborum voluptatem voluptatibus ab.",
+         *       "forceCreateNewServicePlanVersion": true,
+         *       "name": "MySQL multi-writer service",
+         *       "release": true,
+         *       "releaseAsPreferred": true,
+         *       "releaseVersionName": "mysql",
+         *       "secrets": {
+         *         "Libero minus soluta nam.": "Est expedita minima exercitationem delectus porro dolor."
+         *       },
+         *       "serviceLogoURL": "http://walter.org/julian.wintheiser"
+         *     }
+         */
+        "application/json": components["schemas"]["BuildServiceFromComposeSpecRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "isNewServicePlanVersionCreated": true,
+           *       "productTierID": "Natus sit.",
+           *       "serviceEnvironmentID": "se-123456",
+           *       "serviceID": "s-123456",
+           *       "undefinedResources": {
+           *         "mysql": "r-12345678"
+           *       }
+           *     }
+           */
+          "application/json": components["schemas"]["BuildServiceFromComposeSpecResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to build a service from compose spec */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "service-api/CreateServiceFromComposeSpec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *       "fileContent": "Fugiat quia maiores.",
+         *       "fileFormat": "text/plain",
+         *       "fileName": "mysql.yaml",
+         *       "name": "MySQL multi-writer service",
+         *       "serviceLogoURL": "http://jaskolski.com/jeramie"
+         *     }
+         */
+        "application/json": components["schemas"]["CreateServiceFromComposeSpecRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example s-123456 */
+          "application/json": string;
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a service */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "service-api/BuildServiceFromServicePlanSpec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
+         *       "dryrun": true,
+         *       "environment": "dev",
+         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+         *       "fileContent": "Beatae eveniet consequatur perferendis.",
+         *       "forceCreateNewServicePlanVersion": true,
+         *       "name": "MySQL multi-writer service",
+         *       "release": true,
+         *       "releaseAsPreferred": true,
+         *       "releaseVersionName": "mysql",
+         *       "serviceLogoURL": "http://cormier.com/enos.cassin"
+         *     }
+         */
+        "application/json": components["schemas"]["BuildServiceFromServicePlanSpecRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "isNewServicePlanVersionCreated": true,
+           *       "productTierID": "Doloribus et dolores nesciunt aut ut.",
+           *       "serviceEnvironmentID": "se-123456",
+           *       "serviceID": "s-123456",
+           *       "undefinedResources": {
+           *         "mysql": "r-12345678"
+           *       }
+           *     }
+           */
+          "application/json": components["schemas"]["BuildServiceFromServicePlanSpecResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to build a service from service plan spec */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "service-api/PrepareServiceFromServicePlanSpec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "customerOnboardingId": "Mollitia nihil ea eaque ut sequi et.",
+         *       "environment": "dev",
+         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+         *       "fileContent": "Exercitationem et atque sunt natus vitae nobis.",
+         *       "name": "MySQL multi-writer service"
+         *     }
+         */
+        "application/json": components["schemas"]["PrepareServiceFromServicePlanSpecRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "artifactUploadingTasks": [
+           *         {
+           *           "accountConfigID": "ac-12345678",
+           *           "artifactPath": "mysql/mysql.tar.gz",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "productTierName": "Basic",
+           *           "serviceName": "mysql"
+           *         },
+           *         {
+           *           "accountConfigID": "ac-12345678",
+           *           "artifactPath": "mysql/mysql.tar.gz",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "productTierName": "Basic",
+           *           "serviceName": "mysql"
+           *         },
+           *         {
+           *           "accountConfigID": "ac-12345678",
+           *           "artifactPath": "mysql/mysql.tar.gz",
+           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
+           *           "productTierName": "Basic",
+           *           "serviceName": "mysql"
+           *         }
+           *       ],
+           *       "isNewProductTierCreated": true,
+           *       "productTierID": "Dicta voluptatem rerum non voluptas odio.",
+           *       "serviceEnvironmentID": "se-123456",
+           *       "serviceID": "s-123456"
+           *     }
+           */
+          "application/json": components["schemas"]["PrepareServiceFromServicePlanSpecResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to build a service from service plan spec */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "service-api/DescribeService": {
     parameters: {
       query?: never;
@@ -93785,6 +94107,101 @@ export interface operations {
       };
     };
   };
+  "compute-config-api/ListComputeInstanceTypes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The service ID
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description The cloud provider for this compute instance type config
+         * @example aws
+         */
+        cloudProviderName: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "nextPageToken": "next-token",
+           *       "types": [
+           *         "m5.xlarge",
+           *         "c5.xlarge",
+           *         "r5.xlarge"
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListComputeInstanceTypesResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list compute instance types */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "compute-config-api/DescribeComputeConfig": {
     parameters: {
       query?: {
@@ -94345,101 +94762,6 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to remove compute instance type */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "compute-config-api/ListComputeInstanceTypes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The service ID
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description The cloud provider for this compute instance type config
-         * @example aws
-         */
-        cloudProviderName: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "nextPageToken": "next-token",
-           *       "types": [
-           *         "m5.xlarge",
-           *         "c5.xlarge",
-           *         "r5.xlarge"
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListComputeInstanceTypesResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list compute instance types */
       500: {
         headers: {
           [name: string]: unknown;
@@ -98169,6 +98491,128 @@ export interface operations {
       };
     };
   };
+  "service-model-api/CopyServiceModel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The service ID this model belongs to
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description The source service model ID
+         * @example sm-12345678
+         */
+        sourceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "accountConfigIds": [
+         *         "ac-12345678",
+         *         "ac-23456789"
+         *       ],
+         *       "description": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
+         *       "features": [
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
+         *         },
+         *         {
+         *           "configuration": {
+         *             "status": "ON"
+         *           },
+         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
+         *         }
+         *       ],
+         *       "name": "MySQL multi-writer service hosted model",
+         *       "targetServiceModelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
+         *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+         *     }
+         */
+        "application/json": components["schemas"]["CopyServiceModelRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example Ipsum earum. */
+          "application/json": string;
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to copy a service model */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "service-model-api/DescribeServiceModel": {
     parameters: {
       query?: never;
@@ -99221,128 +99665,6 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to list vunits */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "service-model-api/CopyServiceModel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The service ID this model belongs to
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description The source service model ID
-         * @example sm-12345678
-         */
-        sourceId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "accountConfigIds": [
-         *         "ac-12345678",
-         *         "ac-23456789"
-         *       ],
-         *       "description": "A MySQL Hosted SaaS specializing in multi-writer clusters for high availability",
-         *       "features": [
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
-         *         },
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
-         *         },
-         *         {
-         *           "configuration": {
-         *             "status": "ON"
-         *           },
-         *           "feature": "CUSTOM_NETWORKS|CUSTOM_TERRAFORM_POLICY|CUSTOM_AGENT_RBAC"
-         *         }
-         *       ],
-         *       "name": "MySQL multi-writer service hosted model",
-         *       "targetServiceModelType": "OMNISTRATE_HOSTED|CUSTOMER_HOSTED|BYOA",
-         *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
-         *     }
-         */
-        "application/json": components["schemas"]["CopyServiceModelRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example Ipsum earum. */
-          "application/json": string;
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to copy a service model */
       500: {
         headers: {
           [name: string]: unknown;
@@ -100693,6 +101015,182 @@ export interface operations {
       };
     };
   };
+  "product-tier-api/CopyProductTier": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Service ID
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description The source product tier ID
+         * @example pt-12345678
+         */
+        sourceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "allowCreatesWhenPaymentNotConfigured": true,
+         *       "autoApproveSubscription": false,
+         *       "awsRegions": [
+         *         "us-east-2",
+         *         "ca-central-1"
+         *       ],
+         *       "azureRegions": [
+         *         "northcentralus"
+         *       ],
+         *       "billingProductID": "abc123",
+         *       "byocOnpremRegions": [
+         *         "on-prem"
+         *       ],
+         *       "customMetering": {
+         *         "metrics": [
+         *           {
+         *             "aggregationFunction": "count",
+         *             "displayName": "Request count",
+         *             "name": "requests"
+         *           }
+         *         ]
+         *       },
+         *       "description": "A premium product tier",
+         *       "documentation": "Any documentation",
+         *       "enableDeletionProtection": false,
+         *       "exportUsageMetering": true,
+         *       "exportUsageMeteringConfig": {
+         *         "GCS": {
+         *           "GCSBucketName": "my_billing_bucket_name"
+         *         },
+         *         "S3": {
+         *           "S3BucketArn": "arn:aws:s3:::my_billing_bucket_name",
+         *           "S3BucketRegion": "us-east-1"
+         *         }
+         *       },
+         *       "gcpRegions": [
+         *         "us-central1"
+         *       ],
+         *       "maxNumberOfInstances": 5,
+         *       "name": "Premium",
+         *       "nebiusRegions": [
+         *         "eu-north1"
+         *       ],
+         *       "ociRegions": [
+         *         "us-sanjose-1"
+         *       ],
+         *       "onPremPlatforms": [
+         *         "EKS",
+         *         "Generic"
+         *       ],
+         *       "planDescription": "A premium plan",
+         *       "pricePerUnit": {
+         *         "CPU core hours": {
+         *           "amount": 0.001,
+         *           "currency": "USD"
+         *         },
+         *         "Deployment cell hours": {
+         *           "amount": 0.001,
+         *           "currency": "USD"
+         *         },
+         *         "Memory GiB hours": {
+         *           "amount": 0.0001,
+         *           "currency": "USD"
+         *         },
+         *         "Replica hours": {
+         *           "amount": 0.001,
+         *           "currency": "USD"
+         *         },
+         *         "Storage GiB hours": {
+         *           "amount": 0.0001,
+         *           "currency": "USD"
+         *         }
+         *       },
+         *       "pricing": {
+         *         "price1": "value1"
+         *       },
+         *       "privateRegions": [
+         *         "n/a"
+         *       ],
+         *       "serviceModelId": "Iusto corporis quasi et nihil.",
+         *       "support": "Any support",
+         *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
+         *     }
+         */
+        "application/json": components["schemas"]["CopyProductTierRequest2"];
+      };
+    };
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example Incidunt doloremque. */
+          "application/json": string;
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to create a product tier */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "product-tier-api/DescribeProductTier": {
     parameters: {
       query?: {
@@ -101393,109 +101891,6 @@ export interface operations {
       };
     };
   };
-  "product-tier-api/DescribeProductTierWorkspaceArtifacts": {
-    parameters: {
-      query?: {
-        /**
-         * @description The product tier version to use. If omitted, the latest product tier workspace artifacts are used.
-         * @example 3.0
-         */
-        version?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description Service ID
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description Product tier ID
-         * @example pt-12345678
-         */
-        id: string;
-        /**
-         * @description The workspace artifact archive ID
-         * @example ws-da-12345678
-         */
-        workspaceArtifactId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "lastFailedReason": "Failed to package deployment artifacts",
-           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
-           *       "workspaceArtifactId": "Non in et optio sed quibusdam."
-           *     }
-           */
-          "application/json": components["schemas"]["WorkspaceArtifactsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe product tier workspace artifacts */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "product-tier-api/DownloadProductTierWorkspaceArtifacts": {
     parameters: {
       query?: {
@@ -101796,6 +102191,109 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to prepare product tier workspace artifacts */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "product-tier-api/DescribeProductTierWorkspaceArtifacts": {
+    parameters: {
+      query?: {
+        /**
+         * @description The product tier version to use. If omitted, the latest product tier workspace artifacts are used.
+         * @example 3.0
+         */
+        version?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description Service ID
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description Product tier ID
+         * @example pt-12345678
+         */
+        id: string;
+        /**
+         * @description The workspace artifact archive ID
+         * @example ws-da-12345678
+         */
+        workspaceArtifactId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "lastFailedReason": "Failed to package deployment artifacts",
+           *       "status": "FAILED|CANCELLED|PENDING_DEPENDENCY|PENDING|RUNNING|DEPLOYING|UPLOADING|READY|SUCCESS|COMPLETE|DELETING|DELETED|UNKNOWN|DISCONNECTED|DISCONNECTING|CONNECTING|DEACTIVATED",
+           *       "workspaceArtifactId": "Non in et optio sed quibusdam."
+           *     }
+           */
+          "application/json": components["schemas"]["WorkspaceArtifactsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe product tier workspace artifacts */
       500: {
         headers: {
           [name: string]: unknown;
@@ -102521,182 +103019,6 @@ export interface operations {
       };
     };
   };
-  "product-tier-api/CopyProductTier": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description Service ID
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description The source product tier ID
-         * @example pt-12345678
-         */
-        sourceId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "allowCreatesWhenPaymentNotConfigured": true,
-         *       "autoApproveSubscription": false,
-         *       "awsRegions": [
-         *         "us-east-2",
-         *         "ca-central-1"
-         *       ],
-         *       "azureRegions": [
-         *         "northcentralus"
-         *       ],
-         *       "billingProductID": "abc123",
-         *       "byocOnpremRegions": [
-         *         "on-prem"
-         *       ],
-         *       "customMetering": {
-         *         "metrics": [
-         *           {
-         *             "aggregationFunction": "count",
-         *             "displayName": "Request count",
-         *             "name": "requests"
-         *           }
-         *         ]
-         *       },
-         *       "description": "A premium product tier",
-         *       "documentation": "Any documentation",
-         *       "enableDeletionProtection": false,
-         *       "exportUsageMetering": true,
-         *       "exportUsageMeteringConfig": {
-         *         "GCS": {
-         *           "GCSBucketName": "my_billing_bucket_name"
-         *         },
-         *         "S3": {
-         *           "S3BucketArn": "arn:aws:s3:::my_billing_bucket_name",
-         *           "S3BucketRegion": "us-east-1"
-         *         }
-         *       },
-         *       "gcpRegions": [
-         *         "us-central1"
-         *       ],
-         *       "maxNumberOfInstances": 5,
-         *       "name": "Premium",
-         *       "nebiusRegions": [
-         *         "eu-north1"
-         *       ],
-         *       "ociRegions": [
-         *         "us-sanjose-1"
-         *       ],
-         *       "onPremPlatforms": [
-         *         "EKS",
-         *         "Generic"
-         *       ],
-         *       "planDescription": "A premium plan",
-         *       "pricePerUnit": {
-         *         "CPU core hours": {
-         *           "amount": 0.001,
-         *           "currency": "USD"
-         *         },
-         *         "Deployment cell hours": {
-         *           "amount": 0.001,
-         *           "currency": "USD"
-         *         },
-         *         "Memory GiB hours": {
-         *           "amount": 0.0001,
-         *           "currency": "USD"
-         *         },
-         *         "Replica hours": {
-         *           "amount": 0.001,
-         *           "currency": "USD"
-         *         },
-         *         "Storage GiB hours": {
-         *           "amount": 0.0001,
-         *           "currency": "USD"
-         *         }
-         *       },
-         *       "pricing": {
-         *         "price1": "value1"
-         *       },
-         *       "privateRegions": [
-         *         "n/a"
-         *       ],
-         *       "serviceModelId": "Iusto corporis quasi et nihil.",
-         *       "support": "Any support",
-         *       "targetTierType": "OMNISTRATE_DEDICATED_TENANCY|OMNISTRATE_MULTI_TENANCY|CUSTOM_TENANCY"
-         *     }
-         */
-        "application/json": components["schemas"]["CopyProductTierRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example Incidunt doloremque. */
-          "application/json": string;
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a product tier */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "tier-version-set-api/CustomerListTierVersionSets": {
     parameters: {
       query?: {
@@ -103300,6 +103622,216 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to create a version set. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "tier-version-set-api/GetTierVersionSetSpec": {
+    parameters: {
+      query?: {
+        /**
+         * @description The version number for the specific version set. If not specified, returns the latest preferred or active version.
+         * @example 3.0
+         */
+        version?: string;
+      };
+      header?: never;
+      path: {
+        /**
+         * @description ID of the Service
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description The product tier ID that this version set belongs to.
+         * @example Ad a officiis est nobis debitis eos.
+         */
+        productTierId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "createdAt": "2007-03-30T16:04:54Z",
+           *       "productTierId": "Eligendi ut consequatur dolorem.",
+           *       "serviceId": "s-123456",
+           *       "specContent": "{\"RawYAML\":\"bmFtZTogbXktc2VydmljZQpkZXBsb3ltZW50OgogIGhvc3RlZDoKICAgIGFjY291bnQ6IC4uLg==\",\"Configs\":{\"database_url\":\"cG9zdGdyZXM6Ly9sb2NhbGhvc3Q6NTQzMi9teWRi\"},\"Secrets\":{\"api_key\":\"c2VjcmV0X2FwaV9rZXlfdjEyMzQ1\"}}",
+           *       "updatedAt": "2011-02-08T22:26:56Z",
+           *       "version": "1.0"
+           *     }
+           */
+          "application/json": components["schemas"]["GetTierVersionSetSpecResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to get tier version set spec */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "tier-version-set-api/ListTierVersionSetSpecs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description ID of the Service
+         * @example s-12345678
+         */
+        serviceId: string;
+        /**
+         * @description The product tier ID that this version set belongs to.
+         * @example Ad a officiis est nobis debitis eos.
+         */
+        productTierId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "specs": [
+           *         {
+           *           "createdAt": "1984-06-24T09:34:56Z",
+           *           "hasSpecFile": true,
+           *           "productTierId": "Totam veniam ipsam voluptas quod non nam.",
+           *           "serviceId": "s-123456",
+           *           "status": "Active",
+           *           "updatedAt": "1973-03-19T16:52:41Z",
+           *           "version": "1.0"
+           *         },
+           *         {
+           *           "createdAt": "1984-06-24T09:34:56Z",
+           *           "hasSpecFile": true,
+           *           "productTierId": "Totam veniam ipsam voluptas quod non nam.",
+           *           "serviceId": "s-123456",
+           *           "status": "Active",
+           *           "updatedAt": "1973-03-19T16:52:41Z",
+           *           "version": "1.0"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": components["schemas"]["ListTierVersionSetSpecsResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to list tier version set specs */
       500: {
         headers: {
           [name: string]: unknown;
@@ -104662,216 +105194,6 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to release a version set. */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "tier-version-set-api/GetTierVersionSetSpec": {
-    parameters: {
-      query?: {
-        /**
-         * @description The version number for the specific version set. If not specified, returns the latest preferred or active version.
-         * @example 3.0
-         */
-        version?: string;
-      };
-      header?: never;
-      path: {
-        /**
-         * @description ID of the Service
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description The product tier ID that this version set belongs to.
-         * @example Ad a officiis est nobis debitis eos.
-         */
-        productTierId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "createdAt": "2007-03-30T16:04:54Z",
-           *       "productTierId": "Eligendi ut consequatur dolorem.",
-           *       "serviceId": "s-123456",
-           *       "specContent": "{\"RawYAML\":\"bmFtZTogbXktc2VydmljZQpkZXBsb3ltZW50OgogIGhvc3RlZDoKICAgIGFjY291bnQ6IC4uLg==\",\"Configs\":{\"database_url\":\"cG9zdGdyZXM6Ly9sb2NhbGhvc3Q6NTQzMi9teWRi\"},\"Secrets\":{\"api_key\":\"c2VjcmV0X2FwaV9rZXlfdjEyMzQ1\"}}",
-           *       "updatedAt": "2011-02-08T22:26:56Z",
-           *       "version": "1.0"
-           *     }
-           */
-          "application/json": components["schemas"]["GetTierVersionSetSpecResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to get tier version set spec */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "tier-version-set-api/ListTierVersionSetSpecs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description ID of the Service
-         * @example s-12345678
-         */
-        serviceId: string;
-        /**
-         * @description The product tier ID that this version set belongs to.
-         * @example Ad a officiis est nobis debitis eos.
-         */
-        productTierId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "specs": [
-           *         {
-           *           "createdAt": "1984-06-24T09:34:56Z",
-           *           "hasSpecFile": true,
-           *           "productTierId": "Totam veniam ipsam voluptas quod non nam.",
-           *           "serviceId": "s-123456",
-           *           "status": "Active",
-           *           "updatedAt": "1973-03-19T16:52:41Z",
-           *           "version": "1.0"
-           *         },
-           *         {
-           *           "createdAt": "1984-06-24T09:34:56Z",
-           *           "hasSpecFile": true,
-           *           "productTierId": "Totam veniam ipsam voluptas quod non nam.",
-           *           "serviceId": "s-123456",
-           *           "status": "Active",
-           *           "updatedAt": "1973-03-19T16:52:41Z",
-           *           "version": "1.0"
-           *         }
-           *       ]
-           *     }
-           */
-          "application/json": components["schemas"]["ListTierVersionSetSpecsResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to list tier version set specs */
       500: {
         headers: {
           [name: string]: unknown;
@@ -113850,428 +114172,6 @@ export interface operations {
       };
     };
   };
-  "service-api/BuildServiceFromComposeSpec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "configs": {
-         *         "Debitis veniam fugiat totam porro.": "Reiciendis debitis.",
-         *         "Libero natus nostrum ipsa cumque explicabo.": "Aut vero et."
-         *       },
-         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "dryrun": true,
-         *       "environment": "dev",
-         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-         *       "fileContent": "Quo laborum voluptatem voluptatibus ab.",
-         *       "forceCreateNewServicePlanVersion": true,
-         *       "name": "MySQL multi-writer service",
-         *       "release": true,
-         *       "releaseAsPreferred": true,
-         *       "releaseVersionName": "mysql",
-         *       "secrets": {
-         *         "Libero minus soluta nam.": "Est expedita minima exercitationem delectus porro dolor."
-         *       },
-         *       "serviceLogoURL": "http://walter.org/julian.wintheiser"
-         *     }
-         */
-        "application/json": components["schemas"]["BuildServiceFromComposeSpecRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "isNewServicePlanVersionCreated": true,
-           *       "productTierID": "Natus sit.",
-           *       "serviceEnvironmentID": "se-123456",
-           *       "serviceID": "s-123456",
-           *       "undefinedResources": {
-           *         "mysql": "r-12345678"
-           *       }
-           *     }
-           */
-          "application/json": components["schemas"]["BuildServiceFromComposeSpecResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to build a service from compose spec */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "service-api/CreateServiceFromComposeSpec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "fileContent": "Fugiat quia maiores.",
-         *       "fileFormat": "text/plain",
-         *       "fileName": "mysql.yaml",
-         *       "name": "MySQL multi-writer service",
-         *       "serviceLogoURL": "http://jaskolski.com/jeramie"
-         *     }
-         */
-        "application/json": components["schemas"]["CreateServiceFromComposeSpecRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example s-123456 */
-          "application/json": string;
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to create a service */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "service-api/BuildServiceFromServicePlanSpec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "description": "A MySQL SaaS specializing in multi-writer clusters for high availability",
-         *       "dryrun": true,
-         *       "environment": "dev",
-         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-         *       "fileContent": "Beatae eveniet consequatur perferendis.",
-         *       "forceCreateNewServicePlanVersion": true,
-         *       "name": "MySQL multi-writer service",
-         *       "release": true,
-         *       "releaseAsPreferred": true,
-         *       "releaseVersionName": "mysql",
-         *       "serviceLogoURL": "http://cormier.com/enos.cassin"
-         *     }
-         */
-        "application/json": components["schemas"]["BuildServiceFromServicePlanSpecRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "isNewServicePlanVersionCreated": true,
-           *       "productTierID": "Doloribus et dolores nesciunt aut ut.",
-           *       "serviceEnvironmentID": "se-123456",
-           *       "serviceID": "s-123456",
-           *       "undefinedResources": {
-           *         "mysql": "r-12345678"
-           *       }
-           *     }
-           */
-          "application/json": components["schemas"]["BuildServiceFromServicePlanSpecResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to build a service from service plan spec */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "service-api/PrepareServiceFromServicePlanSpec": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        /**
-         * @example {
-         *       "customerOnboardingId": "Mollitia nihil ea eaque ut sequi et.",
-         *       "environment": "dev",
-         *       "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-         *       "fileContent": "Exercitationem et atque sunt natus vitae nobis.",
-         *       "name": "MySQL multi-writer service"
-         *     }
-         */
-        "application/json": components["schemas"]["PrepareServiceFromServicePlanSpecRequest2"];
-      };
-    };
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "artifactUploadingTasks": [
-           *         {
-           *           "accountConfigID": "ac-12345678",
-           *           "artifactPath": "mysql/mysql.tar.gz",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "productTierName": "Basic",
-           *           "serviceName": "mysql"
-           *         },
-           *         {
-           *           "accountConfigID": "ac-12345678",
-           *           "artifactPath": "mysql/mysql.tar.gz",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "productTierName": "Basic",
-           *           "serviceName": "mysql"
-           *         },
-           *         {
-           *           "accountConfigID": "ac-12345678",
-           *           "artifactPath": "mysql/mysql.tar.gz",
-           *           "environmentType": "PROD|PRIVATE|CANARY|STAGING|QA|DEV|GLOBAL",
-           *           "productTierName": "Basic",
-           *           "serviceName": "mysql"
-           *         }
-           *       ],
-           *       "isNewProductTierCreated": true,
-           *       "productTierID": "Dicta voluptatem rerum non voluptas odio.",
-           *       "serviceEnvironmentID": "se-123456",
-           *       "serviceID": "s-123456"
-           *     }
-           */
-          "application/json": components["schemas"]["PrepareServiceFromServicePlanSpecResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to build a service from service plan spec */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "signin-api/Signin": {
     parameters: {
       query?: never;
@@ -115545,205 +115445,6 @@ export interface operations {
       };
     };
   };
-  "subscription-api/DescribeSubscription": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The subscription ID
-         * @example sub-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /**
-           * @example {
-           *       "accountConfigIdentityId": "Temporibus sint ipsa aut labore.",
-           *       "allowCreatesWhenPaymentNotConfigured": true,
-           *       "allowedDeploymentLocations": [
-           *         {
-           *           "cloudProvider": "aws",
-           *           "regions": [
-           *             "us-east-1",
-           *             "us-west-2"
-           *           ]
-           *         },
-           *         {
-           *           "cloudProvider": "gcp"
-           *         }
-           *       ],
-           *       "cloudProviderNames": [
-           *         "aws",
-           *         "gcp"
-           *       ],
-           *       "createdAt": "2019-01-01T00:00:00Z",
-           *       "defaultSubscription": true,
-           *       "id": "Tempore voluptate inventore repellendus.",
-           *       "maxNumberOfInstances": 10,
-           *       "paymentMethodConfigured": true,
-           *       "productTierId": "Magnam doloremque soluta ut quam.",
-           *       "productTierName": "Omnistrate Multi Tenancy",
-           *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
-           *       "rootUserId": "Ut consequatur itaque pariatur ab delectus.",
-           *       "rootUserName": "John Doe",
-           *       "rootUserOrgId": "Et amet qui.",
-           *       "rootUserOrgName": "Example Inc.",
-           *       "serviceId": "s-123456",
-           *       "serviceLogoURL": "Quo officiis.",
-           *       "serviceName": "MySQL multi-writer service",
-           *       "serviceOrgId": "Et at aliquid ea est natus.",
-           *       "serviceOrgName": "Omnistrate",
-           *       "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
-           *       "subscriptionOwnerName": "John Doe"
-           *     }
-           */
-          "application/json": components["schemas"]["DescribeSubscriptionResult"];
-        };
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to describe a subscription */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "subscription-api/DeleteSubscription": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /**
-         * @description The subscription ID
-         * @example sub-12345678
-         */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK response. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description bad_request: Response used on a bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description auth_failure: Response used on authentication failure */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description forbidden: Response used on authorization failure */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description not_found: Response used when the requested resource is not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-      /** @description failed_request: Response used on failure to delete a subscription */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/vnd.goa.error": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "subscription-request-api/ListSubscriptionRequests": {
     parameters: {
       query?: {
@@ -116151,6 +115852,205 @@ export interface operations {
         };
       };
       /** @description failed_request: Response used on failure to create a subscription */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "subscription-api/DescribeSubscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The subscription ID
+         * @example sub-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "accountConfigIdentityId": "Temporibus sint ipsa aut labore.",
+           *       "allowCreatesWhenPaymentNotConfigured": true,
+           *       "allowedDeploymentLocations": [
+           *         {
+           *           "cloudProvider": "aws",
+           *           "regions": [
+           *             "us-east-1",
+           *             "us-west-2"
+           *           ]
+           *         },
+           *         {
+           *           "cloudProvider": "gcp"
+           *         }
+           *       ],
+           *       "cloudProviderNames": [
+           *         "aws",
+           *         "gcp"
+           *       ],
+           *       "createdAt": "2019-01-01T00:00:00Z",
+           *       "defaultSubscription": true,
+           *       "id": "Tempore voluptate inventore repellendus.",
+           *       "maxNumberOfInstances": 10,
+           *       "paymentMethodConfigured": true,
+           *       "productTierId": "Magnam doloremque soluta ut quam.",
+           *       "productTierName": "Omnistrate Multi Tenancy",
+           *       "roleType": "root|editor|reader|service_editor|service_reader|admin|service_operator",
+           *       "rootUserId": "Ut consequatur itaque pariatur ab delectus.",
+           *       "rootUserName": "John Doe",
+           *       "rootUserOrgId": "Et amet qui.",
+           *       "rootUserOrgName": "Example Inc.",
+           *       "serviceId": "s-123456",
+           *       "serviceLogoURL": "Quo officiis.",
+           *       "serviceName": "MySQL multi-writer service",
+           *       "serviceOrgId": "Et at aliquid ea est natus.",
+           *       "serviceOrgName": "Omnistrate",
+           *       "status": "ACTIVE|SUSPENDED|TERMINATED|CANCELLED",
+           *       "subscriptionOwnerName": "John Doe"
+           *     }
+           */
+          "application/json": components["schemas"]["DescribeSubscriptionResult"];
+        };
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to describe a subscription */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "subscription-api/DeleteSubscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description The subscription ID
+         * @example sub-12345678
+         */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description bad_request: Response used on a bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description auth_failure: Response used on authentication failure */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description forbidden: Response used on authorization failure */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description not_found: Response used when the requested resource is not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description invalid_state: Response used when requested resource is in an invalid state for this operation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.goa.error": components["schemas"]["Error"];
+        };
+      };
+      /** @description failed_request: Response used on failure to delete a subscription */
       500: {
         headers: {
           [name: string]: unknown;
