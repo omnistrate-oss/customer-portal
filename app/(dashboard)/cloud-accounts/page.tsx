@@ -1195,7 +1195,7 @@ const CloudAccountsPage = () => {
         cloudFormationTemplateUrl={awsCloudFormationTemplateUrl}
         cloudFormationUpdateUrl={
           accountConfigsHash?.[getResultParams(clickedInstance)?.cloud_provider_account_config_id ?? ""]
-            ?.awsCloudFormationUpdateURL
+            ?.awsCloudFormationTemplateURL
         }
         isAccountCreation={isAccountCreation}
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}

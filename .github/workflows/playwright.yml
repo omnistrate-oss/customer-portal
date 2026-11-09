@@ -21,7 +21,8 @@ jobs:
     # Private HARs and live runtime auth are available only for trusted PRs.
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]')
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    # Playwright 1.60 has no Chromium build for ubuntu-latest (26.04); unpin after upgrading to 1.61+.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 

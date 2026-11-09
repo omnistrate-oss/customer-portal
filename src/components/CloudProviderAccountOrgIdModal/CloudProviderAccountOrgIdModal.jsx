@@ -609,13 +609,14 @@ const NonCreationTimeInstructions = (props) => {
   }
 
   if (isAwsReconfiguration) {
-    if (!cloudFormationUpdateUrl) {
+    const reconfigurationUrl = cloudFormationUpdateUrl || cloudFormationTemplateUrl;
+    if (!reconfigurationUrl) {
       return <BodyText>The AWS update instructions are not available yet. Please try again later.</BodyText>;
     }
     return (
       <AwsReconfigurationInstructions
         awsAccountId={accountInstructionDetails.awsAccountID}
-        cloudFormationUrl={cloudFormationUpdateUrl}
+        cloudFormationUrl={reconfigurationUrl}
         cloudFormationCreateUrl={cloudFormationTemplateUrl}
       />
     );
