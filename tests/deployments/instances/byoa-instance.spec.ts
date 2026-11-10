@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 import { InstancesPage } from "page-objects/instances-page";
 import { readRecordedServiceOffering } from "test-fixtures/har-replay";
@@ -93,7 +94,7 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await page.getByRole("option", { name: `${cloudAccountInstanceId} (Account` }).click();
 
     await page.getByTestId("private-radio").click();
-    await page.getByTestId("password-input").fill(process.env.TEST_INSTANCE_PASSWORD!);
+    await page.getByTestId("password-input").fill(randomBytes(18).toString("base64url"));
     await page.getByTestId("username-input").fill("username");
 
     await page.waitForTimeout(5000);

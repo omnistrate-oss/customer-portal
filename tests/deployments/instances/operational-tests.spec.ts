@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { InstancesPage } from "page-objects/instances-page";
 import { ApiFixture } from "test-fixtures/api-fixture";
 import { test } from "test-fixtures/har-test";
@@ -125,7 +126,7 @@ test.describe("Instances Page - Operational Tests", () => {
     await page.getByTestId("modify-button").click();
     await page.waitForLoadState("networkidle");
 
-    await page.getByTestId("password-input").fill(process.env.TEST_INSTANCE_PASSWORD!);
+    await page.getByTestId("password-input").fill(randomBytes(18).toString("base64url"));
     await page.getByTestId("username-input").fill("new_username");
 
     await page.waitForTimeout(5000);
