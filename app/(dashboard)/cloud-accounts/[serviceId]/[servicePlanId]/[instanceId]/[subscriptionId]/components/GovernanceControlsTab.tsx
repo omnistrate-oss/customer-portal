@@ -135,8 +135,10 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
 
     return backendCommand.replace(/https?:\/\/[^\s"'`)]+/g, (rawUrl) => {
       try {
-        if (new URL(rawUrl).pathname !== "/2022-09-01-00/account-setup/aws-bootstrap.sh") return rawUrl;
-        return getActionProxyUrl(rawUrl, true) || rawUrl;
+        const url = new URL(rawUrl);
+        const scriptPath = "/2022-09-01-00/account-setup/aws-bootstrap.sh";
+        if (url.pathname !== scriptPath && url.pathname !== "/account-setup/aws-bootstrap.sh") return rawUrl;
+        return getActionProxyUrl(`${scriptPath}${url.search}`, true) || rawUrl;
       } catch {
         return rawUrl;
       }
