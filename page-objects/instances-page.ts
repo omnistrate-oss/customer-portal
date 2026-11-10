@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from "@playwright/test";
 import { BackendError } from "test-utils/backend-error";
 import { isReplayMode } from "test-utils/har-mode";
+import { retryOnRateLimit } from "test-utils/retry-on-rate-limit";
 import { UserAPIClient } from "test-utils/user-api-client";
 
 import { dataTestIds } from "src/constants/testIds/instances-page";
@@ -142,21 +143,21 @@ export class InstancesPage {
 
   async selectInstance(instanceId: string) {
     const row = this.page.getByTestId(instanceId);
-    await row.getByRole("checkbox").click();
+    await row.getByRole("checkbox").check();
   }
 
   async deleteInstance(instanceId: string) {
     await this.selectInstance(instanceId);
     await this.page.getByTestId(this.dataTestIds.deleteButton).click();
     await this.page.locator("#confirmationText").fill("deleteme");
-    await this.page.getByRole("button", { name: "Delete" }).click();
+    await this.confirmAction(instanceId, "Delete");
   }
 
   async stopInstance(instanceId: string) {
     await this.selectInstance(instanceId);
     await this.page.getByTestId(this.dataTestIds.stopButton).click();
     await this.page.locator("#confirmationText").fill("stop");
-    await this.page.getByRole("button", { name: "Stop" }).click();
+    await this.confirmAction(instanceId, "Stop");
   }
 
   async startInstance(instanceId: string) {
@@ -170,7 +171,27 @@ export class InstancesPage {
     await this.page.getByTestId(this.dataTestIds.rebootButton).click();
 
     await this.page.locator("#confirmationText").fill("reboot");
-    await this.page.getByRole("button", { name: "Reboot" }).click();
+    await this.confirmAction(instanceId, "Reboot");
+  }
+
+  // Clicks the dialog's confirm button, retrying 429s, and waits for the dialog to close.
+  private async confirmAction(instanceId: string, buttonName: string) {
+    const response = await retryOnRateLimit(async () => {
+      const [response] = await Promise.all([
+        this.page.waitForResponse(
+          (response) =>
+            response.url().includes("%2Fresource-instance%2F") &&
+            response.url().includes(instanceId) &&
+            response.request().postDataJSON()?.method !== "GET"
+        ),
+        this.page.locator(".MuiDialog-root").getByRole("button", { name: buttonName, exact: true }).click(),
+      ]);
+      return response;
+    });
+    if (!response.ok()) {
+      throw new BackendError(`${buttonName} instance ${instanceId} failed with ${response.status()}`);
+    }
+    await expect(this.page.locator(".MuiDialog-root")).toHaveCount(0, { timeout: 2 * 60_000 });
   }
 
   async changeCapacity(type: "add" | "remove", instanceId: string, newCapacity: number) {

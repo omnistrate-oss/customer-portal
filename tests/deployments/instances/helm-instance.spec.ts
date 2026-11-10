@@ -43,7 +43,8 @@ test.describe("Instances Page - Helm Instance Tests", () => {
     await page.getByTestId(dataTestIds.regionSelect).click();
     await page.getByRole("option", { name: "ap-south-" }).click();
 
-    await page.getByLabel("Password Generator").click();
+    await page.getByTestId("private-radio").click();
+    await page.getByTestId("postgresPassword-input").fill(process.env.TEST_INSTANCE_PASSWORD!);
     await page.getByTestId(dataTestIds.submitButton).click();
 
     const instanceIdInput = page.getByTestId(dataTestIds.instanceId).locator("input");
@@ -55,8 +56,8 @@ test.describe("Instances Page - Helm Instance Tests", () => {
   });
 
   test("Delete Instance", async () => {
-    await instancesPage.deleteInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.deleteInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
     });
   });

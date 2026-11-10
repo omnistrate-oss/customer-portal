@@ -92,7 +92,8 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await page.getByTestId(dataTestIds.cloudAccountSelect).click();
     await page.getByRole("option", { name: `${cloudAccountInstanceId} (Account` }).click();
 
-    await page.getByTestId("password-input").fill("a_secure_password");
+    await page.getByTestId("private-radio").click();
+    await page.getByTestId("password-input").fill(process.env.TEST_INSTANCE_PASSWORD!);
     await page.getByTestId("username-input").fill("username");
 
     await page.waitForTimeout(5000);
@@ -110,8 +111,8 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");
 
-    await instancesPage.deleteInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.deleteInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
       await instancesPage.waitForDelete(instanceId, logPrefix);
     });

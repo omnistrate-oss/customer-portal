@@ -1,6 +1,6 @@
-import { test } from "test-fixtures/har-test";
 import { InstancesPage } from "page-objects/instances-page";
 import { ApiFixture } from "test-fixtures/api-fixture";
+import { test } from "test-fixtures/har-test";
 import { BackendError, BackendSetupGuard, skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { registerSoftFailureRecorder } from "test-utils/soft-failure-tracker";
@@ -68,10 +68,10 @@ test.describe("Instances Page - Operational Tests", () => {
             subscriptionId,
             {
               cloud_provider: "aws",
-              network_type: "PUBLIC",
+              network_type: "INTERNAL",
               region: "ap-south-1",
               requestParams: {
-                password: "a_secure_password",
+                password: process.env.TEST_INSTANCE_PASSWORD!,
                 username: "username",
               },
             }
@@ -97,8 +97,8 @@ test.describe("Instances Page - Operational Tests", () => {
     await skipOnBackendError(test, async () => {
       await instancesPage.waitForStatus(instance.id!, "Running", logPrefix);
     });
-    await instancesPage.rebootInstance(instance.id!);
     await skipOnBackendError(test, async () => {
+      await instancesPage.rebootInstance(instance.id!);
       await instancesPage.waitForStatus(instance.id!, "Restarting", logPrefix);
     });
   });
@@ -125,7 +125,7 @@ test.describe("Instances Page - Operational Tests", () => {
     await page.getByTestId("modify-button").click();
     await page.waitForLoadState("networkidle");
 
-    await page.getByTestId("password-input").fill("new_password");
+    await page.getByTestId("password-input").fill(process.env.TEST_INSTANCE_PASSWORD!);
     await page.getByTestId("username-input").fill("new_username");
 
     await page.waitForTimeout(5000);

@@ -88,6 +88,7 @@ jobs:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          TEST_INSTANCE_PASSWORD: ${{ secrets.TEST_INSTANCE_PASSWORD }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
           BYOA_AWS_ACCOUNT_ID: ${{ secrets.BYOA_AWS_ACCOUNT_ID }}
