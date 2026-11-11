@@ -8,6 +8,7 @@ import {
 import { errorSummary } from "src/server/utils/errorSummary";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
+const REVOCATION_TIMEOUT_MS = 5000;
 
 export default async function handleLogout(nextRequest, nextResponse) {
   if (nextRequest.method !== "POST") {
@@ -38,6 +39,7 @@ export default async function handleLogout(nextRequest, nextResponse) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ refreshToken }),
+        signal: AbortSignal.timeout(REVOCATION_TIMEOUT_MS),
       }).catch((error) => {
         console.error("Backend refresh token revocation request failed", errorSummary(error));
       });
