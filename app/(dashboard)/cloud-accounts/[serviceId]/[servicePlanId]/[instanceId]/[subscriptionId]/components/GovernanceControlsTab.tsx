@@ -278,6 +278,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
               <Switch
                 checked={effectiveValues[field]}
                 disabled={!!fieldDisabledReason}
+                sx={{ "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: colors.purple600 } }}
                 inputProps={{
                   role: "switch",
                   "aria-label": section.label,
@@ -403,12 +404,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
         py="18px"
         borderBottom={`1px solid ${colors.gray200}`}
       >
-        <Box px="10px" py="6px" borderRadius="6px" bgcolor={colors.lightBlue50} flex={1} minWidth={0}>
+        <Box px="10px" py="6px" borderRadius="6px" bgcolor={colors.lightBlue50} width="fit-content" maxWidth="100%">
           <Text weight="regular" color={colors.blue600}>
             Save your changes to get a command. Run it in AWS CloudShell or a local terminal to apply them.
           </Text>
         </Box>
-        <Stack direction="row" justifyContent="flex-end" gap="10px" flexShrink={0}>
+        <Stack direction="row" justifyContent="flex-end" gap="10px" flexShrink={0} ml={{ md: "auto" }}>
           <Button
             type="button"
             variant="outlined"
