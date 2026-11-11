@@ -22,10 +22,11 @@ type GovernanceControlsCellProps = {
 
 const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disabled, privateLinkEnabled }) => {
   const isPrivateLinkUnavailable = !disabled && !privateLinkEnabled;
+  const iconDisabled = disabled || isPrivateLinkUnavailable;
   const linkHref = disabled || isPrivateLinkUnavailable ? undefined : href;
   const icon = (
     <Box sx={iconWrapperSx}>
-      <GovernanceControlsIcon color={disabled ? DISABLED_ICON_COLOR : undefined} />
+      <GovernanceControlsIcon color={iconDisabled ? DISABLED_ICON_COLOR : undefined} />
     </Box>
   );
 
