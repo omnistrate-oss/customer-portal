@@ -1,4 +1,4 @@
-import { Box, Stack, useTheme } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { FC, ReactNode, useId, useMemo, useRef } from "react";
@@ -59,7 +59,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   cloudFormationCreateUrl,
   awsCloudFormationTemplateURL,
 }) => {
-  const theme = useTheme();
   const id = useId();
   const snackbar = useSnackbar();
   const queryClient = useQueryClient();
@@ -207,7 +206,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
       ? "The AWS changes are applied. The account status is refreshing automatically."
       : `This setting stays ${applied[field] ? "enabled" : "disabled"} until you apply your saved changes in AWS.${changed ? " You also have an unsaved change to this setting." : ""}`;
     const warning =
-      !isVerifying && applied[field] && initialValues[field] && !effectiveValues[field] && !fieldDisabledReason;
+      !isVerifying && applied[field] && initialValues[field] && !effectiveValues[field] && !disabledReason;
     const descriptionId = `${id}-${field}-description`;
     const selectionId = `${id}-${field}-selection`;
     const lockId = `${id}-${field}-lock`;
@@ -286,12 +285,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
                 }}
                 onChange={(_, checked: boolean) => {
                   if (!fieldDisabledReason) void form.setFieldValue(field, checked);
-                }}
-                sx={{
-                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: theme.palette.primary.main,
-                  },
-                  "& .MuiSwitch-switchBase.Mui-focusVisible .MuiSwitch-thumb": { color: theme.palette.primary.main },
                 }}
               />
             </Box>
@@ -430,7 +423,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
             type="submit"
             variant="contained"
             size="small"
-            bgColor={theme.palette.primary.main}
             isLoading={update.isPending || form.isSubmitting}
             disabled={!!disabledReason || !unsaved}
             disabledMessage={disabledReason || "No changes to save."}
