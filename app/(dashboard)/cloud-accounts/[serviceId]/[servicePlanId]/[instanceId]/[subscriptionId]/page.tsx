@@ -90,6 +90,8 @@ const CloudAccountDetailsPage = ({
     id: instanceId,
     subscriptionId,
     enabled: Boolean(offering && resourceKey),
+    refetchInterval: currentTab === "Governance Controls" ? 10000 : false,
+    refetchOnWindowFocus: currentTab === "Governance Controls",
   });
 
   const instance = instanceQuery.data as ResourceInstance | undefined;
