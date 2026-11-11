@@ -71,6 +71,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await page.getByTestId(dataTestIds.gcpCard).click();
     await page.getByTestId(dataTestIds.regionSelect).click();
     await page.getByRole("option", { name: "us-central1" }).click();
+    await page.getByTestId("private-radio").click();
 
     await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
@@ -118,8 +119,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
   });
 
   test("Stop Instance -> Test Stopped State", async ({ page }) => {
-    await instancesPage.stopInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.stopInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Stopped", logPrefix);
     });
 
@@ -142,8 +143,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
   });
 
   test("Delete Instance", async () => {
-    await instancesPage.deleteInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.deleteInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
     });
   });

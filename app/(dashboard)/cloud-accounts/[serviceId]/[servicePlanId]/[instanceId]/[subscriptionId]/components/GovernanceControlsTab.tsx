@@ -1,7 +1,7 @@
-import { FC, ReactNode, useId, useMemo, useRef } from "react";
 import { Box, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { FC, ReactNode, useId, useMemo, useRef } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -145,9 +145,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     });
   }, [backendCommand, getActionProxyUrl]);
   const stack =
-    parseAwsCloudFormationUpdateUrl(
-      getSafeExternalURL(account.awsCloudFormationUpdateURL ?? account.awsCloudFormationTemplateURL)
-    ) ??
+    parseAwsCloudFormationUpdateUrl(getSafeExternalURL(account.awsCloudFormationTemplateURL)) ??
     parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(cloudFormationCreateUrl ?? awsCloudFormationTemplateURL));
   const cloudShellURL = getSafeExternalURL(`https://console.aws.amazon.com/cloudshell/home`);
   const awsDetails = [account.awsAccountID ? `AWS Account ${account.awsAccountID}` : "", stack?.region]
