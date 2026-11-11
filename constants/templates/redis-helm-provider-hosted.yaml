@@ -32,11 +32,11 @@ services:
         - 6379
     endpointConfiguration:
       redisCluster:
-        host: "$sys.network.externalClusterEndpoint"
+        host: "$sys.network.internalClusterEndpoint"
         ports:
           - 6379
         primary: true
-        networkingType: PUBLIC
+        networkingType: PRIVATE
         disableMonitoring: false
     helmChartConfiguration:
       chartName: redis
@@ -44,15 +44,16 @@ services:
       chartRepoName: bitnami
       chartRepoURL: https://charts.bitnami.com/bitnami
       chartValues:
+        auth:
+          enabled: true
+          password: $var.postgresPassword
         master:
           podLabels:
             omnistrate.com/schedule-mode: exclusive
           persistence:
             enabled: false
           service:
-            type: LoadBalancer
-            annotations:
-              external-dns.alpha.kubernetes.io/hostname: $sys.network.externalClusterEndpoint
+            type: ClusterIP
 
           resources:
             requests:
