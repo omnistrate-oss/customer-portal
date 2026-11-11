@@ -19,7 +19,7 @@ import { DisplayText } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { parseAwsCloudFormationQuickCreateUrl } from "src/utils/accountConfig/awsCloudFormation";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -96,8 +96,9 @@ const CloudAccountDetailsPage = ({
   const resultParams = getResultParams(instance);
   const cloudProvider = getCloudAccountProvider(resultParams);
 
-  // Governance controls are driven by CloudFormation, so the tab is AWS-only.
-  const tabs: CloudAccountTab[] = cloudProvider === "aws" ? ALL_TABS : ["Account Details"];
+  // Governance controls require an AWS account with Private Link enabled.
+  const tabs: CloudAccountTab[] =
+    cloudProvider === "aws" && isPrivateLinkEnabled(resultParams) ? ALL_TABS : ["Account Details"];
   const activeTab = tabs.includes(currentTab) ? currentTab : "Account Details";
 
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
