@@ -183,7 +183,9 @@ export class InstancesPage {
             (response) =>
               response.url().includes("%2Fresource-instance%2F") &&
               response.url().includes(instanceId) &&
-              response.request().postDataJSON()?.method !== "GET"
+              response.request().postDataJSON()?.method !== "GET" &&
+              // An expired session gets a 401 that the API client refreshes and retries; wait for the retry.
+              response.status() !== 401
           ),
           this.page.getByRole("dialog").getByRole("button", { name: buttonName, exact: true }).click(),
         ]);
