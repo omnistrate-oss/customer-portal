@@ -184,14 +184,16 @@ export class InstancesPage {
             response.url().includes(instanceId) &&
             response.request().postDataJSON()?.method !== "GET"
         ),
-        this.page.locator(".MuiDialog-root").getByRole("button", { name: buttonName, exact: true }).click(),
+        this.page.getByRole("dialog").getByRole("button", { name: buttonName, exact: true }).click(),
       ]);
       return response;
     });
     if (!response.ok()) {
-      throw new BackendError(`${buttonName} instance ${instanceId} failed with ${response.status()}`);
+      const status = response.status();
+      const message = `${buttonName} instance ${instanceId} failed with ${status}`;
+      throw status === 429 || status >= 500 ? new BackendError(message) : new Error(message);
     }
-    await expect(this.page.locator(".MuiDialog-root")).toHaveCount(0, { timeout: 2 * 60_000 });
+    await expect(this.page.getByRole("dialog")).toHaveCount(0, { timeout: 2 * 60_000 });
   }
 
   async changeCapacity(type: "add" | "remove", instanceId: string, newCapacity: number) {

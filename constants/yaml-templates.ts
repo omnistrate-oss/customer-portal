@@ -1,12 +1,15 @@
+import { randomBytes } from "crypto";
 import { readFileSync } from "fs";
+
+// Recordings keep service parameter defaults verbatim, so test instances get a throwaway password, never a secret.
+export const testInstancePassword = randomBytes(16).toString("hex");
 
 const replaceAccountCredentials = (yaml: string) => {
   const accountId = process.env.AWS_ACCOUNT_ID;
   const gcpProjectId = process.env.GCP_PROJECT_ID;
   const gcpProjectNumber = process.env.GCP_PROJECT_NUMBER;
-  const testInstancePassword = process.env.TEST_INSTANCE_PASSWORD;
 
-  if (!accountId || !gcpProjectId || !gcpProjectNumber || !testInstancePassword) {
+  if (!accountId || !gcpProjectId || !gcpProjectNumber) {
     throw new Error("Missing required environment variables for account credentials");
   }
 

@@ -1,3 +1,4 @@
+import { testInstancePassword } from "constants/yaml-templates";
 import { randomBytes } from "crypto";
 import { InstancesPage } from "page-objects/instances-page";
 import { ApiFixture } from "test-fixtures/api-fixture";
@@ -72,7 +73,7 @@ test.describe("Instances Page - Operational Tests", () => {
               network_type: "INTERNAL",
               region: "ap-south-1",
               requestParams: {
-                password: process.env.TEST_INSTANCE_PASSWORD!,
+                password: testInstancePassword,
                 username: "username",
               },
             }
