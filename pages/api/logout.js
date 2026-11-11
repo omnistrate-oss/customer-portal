@@ -1,4 +1,10 @@
-import { clearAuthCookie, clearIndicatorCookie, clearRefreshCookie, getAuthToken } from "src/server/utils/authCookie";
+import {
+  clearAuthCookie,
+  clearIndicatorCookie,
+  clearRefreshCookie,
+  getAuthToken,
+  getRefreshToken,
+} from "src/server/utils/authCookie";
 import { errorSummary } from "src/server/utils/errorSummary";
 
 const baseDomain = process.env.NEXT_PUBLIC_BACKEND_BASE_DOMAIN || "https://api.omnistrate.cloud";
@@ -21,6 +27,19 @@ export default async function handleLogout(nextRequest, nextResponse) {
         },
       }).catch((error) => {
         console.error("Backend logout request failed", errorSummary(error));
+      });
+    }
+
+    const refreshToken = getRefreshToken(nextRequest);
+    if (refreshToken) {
+      await fetch(`${baseDomain}/2022-09-01-00/revoke-token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+      }).catch((error) => {
+        console.error("Backend refresh token revocation request failed", errorSummary(error));
       });
     }
   } catch (error) {

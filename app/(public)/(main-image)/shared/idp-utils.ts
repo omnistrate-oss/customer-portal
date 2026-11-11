@@ -1,5 +1,6 @@
 import extractQueryParam from "src/constants/extractQueryParam";
 import { IdentityProvider } from "src/types/identityProvider";
+import getSafeExternalURL from "src/utils/getSafeExternalURL";
 
 type InvitationInfo = {
   invitedEmail?: string;
@@ -41,9 +42,15 @@ export function buildInvitationInfo(params: {
 export function handleIDPButtonClick(params: HandleIDPButtonClickParams) {
   const { idp, userEmail, destination, invitationInfo, affiliateCode, onRedirect, onSetLoginMethod } = params;
 
-  const stateFromURL = extractQueryParam(idp.renderedAuthorizationEndpoint, "state");
+  const safeAuthorizationEndpoint = getSafeExternalURL(idp.renderedAuthorizationEndpoint);
+  if (!safeAuthorizationEndpoint) {
+    console.error("Blocked IdP sign-in: unsafe authorization URL");
+    return;
+  }
+
+  const stateFromURL = extractQueryParam(safeAuthorizationEndpoint, "state");
   const state = idp.state;
-  let redirectURL = idp.renderedAuthorizationEndpoint;
+  let redirectURL = safeAuthorizationEndpoint;
 
   if (!stateFromURL && state) {
     redirectURL += (redirectURL.includes("?") ? "&" : "?") + `state=${state}`;

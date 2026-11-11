@@ -50,6 +50,9 @@ jobs:
       - name: API fixture security tests
         run: yarn test:api-fixture-security
 
+      - name: Sanitizer tests
+        run: yarn test:sanitize-html
+
       - name: HAR and tracked auth guard
         # A fork can run this with no private HAR submodule access.
         run: yarn check:har-secrets
