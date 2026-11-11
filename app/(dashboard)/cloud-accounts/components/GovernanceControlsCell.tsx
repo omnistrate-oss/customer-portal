@@ -30,13 +30,13 @@ const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disable
           UNSUPPORTED_PROVIDER_MESSAGE
         ) : linkHref ? (
           <>
-            To enable or disable agent debug access and infrastructure permissions,{" "}
+            Manage account access and permissions in{" "}
             <Box component={Link} href={linkHref} sx={{ color: "#D6BBFB", textDecoration: "underline" }}>
-              click here
+              Governance Controls
             </Box>
           </>
         ) : (
-          "Enable or disable agent debug access and infrastructure permissions"
+          "Manage account access and permissions in Governance Controls"
         )
       }
     >
