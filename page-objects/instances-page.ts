@@ -176,18 +176,22 @@ export class InstancesPage {
 
   // Clicks the dialog's confirm button, retrying 429s, and waits for the dialog to close.
   private async confirmAction(instanceId: string, buttonName: string) {
-    const response = await retryOnRateLimit(async () => {
-      const [response] = await Promise.all([
-        this.page.waitForResponse(
-          (response) =>
-            response.url().includes("%2Fresource-instance%2F") &&
-            response.url().includes(instanceId) &&
-            response.request().postDataJSON()?.method !== "GET"
-        ),
-        this.page.getByRole("dialog").getByRole("button", { name: buttonName, exact: true }).click(),
-      ]);
-      return response;
-    });
+    const response = await retryOnRateLimit(
+      async () => {
+        const [response] = await Promise.all([
+          this.page.waitForResponse(
+            (response) =>
+              response.url().includes("%2Fresource-instance%2F") &&
+              response.url().includes(instanceId) &&
+              response.request().postDataJSON()?.method !== "GET"
+          ),
+          this.page.getByRole("dialog").getByRole("button", { name: buttonName, exact: true }).click(),
+        ]);
+        return response;
+      },
+      4,
+      isReplayMode() ? 0 : undefined
+    );
     if (!response.ok()) {
       const status = response.status();
       const message = `${buttonName} instance ${instanceId} failed with ${status}`;

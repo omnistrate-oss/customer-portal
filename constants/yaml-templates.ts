@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 import { readFileSync } from "fs";
 
 // Recordings keep service parameter defaults verbatim, so test instances get a throwaway password, never a secret.
-export const testInstancePassword = randomBytes(16).toString("hex");
+const testInstancePassword = randomBytes(16).toString("hex");
 
 const replaceAccountCredentials = (yaml: string) => {
   const accountId = process.env.AWS_ACCOUNT_ID;
