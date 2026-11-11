@@ -38,7 +38,7 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -269,6 +269,7 @@ const CloudAccountsPage = () => {
         id: "row_icons",
         header: "",
         cell: (data) => {
+          const resultParams = getResultParams(data.row.original);
           const isDeleteProtectionSupported =
             data.row.original.resourceInstanceMetadata?.deletionProtection !== undefined;
           const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
@@ -277,7 +278,8 @@ const CloudAccountsPage = () => {
             <Stack direction="row" alignItems="center" gap="8px">
               <GovernanceControlsCell
                 href={getDetailsRoute(data.row.original, "Governance Controls")}
-                disabled={getCloudAccountProvider(getResultParams(data.row.original)) !== "aws"}
+                disabled={getCloudAccountProvider(resultParams) !== "aws"}
+                privateLinkEnabled={isPrivateLinkEnabled(resultParams)}
               />
               <Tooltip
                 title={

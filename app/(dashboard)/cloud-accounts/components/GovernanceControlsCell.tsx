@@ -16,10 +16,20 @@ type GovernanceControlsCellProps = {
   href?: string;
   /** Governance controls are AWS-only; other providers get an inert, greyed-out icon. */
   disabled?: boolean;
+  /** AWS governance controls are available only when Private Link is enabled. */
+  privateLinkEnabled: boolean;
 };
 
-const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disabled }) => {
-  const linkHref = disabled ? undefined : href;
+const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disabled, privateLinkEnabled }) => {
+  const isPrivateLinkUnavailable = !disabled && !privateLinkEnabled;
+  const linkHref = disabled || isPrivateLinkUnavailable ? undefined : href;
+  const icon = (
+    <Box sx={iconWrapperSx}>
+      <GovernanceControlsIcon color={disabled ? DISABLED_ICON_COLOR : undefined} />
+    </Box>
+  );
+
+  if (isPrivateLinkUnavailable) return icon;
 
   return (
     <Tooltip
@@ -45,9 +55,7 @@ const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disable
           <GovernanceControlsIcon />
         </Box>
       ) : (
-        <Box sx={iconWrapperSx}>
-          <GovernanceControlsIcon color={disabled ? DISABLED_ICON_COLOR : undefined} />
-        </Box>
+        icon
       )}
     </Tooltip>
   );
