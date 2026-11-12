@@ -30,14 +30,12 @@ const GovernanceControlsCell: FC<GovernanceControlsCellProps> = ({ href, disable
     </Box>
   );
 
-  if (isPrivateLinkUnavailable) return icon;
-
   return (
     <Tooltip
       placement="top"
       slotProps={{ tooltip: { sx: { maxWidth: "320px" } } }}
       title={
-        disabled ? (
+        iconDisabled ? (
           UNSUPPORTED_PROVIDER_MESSAGE
         ) : linkHref ? (
           <>
