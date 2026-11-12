@@ -120,7 +120,12 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   });
   const effectiveValues = getSaveValues(form.values);
   const unsaved = fields.some((field) => effectiveValues[field] !== initialValues[field]);
-  const needsApply = fields.some((field) => applied[field] !== initialValues[field]);
+  const allAppliedSettingsMatch =
+    !!appliedControls &&
+    fields.every(
+      (field) => typeof appliedControls[field] === "boolean" && appliedControls[field] === initialValues[field]
+    );
+  const needsApply = !allAppliedSettingsMatch;
   const backendCommand: unknown = "awsBootstrapShellCommand" in account ? account.awsBootstrapShellCommand : undefined;
   const awsBootstrapShellCommand = useMemo(() => {
     if (typeof backendCommand !== "string" || !backendCommand.trim()) return "";
