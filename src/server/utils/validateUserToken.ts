@@ -8,7 +8,7 @@ import { getAuthToken } from "./authCookie";
 import { getEnvironmentType } from "./getEnvironmentType";
 
 type UserTokenValidationResult =
-  | { ok: true; authToken: string }
+  | { ok: true; authToken: string; user: ProviderUser }
   | { ok: false; status: 401 | 403 | 500 | 503; message: string };
 
 const AUTHENTICATION_TIMEOUT_MS = 10000;
@@ -88,7 +88,7 @@ export async function validateUserToken(req: NextApiRequest): Promise<UserTokenV
       return WRONG_ORGANIZATION;
     }
 
-    return { ok: true, authToken };
+    return { ok: true, authToken, user };
   } catch {
     return VALIDATION_FAILED;
   }

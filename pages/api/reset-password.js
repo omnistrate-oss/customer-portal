@@ -1,6 +1,7 @@
 import { customerUserResetPassword } from "src/server/api/customer-user";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
+import { validateUserToken } from "src/server/utils/validateUserToken";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
 
 export default async function handleResetPassword(nextRequest, nextResponse) {
@@ -16,7 +17,20 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
       if (isReCaptchaSetup) {
         const { reCaptchaToken } = requestBody;
         const isVerified = await verifyRecaptchaToken(reCaptchaToken);
-        if (!isVerified) throw new CaptchaVerificationError();
+        if (!isVerified) {
+          const authentication = await validateUserToken(nextRequest);
+          const userEmail = authentication.ok ? authentication.user.email : undefined;
+          const requestedEmail = requestBody.email;
+          if (
+            typeof userEmail !== "string" ||
+            !userEmail.trim() ||
+            typeof requestedEmail !== "string" ||
+            !requestedEmail.trim() ||
+            userEmail.trim().toLowerCase() !== requestedEmail.trim().toLowerCase()
+          ) {
+            throw new CaptchaVerificationError();
+          }
+        }
       }
 
       await customerUserResetPassword(
