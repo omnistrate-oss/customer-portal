@@ -1,6 +1,6 @@
-import { FC } from "react";
-import Link from "next/link";
 import { Box } from "@mui/material";
+import Link from "next/link";
+import { FC } from "react";
 
 import GovernanceControlsIcon from "src/components/Icons/GovernanceControls/GovernanceControls";
 import Tooltip from "src/components/Tooltip/Tooltip";
@@ -9,7 +9,7 @@ const iconWrapperSx = { display: "flex", alignItems: "center" };
 
 const DISABLED_ICON_COLOR = "#D5D7DA";
 const UNSUPPORTED_PROVIDER_MESSAGE =
-  "Agent debug access and infrastructure permission controls are available only for AWS cloud accounts.";
+  "Account access and permission controls (Governance Controls) are supported only on AWS accounts with PrivateLink enabled.";
 
 type GovernanceControlsCellProps = {
   /** Route to the instance's Governance Controls tab. Omitted when the row's subscription is unresolved. */
