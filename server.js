@@ -1,6 +1,7 @@
 const next = require("next");
 const express = require("express");
 const path = require("path");
+const nextConfig = require("./next.config");
 const { startMailServiceCron } = require("./src/server/mail-service/mail-cron");
 const verifyEnvrionmentVariables = require("./src/server/utils/verifyEnvironmentVariables");
 
@@ -27,7 +28,12 @@ app.prepare().then(async () => {
   }
   expressApp.set("view engine", "ejs");
   expressApp.set("views", path.join(__dirname, "src/server/views"));
-  expressApp.use(express.static(path.join(__dirname, "public")));
+  const [{ headers: securityHeaders }] = await nextConfig.headers();
+  expressApp.use(
+    express.static(path.join(__dirname, "public"), {
+      setHeaders: (response) => securityHeaders.forEach(({ key, value }) => response.setHeader(key, value)),
+    })
+  );
   expressApp.use(async (request, response) => {
     try {
       if (!isVerified && process.env.NODE_ENV === "development") {
