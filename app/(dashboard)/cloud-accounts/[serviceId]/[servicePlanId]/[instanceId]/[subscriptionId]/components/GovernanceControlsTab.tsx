@@ -31,12 +31,13 @@ const fields = ["connected", "debugAccessEnabled", "infrastructureMutationEnable
 type GovernanceValues = Required<AccountGovernanceControls>;
 type GovernanceControlsTabProps = {
   accountConfigId: string;
+  instanceStatus?: string;
   canUpdate: boolean;
   canUpdateAgentPermissions: boolean;
   cloudFormationCreateUrl?: string;
   awsCloudFormationTemplateURL?: string;
 };
-type GovernanceSettingsFormProps = Omit<GovernanceControlsTabProps, "accountConfigId"> & {
+type GovernanceSettingsFormProps = Omit<GovernanceControlsTabProps, "accountConfigId" | "instanceStatus"> & {
   account: AccountConfig;
 };
 type GovernanceSection = {
@@ -427,7 +428,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   );
 };
 
-const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId, ...props }) => {
+const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId, instanceStatus, ...props }) => {
   const query = $api.useQuery(
     "get",
     "/2022-09-01-00/accountconfig/{id}",
@@ -437,16 +438,39 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId
     },
     { enabled: !!accountConfigId, refetchInterval: 10000, refetchOnWindowFocus: true }
   );
+  const normalizedInstanceStatus = instanceStatus?.toUpperCase();
+  const accountSetupRequired =
+    normalizedInstanceStatus === "FAILED" ||
+    (normalizedInstanceStatus === "DEPLOYING" && query.data?.status === "VERIFYING");
+
+  if (accountSetupRequired) {
+    return (
+      <Stack minHeight="50vh" alignItems="center" justifyContent="center" gap="6px" textAlign="center">
+        <Text component="h2" size="large" weight="semibold" color={colors.gray900}>
+          Account Setup Required
+        </Text>
+        <Text weight="regular" color={colors.gray600}>
+          Governance controls are available once account setup is complete.
+        </Text>
+      </Stack>
+    );
+  }
+
   if (accountConfigId && query.isPending) return <LoadingSpinner />;
-  return (
-    <Box mt="32px">
-      {query.data ? (
-        <GovernanceSettingsForm key={accountConfigId} account={query.data} {...props} />
-      ) : (
+
+  if (!query.data) {
+    return (
+      <Stack minHeight="50vh" alignItems="center" justifyContent="center">
         <Text weight="regular" color={colors.gray600}>
           Account settings are unavailable. Please try again later.
         </Text>
-      )}
+      </Stack>
+    );
+  }
+
+  return (
+    <Box mt="32px">
+      <GovernanceSettingsForm key={accountConfigId} account={query.data} {...props} />
     </Box>
   );
 };

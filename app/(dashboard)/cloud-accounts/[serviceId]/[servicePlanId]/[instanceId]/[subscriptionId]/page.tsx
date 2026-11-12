@@ -183,6 +183,7 @@ const CloudAccountDetailsPage = ({
       {activeTab === "Governance Controls" && (
         <GovernanceControlsTab
           accountConfigId={resultParams?.cloud_provider_account_config_id ?? ""}
+          instanceStatus={instance.status}
           cloudFormationCreateUrl={[resultParams?.cloudformation_url, resultParams?.cloudformation_url_no_lb].find(
             (url: unknown): url is string => typeof url === "string" && !!parseAwsCloudFormationQuickCreateUrl(url)
           )}
