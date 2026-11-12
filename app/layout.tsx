@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 
 import { ENVIRONMENT_TYPES } from "src/constants/environmentTypes";
 import { getProviderOrgDetails } from "src/server/api/customer-user";
@@ -33,15 +34,22 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html lang="en">
       <head>
         {process.env.GOOGLE_ANALYTICS_TAG_ID && (
           <>
             {/* Load GA script early; establish default denied consent but still send a cookieless page_view for modeling */}
-            <script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS_TAG_ID}`} async />
+            <script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS_TAG_ID}`}
+              async
+              nonce={nonce}
+            />
             <script
               id="ga-init"
+              nonce={nonce}
               dangerouslySetInnerHTML={{
                 __html: `
                   (function(){

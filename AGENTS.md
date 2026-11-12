@@ -77,7 +77,7 @@ Match the page titles in `src/constants/pageTitleMap.ts` and the sidebar: Dashbo
 - **Provider-token authorization:** after authentication, authorize every client-controlled object identifier before using it in a provider-token request. Use the pattern appropriate to the route's parameters and protected resource: `requireProductTierAccess()` applies specifically to `serviceId` plus `productTierId`; subscription-based routes derive provider lookup IDs only from subscriptions fetched with the validated customer token; other resource types need an equivalent customer-scoped check.
 - **Provider-route refresh:** a browser caller of a same-origin `/api/*` route that can return `401` must use the existing refresh-aware client so an expired access token refreshes and retries once. Organization or object-access failures return `403` and must not trigger refresh.
 - **HTML:** render text; no new `dangerouslySetInnerHTML` (non-negotiable 11); provider HTML goes through `sanitizeHTML` (`src/utils/sanitizeHTML.ts`).
-- **Dependencies and CSP:** new packages, SDKs, third-party scripts or CSP changes in `next.config.js` need a maintainer's review, because every fork inherits them. Install scripts stay disabled.
+- **Dependencies and CSP:** new packages, SDKs, third-party scripts or CSP changes in `next.config.js` need a maintainer's review, because every fork inherits them. Install scripts stay disabled. The policy text lives in `src/server/utils/contentSecurityPolicy.js`, `proxy.js` sends a per-request nonce policy, and any new inline or third-party `<script>` tag must carry the nonce from the `x-nonce` request header.
 
 ## Working agreements
 
