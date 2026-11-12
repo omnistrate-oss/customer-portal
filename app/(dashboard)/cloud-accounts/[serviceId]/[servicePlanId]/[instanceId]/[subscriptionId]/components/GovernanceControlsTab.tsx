@@ -120,14 +120,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   });
   const effectiveValues = getSaveValues(form.values);
   const unsaved = fields.some((field) => effectiveValues[field] !== initialValues[field]);
-  const effectiveFields = initialValues.connected ? fields : (["connected"] as const);
-  // Verification can finish before applied settings are populated or refreshed.
-  const verificationComplete = account.status === "READY" || account.status === "DISCONNECTED";
-  const needsApply =
-    !verificationComplete &&
-    (effectiveFields.some((field) => applied[field] !== initialValues[field]) || account.status === "PENDING_UPDATE");
-  const isVerifying =
-    account.status === "PENDING_UPDATE" && effectiveFields.every((field) => applied[field] === initialValues[field]);
+  const needsApply = fields.some((field) => applied[field] !== initialValues[field]);
   const backendCommand: unknown = "awsBootstrapShellCommand" in account ? account.awsBootstrapShellCommand : undefined;
   const awsBootstrapShellCommand = useMemo(() => {
     if (typeof backendCommand !== "string" || !backendCommand.trim()) return "";
@@ -159,11 +152,9 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     disabledReason ||
     (unsaved
       ? "Save or discard your edits before copying the script command or opening AWS CloudShell."
-      : isVerifying
-        ? "Wait for the account settings to refresh."
-        : !awsBootstrapShellCommand
-          ? "The setup script is not available yet. Try again later."
-          : "");
+      : !awsBootstrapShellCommand
+        ? "The setup script is not available yet. Try again later."
+        : "");
   const discardChanges = () => {
     if (disabledReason || !unsaved) return;
     form.resetForm();
@@ -202,11 +193,8 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
     const pending = needsApply && applied[field] !== initialValues[field];
     const changed = effectiveValues[field] !== initialValues[field];
     const selection = `${changed ? "Unsaved: " : pending ? "Requested: " : ""}${effectiveValues[field] ? "Enabled" : "Disabled"}`;
-    const pendingDetail = isVerifying
-      ? "The AWS changes are applied. The account status is refreshing automatically."
-      : `This setting stays ${applied[field] ? "enabled" : "disabled"} until you apply your saved changes in AWS.${changed ? " You also have an unsaved change to this setting." : ""}`;
-    const warning =
-      !isVerifying && applied[field] && initialValues[field] && !effectiveValues[field] && !disabledReason;
+    const pendingDetail = `This setting stays ${applied[field] ? "enabled" : "disabled"} until you apply your saved changes in AWS.${changed ? " You also have an unsaved change to this setting." : ""}`;
+    const warning = applied[field] && initialValues[field] && !effectiveValues[field] && !disabledReason;
     const descriptionId = `${id}-${field}-description`;
     const selectionId = `${id}-${field}-selection`;
     const lockId = `${id}-${field}-lock`;
@@ -316,7 +304,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
       {!!needsApply && (
         <Card
           role="status"
-          aria-label={isVerifying ? "Refreshing account settings" : "AWS update required"}
+          aria-label="AWS update required"
           mb={{ xs: "24px", md: "28px" }}
           py={{ xs: "16px", md: "18px" }}
           px={{ xs: "16px", md: "20px" }}
@@ -325,18 +313,16 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
           <Stack direction={{ xs: "column", md: "row" }} alignItems={{ md: "center" }} gap="16px">
             <Stack flex={1} minWidth={0}>
               <Text weight="semibold" color={colors.gray900}>
-                {isVerifying ? "Updating Account Settings" : "Pending AWS Update"}
+                Pending AWS Update
               </Text>
-              {!!awsBootstrapShellCommand && !isVerifying && (
+              {!!awsBootstrapShellCommand && (
                 <Text weight="regular" color={colors.gray700} sx={{ mt: "4px" }}>
                   Copy and run the command below in AWS CloudShell or a local terminal. It downloads and runs the script
                   to apply your saved changes.
                 </Text>
               )}
               <Text weight="regular" color={colors.gray500} sx={{ mt: "6px" }}>
-                {isVerifying
-                  ? "The AWS changes are applied. The account status is refreshing automatically."
-                  : "The account status refreshes automatically once those changes are applied in AWS."}
+                The account status refreshes automatically once those changes are applied in AWS.
               </Text>
               {!!awsDetails && (
                 <Text size="xsmall" weight="regular" color={colors.gray500} sx={{ mt: "8px" }}>
