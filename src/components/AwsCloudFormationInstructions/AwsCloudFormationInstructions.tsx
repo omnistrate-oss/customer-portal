@@ -14,9 +14,9 @@ import CommandBlock from "./CommandBlock";
 type InstructionsVariant = "onboarding" | "reconfiguration" | "offboarding";
 
 export type AwsCloudFormationInstructionsProps = {
-  /** Console URL; updates require a verified existing-stack link. */
+  /** Console URL; updates prefer a verified existing-stack link. */
   cloudFormationUrl?: string | null;
-  /** Full onboarding parameter list for updates; never used as the existing stack identity. */
+  /** Onboarding parameters and fallback stack target when the update URL is absent. */
   cloudFormationCreateUrl?: string | null;
   variant: InstructionsVariant;
   awsAccountId?: string;

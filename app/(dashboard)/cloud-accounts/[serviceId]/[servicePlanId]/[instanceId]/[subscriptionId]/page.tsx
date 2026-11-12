@@ -10,16 +10,16 @@ import { getCloudAccountId, getCloudAccountProvider } from "app/(dashboard)/clou
 import PageContainer from "app/(dashboard)/components/Layout/PageContainer";
 import NoServiceFoundUI from "app/(dashboard)/components/NoServiceFoundUI/NoServiceFoundUI";
 import useInstancesDescribe from "app/(dashboard)/instances/hooks/useInstancesDescribe";
-import { RiArrowGoBackFill } from "react-icons/ri";
 
 import Button from "src/components/Button/Button";
+import RiArrowGoBackFill from "src/components/Icons/ArrowGoBack/ArrowGoBackIcon";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { DisplayText } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { parseAwsCloudFormationQuickCreateUrl } from "src/utils/accountConfig/awsCloudFormation";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -90,14 +90,17 @@ const CloudAccountDetailsPage = ({
     id: instanceId,
     subscriptionId,
     enabled: Boolean(offering && resourceKey),
+    refetchInterval: currentTab === "Governance Controls" ? 10000 : false,
+    refetchOnWindowFocus: currentTab === "Governance Controls",
   });
 
   const instance = instanceQuery.data as ResourceInstance | undefined;
   const resultParams = getResultParams(instance);
   const cloudProvider = getCloudAccountProvider(resultParams);
 
-  // Governance controls are driven by CloudFormation, so the tab is AWS-only.
-  const tabs: CloudAccountTab[] = cloudProvider === "aws" ? ALL_TABS : ["Account Details"];
+  // Governance controls require an AWS account with Private Link enabled.
+  const tabs: CloudAccountTab[] =
+    cloudProvider === "aws" && isPrivateLinkEnabled(resultParams) ? ALL_TABS : ["Account Details"];
   const activeTab = tabs.includes(currentTab) ? currentTab : "Account Details";
 
   if (!isFetchingServiceOfferings && !isFetchingSubscriptions && (!subscription || !offering)) {
@@ -146,15 +149,19 @@ const CloudAccountDetailsPage = ({
       </Stack>
 
       <Collapse in={isSummaryVisible}>
-        <CloudAccountOverview
-          accountId={getCloudAccountId(resultParams)}
-          cloudProvider={cloudProvider}
-          serviceName={subscription?.serviceName}
-          serviceLogoURL={subscription?.serviceLogoURL}
-          productTierName={subscription?.productTierName}
-          subscriptionOwnerName={subscription?.subscriptionOwnerName}
-          status={instance.status}
-        />
+        <Box sx={{ overflowX: "auto" }}>
+          <Box minWidth="850px">
+            <CloudAccountOverview
+              accountId={getCloudAccountId(resultParams)}
+              cloudProvider={cloudProvider}
+              serviceName={subscription?.serviceName}
+              serviceLogoURL={subscription?.serviceLogoURL}
+              productTierName={subscription?.productTierName}
+              subscriptionOwnerName={subscription?.subscriptionOwnerName}
+              status={instance.status}
+            />
+          </Box>
+        </Box>
       </Collapse>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px" sx={{ marginTop: "20px" }}>
@@ -176,6 +183,7 @@ const CloudAccountDetailsPage = ({
       {activeTab === "Governance Controls" && (
         <GovernanceControlsTab
           accountConfigId={resultParams?.cloud_provider_account_config_id ?? ""}
+          instanceStatus={instance.status}
           cloudFormationCreateUrl={[resultParams?.cloudformation_url, resultParams?.cloudformation_url_no_lb].find(
             (url: unknown): url is string => typeof url === "string" && !!parseAwsCloudFormationQuickCreateUrl(url)
           )}
@@ -184,6 +192,7 @@ const CloudAccountDetailsPage = ({
             getEnumFromUserRoleString(subscription?.roleType),
             viewEnum.Access_Resources
           )}
+          canUpdateAgentPermissions={subscription?.roleType === "root" || subscription?.roleType === "admin"}
         />
       )}
     </PageContainer>
