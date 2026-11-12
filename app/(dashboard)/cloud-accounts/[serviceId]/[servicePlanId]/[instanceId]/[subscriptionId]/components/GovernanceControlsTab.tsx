@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { FC, ReactNode, useId, useMemo, useRef } from "react";
@@ -61,6 +61,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   awsCloudFormationTemplateURL,
 }) => {
   const id = useId();
+  const theme = useTheme();
   const snackbar = useSnackbar();
   const queryClient = useQueryClient();
   const formContainer = useRef<HTMLFormElement | null>(null);
@@ -127,9 +128,9 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
       (field) => typeof appliedControls[field] === "boolean" && appliedControls[field] === initialValues[field]
     );
   const needsApply = !allAppliedSettingsMatch;
-  const backendCommand: unknown = "awsBootstrapShellCommand" in account ? account.awsBootstrapShellCommand : undefined;
+  const backendCommand = account.awsBootstrapShellCommand;
   const awsBootstrapShellCommand = useMemo(() => {
-    if (typeof backendCommand !== "string" || !backendCommand.trim()) return "";
+    if (!backendCommand?.trim()) return "";
 
     return backendCommand.replace(/https?:\/\/[^\s"'`)]+/g, (rawUrl) => {
       try {
@@ -145,7 +146,7 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const stack =
     parseAwsCloudFormationUpdateUrl(getSafeExternalURL(account.awsCloudFormationTemplateURL)) ??
     parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(cloudFormationCreateUrl ?? awsCloudFormationTemplateURL));
-  const cloudShellURL = getSafeExternalURL(`https://console.aws.amazon.com/cloudshell/home`);
+  const cloudShellURL = "https://console.aws.amazon.com/cloudshell/home";
   const awsDetails = [account.awsAccountID ? `AWS Account ${account.awsAccountID}` : "", stack?.region]
     .filter(Boolean)
     .join(" · ");
@@ -272,7 +273,11 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
               <Switch
                 checked={effectiveValues[field]}
                 disabled={!!fieldDisabledReason}
-                sx={{ "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: colors.purple600 } }}
+                sx={{
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: theme.palette.primary.main,
+                  },
+                }}
                 inputProps={{
                   role: "switch",
                   "aria-label": section.label,
@@ -468,9 +473,15 @@ const GovernanceControlsTab: FC<GovernanceControlsTabProps> = ({ accountConfigId
     );
   }
 
+  const requestedControls = query.data.requestedSettings?.accountGovernanceControls;
+  const appliedControls = query.data.appliedSettings?.accountGovernanceControls;
+  const baselineKey = fields
+    .map((field) => requestedControls?.[field] ?? appliedControls?.[field] ?? "missing")
+    .join(":");
+
   return (
     <Box mt="32px">
-      <GovernanceSettingsForm key={accountConfigId} account={query.data} {...props} />
+      <GovernanceSettingsForm key={`${accountConfigId}:${baselineKey}`} account={query.data} {...props} />
     </Box>
   );
 };
