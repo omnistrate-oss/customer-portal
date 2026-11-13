@@ -9,6 +9,7 @@ import {
   getAzureBootstrapShellCommand,
   getGcpBootstrapShellCommand,
 } from "src/utils/accountConfig/accountConfig";
+import { accountSetupUrlsWithProxy } from "src/utils/accountConfig/accountSetupProxy";
 import { getAwsCloudFormationUpdateConsoleUrl } from "src/utils/accountConfig/awsCloudFormation";
 import { getAccountConfigStatusBasedHeader } from "src/utils/constants/accountConfig";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
@@ -185,18 +186,20 @@ export const getOnboardingInstructions = (
     };
   }
 
+  const proxiedCommand = instructions.isUrl ? command : accountSetupUrlsWithProxy(command, true);
+
   return {
     header,
     steps: [
       {
         title: instructions.title,
         description: instructions.description,
-        command,
+        command: proxiedCommand,
         ...(instructions.isUrl
           ? { href: command }
           : cloudProvider === "byoc-onprem"
-            ? {}
-            : { copyValue: addQuotesToShellCommand(command) }),
+            ? { copyValue: proxiedCommand }
+            : { copyValue: addQuotesToShellCommand(proxiedCommand) }),
       },
     ],
     ...(cloudProvider === "aws" ? { awsCloudFormationUrl: command } : {}),
