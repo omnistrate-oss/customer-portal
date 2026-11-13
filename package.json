@@ -25,6 +25,7 @@
     "test:har-recorder": "node --import tsx --test scripts/har-recorder.test.mjs scripts/har-recorder-browser.test.mjs",
     "test:api-fixture-security": "node --import tsx --test scripts/api-fixture.test.mjs",
     "test:sanitize-html": "node --import tsx --test scripts/sanitize-html.test.mjs",
+    "test:reset-password-route": "node --import tsx --test scripts/reset-password-route.test.mjs",
     "test:har-recorder-boundary": "node --import tsx --test scripts/har-recorder.test.mjs"
   },
   "next-unused": {
