@@ -1,5 +1,6 @@
 import { customerUserResetPassword } from "src/server/api/customer-user";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
+import { getRefreshToken } from "src/server/utils/authCookie";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
 import { validateUserToken } from "src/server/utils/validateUserToken";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
@@ -19,6 +20,9 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
         const isVerified = await verifyRecaptchaToken(reCaptchaToken);
         if (!isVerified) {
           const authentication = await validateUserToken(nextRequest);
+          if (!authentication.ok && authentication.status === 401 && !reCaptchaToken && getRefreshToken(nextRequest)) {
+            return nextResponse.status(401).send({ message: "Not authenticated" });
+          }
           const userEmail = authentication.ok ? authentication.user.email : undefined;
           const requestedEmail = requestBody.email;
           if (
