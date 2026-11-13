@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Box } from "@mui/material";
-import DOMPurify from "isomorphic-dompurify";
 
 import { styleConfig } from "src/providerConfig";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
 import { getPrivacyPolicyRoute } from "src/utils/routes";
+import { sanitizeHTML } from "src/utils/sanitizeHTML";
 import Container from "components/NonDashboardComponents/Container/Container";
 import Footer from "components/NonDashboardComponents/Footer";
 
@@ -247,7 +247,7 @@ const TermsPage = () => {
                 },
               }}
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(orgTermsOfUse),
+                __html: sanitizeHTML(orgTermsOfUse),
               }}
             />
           </article>

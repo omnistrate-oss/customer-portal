@@ -1,8 +1,8 @@
-import axios from "src/axios";
 import { customerUserResetPassword } from "src/server/api/customer-user";
 import CaptchaVerificationError from "src/server/errors/CaptchaVerificationError";
+import { getRefreshToken } from "src/server/utils/authCookie";
 import { checkReCaptchaSetup } from "src/server/utils/checkReCaptchaSetup";
-import { errorSummary } from "src/server/utils/errorSummary";
+import { validateUserToken } from "src/server/utils/validateUserToken";
 import { verifyRecaptchaToken } from "src/server/utils/verifyRecaptchaToken";
 
 export default async function handleResetPassword(nextRequest, nextResponse) {
@@ -15,21 +15,35 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
       const saasBuilderIP = process.env.POD_IP || "";
       const requestBody = nextRequest.body || {};
       const isReCaptchaSetup = checkReCaptchaSetup();
-      const token = nextRequest.cookies?.token;
-      let tokenValidate = false;
-      if (token) {
-        tokenValidate = await getUser(token);
-      }
-      if (!tokenValidate && isReCaptchaSetup) {
+      if (isReCaptchaSetup) {
         const { reCaptchaToken } = requestBody;
         const isVerified = await verifyRecaptchaToken(reCaptchaToken);
-        if (!isVerified) throw new CaptchaVerificationError();
+        if (!isVerified) {
+          const authentication = await validateUserToken(nextRequest);
+          if (!authentication.ok && authentication.status === 401 && !reCaptchaToken && getRefreshToken(nextRequest)) {
+            return nextResponse.status(401).send({ message: "Not authenticated" });
+          }
+          const userEmail = authentication.ok ? authentication.user.email : undefined;
+          const requestedEmail = requestBody.email;
+          if (
+            typeof userEmail !== "string" ||
+            !userEmail.trim() ||
+            typeof requestedEmail !== "string" ||
+            !requestedEmail.trim() ||
+            userEmail.trim().toLowerCase() !== requestedEmail.trim().toLowerCase()
+          ) {
+            throw new CaptchaVerificationError();
+          }
+        }
       }
 
-      await customerUserResetPassword(requestBody, {
-        "Client-IP": clientIP,
-        "SaaSBuilder-IP": saasBuilderIP,
-      });
+      await customerUserResetPassword(
+        { email: requestBody.email },
+        {
+          "Client-IP": clientIP,
+          "SaaSBuilder-IP": saasBuilderIP,
+        }
+      );
       nextResponse.status(200).send();
     } catch (error) {
       const defaultErrorMessage = "Something went wrong. Please retry";
@@ -43,6 +57,7 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
 
         if (responseErrorMessage === "user not found: record not found") {
           nextResponse.status(200).send();
+          return;
         }
 
         nextResponse.status(error.response?.status || 500).send({
@@ -54,20 +69,5 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
     nextResponse.status(404).json({
       message: "Endpoint not found",
     });
-  }
-}
-
-async function getUser(token) {
-  try {
-    const response = await axios.get("/user", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.status === 200;
-  } catch (error) {
-    console.error("getUser error", errorSummary(error));
-    return false;
   }
 }
