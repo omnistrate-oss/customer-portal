@@ -134,11 +134,11 @@ docker push yourorg/your-customer-portal:1.0.0
 
 ### Without Code Customizations
 
-For users looking to deploy the Customer Portal quickly and without modifications, the straightforward approach involves using a predefined Docker compose [yaml](https://github.com/omnistrate-oss/customer-portal/blob/master/docker-compose.yaml). This method facilitates the creation and launching of your service on the Omnistrate platform, utilizing the Customer Portal's existing setup and allowing for basic, provided customizations. It's an efficient path for rapid deployment, capitalizing on the built-in configurations of Customer Portal.
+For users looking to deploy the Customer Portal quickly and without modifications, the straightforward approach involves using the predefined Docker compose yaml attached to the [latest release](https://github.com/omnistrate-oss/customer-portal/releases/latest). That file names the exact image version and digest of the release. The [file in the repository](https://github.com/omnistrate-oss/customer-portal/blob/master/docker-compose.yaml) is the template it is built from and points at the `latest` image. This method facilitates the creation and launching of your service on the Omnistrate platform, utilizing the Customer Portal's existing setup and allowing for basic, provided customizations. It's an efficient path for rapid deployment, capitalizing on the built-in configurations of Customer Portal.
 
 For a video guide covering all the below steps, you can follow it [here](https://www.loom.com/share/58d0019c307646868dae2ba9bc56f727?sid=bab3b5f7-b6b8-4669-9dff-e53ee74dd3cc). The manual steps are listed below -
 
-- Copy the contents of the docker-compose.yaml
+- Download `docker-compose.yaml` from the [latest release](https://github.com/omnistrate-oss/customer-portal/releases/latest/download/docker-compose.yaml) and copy its contents
 - Login to Omnistrate and navigate to "Build Your SaaS" and "Your Compose Spec" tab
 - Paste the content of docker-compose.yaml in the yaml editor and provide name, description (logo image is optional and wont be seen by your customers).
 - Choose your service model i.e. Provider Hosted, to create your service.
