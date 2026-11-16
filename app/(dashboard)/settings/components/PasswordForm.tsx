@@ -74,15 +74,8 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ email }) => {
     },
   });
 
-  async function handleSetPassword() {
-    const data = { email: email };
-
-    for (const key in values) {
-      if (values[key]) {
-        data[key] = values[key];
-      }
-    }
-    setPasswordMutation.mutate(data);
+  function handleSetPassword() {
+    setPasswordMutation.mutate({ email });
   }
   if (!isLoggedInUsingSSO) {
     return (

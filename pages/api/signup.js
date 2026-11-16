@@ -36,7 +36,19 @@ export default async function handleSignup(nextRequest, nextResponse) {
       const clientIP = xForwardedForHeader.split(",").shift().trim();
       const saasBuilderIP = process.env.POD_IP || "";
 
-      await customerUserSignUp(nextRequest.body, {
+      const payload = {
+        name: requestBody.name,
+        email,
+        password,
+        legalCompanyName: requestBody.legalCompanyName ?? requestBody.legalcompanyname,
+        companyDescription: requestBody.companyDescription ?? requestBody.companydescription,
+        companyUrl: requestBody.companyUrl ?? requestBody.companyurl,
+      };
+      if (typeof requestBody.attributes?.affiliateCode === "string") {
+        payload.attributes = { affiliateCode: requestBody.attributes.affiliateCode };
+      }
+
+      await customerUserSignUp(payload, {
         "Client-IP": clientIP,
         "SaaSBuilder-IP": saasBuilderIP,
       });
@@ -59,6 +71,7 @@ export default async function handleSignup(nextRequest, nextResponse) {
             "tenant with a valid token already exists, wait for the current token to expire"
         ) {
           nextResponse.status(200).send();
+          return;
         }
         nextResponse.status(error.response?.status || 500).send({
           message: responseErrorMessage || defaultErrorMessage,

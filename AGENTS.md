@@ -20,7 +20,7 @@ Lint messages start with the guardrail name, for example `[no-axios]`. Existing 
 8. **Every Formik form has a Yup `validationSchema`** (`[formik-requires-yup]`).
 9. **TypeScript:** no `any` (`@typescript-eslint/no-explicit-any`); `type` over `interface` (`@typescript-eslint/consistent-type-definitions`); arrow-function components (`react/function-component-definition`); explicit types for props, hooks and API data.
 10. **The left side of a JSX `&&` is a boolean:** `{!!count && <X />}` (`react/jsx-no-leaked-render`).
-11. **No `console.log`** (`no-console`). **No new `dangerouslySetInnerHTML`**: `react/no-danger` rejects every use, sanitized or not. Render text. If HTML must render, sanitize it with `isomorphic-dompurify` and raise it in the pull request.
+11. **No `console.log`** (`no-console`). **No new `dangerouslySetInnerHTML`**: `react/no-danger` rejects every use, sanitized or not. Render text. If HTML must render, sanitize it with `sanitizeHTML` (`src/utils/sanitizeHTML.ts`) and raise it in the pull request.
 12. **White-label.** Never show "Omnistrate", "SaaS Builder" or another vendor name to end customers. Take the provider's name, logo and support email from `useProviderOrgDetails()` in `src/providers/ProviderOrgDetailsProvider.tsx` (review only; there is no lint rule).
 13. **Permission-restricted actions are disabled with a reason** (`disabledMessage`), so they can't be used and the customer sees why. Never hide them, and never rely on a backend 403.
 14. **Never render backend error text yourself.** Show fixed, friendly copy.
@@ -76,8 +76,8 @@ Match the page titles in `src/constants/pageTitleMap.ts` and the sidebar: Dashbo
 - **Provider-token authentication:** any `pages/api/` route that uses the provider's credentials to return customer-visible data must first call `validateUserToken()` (`src/server/utils/validateUserToken.ts`). It validates the exact access token through backend `GET /auth/session`, then calls `GET /user` with the same token and compares `/user.orgId` with `/auth/session`'s `organizationID` in `PROD` or `serviceProviderID` in other environments. Never treat `jwtDecode` alone as authentication, and never make the provider request after validation fails.
 - **Provider-token authorization:** after authentication, authorize every client-controlled object identifier before using it in a provider-token request. Use the pattern appropriate to the route's parameters and protected resource: `requireProductTierAccess()` applies specifically to `serviceId` plus `productTierId`; subscription-based routes derive provider lookup IDs only from subscriptions fetched with the validated customer token; other resource types need an equivalent customer-scoped check.
 - **Provider-route refresh:** a browser caller of a same-origin `/api/*` route that can return `401` must use the existing refresh-aware client so an expired access token refreshes and retries once. Organization or object-access failures return `403` and must not trigger refresh.
-- **HTML:** render text; no new `dangerouslySetInnerHTML` (non-negotiable 11).
-- **Dependencies and CSP:** new packages, SDKs, third-party scripts or CSP changes in `next.config.js` need a maintainer's review, because every fork inherits them. Install scripts stay disabled.
+- **HTML:** render text; no new `dangerouslySetInnerHTML` (non-negotiable 11); provider HTML goes through `sanitizeHTML` (`src/utils/sanitizeHTML.ts`).
+- **Dependencies and CSP:** new packages, SDKs, third-party scripts or CSP changes in `next.config.js` need a maintainer's review, because every fork inherits them. Install scripts stay disabled. The policy text lives in `src/server/utils/contentSecurityPolicy.js`, `proxy.js` sends a per-request nonce policy, and any new inline or third-party `<script>` tag must carry the nonce from the `x-nonce` request header.
 
 ## Working agreements
 
