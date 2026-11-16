@@ -53,6 +53,9 @@ jobs:
       - name: Sanitizer tests
         run: yarn test:sanitize-html
 
+      - name: Password generator tests
+        run: yarn test:generate-random-password
+
       - name: Auth route tests
         run: yarn test:auth-routes
 
