@@ -19,7 +19,22 @@ const backend = http.createServer((request, response) => {
     if (path.endsWith("/user")) {
       return response.end(JSON.stringify({ orgId: "org-1", email: "Customer@Example.com" }));
     }
-    if (path.endsWith("/customer-reset-password")) resetCalls.push(JSON.parse(body));
+    if (path.endsWith("/customer-reset-password")) {
+      const { email } = JSON.parse(body);
+      resetCalls.push({ email });
+      if (email === "missing@example.com") {
+        response.statusCode = 400;
+        return response.end(JSON.stringify({ message: "user not found: record not found" }));
+      }
+      if (email === "rejected@example.com") {
+        response.statusCode = 422;
+        return response.end(JSON.stringify({ message: "internal detail about this account" }));
+      }
+      if (email === "outage@example.com") {
+        response.statusCode = 503;
+        return response.end(JSON.stringify({ message: "upstream detail" }));
+      }
+    }
     response.end("{}");
   });
 });
@@ -63,6 +78,11 @@ const post = async ({ email = "customer@example.com", cookies = {} } = {}) => {
 
 const signedIn = { omnistrate_token: "valid", omnistrate_refresh_token: "refresh" };
 
+const withoutRecaptcha = () => {
+  delete process.env.GOOGLE_RECAPTCHA_SITE_KEY;
+  delete process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
+};
+
 test("rejects a signed-out request with no reCAPTCHA answer", async () => {
   assert.equal((await post()).status, 500);
   assert.equal(resetCalls.length, 0);
@@ -95,8 +115,25 @@ test("rejects an expired session with no refresh cookie", async () => {
 });
 
 test("needs no session when reCAPTCHA is not configured", async () => {
-  delete process.env.GOOGLE_RECAPTCHA_SITE_KEY;
-  delete process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
+  withoutRecaptcha();
   assert.equal((await post()).status, 200);
   assert.deepEqual(resetCalls, [{ email: "customer@example.com" }]);
+});
+
+test("answers a backend rejection exactly like success", async () => {
+  withoutRecaptcha();
+  const accepted = await post({ email: "customer@example.com" });
+  for (const email of ["missing@example.com", "rejected@example.com"]) {
+    assert.deepEqual(await post({ email }), accepted);
+  }
+  assert.equal(accepted.status, 200);
+  assert.equal(resetCalls.length, 3);
+});
+
+test("answers a backend outage with a fixed message", async () => {
+  withoutRecaptcha();
+  assert.deepEqual(await post({ email: "outage@example.com" }), {
+    status: 500,
+    body: { message: "Something went wrong. Please retry" },
+  });
 });
