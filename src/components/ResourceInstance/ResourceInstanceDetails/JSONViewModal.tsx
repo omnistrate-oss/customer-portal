@@ -18,6 +18,7 @@ const StyledContainer = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
+  outline: "none",
 }));
 
 const TitleContainer = styled(Box)(() => ({
