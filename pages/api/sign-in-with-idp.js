@@ -8,13 +8,20 @@ export default async function handleSignIn(nextRequest, nextResponse) {
   if (nextRequest.method === "POST") {
     try {
       const environmentType = getEnvironmentType();
+      const body = nextRequest.body || {};
       const requestBody = {
-        ...nextRequest.body,
-        environmentType: environmentType,
+        authorizationCode: body.authorizationCode,
+        identityProviderName: body.identityProviderName,
+        state: body.state,
+        invitedEmail: body.invitedEmail,
+        legalCompanyName: body.legalCompanyName,
+        companyUrl: body.companyUrl,
+        environmentType,
+        redirectUri: `${getSaaSDomainURL()}/idp-auth`,
       };
-      const saasDomainURL = getSaaSDomainURL();
-
-      requestBody.redirectUri = `${saasDomainURL}/idp-auth`;
+      if (typeof body.attributes?.affiliateCode === "string") {
+        requestBody.attributes = { affiliateCode: body.attributes.affiliateCode };
+      }
 
       //xForwardedForHeader has multiple IPs in the format <client>, <proxy1>, <proxy2>
       //get the first IP (client IP)

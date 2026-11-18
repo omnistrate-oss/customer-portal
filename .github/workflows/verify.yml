@@ -53,8 +53,11 @@ jobs:
       - name: Sanitizer tests
         run: yarn test:sanitize-html
 
-      - name: Reset password route tests
-        run: yarn test:reset-password-route
+      - name: Password generator tests
+        run: yarn test:generate-random-password
+
+      - name: Auth route tests
+        run: yarn test:auth-routes
 
       - name: HAR and tracked auth guard
         # A fork can run this with no private HAR submodule access.

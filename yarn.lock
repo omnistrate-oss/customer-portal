@@ -6564,13 +6564,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"generate-password@npm:^1.7.1":
-  version: 1.7.1
-  resolution: "generate-password@npm:1.7.1"
-  checksum: 10c0/76f5c1f478d0151630910d81e5e1ca6c2762053f03b15f629546c60c7692b93a6743fbf43a2e2825c4fb833e8f20fa2290ade55cfd9296e1f16d0cc0266216d9
-  languageName: node
-  linkType: hard
-
 "generator-function@npm:^2.0.0":
   version: 2.0.1
   resolution: "generator-function@npm:2.0.1"
@@ -8874,7 +8867,6 @@ __metadata:
     eslint-plugin-simple-import-sort: "npm:^12.1.1"
     express: "npm:^4.21.2"
     formik: "npm:^2.2.9"
-    generate-password: "npm:^1.7.1"
     isomorphic-dompurify: "npm:^2.23.0"
     js-base64: "npm:^3.7.5"
     js-cookie: "npm:^3.0.7"

@@ -46,24 +46,12 @@ export default async function handleResetPassword(nextRequest, nextResponse) {
       );
       nextResponse.status(200).send();
     } catch (error) {
-      const defaultErrorMessage = "Something went wrong. Please retry";
-
-      if (error.name === "ProviderAuthError" || error?.response?.status === undefined) {
-        nextResponse.status(500).send({
-          message: defaultErrorMessage,
-        });
-      } else {
-        const responseErrorMessage = error.response?.data?.message;
-
-        if (responseErrorMessage === "user not found: record not found") {
-          nextResponse.status(200).send();
-          return;
-        }
-
-        nextResponse.status(error.response?.status || 500).send({
-          message: responseErrorMessage || defaultErrorMessage,
-        });
+      // A backend rejection is answered like success, so the response never hints whether an account exists.
+      if (error.name !== "ProviderAuthError" && error?.response?.status < 500) {
+        return nextResponse.status(200).send();
       }
+
+      nextResponse.status(500).send({ message: "Something went wrong. Please retry" });
     }
   } else {
     nextResponse.status(404).json({

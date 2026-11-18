@@ -274,6 +274,39 @@ jobs:
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
 
+  attach-pinned-compose:
+    if: github.event_name == 'release'
+    name: Attach pinned compose file
+    runs-on: ubuntu-latest
+    needs:
+      - merge-multi-arch-digest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Pin the compose image to this release and attach it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          image="$(tr '[:upper:]' '[:lower:]' <<< "${REGISTRY}/${IMAGE_NAME}")"
+          version="${TAG#v}"
+          digest="$(docker buildx imagetools inspect "${image}:${version}" | awk '/^Digest:/{print $2}')"
+          if [[ ! "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "No digest found for ${image}:${version}" >&2
+            exit 1
+          fi
+          sed -E "s|^([[:space:]]*image:[[:space:]]*).*:latest[[:space:]]*$|\\1${image}:${version}@${digest}|" docker-compose.yaml > pinned-compose.yaml
+          mv pinned-compose.yaml docker-compose.yaml
+          if ! grep -q "image: ${image}:${version}@${digest}$" docker-compose.yaml; then
+            echo "docker-compose.yaml has no image line ending in :latest to pin" >&2
+            exit 1
+          fi
+          gh release upload "$TAG" docker-compose.yaml --clobber
+
   tag:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest

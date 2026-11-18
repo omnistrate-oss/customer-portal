@@ -25,7 +25,8 @@
     "test:har-recorder": "node --import tsx --test scripts/har-recorder.test.mjs scripts/har-recorder-browser.test.mjs",
     "test:api-fixture-security": "node --import tsx --test scripts/api-fixture.test.mjs",
     "test:sanitize-html": "node --import tsx --test scripts/sanitize-html.test.mjs",
-    "test:reset-password-route": "node --import tsx --test scripts/reset-password-route.test.mjs",
+    "test:generate-random-password": "node --import tsx --test scripts/generate-random-password.test.mjs",
+    "test:auth-routes": "node --import tsx --test scripts/reset-password-route.test.mjs scripts/sign-in-with-idp-route.test.mjs",
     "test:har-recorder-boundary": "node --import tsx --test scripts/har-recorder.test.mjs"
   },
   "next-unused": {
@@ -66,7 +67,6 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "formik": "^2.2.9",
-    "generate-password": "^1.7.1",
     "isomorphic-dompurify": "^2.23.0",
     "js-base64": "^3.7.5",
     "js-cookie": "^3.0.7",

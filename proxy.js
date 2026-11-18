@@ -5,10 +5,12 @@ import { baseURL } from "src/axios";
 import { PAGE_TITLE_MAP } from "src/constants/pageTitleMap";
 import { COOKIE_NAME, REFRESH_COOKIE_NAME } from "src/server/utils/authCookieConstants";
 import { clearAuthCookieEdge, clearIndicatorCookieEdge, clearRefreshCookieEdge } from "src/server/utils/authCookieEdge";
-import { buildContentSecurityPolicy, NONCE_POLICY_HEADER } from "src/server/utils/contentSecurityPolicy";
+import { buildContentSecurityPolicy } from "src/server/utils/contentSecurityPolicy";
 import { getEnvironmentType } from "src/server/utils/getEnvironmentType";
 
 const environmentType = getEnvironmentType();
+// Pages anyone can open: they get the script policy but skip the sign-in checks.
+const PUBLIC_PAGES = ["/privacy-policy", "/cookie-policy", "/terms-of-use", "/idp-auth", "/validate-token"];
 
 function isTokenMissingOrExpired(tokenValue) {
   if (!tokenValue) return true;
@@ -26,17 +28,19 @@ export async function proxy(request) {
   const policy = buildContentSecurityPolicy(nonce);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set(NONCE_POLICY_HEADER, policy);
+  requestHeaders.set("Content-Security-Policy", policy);
 
   const nextWithNonce = () => {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    response.headers.set(NONCE_POLICY_HEADER, policy);
+    response.headers.set("Content-Security-Policy", policy);
     return response;
   };
 
   const authToken = request.cookies.get(COOKIE_NAME);
   const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME);
   const path = request.nextUrl.pathname;
+
+  if (PUBLIC_PAGES.some((page) => path.startsWith(page))) return nextWithNonce();
 
   if (path.startsWith("/signup") || path.startsWith("/reset-password") || path.startsWith("/change-password")) {
     if (environmentType === "PROD") return nextWithNonce();
@@ -125,7 +129,6 @@ export async function proxy(request) {
  * - signup
  * - reset-password
  * - change-password
- * - validate-token
  * - _next/static (static files)
  * - _next/image (image optimization files)
  * - favicon.ico (favicon file)
@@ -133,6 +136,6 @@ export async function proxy(request) {
 
 export const config = {
   matcher: [
-    "/((?!api/action|api/signup|api/signin|api/logout|api/refresh-token|api/reset-password|api/provider-details|api/download-cli|api/download-installer|idp-auth|api/sign-in-with-idp|privacy-policy|cookie-policy|terms-of-use|favicon.ico|_next/image|_next/static|static|validate-token).*)",
+    "/((?!api/action|api/signup|api/signin|api/logout|api/refresh-token|api/reset-password|api/provider-details|api/download-cli|api/download-installer|api/sign-in-with-idp|favicon.ico|_next/image|_next/static|static).*)",
   ],
 };
