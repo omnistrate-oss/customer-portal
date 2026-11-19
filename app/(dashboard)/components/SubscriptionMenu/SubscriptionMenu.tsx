@@ -6,10 +6,9 @@ import Select from "src/components/FormElementsv2/Select/Select";
 import SubscriptionTypeDirectIcon from "src/components/Icons/SubscriptionType/SubscriptionTypeDirectIcon";
 import SubscriptionTypeInvitedIcon from "src/components/Icons/SubscriptionType/SubscriptionTypeInvitedIcon";
 import { Text } from "src/components/Typography/Typography";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { Subscription } from "src/types/subscription";
-import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { isSubscriptionWriteRole } from "src/utils/subscriptionRBAC";
 import { getBillingRoute } from "src/utils/routes";
 
 type SubscriptionMenuProps = {
@@ -27,7 +26,6 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
 }) => {
   const { values, touched, errors, handleChange, handleBlur } = formData;
   const { serviceOfferingsObj } = useGlobalData();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   return (
     <Select
@@ -58,9 +56,7 @@ const SubscriptionMenu: React.FC<SubscriptionMenuProps> = ({
             !(subscription.allowCreatesWhenPaymentNotConfigured ?? plan.allowCreatesWhenPaymentNotConfigured);
 
           const isDisabled =
-            !isSubscriptionWriteRole(subscription.roleType, consumptionSubscriptionAdminRBAC) ||
-            isInstanceLimitReached ||
-            hasPaymentIssue;
+            !isSubscriptionWriteRole(subscription.roleType) || isInstanceLimitReached || hasPaymentIssue;
 
           let disabledMessage: string | React.ReactNode = "";
           if (subscription.roleType === "reader") {

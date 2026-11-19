@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { $api } from "src/api/query";
 import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
 import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -59,7 +58,6 @@ const AccessControlPage = () => {
   const [selectedUser, setSelectedUser] = useState<SubscriptionUser | null>(null);
   const { subscriptionsObj, isSubscriptionsPending } = useGlobalData();
   const currentUser = useSelector(selectUserrootData);
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const { data: users = [], isFetching: isFetchingUsers, refetch: refetchUsers } = useAllUsers();
 
@@ -143,10 +141,7 @@ const AccessControlPage = () => {
           const isDeleteAllowed = isOperationAllowedByRBAC(
             operationEnum.UnInvite,
             getEnumFromUserRoleString(subscription?.roleType),
-            viewEnum.Access_AccessControl,
-            {
-              consumptionSubscriptionAdminRBAC,
-            }
+            viewEnum.Access_AccessControl
           );
           const isSubscriptionOwner = data.row.original.roleType === "root";
           const isCurrentUser = data.row.original.userId === currentUser?.id;
@@ -188,7 +183,7 @@ const AccessControlPage = () => {
         },
       }),
     ];
-  }, [consumptionSubscriptionAdminRBAC, currentUser?.id, subscriptionsObj]);
+  }, [currentUser?.id, subscriptionsObj]);
 
   const {
     columns: preferredColumns,

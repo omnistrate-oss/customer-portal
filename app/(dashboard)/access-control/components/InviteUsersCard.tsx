@@ -10,7 +10,6 @@ import { FieldArray, FormikProvider, getIn, useFormik } from "formik";
 import { $api } from "src/api/query";
 import FieldError from "src/components/FormElementsv2/FieldError/FieldError";
 import IconButtonSquare from "src/components/IconButtonSquare/IconButtonSquare";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
@@ -20,7 +19,7 @@ import {
   getSubscriptionUserInviteRoleOptions,
   isManageableSubscriptionRole,
   toSubscriptionUserRoleType,
-} from "src/utils/consumptionSubscriptionAdminRBAC";
+} from "src/utils/subscriptionRBAC";
 import Button from "components/Button/Button";
 import Form from "components/FormElementsv2/Form/Form";
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
@@ -48,11 +47,11 @@ type SelectMenuItem = {
 
 const isSelectMenuItem = (item: SelectMenuItem | null): item is SelectMenuItem => item !== null;
 
-const getServiceMenuItems = (subscriptions: Subscription[], consumptionSubscriptionAdminRBAC: boolean) => {
+const getServiceMenuItems = (subscriptions: Subscription[]) => {
   const serviceIdSet = new Set<string>();
 
   const serviceMenuItems = subscriptions
-    .filter((sub) => isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC))
+    .filter((sub) => isManageableSubscriptionRole(sub.roleType))
     .map((sub) => {
       if (!serviceIdSet.has(sub.serviceId)) {
         serviceIdSet.add(sub.serviceId);
@@ -67,18 +66,11 @@ const getServiceMenuItems = (subscriptions: Subscription[], consumptionSubscript
   return serviceMenuItems.filter(isSelectMenuItem).sort((a, b) => a.label.localeCompare(b.label));
 };
 
-const getServicePlanMenuItems = (
-  subscriptions: Subscription[],
-  serviceId: string,
-  consumptionSubscriptionAdminRBAC: boolean
-) => {
+const getServicePlanMenuItems = (subscriptions: Subscription[], serviceId: string) => {
   const servicePlanIdSet = new Set<string>();
 
   const servicePlanMenuItems = subscriptions
-    .filter(
-      (sub) =>
-        sub.serviceId === serviceId && isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
-    )
+    .filter((sub) => sub.serviceId === serviceId && isManageableSubscriptionRole(sub.roleType))
     .map((sub) => {
       if (servicePlanIdSet.has(sub.productTierId)) {
         return null;
@@ -97,17 +89,13 @@ const getServicePlanMenuItems = (
 const getManageableSubscriptionForInvite = (
   subscriptions: Subscription[],
   serviceId: string,
-  servicePlanId: string,
-  consumptionSubscriptionAdminRBAC: boolean
+  servicePlanId: string
 ) => {
   return getHighestPermissionSubscription(
     subscriptions.filter(
       (sub) =>
-        sub.serviceId === serviceId &&
-        sub.productTierId === servicePlanId &&
-        isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
-    ),
-    consumptionSubscriptionAdminRBAC
+        sub.serviceId === serviceId && sub.productTierId === servicePlanId && isManageableSubscriptionRole(sub.roleType)
+    )
   );
 };
 
@@ -131,16 +119,9 @@ type InviteUsersFormValues = {
 const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetchingUsers }) => {
   const snackbar = useSnackbar();
   const { subscriptions, isSubscriptionsPending } = useGlobalData();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
-  const roleOptions = useMemo(
-    () => getSubscriptionUserInviteRoleOptions(consumptionSubscriptionAdminRBAC),
-    [consumptionSubscriptionAdminRBAC]
-  );
+  const roleOptions = useMemo(() => getSubscriptionUserInviteRoleOptions(), []);
   const validationSchema = useMemo(() => getInviteUsersValidationSchema(roleOptions), [roleOptions]);
-  const serviceMenuItems = useMemo(
-    () => getServiceMenuItems(subscriptions, consumptionSubscriptionAdminRBAC),
-    [subscriptions, consumptionSubscriptionAdminRBAC]
-  );
+  const serviceMenuItems = useMemo(() => getServiceMenuItems(subscriptions), [subscriptions]);
 
   const inviteUserMutation = $api.useMutation(
     "post",
@@ -157,12 +138,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
               roleType: d.roleType,
             };
 
-            const subscription = getManageableSubscriptionForInvite(
-              subscriptions,
-              d.serviceId,
-              d.servicePlanId,
-              consumptionSubscriptionAdminRBAC
-            );
+            const subscription = getManageableSubscriptionForInvite(subscriptions, d.serviceId, d.servicePlanId);
             if (!subscription?.id) {
               // Return a rejected promise (instead of throwing synchronously) so the
               // remaining invites in the batch still start; Promise.all still rejects overall.
@@ -246,8 +222,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                       {values.userInvite.map((invite, index) => {
                         const servicePlanMenuItems = getServicePlanMenuItems(
                           subscriptions,
-                          values.userInvite[index].serviceId,
-                          consumptionSubscriptionAdminRBAC
+                          values.userInvite[index].serviceId
                         );
 
                         return (
@@ -313,11 +288,7 @@ const InviteUsersCard: React.FC<InviteUsersCardProps> = ({ refetchUsers, isFetch
                                   ))
                                 ) : (
                                   <MenuItem value="" disabled>
-                                    <i>
-                                      {consumptionSubscriptionAdminRBAC
-                                        ? "No Products With Member Management Access"
-                                        : "No Products With Root Access"}
-                                    </i>
+                                    <i>No Products With Member Management Access</i>
                                   </MenuItem>
                                 )}
                               </Select>

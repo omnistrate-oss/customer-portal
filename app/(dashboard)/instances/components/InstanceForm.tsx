@@ -10,7 +10,6 @@ import * as yup from "yup";
 import { $api } from "src/api/query";
 import { productTierTypes } from "src/constants/servicePlan";
 import useAvailabilityZone from "src/hooks/query/useAvailabilityZone";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useResourcesInstanceIds from "src/hooks/useResourcesInstanceIds";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
@@ -94,7 +93,6 @@ const InstanceForm = ({
     subscriptionsObj,
     isFetchingSubscriptions,
   } = useGlobalData();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const nonCloudAccountInstances = useMemo(() => {
     return instances.filter((instance) => !isCloudAccountInstance(instance));
@@ -195,12 +193,11 @@ const InstanceForm = ({
         serviceOfferingsObj,
         serviceOfferings,
         nonCloudAccountInstances,
-        [], // Will be updated later when customerVersionSets loads
-        consumptionSubscriptionAdminRBAC
+        [] // Will be updated later when customerVersionSets loads
       ),
     // Only recompute when the selected instance changes (modify mode) or on first mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [consumptionSubscriptionAdminRBAC, selectedInstance?.id]
+    [selectedInstance?.id]
   );
 
   const rawFormData = useFormik({
@@ -1137,7 +1134,6 @@ const InstanceForm = ({
       effectiveCloudAccountInstances,
       cloudNativeNetworks,
       selectedCloudAccountDescribeQuery.isFetching,
-      consumptionSubscriptionAdminRBAC,
       orgName
     );
   }, [
@@ -1154,7 +1150,6 @@ const InstanceForm = ({
     isFetchingResourceInstanceIds,
     cloudNativeNetworks,
     selectedCloudAccountDescribeQuery.isFetching,
-    consumptionSubscriptionAdminRBAC,
     orgName,
   ]);
 

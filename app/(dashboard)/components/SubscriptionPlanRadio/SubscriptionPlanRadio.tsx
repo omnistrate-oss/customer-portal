@@ -13,14 +13,13 @@ import { getSubscriptionRequest } from "src/api/subscriptionRequests";
 import { getSubscription } from "src/api/subscriptions";
 import LoadingSpinnerSmall from "src/components/CircularProgress/CircularProgress";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { colors } from "src/themeConfig";
 import { ServiceOffering } from "src/types/serviceOffering";
 import { Subscription } from "src/types/subscription";
 import { SubscriptionRequest } from "src/types/subscriptionRequest";
-import { getHighestPermissionSubscription, isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { getHighestPermissionSubscription, isSubscriptionWriteRole } from "src/utils/subscriptionRBAC";
 import { getSubscriptionsRoute } from "src/utils/routes";
 import Button from "components/Button/Button";
 import CircleCheckIcon from "components/Icons/ServicePlanCard/CircleCheckIcon";
@@ -40,11 +39,8 @@ const SubscriptionPlanCard = ({
   disabledMessage,
   isPlanSelectionDisabled,
 }) => {
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
-  const currentSubscription = getHighestPermissionSubscription(subscriptions, consumptionSubscriptionAdminRBAC);
-  const writeSubscriptions = subscriptions.filter((subscription) =>
-    isSubscriptionWriteRole(subscription.roleType, consumptionSubscriptionAdminRBAC)
-  );
+  const currentSubscription = getHighestPermissionSubscription(subscriptions);
+  const writeSubscriptions = subscriptions.filter((subscription) => isSubscriptionWriteRole(subscription.roleType));
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   const card = (
