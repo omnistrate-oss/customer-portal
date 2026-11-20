@@ -1,24 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import Chip from "components/Chip/Chip";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import { $api } from "src/api/query";
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
+import StatusChip from "src/components/StatusChip/StatusChip";
 import { cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
-import Chip from "components/Chip/Chip";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 import useCloudNativeNetworks from "../hooks/useCloudNativeNetworks";
 import { hasCloudNativeVpcConfiguration } from "../utils";
 
-import ConfigureVPCsStep from "./steps/ConfigureVPCsStep";
 import CloudAccountSummaryCard, { SummarySection } from "./CloudAccountSummaryCard";
+import ConfigureVPCsStep from "./steps/ConfigureVPCsStep";
 
 const READY_STATUSES = ["READY", "RUNNING", "COMPLETE"];
 const TERMINAL_STATUSES = [...READY_STATUSES, "FAILED"];
@@ -205,18 +206,14 @@ const ModifyVPCsDrawer: React.FC<ModifyVPCsDrawerProps> = ({ selectedInstance, o
           : undefined,
       },
       ...accountIdentityItems,
-      ...(cloudProvider !== "byoc-onprem"
-        ? [
-            {
-              label: "Private Connectivity",
-              value: privateConnectivityEnabled ? (
-                <Chip size="small" label="Enabled" fontColor="#067647" bgColor="#ECFDF3" borderColor="#ABEFC6" />
-              ) : (
-                <Chip size="small" label="Disabled" fontColor="#667085" bgColor="#F2F4F7" borderColor="#D0D5DD" />
-              ),
-            },
-          ]
-        : []),
+      {
+        label: "Private Connectivity",
+        value: privateConnectivityEnabled ? (
+          <StatusChip size="small" label="Enabled" category="success" />
+        ) : (
+          <StatusChip size="small" label="Disabled" category="unknown" />
+        ),
+      },
     ];
 
     const sections: SummarySection[] = [{ title: "Standard Information", items: standardItems }];

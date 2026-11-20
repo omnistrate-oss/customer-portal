@@ -521,22 +521,13 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (resultParams?.private_link === undefined || resultParams?.private_link === null) {
-            return "NA";
-          }
-          return resultParams?.private_link ? "Enabled" : "Disabled";
+          return isPrivateLinkEnabled(resultParams) ? "Enabled" : "Disabled";
         },
         {
           id: "privateLink",
           header: "Private Link",
           cell: (data) => {
             const value = data.getValue();
-            const resultParams = getResultParams(data.row.original);
-            const isNebius = !!resultParams?.nebius_tenant_id;
-            const isBYOCOnprem = !!resultParams?.cluster_name;
-            if (value === "NA" || isNebius || isBYOCOnprem) {
-              return "-";
-            }
             return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
           },
           meta: {

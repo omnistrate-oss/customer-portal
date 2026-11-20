@@ -10,7 +10,7 @@ import { SetState } from "src/types/common/reactGenerics";
 import { ResourceInstance } from "src/types/resourceInstance";
 import { Subscription } from "src/types/subscription";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 
 import { getCloudAccountId, getCloudAccountProvider, getExistingVpcCount } from "../utils";
 
@@ -112,12 +112,7 @@ const CloudAccountsFilters: FC<CloudAccountsFiltersProps> = ({
           : resultParams.allow_new_cloud_native_network_creation
             ? "Yes"
             : "No";
-      const privateLink =
-        resultParams?.private_link == null || resultParams?.cluster_name || resultParams?.nebius_tenant_id
-          ? ""
-          : resultParams.private_link
-            ? "Enabled"
-            : "Disabled";
+      const privateLink = isPrivateLinkEnabled(resultParams) ? "Enabled" : "Disabled";
       const existingVpcs =
         !resultParams?.cloud_provider_account_config_id || resultParams?.cluster_name
           ? ""

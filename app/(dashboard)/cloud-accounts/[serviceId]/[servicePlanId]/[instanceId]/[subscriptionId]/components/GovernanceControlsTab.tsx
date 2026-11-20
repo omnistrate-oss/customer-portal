@@ -1,7 +1,7 @@
+import { FC, ReactNode, useId, useMemo, useRef } from "react";
 import { Box, Stack, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { FC, ReactNode, useId, useMemo, useRef } from "react";
 import * as Yup from "yup";
 
 import { $api } from "src/api/query";
@@ -16,11 +16,11 @@ import StatusChip from "src/components/StatusChip/StatusChip";
 import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
-import useInstallCommand from "src/hooks/useInstallCommand";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { colors } from "src/themeConfig";
 import { AccountConfig, AccountGovernanceControls } from "src/types/account-config";
+import { accountSetupUrlsWithProxy } from "src/utils/accountConfig/accountSetupProxy";
 import {
   parseAwsCloudFormationQuickCreateUrl,
   parseAwsCloudFormationUpdateUrl,
@@ -68,7 +68,6 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const commandContainer = useRef<HTMLDivElement | null>(null);
   const saveInFlight = useRef(false);
   const { orgName } = useProviderOrgDetails();
-  const { getActionProxyUrl } = useInstallCommand();
   const providerName = orgName || "Your service provider";
   const requested = account.requestedSettings?.accountGovernanceControls;
   const appliedControls = account.appliedSettings?.accountGovernanceControls;
@@ -130,19 +129,8 @@ const GovernanceSettingsForm: FC<GovernanceSettingsFormProps> = ({
   const needsApply = !allAppliedSettingsMatch;
   const backendCommand = account.awsBootstrapShellCommand;
   const awsBootstrapShellCommand = useMemo(() => {
-    if (!backendCommand?.trim()) return "";
-
-    return backendCommand.replace(/https?:\/\/[^\s"'`)]+/g, (rawUrl) => {
-      try {
-        const url = new URL(rawUrl);
-        const scriptPath = "/2022-09-01-00/account-setup/aws-bootstrap.sh";
-        if (url.pathname !== scriptPath && url.pathname !== "/account-setup/aws-bootstrap.sh") return rawUrl;
-        return getActionProxyUrl(`${scriptPath}${url.search}`, true) || rawUrl;
-      } catch {
-        return rawUrl;
-      }
-    });
-  }, [backendCommand, getActionProxyUrl]);
+    return accountSetupUrlsWithProxy(backendCommand?.trim() || "", true);
+  }, [backendCommand]);
   const stack =
     parseAwsCloudFormationUpdateUrl(getSafeExternalURL(account.awsCloudFormationTemplateURL)) ??
     parseAwsCloudFormationQuickCreateUrl(getSafeExternalURL(cloudFormationCreateUrl ?? awsCloudFormationTemplateURL));
