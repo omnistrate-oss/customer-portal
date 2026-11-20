@@ -1,8 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, CircularProgress, Dialog, IconButton, Stack } from "@mui/material";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import Button from "src/components/Button/Button";
@@ -10,8 +10,8 @@ import { TextContainerToCopy } from "src/components/CloudProviderAccountOrgIdMod
 import CopyToClipboardButton from "src/components/CopyClipboardButton/CopyClipboardButton";
 import InstructionsModalIcon from "src/components/Icons/AccountConfig/InstructionsModalIcon";
 import { Text } from "src/components/Typography/Typography";
-import useInstallCommand from "src/hooks/useInstallCommand";
 import { ServiceOffering } from "src/types/serviceOffering";
+import { accountSetupUrlsWithProxy } from "src/utils/accountConfig/accountSetupProxy";
 import { getResultParams } from "src/utils/instance";
 
 type SetupPrivateClusterDialogProps = {
@@ -64,7 +64,6 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   offering,
   subscriptionId,
 }) => {
-  const { getActionProxyUrl } = useInstallCommand();
   const [isPolling, setIsPolling] = useState(true);
   const [pollingError, setPollingError] = useState<string | null>(null);
   const [resultParams, setResultParams] = useState<PrivateClusterResultParams | null>(null);
@@ -215,18 +214,8 @@ const SetupPrivateClusterDialog: React.FC<SetupPrivateClusterDialogProps> = ({
   const displayClusterName = resultParams?.cluster_name || clusterName || "";
   const installCommand = resultParams?.byoc_onprem_install_command || "";
   const installCommandWithProxy = useMemo(() => {
-    if (!installCommand) return "";
-
-    const urlRegex = /https?:\/\/[^\s"']+/g;
-
-    return installCommand.replace(urlRegex, (rawUrl) => {
-      if (!rawUrl.includes("/account-setup/")) {
-        return rawUrl;
-      }
-      const proxied = getActionProxyUrl(rawUrl, true);
-      return proxied || rawUrl;
-    });
-  }, [installCommand, getActionProxyUrl]);
+    return accountSetupUrlsWithProxy(installCommand, true);
+  }, [installCommand]);
 
   return (
     <Dialog
