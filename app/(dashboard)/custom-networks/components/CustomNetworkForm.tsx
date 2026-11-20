@@ -8,12 +8,11 @@ import { $api } from "src/api/query";
 import Switch from "src/components/Switch/Switch";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { CreateCustomNetworkRequestBody, CustomNetwork } from "src/types/customNetwork";
 import { Region } from "src/types/region";
-import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { isSubscriptionWriteRole } from "src/utils/subscriptionRBAC";
 import GridDynamicForm from "components/DynamicForm/GridDynamicForm";
 import { FormConfiguration } from "components/DynamicForm/types";
 
@@ -38,7 +37,6 @@ const CustomNetworkForm: FC<CustomNetworkFormProps> = ({
 }) => {
   const snackbar = useSnackbar();
   const { subscriptions, isFetchingSubscriptions } = useGlobalData();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const subscriptionOwners = useMemo(() => {
     const seen = new Set<string>();
@@ -47,7 +45,7 @@ const CustomNetworkForm: FC<CustomNetworkFormProps> = ({
         (sub) =>
           sub.status === "ACTIVE" &&
           sub.rootUserOrgId &&
-          isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC) &&
+          isSubscriptionWriteRole(sub.roleType) &&
           sub.roleType !== "root"
       )
       .reduce<{ name: string; orgIdentifier: string; orgId: string }[]>((acc, sub) => {
@@ -62,7 +60,7 @@ const CustomNetworkForm: FC<CustomNetworkFormProps> = ({
         }
         return acc;
       }, []);
-  }, [consumptionSubscriptionAdminRBAC, subscriptions]);
+  }, [subscriptions]);
 
   const createCustomNetworkMutation = $api.useMutation("post", "/2022-09-01-00/resource-instance/custom-network", {
     onSuccess: () => {

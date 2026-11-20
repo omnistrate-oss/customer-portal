@@ -75,7 +75,6 @@ export const getStandardInformationFields = (
     inUse?: boolean;
   }>,
   isFetchingCloudNativeNetworks: boolean,
-  consumptionSubscriptionAdminRBAC = false,
   orgName
 ) => {
   if (isFetchingServiceOfferings) return [];
@@ -186,8 +185,7 @@ export const getStandardInformationFields = (
           subscriptions,
           instances,
           serviceId,
-          undefined,
-          consumptionSubscriptionAdminRBAC
+          undefined
         );
 
         const servicePlanId = subscription?.productTierId || "";
@@ -305,8 +303,7 @@ export const getStandardInformationFields = (
               subscriptions,
               instances,
               serviceId,
-              servicePlanId,
-              consumptionSubscriptionAdminRBAC
+              servicePlanId
             );
 
             setFieldValue("subscriptionId", subscriptionId || subscription?.id || "");

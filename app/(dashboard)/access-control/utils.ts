@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { getSubscriptionUserInviteRoleOptions } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { getSubscriptionUserInviteRoleOptions } from "src/utils/subscriptionRBAC";
 
 export const getInviteUsersValidationSchema = (roleOptions = getSubscriptionUserInviteRoleOptions()) =>
   yup.object().shape({

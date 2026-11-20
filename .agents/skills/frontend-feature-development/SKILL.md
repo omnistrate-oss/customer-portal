@@ -115,12 +115,11 @@ New backend call:
 
 ## 6. Permissions (RBAC): disable with a reason, never hide
 
-| Helper                                                                                                         | Use                                                               |
-| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `getEnumFromUserRoleString(subscription?.roleType)` from `src/utils/isAllowedByRBAC.js`                        | Converts the subscription role string to a role enum              |
-| `isOperationAllowedByRBAC(operationEnum.X, role, viewEnum.Y, { consumptionSubscriptionAdminRBAC })`            | Whether the role may perform the operation                        |
-| `isSubscriptionWriteRole`, `isManageableSubscriptionRole` from `src/utils/consumptionSubscriptionAdminRBAC.ts` | Subscription-level write and manage checks                        |
-| `useFeatureFlags()` from `src/hooks/useFeatureFlags.ts`                                                        | Provider feature flags such as `consumptionSubscriptionAdminRBAC` |
+| Helper                                                                                       | Use                                                |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `getEnumFromUserRoleString(subscription?.roleType)` from `src/utils/isAllowedByRBAC.js`      | Converts the subscription role string to a role enum |
+| `isOperationAllowedByRBAC(operationEnum.X, role, viewEnum.Y)`                                | Whether the role may perform the operation         |
+| `isSubscriptionWriteRole`, `isManageableSubscriptionRole` from `src/utils/subscriptionRBAC.ts` | Subscription-level write and manage checks         |
 
 Render the action disabled and say why:
 
