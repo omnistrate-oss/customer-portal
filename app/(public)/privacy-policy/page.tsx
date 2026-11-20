@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Box } from "@mui/material";
-import DOMPurify from "isomorphic-dompurify";
 
 import { styleConfig } from "src/providerConfig";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
+import { sanitizeHTML } from "src/utils/sanitizeHTML";
 import Container from "components/NonDashboardComponents/Container/Container";
 import Footer from "components/NonDashboardComponents/Footer";
 
@@ -187,7 +187,7 @@ const PrivacyPolicyPage = () => {
                 },
               }}
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(orgPrivacyPolicy),
+                __html: sanitizeHTML(orgPrivacyPolicy),
               }}
             />
           </article>

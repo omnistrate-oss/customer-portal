@@ -1,5 +1,7 @@
+import { randomBytes } from "crypto";
 import { CloudAccountsPage } from "page-objects/cloud-accounts-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { readRecordedServiceOffering } from "test-fixtures/har-replay";
 import { expect, test } from "test-fixtures/har-test";
 import { skipOnBackendError } from "test-utils/backend-error";
 import { GlobalStateManager } from "test-utils/global-state-manager";
@@ -24,7 +26,7 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     cloudAccountsPage = new CloudAccountsPage(page);
   });
 
-  test("Create a Cloud Provider Account Instance", async ({ page }) => {
+  test("Create a Cloud Provider Account Instance", async ({ page, harMode, harFilePath }) => {
     await cloudAccountsPage.navigate();
     await page.waitForLoadState("networkidle");
 
@@ -33,8 +35,15 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
 
     await page.getByTestId(dataTestIds.createButton).click();
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
-    const date = GlobalStateManager.getDate();
-    await page.getByRole("option", { name: `SaaSBuilder Postgres DT BYOA - ${date}` }).click();
+    const recordedOffering =
+      harMode === "replay" ? readRecordedServiceOffering(harFilePath, "SaaSBuilder Postgres DT BYOA - ") : undefined;
+    if (recordedOffering) {
+      await page.locator(`[role="option"][data-value="${recordedOffering.serviceId}"]`).click();
+    } else {
+      await page
+        .getByRole("option", { name: `SaaSBuilder Postgres DT BYOA - ${GlobalStateManager.getDate()}` })
+        .click();
+    }
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
@@ -50,7 +59,7 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     );
 
     const cloudAccount = await instanceDetails.json();
-    console.log(logPrefix, "Cloud Account Instance:", cloudAccount);
+    console.info(logPrefix, "Cloud account instance received");
 
     cloudAccountInstanceId = cloudAccount.id;
 
@@ -62,7 +71,7 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     });
   });
 
-  test("Create a BYOA Instance", async ({ page }) => {
+  test("Create a BYOA Instance", async ({ page, harMode, harFilePath }) => {
     const dataTestIds = instancesPage.dataTestIds;
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");
@@ -70,14 +79,22 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await page.getByTestId(dataTestIds.createButton).click();
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
 
-    const date = GlobalStateManager.getDate();
-    await page.getByRole("option", { name: `SaaSBuilder Postgres DT BYOA - ${date}` }).click();
+    const recordedOffering =
+      harMode === "replay" ? readRecordedServiceOffering(harFilePath, "SaaSBuilder Postgres DT BYOA - ") : undefined;
+    if (recordedOffering) {
+      await page.locator(`[role="option"][data-value="${recordedOffering.serviceId}"]`).click();
+    } else {
+      await page
+        .getByRole("option", { name: `SaaSBuilder Postgres DT BYOA - ${GlobalStateManager.getDate()}` })
+        .click();
+    }
     await page.waitForLoadState("networkidle");
 
     await page.getByTestId(dataTestIds.cloudAccountSelect).click();
     await page.getByRole("option", { name: `${cloudAccountInstanceId} (Account` }).click();
 
-    await page.getByTestId("password-input").fill("a_secure_password");
+    await page.getByTestId("private-radio").click();
+    await page.getByTestId("password-input").fill(randomBytes(18).toString("base64url"));
     await page.getByTestId("username-input").fill("username");
 
     await page.waitForTimeout(5000);
@@ -95,8 +112,8 @@ test.describe.skip("Instances Page - BYOA Instance Tests", () => {
     await instancesPage.navigate();
     await page.waitForLoadState("networkidle");
 
-    await instancesPage.deleteInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.deleteInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
       await instancesPage.waitForDelete(instanceId, logPrefix);
     });

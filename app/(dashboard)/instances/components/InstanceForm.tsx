@@ -946,17 +946,14 @@ const InstanceForm = ({
   }, [resourceCreateSchema, formMode, offering, formData.values.cloudProvider]);
 
   const customAvailabilityZones = useMemo(() => {
-    // @ts-expect-error TODO: Ask someone on the backend to fix the docs
-    const availabilityZones = customAvailabilityZoneData?.availabilityZones || [];
-    return availabilityZones.sort(function (a, b) {
+    return [...customAvailabilityZoneData].sort(function (a, b) {
       if (a.code < b.code) return -1;
       else if (a.code > b.code) {
         return 1;
       }
       return -1;
     });
-    // @ts-expect-error TODO: Ask someone on the backend to fix the docs
-  }, [customAvailabilityZoneData?.availabilityZones]);
+  }, [customAvailabilityZoneData]);
 
   const cloudAccountInstances = useMemo(
     () =>

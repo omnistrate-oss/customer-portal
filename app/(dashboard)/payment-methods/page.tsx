@@ -177,6 +177,7 @@ const PaymentMethodsPage = () => {
                 paymentInfoPortalURL={billingDetails?.paymentInfoPortalURL}
                 onPaymentMethodsChanged={async () => {
                   await refetchBillingDetails();
+                  refetchSubscriptions();
                 }}
               />
             ) : (

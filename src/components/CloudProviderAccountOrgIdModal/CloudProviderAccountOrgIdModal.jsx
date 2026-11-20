@@ -1,14 +1,19 @@
 // import { CLOUD_PROVIDERS } from "src/constants/cloudProviders";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, IconButton, Stack, styled } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import Button from "src/components/Button/Button";
 import { Text } from "src/components/Typography/Typography";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
+import { colors } from "src/themeConfig";
 import { addQuotesToShellCommand } from "src/utils/accountConfig/accountConfig";
+import {
+  getAwsCloudFormationUpdateConsoleUrl,
+  parseAwsCloudFormationQuickCreateUrl,
+} from "src/utils/accountConfig/awsCloudFormation";
 import {
   // ACCOUNT_CREATION_METHODS,
   getAccountConfigStatusBasedHeader,
@@ -175,7 +180,14 @@ const ExistingLoadBalancerPolicyNotice = () => (
 );
 
 /** Renders the ready-state AWS reconfiguration instructions from the Cloud Accounts design. */
-const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => {
+const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl, cloudFormationCreateUrl }) => {
+  const updateConsoleUrl = getAwsCloudFormationUpdateConsoleUrl(cloudFormationUrl);
+  const sourceUrl = getSafeExternalURL(cloudFormationCreateUrl || cloudFormationUrl);
+  const templateDetails = parseAwsCloudFormationQuickCreateUrl(sourceUrl);
+  const templateUrl = getSafeExternalURL(
+    templateDetails?.templateUrl || (sourceUrl && !new URL(sourceUrl).hash ? sourceUrl : undefined)
+  );
+
   return (
     <Stack gap="20px">
       <Box>
@@ -198,7 +210,8 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
 
         <AwsCloudFormationInstructions
           cloudFormationUrl={cloudFormationUrl}
-          variant="onboarding"
+          cloudFormationCreateUrl={cloudFormationCreateUrl}
+          variant="reconfiguration"
           awsAccountId={awsAccountId}
           contentSpacing="12px"
           cliDescription={
@@ -207,23 +220,54 @@ const AwsReconfigurationInstructions = ({ awsAccountId, cloudFormationUrl }) => 
               <Box component="span" sx={{ fontWeight: 600 }}>
                 {awsAccountId}
               </Box>
-              . It creates the same CloudFormation stack as the console flow.
+              . It updates the existing CloudFormation stack.
             </Text>
           }
           footer={<ExistingLoadBalancerPolicyNotice />}
         >
           <Stack gap="28px">
-            <Text size="small" weight="regular" color="#344054">
-              To reconfigure it, please create your CloudFormation Stack for AWS account{" "}
-              <Box component="span" sx={{ fontWeight: 600 }}>
-                {awsAccountId}
-              </Box>{" "}
-              using the{" "}
-              <StyledLink href={cloudFormationUrl} target="_blank" rel="noopener noreferrer">
-                link
-              </StyledLink>
-              .
-            </Text>
+            {updateConsoleUrl ? (
+              <BodyText>
+                To reconfigure it, please update your existing CloudFormation stack for AWS account{" "}
+                <Text component="span" weight="semibold" color={colors.gray700}>
+                  {awsAccountId}
+                </Text>{" "}
+                using the{" "}
+                <StyledLink href={updateConsoleUrl} target="_blank" rel="noopener noreferrer">
+                  link
+                </StyledLink>
+                .
+              </BodyText>
+            ) : (
+              <Stack gap="12px">
+                <BodyText>
+                  Open{" "}
+                  <StyledLink
+                    href="https://console.aws.amazon.com/cloudformation/home"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    AWS CloudFormation
+                  </StyledLink>{" "}
+                  for this account, select your existing account setup stack, and choose Update.
+                </BodyText>
+                {templateUrl ? (
+                  <BodyText>
+                    To use the latest account setup template, choose Replace current template and enter the{" "}
+                    <StyledLink href={templateUrl} target="_blank" rel="noopener noreferrer">
+                      template URL
+                    </StyledLink>
+                    . Keep the existing parameter values unless you intend to change them, then review and submit the
+                    update.
+                  </BodyText>
+                ) : (
+                  <BodyText>
+                    Keep the current template and existing parameter values unless you intend to change them, then
+                    review and submit the update.
+                  </BodyText>
+                )}
+              </Stack>
+            )}
 
             <Text size="small" weight="regular" color="#344054">
               For guidance, our instructional video is available{" "}
@@ -610,6 +654,7 @@ const NonCreationTimeInstructions = (props) => {
       <AwsReconfigurationInstructions
         awsAccountId={accountInstructionDetails.awsAccountID}
         cloudFormationUrl={cloudFormationTemplateUrl}
+        cloudFormationCreateUrl={cloudFormationTemplateUrl}
       />
     );
   }
@@ -907,9 +952,8 @@ function CloudProviderAccountOrgIdModal(props) {
   );
 
   const isAwsReconfiguration =
-    !isAccountCreation &&
-    String(selectedAccountConfig?.status ?? "").toUpperCase() === "READY" &&
-    Boolean(accountInstructionDetails?.awsAccountID && safeCloudFormationTemplateUrl);
+    ["READY", "RUNNING"].includes(String(selectedAccountConfig?.status ?? "").toUpperCase()) &&
+    Boolean(accountInstructionDetails?.awsAccountID);
 
   return (
     <Dialog disableRestoreFocus open={open} onClose={handleClose} fullWidth>
@@ -939,7 +983,7 @@ function CloudProviderAccountOrgIdModal(props) {
           </IconButton>
         </Header>
         <Content>
-          {isAccountCreation ? (
+          {isAccountCreation && !isAwsReconfiguration ? (
             <CreationTimeInstructions
               cloudformationlink={cloudformationlink}
               cloudFormationGuide={cloudFormationGuide}

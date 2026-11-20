@@ -27,7 +27,7 @@ services:
         modifiable: true
         required: true
         export: false
-        defaultValue: a_secure_password
+        defaultValue: {{TEST_INSTANCE_PASSWORD}}
       - key: username
         description: Postgres user name
         name: Username

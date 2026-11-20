@@ -2,7 +2,6 @@
 
 import { Box, InputAdornment, Stack } from "@mui/material";
 import { getJsonValue } from "app/(dashboard)/instances/utils";
-import Generator from "generate-password";
 import { useRef, useState } from "react";
 
 import MenuItem from "components/FormElementsv2/MenuItem/MenuItem";
@@ -10,6 +9,7 @@ import Select from "components/FormElementsv2/Select/Select";
 import TextField from "components/FormElementsv2/TextField/TextField";
 import KeyIcon from "components/Icons/Key/KeyIcon";
 import { Text } from "components/Typography/Typography";
+import { generateRandomPassword } from "src/utils/generateRandomPassword";
 
 import LoadingSpinnerSmall from "../CircularProgress/CircularProgress";
 import CodeEditor from "../CodeEditor/CodeEditor";
@@ -229,10 +229,7 @@ export const MultilinePasswordInput = ({ field, formData }) => {
                   onClick={() => {
                     if (field.disabled) return;
 
-                    const password = Generator.generate({
-                      length: 12,
-                      numbers: true,
-                    });
+                    const password = generateRandomPassword();
 
                     const syntheticEvent = {
                       target: {

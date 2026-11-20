@@ -59,6 +59,7 @@ const allowedRoutes: AllowedRoute[] = [
     method: "GET",
     pattern: "/2022-09-01-00/availability-zone/region/code/:regionCode/cloud-provider/:cloudProviderName",
   },
+  { method: "GET", pattern: "/2022-09-01-00/availability-zone/:id" },
 
   // ─── User & Auth ───────────────────────────────────────────────────
   { method: "GET", pattern: "/2022-09-01-00/user" },

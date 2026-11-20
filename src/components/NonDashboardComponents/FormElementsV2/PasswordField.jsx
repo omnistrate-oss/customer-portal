@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Box, InputAdornment, Tooltip } from "@mui/material";
-import Generator from "generate-password";
 
 import { StyledTextField } from "src/components/FormElementsv2/TextField/TextField";
 import KeyIcon from "src/components/Icons/Key/KeyIcon";
 import { Text } from "src/components/Typography/Typography";
+import { generateRandomPassword } from "src/utils/generateRandomPassword";
 
 const PasswordField = (props) => {
   const { disabled = false, value, dataCy, showPasswordGenerator, sx = {}, ...restProps } = props;
@@ -49,10 +49,7 @@ const PasswordField = (props) => {
                     borderLeft: "1px solid #D0D5DD",
                   }}
                   onClick={() => {
-                    const password = Generator.generate({
-                      length: 12,
-                      numbers: true,
-                    });
+                    const password = generateRandomPassword();
 
                     restProps.onChange?.({
                       target: {

@@ -16,6 +16,7 @@ import RefreshIcon from "src/components/Icons/Refresh/Refresh";
 import LoadingSpinner from "src/components/LoadingSpinner/LoadingSpinner";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import { Text } from "src/components/Typography/Typography";
+import { colors } from "src/themeConfig";
 import Tooltip from "components/Tooltip/Tooltip";
 
 import { canImportCloudNativeNetwork, canUnimportCloudNativeNetwork, isBringOwnVpcsSupported } from "../../utils";
@@ -351,7 +352,30 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
                 checked={privateConnectivityEnabled}
                 disabled
                 inputProps={{ "aria-label": "Enable Private Connectivity" }}
-                sx={{ p: 0 }}
+                checkedIcon={
+                  <Box
+                    className="private-connectivity-checked-icon"
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: "6px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: colors.purple600,
+                      color: colors.white,
+                    }}
+                  >
+                    <CheckIcon sx={{ fontSize: 16 }} />
+                  </Box>
+                }
+                sx={{
+                  p: 0,
+                  "&.Mui-disabled.Mui-checked .private-connectivity-checked-icon": {
+                    backgroundColor: colors.purple200,
+                    border: `1px solid ${colors.gray300}`,
+                  },
+                }}
               />
               <Stack gap="2px">
                 <Text size="small" weight="medium">

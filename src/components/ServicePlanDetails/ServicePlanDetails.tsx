@@ -1,12 +1,12 @@
 "use client";
 
 import { Box, Stack } from "@mui/material";
-import DOMPurify from "isomorphic-dompurify";
 import { useState } from "react";
 
 import useDownloadCLI from "src/hooks/useDownloadCLI";
 import { colors } from "src/themeConfig";
 import { ServiceOffering } from "src/types/serviceOffering";
+import { sanitizeHTML } from "src/utils/sanitizeHTML";
 
 import APIDocumentation from "../APIDocumentation/APIDocumentation";
 import Button from "../Button/Button";
@@ -68,7 +68,7 @@ const ServicePlanDetails: React.FC<ServicePlanDetailsProps> = ({ serviceOffering
               className={"ql-editor"}
               style={{ wordBreak: "break-word" }}
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(
+                __html: sanitizeHTML(
                   currentTab === "plan-details"
                     ? serviceOffering.productTierPlanDescription
                     : currentTab === "documentation"
