@@ -345,51 +345,49 @@ const ConfigureVPCsStep: React.FC<ConfigureVPCsStepProps> = ({
         }
       >
         <Stack gap="16px">
-          {cloudProvider === "aws" && (
-            <Stack direction="row" alignItems="flex-start" gap="12px">
-              <Checkbox
-                data-testid="private-connectivity-checkbox"
-                checked={privateConnectivityEnabled}
-                disabled
-                inputProps={{ "aria-label": "Enable Private Connectivity" }}
-                checkedIcon={
-                  <Box
-                    className="private-connectivity-checked-icon"
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: "6px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: colors.purple600,
-                      color: colors.white,
-                    }}
-                  >
-                    <CheckIcon sx={{ fontSize: 16 }} />
-                  </Box>
-                }
-                sx={{
-                  p: 0,
-                  "&.Mui-disabled.Mui-checked .private-connectivity-checked-icon": {
-                    backgroundColor: colors.purple200,
-                    border: `1px solid ${colors.gray300}`,
-                  },
-                }}
-              />
-              <Stack gap="2px">
-                <Text size="small" weight="medium">
-                  Enable Private Connectivity
-                </Text>
-                <Text size="xsmall" weight="regular" color="#535862">
-                  Private Link is {privateConnectivityEnabled ? "enabled" : "disabled"} -{" "}
-                  <StyledLink href="https://docs.omnistrate.com/operate-guides/byoc-cloud-accounts/#imported-vpc-requirements-for-byoc-privatelink">
-                    View VPC configuration instructions for Private Link
-                  </StyledLink>
-                </Text>
-              </Stack>
+          <Stack direction="row" alignItems="flex-start" gap="12px">
+            <Checkbox
+              data-testid="private-connectivity-checkbox"
+              checked={privateConnectivityEnabled}
+              disabled
+              inputProps={{ "aria-label": "Enable Private Connectivity" }}
+              checkedIcon={
+                <Box
+                  className="private-connectivity-checked-icon"
+                  sx={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: colors.purple600,
+                    color: colors.white,
+                  }}
+                >
+                  <CheckIcon sx={{ fontSize: 16 }} />
+                </Box>
+              }
+              sx={{
+                p: 0,
+                "&.Mui-disabled.Mui-checked .private-connectivity-checked-icon": {
+                  backgroundColor: colors.purple200,
+                  border: `1px solid ${colors.gray300}`,
+                },
+              }}
+            />
+            <Stack gap="2px">
+              <Text size="small" weight="medium">
+                Enable Private Connectivity
+              </Text>
+              <Text size="xsmall" weight="regular" color="#535862">
+                Private Link is {privateConnectivityEnabled ? "enabled" : "disabled"} -{" "}
+                <StyledLink href="https://docs.omnistrate.com/operate-guides/byoc-cloud-accounts/#imported-vpc-requirements-for-byoc-privatelink">
+                  View VPC configuration instructions for Private Link
+                </StyledLink>
+              </Text>
             </Stack>
-          )}
+          </Stack>
 
           {/* Enable new VPCs */}
           {(() => {

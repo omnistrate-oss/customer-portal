@@ -830,18 +830,14 @@ const CloudAccountWizard: React.FC<CloudAccountWizardProps> = ({
           : undefined,
       },
       ...accountIdentityItems,
-      ...(selectedProvider !== "byoc-onprem"
-        ? [
-            {
-              label: "Private Connectivity",
-              value: privateConnectivityEnabled ? (
-                <StatusChip size="small" label="Enabled" category="success" />
-              ) : (
-                <StatusChip size="small" label="Disabled" category="unknown" />
-              ),
-            },
-          ]
-        : []),
+      {
+        label: "Private Connectivity",
+        value: privateConnectivityEnabled ? (
+          <StatusChip size="small" label="Enabled" category="success" />
+        ) : (
+          <StatusChip size="small" label="Disabled" category="unknown" />
+        ),
+      },
     ];
 
     const sections: SummarySection[] = [{ title: "Standard Information", items: standardItems }];
