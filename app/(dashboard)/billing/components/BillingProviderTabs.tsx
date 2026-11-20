@@ -1,38 +1,18 @@
 "use client";
 
-import { Stack, tabClasses } from "@mui/material";
+import { alpha, tabClasses } from "@mui/material";
 
 import { Tab, Tabs } from "src/components/Tab/Tab";
 import { colors } from "src/themeConfig";
-import type { DescribeConsumptionBillingDetailsSuccessResponse } from "src/types/consumption";
+import type { CustomerBillingProvider } from "src/types/consumption";
 
-import { StripeIcon } from "./Icons";
-
-type BillingProvider = NonNullable<DescribeConsumptionBillingDetailsSuccessResponse["billingProviders"]>[number];
+import BillingProviderLabel from "../../components/BillingProviders/BillingProviderLabel";
 
 type BillingProviderTabsProps = {
-  billingProviders?: BillingProvider[];
-  selectedBillingProvider: string;
-  onBillingProviderChange: (providerType: string) => void;
+  billingProviders?: CustomerBillingProvider[];
+  selectedBillingProvider: CustomerBillingProvider["type"];
+  onBillingProviderChange: (providerType: CustomerBillingProvider["type"]) => void;
   className?: string;
-};
-
-const billingProviderTabStyles = {
-  "&:hover": {
-    color: colors.purple700,
-    "& > *": {
-      backgroundColor: colors.gray50,
-    },
-  },
-  [`&.${tabClasses.selected}`]: {
-    color: colors.purple700,
-    "& > *": {
-      backgroundColor: colors.purple50,
-    },
-  },
-  [`&.${tabClasses.selected}:hover > *`]: {
-    backgroundColor: colors.purple50,
-  },
 };
 
 const BillingProviderTabs = ({
@@ -51,32 +31,24 @@ const BillingProviderTabs = ({
         return (
           <Tab
             key={provider.type}
-            label={
-              provider.type === "STRIPE" ? (
-                <Stack direction="row" alignItems="center" gap="8px">
-                  <StripeIcon
-                    style={{
-                      width: "24px",
-                      height: "24px",
-                    }}
-                  />
-                  <div>OmniBilling (Stripe)</div>
-                </Stack>
-              ) : (
-                <Stack direction="row" alignItems="center" gap="8px">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-sm overflow-hidden">
-                    {provider.logoURL ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={provider.logoURL} width="24" height="24" alt="" className="object-cover" />
-                    ) : null}
-                  </div>
-                  <div>{provider.name || "Billing Provider"}</div>
-                </Stack>
-              )
-            }
+            label={<BillingProviderLabel provider={provider} />}
             value={provider.type}
             onClick={() => onBillingProviderChange(provider.type)}
-            sx={billingProviderTabStyles}
+            sx={(theme) => ({
+              "&:hover": {
+                color: theme.palette.primary.main,
+                backgroundColor: colors.gray50,
+                "&::before": { backgroundColor: theme.palette.primary.main },
+              },
+              [`&.${tabClasses.selected}`]: {
+                color: theme.palette.primary.main,
+                "& > *": { backgroundColor: alpha(theme.palette.primary.main, 0.08) },
+                "&::before": { backgroundColor: theme.palette.primary.main },
+              },
+              [`&.${tabClasses.selected}:hover > *`]: {
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              },
+            })}
           />
         );
       })}

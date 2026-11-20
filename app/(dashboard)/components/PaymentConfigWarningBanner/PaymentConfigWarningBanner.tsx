@@ -1,115 +1,56 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { FC } from "react";
 import Link from "next/link";
-import { useTheme } from "@mui/material";
-import useBillingDetails from "app/(dashboard)/billing/hooks/useBillingDetails";
-import useBillingStatus from "app/(dashboard)/billing/hooks/useBillingStatus";
+import { Box, useTheme } from "@mui/material";
 import useInstances from "app/(dashboard)/instances/hooks/useInstances";
 
 import AlertTriangle from "src/components/Icons/AlertTriangle/AlertTriangle";
 import { Text } from "src/components/Typography/Typography";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
-import { Subscription } from "src/types/subscription";
+import { colors } from "src/themeConfig";
 
-//Shows a payment config warning banner if there are instances running under subscriptions that require a payment method but no payment method is configured
-function PaymentConfigWarningBanner() {
-  const [showPaymentWarning, setShowPaymentWarning] = useState(false);
-  const [warningMessage, setWarningMessage] = useState<ReactNode>("");
+const PaymentConfigWarningBanner: FC = () => {
   const { subscriptionsObj, isSubscriptionsPending } = useGlobalData();
+  const { isPending: isInstancesPending, data: instances } = useInstances();
   const theme = useTheme();
 
-  const billingStatusQuery = useBillingStatus();
+  if (isInstancesPending || isSubscriptionsPending) return null;
 
-  const isBillingEnabled = Boolean(billingStatusQuery.data?.enabled);
+  const subscriptionIds = new Set(
+    instances?.flatMap((instance) => {
+      const subscription = instance.subscriptionId ? subscriptionsObj[instance.subscriptionId] : undefined;
+      return subscription?.roleType === "root" &&
+        !subscription.paymentMethodConfigured &&
+        !subscription.allowCreatesWhenPaymentNotConfigured
+        ? [subscription.id]
+        : [];
+    })
+  );
+  if (subscriptionIds.size === 0) return null;
 
-  const { isPending: isBillingDetailsPending, data: billingDetails } = useBillingDetails(isBillingEnabled);
-
-  const isPaymentMethodConfigured = Boolean(billingDetails?.paymentConfigured);
-
-  const { isPending: isInstancesPending, data: instances } = useInstances();
-
-  useEffect(() => {
-    if (!isInstancesPending && !isSubscriptionsPending && !isBillingDetailsPending) {
-      if (!isPaymentMethodConfigured && instances && instances.length > 0) {
-        const subscriptionsRequiringPayment = new Set<Subscription>();
-        const instancesRequiringPaymentMethod = instances.filter((instance) => {
-          const subscriptionId = instance.subscriptionId as string;
-          const subscription = subscriptionsObj[subscriptionId];
-
-          let requiresPayment = false;
-          if (subscription && subscription.roleType === "root") {
-            requiresPayment = !subscription.allowCreatesWhenPaymentNotConfigured;
-            if (requiresPayment) {
-              subscriptionsRequiringPayment.add(subscription);
-            }
-          }
-          return requiresPayment;
-        });
-
-        const hasInstancesRequiringPaymentMethod = instancesRequiringPaymentMethod.length > 0;
-
-        if (hasInstancesRequiringPaymentMethod) {
-          /*
-          show warning message in one of these formats
-          {Subscription_Name} subsription requires a payment method to continue running instances. Go to Billing - single subscription
-          Some subscriptions require a payment method to continue running instances. Go to Billing - multiple subscriptions
-          */
-
-          const subscriptionNames = Array.from(subscriptionsRequiringPayment).map((sub) => sub.productTierName);
-          if (subscriptionNames.length === 1) {
-            setWarningMessage(
-              <>
-                {`${subscriptionNames[0]} subscription requires a payment method to continue running instances.`}{" "}
-                <Link className="underline underline-offset-4" href="/billing">
-                  Go to Billing
-                </Link>
-              </>
-            );
-          } else {
-            setWarningMessage(
-              <>
-                Some subscriptions require a payment method to continue running instances.{" "}
-                <Link className="underline underline-offset-4" href="/billing">
-                  Go to Billing
-                </Link>
-                .
-              </>
-            );
-          }
-          setShowPaymentWarning(true);
-        } else {
-          setShowPaymentWarning(false);
-          setWarningMessage("");
-        }
-      } else {
-        setShowPaymentWarning(false);
-        setWarningMessage("");
-      }
-    }
-  }, [
-    instances,
-    isInstancesPending,
-    subscriptionsObj,
-    isSubscriptionsPending,
-    isBillingDetailsPending,
-    isPaymentMethodConfigured,
-  ]);
-
-  if (!showPaymentWarning) {
-    return null;
-  }
+  const subscriptionName =
+    subscriptionIds.size === 1 ? subscriptionsObj[Array.from(subscriptionIds)[0]]?.productTierName : undefined;
 
   return (
-    <div className="py-2 px-6 border-b border-[#E4E7EC] bg-[#FFFCF5] text-center flex items-center gap-2 justify-center">
-      <div className="flex-shrink-0 self-start mt-0.5">
+    <Box
+      className="py-2 px-6 border-b text-center flex items-center gap-2 justify-center"
+      sx={{ borderColor: colors.gray200, bgcolor: colors.warning50 }}
+      data-testid="payment-config-warning"
+    >
+      <Box className="flex-shrink-0 self-start mt-0.5">
         <AlertTriangle />
-      </div>
+      </Box>
       <Text size="small" weight="medium" color={theme.palette.warning.main}>
-        {warningMessage}
+        {subscriptionName
+          ? `${subscriptionName} subscription requires a payment method to continue running instances.`
+          : "Some subscriptions require a payment method to continue running instances."}{" "}
+        <Link className="underline underline-offset-4" href="/billing">
+          Go to Billing
+        </Link>
       </Text>
-    </div>
+    </Box>
   );
-}
+};
 
 export default PaymentConfigWarningBanner;
