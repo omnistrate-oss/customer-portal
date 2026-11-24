@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 
+import { authLayoutTestIds } from "src/constants/testIds/auth-layout";
 import { getSigninRoute } from "src/utils/routes";
 
 export class SigninPage {
@@ -18,6 +19,8 @@ export class SigninPage {
     otherSignInOptionsButton: "sign-in-options-button",
     passwordLoginButton: "password-login-button",
     resetPasswordSubmitButton: "submit-button",
+    heroPanel: authLayoutTestIds.heroPanel,
+    formPanel: authLayoutTestIds.formPanel,
   };
 
   pageElements = {

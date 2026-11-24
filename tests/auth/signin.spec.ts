@@ -1,6 +1,8 @@
+import type { Locator, Page } from "@playwright/test";
 import { getIdentityProviderButtonLabel } from "app/(public)/(main-image)/signin/utils";
 import { PageURLs } from "page-objects/pages";
 import { SigninPage } from "page-objects/signin-page";
+import { SignupPage } from "page-objects/signup-page";
 import { expect, test } from "test-fixtures/har-test";
 import { ProviderAPIClient } from "test-utils/provider-api-client";
 
@@ -226,5 +228,108 @@ test.describe("Provider API authentication", () => {
         expect(await response.json()).toEqual({ message: "Not authenticated" });
       });
     }
+  }
+});
+
+test.describe("Responsive Auth Layout", () => {
+  const viewports = [
+    { name: "mobile", width: 360, height: 740, showsHero: false },
+    { name: "tablet", width: 768, height: 1024, showsHero: false },
+    { name: "desktop", width: 1440, height: 900, showsHero: true },
+  ];
+
+  const getHorizontalOverflow = (page: Page) =>
+    page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+  const expectWithinViewport = async (locator: Locator, viewportWidth: number) => {
+    await expect(locator).toBeVisible();
+    const box = await locator.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(viewportWidth);
+    }
+  };
+
+  const dismissCookieBanner = async (page: Page, signinPage: SigninPage) => {
+    const banner = page.getByTestId(signinPage.dataTestIds.cookieConsentBanner);
+    await expect(banner).toBeVisible();
+    await page.getByRole("button", { name: "Accept All" }).click();
+    await expect(banner).toBeHidden();
+  };
+
+  for (const viewport of viewports) {
+    test.describe(`${viewport.name} (${viewport.width}px)`, () => {
+      test.use({ viewport: { width: viewport.width, height: viewport.height } });
+
+      test("Sign-in page fits the viewport", async ({ page }) => {
+        const signinPage = new SigninPage(page);
+        const dataTestIds = signinPage.dataTestIds;
+        await signinPage.navigate();
+
+        const heroPanel = page.getByTestId(dataTestIds.heroPanel);
+        if (viewport.showsHero) {
+          await expect(heroPanel).toBeVisible();
+        } else {
+          await expect(heroPanel).toBeHidden();
+        }
+        await expectWithinViewport(page.getByTestId(dataTestIds.emailInput), viewport.width);
+        expect(await getHorizontalOverflow(page)).toBeLessThanOrEqual(0);
+
+        await dismissCookieBanner(page, signinPage);
+        await page.getByTestId(dataTestIds.emailInput).fill(process.env.USER_EMAIL ?? "user@example.com");
+        await page.getByTestId(dataTestIds.nextButton).click();
+
+        await expect(page.getByTestId(dataTestIds.emailInput)).toBeDisabled();
+        await expectWithinViewport(page.getByTestId(dataTestIds.emailInput), viewport.width);
+        expect(await getHorizontalOverflow(page)).toBeLessThanOrEqual(0);
+      });
+
+      test("Sign-up page fits the viewport", async ({ page }) => {
+        test.skip(process.env.ENVIRONMENT_TYPE !== "PROD", "Sign-up page is not available in non-prod environments");
+
+        const signinPage = new SigninPage(page);
+        const signupPage = new SignupPage(page);
+        const signupTestIds = signupPage.dataTestIds;
+        await signupPage.navigate();
+
+        const heroPanel = page.getByTestId(signupTestIds.heroPanel);
+        if (viewport.showsHero) {
+          await expect(heroPanel).toBeVisible();
+        } else {
+          await expect(heroPanel).toBeHidden();
+        }
+        const emailInput = page.getByTestId(signupTestIds.emailInput);
+        await expectWithinViewport(emailInput, viewport.width);
+        expect(await getHorizontalOverflow(page)).toBeLessThanOrEqual(0);
+
+        await dismissCookieBanner(page, signinPage);
+        await emailInput.fill("new-user@example.com");
+        await page.getByTestId(signupTestIds.formPanel).getByTestId(signupTestIds.nextButton).click();
+
+        await expect(emailInput).toBeDisabled();
+        await expectWithinViewport(emailInput, viewport.width);
+
+        // Password sign-up is off when DISABLE_PASSWORD_LOGIN is set or an IDP matches the email domain.
+        const isPasswordLoginEnabled = process.env.DISABLE_PASSWORD_LOGIN?.toLowerCase() !== "true";
+        const nameInput = page.getByTestId(signupTestIds.nameInput);
+        const ssoOnlyEmailField = page.getByTestId(signupTestIds.ssoOnlyEmailField);
+        await expect(nameInput.or(ssoOnlyEmailField)).toBeVisible();
+        if (await nameInput.isVisible()) {
+          expect(isPasswordLoginEnabled).toBe(true);
+          await expectWithinViewport(nameInput, viewport.width);
+          await expectWithinViewport(page.getByTestId(signupTestIds.createAccountButton), viewport.width);
+        } else {
+          await expectWithinViewport(ssoOnlyEmailField, viewport.width);
+          const idpButtons = page.locator(`[data-testid^="${signupTestIds.idpButtonPrefix}"]`);
+          for (const idpButton of await idpButtons.all()) {
+            if (await idpButton.isVisible()) {
+              await expectWithinViewport(idpButton, viewport.width);
+            }
+          }
+        }
+        expect(await getHorizontalOverflow(page)).toBeLessThanOrEqual(0);
+      });
+    });
   }
 });
