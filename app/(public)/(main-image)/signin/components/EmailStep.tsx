@@ -49,7 +49,7 @@ const EmailStep: FC<EmailStepProps> = (props) => {
 
   return (
     <>
-      <DisplayHeading sx={{ fontSize: "26px !important" }} mt="48px">
+      <DisplayHeading sx={{ fontSize: "26px !important" }} mt={{ xs: "24px", md: "48px" }}>
         Enter your email to log in
       </DisplayHeading>
       <Stack gap="30px" mt="24px">

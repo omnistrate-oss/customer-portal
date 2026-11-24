@@ -9,6 +9,7 @@ import { styled } from "@mui/system";
 import Button from "src/components/Button/Button";
 import TextField from "src/components/FormElementsv2/TextField/TextField";
 import { Text } from "src/components/Typography/Typography";
+import { signupPageTestIds } from "src/constants/testIds/signup-page";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import { SetState } from "src/types/common/reactGenerics";
 import { IdentityProvider } from "src/types/identityProvider";
@@ -111,6 +112,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
       {passwordSignupAllowed && <FieldLabel required>Email</FieldLabel>}
       {/* @ts-ignore */}
       <TextField
+        inputProps={{ "data-testid": signupPageTestIds.emailInput }}
         name="email"
         id="email"
         placeholder="example@companyemail.com"
@@ -156,7 +158,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   return (
     <>
       {!passwordSignupAllowed && (
-        <Box maxWidth="390px" mx="auto">
+        <Box maxWidth="390px" mx="auto" data-testid={signupPageTestIds.ssoOnlyEmailField}>
           {emailField}
         </Box>
       )}
@@ -174,7 +176,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
                   key={idp.name}
                   idp={idp}
                   onClick={onIDPButtonClick}
-                  data-testid={`idp-signup-button-${idp.name}`}
+                  data-testid={`${signupPageTestIds.idpButtonPrefix}${idp.name}`}
                 />
               ))}
             </Stack>
@@ -186,7 +188,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
                   key={idp.name}
                   idp={idp}
                   onClick={onIDPButtonClick}
-                  data-testid={`idp-signup-button-${idp.name}`}
+                  data-testid={`${signupPageTestIds.idpButtonPrefix}${idp.name}`}
                 />
               ))}
             </Stack>
@@ -231,6 +233,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
               <FieldLabel required>Name</FieldLabel>
               {/* @ts-ignore */}
               <TextField
+                inputProps={{ "data-testid": signupPageTestIds.nameInput }}
                 id="name"
                 name="name"
                 placeholder="Enter your full name"
@@ -333,7 +336,13 @@ const SignupForm: React.FC<SignupFormProps> = ({
             </Box>
           </FormGrid>
           <Stack mt="32px" maxWidth="360px" mx="auto">
-            <SubmitButton type="submit" onClick={onSubmit} disabled={isSubmitDisabled} loading={isSubmitLoading}>
+            <SubmitButton
+              data-testid={signupPageTestIds.createAccountButton}
+              type="submit"
+              onClick={onSubmit}
+              disabled={isSubmitDisabled}
+              loading={isSubmitLoading}
+            >
               Create Account
             </SubmitButton>
           </Stack>
