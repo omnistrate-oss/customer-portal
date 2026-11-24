@@ -263,11 +263,21 @@ const LoginMethodStep: FC<LoginMethodStepProps> = (props) => {
           />
         </FieldContainer>
         {hasNoLoginMethods ? (
-          <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+          <Text
+            data-testid="no-login-methods-message"
+            size="medium"
+            weight="semibold"
+            sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}
+          >
             No login methods available. Please contact support
           </Text>
         ) : hasNoLoginMethodsForEmail ? (
-          <Text size="medium" weight="semibold" sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}>
+          <Text
+            data-testid="no-login-methods-message"
+            size="medium"
+            weight="semibold"
+            sx={{ color: "#414651", textAlign: "center", marginTop: "24px" }}
+          >
             No login methods available for this email. Try another email or contact support
           </Text>
         ) : (

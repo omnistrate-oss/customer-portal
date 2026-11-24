@@ -281,7 +281,30 @@ test.describe("Responsive Auth Layout", () => {
         await page.getByTestId(dataTestIds.nextButton).click();
 
         await expect(page.getByTestId(dataTestIds.emailInput)).toBeDisabled();
+
+        // The login method is chosen in an effect, so wait for its final controls before measuring.
+        const loginButton = page.getByTestId(dataTestIds.loginButton);
+        const idpLoginButtons = page.locator(`[data-testid^="${dataTestIds.idpLoginButtonPrefix}"]`);
+        const noLoginMethodsMessage = page.getByTestId(dataTestIds.noLoginMethodsMessage);
+        await expect(loginButton.or(idpLoginButtons.first()).or(noLoginMethodsMessage)).toBeVisible();
+
         await expectWithinViewport(page.getByTestId(dataTestIds.emailInput), viewport.width);
+        if (await loginButton.isVisible()) {
+          await expectWithinViewport(page.getByTestId(dataTestIds.passwordInput), viewport.width);
+          await expectWithinViewport(loginButton, viewport.width);
+        } else if (await noLoginMethodsMessage.isVisible()) {
+          await expectWithinViewport(noLoginMethodsMessage, viewport.width);
+        } else {
+          for (const idpButton of await idpLoginButtons.all()) {
+            if (await idpButton.isVisible()) {
+              await expectWithinViewport(idpButton, viewport.width);
+            }
+          }
+        }
+        const otherOptionsButton = page.getByTestId(dataTestIds.otherSignInOptionsButton);
+        if (await otherOptionsButton.isVisible()) {
+          await expectWithinViewport(otherOptionsButton, viewport.width);
+        }
         expect(await getHorizontalOverflow(page)).toBeLessThanOrEqual(0);
       });
 

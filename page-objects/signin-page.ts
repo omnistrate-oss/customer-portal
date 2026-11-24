@@ -18,6 +18,8 @@ export class SigninPage {
     nextButton: "next-button",
     otherSignInOptionsButton: "sign-in-options-button",
     passwordLoginButton: "password-login-button",
+    idpLoginButtonPrefix: "idp-login-button-",
+    noLoginMethodsMessage: "no-login-methods-message",
     resetPasswordSubmitButton: "submit-button",
     heroPanel: authLayoutTestIds.heroPanel,
     formPanel: authLayoutTestIds.formPanel,
