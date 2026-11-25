@@ -1,10 +1,11 @@
-import { FC, useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import clipboard from "clipboardy";
+import { FC, useState } from "react";
 
 import CopyIcon from "src/components/CodeEditor/CopyIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
+import { colors } from "src/themeConfig";
 
 const DEFAULT_TOOLTIP_TEXT = "Click to copy";
 
@@ -17,6 +18,8 @@ export type CommandBlockProps = {
   command: string;
   dataTestId?: string;
   fixedHeight?: boolean;
+  compact?: boolean;
+  copyDisabledReason?: string;
 };
 
 /**
@@ -24,7 +27,14 @@ export type CommandBlockProps = {
  * Visual wrapping keeps every flag readable in a narrow modal without altering the copied text.
  * Long create commands use a fixed-height scroll area; short commands can retain their natural height.
  */
-const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixedHeight = false }) => {
+const CommandBlock: FC<CommandBlockProps> = ({
+  title,
+  command,
+  dataTestId,
+  fixedHeight = false,
+  compact = false,
+  copyDisabledReason = "",
+}) => {
   const [tooltipText, setTooltipText] = useState(DEFAULT_TOOLTIP_TEXT);
 
   return (
@@ -36,6 +46,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
         borderRadius: "12px",
         overflow: "hidden",
         minWidth: 0,
+        position: "relative",
         height: fixedHeight ? "236px" : "auto",
         display: "flex",
         flexDirection: "column",
@@ -47,45 +58,59 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
           alignItems: "center",
           justifyContent: "space-between",
           gap: "12px",
-          minHeight: "56px",
+          minHeight: compact ? undefined : "56px",
+          position: compact ? "absolute" : "static",
+          top: compact ? "10px" : undefined,
+          bottom: compact ? "10px" : undefined,
+          right: compact ? "16px" : undefined,
+          zIndex: compact ? 1 : undefined,
           flexShrink: 0,
-          padding: "11px 11px 8px 23px",
+          padding: compact ? 0 : "11px 11px 8px 23px",
           backgroundColor: CODE_SURFACE,
-          borderBottom: `1px solid ${BORDER_COLOR}`,
+          borderBottom: compact ? undefined : `1px solid ${BORDER_COLOR}`,
         }}
       >
-        <Text weight="semibold" size="medium" color="#F7F7F7">
+        <Text weight="semibold" size="medium" color={colors.gray25} hidden={compact}>
           {title}
         </Text>
 
-        <IconButton
-          aria-label={`Copy ${title.toLowerCase()} command`}
-          sx={{
-            width: "36px",
-            height: "36px",
-            flexShrink: 0,
-            backgroundColor: "#13161B",
-            border: "1px solid #373A41",
-            borderRadius: "8px",
-            boxShadow: "inset 0 0 0 1px rgba(12, 14, 18, 0.18), inset 0 -2px 0 rgba(12, 14, 18, 0.05)",
-            "& svg": { width: "20px", height: "20px" },
-            "& svg path": { stroke: "#CECFD2" },
-            "&:hover": { backgroundColor: "#1F242C" },
-          }}
-          onClick={() => {
-            clipboard
-              .write(command)
-              .then(() => setTooltipText("Copied"))
-              .catch(() => setTooltipText("Unable to copy to clipboard"))
-              .finally(() => setTimeout(() => setTooltipText(DEFAULT_TOOLTIP_TEXT), 1500));
-          }}
-        >
-          <Tooltip title={tooltipText}>
-            <span>
+        <Tooltip title={copyDisabledReason || tooltipText} describeChild>
+          <Box
+            component="span"
+            display="inline-flex"
+            tabIndex={copyDisabledReason ? 0 : undefined}
+            role={copyDisabledReason ? "group" : undefined}
+            aria-label={copyDisabledReason ? "Copy command unavailable" : undefined}
+            aria-disabled={!!copyDisabledReason || undefined}
+          >
+            <IconButton
+              aria-label={compact ? "Copy setup script command" : `Copy ${title.toLowerCase()} command`}
+              disabled={!!copyDisabledReason}
+              sx={{
+                width: "36px",
+                height: "36px",
+                flexShrink: 0,
+                backgroundColor: "#13161B",
+                border: "1px solid #373A41",
+                borderRadius: "8px",
+                boxShadow: "inset 0 0 0 1px rgba(12, 14, 18, 0.18), inset 0 -2px 0 rgba(12, 14, 18, 0.05)",
+                "& svg": { width: "20px", height: "20px" },
+                "& svg path": { stroke: "#CECFD2" },
+                "&:hover": { backgroundColor: "#1F242C" },
+              }}
+              onClick={() => {
+                if (copyDisabledReason) return;
+                clipboard
+                  .write(command)
+                  .then(() => setTooltipText("Copied"))
+                  .catch(() => setTooltipText("Unable to copy to clipboard"))
+                  .finally(() => setTimeout(() => setTooltipText(DEFAULT_TOOLTIP_TEXT), 1500));
+              }}
+            >
               <CopyIcon />
-            </span>
-          </Tooltip>
-        </IconButton>
+            </IconButton>
+          </Box>
+        </Tooltip>
       </Box>
 
       <Box
@@ -111,7 +136,7 @@ const CommandBlock: FC<CommandBlockProps> = ({ title, command, dataTestId, fixed
           data-testid={dataTestId}
           sx={{
             margin: 0,
-            padding: "16px 24px",
+            padding: compact ? "16px 72px 16px 16px" : "16px 24px",
             boxSizing: "border-box",
             width: "100%",
             minHeight: "100%",

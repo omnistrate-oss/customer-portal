@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Stack } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
+import DataTable from "components/DataTable/DataTable";
+import GridCellExpand from "components/GridCellExpand/GridCellExpand";
+import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
+import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "components/StatusChip/StatusChip";
+import Tooltip from "components/Tooltip/Tooltip";
 import { $api } from "src/api/query";
 import { deleteResourceInstance, getResourceInstanceDetails } from "src/api/resourceInstance";
 import ConnectAccountConfigDialog from "src/components/AccountConfigDialog/ConnectAccountConfigDialog";
@@ -31,7 +38,7 @@ import {
   getOciShellScriptOffboardCommand,
 } from "src/utils/accountConfig/accountConfig";
 import formatDateUTC from "src/utils/formatDateUTC";
-import { getResultParams } from "src/utils/instance";
+import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 import {
   getEnumFromUserRoleString,
   isOperationAllowedByRBAC,
@@ -39,13 +46,6 @@ import {
   viewEnum,
 } from "src/utils/isAllowedByRBAC";
 import { CloudAccountTab, getCloudAccountDetailsRoute, getCloudAccountsRoute } from "src/utils/routes";
-import CloudProviderAccountOrgIdModal from "components/CloudProviderAccountOrgIdModal/CloudProviderAccountOrgIdModal";
-import DataTable from "components/DataTable/DataTable";
-import GridCellExpand from "components/GridCellExpand/GridCellExpand";
-import ViewInstructionsIcon from "components/Icons/AccountConfig/ViewInstrcutionsIcon";
-import ServiceNameWithLogo from "components/ServiceNameWithLogo/ServiceNameWithLogo";
-import StatusChip from "components/StatusChip/StatusChip";
-import Tooltip from "components/Tooltip/Tooltip";
 
 import FullScreenDrawer from "../components/FullScreenDrawer/FullScreenDrawer";
 import CloudAccountsIcon from "../components/Icons/CloudAccountsIcon";
@@ -68,8 +68,8 @@ import GovernanceControlsCell from "./components/GovernanceControlsCell";
 import ModifyVPCsDrawer from "./components/ModifyVPCsDrawer";
 import { OffboardInstructionDetails } from "./components/OffboardingInstructions";
 import SetupPrivateClusterDialog from "./components/SetupPrivateClusterDialog";
-import useAccountConfig from "./hooks/useAccountConfig";
 import { DIALOG_DATA } from "./constants";
+import useAccountConfig from "./hooks/useAccountConfig";
 import {
   getCloudAccountId,
   getCloudAccountProvider,
@@ -269,6 +269,7 @@ const CloudAccountsPage = () => {
         id: "row_icons",
         header: "",
         cell: (data) => {
+          const resultParams = getResultParams(data.row.original);
           const isDeleteProtectionSupported =
             data.row.original.resourceInstanceMetadata?.deletionProtection !== undefined;
           const isDeleteProtected = data.row.original?.resourceInstanceMetadata?.deletionProtection;
@@ -277,7 +278,8 @@ const CloudAccountsPage = () => {
             <Stack direction="row" alignItems="center" gap="8px">
               <GovernanceControlsCell
                 href={getDetailsRoute(data.row.original, "Governance Controls")}
-                disabled={getCloudAccountProvider(getResultParams(data.row.original)) !== "aws"}
+                disabled={getCloudAccountProvider(resultParams) !== "aws"}
+                privateLinkEnabled={isPrivateLinkEnabled(resultParams)}
               />
               <Tooltip
                 title={
@@ -519,22 +521,13 @@ const CloudAccountsPage = () => {
       columnHelper.accessor(
         (row) => {
           const resultParams = getResultParams(row);
-          if (resultParams?.private_link === undefined || resultParams?.private_link === null) {
-            return "NA";
-          }
-          return resultParams?.private_link ? "Enabled" : "Disabled";
+          return isPrivateLinkEnabled(resultParams) ? "Enabled" : "Disabled";
         },
         {
           id: "privateLink",
           header: "Private Link",
           cell: (data) => {
             const value = data.getValue();
-            const resultParams = getResultParams(data.row.original);
-            const isNebius = !!resultParams?.nebius_tenant_id;
-            const isBYOCOnprem = !!resultParams?.cluster_name;
-            if (value === "NA" || isNebius || isBYOCOnprem) {
-              return "-";
-            }
             return <StatusChip label={value} category={value === "Enabled" ? "success" : "unknown"} />;
           },
           meta: {
@@ -1193,6 +1186,10 @@ const CloudAccountsPage = () => {
         accountConfigId={clickedInstance?.id}
         selectedAccountConfig={clickedInstance}
         cloudFormationTemplateUrl={awsCloudFormationTemplateUrl}
+        cloudFormationUpdateUrl={
+          accountConfigsHash?.[getResultParams(clickedInstance)?.cloud_provider_account_config_id ?? ""]
+            ?.awsCloudFormationTemplateURL
+        }
         isAccountCreation={isAccountCreation}
         gcpBootstrapShellCommand={gcpBootstrapShellCommand}
         azureBootstrapShellCommand={azureBootstrapShellCommand}

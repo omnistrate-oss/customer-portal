@@ -1,5 +1,6 @@
 import { InstanceDetailsPage } from "page-objects/instance-details-page";
 import { InstancesPage } from "page-objects/instances-page";
+import { readRecordedServiceOffering } from "test-fixtures/har-replay";
 import { expect, test } from "test-fixtures/har-test";
 import {
   TestConnectivityTab,
@@ -35,7 +36,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("Overall Structure and Elements + Create a Postgres DT Instance", async ({ page }) => {
+  test("Overall Structure and Elements + Create a Postgres DT Instance", async ({ page, harMode, harFilePath }) => {
     const dataTestIds = instancesPage.dataTestIds;
 
     // Expect the Refresh, Stop, Start, Modify, Delete, Create, and Actions Menu to be Visible
@@ -48,11 +49,18 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(dataTestIds.actionsMenu)).toBeVisible();
 
     const date = GlobalStateManager.getDate() || "";
+    const recordedOffering =
+      harMode === "replay" ? readRecordedServiceOffering(harFilePath, "SaaSBuilder Postgres DT - ") : undefined;
+    const productName = recordedOffering?.serviceName || `SaaSBuilder Postgres DT - ${date}`;
     await page.getByTestId(dataTestIds.createButton).click();
 
     // Wait for the Form to Load and Click the Service Name Dropdown
     await page.getByTestId(dataTestIds.serviceNameSelect).click();
-    await page.getByRole("option", { name: `SaaSBuilder Postgres DT - ${date}` }).click();
+    if (recordedOffering) {
+      await page.locator(`[role="option"][data-value="${recordedOffering.serviceId}"]`).click();
+    } else {
+      await page.getByRole("option", { name: productName }).click();
+    }
 
     // If the Subscribe Button is Visible, Click it
     const subscribeButton = page.getByTestId("subscribe-button");
@@ -63,6 +71,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await page.getByTestId(dataTestIds.gcpCard).click();
     await page.getByTestId(dataTestIds.regionSelect).click();
     await page.getByRole("option", { name: "us-central1" }).click();
+    await page.getByTestId("private-radio").click();
 
     await page.waitForTimeout(5000);
     await page.getByTestId(dataTestIds.submitButton).click();
@@ -79,7 +88,6 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     await expect(page.getByTestId(instanceId)).toHaveCount(0);
 
     await instancesPage.search("");
-    const productName = `SaaSBuilder Postgres DT - ${GlobalStateManager.getDate() || ""}`;
     await instancesPage.applyMultiSelectFilter("product-name", [productName]);
     await expect(instancesPage.filterChip(`Product Name: ${productName}`)).toBeVisible();
 
@@ -99,7 +107,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     );
 
     instance = await instanceDetails.json();
-    console.log(logPrefix, "Instance Details:", instance);
+    console.info(logPrefix, "Instance details received");
 
     await TestInstanceOverview(instanceDetailsPage, instance);
     await TestInstanceDetailsTab(instanceDetailsPage, instance, "postgres");
@@ -111,8 +119,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
   });
 
   test("Stop Instance -> Test Stopped State", async ({ page }) => {
-    await instancesPage.stopInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.stopInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Stopped", logPrefix);
     });
 
@@ -123,7 +131,7 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
     );
 
     instance = await instanceDetails.json();
-    console.log(logPrefix, "Instance Details:", instance);
+    console.info(logPrefix, "Instance details received");
 
     await TestInstanceOverview(instanceDetailsPage, instance);
     await TestInstanceDetailsTab(instanceDetailsPage, instance, "postgres");
@@ -135,8 +143,8 @@ test.describe("Instances Page - Basic Lifecycle Tests", () => {
   });
 
   test("Delete Instance", async () => {
-    await instancesPage.deleteInstance(instanceId);
     await skipOnBackendError(test, async () => {
+      await instancesPage.deleteInstance(instanceId);
       await instancesPage.waitForStatus(instanceId, "Deleting", logPrefix);
     });
   });

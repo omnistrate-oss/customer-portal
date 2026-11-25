@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Box, styled } from "@mui/material";
-import DOMPurify from "isomorphic-dompurify";
 
 import { styleConfig } from "src/providerConfig";
 import { useProviderOrgDetails } from "src/providers/ProviderOrgDetailsProvider";
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
+import { sanitizeHTML } from "src/utils/sanitizeHTML";
 import CookiePolicyTable from "components/CookiePolicy/CookiePolicyTable";
 import Container from "components/NonDashboardComponents/Container/Container";
 import Footer from "components/NonDashboardComponents/Footer";
@@ -147,7 +147,7 @@ const CookiePolicyPage = () => {
                 },
               }}
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(orgCookiePolicy),
+                __html: sanitizeHTML(orgCookiePolicy),
               }}
             />
           </article>

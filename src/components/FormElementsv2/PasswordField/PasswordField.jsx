@@ -1,18 +1,15 @@
 import { useState } from "react";
 import { Box, InputAdornment } from "@mui/material";
-import Generator from "generate-password";
 
 import KeyIcon from "src/components/Icons/Key/KeyIcon";
 import Tooltip from "src/components/Tooltip/Tooltip";
 import { Text } from "src/components/Typography/Typography";
+import { generateRandomPassword } from "src/utils/generateRandomPassword";
 
 import TextField from "../TextField/TextField";
 
 const generatePassword = (restProps) => {
-  const password = Generator.generate({
-    length: 12,
-    numbers: true,
-  });
+  const password = generateRandomPassword();
 
   restProps.onChange?.({
     target: {

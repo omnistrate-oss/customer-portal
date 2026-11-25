@@ -2,10 +2,11 @@ const axios = require("axios");
 
 //This function takes the token provided by the google recaptcha client widget as input and verifies it using the google captcha verification API
 //Returns true if the verification is successful or if the quota limit has been exceeded, else returns false
-async function verifyRecaptchaToken(token: string) {
-  const googleReCaptchaSecretKey = process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
-  const formData = `secret=${googleReCaptchaSecretKey}&response=${token}`;
-  //   console.log("Token", token);
+async function verifyRecaptchaToken(token: unknown) {
+  if (typeof token !== "string" || !token.trim()) return false;
+
+  const secret = process.env.GOOGLE_RECAPTCHA_SECRET_KEY || "";
+  const formData = new URLSearchParams({ secret, response: token });
 
   let isVerified = false;
 
@@ -15,7 +16,6 @@ async function verifyRecaptchaToken(token: string) {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-    // console.log("Google Response", googleAPIResponse.data);
     if (googleAPIResponse?.data?.success === true) isVerified = true;
     else isVerified = false;
   } catch {

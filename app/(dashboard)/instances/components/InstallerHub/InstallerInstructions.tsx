@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import DOMPurify from "isomorphic-dompurify";
 
 import { Text } from "src/components/Typography/Typography";
+import { sanitizeHTML } from "src/utils/sanitizeHTML";
 
 type InstallerInstructionsProps = {
   installerInstructions: string | undefined;
@@ -36,7 +36,7 @@ const InstallerInstructions = ({ installerInstructions }: InstallerInstructionsP
             }}
             dangerouslySetInnerHTML={{
               __html: installerInstructions
-                ? DOMPurify.sanitize(installerInstructions)
+                ? sanitizeHTML(installerInstructions)
                 : "No installer instructions available.",
             }}
           />

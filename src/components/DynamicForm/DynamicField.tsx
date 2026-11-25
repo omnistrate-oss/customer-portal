@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { Box, InputAdornment, SxProps, Theme } from "@mui/material";
-import Generator from "generate-password";
+
+import { generateRandomPassword } from "src/utils/generateRandomPassword";
 
 import FieldLabel from "../FormElements/FieldLabel/FieldLabel";
 import Autocomplete from "../FormElementsv2/AutoComplete/AutoComplete";
@@ -83,10 +84,7 @@ const PasswordInput = ({ field, formData, value }) => {
                     borderLeft: "1px solid #D0D5DD",
                   }}
                   onClick={() => {
-                    const password = Generator.generate({
-                      length: 12,
-                      numbers: true,
-                    });
+                    const password = generateRandomPassword();
 
                     formData.setFieldValue(field.name, password);
                     field.onChange?.({
