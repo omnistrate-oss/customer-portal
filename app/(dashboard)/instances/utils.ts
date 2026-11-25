@@ -19,7 +19,7 @@ import {
   ResourceInstanceNetworkTopology,
 } from "src/types/resourceInstance";
 import { TierVersionSet } from "src/types/tier-version-set";
-import { getHighestPermissionSubscription, isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { getHighestPermissionSubscription, isSubscriptionWriteRole } from "src/utils/subscriptionRBAC";
 import { getResultParams } from "src/utils/instance";
 
 import { loadStatusLabel, loadStatusMap } from "./constants";
@@ -291,8 +291,7 @@ export const getValidSubscriptionForInstanceCreation = (
   subscriptions: Subscription[],
   instances: ResourceInstance[],
   serviceId?: string,
-  servicePlanId?: string,
-  consumptionSubscriptionAdminRBAC = false
+  servicePlanId?: string
 ): Subscription | undefined => {
   // Build subscription instance count hash
   const subscriptionInstancesNumHash: Record<string, number> = {};
@@ -303,9 +302,7 @@ export const getValidSubscriptionForInstanceCreation = (
 
   // Filter subscriptions to write-capable roles and valid service offerings
   let filteredSubscriptions = subscriptions.filter(
-    (sub) =>
-      serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] &&
-      isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+    (sub) => serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] && isSubscriptionWriteRole(sub.roleType)
   );
 
   // Filter by serviceID if provided
@@ -326,7 +323,7 @@ export const getValidSubscriptionForInstanceCreation = (
     isSubscriptionValid(el, serviceOfferingsObj, subscriptionInstancesNumHash)
   );
 
-  return getHighestPermissionSubscription(validSubscriptions, consumptionSubscriptionAdminRBAC);
+  return getHighestPermissionSubscription(validSubscriptions);
 };
 
 export const cloudProviderToPlatformMap: Record<string, string> = {
@@ -351,8 +348,7 @@ export const getInitialValues = (
   serviceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   serviceOfferings: ServiceOffering[],
   instances: ResourceInstance[],
-  versionSets?: TierVersionSet[],
-  consumptionSubscriptionAdminRBAC = false
+  versionSets?: TierVersionSet[]
 ) => {
   if (instance) {
     const subscription = subscriptions.find((sub) => sub.id === instance?.subscriptionId);
@@ -395,9 +391,7 @@ export const getInitialValues = (
   }
 
   const filteredSubscriptions = subscriptions.filter(
-    (sub) =>
-      serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] &&
-      isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+    (sub) => serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] && isSubscriptionWriteRole(sub.roleType)
   );
 
   const sortedSubscriptionsByName = filteredSubscriptions.sort((a, b) => a.serviceName.localeCompare(b.serviceName));
@@ -409,8 +403,7 @@ export const getInitialValues = (
     subscriptions,
     instances,
     undefined,
-    undefined,
-    consumptionSubscriptionAdminRBAC
+    undefined
   );
 
   const serviceId =

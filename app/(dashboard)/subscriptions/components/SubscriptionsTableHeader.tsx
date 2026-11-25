@@ -4,10 +4,9 @@ import ColumnPreferenceButton, {
   ColumnPreferenceButtonProps,
 } from "src/components/ColumnPreference/ColumnPreferenceButton";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { SetState } from "src/types/common/reactGenerics";
 import { Subscription } from "src/types/subscription";
-import { isManageableSubscriptionRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { isManageableSubscriptionRole } from "src/utils/subscriptionRBAC";
 import Button from "components/Button/Button";
 import DataGridHeaderTitle from "components/Headers/DataGridHeaderTitle";
 
@@ -44,8 +43,6 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
   selectedSubscription,
   columnPreference,
 }) => {
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
-
   return (
     <>
       <div className="py-5 px-6 flex items-center justify-between gap-8 border-b border-[#EAECF0]">
@@ -70,18 +67,15 @@ const SubscriptionsTableHeader: FC<SubscriptionsTableHeaderProps> = ({
               selectedSubscription?.defaultSubscription || // Cannot Unsubscribe From Default Subscription
               isUnsubscribing ||
               isFetchingSubscriptions ||
-              !isManageableSubscriptionRole(selectedSubscription?.roleType, consumptionSubscriptionAdminRBAC)
+              !isManageableSubscriptionRole(selectedSubscription?.roleType)
             }
             disabledMessage={
               selectedRows.length !== 1
                 ? "Please select a subscription to unsubscribe"
                 : selectedSubscription?.defaultSubscription
                   ? "Cannot unsubscribe from Default subscription"
-                  : selectedSubscription &&
-                      !isManageableSubscriptionRole(selectedSubscription?.roleType, consumptionSubscriptionAdminRBAC)
-                    ? consumptionSubscriptionAdminRBAC
-                      ? "Cannot unsubscribe without Root or Admin access"
-                      : "Cannot unsubscribe without Root access"
+                  : selectedSubscription && !isManageableSubscriptionRole(selectedSubscription?.roleType)
+                    ? "Cannot unsubscribe without Root or Admin access"
                     : ""
             }
           >

@@ -7,7 +7,7 @@ import {
   getHighestPermissionSubscription,
   isManageableSubscriptionRole,
   isSubscriptionWriteRole,
-} from "src/utils/consumptionSubscriptionAdminRBAC";
+} from "src/utils/subscriptionRBAC";
 import { getResultParams, isPrivateLinkEnabled } from "src/utils/instance";
 
 export type CloudAccountFormValues = {
@@ -64,8 +64,7 @@ export const getValidSubscriptionForInstanceCreation = (
   subscriptions: Subscription[],
   instances: ResourceInstance[],
   serviceId?: string,
-  servicePlanId?: string,
-  consumptionSubscriptionAdminRBAC = false
+  servicePlanId?: string
 ): Subscription | undefined => {
   // Build subscription instance count hash
   const subscriptionInstancesNumHash: Record<string, number> = {};
@@ -76,9 +75,7 @@ export const getValidSubscriptionForInstanceCreation = (
 
   // Filter subscriptions to write-capable roles and valid service offerings
   let filteredSubscriptions = subscriptions.filter(
-    (sub) =>
-      serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] &&
-      isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+    (sub) => serviceOfferingsObj[sub.serviceId]?.[sub.productTierId] && isSubscriptionWriteRole(sub.roleType)
   );
 
   // Filter by serviceID if provided
@@ -116,7 +113,7 @@ export const getValidSubscriptionForInstanceCreation = (
 
   const validSubscriptions = sortedSubscriptions.filter((sub) => isSubscriptionValid(sub, true));
 
-  return getHighestPermissionSubscription(validSubscriptions, consumptionSubscriptionAdminRBAC);
+  return getHighestPermissionSubscription(validSubscriptions);
 };
 
 export const getInitialValues = (
@@ -129,8 +126,7 @@ export const getInitialValues = (
   byoaSubscriptions: Subscription[],
   byoaServiceOfferingsObj: Record<string, Record<string, ServiceOffering>>,
   byoaServiceOfferings: ServiceOffering[],
-  instances: ResourceInstance[],
-  consumptionSubscriptionAdminRBAC = false
+  instances: ResourceInstance[]
 ): CloudAccountFormValues => {
   if (selectedInstance) {
     const subscription = byoaSubscriptions.find((sub) => sub.id === selectedInstance.subscriptionId);
@@ -174,7 +170,7 @@ export const getInitialValues = (
         sub.serviceId === initialFormValues?.serviceId &&
         sub.productTierId === initialFormValues?.servicePlanId &&
         sub.id === initialFormValues?.subscriptionId &&
-        isManageableSubscriptionRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+        isManageableSubscriptionRole(sub.roleType)
     )
   );
 
@@ -210,8 +206,7 @@ export const getInitialValues = (
     byoaSubscriptions,
     instances,
     "",
-    "",
-    consumptionSubscriptionAdminRBAC
+    ""
   );
 
   const serviceId =

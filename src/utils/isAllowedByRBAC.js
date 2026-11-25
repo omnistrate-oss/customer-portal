@@ -35,9 +35,7 @@ const viewEnum = {
   Access_Resources: "Access_Resources",
 };
 
-function isOperationAllowedByRBAC(operation, role, view, options = {}) {
-  const isConsumptionSubscriptionAdminRBACEnabled = Boolean(options.consumptionSubscriptionAdminRBAC);
-
+function isOperationAllowedByRBAC(operation, role, view) {
   switch (true) {
     // Admin - BillingPricing
     case operation === operationEnum.Read && role === roleEnum.Admin && view === viewEnum.BillingPricing:
@@ -128,15 +126,9 @@ function isOperationAllowedByRBAC(operation, role, view, options = {}) {
     // Access_AccessControl -  Admin
     case operation === operationEnum.List && role === roleEnum.Admin && view === viewEnum.Access_AccessControl:
       return true;
-    case isConsumptionSubscriptionAdminRBACEnabled &&
-      operation === operationEnum.Invite &&
-      role === roleEnum.Admin &&
-      view === viewEnum.Access_AccessControl:
+    case operation === operationEnum.Invite && role === roleEnum.Admin && view === viewEnum.Access_AccessControl:
       return true;
-    case isConsumptionSubscriptionAdminRBACEnabled &&
-      operation === operationEnum.UnInvite &&
-      role === roleEnum.Admin &&
-      view === viewEnum.Access_AccessControl:
+    case operation === operationEnum.UnInvite && role === roleEnum.Admin && view === viewEnum.Access_AccessControl:
       return true;
 
     // Access_Resources - Root

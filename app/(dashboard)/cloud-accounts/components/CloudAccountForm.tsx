@@ -17,7 +17,6 @@ import { getResourceInstanceDetails } from "src/api/resourceInstance";
 import Switch from "src/components/Switch/Switch";
 import { CLOUD_PROVIDERS, cloudProviderLongLogoMap } from "src/constants/cloudProviders";
 import useEnvironmentType from "src/hooks/useEnvironmentType";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import useSnackbar from "src/hooks/useSnackbar";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import { selectUserrootData } from "src/slices/userDataSlice";
@@ -57,7 +56,6 @@ const CloudAccountForm = ({
     subscriptionsObj,
     isSubscriptionsPending,
   } = useGlobalData();
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   const allInstances: ResourceInstance[] = instances;
   //subscriptionID -> key, number of instances -> value
@@ -229,8 +227,7 @@ const CloudAccountForm = ({
       byoaSubscriptions,
       byoaServiceOfferingsObj,
       byoaServiceOfferings,
-      allInstances,
-      consumptionSubscriptionAdminRBAC
+      allInstances
     ),
     enableReinitialize: true,
     validationSchema: CloudAccountValidationSchema,
@@ -354,8 +351,7 @@ const CloudAccountForm = ({
                   byoaSubscriptions,
                   allInstances,
                   serviceId,
-                  undefined,
-                  consumptionSubscriptionAdminRBAC
+                  undefined
                 );
 
                 const servicePlanId = subscription?.productTierId || "";
@@ -406,8 +402,7 @@ const CloudAccountForm = ({
                       byoaSubscriptions,
                       allInstances,
                       serviceId,
-                      servicePlanId,
-                      consumptionSubscriptionAdminRBAC
+                      servicePlanId
                     );
 
                     setFieldValue("subscriptionId", subscriptionId || subscription?.id || "");
@@ -606,7 +601,7 @@ const CloudAccountForm = ({
         },
       ],
     };
-  }, [consumptionSubscriptionAdminRBAC, formMode, subscriptions, byoaServiceOfferings, values]);
+  }, [formMode, subscriptions, byoaServiceOfferings, values]);
 
   if (isFetchingServiceOfferings) {
     return <LoadingSpinner />;

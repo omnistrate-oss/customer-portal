@@ -7,12 +7,11 @@ import ColumnPreferenceButton, {
 } from "src/components/ColumnPreference/ColumnPreferenceButton";
 import DataGridHeaderTitle from "src/components/Headers/DataGridHeaderTitle";
 import RefreshWithToolTip from "src/components/RefreshWithTooltip/RefreshWithToolTip";
-import useFeatureFlags from "src/hooks/useFeatureFlags";
 import { selectUserrootData } from "src/slices/userDataSlice";
 import { SetState } from "src/types/common/reactGenerics";
 import { CustomNetwork } from "src/types/customNetwork";
 import { Subscription } from "src/types/subscription";
-import { isSubscriptionWriteRole } from "src/utils/consumptionSubscriptionAdminRBAC";
+import { isSubscriptionWriteRole } from "src/utils/subscriptionRBAC";
 
 import CustomNetworksFilters from "./CustomNetworksFilters";
 
@@ -48,7 +47,6 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
   columnPreference,
 }) => {
   const currentUser = useSelector(selectUserrootData);
-  const { consumptionSubscriptionAdminRBAC } = useFeatureFlags();
 
   /**
    * Determines whether the currently selected network's actions should be blocked
@@ -74,12 +72,11 @@ const CustomNetworksTableHeader: FC<CustomNetworksTableHeaderProps> = ({
 
     // Check if the user has write access on any subscription belonging to the network owner's org
     const hasAccess = subscriptions.some(
-      (sub) =>
-        sub.rootUserId === networkOwnerId && isSubscriptionWriteRole(sub.roleType, consumptionSubscriptionAdminRBAC)
+      (sub) => sub.rootUserId === networkOwnerId && isSubscriptionWriteRole(sub.roleType)
     );
 
     return !hasAccess;
-  }, [consumptionSubscriptionAdminRBAC, selectedRows, customNetworks, currentUser?.id, subscriptions]);
+  }, [selectedRows, customNetworks, currentUser?.id, subscriptions]);
 
   const getModifyDeleteDisabledMessage = () => {
     if (selectedRows.length !== 1) return "Please select a customer network";
