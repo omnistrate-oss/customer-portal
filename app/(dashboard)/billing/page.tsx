@@ -210,11 +210,16 @@ const BillingPage = () => {
                           {isStripe ? `$${invoicesTotalAmount}` : isMarketplace ? "Unavailable in this portal" : "NA"}
                         </Text>
                         {!!customerPortal && (
-                          <Link href={customerPortal.url} target="_blank" rel="noopener noreferrer">
-                            <Button variant="outlined" endIcon={<ExternalArrowIcon color="currentColor" />}>
-                              {customerPortal.label}
-                            </Button>
-                          </Link>
+                          <Button
+                            component="a"
+                            href={customerPortal.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="outlined"
+                            endIcon={<ExternalArrowIcon color="currentColor" />}
+                          >
+                            {customerPortal.label}
+                          </Button>
                         )}
                         {!isMarketplace &&
                           (payNowLink ? (
