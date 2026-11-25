@@ -20,6 +20,7 @@ test.use({ harMode: "off" });
 test.describe.configure({ mode: "serial" });
 let mixed = false;
 let legacyOnly = false;
+let customPaymentPortalEnabled = false;
 let invoiceRequests = 0;
 let invoiceRequestProviders: Array<string | undefined> = [];
 let stripeRequests = 0;
@@ -57,6 +58,7 @@ const createResourceInstance = (id: string, subscriptionId: string): ResourceIns
 test.beforeEach(async ({ page }) => {
   mixed = false;
   legacyOnly = false;
+  customPaymentPortalEnabled = false;
   invoiceRequests = 0;
   invoiceRequestProviders = [];
   stripeRequests = 0;
@@ -68,7 +70,7 @@ test.beforeEach(async ({ page }) => {
     if (endpoint.endsWith("/billing-details"))
       body = {
         paymentConfigured: false,
-        customPaymentPortalEnabled: false,
+        customPaymentPortalEnabled,
         billingProviders: (legacyOnly
           ? ["MARKETPLACE"]
           : mixed
@@ -209,6 +211,7 @@ test("marketplace payments stay external and do not require a Stripe payment met
 
 test("mixed billing isolates Stripe invoices and warns only for the unpaid subscription", async ({ page }) => {
   mixed = true;
+  customPaymentPortalEnabled = true;
   await page.goto("/billing");
   await expect(page.getByText("$45", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Pay outstanding balance", exact: true })).toHaveAttribute(
@@ -222,10 +225,14 @@ test("mixed billing isolates Stripe invoices and warns only for the unpaid subsc
   const count = invoiceRequests;
   expect(count).toBeGreaterThan(0);
   expect(invoiceRequestProviders.every((provider) => provider === "STRIPE")).toBe(true);
+  await expect(page.getByText("Add a payment method to pay invoices and outstanding balances.")).toBeVisible();
+  expect(stripeRequests).toBeGreaterThan(0);
+  const billingStripeRequestCount = stripeRequests;
   await page.getByRole("tab", { name: "AWS Marketplace", exact: true }).click();
   await expect(page.getByText("Unavailable in this portal", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Pay outstanding balance" })).toHaveCount(0);
   expect(invoiceRequests).toBe(count);
+  expect(stripeRequests).toBe(billingStripeRequestCount);
   await page.getByRole("tab", { name: "External Billing", exact: true }).click();
   await expect(page.getByRole("link", { name: "Pay outstanding balance", exact: true })).toHaveAttribute(
     "href",
@@ -233,6 +240,15 @@ test("mixed billing isolates Stripe invoices and warns only for the unpaid subsc
   );
   await expect(page.getByRole("link", { name: /Open (AWS|Google Cloud|Azure) billing/ })).toHaveCount(0);
   expect(invoiceRequests).toBe(count);
+  expect(stripeRequests).toBe(billingStripeRequestCount);
+
+  await page.goto("/payment-methods");
+  await expect(page.getByText("No payment methods configured.", { exact: true })).toBeVisible();
+  await expect.poll(() => stripeRequests).toBeGreaterThan(billingStripeRequestCount);
+  const paymentSettingsStripeRequestCount = stripeRequests;
+  await page.getByRole("tab", { name: "AWS Marketplace", exact: true }).click();
+  await expect(page.getByText("AWS Marketplace manages payment configuration for this account")).toBeVisible();
+  expect(stripeRequests).toBe(paymentSettingsStripeRequestCount);
 });
 
 test("legacy-only customers retain marketplace billing and payment settings", async ({ page }) => {
