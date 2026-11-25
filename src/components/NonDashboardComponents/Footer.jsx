@@ -7,19 +7,28 @@ import { getPolicyLink } from "src/utils/getPolicyLink";
 import { getPrivacyPolicyRoute, getTermsOfUseRoute } from "src/utils/routes";
 
 const Footer = (props) => {
-  const { nonFloatingBottomPosition = false } = props;
+  // floatOnlyFromMd: static below the md breakpoint so the footer sits under the content on small screens
+  const { nonFloatingBottomPosition = false, floatOnlyFromMd = false } = props;
   const { setIsConsentModalOpen } = useCookieConsentContext();
   const { orgName, orgTermsOfUse, orgPrivacyPolicy } = useProviderOrgDetails();
+
+  const floatingPosition = floatOnlyFromMd ? { xs: "static", md: "absolute" } : "absolute";
+
   return (
     <Box
-      position={nonFloatingBottomPosition ? "static" : "absolute"}
+      position={nonFloatingBottomPosition ? "static" : floatingPosition}
       bottom="14px"
       left="0"
       right="0"
       display="flex"
+      flexWrap="wrap"
       justifyContent="center"
-      gap="10px"
-      padding={nonFloatingBottomPosition ? "20px" : "0px"}
+      alignItems="center"
+      textAlign="center"
+      columnGap="10px"
+      rowGap="4px"
+      mt={floatOnlyFromMd && !nonFloatingBottomPosition ? { xs: "32px", md: 0 } : 0}
+      padding={nonFloatingBottomPosition ? "20px" : "0px 16px"}
     >
       <Typography fontWeight="500" fontSize="14px" lineHeight="22px" color="#A0AEC0">
         © {new Date().getFullYear()} {orgName}{" "}
