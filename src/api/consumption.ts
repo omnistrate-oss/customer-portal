@@ -4,7 +4,6 @@ import axios from "src/axios";
 import {
   ConsumptionStripeConfigResponse,
   CreateConsumptionSetupIntentSuccessResponse,
-  DescribeConsumptionBillingDetailsSuccessResponse,
   DescribeConsumptionBillingStatusResponse,
   GetConsumptionUsagePerDaySuccessResponse,
   GetCurrentConsumptionUsageSuccessResponse,
@@ -40,20 +39,6 @@ export const getConsumptionUsagePerDay = (
 
 export const getConsumptionBillingStatus = (): Promise<AxiosResponse<DescribeConsumptionBillingStatusResponse>> => {
   return axios.get("/resource-instance/billing-status", {
-    ignoreGlobalErrorSnack: true,
-  });
-};
-
-export type GetBillingDetailsQueryParams = {
-  returnUrl: string;
-  supportsCustomPaymentPortal?: boolean;
-};
-
-export const getBillingDetails = (
-  queryParams: GetBillingDetailsQueryParams
-): Promise<AxiosResponse<DescribeConsumptionBillingDetailsSuccessResponse>> => {
-  return axios.get("/resource-instance/billing-details", {
-    params: queryParams,
     ignoreGlobalErrorSnack: true,
   });
 };
