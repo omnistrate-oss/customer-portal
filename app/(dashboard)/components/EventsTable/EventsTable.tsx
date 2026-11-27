@@ -14,6 +14,7 @@ import MessageInput from "src/components/MessageInput/MessageInput";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import type { Category } from "src/constants/statusChipStyles";
+import { auditLogsTestIds } from "src/constants/testIds/audit-logs";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import type { AuditEvent, JITAuditAction } from "src/types/auditEvent";
 import type { EventType } from "src/types/event";
@@ -164,7 +165,11 @@ const EventsTable = ({
         cell: (data) => {
           const jitEvent = normalizeJITAuditEvent(data.row.original);
           return jitEvent?.action ? (
-            <StatusChip label={jitEvent.action} category={actionCategories[jitEvent.action]} />
+            <StatusChip
+              data-testid={auditLogsTestIds.actionChip(jitEvent.action)}
+              label={jitEvent.action}
+              category={actionCategories[jitEvent.action]}
+            />
           ) : (
             EMPTY_VALUE
           );
