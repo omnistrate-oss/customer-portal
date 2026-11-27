@@ -47,7 +47,7 @@ const EventsTableHeader: React.FC<EventsTableHeaderProps> = ({
         <AuditLogsEventFilterDropdown
           selectedEventTypes={selectedEventTypes}
           setSelectedEventTypes={setSelectedEventTypes}
-          filterEventTypes={["Customer", "Infra", "Maintenance"]}
+          filterEventTypes={["Customer", "Infra", "Maintenance", "Operations"]}
         />
 
         <ServiceFilter

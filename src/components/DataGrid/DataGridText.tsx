@@ -22,6 +22,8 @@ const colorMap = {
 
 type DataGridTextProps = {
   children?: string;
+  copyAriaLabel?: string;
+  copyText?: string;
   showCopyButton?: boolean;
   linkProps?: LinkProps;
   onClick?: () => void;
@@ -32,6 +34,8 @@ type DataGridTextProps = {
 
 const DataGridText: FC<DataGridTextProps> = ({
   children = "",
+  copyAriaLabel = "Copy value",
+  copyText,
   showCopyButton,
   linkProps,
   onClick,
@@ -44,11 +48,11 @@ const DataGridText: FC<DataGridTextProps> = ({
 
   const onCopyIconClick = useCallback(() => {
     clipboard
-      .write(children)
+      .write(copyText ?? children)
       .then(() => setTooltipText("Copied"))
       .catch(() => setTooltipText("Unable to copy to clipboard"))
       .finally(() => setTimeout(() => setTooltipText("Click to copy"), 1500)); // Reset the tooltip text after copying
-  }, [children]);
+  }, [children, copyText]);
 
   const textStyles = {
     fontSize: "14px",
@@ -92,7 +96,7 @@ const DataGridText: FC<DataGridTextProps> = ({
       <Content />
       {children && showCopyButton && (
         <Tooltip title={tooltipText}>
-          <IconButton onClick={onCopyIconClick}>
+          <IconButton aria-label={copyAriaLabel} onClick={onCopyIconClick}>
             <DataGridCopyIcon />
           </IconButton>
         </Tooltip>

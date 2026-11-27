@@ -7,17 +7,30 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useTableColumnPreference } from "src/components/ColumnPreference/useColumnPreference";
 import DataGridText from "src/components/DataGrid/DataGridText";
 import CursorPaginatedDataTable from "src/components/DataTable/CursorPaginatedDataTable";
+import AuditLogEventDetailsView from "src/components/EventsTable/AuditLogEventDetailsView";
 import EventDetailsView from "src/components/EventsTable/EventDetailsView";
 import EventTypeChip from "src/components/EventsTable/EventTypeChip";
 import MessageInput from "src/components/MessageInput/MessageInput";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
+import StatusChip from "src/components/StatusChip/StatusChip";
+import type { Category } from "src/constants/statusChipStyles";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
-import { AuditEvent } from "src/types/auditEvent";
-import { EventType } from "src/types/event";
+import type { AuditEvent, JITAuditAction } from "src/types/auditEvent";
+import type { EventType } from "src/types/event";
+import { normalizeJITAuditEvent } from "src/utils/auditEvent";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getAccessControlRoute } from "src/utils/route/access/accessRoute";
 
 const columnHelper = createColumnHelper<AuditEvent>();
+const EMPTY_VALUE = "-";
+
+const actionCategories: Record<JITAuditAction, Category> = {
+  Requested: "inProgress",
+  Approved: "success",
+  Denied: "failed",
+  Revoked: "info",
+  Expired: "unknown",
+};
 
 export type ColumnType =
   | "expand"
@@ -26,10 +39,16 @@ export type ColumnType =
   | "resourceType"
   | "time"
   | "type"
+  | "action"
+  | "auditProduct"
+  | "auditPlan"
+  | "auditId"
+  | "auditMessage"
   | "message"
   | "user"
   | "subscriptionPlan"
-  | "subscriptionOwner";
+  | "subscriptionOwner"
+  | "userAgent";
 
 const EventsTable = ({
   tableId,
@@ -48,8 +67,10 @@ const EventsTable = ({
   noRowsText,
   isFilterApplied,
   entityName,
+  presentation = "default",
 }: any) => {
   const { subscriptionsObj } = useGlobalData();
+  const isAuditLogsPresentation = presentation === "auditLogs";
 
   const columnsConfig: Record<ColumnType, any> = useMemo(
     () => ({
@@ -60,7 +81,7 @@ const EventsTable = ({
           const isRowExpandible = data.row.getCanExpand();
           return isRowExpandible ? (
             <IconButton
-              aria-label="expand row"
+              aria-label={`${data.row.getIsExpanded() ? "Collapse" : "Expand"} audit event ${data.row.original.id}`}
               size="small"
               onClick={data.row.getToggleExpandedHandler()}
               disabled={!isRowExpandible}
@@ -137,6 +158,92 @@ const EventsTable = ({
         },
         enableSorting: false,
       }),
+      action: columnHelper.display({
+        id: "action",
+        header: "Action",
+        cell: (data) => {
+          const jitEvent = normalizeJITAuditEvent(data.row.original);
+          return jitEvent?.action ? (
+            <StatusChip label={jitEvent.action} category={actionCategories[jitEvent.action]} />
+          ) : (
+            EMPTY_VALUE
+          );
+        },
+        meta: {
+          minWidth: 120,
+        },
+        enableSorting: false,
+      }),
+      auditProduct: columnHelper.display({
+        id: "serviceName",
+        header: "Product",
+        cell: (data) => {
+          if (normalizeJITAuditEvent(data.row.original)) return EMPTY_VALUE;
+
+          const { serviceLogoURL, serviceName } = subscriptionsObj[data.row.original.subscriptionId] || {};
+          if (!serviceName) return "-";
+
+          return <ServiceNameWithLogo serviceName={serviceName} serviceLogoURL={serviceLogoURL} />;
+        },
+        meta: {
+          minWidth: 180,
+        },
+        enableSorting: false,
+      }),
+      auditPlan: columnHelper.display({
+        id: "servicePlanName",
+        header: "Plan",
+        cell: (data) => {
+          if (normalizeJITAuditEvent(data.row.original)) return EMPTY_VALUE;
+          return subscriptionsObj[data.row.original.subscriptionId]?.productTierName || "-";
+        },
+        meta: {
+          minWidth: 140,
+        },
+        enableSorting: false,
+      }),
+      auditId: columnHelper.display({
+        id: "auditEventResourceId",
+        header: "ID",
+        cell: (data) => {
+          const event = data.row.original;
+          const jitEvent = normalizeJITAuditEvent(event);
+          const rawId = jitEvent ? event.cloudProviderAccountId : event.resourceInstanceId;
+          const displayId = jitEvent && rawId ? `account-${rawId}` : rawId || EMPTY_VALUE;
+
+          return (
+            <DataGridText
+              copyAriaLabel={jitEvent ? "Copy account ID" : "Copy instance ID"}
+              copyText={rawId}
+              showCopyButton={Boolean(rawId)}
+            >
+              {displayId}
+            </DataGridText>
+          );
+        },
+        meta: {
+          minWidth: 200,
+        },
+        enableSorting: false,
+      }),
+      auditMessage: columnHelper.accessor("message", {
+        id: "auditMessage",
+        header: "Message",
+        cell: (data) => {
+          const message = data.row.original.message;
+
+          return (
+            <DataGridText copyAriaLabel="Copy message" showCopyButton={Boolean(message)}>
+              {message || EMPTY_VALUE}
+            </DataGridText>
+          );
+        },
+        meta: {
+          flex: 2,
+          minWidth: 300,
+        },
+        enableSorting: false,
+      }),
       message: columnHelper.accessor("message", {
         id: "message",
         header: "Message",
@@ -153,15 +260,20 @@ const EventsTable = ({
         id: "userName",
         header: "User",
         cell: (data) => {
-          const userId = data.row.original.userId;
-          const userName = data.row.original.userName;
-          const orgName = data.row.original.orgName;
+          const event = data.row.original;
+          const userId = event.userId;
+          const userName = event.userName;
+          const orgName = event.orgName;
+
+          if (normalizeJITAuditEvent(event)) {
+            return <DataGridText>{userName === "System" ? "System" : userId || EMPTY_VALUE}</DataGridText>;
+          }
 
           const isUserOmnistrateSystem = userName === "System" && orgName === "System";
 
           // Special Case for Disabling the Link
           // When the Logged in User Doesn't Have "root" Role for a Subscription, They Don't Have Read Access for Access Control Page.
-          const subscription = subscriptionsObj[data.row.original.subscriptionId];
+          const subscription = subscriptionsObj[event.subscriptionId];
 
           let pageLink = "",
             props = {};
@@ -192,6 +304,7 @@ const EventsTable = ({
       ),
       subscriptionOwner: columnHelper.accessor(
         (row) => {
+          if (normalizeJITAuditEvent(row)) return EMPTY_VALUE;
           return subscriptionsObj[row.subscriptionId]?.subscriptionOwnerName || "-";
         },
         {
@@ -223,7 +336,7 @@ const EventsTable = ({
   } = useTableColumnPreference<AuditEvent>({
     tableId,
     columns: selectedColumns,
-    clickableColumnIds: ["userName"],
+    clickableColumnIds: isAuditLogsPresentation ? ["auditEventResourceId", "userName"] : ["userName"],
   });
 
   return (
@@ -233,11 +346,11 @@ const EventsTable = ({
       columns={preferredColumns}
       columnVisibility={columnVisibility}
       data={data}
-      renderDetailsComponent={EventDetailsView}
+      renderDetailsComponent={isAuditLogsPresentation ? AuditLogEventDetailsView : EventDetailsView}
       noRowsText={noRowsText || "No events"}
       isFilterApplied={isFilterApplied}
       entityName={entityName}
-      getRowCanExpand={(rowData) => Number(rowData.original.workflowFailures?.length) > 0}
+      getRowCanExpand={(rowData) => isAuditLogsPresentation || Number(rowData.original.workflowFailures?.length) > 0}
       HeaderComponent={HeaderComponent}
       headerProps={{ ...HeaderProps, columnPreference }}
       isLoading={isLoading}
