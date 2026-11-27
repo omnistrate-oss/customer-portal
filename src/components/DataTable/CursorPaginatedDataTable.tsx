@@ -61,6 +61,7 @@ type CursorPaginatedDataTableProps<TData> = {
   isFetchingNextPage?: boolean;
   pageSize?: number;
   rowId?: keyof TData;
+  getRowTestId?: (rowData: TData) => string;
   showPagination?: boolean;
   minHeight?: string | number;
   tableStyles?: SxProps;
@@ -90,6 +91,7 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
     isFetchingNextPage,
     pageSize = 10,
     rowId = "id" as keyof TData,
+    getRowTestId,
     showPagination = true,
     minHeight,
     tableStyles = {},
@@ -255,7 +257,7 @@ const CursorPaginatedDataTable = <TData,>(props: CursorPaginatedDataTableProps<T
               {!isLoading &&
                 rowData.map((row) => (
                   <React.Fragment key={row.id}>
-                    <TableRow>
+                    <TableRow data-testid={getRowTestId?.(row.original)}>
                       {row.getVisibleCells().map((cell) => {
                         const cellValue: any = cell.getValue();
                         const columnAlignment = cell.column.columnDef.meta?.align || "left";

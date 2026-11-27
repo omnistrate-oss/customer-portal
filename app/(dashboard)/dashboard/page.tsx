@@ -39,19 +39,18 @@ const DashboardPage = () => {
       <div className="mt-8">
         <EventsTable
           tableId={COLUMN_PREFERENCE_TABLE_IDS.dashboardAuditLogs}
+          presentation="auditLogs"
           HeaderComponent={DashboardLogsTableHeader}
           HeaderProps={{}}
           columns={[
             "expand",
-            "deploymentId",
-            "serviceName",
-            "resourceType",
             "time",
-            "message",
+            "auditProduct",
+            "auditPlan",
+            "auditId",
+            "auditMessage",
             "user",
-            "subscriptionPlan",
             "subscriptionOwner",
-            "userAgent",
           ]}
           data={dashboardLogs}
           fetchNextPage={() => {}}

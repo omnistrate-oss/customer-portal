@@ -1,13 +1,13 @@
-import { EventType } from "src/types/event";
+import type { EventType } from "src/types/event";
 
-import { ColorObject } from "./index";
+import { chipCategoryColors, ColorObject } from "./index";
 
 const stylesMap: Record<EventType, ColorObject & { label: string }> = {
   Customer: {
     color: "#5925DC",
     backgroundColor: "#F4F3FF",
     borderColor: "#D9D6FE",
-    label: "Customer",
+    label: "User",
   },
   Infra: {
     color: "#C11574",
@@ -20,6 +20,10 @@ const stylesMap: Record<EventType, ColorObject & { label: string }> = {
     backgroundColor: "#F0F9FF",
     borderColor: "#B9E6FE",
     label: "Maintenance",
+  },
+  Operations: {
+    ...chipCategoryColors.inProgress,
+    label: "Operations",
   },
 };
 

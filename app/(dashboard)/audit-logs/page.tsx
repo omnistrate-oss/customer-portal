@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { COLUMN_PREFERENCE_TABLE_IDS } from "src/components/ColumnPreference/tableIds";
 import { DateRange } from "src/components/DateRangePicker/DateTimeRangePickerStatic";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
+import type { SetState } from "src/types/common/reactGenerics";
 import { EventType } from "src/types/event";
 import { initialRangeState } from "components/DateRangePicker/DateTimeRangePickerStatic";
 
@@ -22,6 +23,11 @@ const EventsPage = () => {
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [selectedEventTypes, setSelectedEventTypes] = useState<EventType[]>([]);
 
+  const handleSelectedEventTypesChange: SetState<EventType[]> = (value) => {
+    setPageIndex(0);
+    setSelectedEventTypes(value);
+  };
+
   const { serviceOfferings, isSubscriptionsPending } = useGlobalData();
 
   const {
@@ -34,7 +40,9 @@ const EventsPage = () => {
   } = useAuditLogs({
     startDate: selectedDateRange.startDate ?? undefined,
     endDate: selectedDateRange.endDate ?? undefined,
-    eventSourceTypes: selectedEventTypes?.length ? selectedEventTypes : ["Customer", "Infra", "Maintenance"],
+    eventSourceTypes: selectedEventTypes.length
+      ? selectedEventTypes
+      : ["Customer", "Infra", "Maintenance", "Operations"],
     serviceID: selectedServiceId,
   });
 
@@ -51,6 +59,7 @@ const EventsPage = () => {
       <div>
         <EventsTable
           tableId={COLUMN_PREFERENCE_TABLE_IDS.auditLogs}
+          presentation="auditLogs"
           HeaderComponent={EventsTableHeader}
           HeaderProps={{
             refetchAuditLogs: () => {
@@ -64,20 +73,19 @@ const EventsPage = () => {
             setSelectedServiceId,
             serviceOfferings,
             selectedEventTypes,
-            setSelectedEventTypes,
+            setSelectedEventTypes: handleSelectedEventTypesChange,
           }}
           columns={[
             "expand",
-            "deploymentId",
-            "serviceName",
-            "resourceType",
             "time",
             "type",
-            "message",
+            "action",
+            "auditProduct",
+            "auditPlan",
+            "auditId",
+            "auditMessage",
             "user",
-            "subscriptionPlan",
             "subscriptionOwner",
-            "userAgent",
           ]}
           data={auditLogs}
           fetchNextPage={fetchNextPage}

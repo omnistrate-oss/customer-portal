@@ -28,7 +28,7 @@ import {
 import getSafeExternalURL from "src/utils/getSafeExternalURL";
 
 const fields = ["connected", "debugAccessEnabled", "infrastructureMutationEnabled"] as const;
-type GovernanceValues = Required<AccountGovernanceControls>;
+type GovernanceValues = Required<Pick<AccountGovernanceControls, (typeof fields)[number]>>;
 type GovernanceControlsTabProps = {
   accountConfigId: string;
   instanceStatus?: string;

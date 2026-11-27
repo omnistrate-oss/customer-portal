@@ -1,4 +1,4 @@
-export type EventType = "Customer" | "Infra" | "Maintenance";
+export type EventType = "Customer" | "Infra" | "Maintenance" | "Operations";
 
 export type AccessEvent = {
   environmentId?: string;
