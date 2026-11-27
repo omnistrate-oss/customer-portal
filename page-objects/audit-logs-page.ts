@@ -1,5 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 
+import { auditLogsTestIds } from "src/constants/testIds/audit-logs";
+
 import { PageURLs } from "./pages";
 
 export class AuditLogsPage {
@@ -13,12 +15,14 @@ export class AuditLogsPage {
     await this.page.goto(PageURLs.auditLogs);
   }
 
-  rowWithMessage(message: string): Locator {
-    return this.page.getByRole("row").filter({ hasText: message });
+  row(eventId: string): Locator {
+    return this.page.getByTestId(auditLogsTestIds.row(eventId));
   }
 
   async expandEvent(id: string): Promise<Locator> {
-    await this.page.getByRole("button", { name: new RegExp(`Expand audit event ${id}`) }).click();
-    return this.page.getByRole("region", { name: new RegExp(`Audit event details for ${id}`) });
+    await this.row(id)
+      .getByRole("button", { name: `Expand audit event ${id}` })
+      .click();
+    return this.page.getByRole("region", { name: `Audit event details for ${id}` });
   }
 }

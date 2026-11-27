@@ -176,30 +176,35 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
     "User",
     "Subscription Owner",
   ]);
-  expect(auditQueryParams?.eventSourceTypes).toEqual(["Customer", "Infra", "Maintenance", "Operations"]);
+  await expect
+    .poll(() => auditQueryParams?.eventSourceTypes)
+    .toEqual(["Customer", "Infra", "Maintenance", "Operations"]);
 
-  const ordinaryRow = auditLogsPage.rowWithMessage(ordinaryEvent.message);
+  const ordinaryRow = auditLogsPage.row(ordinaryEvent.id);
+  await expect(ordinaryRow).toContainText(ordinaryEvent.message);
   await expect(ordinaryRow).toContainText("Example Product");
   await expect(ordinaryRow).toContainText("Example Plan");
   await expect(ordinaryRow).toContainText("instance-example");
   await expect(ordinaryRow).toContainText("Example Customer");
+  await expect(ordinaryRow.getByText(ordinaryEvent.message, { exact: true })).toHaveCSS("color", "rgb(180, 35, 24)");
   await ordinaryRow.getByRole("button", { name: "Copy message" }).click();
   await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(ordinaryEvent.message);
 
   for (const definition of jitFixtureDefinitions) {
-    const row = auditLogsPage.rowWithMessage(`${definition.action} just-in-time access`);
-    await expect(row).toContainText(definition.action);
+    const row = auditLogsPage.row(`event-jit-${definition.action.toLowerCase()}`);
+    await expect(row).toContainText(`${definition.action} just-in-time access`);
+    await expect(row.getByTestId(auditLogsTestIds.actionChip(definition.action))).toHaveText(definition.action);
     await expect(row).toContainText("account-123456789012");
     await expect(row).toContainText(definition.actor.kind === "system" ? "System" : definition.actor.userId);
   }
 
-  const expiredRow = auditLogsPage.rowWithMessage("Expired just-in-time access");
+  const expiredRow = auditLogsPage.row("event-jit-expired");
   await expect(expiredRow.getByTestId(auditLogsTestIds.actionChip("Expired"))).toHaveCSS(
     "background-color",
     "rgb(248, 249, 252)"
   );
 
-  const requestedRow = auditLogsPage.rowWithMessage("Requested just-in-time access");
+  const requestedRow = auditLogsPage.row("event-jit-requested");
   await expect(requestedRow.getByRole("link", { name: "user-provider-requester" })).toHaveCount(0);
   await requestedRow.getByRole("button", { name: "Copy account ID" }).click();
   await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe("123456789012");
@@ -220,7 +225,8 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
   const expiredDetails = await auditLogsPage.expandEvent("event-jit-expired");
   await expect(expiredDetails).toContainText("1 hour");
 
-  const unsupportedRow = auditLogsPage.rowWithMessage("Escalated just-in-time access");
+  const unsupportedRow = auditLogsPage.row("event-jit-unsupported");
+  await expect(unsupportedRow).toContainText("Escalated just-in-time access");
   await expect(unsupportedRow.getByText("-", { exact: true })).toHaveCount(4);
 
   const ordinaryDetails = await auditLogsPage.expandEvent("event-ordinary");
@@ -232,7 +238,8 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
 
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(page.getByText("Page 2", { exact: true })).toBeVisible();
-  await expect(auditLogsPage.rowWithMessage("Pagination event 4")).toBeVisible();
+  const paginationRow = auditLogsPage.row("event-pagination-4");
+  await expect(paginationRow).toContainText("Pagination event 4");
 
   await page.getByText("Filter by Type", { exact: true }).click();
   const operationsOption = page.getByRole("option", { name: /Operations/ });
@@ -255,10 +262,11 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
     "User",
     "Subscription Owner",
   ]);
-  expect(dashboardAuditQueryParams?.eventSourceTypes).toBe("Customer");
-  expect(dashboardAuditQueryParams?.pageSize).toBe(5);
+  await expect.poll(() => dashboardAuditQueryParams?.eventSourceTypes).toBe("Customer");
+  await expect.poll(() => dashboardAuditQueryParams?.pageSize).toBe(5);
 
-  const dashboardRow = auditLogsPage.rowWithMessage(dashboardEvent.message);
+  const dashboardRow = auditLogsPage.row(dashboardEvent.id);
+  await expect(dashboardRow).toContainText(dashboardEvent.message);
   await expect(dashboardRow).toContainText("Example Product");
   await expect(dashboardRow).toContainText("Example Plan");
   const dashboardDetails = await auditLogsPage.expandEvent(dashboardEvent.id);

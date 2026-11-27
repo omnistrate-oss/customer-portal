@@ -14,6 +14,7 @@ import MessageInput from "src/components/MessageInput/MessageInput";
 import ServiceNameWithLogo from "src/components/ServiceNameWithLogo/ServiceNameWithLogo";
 import StatusChip from "src/components/StatusChip/StatusChip";
 import type { Category } from "src/constants/statusChipStyles";
+import { getEventMessageStylesAndLabel } from "src/constants/statusChipStyles/eventMessage";
 import { auditLogsTestIds } from "src/constants/testIds/audit-logs";
 import { useGlobalData } from "src/providers/GlobalDataProvider";
 import type { AuditEvent, JITAuditAction } from "src/types/auditEvent";
@@ -200,7 +201,9 @@ const EventsTable = ({
         header: "Plan",
         cell: (data) => {
           if (normalizeJITAuditEvent(data.row.original)) return EMPTY_VALUE;
-          return subscriptionsObj[data.row.original.subscriptionId]?.productTierName || "-";
+
+          const planName = subscriptionsObj[data.row.original.subscriptionId]?.productTierName || EMPTY_VALUE;
+          return <DataGridText>{planName}</DataGridText>;
         },
         meta: {
           minWidth: 140,
@@ -235,10 +238,14 @@ const EventsTable = ({
         id: "auditMessage",
         header: "Message",
         cell: (data) => {
-          const message = data.row.original.message;
+          const event = data.row.original;
+          const message = event.message;
+          const messageStyle = normalizeJITAuditEvent(event)
+            ? undefined
+            : { color: getEventMessageStylesAndLabel(message || "").color };
 
           return (
-            <DataGridText copyAriaLabel="Copy message" showCopyButton={Boolean(message)}>
+            <DataGridText copyAriaLabel="Copy message" showCopyButton={Boolean(message)} style={messageStyle}>
               {message || EMPTY_VALUE}
             </DataGridText>
           );
@@ -363,7 +370,8 @@ const EventsTable = ({
       fetchNextPage={fetchNextPage}
       isFetchingNextPage={isFetchingNextPage}
       pageSize={10}
-      rowId="id"
+      rowId={isAuditLogsPresentation ? "rowId" : "id"}
+      getRowTestId={isAuditLogsPresentation ? (event) => auditLogsTestIds.row(event.id) : undefined}
       showPagination={showPagination}
       minHeight={minHeight}
       tableStyles={{

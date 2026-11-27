@@ -55,16 +55,7 @@ const JITDetails: FC<{ jitEvent: JITAuditEvent }> = ({ jitEvent }) => {
 
   return (
     <Stack gap="2px">
-      <Box
-        display="grid"
-        columnGap="40px"
-        sx={{
-          gridTemplateColumns: {
-            xs: "minmax(0, 1fr)",
-            lg: hasLifecycleDetails ? "minmax(280px, 1fr) minmax(320px, 1fr)" : "minmax(0, 620px)",
-          },
-        }}
-      >
+      <Box display="grid" columnGap="40px" gridTemplateColumns="minmax(280px, 600px) minmax(320px, 600px)">
         <Stack gap="2px" minWidth={0}>
           <DetailRow copyable label="Full message" value={event.message} />
           <DetailRow label="Cloud Provider" value={formatAuditCloudProvider(event.cloudProvider)} />

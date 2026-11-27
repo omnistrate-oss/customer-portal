@@ -5,6 +5,8 @@ import { ApiFixture } from "test-fixtures/api-fixture";
 import { GlobalStateManager } from "test-utils/global-state-manager";
 import { UserAPIClient } from "test-utils/user-api-client";
 
+import { getEventTypeStylesAndLabel } from "src/constants/statusChipStyles/eventType";
+import type { EventType } from "src/types/event";
 import { ResourceInstance } from "src/types/resourceInstance";
 import formatDateUTC from "src/utils/formatDateUTC";
 import { getResultParams } from "src/utils/instance";
@@ -272,7 +274,7 @@ export const TestEventsTab = async (instanceDetailsPage: InstanceDetailsPage, in
     const row = page.getByTestId(event.id);
     await expect(row).toBeVisible();
 
-    await expect(row).toContainText(event.eventSource);
+    await expect(row).toContainText(getEventTypeStylesAndLabel(event.eventSource as EventType).label);
     await expect(row).toContainText(formatDateUTC(event.time));
   }
 };
