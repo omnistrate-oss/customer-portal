@@ -2,6 +2,7 @@ import { AuditLogsPage } from "page-objects/audit-logs-page";
 import { PageURLs } from "page-objects/pages";
 import { expect, test } from "test-fixtures/har-test";
 
+import { auditLogsTestIds } from "src/constants/testIds/audit-logs";
 import type { ListAllAuditEventsSuccessResponse } from "src/types/auditEvent";
 import type { ListAllResourceInstancesSuccessResponse } from "src/types/resourceInstance";
 import type { ListServiceOfferingSuccessResponse } from "src/types/serviceOffering";
@@ -37,6 +38,13 @@ const dashboardEvent = {
   message: "Updated a synthetic instance configuration",
   workflowFailures: [],
 } satisfies ListAllAuditEventsSuccessResponse["events"][number];
+
+const paginationEvents = Array.from({ length: 4 }, (_, index) => ({
+  ...ordinaryEvent,
+  id: `event-pagination-${index + 1}`,
+  message: `Pagination event ${index + 1}`,
+  workflowFailures: [],
+})) satisfies ListAllAuditEventsSuccessResponse["events"];
 
 const subscription: Subscription = {
   accountConfigIdentityId: "org-example",
@@ -106,7 +114,12 @@ const serviceOfferings = {
 test("renders ordinary and typed JIT audit events", async ({ page, context }) => {
   let auditQueryParams: Record<string, unknown> | undefined;
   let dashboardAuditQueryParams: Record<string, unknown> | undefined;
-  const events = [ordinaryEvent, ...jitFixtureDefinitions.map(createJITAuditEvent), createUnsupportedJITAuditEvent()];
+  const events = [
+    ordinaryEvent,
+    ...jitFixtureDefinitions.map(createJITAuditEvent),
+    createUnsupportedJITAuditEvent(),
+    ...paginationEvents,
+  ];
 
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.route("**/api/**", async (route) => {
@@ -181,7 +194,7 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
   }
 
   const expiredRow = auditLogsPage.rowWithMessage("Expired just-in-time access");
-  await expect(expiredRow.locator(".MuiChip-root").filter({ hasText: "Expired" })).toHaveCSS(
+  await expect(expiredRow.getByTestId(auditLogsTestIds.actionChip("Expired"))).toHaveCSS(
     "background-color",
     "rgb(248, 249, 252)"
   );
@@ -217,8 +230,18 @@ test("renders ordinary and typed JIT audit events", async ({ page, context }) =>
   await ordinaryDetails.getByRole("button", { name: "Click to copy" }).first().click();
   await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(ordinaryEvent.message);
 
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.getByText("Page 2", { exact: true })).toBeVisible();
+  await expect(auditLogsPage.rowWithMessage("Pagination event 4")).toBeVisible();
+
   await page.getByText("Filter by Type", { exact: true }).click();
-  await expect(page.getByRole("option", { name: /Operations/ })).toBeVisible();
+  const operationsOption = page.getByRole("option", { name: /Operations/ });
+  await expect(operationsOption).toBeVisible();
+  await operationsOption.click();
+  await page.keyboard.press("Escape");
+  await expect.poll(() => auditQueryParams?.eventSourceTypes).toEqual(["Operations"]);
+  await expect(page.getByText("Page 1", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /(Expand|Collapse) audit event event-ordinary/ })).toBeVisible();
 
   await page.goto(PageURLs.dashboard);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
